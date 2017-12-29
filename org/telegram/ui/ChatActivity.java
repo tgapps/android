@@ -2751,7 +2751,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                             this.wasTrackingVibrate = false;
                         } else if (!this.wasTrackingVibrate) {
                             try {
-                                ((Vibrator) ApplicationLoader.applicationContext.getSystemService("vibrator")).vibrate(20);
+                                ((Vibrator) ApplicationLoader.applicationContext.getSystemService("vibrator")).vibrate(10);
                             } catch (Exception e2) {
                             }
                             this.wasTrackingVibrate = true;
@@ -2788,13 +2788,15 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
 
             public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
                 super.requestDisallowInterceptTouchEvent(disallowIntercept);
-                this.endedTrackingX = this.slidingView.getTranslationX();
-                this.lastTrackingAnimationTime = System.currentTimeMillis();
-                this.trackAnimationProgress = 0.0f;
-                invalidate();
-                this.maybeStartTracking = false;
-                this.startedTracking = false;
-                ChatActivity.this.chatLayoutManager.setCanScrollVertically(true);
+                if (this.slidingView != null) {
+                    this.endedTrackingX = this.slidingView.getTranslationX();
+                    this.lastTrackingAnimationTime = System.currentTimeMillis();
+                    this.trackAnimationProgress = 0.0f;
+                    invalidate();
+                    this.maybeStartTracking = false;
+                    this.startedTracking = false;
+                    ChatActivity.this.chatLayoutManager.setCanScrollVertically(true);
+                }
             }
 
             protected void onChildPressed(View child, boolean pressed) {

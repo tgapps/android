@@ -9924,6 +9924,7 @@ public class ChatMessageCell extends BaseCell implements ImageReceiverDelegate, 
         int linkPreviewY;
         int x;
         int y;
+        float progress;
         int x1;
         int y1;
         RadialProgress radialProgress;
@@ -10272,7 +10273,6 @@ public class ChatMessageCell extends BaseCell implements ImageReceiverDelegate, 
             Theme.chat_photoStatesDrawables[drawable][this.buttonPressed].draw(canvas);
             if (this.currentMessageObject.messageOwner.destroyTime != 0) {
                 if (!this.currentMessageObject.isOutOwner()) {
-                    float progress;
                     progress = ((float) Math.max(0, (((long) this.currentMessageObject.messageOwner.destroyTime) * 1000) - (System.currentTimeMillis() + ((long) (ConnectionsManager.getInstance(this.currentAccount).getTimeDifference() * 1000))))) / (((float) this.currentMessageObject.messageOwner.ttl) * 1000.0f);
                     Theme.chat_deleteProgressPaint.setAlpha((int) (255.0f * this.controlsAlpha));
                     canvas.drawArc(this.deleteProgressRect, -90.0f, -360.0f * progress, true, Theme.chat_deleteProgressPaint);
