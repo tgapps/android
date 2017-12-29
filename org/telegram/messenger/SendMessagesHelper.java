@@ -898,7 +898,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                             request.messages.remove(index);
                             request.files.remove(index);
                         }
-                        MediaController.getInstance(this.currentAccount).cancelVideoConvert(object);
+                        MediaController.getInstance().cancelVideoConvert(object);
                         String keyToRemove = (String) message.extraHashMap.get(messageObject);
                         if (keyToRemove != null) {
                             keysToRemove.add(keyToRemove);
@@ -920,7 +920,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                 } else if (message.obj.getId() == object.getId()) {
                     messages.remove(a);
                     message.sendDelayedRequests();
-                    MediaController.getInstance(this.currentAccount).cancelVideoConvert(message.obj);
+                    MediaController.getInstance().cancelVideoConvert(message.obj);
                     if (messages.size() == 0) {
                         keysToRemove.add(entry.getKey());
                         if (message.sendEncryptedRequest != null) {
@@ -1706,8 +1706,8 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
 
     public void sendGame(InputPeer peer, TL_inputMediaGame game, long random_id, long taskId) {
         Throwable e;
+        long newTaskId;
         if (peer != null && game != null) {
-            long newTaskId;
             TL_messages_sendMedia request = new TL_messages_sendMedia();
             request.peer = peer;
             if (request.peer instanceof TL_inputPeerChannel) {
@@ -3157,7 +3157,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                 location = FileLoader.getDirectory(4) + "/" + document.id + ".mp4";
             }
             putToDelayedMessages(location, message);
-            MediaController.getInstance(this.currentAccount).scheduleVideoConvert(message.obj);
+            MediaController.getInstance().scheduleVideoConvert(message.obj);
         } else if (message.type == 2) {
             if (message.httpLocation != null) {
                 putToDelayedMessages(message.httpLocation, message);
@@ -3219,7 +3219,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                         if (message.location != null) {
                             message.extraHashMap.put(location + "_t", message.location);
                         }
-                        MediaController.getInstance(this.currentAccount).scheduleVideoConvert(messageObject);
+                        MediaController.getInstance().scheduleVideoConvert(messageObject);
                     } else {
                         document = messageObject.getDocument();
                         String documentLocation = messageObject.messageOwner.attachPath;
@@ -3426,7 +3426,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
             public void run() {
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     public void run() {
-                        NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).postNotificationName(NotificationCenter.stopEncodingService, path);
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopEncodingService, path, Integer.valueOf(SendMessagesHelper.this.currentAccount));
                     }
                 });
             }

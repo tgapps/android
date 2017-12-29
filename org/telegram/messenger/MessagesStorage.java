@@ -5143,7 +5143,7 @@ Error: java.util.NoSuchElementException
                     cursor.dispose();
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         public void run() {
-                            MediaController.getInstance(MessagesStorage.this.currentAccount).processDownloadObjects(type, objects);
+                            DownloadController.getInstance(MessagesStorage.this.currentAccount).processDownloadObjects(type, objects);
                         }
                     });
                 } catch (Throwable e) {
@@ -5563,7 +5563,7 @@ Error: java.util.NoSuchElementException
                 state5.step();
             }
             data.reuse();
-            if (downloadMask != 0 && ((message.to_id.channel_id == 0 || message.post) && message.date >= ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() - 3600 && MediaController.getInstance(this.currentAccount).canDownloadMedia(message) && ((message.media instanceof TL_messageMediaPhoto) || (message.media instanceof TL_messageMediaDocument)))) {
+            if (downloadMask != 0 && ((message.to_id.channel_id == 0 || message.post) && message.date >= ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() - 3600 && DownloadController.getInstance(this.currentAccount).canDownloadMedia(message) && ((message.media instanceof TL_messageMediaPhoto) || (message.media instanceof TL_messageMediaDocument)))) {
                 int type2 = 0;
                 long id = 0;
                 MessageMedia object = null;
@@ -5734,7 +5734,7 @@ Error: java.util.NoSuchElementException
             final int i = downloadMediaMask;
             AndroidUtilities.runOnUIThread(new Runnable() {
                 public void run() {
-                    MediaController.getInstance(MessagesStorage.this.currentAccount).newDownloadObjectsAvailable(i);
+                    DownloadController.getInstance(MessagesStorage.this.currentAccount).newDownloadObjectsAvailable(i);
                 }
             });
         }

@@ -40,6 +40,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.exoplayer2.util.MimeTypes;
@@ -91,11 +92,11 @@ public class NotificationsController {
     public static final String EXTRA_VOICE_REPLY = "extra_voice_reply";
     private static volatile NotificationsController[] Instance = new NotificationsController[3];
     public static final String OTHER_NOTIFICATIONS_CHANNEL = "Other3";
+    protected static AudioManager audioManager = ((AudioManager) ApplicationLoader.applicationContext.getSystemService(MimeTypes.BASE_TYPE_AUDIO));
     private static NotificationManagerCompat notificationManager;
     private static DispatchQueue notificationsQueue = new DispatchQueue("notificationsQueue");
     private static NotificationManager systemNotificationManager;
     private AlarmManager alarmManager;
-    protected AudioManager audioManager;
     private int currentAccount;
     private ArrayList<MessageObject> delayedPushMessages = new ArrayList();
     private boolean inChatSoundEnabled = true;
@@ -177,7 +178,7 @@ public class NotificationsController {
         notificationManager = NotificationManagerCompat.from(ApplicationLoader.applicationContext);
         systemNotificationManager = (NotificationManager) ApplicationLoader.applicationContext.getSystemService("notification");
         try {
-            this.audioManager = (AudioManager) ApplicationLoader.applicationContext.getSystemService(MimeTypes.BASE_TYPE_AUDIO);
+            audioManager = (AudioManager) ApplicationLoader.applicationContext.getSystemService(MimeTypes.BASE_TYPE_AUDIO);
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -236,6 +237,21 @@ public class NotificationsController {
                 Editor editor = MessagesController.getNotificationsSettings(NotificationsController.this.currentAccount).edit();
                 editor.clear();
                 editor.commit();
+                if (VERSION.SDK_INT >= 26) {
+                    try {
+                        String keyStart = NotificationsController.this.currentAccount + "channel";
+                        List<NotificationChannel> list = NotificationsController.systemNotificationManager.getNotificationChannels();
+                        int count = list.size();
+                        for (int a = 0; a < count; a++) {
+                            String id = ((NotificationChannel) list.get(a)).getId();
+                            if (id.startsWith(keyStart)) {
+                                NotificationsController.systemNotificationManager.deleteNotificationChannel(id);
+                            }
+                        }
+                    } catch (Throwable e2) {
+                        FileLog.e(e2);
+                    }
+                }
             }
         });
     }
@@ -314,7 +330,7 @@ public class NotificationsController {
                             }
                             if (vibrateOnlyIfSilent && needVibrate != 2) {
                                 try {
-                                    int mode = NotificationsController.this.audioManager.getRingerMode();
+                                    int mode = NotificationsController.audioManager.getRingerMode();
                                     if (!(mode == 0 || mode == 1)) {
                                         needVibrate = 2;
                                     }
@@ -372,7 +388,7 @@ public class NotificationsController {
                             if (ledColor != 0) {
                                 mBuilder.setLights(ledColor, 1000, 1000);
                             }
-                            if (needVibrate == 2 || MediaController.getInstance(NotificationsController.this.currentAccount).isRecordingAudio()) {
+                            if (needVibrate == 2 || MediaController.getInstance().isRecordingAudio()) {
                                 vibrationPattern = new long[]{0, 0};
                                 mBuilder.setVibrate(vibrationPattern);
                             } else if (needVibrate == 1) {
@@ -1443,9 +1459,9 @@ public class NotificationsController {
     }
 
     private void playInChatSound() {
-        if (this.inChatSoundEnabled && !MediaController.getInstance(this.currentAccount).isRecordingAudio()) {
+        if (this.inChatSoundEnabled && !MediaController.getInstance().isRecordingAudio()) {
             try {
-                if (this.audioManager.getRingerMode() == 0) {
+                if (audioManager.getRingerMode() == 0) {
                     return;
                 }
             } catch (Throwable e) {
@@ -1633,7 +1649,7 @@ public class NotificationsController {
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.chat_id;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0662;
+        if (r5 == 0) goto L_0x0658;
     L_0x007c:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
@@ -1645,7 +1661,7 @@ public class NotificationsController {
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.user_id;	 Catch:{ Exception -> 0x0052 }
         r63 = r0;
-        if (r63 != 0) goto L_0x066c;
+        if (r63 != 0) goto L_0x0662;
     L_0x0090:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
@@ -1717,7 +1733,7 @@ public class NotificationsController {
         r13 = 0;
         r0 = r54;
         r5 = r0.getBoolean(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0686;
+        if (r5 == 0) goto L_0x067c;
     L_0x011e:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -1745,7 +1761,7 @@ public class NotificationsController {
         r13 = java.lang.Long.valueOf(r6);	 Catch:{ Exception -> 0x0052 }
         r22 = r5.get(r13);	 Catch:{ Exception -> 0x0052 }
         r22 = (android.graphics.Point) r22;	 Catch:{ Exception -> 0x0052 }
-        if (r22 != 0) goto L_0x068c;
+        if (r22 != 0) goto L_0x0682;
     L_0x0167:
         r22 = new android.graphics.Point;	 Catch:{ Exception -> 0x0052 }
         r5 = 1;
@@ -1764,7 +1780,7 @@ public class NotificationsController {
     L_0x0187:
         r5 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0052 }
         r20 = r5.getPath();	 Catch:{ Exception -> 0x0052 }
-        if (r47 != 0) goto L_0x02ea;
+        if (r47 != 0) goto L_0x02e8;
     L_0x018f:
         r5 = "EnableInAppSounds";
         r13 = 1;
@@ -1791,7 +1807,7 @@ public class NotificationsController {
         r13 = 0;
         r0 = r54;
         r19 = r0.getBoolean(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        if (r19 == 0) goto L_0x06da;
+        if (r19 == 0) goto L_0x06d0;
     L_0x01d4:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -1822,14 +1838,14 @@ public class NotificationsController {
         r16 = r0.getString(r5, r13);	 Catch:{ Exception -> 0x0052 }
     L_0x0225:
         r64 = 0;
-        if (r15 == 0) goto L_0x06f1;
+        if (r15 == 0) goto L_0x06e7;
     L_0x0229:
-        if (r16 == 0) goto L_0x06e2;
+        if (r16 == 0) goto L_0x06d8;
     L_0x022b:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x06e2;
+        if (r5 == 0) goto L_0x06d8;
     L_0x0235:
         r16 = 0;
     L_0x0237:
@@ -1920,27 +1936,26 @@ public class NotificationsController {
     L_0x02cc:
         r45 = 2;
     L_0x02ce:
-        if (r31 != 0) goto L_0x0731;
+        if (r31 != 0) goto L_0x0727;
     L_0x02d0:
         r55 = 0;
     L_0x02d2:
-        if (r64 == 0) goto L_0x02ea;
+        if (r64 == 0) goto L_0x02e8;
     L_0x02d4:
         r5 = 2;
         r0 = r45;
-        if (r0 == r5) goto L_0x02ea;
+        if (r0 == r5) goto L_0x02e8;
     L_0x02d9:
-        r0 = r72;
-        r5 = r0.audioManager;	 Catch:{ Exception -> 0x073a }
-        r43 = r5.getRingerMode();	 Catch:{ Exception -> 0x073a }
-        if (r43 == 0) goto L_0x02ea;
-    L_0x02e3:
+        r5 = audioManager;	 Catch:{ Exception -> 0x0730 }
+        r43 = r5.getRingerMode();	 Catch:{ Exception -> 0x0730 }
+        if (r43 == 0) goto L_0x02e8;
+    L_0x02e1:
         r5 = 1;
         r0 = r43;
-        if (r0 == r5) goto L_0x02ea;
-    L_0x02e8:
+        if (r0 == r5) goto L_0x02e8;
+    L_0x02e6:
         r45 = 2;
-    L_0x02ea:
+    L_0x02e8:
         r35 = new android.content.Intent;	 Catch:{ Exception -> 0x0052 }
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
         r13 = org.telegram.ui.LaunchActivity.class;
@@ -1962,29 +1977,29 @@ public class NotificationsController {
         r0 = r35;
         r0.setFlags(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = (int) r6;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x07b7;
-    L_0x0326:
+        if (r5 == 0) goto L_0x07ad;
+    L_0x0324:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x033b;
+        if (r5 != r13) goto L_0x0339;
+    L_0x032f:
+        if (r15 == 0) goto L_0x0736;
     L_0x0331:
-        if (r15 == 0) goto L_0x0740;
-    L_0x0333:
         r5 = "chatId";
         r0 = r35;
         r0.putExtra(r5, r15);	 Catch:{ Exception -> 0x0052 }
-    L_0x033b:
+    L_0x0339:
         r5 = 0;
         r5 = org.telegram.messenger.AndroidUtilities.needShowPasscode(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x0346;
-    L_0x0342:
+        if (r5 != 0) goto L_0x0344;
+    L_0x0340:
         r5 = org.telegram.messenger.SharedConfig.isWaitingForPasscodeEnter;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x074e;
-    L_0x0346:
+        if (r5 == 0) goto L_0x0744;
+    L_0x0344:
         r51 = 0;
-    L_0x0348:
+    L_0x0346:
         r5 = "currentAccount";
         r0 = r72;
         r13 = r0.currentAccount;	 Catch:{ Exception -> 0x0052 }
@@ -1997,34 +2012,34 @@ public class NotificationsController {
         r1 = r66;
         r17 = android.app.PendingIntent.getActivity(r5, r13, r0, r1);	 Catch:{ Exception -> 0x0052 }
         r57 = 1;
-        if (r14 == 0) goto L_0x07d3;
-    L_0x0365:
+        if (r14 == 0) goto L_0x07c9;
+    L_0x0363:
         r8 = r14.title;	 Catch:{ Exception -> 0x0052 }
-    L_0x0367:
+    L_0x0365:
         r5 = (int) r6;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0380;
-    L_0x036a:
+        if (r5 == 0) goto L_0x037e;
+    L_0x0368:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 > r13) goto L_0x0380;
-    L_0x0375:
+        if (r5 > r13) goto L_0x037e;
+    L_0x0373:
         r5 = 0;
         r5 = org.telegram.messenger.AndroidUtilities.needShowPasscode(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x0380;
-    L_0x037c:
+        if (r5 != 0) goto L_0x037e;
+    L_0x037a:
         r5 = org.telegram.messenger.SharedConfig.isWaitingForPasscodeEnter;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x07d9;
-    L_0x0380:
+        if (r5 == 0) goto L_0x07cf;
+    L_0x037e:
         r5 = "AppName";
         r13 = 2131492978; // 0x7f0c0072 float:1.8609423E38 double:1.053097455E-314;
         r44 = org.telegram.messenger.LocaleController.getString(r5, r13);	 Catch:{ Exception -> 0x0052 }
         r57 = 0;
-    L_0x038c:
+    L_0x038a:
         r5 = org.telegram.messenger.UserConfig.getActivatedAccountsCount();	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x07dd;
-    L_0x0392:
+        if (r5 == 0) goto L_0x07d3;
+    L_0x0390:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r72;
@@ -2036,13 +2051,13 @@ public class NotificationsController {
         r13 = "・";
         r5 = r5.append(r13);	 Catch:{ Exception -> 0x0052 }
         r21 = r5.toString();	 Catch:{ Exception -> 0x0052 }
-    L_0x03b6:
+    L_0x03b4:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x07e2;
-    L_0x03c1:
+        if (r5 != r13) goto L_0x07d8;
+    L_0x03bf:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r21;
@@ -2055,13 +2070,13 @@ public class NotificationsController {
         r13 = org.telegram.messenger.LocaleController.formatPluralString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r5 = r5.append(r13);	 Catch:{ Exception -> 0x0052 }
         r21 = r5.toString();	 Catch:{ Exception -> 0x0052 }
-    L_0x03e3:
+    L_0x03e1:
         r5 = new android.support.v4.app.NotificationCompat$Builder;	 Catch:{ Exception -> 0x0052 }
         r13 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
         r5.<init>(r13);	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
         r5 = r5.setContentTitle(r0);	 Catch:{ Exception -> 0x0052 }
-        r13 = 2131165527; // 0x7f070157 float:1.7945274E38 double:1.0529356725E-314;
+        r13 = 2131165529; // 0x7f070159 float:1.7945278E38 double:1.0529356735E-314;
         r5 = r5.setSmallIcon(r13);	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
         r5 = r5.setAutoCancel(r13);	 Catch:{ Exception -> 0x0052 }
@@ -2083,19 +2098,19 @@ public class NotificationsController {
         r5 = "msg";
         r0 = r39;
         r0.setCategory(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r14 != 0) goto L_0x045a;
+        if (r14 != 0) goto L_0x0458;
+    L_0x0429:
+        if (r62 == 0) goto L_0x0458;
     L_0x042b:
-        if (r62 == 0) goto L_0x045a;
-    L_0x042d:
         r0 = r62;
         r5 = r0.phone;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x045a;
-    L_0x0433:
+        if (r5 == 0) goto L_0x0458;
+    L_0x0431:
         r0 = r62;
         r5 = r0.phone;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.length();	 Catch:{ Exception -> 0x0052 }
-        if (r5 <= 0) goto L_0x045a;
-    L_0x043d:
+        if (r5 <= 0) goto L_0x0458;
+    L_0x043b:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = "tel:+";
@@ -2106,7 +2121,7 @@ public class NotificationsController {
         r5 = r5.toString();	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.addPerson(r5);	 Catch:{ Exception -> 0x0052 }
-    L_0x045a:
+    L_0x0458:
         r60 = 2;
         r36 = 0;
         r27 = 0;
@@ -2114,8 +2129,8 @@ public class NotificationsController {
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x087e;
-    L_0x046b:
+        if (r5 != r13) goto L_0x0874;
+    L_0x0469:
         r0 = r72;
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0052 }
         r13 = 0;
@@ -2133,16 +2148,16 @@ public class NotificationsController {
         r0 = r41;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.silent;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0833;
-    L_0x0490:
+        if (r5 == 0) goto L_0x0829;
+    L_0x048e:
         r60 = 1;
-    L_0x0492:
+    L_0x0490:
         if (r40 == 0) goto L_0x001b;
+    L_0x0492:
+        if (r57 == 0) goto L_0x04b5;
     L_0x0494:
-        if (r57 == 0) goto L_0x04b7;
+        if (r14 == 0) goto L_0x082d;
     L_0x0496:
-        if (r14 == 0) goto L_0x0837;
-    L_0x0498:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = " @ ";
@@ -2153,7 +2168,7 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x04b7:
+    L_0x04b5:
         r39.setContentText(r40);	 Catch:{ Exception -> 0x0052 }
         r5 = new android.support.v4.app.NotificationCompat$BigTextStyle;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -2161,7 +2176,7 @@ public class NotificationsController {
         r5 = r5.bigText(r0);	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setStyle(r5);	 Catch:{ Exception -> 0x0052 }
-    L_0x04ca:
+    L_0x04c8:
         r24 = new android.content.Intent;	 Catch:{ Exception -> 0x0052 }
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
         r13 = org.telegram.messenger.NotificationDismissReceiver.class;
@@ -2186,50 +2201,50 @@ public class NotificationsController {
         r5 = android.app.PendingIntent.getBroadcast(r5, r13, r0, r1);	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setDeleteIntent(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r51 == 0) goto L_0x051e;
-    L_0x0503:
+        if (r51 == 0) goto L_0x051c;
+    L_0x0501:
         r5 = org.telegram.messenger.ImageLoader.getInstance();	 Catch:{ Exception -> 0x0052 }
         r13 = 0;
         r66 = "50_50";
         r0 = r51;
         r1 = r66;
         r29 = r5.getImageFromMemory(r0, r13, r1);	 Catch:{ Exception -> 0x0052 }
-        if (r29 == 0) goto L_0x0971;
-    L_0x0515:
+        if (r29 == 0) goto L_0x0967;
+    L_0x0513:
         r5 = r29.getBitmap();	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setLargeIcon(r5);	 Catch:{ Exception -> 0x0052 }
+    L_0x051c:
+        if (r73 == 0) goto L_0x0523;
     L_0x051e:
-        if (r73 == 0) goto L_0x0525;
-    L_0x0520:
         r5 = 1;
         r0 = r60;
-        if (r0 != r5) goto L_0x09b3;
-    L_0x0525:
+        if (r0 != r5) goto L_0x09a9;
+    L_0x0523:
         r5 = -1;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x0532;
-    L_0x0531:
+        if (r5 < r13) goto L_0x0530;
+    L_0x052f:
         r12 = 2;
-    L_0x0532:
+    L_0x0530:
         r5 = 1;
         r0 = r60;
-        if (r0 == r5) goto L_0x0a48;
+        if (r0 == r5) goto L_0x0a3e;
+    L_0x0535:
+        if (r47 != 0) goto L_0x0a3e;
     L_0x0537:
-        if (r47 != 0) goto L_0x0a48;
-    L_0x0539:
         r5 = org.telegram.messenger.ApplicationLoader.mainInterfacePaused;	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x053f;
+        if (r5 != 0) goto L_0x053d;
+    L_0x053b:
+        if (r30 == 0) goto L_0x057b;
     L_0x053d:
-        if (r30 == 0) goto L_0x057d;
-    L_0x053f:
         r5 = r36.length();	 Catch:{ Exception -> 0x0052 }
         r13 = 100;
-        if (r5 <= r13) goto L_0x0576;
-    L_0x0547:
+        if (r5 <= r13) goto L_0x0574;
+    L_0x0545:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = 0;
@@ -2247,69 +2262,65 @@ public class NotificationsController {
         r13 = "...";
         r5 = r5.append(r13);	 Catch:{ Exception -> 0x0052 }
         r36 = r5.toString();	 Catch:{ Exception -> 0x0052 }
-    L_0x0576:
+    L_0x0574:
         r0 = r39;
         r1 = r36;
         r0.setTicker(r1);	 Catch:{ Exception -> 0x0052 }
-    L_0x057d:
-        r0 = r72;
-        r5 = r0.currentAccount;	 Catch:{ Exception -> 0x0052 }
-        r5 = org.telegram.messenger.MediaController.getInstance(r5);	 Catch:{ Exception -> 0x0052 }
+    L_0x057b:
+        r5 = org.telegram.messenger.MediaController.getInstance();	 Catch:{ Exception -> 0x0052 }
         r5 = r5.isRecordingAudio();	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x05aa;
-    L_0x058b:
-        if (r16 == 0) goto L_0x05aa;
-    L_0x058d:
+        if (r5 != 0) goto L_0x05a4;
+    L_0x0585:
+        if (r16 == 0) goto L_0x05a4;
+    L_0x0587:
         r5 = "NoSound";
         r0 = r16;
         r5 = r0.equals(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x05aa;
-    L_0x0598:
+        if (r5 != 0) goto L_0x05a4;
+    L_0x0592:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x09f2;
-    L_0x059e:
+        if (r5 < r13) goto L_0x09e8;
+    L_0x0598:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x09ec;
-    L_0x05a8:
+        if (r5 == 0) goto L_0x09e2;
+    L_0x05a2:
         r11 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0052 }
-    L_0x05aa:
-        if (r10 == 0) goto L_0x05b5;
-    L_0x05ac:
+    L_0x05a4:
+        if (r10 == 0) goto L_0x05af;
+    L_0x05a6:
         r5 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r13 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r0 = r39;
         r0.setLights(r10, r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x05b5:
+    L_0x05af:
         r5 = 2;
         r0 = r45;
-        if (r0 == r5) goto L_0x05c8;
-    L_0x05ba:
-        r0 = r72;
-        r5 = r0.currentAccount;	 Catch:{ Exception -> 0x0052 }
-        r5 = org.telegram.messenger.MediaController.getInstance(r5);	 Catch:{ Exception -> 0x0052 }
+        if (r0 == r5) goto L_0x05be;
+    L_0x05b4:
+        r5 = org.telegram.messenger.MediaController.getInstance();	 Catch:{ Exception -> 0x0052 }
         r5 = r5.isRecordingAudio();	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0a12;
-    L_0x05c8:
+        if (r5 == 0) goto L_0x0a08;
+    L_0x05be:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 0};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
-    L_0x05d3:
+    L_0x05c9:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 24;
-        if (r5 >= r13) goto L_0x062c;
-    L_0x05d9:
+        if (r5 >= r13) goto L_0x0622;
+    L_0x05cf:
         r5 = org.telegram.messenger.SharedConfig.passcodeHash;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.length();	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x062c;
-    L_0x05e1:
+        if (r5 != 0) goto L_0x0622;
+    L_0x05d7:
         r5 = r72.hasMessagesToReply();	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x062c;
-    L_0x05e7:
+        if (r5 == 0) goto L_0x0622;
+    L_0x05dd:
         r58 = new android.content.Intent;	 Catch:{ Exception -> 0x0052 }
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
         r13 = org.telegram.messenger.PopupReplyReceiver.class;
@@ -2322,9 +2333,9 @@ public class NotificationsController {
         r0.putExtra(r5, r13);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 19;
-        if (r5 > r13) goto L_0x0a55;
-    L_0x0604:
-        r5 = 2131165344; // 0x7f0700a0 float:1.7944902E38 double:1.052935582E-314;
+        if (r5 > r13) goto L_0x0a4b;
+    L_0x05fa:
+        r5 = 2131165345; // 0x7f0700a1 float:1.7944904E38 double:1.0529355826E-314;
         r13 = "Reply";
         r66 = 2131494170; // 0x7f0c051a float:1.861184E38 double:1.0530980437E-314;
         r0 = r66;
@@ -2340,24 +2351,24 @@ public class NotificationsController {
         r0 = r39;
         r1 = r66;
         r0.addAction(r5, r13, r1);	 Catch:{ Exception -> 0x0052 }
-    L_0x062c:
+    L_0x0622:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x0645;
-    L_0x0632:
+        if (r5 < r13) goto L_0x063b;
+    L_0x0628:
         r5 = 1;
         r0 = r60;
-        if (r0 == r5) goto L_0x0639;
-    L_0x0637:
-        if (r47 == 0) goto L_0x0a7f;
-    L_0x0639:
+        if (r0 == r5) goto L_0x062f;
+    L_0x062d:
+        if (r47 == 0) goto L_0x0a75;
+    L_0x062f:
         r13 = 1;
-    L_0x063a:
+    L_0x0630:
         r5 = r72;
         r5 = r5.validateChannelId(r6, r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setChannelId(r5);	 Catch:{ Exception -> 0x0052 }
-    L_0x0645:
+    L_0x063b:
         r5 = notificationManager;	 Catch:{ Exception -> 0x0052 }
         r0 = r72;
         r13 = r0.notificationId;	 Catch:{ Exception -> 0x0052 }
@@ -2370,30 +2381,30 @@ public class NotificationsController {
         r0.showExtraNotifications(r1, r2);	 Catch:{ Exception -> 0x0052 }
         r72.scheduleNotificationRepeat();	 Catch:{ Exception -> 0x0052 }
         goto L_0x001b;
-    L_0x0662:
+    L_0x0658:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0052 }
         r15 = r5.channel_id;	 Catch:{ Exception -> 0x0052 }
         goto L_0x0084;
-    L_0x066c:
+    L_0x0662:
         r0 = r72;
         r5 = r0.currentAccount;	 Catch:{ Exception -> 0x0052 }
         r5 = org.telegram.messenger.UserConfig.getInstance(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = r5.getClientUserId();	 Catch:{ Exception -> 0x0052 }
         r0 = r63;
         if (r0 != r5) goto L_0x0098;
-    L_0x067c:
+    L_0x0672:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.from_id;	 Catch:{ Exception -> 0x0052 }
         r63 = r0;
         goto L_0x0098;
-    L_0x0686:
+    L_0x067c:
         r48 = 2;
         r46 = 180; // 0xb4 float:2.52E-43 double:8.9E-322;
         goto L_0x0155;
-    L_0x068c:
+    L_0x0682:
         r0 = r22;
         r0 = r0.y;	 Catch:{ Exception -> 0x0052 }
         r38 = r0;
@@ -2404,8 +2415,8 @@ public class NotificationsController {
         r70 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r68 = r68 / r70;
         r5 = (r66 > r68 ? 1 : (r66 == r68 ? 0 : -1));
-        if (r5 >= 0) goto L_0x06b6;
-    L_0x06a3:
+        if (r5 >= 0) goto L_0x06ac;
+    L_0x0699:
         r5 = 1;
         r66 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0052 }
         r68 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
@@ -2415,14 +2426,14 @@ public class NotificationsController {
         r0 = r22;
         r0.set(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x0187;
-    L_0x06b6:
+    L_0x06ac:
         r0 = r22;
         r0 = r0.x;	 Catch:{ Exception -> 0x0052 }
         r18 = r0;
         r0 = r18;
         r1 = r48;
-        if (r0 >= r1) goto L_0x06d6;
-    L_0x06c2:
+        if (r0 >= r1) goto L_0x06cc;
+    L_0x06b8:
         r5 = r18 + 1;
         r66 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0052 }
         r68 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
@@ -2432,34 +2443,34 @@ public class NotificationsController {
         r0 = r22;
         r0.set(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x0187;
-    L_0x06d6:
+    L_0x06cc:
         r47 = 1;
         goto L_0x0187;
-    L_0x06da:
+    L_0x06d0:
         r65 = 0;
         r56 = 3;
         r16 = 0;
         goto L_0x0225;
-    L_0x06e2:
+    L_0x06d8:
         if (r16 != 0) goto L_0x0237;
-    L_0x06e4:
+    L_0x06da:
         r5 = "GroupSoundPath";
         r0 = r54;
         r1 = r20;
         r16 = r0.getString(r5, r1);	 Catch:{ Exception -> 0x0052 }
         goto L_0x0237;
-    L_0x06f1:
+    L_0x06e7:
         if (r63 == 0) goto L_0x0257;
-    L_0x06f3:
-        if (r16 == 0) goto L_0x0723;
-    L_0x06f5:
+    L_0x06e9:
+        if (r16 == 0) goto L_0x0719;
+    L_0x06eb:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0723;
-    L_0x06ff:
+        if (r5 == 0) goto L_0x0719;
+    L_0x06f5:
         r16 = 0;
-    L_0x0701:
+    L_0x06f7:
         r5 = "vibrate_messages";
         r13 = 0;
         r0 = r54;
@@ -2473,78 +2484,78 @@ public class NotificationsController {
         r0 = r54;
         r10 = r0.getInt(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x0257;
-    L_0x0723:
-        if (r16 != 0) goto L_0x0701;
-    L_0x0725:
+    L_0x0719:
+        if (r16 != 0) goto L_0x06f7;
+    L_0x071b:
         r5 = "GlobalSoundPath";
         r0 = r54;
         r1 = r20;
         r16 = r0.getString(r5, r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0701;
-    L_0x0731:
+        goto L_0x06f7;
+    L_0x0727:
         r5 = 2;
         r0 = r55;
         if (r0 != r5) goto L_0x02d2;
-    L_0x0736:
+    L_0x072c:
         r55 = 1;
         goto L_0x02d2;
-    L_0x073a:
+    L_0x0730:
         r25 = move-exception;
         org.telegram.messenger.FileLog.e(r25);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x02ea;
-    L_0x0740:
-        if (r63 == 0) goto L_0x033b;
-    L_0x0742:
+        goto L_0x02e8;
+    L_0x0736:
+        if (r63 == 0) goto L_0x0339;
+    L_0x0738:
         r5 = "userId";
         r0 = r35;
         r1 = r63;
         r0.putExtra(r5, r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x033b;
-    L_0x074e:
+        goto L_0x0339;
+    L_0x0744:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x0348;
-    L_0x0759:
-        if (r14 == 0) goto L_0x0783;
-    L_0x075b:
+        if (r5 != r13) goto L_0x0346;
+    L_0x074f:
+        if (r14 == 0) goto L_0x0779;
+    L_0x0751:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0348;
-    L_0x075f:
+        if (r5 == 0) goto L_0x0346;
+    L_0x0755:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0348;
-    L_0x0765:
+        if (r5 == 0) goto L_0x0346;
+    L_0x075b:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.volume_id;	 Catch:{ Exception -> 0x0052 }
         r66 = r0;
         r68 = 0;
         r5 = (r66 > r68 ? 1 : (r66 == r68 ? 0 : -1));
-        if (r5 == 0) goto L_0x0348;
-    L_0x0773:
+        if (r5 == 0) goto L_0x0346;
+    L_0x0769:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.local_id;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0348;
-    L_0x077b:
+        if (r5 == 0) goto L_0x0346;
+    L_0x0771:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r51 = r0;
-        goto L_0x0348;
-    L_0x0783:
-        if (r62 == 0) goto L_0x0348;
-    L_0x0785:
+        goto L_0x0346;
+    L_0x0779:
+        if (r62 == 0) goto L_0x0346;
+    L_0x077b:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0348;
-    L_0x078b:
+        if (r5 == 0) goto L_0x0346;
+    L_0x0781:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0348;
-    L_0x0793:
+        if (r5 == 0) goto L_0x0346;
+    L_0x0789:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
@@ -2552,26 +2563,26 @@ public class NotificationsController {
         r66 = r0;
         r68 = 0;
         r5 = (r66 > r68 ? 1 : (r66 == r68 ? 0 : -1));
-        if (r5 == 0) goto L_0x0348;
+        if (r5 == 0) goto L_0x0346;
+    L_0x0799:
+        r0 = r62;
+        r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
+        r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
+        r5 = r5.local_id;	 Catch:{ Exception -> 0x0052 }
+        if (r5 == 0) goto L_0x0346;
     L_0x07a3:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
-        r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
-        r5 = r5.local_id;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0348;
-    L_0x07ad:
-        r0 = r62;
-        r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r51 = r0;
-        goto L_0x0348;
-    L_0x07b7:
+        goto L_0x0346;
+    L_0x07ad:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x0348;
-    L_0x07c2:
+        if (r5 != r13) goto L_0x0346;
+    L_0x07b8:
         r5 = "encId";
         r13 = 32;
         r66 = r6 >> r13;
@@ -2579,17 +2590,17 @@ public class NotificationsController {
         r13 = (int) r0;	 Catch:{ Exception -> 0x0052 }
         r0 = r35;
         r0.putExtra(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0348;
-    L_0x07d3:
+        goto L_0x0346;
+    L_0x07c9:
         r8 = org.telegram.messenger.UserObject.getUserName(r62);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0367;
-    L_0x07d9:
+        goto L_0x0365;
+    L_0x07cf:
         r44 = r8;
-        goto L_0x038c;
-    L_0x07dd:
+        goto L_0x038a;
+    L_0x07d3:
         r21 = "";
-        goto L_0x03b6;
-    L_0x07e2:
+        goto L_0x03b4;
+    L_0x07d8:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r21;
@@ -2620,15 +2631,15 @@ public class NotificationsController {
         r13 = org.telegram.messenger.LocaleController.formatString(r13, r0, r1);	 Catch:{ Exception -> 0x0052 }
         r5 = r5.append(r13);	 Catch:{ Exception -> 0x0052 }
         r21 = r5.toString();	 Catch:{ Exception -> 0x0052 }
-        goto L_0x03e3;
-    L_0x0833:
+        goto L_0x03e1;
+    L_0x0829:
         r60 = 0;
-        goto L_0x0492;
-    L_0x0837:
+        goto L_0x0490;
+    L_0x082d:
         r5 = 0;
         r5 = r61[r5];	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x085d;
-    L_0x083c:
+        if (r5 == 0) goto L_0x0853;
+    L_0x0832:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2639,8 +2650,8 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x04b7;
-    L_0x085d:
+        goto L_0x04b5;
+    L_0x0853:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2651,8 +2662,8 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x04b7;
-    L_0x087e:
+        goto L_0x04b5;
+    L_0x0874:
         r0 = r39;
         r1 = r21;
         r0.setContentText(r1);	 Catch:{ Exception -> 0x0052 }
@@ -2670,11 +2681,11 @@ public class NotificationsController {
         r0 = new boolean[r5];	 Catch:{ Exception -> 0x0052 }
         r61 = r0;
         r28 = 0;
-    L_0x08a6:
+    L_0x089c:
         r0 = r28;
         r1 = r18;
-        if (r0 >= r1) goto L_0x0961;
-    L_0x08ac:
+        if (r0 >= r1) goto L_0x0957;
+    L_0x08a2:
         r0 = r72;
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0052 }
         r0 = r28;
@@ -2685,39 +2696,39 @@ public class NotificationsController {
         r1 = r41;
         r2 = r61;
         r40 = r0.getStringForMessage(r1, r5, r2);	 Catch:{ Exception -> 0x0052 }
-        if (r40 == 0) goto L_0x08cf;
-    L_0x08c5:
+        if (r40 == 0) goto L_0x08c5;
+    L_0x08bb:
         r0 = r41;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.date;	 Catch:{ Exception -> 0x0052 }
         r0 = r23;
-        if (r5 > r0) goto L_0x08d2;
-    L_0x08cf:
+        if (r5 > r0) goto L_0x08c8;
+    L_0x08c5:
         r28 = r28 + 1;
-        goto L_0x08a6;
-    L_0x08d2:
+        goto L_0x089c;
+    L_0x08c8:
         r5 = 2;
         r0 = r60;
-        if (r0 != r5) goto L_0x08e3;
-    L_0x08d7:
+        if (r0 != r5) goto L_0x08d9;
+    L_0x08cd:
         r36 = r40;
         r0 = r41;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.silent;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0919;
-    L_0x08e1:
+        if (r5 == 0) goto L_0x090f;
+    L_0x08d7:
         r60 = 1;
-    L_0x08e3:
+    L_0x08d9:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x0911;
-    L_0x08ee:
-        if (r57 == 0) goto L_0x0911;
-    L_0x08f0:
-        if (r14 == 0) goto L_0x091c;
-    L_0x08f2:
+        if (r5 != r13) goto L_0x0907;
+    L_0x08e4:
+        if (r57 == 0) goto L_0x0907;
+    L_0x08e6:
+        if (r14 == 0) goto L_0x0912;
+    L_0x08e8:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = " @ ";
@@ -2728,19 +2739,19 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x0911:
+    L_0x0907:
         r0 = r34;
         r1 = r40;
         r0.addLine(r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x08cf;
-    L_0x0919:
+        goto L_0x08c5;
+    L_0x090f:
         r60 = 0;
-        goto L_0x08e3;
-    L_0x091c:
+        goto L_0x08d9;
+    L_0x0912:
         r5 = 0;
         r5 = r61[r5];	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0941;
-    L_0x0921:
+        if (r5 == 0) goto L_0x0937;
+    L_0x0917:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2751,8 +2762,8 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0911;
-    L_0x0941:
+        goto L_0x0907;
+    L_0x0937:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2763,156 +2774,156 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0911;
-    L_0x0961:
+        goto L_0x0907;
+    L_0x0957:
         r0 = r34;
         r1 = r21;
         r0.setSummaryText(r1);	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r1 = r34;
         r0.setStyle(r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x04ca;
-    L_0x0971:
+        goto L_0x04c8;
+    L_0x0967:
         r5 = 1;
         r0 = r51;
-        r26 = org.telegram.messenger.FileLoader.getPathToAttach(r0, r5);	 Catch:{ Throwable -> 0x09ac }
-        r5 = r26.exists();	 Catch:{ Throwable -> 0x09ac }
-        if (r5 == 0) goto L_0x051e;
-    L_0x097e:
+        r26 = org.telegram.messenger.FileLoader.getPathToAttach(r0, r5);	 Catch:{ Throwable -> 0x09a2 }
+        r5 = r26.exists();	 Catch:{ Throwable -> 0x09a2 }
+        if (r5 == 0) goto L_0x051c;
+    L_0x0974:
         r5 = 1126170624; // 0x43200000 float:160.0 double:5.564022167E-315;
         r13 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        r13 = org.telegram.messenger.AndroidUtilities.dp(r13);	 Catch:{ Throwable -> 0x09ac }
-        r13 = (float) r13;	 Catch:{ Throwable -> 0x09ac }
+        r13 = org.telegram.messenger.AndroidUtilities.dp(r13);	 Catch:{ Throwable -> 0x09a2 }
+        r13 = (float) r13;	 Catch:{ Throwable -> 0x09a2 }
         r59 = r5 / r13;
-        r50 = new android.graphics.BitmapFactory$Options;	 Catch:{ Throwable -> 0x09ac }
-        r50.<init>();	 Catch:{ Throwable -> 0x09ac }
+        r50 = new android.graphics.BitmapFactory$Options;	 Catch:{ Throwable -> 0x09a2 }
+        r50.<init>();	 Catch:{ Throwable -> 0x09a2 }
         r5 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r5 = (r59 > r5 ? 1 : (r59 == r5 ? 0 : -1));
-        if (r5 >= 0) goto L_0x09af;
-    L_0x0994:
+        if (r5 >= 0) goto L_0x09a5;
+    L_0x098a:
         r5 = 1;
-    L_0x0995:
+    L_0x098b:
         r0 = r50;
-        r0.inSampleSize = r5;	 Catch:{ Throwable -> 0x09ac }
-        r5 = r26.getAbsolutePath();	 Catch:{ Throwable -> 0x09ac }
+        r0.inSampleSize = r5;	 Catch:{ Throwable -> 0x09a2 }
+        r5 = r26.getAbsolutePath();	 Catch:{ Throwable -> 0x09a2 }
         r0 = r50;
-        r4 = android.graphics.BitmapFactory.decodeFile(r5, r0);	 Catch:{ Throwable -> 0x09ac }
-        if (r4 == 0) goto L_0x051e;
-    L_0x09a5:
+        r4 = android.graphics.BitmapFactory.decodeFile(r5, r0);	 Catch:{ Throwable -> 0x09a2 }
+        if (r4 == 0) goto L_0x051c;
+    L_0x099b:
         r0 = r39;
-        r0.setLargeIcon(r4);	 Catch:{ Throwable -> 0x09ac }
-        goto L_0x051e;
-    L_0x09ac:
+        r0.setLargeIcon(r4);	 Catch:{ Throwable -> 0x09a2 }
+        goto L_0x051c;
+    L_0x09a2:
         r5 = move-exception;
-        goto L_0x051e;
-    L_0x09af:
+        goto L_0x051c;
+    L_0x09a5:
         r0 = r59;
         r5 = (int) r0;
-        goto L_0x0995;
-    L_0x09b3:
-        if (r55 != 0) goto L_0x09c4;
-    L_0x09b5:
+        goto L_0x098b;
+    L_0x09a9:
+        if (r55 != 0) goto L_0x09ba;
+    L_0x09ab:
         r5 = 0;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x0532;
-    L_0x09c1:
+        if (r5 < r13) goto L_0x0530;
+    L_0x09b7:
         r12 = 3;
-        goto L_0x0532;
-    L_0x09c4:
+        goto L_0x0530;
+    L_0x09ba:
         r5 = 1;
         r0 = r55;
-        if (r0 != r5) goto L_0x09d8;
-    L_0x09c9:
+        if (r0 != r5) goto L_0x09ce;
+    L_0x09bf:
         r5 = 1;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x0532;
-    L_0x09d5:
+        if (r5 < r13) goto L_0x0530;
+    L_0x09cb:
         r12 = 4;
-        goto L_0x0532;
-    L_0x09d8:
+        goto L_0x0530;
+    L_0x09ce:
         r5 = 2;
         r0 = r55;
-        if (r0 != r5) goto L_0x0532;
-    L_0x09dd:
+        if (r0 != r5) goto L_0x0530;
+    L_0x09d3:
         r5 = 2;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x0532;
-    L_0x09e9:
+        if (r5 < r13) goto L_0x0530;
+    L_0x09df:
         r12 = 5;
-        goto L_0x0532;
-    L_0x09ec:
+        goto L_0x0530;
+    L_0x09e2:
         r11 = android.net.Uri.parse(r16);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05aa;
-    L_0x09f2:
+        goto L_0x05a4;
+    L_0x09e8:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0a06;
-    L_0x09fc:
+        if (r5 == 0) goto L_0x09fc;
+    L_0x09f2:
         r5 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0052 }
         r13 = 5;
         r0 = r39;
         r0.setSound(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05aa;
-    L_0x0a06:
+        goto L_0x05a4;
+    L_0x09fc:
         r5 = android.net.Uri.parse(r16);	 Catch:{ Exception -> 0x0052 }
         r13 = 5;
         r0 = r39;
         r0.setSound(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05aa;
-    L_0x0a12:
+        goto L_0x05a4;
+    L_0x0a08:
         r5 = 1;
         r0 = r45;
-        if (r0 != r5) goto L_0x0a24;
-    L_0x0a17:
+        if (r0 != r5) goto L_0x0a1a;
+    L_0x0a0d:
         r5 = 4;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 100, 0, 100};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05d3;
-    L_0x0a24:
-        if (r45 == 0) goto L_0x0a2b;
-    L_0x0a26:
+        goto L_0x05c9;
+    L_0x0a1a:
+        if (r45 == 0) goto L_0x0a21;
+    L_0x0a1c:
         r5 = 4;
         r0 = r45;
-        if (r0 != r5) goto L_0x0a36;
-    L_0x0a2b:
+        if (r0 != r5) goto L_0x0a2c;
+    L_0x0a21:
         r5 = 2;
         r0 = r39;
         r0.setDefaults(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = 0;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05d3;
-    L_0x0a36:
+        goto L_0x05c9;
+    L_0x0a2c:
         r5 = 3;
         r0 = r45;
-        if (r0 != r5) goto L_0x05d3;
-    L_0x0a3b:
+        if (r0 != r5) goto L_0x05c9;
+    L_0x0a31:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 1000};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05d3;
-    L_0x0a48:
+        goto L_0x05c9;
+    L_0x0a3e:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 0};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05d3;
-    L_0x0a55:
-        r5 = 2131165343; // 0x7f07009f float:1.79449E38 double:1.0529355816E-314;
+        goto L_0x05c9;
+    L_0x0a4b:
+        r5 = 2131165344; // 0x7f0700a0 float:1.7944902E38 double:1.052935582E-314;
         r13 = "Reply";
         r66 = 2131494170; // 0x7f0c051a float:1.861184E38 double:1.0530980437E-314;
         r0 = r66;
@@ -2928,10 +2939,10 @@ public class NotificationsController {
         r0 = r39;
         r1 = r66;
         r0.addAction(r5, r13, r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x062c;
-    L_0x0a7f:
+        goto L_0x0622;
+    L_0x0a75:
         r13 = 0;
-        goto L_0x063a;
+        goto L_0x0630;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.NotificationsController.showOrUpdateNotification(boolean):void");
     }
@@ -3273,9 +3284,9 @@ public class NotificationsController {
     }
 
     public void playOutChatSound() {
-        if (this.inChatSoundEnabled && !MediaController.getInstance(this.currentAccount).isRecordingAudio()) {
+        if (this.inChatSoundEnabled && !MediaController.getInstance().isRecordingAudio()) {
             try {
-                if (this.audioManager.getRingerMode() == 0) {
+                if (audioManager.getRingerMode() == 0) {
                     return;
                 }
             } catch (Throwable e) {

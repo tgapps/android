@@ -182,6 +182,7 @@ public class Theme {
     public static Drawable[][] chat_photoStatesDrawables = ((Drawable[][]) Array.newInstance(Drawable.class, new int[]{13, 2}));
     public static Paint chat_radialProgress2Paint = null;
     public static Paint chat_radialProgressPaint = null;
+    public static Drawable chat_replyIconDrawable = null;
     public static Paint chat_replyLinePaint = null;
     public static TextPaint chat_replyNamePaint = null;
     public static TextPaint chat_replyTextPaint = null;
@@ -218,6 +219,9 @@ public class Theme {
     public static Paint dialogs_errorPaint = null;
     public static Drawable dialogs_groupDrawable = null;
     public static Drawable dialogs_halfCheckDrawable = null;
+    private static Drawable dialogs_holidayDrawable = null;
+    private static int dialogs_holidayDrawableOffsetX = 0;
+    private static int dialogs_holidayDrawableOffsetY = 0;
     public static Drawable dialogs_lockDrawable = null;
     public static Drawable dialogs_mentionDrawable = null;
     public static TextPaint dialogs_messagePaint = null;
@@ -761,6 +765,7 @@ public class Theme {
     public static String[] keys_avatar_backgroundInProfile = new String[]{key_avatar_backgroundInProfileRed, key_avatar_backgroundInProfileOrange, key_avatar_backgroundInProfileViolet, key_avatar_backgroundInProfileGreen, key_avatar_backgroundInProfileCyan, key_avatar_backgroundInProfileBlue, key_avatar_backgroundInProfilePink};
     public static String[] keys_avatar_nameInMessage = new String[]{key_avatar_nameInMessageRed, key_avatar_nameInMessageOrange, key_avatar_nameInMessageViolet, key_avatar_nameInMessageGreen, key_avatar_nameInMessageCyan, key_avatar_nameInMessageBlue, key_avatar_nameInMessagePink};
     public static String[] keys_avatar_subtitleInProfile = new String[]{key_avatar_subtitleInProfileRed, key_avatar_subtitleInProfileOrange, key_avatar_subtitleInProfileViolet, key_avatar_subtitleInProfileGreen, key_avatar_subtitleInProfileCyan, key_avatar_subtitleInProfileBlue, key_avatar_subtitleInProfilePink};
+    private static long lastHolidayCheckTime;
     public static Paint linkSelectionPaint;
     public static Drawable listSelector;
     private static Paint maskPaint = new Paint(1);
@@ -1507,6 +1512,76 @@ public class Theme {
         stateListDrawable.addState(new int[]{16842908}, pressedDrawable);
         stateListDrawable.addState(StateSet.WILD_CARD, defaultDrawable);
         return stateListDrawable;
+    }
+
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static android.graphics.drawable.Drawable getCurrentHolidayDrawable() {
+        /*
+        r4 = 31;
+        r3 = dialogs_holidayDrawable;
+        if (r3 != 0) goto L_0x005d;
+    L_0x0006:
+        r6 = java.lang.System.currentTimeMillis();
+        r8 = lastHolidayCheckTime;
+        r6 = r6 - r8;
+        r8 = 3600000; // 0x36ee80 float:5.044674E-39 double:1.7786363E-317;
+        r3 = (r6 > r8 ? 1 : (r6 == r8 ? 0 : -1));
+        if (r3 < 0) goto L_0x005d;
+    L_0x0014:
+        r6 = java.lang.System.currentTimeMillis();
+        lastHolidayCheckTime = r6;
+        r0 = java.util.Calendar.getInstance();
+        r6 = java.lang.System.currentTimeMillis();
+        r0.setTimeInMillis(r6);
+        r3 = 2;
+        r2 = r0.get(r3);
+        r3 = 5;
+        r1 = r0.get(r3);
+        r3 = 11;
+        if (r2 != r3) goto L_0x003d;
+    L_0x0033:
+        r3 = org.telegram.messenger.BuildVars.DEBUG_PRIVATE_VERSION;
+        if (r3 == 0) goto L_0x0060;
+    L_0x0037:
+        r3 = 29;
+    L_0x0039:
+        if (r1 < r3) goto L_0x003d;
+    L_0x003b:
+        if (r1 <= r4) goto L_0x0042;
+    L_0x003d:
+        if (r2 != 0) goto L_0x005d;
+    L_0x003f:
+        r3 = 1;
+        if (r1 != r3) goto L_0x005d;
+    L_0x0042:
+        r3 = org.telegram.messenger.ApplicationLoader.applicationContext;
+        r3 = r3.getResources();
+        r4 = 2131165524; // 0x7f070154 float:1.7945268E38 double:1.052935671E-314;
+        r3 = r3.getDrawable(r4);
+        dialogs_holidayDrawable = r3;
+        r3 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r3 = org.telegram.messenger.AndroidUtilities.dp(r3);
+        r3 = -r3;
+        dialogs_holidayDrawableOffsetX = r3;
+        r3 = 0;
+        dialogs_holidayDrawableOffsetY = r3;
+    L_0x005d:
+        r3 = dialogs_holidayDrawable;
+        return r3;
+    L_0x0060:
+        r3 = r4;
+        goto L_0x0039;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.Theme.getCurrentHolidayDrawable():android.graphics.drawable.Drawable");
+    }
+
+    public static int getCurrentHolidayDrawableXOffset() {
+        return dialogs_holidayDrawableOffsetX;
+    }
+
+    public static int getCurrentHolidayDrawableYOffset() {
+        return dialogs_holidayDrawableOffsetY;
     }
 
     public static Drawable createSimpleSelectorDrawable(Context context, int resource, int defaultColor, int pressedColor) {
@@ -2355,6 +2430,7 @@ public class Theme {
             chat_cornerInner[3] = resources.getDrawable(R.drawable.corner_in_bl);
             chat_shareDrawable = resources.getDrawable(R.drawable.share_round);
             chat_shareIconDrawable = resources.getDrawable(R.drawable.share_arrow);
+            chat_replyIconDrawable = resources.getDrawable(R.drawable.fast_reply);
             chat_goIconDrawable = resources.getDrawable(R.drawable.message_arrow);
             chat_ivStatesDrawable[0][0] = createCircleDrawableWithIcon(AndroidUtilities.dp(40.0f), (int) R.drawable.msg_round_play_m, 1);
             chat_ivStatesDrawable[0][1] = createCircleDrawableWithIcon(AndroidUtilities.dp(40.0f), (int) R.drawable.msg_round_play_m, 1);
@@ -2525,6 +2601,7 @@ public class Theme {
             setDrawableColorByKey(chat_msgStickerClockDrawable, key_chat_serviceText);
             setDrawableColorByKey(chat_msgStickerViewsDrawable, key_chat_serviceText);
             setDrawableColorByKey(chat_shareIconDrawable, key_chat_serviceIcon);
+            setDrawableColorByKey(chat_replyIconDrawable, key_chat_serviceIcon);
             setDrawableColorByKey(chat_goIconDrawable, key_chat_serviceIcon);
             setDrawableColorByKey(chat_botInlineDrawable, key_chat_serviceIcon);
             setDrawableColorByKey(chat_botLinkDrawalbe, key_chat_serviceIcon);
@@ -2829,12 +2906,12 @@ public class Theme {
             Utilities.searchQueue.postRunnable(new Runnable() {
                 public void run() {
                     Throwable e;
-                    int i;
-                    SharedPreferences preferences;
+                    int selectedBackground;
+                    File toFile;
                     Throwable th;
                     synchronized (Theme.wallpaperSync) {
-                        int selectedBackground;
-                        File toFile;
+                        int i;
+                        SharedPreferences preferences;
                         if (!MessagesController.getGlobalMainSettings().getBoolean("overrideThemeWallpaper", false)) {
                             Integer backgroundColor = (Integer) Theme.currentColors.get(Theme.key_chat_wallpaper);
                             if (backgroundColor != null) {

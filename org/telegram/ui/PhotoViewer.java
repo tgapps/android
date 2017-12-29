@@ -2070,7 +2070,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                 preparePlayer(this.currentPlayingVideoFile, false, false);
             } else if (this.tryStartRequestPreviewOnFinish) {
                 releasePlayer();
-                this.tryStartRequestPreviewOnFinish = !MediaController.getInstance(this.currentAccount).scheduleVideoConvert(this.videoPreviewMessageObject, true);
+                this.tryStartRequestPreviewOnFinish = !MediaController.getInstance().scheduleVideoConvert(this.videoPreviewMessageObject, true);
             } else if (messageObject == this.videoPreviewMessageObject) {
                 this.requestingPreview = false;
                 this.progressView.setVisibility(4);
@@ -2496,7 +2496,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                                         if (!((currentUser == null || currentUser.id == UserConfig.getInstance(PhotoViewer.this.currentAccount).getClientUserId()) && currentChat == null) && ((PhotoViewer.this.currentMessageObject.messageOwner.action == null || (PhotoViewer.this.currentMessageObject.messageOwner.action instanceof TL_messageActionEmpty)) && PhotoViewer.this.currentMessageObject.isOut() && currentDate - PhotoViewer.this.currentMessageObject.messageOwner.date <= 172800)) {
                                             int dp;
                                             View frameLayout = new FrameLayout(PhotoViewer.this.parentActivity);
-                                            CheckBoxCell cell = new CheckBoxCell(PhotoViewer.this.parentActivity, true);
+                                            CheckBoxCell cell = new CheckBoxCell(PhotoViewer.this.parentActivity, 1);
                                             cell.setBackgroundDrawable(Theme.getSelectorDrawable(false));
                                             if (currentChat != null) {
                                                 cell.setText(LocaleController.getString("DeleteForAll", R.string.DeleteForAll), TtmlNode.ANONYMOUS_REGION_ID, false, false);
@@ -2663,7 +2663,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
             this.captionTextView.setLinkTextColor(-1);
             this.captionTextView.setTextColor(-1);
             this.captionTextView.setEllipsize(TruncateAt.END);
-            this.captionTextView.setGravity(19);
+            this.captionTextView.setGravity((LocaleController.isRTL ? 5 : 3) | 16);
             this.captionTextView.setTextSize(1, 16.0f);
             this.captionTextView.setVisibility(4);
             this.captionTextView.setOnClickListener(new OnClickListener() {
@@ -5133,7 +5133,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0.muteVideo = r3;
         r0 = r22;
         r3 = r0.muteItem;
-        r4 = 2131165675; // 0x7f0701eb float:1.7945574E38 double:1.0529357456E-314;
+        r4 = 2131165677; // 0x7f0701ed float:1.7945578E38 double:1.0529357466E-314;
         r3.setImageResource(r4);
         r0 = r22;
         r3 = r0.editorDoneLayout;
@@ -8245,7 +8245,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
 
     private void requestVideoPreview(int request) {
         if (this.videoPreviewMessageObject != null) {
-            MediaController.getInstance(this.currentAccount).cancelVideoConvert(this.videoPreviewMessageObject);
+            MediaController.getInstance().cancelVideoConvert(this.videoPreviewMessageObject);
         }
         boolean wasRequestingPreview = this.requestingPreview && !this.tryStartRequestPreviewOnFinish;
         this.requestingPreview = false;
@@ -8299,7 +8299,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
             this.videoPreviewMessageObject.videoEditedInfo.bitrate = this.bitrate;
             this.videoPreviewMessageObject.videoEditedInfo.resultWidth = this.resultWidth;
             this.videoPreviewMessageObject.videoEditedInfo.resultHeight = this.resultHeight;
-            if (!MediaController.getInstance(this.currentAccount).scheduleVideoConvert(this.videoPreviewMessageObject, true)) {
+            if (!MediaController.getInstance().scheduleVideoConvert(this.videoPreviewMessageObject, true)) {
                 this.tryStartRequestPreviewOnFinish = true;
             }
             this.requestingPreview = true;

@@ -633,7 +633,7 @@ public class DocumentSelectActivity extends BaseFragment {
         r21 = org.telegram.messenger.LocaleController.getString(r21, r22);
         r0 = r21;
         r8.title = r0;
-        r21 = 2131165364; // 0x7f0700b4 float:1.7944943E38 double:1.052935592E-314;
+        r21 = 2131165365; // 0x7f0700b5 float:1.7944945E38 double:1.0529355925E-314;
         r0 = r21;
         r8.icon = r0;
     L_0x0062:
@@ -768,7 +768,7 @@ public class DocumentSelectActivity extends BaseFragment {
         r0 = r21;
         r13.title = r0;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
     L_0x018c:
-        r21 = 2131165364; // 0x7f0700b4 float:1.7944943E38 double:1.052935592E-314;
+        r21 = 2131165365; // 0x7f0700b5 float:1.7944945E38 double:1.0529355925E-314;
         r0 = r21;
         r13.icon = r0;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
         r0 = r23;
@@ -810,11 +810,11 @@ public class DocumentSelectActivity extends BaseFragment {
         r0 = r21;
         r9.title = r0;
         r21 = "SystemRoot";
-        r22 = 2131494381; // 0x7f0c05ed float:1.8612269E38 double:1.053098148E-314;
+        r22 = 2131494387; // 0x7f0c05f3 float:1.861228E38 double:1.053098151E-314;
         r21 = org.telegram.messenger.LocaleController.getString(r21, r22);
         r0 = r21;
         r9.subtitle = r0;
-        r21 = 2131165362; // 0x7f0700b2 float:1.7944939E38 double:1.052935591E-314;
+        r21 = 2131165363; // 0x7f0700b3 float:1.794494E38 double:1.0529355915E-314;
         r0 = r21;
         r9.icon = r0;
         r21 = new java.io.File;
@@ -848,7 +848,7 @@ public class DocumentSelectActivity extends BaseFragment {
         r21 = r18.toString();	 Catch:{ Exception -> 0x02f9 }
         r0 = r21;
         r10.subtitle = r0;	 Catch:{ Exception -> 0x02f9 }
-        r21 = 2131165362; // 0x7f0700b2 float:1.7944939E38 double:1.052935591E-314;
+        r21 = 2131165363; // 0x7f0700b3 float:1.794494E38 double:1.0529355915E-314;
         r0 = r21;
         r10.icon = r0;	 Catch:{ Exception -> 0x02f9 }
         r0 = r18;
@@ -875,7 +875,7 @@ public class DocumentSelectActivity extends BaseFragment {
         r21 = org.telegram.messenger.LocaleController.getString(r21, r22);
         r0 = r21;
         r9.subtitle = r0;
-        r21 = 2131165411; // 0x7f0700e3 float:1.7945038E38 double:1.052935615E-314;
+        r21 = 2131165412; // 0x7f0700e4 float:1.794504E38 double:1.0529356157E-314;
         r0 = r21;
         r9.icon = r0;
         r21 = 0;
@@ -905,7 +905,7 @@ public class DocumentSelectActivity extends BaseFragment {
         r21 = org.telegram.messenger.LocaleController.getString(r21, r22);
         r0 = r21;
         r8.title = r0;
-        r21 = 2131165410; // 0x7f0700e2 float:1.7945036E38 double:1.0529356147E-314;
+        r21 = 2131165411; // 0x7f0700e3 float:1.7945038E38 double:1.052935615E-314;
         r0 = r21;
         r8.icon = r0;
         goto L_0x0062;

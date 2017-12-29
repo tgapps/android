@@ -144,1098 +144,1086 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    protected void onCreate(android.os.Bundle r39) {
+    protected void onCreate(android.os.Bundle r38) {
         /*
-        r38 = this;
+        r37 = this;
         org.telegram.messenger.ApplicationLoader.postInitApplication();
-        org.telegram.messenger.NativeCrashManager.handleDumpFiles(r38);
-        r33 = r38.getResources();
-        r33 = r33.getConfiguration();
-        r0 = r38;
-        r1 = r33;
+        org.telegram.messenger.NativeCrashManager.handleDumpFiles(r37);
+        r32 = r37.getResources();
+        r32 = r32.getConfiguration();
+        r0 = r37;
+        r1 = r32;
         org.telegram.messenger.AndroidUtilities.checkDisplaySize(r0, r1);
-        r33 = org.telegram.messenger.UserConfig.selectedAccount;
-        r0 = r33;
-        r1 = r38;
+        r32 = org.telegram.messenger.UserConfig.selectedAccount;
+        r0 = r32;
+        r1 = r37;
         r1.currentAccount = r0;
-        r0 = r38;
+        r0 = r37;
         r0 = r0.currentAccount;
-        r33 = r0;
-        r33 = org.telegram.messenger.UserConfig.getInstance(r33);
-        r33 = r33.isClientActivated();
-        if (r33 != 0) goto L_0x00e5;
+        r32 = r0;
+        r32 = org.telegram.messenger.UserConfig.getInstance(r32);
+        r32 = r32.isClientActivated();
+        if (r32 != 0) goto L_0x00df;
     L_0x002d:
-        r20 = r38.getIntent();
-        if (r20 == 0) goto L_0x005a;
+        r19 = r37.getIntent();
+        if (r19 == 0) goto L_0x005a;
     L_0x0033:
-        r33 = r20.getAction();
-        if (r33 == 0) goto L_0x005a;
+        r32 = r19.getAction();
+        if (r32 == 0) goto L_0x005a;
     L_0x0039:
-        r33 = "android.intent.action.SEND";
-        r34 = r20.getAction();
-        r33 = r33.equals(r34);
-        if (r33 != 0) goto L_0x0053;
+        r32 = "android.intent.action.SEND";
+        r33 = r19.getAction();
+        r32 = r32.equals(r33);
+        if (r32 != 0) goto L_0x0053;
     L_0x0046:
-        r33 = r20.getAction();
-        r34 = "android.intent.action.SEND_MULTIPLE";
-        r33 = r33.equals(r34);
-        if (r33 == 0) goto L_0x005a;
+        r32 = r19.getAction();
+        r33 = "android.intent.action.SEND_MULTIPLE";
+        r32 = r32.equals(r33);
+        if (r32 == 0) goto L_0x005a;
     L_0x0053:
-        super.onCreate(r39);
-        r38.finish();
+        super.onCreate(r38);
+        r37.finish();
     L_0x0059:
         return;
     L_0x005a:
-        r26 = org.telegram.messenger.MessagesController.getGlobalMainSettings();
+        r25 = org.telegram.messenger.MessagesController.getGlobalMainSettings();
+        r32 = "intro_crashed_time";
+        r34 = 0;
+        r0 = r25;
+        r1 = r32;
+        r2 = r34;
+        r10 = r0.getLong(r1, r2);
+        r32 = "fromIntro";
+        r33 = 0;
+        r0 = r19;
+        r1 = r32;
+        r2 = r33;
+        r17 = r0.getBooleanExtra(r1, r2);
+        if (r17 == 0) goto L_0x008e;
+    L_0x007e:
+        r32 = r25.edit();
         r33 = "intro_crashed_time";
         r34 = 0;
-        r0 = r26;
-        r1 = r33;
-        r2 = r34;
-        r12 = r0.getLong(r1, r2);
-        r33 = "fromIntro";
+        r32 = r32.putLong(r33, r34);
+        r32.commit();
+    L_0x008e:
+        r32 = java.lang.System.currentTimeMillis();
+        r32 = r10 - r32;
+        r32 = java.lang.Math.abs(r32);
+        r34 = 120000; // 0x1d4c0 float:1.68156E-40 double:5.9288E-319;
+        r32 = (r32 > r34 ? 1 : (r32 == r34 ? 0 : -1));
+        if (r32 < 0) goto L_0x00df;
+    L_0x009f:
+        if (r19 == 0) goto L_0x00df;
+    L_0x00a1:
+        if (r17 != 0) goto L_0x00df;
+    L_0x00a3:
+        r32 = org.telegram.messenger.ApplicationLoader.applicationContext;
+        r33 = "logininfo2";
         r34 = 0;
+        r25 = r32.getSharedPreferences(r33, r34);
+        r30 = r25.getAll();
+        r32 = r30.isEmpty();
+        if (r32 == 0) goto L_0x00df;
+    L_0x00b8:
+        r20 = new android.content.Intent;
+        r32 = org.telegram.ui.IntroActivity.class;
         r0 = r20;
-        r1 = r33;
-        r2 = r34;
-        r18 = r0.getBooleanExtra(r1, r2);
-        if (r18 == 0) goto L_0x0094;
-    L_0x007e:
-        r33 = r26.edit();
-        r34 = "intro_crashed_time";
-        r36 = 0;
-        r0 = r33;
-        r1 = r34;
-        r2 = r36;
-        r33 = r0.putLong(r1, r2);
-        r33.commit();
-    L_0x0094:
-        r34 = java.lang.System.currentTimeMillis();
-        r34 = r12 - r34;
-        r34 = java.lang.Math.abs(r34);
-        r36 = 120000; // 0x1d4c0 float:1.68156E-40 double:5.9288E-319;
-        r33 = (r34 > r36 ? 1 : (r34 == r36 ? 0 : -1));
-        if (r33 < 0) goto L_0x00e5;
-    L_0x00a5:
-        if (r20 == 0) goto L_0x00e5;
-    L_0x00a7:
-        if (r18 != 0) goto L_0x00e5;
-    L_0x00a9:
-        r33 = org.telegram.messenger.ApplicationLoader.applicationContext;
-        r34 = "logininfo2";
-        r35 = 0;
-        r26 = r33.getSharedPreferences(r34, r35);
-        r31 = r26.getAll();
-        r33 = r31.isEmpty();
-        if (r33 == 0) goto L_0x00e5;
-    L_0x00be:
-        r21 = new android.content.Intent;
-        r33 = org.telegram.ui.IntroActivity.class;
-        r0 = r21;
-        r1 = r38;
-        r2 = r33;
+        r1 = r37;
+        r2 = r32;
         r0.<init>(r1, r2);
-        r33 = r20.getData();
-        r0 = r21;
-        r1 = r33;
+        r32 = r19.getData();
+        r0 = r20;
+        r1 = r32;
         r0.setData(r1);
-        r0 = r38;
-        r1 = r21;
+        r0 = r37;
+        r1 = r20;
         r0.startActivity(r1);
-        super.onCreate(r39);
-        r38.finish();
+        super.onCreate(r38);
+        r37.finish();
         goto L_0x0059;
-    L_0x00e5:
-        r33 = 1;
-        r0 = r38;
-        r1 = r33;
+    L_0x00df:
+        r32 = 1;
+        r0 = r37;
+        r1 = r32;
         r0.requestWindowFeature(r1);
-        r33 = 2131558412; // 0x7f0d000c float:1.874214E38 double:1.0531297835E-314;
-        r0 = r38;
-        r1 = r33;
+        r32 = 2131558412; // 0x7f0d000c float:1.874214E38 double:1.0531297835E-314;
+        r0 = r37;
+        r1 = r32;
         r0.setTheme(r1);
-        r33 = android.os.Build.VERSION.SDK_INT;
-        r34 = 21;
-        r0 = r33;
-        r1 = r34;
-        if (r0 < r1) goto L_0x011d;
-    L_0x0102:
-        r33 = new android.app.ActivityManager$TaskDescription;	 Catch:{ Exception -> 0x08ca }
-        r34 = 0;
-        r35 = 0;
-        r36 = "actionBarDefault";
-        r36 = org.telegram.ui.ActionBar.Theme.getColor(r36);	 Catch:{ Exception -> 0x08ca }
-        r37 = -16777216; // 0xffffffffff000000 float:-1.7014118E38 double:NaN;
-        r36 = r36 | r37;
-        r33.<init>(r34, r35, r36);	 Catch:{ Exception -> 0x08ca }
-        r0 = r38;
+        r32 = android.os.Build.VERSION.SDK_INT;
+        r33 = 21;
+        r0 = r32;
         r1 = r33;
-        r0.setTaskDescription(r1);	 Catch:{ Exception -> 0x08ca }
-    L_0x011d:
-        r33 = r38.getWindow();
-        r34 = 2131165658; // 0x7f0701da float:1.794554E38 double:1.052935737E-314;
-        r33.setBackgroundDrawableResource(r34);
-        r33 = org.telegram.messenger.SharedConfig.passcodeHash;
-        r33 = r33.length();
-        if (r33 <= 0) goto L_0x013e;
-    L_0x012f:
-        r33 = org.telegram.messenger.SharedConfig.allowScreenCapture;
-        if (r33 != 0) goto L_0x013e;
-    L_0x0133:
-        r33 = r38.getWindow();	 Catch:{ Exception -> 0x061b }
-        r34 = 8192; // 0x2000 float:1.14794E-41 double:4.0474E-320;
-        r35 = 8192; // 0x2000 float:1.14794E-41 double:4.0474E-320;
-        r33.setFlags(r34, r35);	 Catch:{ Exception -> 0x061b }
-    L_0x013e:
-        super.onCreate(r39);
-        r33 = android.os.Build.VERSION.SDK_INT;
-        r34 = 24;
-        r0 = r33;
-        r1 = r34;
-        if (r0 < r1) goto L_0x0151;
-    L_0x014b:
-        r33 = r38.isInMultiWindowMode();
-        org.telegram.messenger.AndroidUtilities.isInMultiwindow = r33;
-    L_0x0151:
+        if (r0 < r1) goto L_0x0117;
+    L_0x00fc:
+        r32 = new android.app.ActivityManager$TaskDescription;	 Catch:{ Exception -> 0x08b8 }
         r33 = 0;
-        r0 = r38;
+        r34 = 0;
+        r35 = "actionBarDefault";
+        r35 = org.telegram.ui.ActionBar.Theme.getColor(r35);	 Catch:{ Exception -> 0x08b8 }
+        r36 = -16777216; // 0xffffffffff000000 float:-1.7014118E38 double:NaN;
+        r35 = r35 | r36;
+        r32.<init>(r33, r34, r35);	 Catch:{ Exception -> 0x08b8 }
+        r0 = r37;
+        r1 = r32;
+        r0.setTaskDescription(r1);	 Catch:{ Exception -> 0x08b8 }
+    L_0x0117:
+        r32 = r37.getWindow();
+        r33 = 2131165660; // 0x7f0701dc float:1.7945543E38 double:1.052935738E-314;
+        r32.setBackgroundDrawableResource(r33);
+        r32 = org.telegram.messenger.SharedConfig.passcodeHash;
+        r32 = r32.length();
+        if (r32 <= 0) goto L_0x0138;
+    L_0x0129:
+        r32 = org.telegram.messenger.SharedConfig.allowScreenCapture;
+        if (r32 != 0) goto L_0x0138;
+    L_0x012d:
+        r32 = r37.getWindow();	 Catch:{ Exception -> 0x060d }
+        r33 = 8192; // 0x2000 float:1.14794E-41 double:4.0474E-320;
+        r34 = 8192; // 0x2000 float:1.14794E-41 double:4.0474E-320;
+        r32.setFlags(r33, r34);	 Catch:{ Exception -> 0x060d }
+    L_0x0138:
+        super.onCreate(r38);
+        r32 = android.os.Build.VERSION.SDK_INT;
+        r33 = 24;
+        r0 = r32;
         r1 = r33;
+        if (r0 < r1) goto L_0x014b;
+    L_0x0145:
+        r32 = r37.isInMultiWindowMode();
+        org.telegram.messenger.AndroidUtilities.isInMultiwindow = r32;
+    L_0x014b:
+        r32 = 0;
+        r0 = r37;
+        r1 = r32;
         org.telegram.ui.ActionBar.Theme.createChatResources(r0, r1);
-        r33 = org.telegram.messenger.SharedConfig.passcodeHash;
-        r33 = r33.length();
-        if (r33 == 0) goto L_0x0170;
-    L_0x0162:
-        r33 = org.telegram.messenger.SharedConfig.appLocked;
-        if (r33 == 0) goto L_0x0170;
-    L_0x0166:
-        r33 = org.telegram.tgnet.ConnectionsManager.getAccountInstance();
-        r33 = r33.getCurrentTime();
-        org.telegram.messenger.SharedConfig.lastPauseTime = r33;
-    L_0x0170:
-        r33 = r38.getResources();
-        r34 = "status_bar_height";
-        r35 = "dimen";
-        r36 = "android";
-        r28 = r33.getIdentifier(r34, r35, r36);
-        if (r28 <= 0) goto L_0x0191;
-    L_0x0183:
-        r33 = r38.getResources();
-        r0 = r33;
-        r1 = r28;
-        r33 = r0.getDimensionPixelSize(r1);
-        org.telegram.messenger.AndroidUtilities.statusBarHeight = r33;
-    L_0x0191:
-        r33 = new org.telegram.ui.ActionBar.ActionBarLayout;
-        r0 = r33;
-        r1 = r38;
+        r32 = org.telegram.messenger.SharedConfig.passcodeHash;
+        r32 = r32.length();
+        if (r32 == 0) goto L_0x016a;
+    L_0x015c:
+        r32 = org.telegram.messenger.SharedConfig.appLocked;
+        if (r32 == 0) goto L_0x016a;
+    L_0x0160:
+        r32 = org.telegram.tgnet.ConnectionsManager.getAccountInstance();
+        r32 = r32.getCurrentTime();
+        org.telegram.messenger.SharedConfig.lastPauseTime = r32;
+    L_0x016a:
+        r32 = r37.getResources();
+        r33 = "status_bar_height";
+        r34 = "dimen";
+        r35 = "android";
+        r27 = r32.getIdentifier(r33, r34, r35);
+        if (r27 <= 0) goto L_0x018b;
+    L_0x017d:
+        r32 = r37.getResources();
+        r0 = r32;
+        r1 = r27;
+        r32 = r0.getDimensionPixelSize(r1);
+        org.telegram.messenger.AndroidUtilities.statusBarHeight = r32;
+    L_0x018b:
+        r32 = new org.telegram.ui.ActionBar.ActionBarLayout;
+        r0 = r32;
+        r1 = r37;
         r0.<init>(r1);
-        r0 = r33;
-        r1 = r38;
+        r0 = r32;
+        r1 = r37;
         r1.actionBarLayout = r0;
-        r33 = new org.telegram.ui.ActionBar.DrawerLayoutContainer;
-        r0 = r33;
-        r1 = r38;
+        r32 = new org.telegram.ui.ActionBar.DrawerLayoutContainer;
+        r0 = r32;
+        r1 = r37;
         r0.<init>(r1);
-        r0 = r33;
-        r1 = r38;
+        r0 = r32;
+        r1 = r37;
         r1.drawerLayoutContainer = r0;
-        r0 = r38;
+        r0 = r37;
+        r0 = r0.drawerLayoutContainer;
+        r32 = r0;
+        r33 = new org.telegram.ui.LaunchActivity$1;
+        r0 = r33;
+        r1 = r37;
+        r0.<init>();
+        r32.setDelegate(r33);
+        r0 = r37;
+        r0 = r0.drawerLayoutContainer;
+        r32 = r0;
+        r33 = new android.view.ViewGroup$LayoutParams;
+        r34 = -1;
+        r35 = -1;
+        r33.<init>(r34, r35);
+        r0 = r37;
+        r1 = r32;
+        r2 = r33;
+        r0.setContentView(r1, r2);
+        r32 = org.telegram.messenger.AndroidUtilities.isTablet();
+        if (r32 == 0) goto L_0x061b;
+    L_0x01d9:
+        r32 = r37.getWindow();
+        r33 = 16;
+        r32.setSoftInputMode(r33);
+        r21 = new org.telegram.ui.LaunchActivity$2;
+        r0 = r21;
+        r1 = r37;
+        r2 = r37;
+        r0.<init>(r2);
+        r0 = r37;
+        r0 = r0.drawerLayoutContainer;
+        r32 = r0;
+        r33 = -1;
+        r34 = -1082130432; // 0xffffffffbf800000 float:-1.0 double:NaN;
+        r33 = org.telegram.ui.Components.LayoutHelper.createFrame(r33, r34);
+        r0 = r32;
+        r1 = r21;
+        r2 = r33;
+        r0.addView(r1, r2);
+        r32 = new android.view.View;
+        r0 = r32;
+        r1 = r37;
+        r0.<init>(r1);
+        r0 = r32;
+        r1 = r37;
+        r1.backgroundTablet = r0;
+        r32 = r37.getResources();
+        r33 = 2131165258; // 0x7f07004a float:1.7944728E38 double:1.0529355396E-314;
+        r13 = r32.getDrawable(r33);
+        r13 = (android.graphics.drawable.BitmapDrawable) r13;
+        r32 = android.graphics.Shader.TileMode.REPEAT;
+        r33 = android.graphics.Shader.TileMode.REPEAT;
+        r0 = r32;
+        r1 = r33;
+        r13.setTileModeXY(r0, r1);
+        r0 = r37;
+        r0 = r0.backgroundTablet;
+        r32 = r0;
+        r0 = r32;
+        r0.setBackgroundDrawable(r13);
+        r0 = r37;
+        r0 = r0.backgroundTablet;
+        r32 = r0;
+        r33 = -1;
+        r34 = -1;
+        r33 = org.telegram.ui.Components.LayoutHelper.createRelative(r33, r34);
+        r0 = r21;
+        r1 = r32;
+        r2 = r33;
+        r0.addView(r1, r2);
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r32 = r0;
+        r0 = r21;
+        r1 = r32;
+        r0.addView(r1);
+        r32 = new org.telegram.ui.ActionBar.ActionBarLayout;
+        r0 = r32;
+        r1 = r37;
+        r0.<init>(r1);
+        r0 = r32;
+        r1 = r37;
+        r1.rightActionBarLayout = r0;
+        r0 = r37;
+        r0 = r0.rightActionBarLayout;
+        r32 = r0;
+        r33 = rightFragmentsStack;
+        r32.init(r33);
+        r0 = r37;
+        r0 = r0.rightActionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r1 = r37;
+        r0.setDelegate(r1);
+        r0 = r37;
+        r0 = r0.rightActionBarLayout;
+        r32 = r0;
+        r0 = r21;
+        r1 = r32;
+        r0.addView(r1);
+        r32 = new android.widget.FrameLayout;
+        r0 = r32;
+        r1 = r37;
+        r0.<init>(r1);
+        r0 = r32;
+        r1 = r37;
+        r1.shadowTabletSide = r0;
+        r0 = r37;
+        r0 = r0.shadowTabletSide;
+        r32 = r0;
+        r33 = 1076449908; // 0x40295274 float:2.6456575 double:5.31836919E-315;
+        r32.setBackgroundColor(r33);
+        r0 = r37;
+        r0 = r0.shadowTabletSide;
+        r32 = r0;
+        r0 = r21;
+        r1 = r32;
+        r0.addView(r1);
+        r32 = new android.widget.FrameLayout;
+        r0 = r32;
+        r1 = r37;
+        r0.<init>(r1);
+        r0 = r32;
+        r1 = r37;
+        r1.shadowTablet = r0;
+        r0 = r37;
+        r0 = r0.shadowTablet;
+        r33 = r0;
+        r32 = layerFragmentsStack;
+        r32 = r32.isEmpty();
+        if (r32 == 0) goto L_0x0613;
+    L_0x02d3:
+        r32 = 8;
+    L_0x02d5:
+        r0 = r33;
+        r1 = r32;
+        r0.setVisibility(r1);
+        r0 = r37;
+        r0 = r0.shadowTablet;
+        r32 = r0;
+        r33 = 2130706432; // 0x7f000000 float:1.7014118E38 double:1.0527088494E-314;
+        r32.setBackgroundColor(r33);
+        r0 = r37;
+        r0 = r0.shadowTablet;
+        r32 = r0;
+        r0 = r21;
+        r1 = r32;
+        r0.addView(r1);
+        r0 = r37;
+        r0 = r0.shadowTablet;
+        r32 = r0;
+        r33 = new org.telegram.ui.LaunchActivity$3;
+        r0 = r33;
+        r1 = r37;
+        r0.<init>();
+        r32.setOnTouchListener(r33);
+        r0 = r37;
+        r0 = r0.shadowTablet;
+        r32 = r0;
+        r33 = new org.telegram.ui.LaunchActivity$4;
+        r0 = r33;
+        r1 = r37;
+        r0.<init>();
+        r32.setOnClickListener(r33);
+        r32 = new org.telegram.ui.ActionBar.ActionBarLayout;
+        r0 = r32;
+        r1 = r37;
+        r0.<init>(r1);
+        r0 = r32;
+        r1 = r37;
+        r1.layersActionBarLayout = r0;
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r33 = 1;
+        r32.setRemoveActionBarExtraHeight(r33);
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r0 = r37;
+        r0 = r0.shadowTablet;
+        r33 = r0;
+        r32.setBackgroundView(r33);
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r33 = 1;
+        r32.setUseAlphaAnimations(r33);
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r33 = 2131165249; // 0x7f070041 float:1.794471E38 double:1.052935535E-314;
+        r32.setBackgroundResource(r33);
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r33 = layerFragmentsStack;
+        r32.init(r33);
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r1 = r37;
+        r0.setDelegate(r1);
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r0 = r37;
         r0 = r0.drawerLayoutContainer;
         r33 = r0;
-        r34 = new org.telegram.ui.LaunchActivity$1;
-        r0 = r34;
-        r1 = r38;
-        r0.<init>();
-        r33.setDelegate(r34);
-        r0 = r38;
+        r32.setDrawerLayoutContainer(r33);
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r33 = r0;
+        r32 = layerFragmentsStack;
+        r32 = r32.isEmpty();
+        if (r32 == 0) goto L_0x0617;
+    L_0x038d:
+        r32 = 8;
+    L_0x038f:
+        r0 = r33;
+        r1 = r32;
+        r0.setVisibility(r1);
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r0 = r21;
+        r1 = r32;
+        r0.addView(r1);
+    L_0x03a3:
+        r32 = new org.telegram.ui.Components.RecyclerListView;
+        r0 = r32;
+        r1 = r37;
+        r0.<init>(r1);
+        r0 = r32;
+        r1 = r37;
+        r1.sideMenu = r0;
+        r0 = r37;
+        r0 = r0.sideMenu;
+        r32 = r0;
+        r33 = "chats_menuBackground";
+        r33 = org.telegram.ui.ActionBar.Theme.getColor(r33);
+        r32.setBackgroundColor(r33);
+        r0 = r37;
+        r0 = r0.sideMenu;
+        r32 = r0;
+        r33 = new org.telegram.messenger.support.widget.LinearLayoutManager;
+        r34 = 1;
+        r35 = 0;
+        r0 = r33;
+        r1 = r37;
+        r2 = r34;
+        r3 = r35;
+        r0.<init>(r1, r2, r3);
+        r32.setLayoutManager(r33);
+        r0 = r37;
+        r0 = r0.sideMenu;
+        r32 = r0;
+        r33 = new org.telegram.ui.Adapters.DrawerLayoutAdapter;
+        r0 = r33;
+        r1 = r37;
+        r0.<init>(r1);
+        r0 = r33;
+        r1 = r37;
+        r1.drawerLayoutAdapter = r0;
+        r32.setAdapter(r33);
+        r0 = r37;
         r0 = r0.drawerLayoutContainer;
+        r32 = r0;
+        r0 = r37;
+        r0 = r0.sideMenu;
+        r33 = r0;
+        r32.setDrawerLayout(r33);
+        r0 = r37;
+        r0 = r0.sideMenu;
+        r32 = r0;
+        r22 = r32.getLayoutParams();
+        r22 = (android.widget.FrameLayout.LayoutParams) r22;
+        r28 = org.telegram.messenger.AndroidUtilities.getRealScreenSize();
+        r32 = org.telegram.messenger.AndroidUtilities.isTablet();
+        if (r32 == 0) goto L_0x0635;
+    L_0x0419:
+        r32 = 1134559232; // 0x43a00000 float:320.0 double:5.605467397E-315;
+        r32 = org.telegram.messenger.AndroidUtilities.dp(r32);
+    L_0x041f:
+        r0 = r32;
+        r1 = r22;
+        r1.width = r0;
+        r32 = -1;
+        r0 = r32;
+        r1 = r22;
+        r1.height = r0;
+        r0 = r37;
+        r0 = r0.sideMenu;
+        r32 = r0;
+        r0 = r32;
+        r1 = r22;
+        r0.setLayoutParams(r1);
+        r0 = r37;
+        r0 = r0.sideMenu;
+        r32 = r0;
+        r33 = new org.telegram.ui.LaunchActivity$5;
+        r0 = r33;
+        r1 = r37;
+        r0.<init>();
+        r32.setOnItemClickListener(r33);
+        r0 = r37;
+        r0 = r0.drawerLayoutContainer;
+        r32 = r0;
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r33 = r0;
+        r32.setParentActionBarLayout(r33);
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r32 = r0;
+        r0 = r37;
+        r0 = r0.drawerLayoutContainer;
+        r33 = r0;
+        r32.setDrawerLayoutContainer(r33);
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r32 = r0;
+        r33 = mainFragmentsStack;
+        r32.init(r33);
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r1 = r37;
+        r0.setDelegate(r1);
+        org.telegram.ui.ActionBar.Theme.loadWallpaper();
+        r32 = new org.telegram.ui.Components.PasscodeView;
+        r0 = r32;
+        r1 = r37;
+        r0.<init>(r1);
+        r0 = r32;
+        r1 = r37;
+        r1.passcodeView = r0;
+        r0 = r37;
+        r0 = r0.drawerLayoutContainer;
+        r32 = r0;
+        r0 = r37;
+        r0 = r0.passcodeView;
+        r33 = r0;
+        r34 = -1;
+        r35 = -1082130432; // 0xffffffffbf800000 float:-1.0 double:NaN;
+        r34 = org.telegram.ui.Components.LayoutHelper.createFrame(r34, r35);
+        r32.addView(r33, r34);
+        r32 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
+        r33 = org.telegram.messenger.NotificationCenter.closeOtherAppActivities;
+        r34 = 1;
+        r0 = r34;
+        r0 = new java.lang.Object[r0];
+        r34 = r0;
+        r35 = 0;
+        r34[r35] = r37;
+        r32.postNotificationName(r33, r34);
+        r32 = org.telegram.tgnet.ConnectionsManager.getAccountInstance();
+        r32 = r32.getConnectionState();
+        r0 = r32;
+        r1 = r37;
+        r1.currentConnectionState = r0;
+        r37.checkCurrentAccount();
+        r32 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
+        r33 = org.telegram.messenger.NotificationCenter.reloadInterface;
+        r0 = r32;
+        r1 = r37;
+        r2 = r33;
+        r0.addObserver(r1, r2);
+        r32 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
+        r33 = org.telegram.messenger.NotificationCenter.suggestedLangpack;
+        r0 = r32;
+        r1 = r37;
+        r2 = r33;
+        r0.addObserver(r1, r2);
+        r32 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
+        r33 = org.telegram.messenger.NotificationCenter.didSetNewTheme;
+        r0 = r32;
+        r1 = r37;
+        r2 = r33;
+        r0.addObserver(r1, r2);
+        r32 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
+        r33 = org.telegram.messenger.NotificationCenter.closeOtherAppActivities;
+        r0 = r32;
+        r1 = r37;
+        r2 = r33;
+        r0.addObserver(r1, r2);
+        r32 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
+        r33 = org.telegram.messenger.NotificationCenter.didSetPasscode;
+        r0 = r32;
+        r1 = r37;
+        r2 = r33;
+        r0.addObserver(r1, r2);
+        r32 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
+        r33 = org.telegram.messenger.NotificationCenter.didSetNewWallpapper;
+        r0 = r32;
+        r1 = r37;
+        r2 = r33;
+        r0.addObserver(r1, r2);
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r0 = r0.fragmentsStack;
+        r32 = r0;
+        r32 = r32.isEmpty();
+        if (r32 == 0) goto L_0x07d2;
+    L_0x053d:
+        r0 = r37;
+        r0 = r0.currentAccount;
+        r32 = r0;
+        r32 = org.telegram.messenger.UserConfig.getInstance(r32);
+        r32 = r32.isClientActivated();
+        if (r32 != 0) goto L_0x0659;
+    L_0x054d:
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r32 = r0;
+        r33 = new org.telegram.ui.LoginActivity;
+        r33.<init>();
+        r32.addFragmentToStack(r33);
+        r0 = r37;
+        r0 = r0.drawerLayoutContainer;
+        r32 = r0;
+        r33 = 0;
+        r34 = 0;
+        r32.setAllowOpenDrawer(r33, r34);
+    L_0x0568:
+        if (r38 == 0) goto L_0x058e;
+    L_0x056a:
+        r32 = "fragment";
+        r0 = r38;
+        r1 = r32;
+        r16 = r0.getString(r1);	 Catch:{ Exception -> 0x071a }
+        if (r16 == 0) goto L_0x058e;
+    L_0x0577:
+        r32 = "args";
+        r0 = r38;
+        r1 = r32;
+        r7 = r0.getBundle(r1);	 Catch:{ Exception -> 0x071a }
+        r32 = -1;
+        r33 = r16.hashCode();	 Catch:{ Exception -> 0x071a }
+        switch(r33) {
+            case -1529105743: goto L_0x06ed;
+            case -1349522494: goto L_0x06dc;
+            case 3052376: goto L_0x0687;
+            case 3108362: goto L_0x06cb;
+            case 98629247: goto L_0x06a9;
+            case 738950403: goto L_0x06ba;
+            case 1434631203: goto L_0x0698;
+            default: goto L_0x058b;
+        };
+    L_0x058b:
+        switch(r32) {
+            case 0: goto L_0x06fe;
+            case 1: goto L_0x0720;
+            case 2: goto L_0x073b;
+            case 3: goto L_0x075d;
+            case 4: goto L_0x0779;
+            case 5: goto L_0x0795;
+            case 6: goto L_0x07b7;
+            default: goto L_0x058e;
+        };
+    L_0x058e:
+        r37.checkLayout();
+        r33 = r37.getIntent();
+        r34 = 0;
+        if (r38 == 0) goto L_0x08a4;
+    L_0x0599:
+        r32 = 1;
+    L_0x059b:
+        r35 = 0;
+        r0 = r37;
+        r1 = r33;
+        r2 = r34;
+        r3 = r32;
+        r4 = r35;
+        r0.handleIntent(r1, r2, r3, r4);
+        r23 = android.os.Build.DISPLAY;	 Catch:{ Exception -> 0x08b2 }
+        r24 = android.os.Build.USER;	 Catch:{ Exception -> 0x08b2 }
+        if (r23 == 0) goto L_0x08a8;
+    L_0x05b0:
+        r23 = r23.toLowerCase();	 Catch:{ Exception -> 0x08b2 }
+    L_0x05b4:
+        if (r24 == 0) goto L_0x08ad;
+    L_0x05b6:
+        r24 = r23.toLowerCase();	 Catch:{ Exception -> 0x08b2 }
+    L_0x05ba:
+        r32 = "flyme";
+        r0 = r23;
+        r1 = r32;
+        r32 = r0.contains(r1);	 Catch:{ Exception -> 0x08b2 }
+        if (r32 != 0) goto L_0x05d4;
+    L_0x05c7:
+        r32 = "flyme";
+        r0 = r24;
+        r1 = r32;
+        r32 = r0.contains(r1);	 Catch:{ Exception -> 0x08b2 }
+        if (r32 == 0) goto L_0x05fc;
+    L_0x05d4:
+        r32 = 1;
+        org.telegram.messenger.AndroidUtilities.incorrectDisplaySizeFix = r32;	 Catch:{ Exception -> 0x08b2 }
+        r32 = r37.getWindow();	 Catch:{ Exception -> 0x08b2 }
+        r32 = r32.getDecorView();	 Catch:{ Exception -> 0x08b2 }
+        r31 = r32.getRootView();	 Catch:{ Exception -> 0x08b2 }
+        r32 = r31.getViewTreeObserver();	 Catch:{ Exception -> 0x08b2 }
+        r33 = new org.telegram.ui.LaunchActivity$6;	 Catch:{ Exception -> 0x08b2 }
+        r0 = r33;
+        r1 = r37;
+        r2 = r31;
+        r0.<init>(r2);	 Catch:{ Exception -> 0x08b2 }
+        r0 = r33;
+        r1 = r37;
+        r1.onGlobalLayoutListener = r0;	 Catch:{ Exception -> 0x08b2 }
+        r32.addOnGlobalLayoutListener(r33);	 Catch:{ Exception -> 0x08b2 }
+    L_0x05fc:
+        r32 = org.telegram.messenger.MediaController.getInstance();
+        r33 = 1;
+        r0 = r32;
+        r1 = r37;
+        r2 = r33;
+        r0.setBaseActivity(r1, r2);
+        goto L_0x0059;
+    L_0x060d:
+        r14 = move-exception;
+        org.telegram.messenger.FileLog.e(r14);
+        goto L_0x0138;
+    L_0x0613:
+        r32 = 0;
+        goto L_0x02d5;
+    L_0x0617:
+        r32 = 0;
+        goto L_0x038f;
+    L_0x061b:
+        r0 = r37;
+        r0 = r0.drawerLayoutContainer;
+        r32 = r0;
+        r0 = r37;
+        r0 = r0.actionBarLayout;
         r33 = r0;
         r34 = new android.view.ViewGroup$LayoutParams;
         r35 = -1;
         r36 = -1;
         r34.<init>(r35, r36);
-        r0 = r38;
-        r1 = r33;
-        r2 = r34;
-        r0.setContentView(r1, r2);
-        r33 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r33 == 0) goto L_0x0629;
-    L_0x01df:
-        r33 = r38.getWindow();
-        r34 = 16;
-        r33.setSoftInputMode(r34);
-        r22 = new org.telegram.ui.LaunchActivity$2;
-        r0 = r22;
-        r1 = r38;
-        r2 = r38;
-        r0.<init>(r2);
-        r0 = r38;
-        r0 = r0.drawerLayoutContainer;
-        r33 = r0;
-        r34 = -1;
-        r35 = -1082130432; // 0xffffffffbf800000 float:-1.0 double:NaN;
-        r34 = org.telegram.ui.Components.LayoutHelper.createFrame(r34, r35);
-        r0 = r33;
-        r1 = r22;
-        r2 = r34;
-        r0.addView(r1, r2);
-        r33 = new android.view.View;
-        r0 = r33;
-        r1 = r38;
-        r0.<init>(r1);
-        r0 = r33;
-        r1 = r38;
-        r1.backgroundTablet = r0;
-        r33 = r38.getResources();
-        r34 = 2131165258; // 0x7f07004a float:1.7944728E38 double:1.0529355396E-314;
-        r14 = r33.getDrawable(r34);
-        r14 = (android.graphics.drawable.BitmapDrawable) r14;
-        r33 = android.graphics.Shader.TileMode.REPEAT;
-        r34 = android.graphics.Shader.TileMode.REPEAT;
-        r0 = r33;
-        r1 = r34;
-        r14.setTileModeXY(r0, r1);
-        r0 = r38;
-        r0 = r0.backgroundTablet;
-        r33 = r0;
-        r0 = r33;
-        r0.setBackgroundDrawable(r14);
-        r0 = r38;
-        r0 = r0.backgroundTablet;
-        r33 = r0;
-        r34 = -1;
-        r35 = -1;
-        r34 = org.telegram.ui.Components.LayoutHelper.createRelative(r34, r35);
-        r0 = r22;
-        r1 = r33;
-        r2 = r34;
-        r0.addView(r1, r2);
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r33 = r0;
-        r0 = r22;
-        r1 = r33;
-        r0.addView(r1);
-        r33 = new org.telegram.ui.ActionBar.ActionBarLayout;
-        r0 = r33;
-        r1 = r38;
-        r0.<init>(r1);
-        r0 = r33;
-        r1 = r38;
-        r1.rightActionBarLayout = r0;
-        r0 = r38;
-        r0 = r0.rightActionBarLayout;
-        r33 = r0;
-        r34 = rightFragmentsStack;
-        r33.init(r34);
-        r0 = r38;
-        r0 = r0.rightActionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r1 = r38;
-        r0.setDelegate(r1);
-        r0 = r38;
-        r0 = r0.rightActionBarLayout;
-        r33 = r0;
-        r0 = r22;
-        r1 = r33;
-        r0.addView(r1);
-        r33 = new android.widget.FrameLayout;
-        r0 = r33;
-        r1 = r38;
-        r0.<init>(r1);
-        r0 = r33;
-        r1 = r38;
-        r1.shadowTabletSide = r0;
-        r0 = r38;
-        r0 = r0.shadowTabletSide;
-        r33 = r0;
-        r34 = 1076449908; // 0x40295274 float:2.6456575 double:5.31836919E-315;
-        r33.setBackgroundColor(r34);
-        r0 = r38;
-        r0 = r0.shadowTabletSide;
-        r33 = r0;
-        r0 = r22;
-        r1 = r33;
-        r0.addView(r1);
-        r33 = new android.widget.FrameLayout;
-        r0 = r33;
-        r1 = r38;
-        r0.<init>(r1);
-        r0 = r33;
-        r1 = r38;
-        r1.shadowTablet = r0;
-        r0 = r38;
-        r0 = r0.shadowTablet;
-        r34 = r0;
-        r33 = layerFragmentsStack;
-        r33 = r33.isEmpty();
-        if (r33 == 0) goto L_0x0621;
-    L_0x02d9:
-        r33 = 8;
-    L_0x02db:
-        r0 = r34;
-        r1 = r33;
-        r0.setVisibility(r1);
-        r0 = r38;
-        r0 = r0.shadowTablet;
-        r33 = r0;
-        r34 = 2130706432; // 0x7f000000 float:1.7014118E38 double:1.0527088494E-314;
-        r33.setBackgroundColor(r34);
-        r0 = r38;
-        r0 = r0.shadowTablet;
-        r33 = r0;
-        r0 = r22;
-        r1 = r33;
-        r0.addView(r1);
-        r0 = r38;
-        r0 = r0.shadowTablet;
-        r33 = r0;
-        r34 = new org.telegram.ui.LaunchActivity$3;
-        r0 = r34;
-        r1 = r38;
-        r0.<init>();
-        r33.setOnTouchListener(r34);
-        r0 = r38;
-        r0 = r0.shadowTablet;
-        r33 = r0;
-        r34 = new org.telegram.ui.LaunchActivity$4;
-        r0 = r34;
-        r1 = r38;
-        r0.<init>();
-        r33.setOnClickListener(r34);
-        r33 = new org.telegram.ui.ActionBar.ActionBarLayout;
-        r0 = r33;
-        r1 = r38;
-        r0.<init>(r1);
-        r0 = r33;
-        r1 = r38;
-        r1.layersActionBarLayout = r0;
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r34 = 1;
-        r33.setRemoveActionBarExtraHeight(r34);
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r0 = r38;
-        r0 = r0.shadowTablet;
-        r34 = r0;
-        r33.setBackgroundView(r34);
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r34 = 1;
-        r33.setUseAlphaAnimations(r34);
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r34 = 2131165249; // 0x7f070041 float:1.794471E38 double:1.052935535E-314;
-        r33.setBackgroundResource(r34);
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r34 = layerFragmentsStack;
-        r33.init(r34);
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r1 = r38;
-        r0.setDelegate(r1);
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r0 = r38;
-        r0 = r0.drawerLayoutContainer;
-        r34 = r0;
-        r33.setDrawerLayoutContainer(r34);
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r34 = r0;
-        r33 = layerFragmentsStack;
-        r33 = r33.isEmpty();
-        if (r33 == 0) goto L_0x0625;
-    L_0x0393:
-        r33 = 8;
-    L_0x0395:
-        r0 = r34;
-        r1 = r33;
-        r0.setVisibility(r1);
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r0 = r22;
-        r1 = r33;
-        r0.addView(r1);
-    L_0x03a9:
-        r33 = new org.telegram.ui.Components.RecyclerListView;
-        r0 = r33;
-        r1 = r38;
-        r0.<init>(r1);
-        r0 = r33;
-        r1 = r38;
-        r1.sideMenu = r0;
-        r0 = r38;
-        r0 = r0.sideMenu;
-        r33 = r0;
-        r34 = "chats_menuBackground";
-        r34 = org.telegram.ui.ActionBar.Theme.getColor(r34);
-        r33.setBackgroundColor(r34);
-        r0 = r38;
-        r0 = r0.sideMenu;
-        r33 = r0;
-        r34 = new org.telegram.messenger.support.widget.LinearLayoutManager;
-        r35 = 1;
-        r36 = 0;
-        r0 = r34;
-        r1 = r38;
-        r2 = r35;
-        r3 = r36;
-        r0.<init>(r1, r2, r3);
-        r33.setLayoutManager(r34);
-        r0 = r38;
-        r0 = r0.sideMenu;
-        r33 = r0;
-        r34 = new org.telegram.ui.Adapters.DrawerLayoutAdapter;
-        r0 = r34;
-        r1 = r38;
-        r0.<init>(r1);
-        r0 = r34;
-        r1 = r38;
-        r1.drawerLayoutAdapter = r0;
-        r33.setAdapter(r34);
-        r0 = r38;
-        r0 = r0.drawerLayoutContainer;
-        r33 = r0;
-        r0 = r38;
-        r0 = r0.sideMenu;
-        r34 = r0;
-        r33.setDrawerLayout(r34);
-        r0 = r38;
-        r0 = r0.sideMenu;
-        r33 = r0;
-        r23 = r33.getLayoutParams();
-        r23 = (android.widget.FrameLayout.LayoutParams) r23;
-        r29 = org.telegram.messenger.AndroidUtilities.getRealScreenSize();
-        r33 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r33 == 0) goto L_0x0643;
-    L_0x041f:
-        r33 = 1134559232; // 0x43a00000 float:320.0 double:5.605467397E-315;
-        r33 = org.telegram.messenger.AndroidUtilities.dp(r33);
-    L_0x0425:
-        r0 = r33;
-        r1 = r23;
-        r1.width = r0;
-        r33 = -1;
-        r0 = r33;
-        r1 = r23;
-        r1.height = r0;
-        r0 = r38;
-        r0 = r0.sideMenu;
-        r33 = r0;
-        r0 = r33;
-        r1 = r23;
-        r0.setLayoutParams(r1);
-        r0 = r38;
-        r0 = r0.sideMenu;
-        r33 = r0;
-        r34 = new org.telegram.ui.LaunchActivity$5;
-        r0 = r34;
-        r1 = r38;
-        r0.<init>();
-        r33.setOnItemClickListener(r34);
-        r0 = r38;
-        r0 = r0.drawerLayoutContainer;
-        r33 = r0;
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r34 = r0;
-        r33.setParentActionBarLayout(r34);
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r33 = r0;
-        r0 = r38;
-        r0 = r0.drawerLayoutContainer;
-        r34 = r0;
-        r33.setDrawerLayoutContainer(r34);
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r33 = r0;
-        r34 = mainFragmentsStack;
-        r33.init(r34);
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r1 = r38;
-        r0.setDelegate(r1);
-        org.telegram.ui.ActionBar.Theme.loadWallpaper();
-        r33 = new org.telegram.ui.Components.PasscodeView;
-        r0 = r33;
-        r1 = r38;
-        r0.<init>(r1);
-        r0 = r33;
-        r1 = r38;
-        r1.passcodeView = r0;
-        r0 = r38;
-        r0 = r0.drawerLayoutContainer;
-        r33 = r0;
-        r0 = r38;
-        r0 = r0.passcodeView;
-        r34 = r0;
-        r35 = -1;
-        r36 = -1082130432; // 0xffffffffbf800000 float:-1.0 double:NaN;
-        r35 = org.telegram.ui.Components.LayoutHelper.createFrame(r35, r36);
-        r33.addView(r34, r35);
-        r33 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
-        r34 = org.telegram.messenger.NotificationCenter.closeOtherAppActivities;
-        r35 = 1;
-        r0 = r35;
-        r0 = new java.lang.Object[r0];
-        r35 = r0;
-        r36 = 0;
-        r35[r36] = r38;
-        r33.postNotificationName(r34, r35);
-        r33 = org.telegram.tgnet.ConnectionsManager.getAccountInstance();
-        r33 = r33.getConnectionState();
-        r0 = r33;
-        r1 = r38;
-        r1.currentConnectionState = r0;
-        r38.checkCurrentAccount();
-        r33 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
-        r34 = org.telegram.messenger.NotificationCenter.reloadInterface;
-        r0 = r33;
-        r1 = r38;
-        r2 = r34;
-        r0.addObserver(r1, r2);
-        r33 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
-        r34 = org.telegram.messenger.NotificationCenter.suggestedLangpack;
-        r0 = r33;
-        r1 = r38;
-        r2 = r34;
-        r0.addObserver(r1, r2);
-        r33 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
-        r34 = org.telegram.messenger.NotificationCenter.didSetNewTheme;
-        r0 = r33;
-        r1 = r38;
-        r2 = r34;
-        r0.addObserver(r1, r2);
-        r33 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
-        r34 = org.telegram.messenger.NotificationCenter.closeOtherAppActivities;
-        r0 = r33;
-        r1 = r38;
-        r2 = r34;
-        r0.addObserver(r1, r2);
-        r33 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
-        r34 = org.telegram.messenger.NotificationCenter.didSetPasscode;
-        r0 = r33;
-        r1 = r38;
-        r2 = r34;
-        r0.addObserver(r1, r2);
-        r33 = org.telegram.messenger.NotificationCenter.getGlobalInstance();
-        r34 = org.telegram.messenger.NotificationCenter.didSetNewWallpapper;
-        r0 = r33;
-        r1 = r38;
-        r2 = r34;
-        r0.addObserver(r1, r2);
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r0 = r0.fragmentsStack;
-        r33 = r0;
-        r33 = r33.isEmpty();
-        if (r33 == 0) goto L_0x07e0;
-    L_0x0543:
-        r0 = r38;
-        r0 = r0.currentAccount;
-        r33 = r0;
-        r33 = org.telegram.messenger.UserConfig.getInstance(r33);
-        r33 = r33.isClientActivated();
-        if (r33 != 0) goto L_0x0667;
-    L_0x0553:
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r33 = r0;
-        r34 = new org.telegram.ui.LoginActivity;
-        r34.<init>();
-        r33.addFragmentToStack(r34);
-        r0 = r38;
-        r0 = r0.drawerLayoutContainer;
-        r33 = r0;
-        r34 = 0;
-        r35 = 0;
-        r33.setAllowOpenDrawer(r34, r35);
-    L_0x056e:
-        if (r39 == 0) goto L_0x0594;
-    L_0x0570:
-        r33 = "fragment";
-        r0 = r39;
-        r1 = r33;
-        r17 = r0.getString(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r17 == 0) goto L_0x0594;
-    L_0x057d:
-        r33 = "args";
-        r0 = r39;
-        r1 = r33;
-        r8 = r0.getBundle(r1);	 Catch:{ Exception -> 0x0728 }
-        r33 = -1;
-        r34 = r17.hashCode();	 Catch:{ Exception -> 0x0728 }
-        switch(r34) {
-            case -1529105743: goto L_0x06fb;
-            case -1349522494: goto L_0x06ea;
-            case 3052376: goto L_0x0695;
-            case 3108362: goto L_0x06d9;
-            case 98629247: goto L_0x06b7;
-            case 738950403: goto L_0x06c8;
-            case 1434631203: goto L_0x06a6;
-            default: goto L_0x0591;
-        };
-    L_0x0591:
-        switch(r33) {
-            case 0: goto L_0x070c;
-            case 1: goto L_0x072e;
-            case 2: goto L_0x0749;
-            case 3: goto L_0x076b;
-            case 4: goto L_0x0787;
-            case 5: goto L_0x07a3;
-            case 6: goto L_0x07c5;
-            default: goto L_0x0594;
-        };
-    L_0x0594:
-        r38.checkLayout();
-        r34 = r38.getIntent();
-        r35 = 0;
-        if (r39 == 0) goto L_0x08b6;
-    L_0x059f:
-        r33 = 1;
-    L_0x05a1:
-        r36 = 0;
-        r0 = r38;
-        r1 = r34;
-        r2 = r35;
-        r3 = r33;
-        r4 = r36;
-        r0.handleIntent(r1, r2, r3, r4);
-        r24 = android.os.Build.DISPLAY;	 Catch:{ Exception -> 0x08c4 }
-        r25 = android.os.Build.USER;	 Catch:{ Exception -> 0x08c4 }
-        if (r24 == 0) goto L_0x08ba;
-    L_0x05b6:
-        r24 = r24.toLowerCase();	 Catch:{ Exception -> 0x08c4 }
-    L_0x05ba:
-        if (r25 == 0) goto L_0x08bf;
-    L_0x05bc:
-        r25 = r24.toLowerCase();	 Catch:{ Exception -> 0x08c4 }
-    L_0x05c0:
-        r33 = "flyme";
-        r0 = r24;
-        r1 = r33;
-        r33 = r0.contains(r1);	 Catch:{ Exception -> 0x08c4 }
-        if (r33 != 0) goto L_0x05da;
-    L_0x05cd:
-        r33 = "flyme";
-        r0 = r25;
-        r1 = r33;
-        r33 = r0.contains(r1);	 Catch:{ Exception -> 0x08c4 }
-        if (r33 == 0) goto L_0x0602;
-    L_0x05da:
-        r33 = 1;
-        org.telegram.messenger.AndroidUtilities.incorrectDisplaySizeFix = r33;	 Catch:{ Exception -> 0x08c4 }
-        r33 = r38.getWindow();	 Catch:{ Exception -> 0x08c4 }
-        r33 = r33.getDecorView();	 Catch:{ Exception -> 0x08c4 }
-        r32 = r33.getRootView();	 Catch:{ Exception -> 0x08c4 }
-        r33 = r32.getViewTreeObserver();	 Catch:{ Exception -> 0x08c4 }
-        r34 = new org.telegram.ui.LaunchActivity$6;	 Catch:{ Exception -> 0x08c4 }
-        r0 = r34;
-        r1 = r38;
-        r2 = r32;
-        r0.<init>(r2);	 Catch:{ Exception -> 0x08c4 }
-        r0 = r34;
-        r1 = r38;
-        r1.onGlobalLayoutListener = r0;	 Catch:{ Exception -> 0x08c4 }
-        r33.addOnGlobalLayoutListener(r34);	 Catch:{ Exception -> 0x08c4 }
-    L_0x0602:
-        r6 = 0;
-    L_0x0603:
-        r33 = 3;
-        r0 = r33;
-        if (r6 >= r0) goto L_0x0059;
-    L_0x0609:
-        r33 = org.telegram.messenger.MediaController.getInstance(r6);
-        r34 = 1;
-        r0 = r33;
-        r1 = r38;
-        r2 = r34;
-        r0.setBaseActivity(r1, r2);
-        r6 = r6 + 1;
-        goto L_0x0603;
-    L_0x061b:
-        r15 = move-exception;
-        org.telegram.messenger.FileLog.e(r15);
-        goto L_0x013e;
-    L_0x0621:
-        r33 = 0;
-        goto L_0x02db;
-    L_0x0625:
-        r33 = 0;
-        goto L_0x0395;
-    L_0x0629:
-        r0 = r38;
-        r0 = r0.drawerLayoutContainer;
-        r33 = r0;
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r34 = r0;
-        r35 = new android.view.ViewGroup$LayoutParams;
-        r36 = -1;
-        r37 = -1;
-        r35.<init>(r36, r37);
-        r33.addView(r34, r35);
-        goto L_0x03a9;
-    L_0x0643:
-        r33 = 1134559232; // 0x43a00000 float:320.0 double:5.605467397E-315;
-        r33 = org.telegram.messenger.AndroidUtilities.dp(r33);
-        r0 = r29;
+        r32.addView(r33, r34);
+        goto L_0x03a3;
+    L_0x0635:
+        r32 = 1134559232; // 0x43a00000 float:320.0 double:5.605467397E-315;
+        r32 = org.telegram.messenger.AndroidUtilities.dp(r32);
+        r0 = r28;
         r0 = r0.x;
-        r34 = r0;
-        r0 = r29;
+        r33 = r0;
+        r0 = r28;
         r0 = r0.y;
-        r35 = r0;
-        r34 = java.lang.Math.min(r34, r35);
-        r35 = 1113587712; // 0x42600000 float:56.0 double:5.50185432E-315;
-        r35 = org.telegram.messenger.AndroidUtilities.dp(r35);
-        r34 = r34 - r35;
+        r34 = r0;
         r33 = java.lang.Math.min(r33, r34);
-        goto L_0x0425;
-    L_0x0667:
-        r11 = new org.telegram.ui.DialogsActivity;
-        r33 = 0;
-        r0 = r33;
-        r11.<init>(r0);
-        r0 = r38;
+        r34 = 1113587712; // 0x42600000 float:56.0 double:5.50185432E-315;
+        r34 = org.telegram.messenger.AndroidUtilities.dp(r34);
+        r33 = r33 - r34;
+        r32 = java.lang.Math.min(r32, r33);
+        goto L_0x041f;
+    L_0x0659:
+        r12 = new org.telegram.ui.DialogsActivity;
+        r32 = 0;
+        r0 = r32;
+        r12.<init>(r0);
+        r0 = r37;
         r0 = r0.sideMenu;
-        r33 = r0;
-        r0 = r33;
-        r11.setSideMenu(r0);
-        r0 = r38;
+        r32 = r0;
+        r0 = r32;
+        r12.setSideMenu(r0);
+        r0 = r37;
         r0 = r0.actionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r0.addFragmentToStack(r11);
-        r0 = r38;
+        r32 = r0;
+        r0 = r32;
+        r0.addFragmentToStack(r12);
+        r0 = r37;
         r0 = r0.drawerLayoutContainer;
-        r33 = r0;
-        r34 = 1;
-        r35 = 0;
-        r33.setAllowOpenDrawer(r34, r35);
-        goto L_0x056e;
-    L_0x0695:
-        r34 = "chat";
-        r0 = r17;
-        r1 = r34;
-        r34 = r0.equals(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r34 == 0) goto L_0x0591;
-    L_0x06a2:
-        r33 = 0;
-        goto L_0x0591;
-    L_0x06a6:
-        r34 = "settings";
-        r0 = r17;
-        r1 = r34;
-        r34 = r0.equals(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r34 == 0) goto L_0x0591;
-    L_0x06b3:
+        r32 = r0;
         r33 = 1;
-        goto L_0x0591;
-    L_0x06b7:
-        r34 = "group";
-        r0 = r17;
-        r1 = r34;
-        r34 = r0.equals(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r34 == 0) goto L_0x0591;
-    L_0x06c4:
-        r33 = 2;
-        goto L_0x0591;
-    L_0x06c8:
-        r34 = "channel";
-        r0 = r17;
-        r1 = r34;
-        r34 = r0.equals(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r34 == 0) goto L_0x0591;
-    L_0x06d5:
-        r33 = 3;
-        goto L_0x0591;
-    L_0x06d9:
-        r34 = "edit";
-        r0 = r17;
-        r1 = r34;
-        r34 = r0.equals(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r34 == 0) goto L_0x0591;
-    L_0x06e6:
-        r33 = 4;
-        goto L_0x0591;
-    L_0x06ea:
-        r34 = "chat_profile";
-        r0 = r17;
-        r1 = r34;
-        r34 = r0.equals(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r34 == 0) goto L_0x0591;
-    L_0x06f7:
-        r33 = 5;
-        goto L_0x0591;
-    L_0x06fb:
-        r34 = "wallpapers";
-        r0 = r17;
-        r1 = r34;
-        r34 = r0.equals(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r34 == 0) goto L_0x0591;
-    L_0x0708:
-        r33 = 6;
-        goto L_0x0591;
-    L_0x070c:
-        if (r8 == 0) goto L_0x0594;
-    L_0x070e:
-        r10 = new org.telegram.ui.ChatActivity;	 Catch:{ Exception -> 0x0728 }
-        r10.<init>(r8);	 Catch:{ Exception -> 0x0728 }
-        r0 = r38;
-        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x0728 }
-        r33 = r0;
-        r0 = r33;
-        r33 = r0.addFragmentToStack(r10);	 Catch:{ Exception -> 0x0728 }
-        if (r33 == 0) goto L_0x0594;
-    L_0x0721:
-        r0 = r39;
-        r10.restoreSelfArgs(r0);	 Catch:{ Exception -> 0x0728 }
-        goto L_0x0594;
-    L_0x0728:
-        r15 = move-exception;
-        org.telegram.messenger.FileLog.e(r15);
-        goto L_0x0594;
-    L_0x072e:
-        r30 = new org.telegram.ui.SettingsActivity;	 Catch:{ Exception -> 0x0728 }
-        r30.<init>();	 Catch:{ Exception -> 0x0728 }
-        r0 = r38;
-        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x0728 }
-        r33 = r0;
-        r0 = r33;
-        r1 = r30;
-        r0.addFragmentToStack(r1);	 Catch:{ Exception -> 0x0728 }
-        r0 = r30;
-        r1 = r39;
-        r0.restoreSelfArgs(r1);	 Catch:{ Exception -> 0x0728 }
-        goto L_0x0594;
-    L_0x0749:
-        if (r8 == 0) goto L_0x0594;
-    L_0x074b:
-        r19 = new org.telegram.ui.GroupCreateFinalActivity;	 Catch:{ Exception -> 0x0728 }
-        r0 = r19;
-        r0.<init>(r8);	 Catch:{ Exception -> 0x0728 }
-        r0 = r38;
-        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x0728 }
-        r33 = r0;
-        r0 = r33;
-        r1 = r19;
-        r33 = r0.addFragmentToStack(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r33 == 0) goto L_0x0594;
-    L_0x0762:
-        r0 = r19;
-        r1 = r39;
-        r0.restoreSelfArgs(r1);	 Catch:{ Exception -> 0x0728 }
-        goto L_0x0594;
-    L_0x076b:
-        if (r8 == 0) goto L_0x0594;
-    L_0x076d:
-        r9 = new org.telegram.ui.ChannelCreateActivity;	 Catch:{ Exception -> 0x0728 }
-        r9.<init>(r8);	 Catch:{ Exception -> 0x0728 }
-        r0 = r38;
-        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x0728 }
-        r33 = r0;
-        r0 = r33;
-        r33 = r0.addFragmentToStack(r9);	 Catch:{ Exception -> 0x0728 }
-        if (r33 == 0) goto L_0x0594;
-    L_0x0780:
-        r0 = r39;
-        r9.restoreSelfArgs(r0);	 Catch:{ Exception -> 0x0728 }
-        goto L_0x0594;
-    L_0x0787:
-        if (r8 == 0) goto L_0x0594;
-    L_0x0789:
-        r9 = new org.telegram.ui.ChannelEditActivity;	 Catch:{ Exception -> 0x0728 }
-        r9.<init>(r8);	 Catch:{ Exception -> 0x0728 }
-        r0 = r38;
-        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x0728 }
-        r33 = r0;
-        r0 = r33;
-        r33 = r0.addFragmentToStack(r9);	 Catch:{ Exception -> 0x0728 }
-        if (r33 == 0) goto L_0x0594;
-    L_0x079c:
-        r0 = r39;
-        r9.restoreSelfArgs(r0);	 Catch:{ Exception -> 0x0728 }
-        goto L_0x0594;
-    L_0x07a3:
-        if (r8 == 0) goto L_0x0594;
-    L_0x07a5:
-        r27 = new org.telegram.ui.ProfileActivity;	 Catch:{ Exception -> 0x0728 }
-        r0 = r27;
-        r0.<init>(r8);	 Catch:{ Exception -> 0x0728 }
-        r0 = r38;
-        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x0728 }
-        r33 = r0;
-        r0 = r33;
-        r1 = r27;
-        r33 = r0.addFragmentToStack(r1);	 Catch:{ Exception -> 0x0728 }
-        if (r33 == 0) goto L_0x0594;
-    L_0x07bc:
-        r0 = r27;
-        r1 = r39;
-        r0.restoreSelfArgs(r1);	 Catch:{ Exception -> 0x0728 }
-        goto L_0x0594;
-    L_0x07c5:
-        r30 = new org.telegram.ui.WallpapersActivity;	 Catch:{ Exception -> 0x0728 }
-        r30.<init>();	 Catch:{ Exception -> 0x0728 }
-        r0 = r38;
-        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x0728 }
-        r33 = r0;
-        r0 = r33;
-        r1 = r30;
-        r0.addFragmentToStack(r1);	 Catch:{ Exception -> 0x0728 }
-        r0 = r30;
-        r1 = r39;
-        r0.restoreSelfArgs(r1);	 Catch:{ Exception -> 0x0728 }
-        goto L_0x0594;
-    L_0x07e0:
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r0 = r0.fragmentsStack;
-        r33 = r0;
         r34 = 0;
-        r16 = r33.get(r34);
-        r16 = (org.telegram.ui.ActionBar.BaseFragment) r16;
-        r0 = r16;
-        r0 = r0 instanceof org.telegram.ui.DialogsActivity;
-        r33 = r0;
-        if (r33 == 0) goto L_0x080b;
-    L_0x07fc:
-        r16 = (org.telegram.ui.DialogsActivity) r16;
-        r0 = r38;
-        r0 = r0.sideMenu;
-        r33 = r0;
+        r32.setAllowOpenDrawer(r33, r34);
+        goto L_0x0568;
+    L_0x0687:
+        r33 = "chat";
         r0 = r16;
         r1 = r33;
-        r0.setSideMenu(r1);
-    L_0x080b:
-        r7 = 1;
-        r33 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r33 == 0) goto L_0x0870;
-    L_0x0812:
+        r33 = r0.equals(r1);	 Catch:{ Exception -> 0x071a }
+        if (r33 == 0) goto L_0x058b;
+    L_0x0694:
+        r32 = 0;
+        goto L_0x058b;
+    L_0x0698:
+        r33 = "settings";
+        r0 = r16;
+        r1 = r33;
+        r33 = r0.equals(r1);	 Catch:{ Exception -> 0x071a }
+        if (r33 == 0) goto L_0x058b;
+    L_0x06a5:
+        r32 = 1;
+        goto L_0x058b;
+    L_0x06a9:
+        r33 = "group";
+        r0 = r16;
+        r1 = r33;
+        r33 = r0.equals(r1);	 Catch:{ Exception -> 0x071a }
+        if (r33 == 0) goto L_0x058b;
+    L_0x06b6:
+        r32 = 2;
+        goto L_0x058b;
+    L_0x06ba:
+        r33 = "channel";
+        r0 = r16;
+        r1 = r33;
+        r33 = r0.equals(r1);	 Catch:{ Exception -> 0x071a }
+        if (r33 == 0) goto L_0x058b;
+    L_0x06c7:
+        r32 = 3;
+        goto L_0x058b;
+    L_0x06cb:
+        r33 = "edit";
+        r0 = r16;
+        r1 = r33;
+        r33 = r0.equals(r1);	 Catch:{ Exception -> 0x071a }
+        if (r33 == 0) goto L_0x058b;
+    L_0x06d8:
+        r32 = 4;
+        goto L_0x058b;
+    L_0x06dc:
+        r33 = "chat_profile";
+        r0 = r16;
+        r1 = r33;
+        r33 = r0.equals(r1);	 Catch:{ Exception -> 0x071a }
+        if (r33 == 0) goto L_0x058b;
+    L_0x06e9:
+        r32 = 5;
+        goto L_0x058b;
+    L_0x06ed:
+        r33 = "wallpapers";
+        r0 = r16;
+        r1 = r33;
+        r33 = r0.equals(r1);	 Catch:{ Exception -> 0x071a }
+        if (r33 == 0) goto L_0x058b;
+    L_0x06fa:
+        r32 = 6;
+        goto L_0x058b;
+    L_0x06fe:
+        if (r7 == 0) goto L_0x058e;
+    L_0x0700:
+        r9 = new org.telegram.ui.ChatActivity;	 Catch:{ Exception -> 0x071a }
+        r9.<init>(r7);	 Catch:{ Exception -> 0x071a }
+        r0 = r37;
+        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x071a }
+        r32 = r0;
+        r0 = r32;
+        r32 = r0.addFragmentToStack(r9);	 Catch:{ Exception -> 0x071a }
+        if (r32 == 0) goto L_0x058e;
+    L_0x0713:
         r0 = r38;
+        r9.restoreSelfArgs(r0);	 Catch:{ Exception -> 0x071a }
+        goto L_0x058e;
+    L_0x071a:
+        r14 = move-exception;
+        org.telegram.messenger.FileLog.e(r14);
+        goto L_0x058e;
+    L_0x0720:
+        r29 = new org.telegram.ui.SettingsActivity;	 Catch:{ Exception -> 0x071a }
+        r29.<init>();	 Catch:{ Exception -> 0x071a }
+        r0 = r37;
+        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x071a }
+        r32 = r0;
+        r0 = r32;
+        r1 = r29;
+        r0.addFragmentToStack(r1);	 Catch:{ Exception -> 0x071a }
+        r0 = r29;
+        r1 = r38;
+        r0.restoreSelfArgs(r1);	 Catch:{ Exception -> 0x071a }
+        goto L_0x058e;
+    L_0x073b:
+        if (r7 == 0) goto L_0x058e;
+    L_0x073d:
+        r18 = new org.telegram.ui.GroupCreateFinalActivity;	 Catch:{ Exception -> 0x071a }
+        r0 = r18;
+        r0.<init>(r7);	 Catch:{ Exception -> 0x071a }
+        r0 = r37;
+        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x071a }
+        r32 = r0;
+        r0 = r32;
+        r1 = r18;
+        r32 = r0.addFragmentToStack(r1);	 Catch:{ Exception -> 0x071a }
+        if (r32 == 0) goto L_0x058e;
+    L_0x0754:
+        r0 = r18;
+        r1 = r38;
+        r0.restoreSelfArgs(r1);	 Catch:{ Exception -> 0x071a }
+        goto L_0x058e;
+    L_0x075d:
+        if (r7 == 0) goto L_0x058e;
+    L_0x075f:
+        r8 = new org.telegram.ui.ChannelCreateActivity;	 Catch:{ Exception -> 0x071a }
+        r8.<init>(r7);	 Catch:{ Exception -> 0x071a }
+        r0 = r37;
+        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x071a }
+        r32 = r0;
+        r0 = r32;
+        r32 = r0.addFragmentToStack(r8);	 Catch:{ Exception -> 0x071a }
+        if (r32 == 0) goto L_0x058e;
+    L_0x0772:
+        r0 = r38;
+        r8.restoreSelfArgs(r0);	 Catch:{ Exception -> 0x071a }
+        goto L_0x058e;
+    L_0x0779:
+        if (r7 == 0) goto L_0x058e;
+    L_0x077b:
+        r8 = new org.telegram.ui.ChannelEditActivity;	 Catch:{ Exception -> 0x071a }
+        r8.<init>(r7);	 Catch:{ Exception -> 0x071a }
+        r0 = r37;
+        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x071a }
+        r32 = r0;
+        r0 = r32;
+        r32 = r0.addFragmentToStack(r8);	 Catch:{ Exception -> 0x071a }
+        if (r32 == 0) goto L_0x058e;
+    L_0x078e:
+        r0 = r38;
+        r8.restoreSelfArgs(r0);	 Catch:{ Exception -> 0x071a }
+        goto L_0x058e;
+    L_0x0795:
+        if (r7 == 0) goto L_0x058e;
+    L_0x0797:
+        r26 = new org.telegram.ui.ProfileActivity;	 Catch:{ Exception -> 0x071a }
+        r0 = r26;
+        r0.<init>(r7);	 Catch:{ Exception -> 0x071a }
+        r0 = r37;
+        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x071a }
+        r32 = r0;
+        r0 = r32;
+        r1 = r26;
+        r32 = r0.addFragmentToStack(r1);	 Catch:{ Exception -> 0x071a }
+        if (r32 == 0) goto L_0x058e;
+    L_0x07ae:
+        r0 = r26;
+        r1 = r38;
+        r0.restoreSelfArgs(r1);	 Catch:{ Exception -> 0x071a }
+        goto L_0x058e;
+    L_0x07b7:
+        r29 = new org.telegram.ui.WallpapersActivity;	 Catch:{ Exception -> 0x071a }
+        r29.<init>();	 Catch:{ Exception -> 0x071a }
+        r0 = r37;
+        r0 = r0.actionBarLayout;	 Catch:{ Exception -> 0x071a }
+        r32 = r0;
+        r0 = r32;
+        r1 = r29;
+        r0.addFragmentToStack(r1);	 Catch:{ Exception -> 0x071a }
+        r0 = r29;
+        r1 = r38;
+        r0.restoreSelfArgs(r1);	 Catch:{ Exception -> 0x071a }
+        goto L_0x058e;
+    L_0x07d2:
+        r0 = r37;
         r0 = r0.actionBarLayout;
-        r33 = r0;
-        r0 = r33;
+        r32 = r0;
+        r0 = r32;
         r0 = r0.fragmentsStack;
-        r33 = r0;
-        r33 = r33.size();
-        r34 = 1;
-        r0 = r33;
-        r1 = r34;
-        if (r0 > r1) goto L_0x08b4;
-    L_0x082a:
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r0 = r0.fragmentsStack;
-        r33 = r0;
-        r33 = r33.isEmpty();
-        if (r33 == 0) goto L_0x08b4;
-    L_0x083c:
-        r7 = 1;
-    L_0x083d:
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r0 = r0.fragmentsStack;
-        r33 = r0;
-        r33 = r33.size();
-        r34 = 1;
-        r0 = r33;
-        r1 = r34;
-        if (r0 != r1) goto L_0x0870;
-    L_0x0855:
-        r0 = r38;
-        r0 = r0.layersActionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r0 = r0.fragmentsStack;
-        r33 = r0;
-        r34 = 0;
-        r33 = r33.get(r34);
-        r0 = r33;
-        r0 = r0 instanceof org.telegram.ui.LoginActivity;
-        r33 = r0;
-        if (r33 == 0) goto L_0x0870;
-    L_0x086f:
-        r7 = 0;
-    L_0x0870:
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r0 = r0.fragmentsStack;
-        r33 = r0;
-        r33 = r33.size();
-        r34 = 1;
-        r0 = r33;
-        r1 = r34;
-        if (r0 != r1) goto L_0x08a3;
-    L_0x0888:
-        r0 = r38;
-        r0 = r0.actionBarLayout;
-        r33 = r0;
-        r0 = r33;
-        r0 = r0.fragmentsStack;
-        r33 = r0;
-        r34 = 0;
-        r33 = r33.get(r34);
-        r0 = r33;
-        r0 = r0 instanceof org.telegram.ui.LoginActivity;
-        r33 = r0;
-        if (r33 == 0) goto L_0x08a3;
-    L_0x08a2:
-        r7 = 0;
-    L_0x08a3:
-        r0 = r38;
-        r0 = r0.drawerLayoutContainer;
-        r33 = r0;
-        r34 = 0;
-        r0 = r33;
-        r1 = r34;
-        r0.setAllowOpenDrawer(r7, r1);
-        goto L_0x0594;
-    L_0x08b4:
-        r7 = 0;
-        goto L_0x083d;
-    L_0x08b6:
+        r32 = r0;
         r33 = 0;
-        goto L_0x05a1;
-    L_0x08ba:
+        r15 = r32.get(r33);
+        r15 = (org.telegram.ui.ActionBar.BaseFragment) r15;
+        r0 = r15 instanceof org.telegram.ui.DialogsActivity;
+        r32 = r0;
+        if (r32 == 0) goto L_0x07f9;
+    L_0x07ec:
+        r15 = (org.telegram.ui.DialogsActivity) r15;
+        r0 = r37;
+        r0 = r0.sideMenu;
+        r32 = r0;
+        r0 = r32;
+        r15.setSideMenu(r0);
+    L_0x07f9:
+        r6 = 1;
+        r32 = org.telegram.messenger.AndroidUtilities.isTablet();
+        if (r32 == 0) goto L_0x085e;
+    L_0x0800:
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r0 = r0.fragmentsStack;
+        r32 = r0;
+        r32 = r32.size();
+        r33 = 1;
+        r0 = r32;
+        r1 = r33;
+        if (r0 > r1) goto L_0x08a2;
+    L_0x0818:
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r0 = r0.fragmentsStack;
+        r32 = r0;
+        r32 = r32.isEmpty();
+        if (r32 == 0) goto L_0x08a2;
+    L_0x082a:
+        r6 = 1;
+    L_0x082b:
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r0 = r0.fragmentsStack;
+        r32 = r0;
+        r32 = r32.size();
+        r33 = 1;
+        r0 = r32;
+        r1 = r33;
+        if (r0 != r1) goto L_0x085e;
+    L_0x0843:
+        r0 = r37;
+        r0 = r0.layersActionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r0 = r0.fragmentsStack;
+        r32 = r0;
+        r33 = 0;
+        r32 = r32.get(r33);
+        r0 = r32;
+        r0 = r0 instanceof org.telegram.ui.LoginActivity;
+        r32 = r0;
+        if (r32 == 0) goto L_0x085e;
+    L_0x085d:
+        r6 = 0;
+    L_0x085e:
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r0 = r0.fragmentsStack;
+        r32 = r0;
+        r32 = r32.size();
+        r33 = 1;
+        r0 = r32;
+        r1 = r33;
+        if (r0 != r1) goto L_0x0891;
+    L_0x0876:
+        r0 = r37;
+        r0 = r0.actionBarLayout;
+        r32 = r0;
+        r0 = r32;
+        r0 = r0.fragmentsStack;
+        r32 = r0;
+        r33 = 0;
+        r32 = r32.get(r33);
+        r0 = r32;
+        r0 = r0 instanceof org.telegram.ui.LoginActivity;
+        r32 = r0;
+        if (r32 == 0) goto L_0x0891;
+    L_0x0890:
+        r6 = 0;
+    L_0x0891:
+        r0 = r37;
+        r0 = r0.drawerLayoutContainer;
+        r32 = r0;
+        r33 = 0;
+        r0 = r32;
+        r1 = r33;
+        r0.setAllowOpenDrawer(r6, r1);
+        goto L_0x058e;
+    L_0x08a2:
+        r6 = 0;
+        goto L_0x082b;
+    L_0x08a4:
+        r32 = 0;
+        goto L_0x059b;
+    L_0x08a8:
+        r23 = "";
+        goto L_0x05b4;
+    L_0x08ad:
         r24 = "";
         goto L_0x05ba;
-    L_0x08bf:
-        r25 = "";
-        goto L_0x05c0;
-    L_0x08c4:
-        r15 = move-exception;
-        org.telegram.messenger.FileLog.e(r15);
-        goto L_0x0602;
-    L_0x08ca:
-        r33 = move-exception;
-        goto L_0x011d;
+    L_0x08b2:
+        r14 = move-exception;
+        org.telegram.messenger.FileLog.e(r14);
+        goto L_0x05fc;
+    L_0x08b8:
+        r32 = move-exception;
+        goto L_0x0117;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.LaunchActivity.onCreate(android.os.Bundle):void");
     }
@@ -1246,6 +1234,16 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
             UserConfig.selectedAccount = account;
             UserConfig.getInstance(0).saveConfig(false);
             checkCurrentAccount();
+            if (AndroidUtilities.isTablet()) {
+                this.layersActionBarLayout.removeAllFragments();
+                this.rightActionBarLayout.removeAllFragments();
+                if (!this.tabletFullSize) {
+                    this.shadowTabletSide.setVisibility(0);
+                    if (this.rightActionBarLayout.fragmentsStack.isEmpty()) {
+                        this.backgroundTablet.setVisibility(0);
+                    }
+                }
+            }
             if (removeAll) {
                 this.actionBarLayout.removeAllFragments();
             } else {
@@ -1827,13 +1825,13 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         if (r87 != 0) goto L_0x0355;
     L_0x0302:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x1100;
+        if (r4 == 0) goto L_0x1109;
     L_0x0308:
         r0 = r85;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.UserConfig.getInstance(r4);
         r4 = r4.isClientActivated();
-        if (r4 != 0) goto L_0x10cc;
+        if (r4 != 0) goto L_0x10d5;
     L_0x0316:
         r0 = r85;
         r4 = r0.layersActionBarLayout;
@@ -2844,19 +2842,19 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r49 = r0.getQueryParameter(r4);
         if (r81 == 0) goto L_0x0b74;
     L_0x0b60:
-        r4 = java.lang.Integer.parseInt(r81);	 Catch:{ NumberFormatException -> 0x1162 }
-        r65 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x1162 }
+        r4 = java.lang.Integer.parseInt(r81);	 Catch:{ NumberFormatException -> 0x116b }
+        r65 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x116b }
     L_0x0b68:
         if (r49 == 0) goto L_0x07a9;
     L_0x0b6a:
-        r4 = java.lang.Integer.parseInt(r49);	 Catch:{ NumberFormatException -> 0x115c }
-        r64 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x115c }
+        r4 = java.lang.Integer.parseInt(r49);	 Catch:{ NumberFormatException -> 0x1165 }
+        r64 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x1165 }
         goto L_0x07a9;
     L_0x0b74:
         if (r29 == 0) goto L_0x0b68;
     L_0x0b76:
-        r4 = java.lang.Integer.parseInt(r29);	 Catch:{ NumberFormatException -> 0x115f }
-        r62 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x115f }
+        r4 = java.lang.Integer.parseInt(r29);	 Catch:{ NumberFormatException -> 0x1168 }
+        r62 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x1168 }
         goto L_0x0b68;
     L_0x0b7f:
         if (r6 != 0) goto L_0x0b8b;
@@ -3242,7 +3240,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0e73:
         r0 = r85;
         r4 = r0.documentsUrisArray;
-        if (r4 == 0) goto L_0x101e;
+        if (r4 == 0) goto L_0x1027;
     L_0x0e79:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
         if (r4 != 0) goto L_0x0e95;
@@ -3260,7 +3258,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0e95:
         r4 = 0;
         r4 = (r36 > r4 ? 1 : (r36 == r4 ? 0 : -1));
-        if (r4 != 0) goto L_0x1001;
+        if (r4 != 0) goto L_0x100a;
     L_0x0e9b:
         r24 = new android.os.Bundle;
         r24.<init>();
@@ -3272,10 +3270,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r5 = 3;
         r0 = r24;
         r0.putInt(r4, r5);
+        r4 = "allowSwitchAccount";
+        r5 = 1;
+        r0 = r24;
+        r0.putBoolean(r4, r5);
         r0 = r85;
         r4 = r0.contactsToSend;
-        if (r4 == 0) goto L_0x0f68;
-    L_0x0eb8:
+        if (r4 == 0) goto L_0x0f71;
+    L_0x0ec1:
         r4 = "selectAlertString";
         r5 = "SendContactTo";
         r16 = 2131494281; // 0x7f0c0589 float:1.8612066E38 double:1.0530980985E-314;
@@ -3290,7 +3292,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
-    L_0x0ee0:
+    L_0x0ee9:
         r44 = new org.telegram.ui.DialogsActivity;
         r0 = r44;
         r1 = r24;
@@ -3299,14 +3301,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r1 = r85;
         r0.setDelegate(r1);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x0f95;
-    L_0x0ef6:
+        if (r4 == 0) goto L_0x0f9e;
+    L_0x0eff:
         r0 = r85;
         r4 = r0.layersActionBarLayout;
         r4 = r4.fragmentsStack;
         r4 = r4.size();
-        if (r4 <= 0) goto L_0x0f92;
-    L_0x0f02:
+        if (r4 <= 0) goto L_0x0f9b;
+    L_0x0f0b:
         r0 = r85;
         r4 = r0.layersActionBarLayout;
         r4 = r4.fragmentsStack;
@@ -3317,10 +3319,10 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r5 = r5 + -1;
         r4 = r4.get(r5);
         r4 = r4 instanceof org.telegram.ui.DialogsActivity;
-        if (r4 == 0) goto L_0x0f92;
-    L_0x0f1c:
+        if (r4 == 0) goto L_0x0f9b;
+    L_0x0f25:
         r66 = 1;
-    L_0x0f1e:
+    L_0x0f27:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r5 = 1;
@@ -3332,14 +3334,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r61 = 1;
         r4 = org.telegram.ui.SecretMediaViewer.getInstance();
         r4 = r4.isVisible();
-        if (r4 == 0) goto L_0x0fc3;
-    L_0x0f3a:
+        if (r4 == 0) goto L_0x0fcc;
+    L_0x0f43:
         r4 = org.telegram.ui.SecretMediaViewer.getInstance();
         r5 = 0;
         r16 = 0;
         r0 = r16;
         r4.closePhoto(r5, r0);
-    L_0x0f46:
+    L_0x0f4f:
         r0 = r85;
         r4 = r0.drawerLayoutContainer;
         r5 = 0;
@@ -3347,8 +3349,8 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x0ff3;
-    L_0x0f58:
+        if (r4 == 0) goto L_0x0ffc;
+    L_0x0f61:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4.showLastFragment();
@@ -3356,7 +3358,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r4 = r0.rightActionBarLayout;
         r4.showLastFragment();
         goto L_0x02fe;
-    L_0x0f68:
+    L_0x0f71:
         r4 = "selectAlertString";
         r5 = "SendMessagesTo";
         r16 = 2131494281; // 0x7f0c0589 float:1.8612066E38 double:1.0530980985E-314;
@@ -3371,18 +3373,18 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
-        goto L_0x0ee0;
-    L_0x0f92:
+        goto L_0x0ee9;
+    L_0x0f9b:
         r66 = 0;
-        goto L_0x0f1e;
-    L_0x0f95:
+        goto L_0x0f27;
+    L_0x0f9e:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4 = r4.fragmentsStack;
         r4 = r4.size();
         r5 = 1;
-        if (r4 <= r5) goto L_0x0fc0;
-    L_0x0fa2:
+        if (r4 <= r5) goto L_0x0fc9;
+    L_0x0fab:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4 = r4.fragmentsStack;
@@ -3393,37 +3395,37 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r5 = r5 + -1;
         r4 = r4.get(r5);
         r4 = r4 instanceof org.telegram.ui.DialogsActivity;
-        if (r4 == 0) goto L_0x0fc0;
-    L_0x0fbc:
+        if (r4 == 0) goto L_0x0fc9;
+    L_0x0fc5:
         r66 = 1;
-    L_0x0fbe:
-        goto L_0x0f1e;
-    L_0x0fc0:
+    L_0x0fc7:
+        goto L_0x0f27;
+    L_0x0fc9:
         r66 = 0;
-        goto L_0x0fbe;
-    L_0x0fc3:
+        goto L_0x0fc7;
+    L_0x0fcc:
         r4 = org.telegram.ui.PhotoViewer.getInstance();
         r4 = r4.isVisible();
-        if (r4 == 0) goto L_0x0fdb;
-    L_0x0fcd:
+        if (r4 == 0) goto L_0x0fe4;
+    L_0x0fd6:
         r4 = org.telegram.ui.PhotoViewer.getInstance();
         r5 = 0;
         r16 = 1;
         r0 = r16;
         r4.closePhoto(r5, r0);
-        goto L_0x0f46;
-    L_0x0fdb:
+        goto L_0x0f4f;
+    L_0x0fe4:
         r4 = org.telegram.ui.ArticleViewer.getInstance();
         r4 = r4.isVisible();
-        if (r4 == 0) goto L_0x0f46;
-    L_0x0fe5:
+        if (r4 == 0) goto L_0x0f4f;
+    L_0x0fee:
         r4 = org.telegram.ui.ArticleViewer.getInstance();
         r5 = 0;
         r16 = 1;
         r0 = r16;
         r4.close(r5, r0);
-        goto L_0x0f46;
-    L_0x0ff3:
+        goto L_0x0f4f;
+    L_0x0ffc:
         r0 = r85;
         r4 = r0.drawerLayoutContainer;
         r5 = 1;
@@ -3431,7 +3433,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         goto L_0x02fe;
-    L_0x1001:
+    L_0x100a:
         r39 = new java.util.ArrayList;
         r39.<init>();
         r4 = java.lang.Long.valueOf(r36);
@@ -3445,10 +3447,10 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r2 = r16;
         r0.didSelectDialogs(r4, r1, r5, r2);
         goto L_0x02fe;
-    L_0x101e:
+    L_0x1027:
         r4 = r53.intValue();
-        if (r4 == 0) goto L_0x106d;
-    L_0x1024:
+        if (r4 == 0) goto L_0x1076;
+    L_0x102d:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r5 = new org.telegram.ui.SettingsActivity;
@@ -3461,8 +3463,8 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r2 = r18;
         r4.presentFragment(r5, r0, r1, r2);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x1060;
-    L_0x1042:
+        if (r4 == 0) goto L_0x1069;
+    L_0x104b:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4.showLastFragment();
@@ -3475,21 +3477,21 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r16 = 0;
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
-    L_0x105c:
+    L_0x1065:
         r61 = 1;
         goto L_0x02fe;
-    L_0x1060:
+    L_0x1069:
         r0 = r85;
         r4 = r0.drawerLayoutContainer;
         r5 = 1;
         r16 = 0;
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
-        goto L_0x105c;
-    L_0x106d:
+        goto L_0x1065;
+    L_0x1076:
         r4 = r52.intValue();
         if (r4 == 0) goto L_0x02fe;
-    L_0x1073:
+    L_0x107c:
         r24 = new android.os.Bundle;
         r24.<init>();
         r4 = "destroyAfterSelect";
@@ -3509,8 +3511,8 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r2 = r18;
         r4.presentFragment(r5, r0, r1, r2);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x10bf;
-    L_0x10a1:
+        if (r4 == 0) goto L_0x10c8;
+    L_0x10aa:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4.showLastFragment();
@@ -3523,24 +3525,24 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r16 = 0;
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
-    L_0x10bb:
+    L_0x10c4:
         r61 = 1;
         goto L_0x02fe;
-    L_0x10bf:
+    L_0x10c8:
         r0 = r85;
         r4 = r0.drawerLayoutContainer;
         r5 = 1;
         r16 = 0;
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
-        goto L_0x10bb;
-    L_0x10cc:
+        goto L_0x10c4;
+    L_0x10d5:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4 = r4.fragmentsStack;
         r4 = r4.isEmpty();
         if (r4 == 0) goto L_0x033a;
-    L_0x10d8:
+    L_0x10e1:
         r38 = new org.telegram.ui.DialogsActivity;
         r4 = 0;
         r0 = r38;
@@ -3560,19 +3562,19 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         goto L_0x033a;
-    L_0x1100:
+    L_0x1109:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4 = r4.fragmentsStack;
         r4 = r4.isEmpty();
         if (r4 == 0) goto L_0x033a;
-    L_0x110c:
+    L_0x1115:
         r0 = r85;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.UserConfig.getInstance(r4);
         r4 = r4.isClientActivated();
-        if (r4 != 0) goto L_0x1134;
-    L_0x111a:
+        if (r4 != 0) goto L_0x113d;
+    L_0x1123:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r5 = new org.telegram.ui.LoginActivity;
@@ -3585,7 +3587,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         goto L_0x033a;
-    L_0x1134:
+    L_0x113d:
         r38 = new org.telegram.ui.DialogsActivity;
         r4 = 0;
         r0 = r38;
@@ -3605,13 +3607,13 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         goto L_0x033a;
-    L_0x115c:
+    L_0x1165:
         r4 = move-exception;
         goto L_0x07a9;
-    L_0x115f:
+    L_0x1168:
         r4 = move-exception;
         goto L_0x0b68;
-    L_0x1162:
+    L_0x116b:
         r4 = move-exception;
         goto L_0x0b68;
         */
@@ -3674,7 +3676,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
                                             TL_inputMediaGame inputMediaGame = new TL_inputMediaGame();
                                             inputMediaGame.id = new TL_inputGameShortName();
                                             inputMediaGame.id.short_name = str3;
-                                            inputMediaGame.id.bot_id = MessagesController.getInstance(LaunchActivity.this.currentAccount).getInputUser((User) res.users.get(0));
+                                            inputMediaGame.id.bot_id = MessagesController.getInstance(i).getInputUser((User) res.users.get(0));
                                             SendMessagesHelper.getInstance(i).sendGame(MessagesController.getInstance(i).getInputPeer((int) did), inputMediaGame, 0, 0);
                                             Bundle args = new Bundle();
                                             args.putBoolean("scrollToTopOnResume", true);
@@ -4044,6 +4046,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
             if (this.photoPathsArray != null) {
                 if (this.sendingText != null && this.sendingText.length() <= Callback.DEFAULT_DRAG_ANIMATION_DURATION && this.photoPathsArray.size() == 1) {
                     ((SendingMediaInfo) this.photoPathsArray.get(0)).caption = this.sendingText;
+                    this.sendingText = null;
                 }
                 SendMessagesHelper.prepareSendingMedia(this.photoPathsArray, did, null, null, false, false);
             }
@@ -4243,9 +4246,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         ArticleViewer.getInstance().destroyArticleViewer();
         StickerPreviewViewer.getInstance().destroy();
         PipRoundVideoView pipRoundVideoView = PipRoundVideoView.getInstance();
-        for (int a = 0; a < 3; a++) {
-            MediaController.getInstance(a).setBaseActivity(this, false);
-        }
+        MediaController.getInstance().setBaseActivity(this, false);
         if (pipRoundVideoView != null) {
             pipRoundVideoView.close(false);
         }
@@ -4311,10 +4312,10 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         if (PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().onResume();
         }
-        if (PipRoundVideoView.getInstance() != null && MediaController.getInstance(this.currentAccount).isMessagePaused()) {
-            MessageObject messageObject = MediaController.getInstance(this.currentAccount).getPlayingMessageObject();
+        if (PipRoundVideoView.getInstance() != null && MediaController.getInstance().isMessagePaused()) {
+            MessageObject messageObject = MediaController.getInstance().getPlayingMessageObject();
             if (messageObject != null) {
-                MediaController.getInstance(this.currentAccount).seekToProgress(messageObject, messageObject.audioProgress);
+                MediaController.getInstance().seekToProgress(messageObject, messageObject.audioProgress);
             }
         }
     }

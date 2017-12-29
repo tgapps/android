@@ -925,7 +925,6 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         }
 
         public void drainEncoder(boolean endOfStream) throws Exception {
-            ByteBuffer encodedData;
             if (endOfStream) {
                 this.videoEncoder.signalEndOfInputStream();
             }
@@ -935,6 +934,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             }
             while (true) {
                 MediaFormat newFormat;
+                ByteBuffer encodedData;
                 int encoderStatus = this.videoEncoder.dequeueOutputBuffer(this.videoBufferInfo, 10000);
                 if (encoderStatus == -1) {
                     if (!endOfStream) {
@@ -1639,7 +1639,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             this.key = null;
             this.iv = null;
             if (initCamera()) {
-                MediaController.getInstance(this.currentAccount).pauseMessage(MediaController.getInstance(this.currentAccount).getPlayingMessageObject());
+                MediaController.getInstance().pauseMessage(MediaController.getInstance().getPlayingMessageObject());
                 this.cameraFile = new File(FileLoader.getDirectory(4), SharedConfig.lastLocalId + ".mp4");
                 SharedConfig.lastLocalId--;
                 SharedConfig.saveConfig();
