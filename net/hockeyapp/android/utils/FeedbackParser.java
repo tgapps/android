@@ -4,9 +4,6 @@ public class FeedbackParser {
 
     private static class FeedbackParserHolder {
         public static final FeedbackParser INSTANCE = new FeedbackParser();
-
-        private FeedbackParserHolder() {
-        }
     }
 
     private FeedbackParser() {

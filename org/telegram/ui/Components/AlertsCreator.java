@@ -13,13 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.MessagesStorage.IntCallback;
 import org.telegram.messenger.NotificationsController;
 import org.telegram.messenger.SecretChatHelper;
+import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
@@ -54,59 +54,59 @@ public class AlertsCreator {
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public static android.app.Dialog processError(org.telegram.tgnet.TLRPC.TL_error r7, org.telegram.ui.ActionBar.BaseFragment r8, org.telegram.tgnet.TLObject r9, java.lang.Object... r10) {
+    public static android.app.Dialog processError(int r7, org.telegram.tgnet.TLRPC.TL_error r8, org.telegram.ui.ActionBar.BaseFragment r9, org.telegram.tgnet.TLObject r10, java.lang.Object... r11) {
         /*
-        r6 = 2131427707; // 0x7f0b017b float:1.8477038E38 double:1.0530652066E-314;
-        r5 = 2131427884; // 0x7f0b022c float:1.8477397E38 double:1.053065294E-314;
+        r6 = 2131493247; // 0x7f0c017f float:1.8609969E38 double:1.0530975877E-314;
+        r5 = 2131493424; // 0x7f0c0230 float:1.8610328E38 double:1.053097675E-314;
         r2 = 1;
-        r4 = 2131427974; // 0x7f0b0286 float:1.847758E38 double:1.0530653385E-314;
+        r4 = 2131493514; // 0x7f0c028a float:1.861051E38 double:1.0530977196E-314;
         r1 = 0;
-        r0 = r7.code;
+        r0 = r8.code;
         r3 = 406; // 0x196 float:5.69E-43 double:2.006E-321;
         if (r0 == r3) goto L_0x0015;
     L_0x0011:
-        r0 = r7.text;
+        r0 = r8.text;
         if (r0 != 0) goto L_0x0017;
     L_0x0015:
         r0 = 0;
     L_0x0016:
         return r0;
     L_0x0017:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_channels_joinChannel;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_channels_joinChannel;
         if (r0 != 0) goto L_0x002f;
     L_0x001b:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_channels_editAdmin;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_channels_editAdmin;
         if (r0 != 0) goto L_0x002f;
     L_0x001f:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_channels_inviteToChannel;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_channels_inviteToChannel;
         if (r0 != 0) goto L_0x002f;
     L_0x0023:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_addChatUser;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_addChatUser;
         if (r0 != 0) goto L_0x002f;
     L_0x0027:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_startBot;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_startBot;
         if (r0 != 0) goto L_0x002f;
     L_0x002b:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_channels_editBanned;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_channels_editBanned;
         if (r0 == 0) goto L_0x005d;
     L_0x002f:
-        if (r8 == 0) goto L_0x0040;
+        if (r9 == 0) goto L_0x0040;
     L_0x0031:
-        r2 = r7.text;
-        r0 = r10[r1];
+        r2 = r8.text;
+        r0 = r11[r1];
         r0 = (java.lang.Boolean) r0;
         r0 = r0.booleanValue();
-        showAddUserAlert(r2, r8, r0);
+        showAddUserAlert(r2, r9, r0);
     L_0x003e:
         r0 = 0;
         goto L_0x0016;
     L_0x0040:
-        r0 = r7.text;
+        r0 = r8.text;
         r3 = "PEER_FLOOD";
         r0 = r0.equals(r3);
         if (r0 == 0) goto L_0x003e;
     L_0x004b:
-        r0 = org.telegram.messenger.NotificationCenter.getInstance();
+        r0 = org.telegram.messenger.NotificationCenter.getInstance(r7);
         r3 = org.telegram.messenger.NotificationCenter.needShowAlert;
         r4 = new java.lang.Object[r2];
         r2 = java.lang.Integer.valueOf(r2);
@@ -114,75 +114,75 @@ public class AlertsCreator {
         r0.postNotificationName(r3, r4);
         goto L_0x003e;
     L_0x005d:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_createChat;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_createChat;
         if (r0 == 0) goto L_0x0078;
     L_0x0061:
-        r0 = r7.text;
+        r0 = r8.text;
         r2 = "FLOOD_WAIT";
         r0 = r0.startsWith(r2);
         if (r0 == 0) goto L_0x0072;
     L_0x006c:
-        r0 = r7.text;
-        showFloodWaitAlert(r0, r8);
+        r0 = r8.text;
+        showFloodWaitAlert(r0, r9);
         goto L_0x003e;
     L_0x0072:
-        r0 = r7.text;
-        showAddUserAlert(r0, r8, r1);
+        r0 = r8.text;
+        showAddUserAlert(r0, r9, r1);
         goto L_0x003e;
     L_0x0078:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_channels_createChannel;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_channels_createChannel;
         if (r0 == 0) goto L_0x008d;
     L_0x007c:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
         if (r0 == 0) goto L_0x003e;
     L_0x0087:
-        r0 = r7.text;
-        showFloodWaitAlert(r0, r8);
+        r0 = r8.text;
+        showFloodWaitAlert(r0, r9);
         goto L_0x003e;
     L_0x008d:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_editMessage;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_editMessage;
         if (r0 == 0) goto L_0x00aa;
     L_0x0091:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "MESSAGE_NOT_MODIFIED";
         r0 = r0.equals(r1);
         if (r0 != 0) goto L_0x003e;
     L_0x009c:
         r0 = "EditMessageError";
-        r1 = 2131427848; // 0x7f0b0208 float:1.8477324E38 double:1.0530652763E-314;
+        r1 = 2131493388; // 0x7f0c020c float:1.8610255E38 double:1.0530976573E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x00aa:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendMessage;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendMessage;
         if (r0 != 0) goto L_0x00c6;
     L_0x00ae:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendMedia;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendMedia;
         if (r0 != 0) goto L_0x00c6;
     L_0x00b2:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_geochats_sendMessage;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_geochats_sendMessage;
         if (r0 != 0) goto L_0x00c6;
     L_0x00b6:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendBroadcast;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendBroadcast;
         if (r0 != 0) goto L_0x00c6;
     L_0x00ba:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendInlineBotResult;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendInlineBotResult;
         if (r0 != 0) goto L_0x00c6;
     L_0x00be:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_geochats_sendMedia;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_geochats_sendMedia;
         if (r0 != 0) goto L_0x00c6;
     L_0x00c2:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_forwardMessages;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_forwardMessages;
         if (r0 == 0) goto L_0x00e4;
     L_0x00c6:
-        r0 = r7.text;
+        r0 = r8.text;
         r3 = "PEER_FLOOD";
         r0 = r0.equals(r3);
         if (r0 == 0) goto L_0x003e;
     L_0x00d1:
-        r0 = org.telegram.messenger.NotificationCenter.getInstance();
+        r0 = org.telegram.messenger.NotificationCenter.getInstance(r7);
         r3 = org.telegram.messenger.NotificationCenter.needShowAlert;
         r2 = new java.lang.Object[r2];
         r4 = java.lang.Integer.valueOf(r1);
@@ -190,45 +190,45 @@ public class AlertsCreator {
         r0.postNotificationName(r3, r2);
         goto L_0x003e;
     L_0x00e4:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_importChatInvite;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_importChatInvite;
         if (r0 == 0) goto L_0x0128;
     L_0x00e8:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
         if (r0 == 0) goto L_0x00ff;
     L_0x00f3:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x00ff:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "USERS_TOO_MUCH";
         r0 = r0.equals(r1);
         if (r0 == 0) goto L_0x0119;
     L_0x010a:
         r0 = "JoinToGroupErrorFull";
-        r1 = 2131428141; // 0x7f0b032d float:1.8477918E38 double:1.053065421E-314;
+        r1 = 2131493681; // 0x7f0c0331 float:1.861085E38 double:1.053097802E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0119:
         r0 = "JoinToGroupErrorNotExist";
-        r1 = 2131428142; // 0x7f0b032e float:1.847792E38 double:1.0530654215E-314;
+        r1 = 2131493682; // 0x7f0c0332 float:1.8610851E38 double:1.0530978026E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0128:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_messages_getAttachedStickers;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_getAttachedStickers;
         if (r0 == 0) goto L_0x0162;
     L_0x012c:
-        if (r8 == 0) goto L_0x003e;
+        if (r9 == 0) goto L_0x003e;
     L_0x012e:
-        r0 = r8.getParentActivity();
+        r0 = r9.getParentActivity();
         if (r0 == 0) goto L_0x003e;
     L_0x0134:
-        r0 = r8.getParentActivity();
+        r0 = r9.getParentActivity();
         r2 = new java.lang.StringBuilder;
         r2.<init>();
         r3 = "ErrorOccurred";
@@ -236,107 +236,107 @@ public class AlertsCreator {
         r2 = r2.append(r3);
         r3 = "\n";
         r2 = r2.append(r3);
-        r3 = r7.text;
+        r3 = r8.text;
         r2 = r2.append(r3);
         r2 = r2.toString();
         r0 = android.widget.Toast.makeText(r0, r2, r1);
         r0.show();
         goto L_0x003e;
     L_0x0162:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_account_confirmPhone;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_confirmPhone;
         if (r0 == 0) goto L_0x01c0;
     L_0x0166:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_CODE_EMPTY";
         r0 = r0.contains(r1);
         if (r0 != 0) goto L_0x017c;
     L_0x0171:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_CODE_INVALID";
         r0 = r0.contains(r1);
         if (r0 == 0) goto L_0x018b;
     L_0x017c:
         r0 = "InvalidCode";
-        r1 = 2131428109; // 0x7f0b030d float:1.8477853E38 double:1.053065405E-314;
+        r1 = 2131493649; // 0x7f0c0311 float:1.8610784E38 double:1.0530977863E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x018b:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_CODE_EXPIRED";
         r0 = r0.contains(r1);
         if (r0 == 0) goto L_0x01a2;
     L_0x0196:
         r0 = "CodeExpired";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x01a2:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
         if (r0 == 0) goto L_0x01b9;
     L_0x01ad:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x01b9:
-        r0 = r7.text;
-        showSimpleAlert(r8, r0);
+        r0 = r8.text;
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x01c0:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_auth_resendCode;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_auth_resendCode;
         if (r0 == 0) goto L_0x025d;
     L_0x01c4:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_NUMBER_INVALID";
         r0 = r0.contains(r1);
         if (r0 == 0) goto L_0x01de;
     L_0x01cf:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131428112; // 0x7f0b0310 float:1.847786E38 double:1.0530654067E-314;
+        r1 = 2131493652; // 0x7f0c0314 float:1.861079E38 double:1.053097788E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x01de:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_CODE_EMPTY";
         r0 = r0.contains(r1);
         if (r0 != 0) goto L_0x01f4;
     L_0x01e9:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_CODE_INVALID";
         r0 = r0.contains(r1);
         if (r0 == 0) goto L_0x0203;
     L_0x01f4:
         r0 = "InvalidCode";
-        r1 = 2131428109; // 0x7f0b030d float:1.8477853E38 double:1.053065405E-314;
+        r1 = 2131493649; // 0x7f0c0311 float:1.8610784E38 double:1.0530977863E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0203:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_CODE_EXPIRED";
         r0 = r0.contains(r1);
         if (r0 == 0) goto L_0x021a;
     L_0x020e:
         r0 = "CodeExpired";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x021a:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
         if (r0 == 0) goto L_0x0231;
     L_0x0225:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0231:
-        r0 = r7.code;
+        r0 = r8.code;
         r1 = -1000; // 0xfffffffffffffc18 float:NaN double:NaN;
         if (r0 == r1) goto L_0x003e;
     L_0x0237:
@@ -347,171 +347,171 @@ public class AlertsCreator {
         r0 = r0.append(r1);
         r1 = "\n";
         r0 = r0.append(r1);
-        r1 = r7.text;
+        r1 = r8.text;
         r0 = r0.append(r1);
         r0 = r0.toString();
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x025d:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_account_sendConfirmPhoneCode;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_sendConfirmPhoneCode;
         if (r0 == 0) goto L_0x02a0;
     L_0x0261:
-        r0 = r7.code;
+        r0 = r8.code;
         r1 = 400; // 0x190 float:5.6E-43 double:1.976E-321;
         if (r0 != r1) goto L_0x0277;
     L_0x0267:
         r0 = "CancelLinkExpired";
-        r1 = 2131427573; // 0x7f0b00f5 float:1.8476766E38 double:1.0530651404E-314;
+        r1 = 2131493112; // 0x7f0c00f8 float:1.8609695E38 double:1.053097521E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        r0 = showSimpleAlert(r8, r0);
+        r0 = showSimpleAlert(r9, r0);
         goto L_0x0016;
     L_0x0277:
-        r0 = r7.text;
+        r0 = r8.text;
         if (r0 == 0) goto L_0x003e;
     L_0x027b:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
         if (r0 == 0) goto L_0x0293;
     L_0x0286:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
-        r0 = showSimpleAlert(r8, r0);
+        r0 = showSimpleAlert(r9, r0);
         goto L_0x0016;
     L_0x0293:
         r0 = "ErrorOccurred";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r5);
-        r0 = showSimpleAlert(r8, r0);
+        r0 = showSimpleAlert(r9, r0);
         goto L_0x0016;
     L_0x02a0:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_account_changePhone;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_changePhone;
         if (r0 == 0) goto L_0x0318;
     L_0x02a4:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_NUMBER_INVALID";
         r0 = r0.contains(r1);
         if (r0 == 0) goto L_0x02be;
     L_0x02af:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131428112; // 0x7f0b0310 float:1.847786E38 double:1.0530654067E-314;
+        r1 = 2131493652; // 0x7f0c0314 float:1.861079E38 double:1.053097788E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x02be:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_CODE_EMPTY";
         r0 = r0.contains(r1);
         if (r0 != 0) goto L_0x02d4;
     L_0x02c9:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_CODE_INVALID";
         r0 = r0.contains(r1);
         if (r0 == 0) goto L_0x02e3;
     L_0x02d4:
         r0 = "InvalidCode";
-        r1 = 2131428109; // 0x7f0b030d float:1.8477853E38 double:1.053065405E-314;
+        r1 = 2131493649; // 0x7f0c0311 float:1.8610784E38 double:1.0530977863E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x02e3:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "PHONE_CODE_EXPIRED";
         r0 = r0.contains(r1);
         if (r0 == 0) goto L_0x02fa;
     L_0x02ee:
         r0 = "CodeExpired";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x02fa:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
         if (r0 == 0) goto L_0x0311;
     L_0x0305:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0311:
-        r0 = r7.text;
-        showSimpleAlert(r8, r0);
+        r0 = r8.text;
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0318:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_account_sendChangePhoneCode;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_sendChangePhoneCode;
         if (r0 == 0) goto L_0x03b7;
     L_0x031c:
-        r0 = r7.text;
+        r0 = r8.text;
         r3 = "PHONE_NUMBER_INVALID";
         r0 = r0.contains(r3);
         if (r0 == 0) goto L_0x0336;
     L_0x0327:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131428112; // 0x7f0b0310 float:1.847786E38 double:1.0530654067E-314;
+        r1 = 2131493652; // 0x7f0c0314 float:1.861079E38 double:1.053097788E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0336:
-        r0 = r7.text;
+        r0 = r8.text;
         r3 = "PHONE_CODE_EMPTY";
         r0 = r0.contains(r3);
         if (r0 != 0) goto L_0x034c;
     L_0x0341:
-        r0 = r7.text;
+        r0 = r8.text;
         r3 = "PHONE_CODE_INVALID";
         r0 = r0.contains(r3);
         if (r0 == 0) goto L_0x035b;
     L_0x034c:
         r0 = "InvalidCode";
-        r1 = 2131428109; // 0x7f0b030d float:1.8477853E38 double:1.053065405E-314;
+        r1 = 2131493649; // 0x7f0c0311 float:1.8610784E38 double:1.0530977863E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x035b:
-        r0 = r7.text;
+        r0 = r8.text;
         r3 = "PHONE_CODE_EXPIRED";
         r0 = r0.contains(r3);
         if (r0 == 0) goto L_0x0372;
     L_0x0366:
         r0 = "CodeExpired";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0372:
-        r0 = r7.text;
+        r0 = r8.text;
         r3 = "FLOOD_WAIT";
         r0 = r0.startsWith(r3);
         if (r0 == 0) goto L_0x0389;
     L_0x037d:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0389:
-        r0 = r7.text;
+        r0 = r8.text;
         r3 = "PHONE_NUMBER_OCCUPIED";
         r0 = r0.startsWith(r3);
         if (r0 == 0) goto L_0x03ab;
     L_0x0394:
         r3 = "ChangePhoneNumberOccupied";
-        r4 = 2131427583; // 0x7f0b00ff float:1.8476786E38 double:1.0530651454E-314;
+        r4 = 2131493122; // 0x7f0c0102 float:1.8609715E38 double:1.053097526E-314;
         r2 = new java.lang.Object[r2];
-        r0 = r10[r1];
+        r0 = r11[r1];
         r0 = (java.lang.String) r0;
         r2[r1] = r0;
         r0 = org.telegram.messenger.LocaleController.formatString(r3, r4, r2);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x03ab:
         r0 = "ErrorOccurred";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r5);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x03b7:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_updateUserName;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_updateUserName;
         if (r0 == 0) goto L_0x0408;
     L_0x03bb:
-        r3 = r7.text;
+        r3 = r8.text;
         r0 = -1;
         r4 = r3.hashCode();
         switch(r4) {
@@ -530,7 +530,7 @@ public class AlertsCreator {
     L_0x03c9:
         r0 = "ErrorOccurred";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r5);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x03d5:
         r2 = "USERNAME_INVALID";
@@ -547,30 +547,30 @@ public class AlertsCreator {
         goto L_0x03c6;
     L_0x03ea:
         r0 = "UsernameInvalid";
-        r1 = 2131428934; // 0x7f0b0646 float:1.8479526E38 double:1.053065813E-314;
+        r1 = 2131494477; // 0x7f0c064d float:1.8612463E38 double:1.0530981954E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x03f9:
         r0 = "UsernameInUse";
-        r1 = 2131428933; // 0x7f0b0645 float:1.8479524E38 double:1.0530658123E-314;
+        r1 = 2131494476; // 0x7f0c064c float:1.8612461E38 double:1.053098195E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0408:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_contacts_importContacts;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_contacts_importContacts;
         if (r0 == 0) goto L_0x044b;
     L_0x040c:
-        if (r7 == 0) goto L_0x0419;
+        if (r8 == 0) goto L_0x0419;
     L_0x040e:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
         if (r0 == 0) goto L_0x0425;
     L_0x0419:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0425:
         r0 = new java.lang.StringBuilder;
@@ -580,36 +580,36 @@ public class AlertsCreator {
         r0 = r0.append(r1);
         r1 = "\n";
         r0 = r0.append(r1);
-        r1 = r7.text;
+        r1 = r8.text;
         r0 = r0.append(r1);
         r0 = r0.toString();
-        showSimpleAlert(r8, r0);
+        showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x044b:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_account_getPassword;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_getPassword;
         if (r0 != 0) goto L_0x0453;
     L_0x044f:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_account_getTmpPassword;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_getTmpPassword;
         if (r0 == 0) goto L_0x0470;
     L_0x0453:
-        r0 = r7.text;
+        r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
         if (r0 == 0) goto L_0x0469;
     L_0x045e:
-        r0 = r7.text;
+        r0 = r8.text;
         r0 = getFloodWaitString(r0);
-        showSimpleToast(r8, r0);
+        showSimpleToast(r9, r0);
         goto L_0x003e;
     L_0x0469:
-        r0 = r7.text;
-        showSimpleToast(r8, r0);
+        r0 = r8.text;
+        showSimpleToast(r9, r0);
         goto L_0x003e;
     L_0x0470:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_payments_sendPaymentForm;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_payments_sendPaymentForm;
         if (r0 == 0) goto L_0x04bc;
     L_0x0474:
-        r3 = r7.text;
+        r3 = r8.text;
         r0 = -1;
         r4 = r3.hashCode();
         switch(r4) {
@@ -626,8 +626,8 @@ public class AlertsCreator {
             default: goto L_0x0482;
         };
     L_0x0482:
-        r0 = r7.text;
-        showSimpleToast(r8, r0);
+        r0 = r8.text;
+        showSimpleToast(r9, r0);
         goto L_0x003e;
     L_0x0489:
         r2 = "BOT_PRECHECKOUT_FAILED";
@@ -644,21 +644,21 @@ public class AlertsCreator {
         goto L_0x047f;
     L_0x049e:
         r0 = "PaymentPrecheckoutFailed";
-        r1 = 2131428519; // 0x7f0b04a7 float:1.8478685E38 double:1.053065608E-314;
+        r1 = 2131494062; // 0x7f0c04ae float:1.8611622E38 double:1.0530979903E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleToast(r8, r0);
+        showSimpleToast(r9, r0);
         goto L_0x003e;
     L_0x04ad:
         r0 = "PaymentFailed";
-        r1 = 2131428506; // 0x7f0b049a float:1.8478658E38 double:1.0530656014E-314;
+        r1 = 2131494049; // 0x7f0c04a1 float:1.8611595E38 double:1.053097984E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleToast(r8, r0);
+        showSimpleToast(r9, r0);
         goto L_0x003e;
     L_0x04bc:
-        r0 = r9 instanceof org.telegram.tgnet.TLRPC.TL_payments_validateRequestedInfo;
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_payments_validateRequestedInfo;
         if (r0 == 0) goto L_0x003e;
     L_0x04c0:
-        r2 = r7.text;
+        r2 = r8.text;
         r0 = -1;
         r3 = r2.hashCode();
         switch(r3) {
@@ -671,8 +671,8 @@ public class AlertsCreator {
             default: goto L_0x04cd;
         };
     L_0x04cd:
-        r0 = r7.text;
-        showSimpleToast(r8, r0);
+        r0 = r8.text;
+        showSimpleToast(r9, r0);
         goto L_0x003e;
     L_0x04d4:
         r3 = "SHIPPING_NOT_AVAILABLE";
@@ -683,12 +683,12 @@ public class AlertsCreator {
         goto L_0x04ca;
     L_0x04df:
         r0 = "PaymentNoShippingMethod";
-        r1 = 2131428508; // 0x7f0b049c float:1.8478662E38 double:1.0530656024E-314;
+        r1 = 2131494051; // 0x7f0c04a3 float:1.86116E38 double:1.053097985E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleToast(r8, r0);
+        showSimpleToast(r9, r0);
         goto L_0x003e;
         */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.AlertsCreator.processError(org.telegram.tgnet.TLRPC$TL_error, org.telegram.ui.ActionBar.BaseFragment, org.telegram.tgnet.TLObject, java.lang.Object[]):android.app.Dialog");
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.AlertsCreator.processError(int, org.telegram.tgnet.TLRPC$TL_error, org.telegram.ui.ActionBar.BaseFragment, org.telegram.tgnet.TLObject, java.lang.Object[]):android.app.Dialog");
     }
 
     public static Toast showSimpleToast(BaseFragment baseFragment, String text) {
@@ -727,7 +727,7 @@ public class AlertsCreator {
         builder.setItems(items, new OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
                 long flags;
-                int untilTime = ConnectionsManager.getInstance().getCurrentTime();
+                int untilTime = ConnectionsManager.getAccountInstance().getCurrentTime();
                 if (i == 0) {
                     untilTime += 3600;
                 } else if (i == 1) {
@@ -737,7 +737,7 @@ public class AlertsCreator {
                 } else if (i == 3) {
                     untilTime = ConnectionsManager.DEFAULT_DATACENTER_ID;
                 }
-                Editor editor = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0).edit();
+                Editor editor = MessagesController.getNotificationsSettings(UserConfig.selectedAccount).edit();
                 if (i == 3) {
                     editor.putInt("notify2_" + dialog_id, 2);
                     flags = 1;
@@ -746,15 +746,15 @@ public class AlertsCreator {
                     editor.putInt("notifyuntil_" + dialog_id, untilTime);
                     flags = (((long) untilTime) << 32) | 1;
                 }
-                NotificationsController.getInstance().removeNotificationsForDialog(dialog_id);
-                MessagesStorage.getInstance().setDialogFlags(dialog_id, flags);
+                NotificationsController.getInstance(UserConfig.selectedAccount).removeNotificationsForDialog(dialog_id);
+                MessagesStorage.getAccountInstance().setDialogFlags(dialog_id, flags);
                 editor.commit();
-                TL_dialog dialog = (TL_dialog) MessagesController.getInstance().dialogs_dict.get(Long.valueOf(dialog_id));
+                TL_dialog dialog = (TL_dialog) MessagesController.getAccountInstance().dialogs_dict.get(Long.valueOf(dialog_id));
                 if (dialog != null) {
                     dialog.notify_settings = new TL_peerNotifySettings();
                     dialog.notify_settings.mute_until = untilTime;
                 }
-                NotificationsController.updateServerNotificationsSettings(dialog_id);
+                NotificationsController.getInstance(UserConfig.selectedAccount).updateServerNotificationsSettings(dialog_id);
             }
         });
         return builder.create();
@@ -775,7 +775,7 @@ public class AlertsCreator {
                     return;
                 }
                 TL_account_reportPeer req = new TL_account_reportPeer();
-                req.peer = MessagesController.getInputPeer((int) dialog_id);
+                req.peer = MessagesController.getAccountInstance().getInputPeer((int) dialog_id);
                 if (i == 0) {
                     req.reason = new TL_inputReportReasonSpam();
                 } else if (i == 1) {
@@ -783,7 +783,7 @@ public class AlertsCreator {
                 } else if (i == 2) {
                     req.reason = new TL_inputReportReasonPornography();
                 }
-                ConnectionsManager.getInstance().sendRequest(req, new RequestDelegate() {
+                ConnectionsManager.getAccountInstance().sendRequest(req, new RequestDelegate() {
                     public void run(TLObject response, TL_error error) {
                     }
                 });
@@ -942,7 +942,7 @@ public class AlertsCreator {
                     builder.setMessage(LocaleController.getString("NobodyLikesSpam2", R.string.NobodyLikesSpam2));
                     builder.setNegativeButton(LocaleController.getString("MoreInfo", R.string.MoreInfo), new OnClickListener() {
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            MessagesController.openByUserName("spambot", fragment, 1);
+                            MessagesController.getInstance(fragment.getCurrentAccount()).openByUserName("spambot", fragment, 1);
                         }
                     });
                     break;
@@ -1026,7 +1026,7 @@ public class AlertsCreator {
 
     public static Dialog createColorSelectDialog(Activity parentActivity, long dialog_id, boolean globalGroup, boolean globalAll, Runnable onSelect) {
         int currentColor;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0);
+        SharedPreferences preferences = MessagesController.getNotificationsSettings(UserConfig.selectedAccount);
         if (globalGroup) {
             currentColor = preferences.getInt("GroupLed", -16776961);
         } else if (globalAll) {
@@ -1078,7 +1078,7 @@ public class AlertsCreator {
         final Runnable runnable = onSelect;
         builder.setPositiveButton(LocaleController.getString("Set", R.string.Set), new OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int which) {
-                Editor editor = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0).edit();
+                Editor editor = MessagesController.getNotificationsSettings(UserConfig.selectedAccount).edit();
                 if (z) {
                     editor.putInt("MessagesLed", selectedColor[0]);
                 } else if (z2) {
@@ -1098,7 +1098,7 @@ public class AlertsCreator {
         final Runnable runnable2 = onSelect;
         builder.setNeutralButton(LocaleController.getString("LedDisabled", R.string.LedDisabled), new OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                Editor editor = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0).edit();
+                Editor editor = MessagesController.getNotificationsSettings(UserConfig.selectedAccount).edit();
                 if (z3) {
                     editor.putInt("MessagesLed", 0);
                 } else if (z4) {
@@ -1117,7 +1117,7 @@ public class AlertsCreator {
             final Runnable runnable3 = onSelect;
             builder.setNegativeButton(LocaleController.getString("Default", R.string.Default), new OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    Editor editor = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0).edit();
+                    Editor editor = MessagesController.getNotificationsSettings(UserConfig.selectedAccount).edit();
                     editor.remove("color_" + j3);
                     editor.commit();
                     if (runnable3 != null) {
@@ -1141,7 +1141,7 @@ public class AlertsCreator {
 
     public static Dialog createVibrationSelectDialog(Activity parentActivity, BaseFragment parentFragment, long dialog_id, String prefKeyPrefix, Runnable onSelect) {
         String[] descriptions;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0);
+        SharedPreferences preferences = MessagesController.getNotificationsSettings(UserConfig.selectedAccount);
         final int[] selected = new int[1];
         if (dialog_id != 0) {
             selected[0] = preferences.getInt(prefKeyPrefix + dialog_id, 0);
@@ -1179,7 +1179,7 @@ public class AlertsCreator {
             cell.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     selected[0] = ((Integer) v.getTag()).intValue();
-                    Editor editor = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0).edit();
+                    Editor editor = MessagesController.getNotificationsSettings(UserConfig.selectedAccount).edit();
                     if (j != 0) {
                         if (selected[0] == 0) {
                             editor.putInt(str + j, 0);
@@ -1286,7 +1286,7 @@ public class AlertsCreator {
 
     public static Dialog createFreeSpaceDialog(LaunchActivity parentActivity) {
         final int[] selected = new int[1];
-        int keepMedia = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0).getInt("keep_media", 2);
+        int keepMedia = MessagesController.getGlobalMainSettings().getInt("keep_media", 2);
         if (keepMedia == 2) {
             selected[0] = 3;
         } else if (keepMedia == 0) {
@@ -1350,7 +1350,7 @@ public class AlertsCreator {
         builder.setView(linearLayout);
         builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0).edit().putInt("keep_media", selected[0]).commit();
+                MessagesController.getGlobalMainSettings().edit().putInt("keep_media", selected[0]).commit();
             }
         });
         final LaunchActivity launchActivity = parentActivity;
@@ -1364,7 +1364,7 @@ public class AlertsCreator {
 
     public static Dialog createPrioritySelectDialog(Activity parentActivity, BaseFragment parentFragment, long dialog_id, boolean globalGroup, boolean globalAll, Runnable onSelect) {
         String[] descriptions;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0);
+        SharedPreferences preferences = MessagesController.getNotificationsSettings(UserConfig.selectedAccount);
         final int[] selected = new int[1];
         if (dialog_id != 0) {
             selected[0] = preferences.getInt("priority_" + dialog_id, 3);
@@ -1399,7 +1399,7 @@ public class AlertsCreator {
             cell.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     selected[0] = ((Integer) v.getTag()).intValue();
-                    Editor editor = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0).edit();
+                    Editor editor = MessagesController.getNotificationsSettings(UserConfig.selectedAccount).edit();
                     if (j != 0) {
                         if (selected[0] == 0) {
                             selected[0] = 3;
@@ -1430,7 +1430,7 @@ public class AlertsCreator {
     }
 
     public static Dialog createPopupSelectDialog(Activity parentActivity, final BaseFragment parentFragment, final boolean globalGroup, boolean globalAll, final Runnable onSelect) {
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0);
+        SharedPreferences preferences = MessagesController.getNotificationsSettings(UserConfig.selectedAccount);
         final int[] selected = new int[1];
         if (globalAll) {
             selected[0] = preferences.getInt("popupAll", 0);
@@ -1451,7 +1451,7 @@ public class AlertsCreator {
             cell.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     selected[0] = ((Integer) v.getTag()).intValue();
-                    Editor editor = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", 0).edit();
+                    Editor editor = MessagesController.getNotificationsSettings(UserConfig.selectedAccount).edit();
                     editor.putInt(globalGroup ? "popupGroup" : "popupAll", selected[0]);
                     editor.commit();
                     if (parentFragment != null) {
@@ -1549,7 +1549,7 @@ public class AlertsCreator {
                 if (value == 20) {
                     return LocaleController.formatTTLString(604800);
                 }
-                return "";
+                return TtmlNode.ANONYMOUS_REGION_ID;
             }
         });
         builder.setView(numberPicker);
@@ -1571,8 +1571,8 @@ public class AlertsCreator {
                     encryptedChat.ttl = 604800;
                 }
                 if (oldValue != encryptedChat.ttl) {
-                    SecretChatHelper.getInstance().sendTTLMessage(encryptedChat, null);
-                    MessagesStorage.getInstance().updateEncryptedChatTTL(encryptedChat);
+                    SecretChatHelper.getInstance(UserConfig.selectedAccount).sendTTLMessage(encryptedChat, null);
+                    MessagesStorage.getAccountInstance().updateEncryptedChatTTL(encryptedChat);
                 }
             }
         });

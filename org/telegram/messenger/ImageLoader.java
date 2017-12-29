@@ -37,6 +37,7 @@ import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
+import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.TLRPC.Document;
 import org.telegram.tgnet.TLRPC.FileLocation;
 import org.telegram.tgnet.TLRPC.InputEncryptedFile;
@@ -90,6 +91,7 @@ public class ImageLoader {
     private class CacheImage {
         protected boolean animatedFile;
         protected CacheOutTask cacheTask;
+        protected int currentAccount;
         protected File encryptionKeyPath;
         protected String ext;
         protected String filter;
@@ -161,11 +163,11 @@ public class ImageLoader {
                 this.imageReceiverArray.clear();
                 if (!(this.location == null || ImageLoader.this.forceLoadingImages.containsKey(this.key))) {
                     if (this.location instanceof FileLocation) {
-                        FileLoader.getInstance().cancelLoadFile((FileLocation) this.location, this.ext);
+                        FileLoader.getInstance(this.currentAccount).cancelLoadFile((FileLocation) this.location, this.ext);
                     } else if (this.location instanceof Document) {
-                        FileLoader.getInstance().cancelLoadFile((Document) this.location);
+                        FileLoader.getInstance(this.currentAccount).cancelLoadFile((Document) this.location);
                     } else if (this.location instanceof TL_webDocument) {
-                        FileLoader.getInstance().cancelLoadFile((TL_webDocument) this.location);
+                        FileLoader.getInstance(this.currentAccount).cancelLoadFile((TL_webDocument) this.location);
                     }
                 }
                 if (this.cacheTask != null) {
@@ -1408,6 +1410,7 @@ public class ImageLoader {
 
     private class HttpFileTask extends AsyncTask<Void, Void, Boolean> {
         private boolean canRetry = true;
+        private int currentAccount;
         private String ext;
         private RandomAccessFile fileOutputStream = null;
         private int fileSize;
@@ -1415,10 +1418,11 @@ public class ImageLoader {
         private File tempFile;
         private String url;
 
-        public HttpFileTask(String url, File tempFile, String ext) {
+        public HttpFileTask(String url, File tempFile, String ext, int currentAccount) {
             this.url = url;
             this.tempFile = tempFile;
             this.ext = ext;
+            this.currentAccount = currentAccount;
         }
 
         private void reportProgress(final float progress) {
@@ -1430,7 +1434,7 @@ public class ImageLoader {
                         ImageLoader.this.fileProgresses.put(HttpFileTask.this.url, Float.valueOf(progress));
                         AndroidUtilities.runOnUIThread(new Runnable() {
                             public void run() {
-                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileLoadProgressChanged, HttpFileTask.this.url, Float.valueOf(progress));
+                                NotificationCenter.getInstance(HttpFileTask.this.currentAccount).postNotificationName(NotificationCenter.FileLoadProgressChanged, HttpFileTask.this.url, Float.valueOf(progress));
                             }
                         });
                     }
@@ -1509,7 +1513,7 @@ public class ImageLoader {
                 }
                 if (httpConnectionStream != null) {
                     try {
-                        byte[] data = new byte[32768];
+                        byte[] data = new byte[TLRPC.MESSAGE_FLAG_EDITED];
                         int totalLoaded = 0;
                         while (!isCancelled()) {
                             int read = httpConnectionStream.read(data);
@@ -1582,7 +1586,7 @@ public class ImageLoader {
                         ImageLoader.this.fileProgresses.put(HttpImageTask.this.cacheImage.url, Float.valueOf(progress));
                         AndroidUtilities.runOnUIThread(new Runnable() {
                             public void run() {
-                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileLoadProgressChanged, HttpImageTask.this.cacheImage.url, Float.valueOf(progress));
+                                NotificationCenter.getInstance(HttpImageTask.this.cacheImage.currentAccount).postNotificationName(NotificationCenter.FileLoadProgressChanged, HttpImageTask.this.cacheImage.url, Float.valueOf(progress));
                             }
                         });
                     }
@@ -1651,7 +1655,7 @@ public class ImageLoader {
                 }
                 if (httpConnectionStream != null) {
                     try {
-                        byte[] data = new byte[8192];
+                        byte[] data = new byte[MessagesController.UPDATE_MASK_CHANNEL];
                         int totalLoaded = 0;
                         while (!isCancelled()) {
                             int read = httpConnectionStream.read(data);
@@ -1714,10 +1718,10 @@ public class ImageLoader {
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         public void run() {
                             if (result.booleanValue()) {
-                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidLoaded, HttpImageTask.this.cacheImage.url);
+                                NotificationCenter.getInstance(HttpImageTask.this.cacheImage.currentAccount).postNotificationName(NotificationCenter.FileDidLoaded, HttpImageTask.this.cacheImage.url);
                                 return;
                             }
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidFailedLoad, HttpImageTask.this.cacheImage.url, Integer.valueOf(2));
+                            NotificationCenter.getInstance(HttpImageTask.this.cacheImage.currentAccount).postNotificationName(NotificationCenter.FileDidFailedLoad, HttpImageTask.this.cacheImage.url, Integer.valueOf(2));
                         }
                     });
                 }
@@ -1740,7 +1744,7 @@ public class ImageLoader {
                     ImageLoader.this.fileProgresses.remove(HttpImageTask.this.cacheImage.url);
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         public void run() {
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidFailedLoad, HttpImageTask.this.cacheImage.url, Integer.valueOf(1));
+                            NotificationCenter.getInstance(HttpImageTask.this.cacheImage.currentAccount).postNotificationName(NotificationCenter.FileDidFailedLoad, HttpImageTask.this.cacheImage.url, Integer.valueOf(1));
                         }
                     });
                 }
@@ -1788,7 +1792,7 @@ public class ImageLoader {
                     return;
                 }
                 final String key = this.thumbLocation.volume_id + "_" + this.thumbLocation.local_id;
-                File thumbFile = new File(FileLoader.getInstance().getDirectory(4), "q_" + key + ".jpg");
+                File thumbFile = new File(FileLoader.getDirectory(4), "q_" + key + ".jpg");
                 if (thumbFile.exists() || !this.originalPath.exists()) {
                     removeTask();
                     return;
@@ -1822,8 +1826,8 @@ public class ImageLoader {
                 Bitmap scaledBitmap = Bitmaps.createScaledBitmap(originalBitmap, (int) (((float) w) / scaleFactor), (int) (((float) h) / scaleFactor), true);
                 if (scaledBitmap != originalBitmap) {
                     originalBitmap.recycle();
+                    originalBitmap = scaledBitmap;
                 }
-                originalBitmap = scaledBitmap;
                 FileOutputStream stream = new FileOutputStream(thumbFile);
                 originalBitmap.compress(CompressFormat.JPEG, 60, stream);
                 stream.close();
@@ -1835,7 +1839,7 @@ public class ImageLoader {
                         if (ThumbGenerateTask.this.filter != null) {
                             kf = kf + "@" + ThumbGenerateTask.this.filter;
                         }
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.messageThumbGenerated, bitmapDrawable, kf);
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.messageThumbGenerated, bitmapDrawable, kf);
                         ImageLoader.this.memCache.put(kf, bitmapDrawable);
                     }
                 });
@@ -1896,88 +1900,107 @@ public class ImageLoader {
                 }
             }
         };
-        FileLoader.getInstance().setDelegate(new FileLoaderDelegate() {
-            public void fileUploadProgressChanged(final String location, final float progress, final boolean isEncrypted) {
-                ImageLoader.this.fileProgresses.put(location, Float.valueOf(progress));
-                long currentTime = System.currentTimeMillis();
-                if (ImageLoader.this.lastProgressUpdateTime == 0 || ImageLoader.this.lastProgressUpdateTime < currentTime - 500) {
-                    ImageLoader.this.lastProgressUpdateTime = currentTime;
-                    AndroidUtilities.runOnUIThread(new Runnable() {
+        HashMap<Integer, File> mediaDirs = new HashMap();
+        File cachePath = AndroidUtilities.getCacheDir();
+        if (!cachePath.isDirectory()) {
+            try {
+                cachePath.mkdirs();
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
+        }
+        try {
+            new File(cachePath, ".nomedia").createNewFile();
+        } catch (Throwable e2) {
+            FileLog.e(e2);
+        }
+        mediaDirs.put(Integer.valueOf(4), cachePath);
+        for (int a = 0; a < 3; a++) {
+            final int currentAccount = a;
+            FileLoader.getInstance(a).setDelegate(new FileLoaderDelegate() {
+                public void fileUploadProgressChanged(final String location, final float progress, final boolean isEncrypted) {
+                    ImageLoader.this.fileProgresses.put(location, Float.valueOf(progress));
+                    long currentTime = System.currentTimeMillis();
+                    if (ImageLoader.this.lastProgressUpdateTime == 0 || ImageLoader.this.lastProgressUpdateTime < currentTime - 500) {
+                        ImageLoader.this.lastProgressUpdateTime = currentTime;
+                        AndroidUtilities.runOnUIThread(new Runnable() {
+                            public void run() {
+                                NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.FileUploadProgressChanged, location, Float.valueOf(progress), Boolean.valueOf(isEncrypted));
+                            }
+                        });
+                    }
+                }
+
+                public void fileDidUploaded(String location, InputFile inputFile, InputEncryptedFile inputEncryptedFile, byte[] key, byte[] iv, long totalFileSize) {
+                    final String str = location;
+                    final InputFile inputFile2 = inputFile;
+                    final InputEncryptedFile inputEncryptedFile2 = inputEncryptedFile;
+                    final byte[] bArr = key;
+                    final byte[] bArr2 = iv;
+                    final long j = totalFileSize;
+                    Utilities.stageQueue.postRunnable(new Runnable() {
                         public void run() {
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileUploadProgressChanged, location, Float.valueOf(progress), Boolean.valueOf(isEncrypted));
+                            AndroidUtilities.runOnUIThread(new Runnable() {
+                                public void run() {
+                                    NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.FileDidUpload, str, inputFile2, inputEncryptedFile2, bArr, bArr2, Long.valueOf(j));
+                                }
+                            });
+                            ImageLoader.this.fileProgresses.remove(str);
                         }
                     });
                 }
-            }
 
-            public void fileDidUploaded(String location, InputFile inputFile, InputEncryptedFile inputEncryptedFile, byte[] key, byte[] iv, long totalFileSize) {
-                final String str = location;
-                final InputFile inputFile2 = inputFile;
-                final InputEncryptedFile inputEncryptedFile2 = inputEncryptedFile;
-                final byte[] bArr = key;
-                final byte[] bArr2 = iv;
-                final long j = totalFileSize;
-                Utilities.stageQueue.postRunnable(new Runnable() {
-                    public void run() {
-                        AndroidUtilities.runOnUIThread(new Runnable() {
-                            public void run() {
-                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidUpload, str, inputFile2, inputEncryptedFile2, bArr, bArr2, Long.valueOf(j));
-                            }
-                        });
-                        ImageLoader.this.fileProgresses.remove(str);
-                    }
-                });
-            }
-
-            public void fileDidFailedUpload(final String location, final boolean isEncrypted) {
-                Utilities.stageQueue.postRunnable(new Runnable() {
-                    public void run() {
-                        AndroidUtilities.runOnUIThread(new Runnable() {
-                            public void run() {
-                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidFailUpload, location, Boolean.valueOf(isEncrypted));
-                            }
-                        });
-                        ImageLoader.this.fileProgresses.remove(location);
-                    }
-                });
-            }
-
-            public void fileDidLoaded(final String location, final File finalFile, final int type) {
-                ImageLoader.this.fileProgresses.remove(location);
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    public void run() {
-                        if (MediaController.getInstance().canSaveToGallery() && ImageLoader.this.telegramPath != null && finalFile != null && ((location.endsWith(".mp4") || location.endsWith(".jpg")) && finalFile.toString().startsWith(ImageLoader.this.telegramPath.toString()))) {
-                            AndroidUtilities.addMediaToGallery(finalFile.toString());
-                        }
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidLoaded, location);
-                        ImageLoader.this.fileDidLoaded(location, finalFile, type);
-                    }
-                });
-            }
-
-            public void fileDidFailedLoad(final String location, final int canceled) {
-                ImageLoader.this.fileProgresses.remove(location);
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    public void run() {
-                        ImageLoader.this.fileDidFailedLoad(location, canceled);
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidFailedLoad, location, Integer.valueOf(canceled));
-                    }
-                });
-            }
-
-            public void fileLoadProgressChanged(final String location, final float progress) {
-                ImageLoader.this.fileProgresses.put(location, Float.valueOf(progress));
-                long currentTime = System.currentTimeMillis();
-                if (ImageLoader.this.lastProgressUpdateTime == 0 || ImageLoader.this.lastProgressUpdateTime < currentTime - 500) {
-                    ImageLoader.this.lastProgressUpdateTime = currentTime;
-                    AndroidUtilities.runOnUIThread(new Runnable() {
+                public void fileDidFailedUpload(final String location, final boolean isEncrypted) {
+                    Utilities.stageQueue.postRunnable(new Runnable() {
                         public void run() {
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileLoadProgressChanged, location, Float.valueOf(progress));
+                            AndroidUtilities.runOnUIThread(new Runnable() {
+                                public void run() {
+                                    NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.FileDidFailUpload, location, Boolean.valueOf(isEncrypted));
+                                }
+                            });
+                            ImageLoader.this.fileProgresses.remove(location);
                         }
                     });
                 }
-            }
-        });
+
+                public void fileDidLoaded(final String location, final File finalFile, final int type) {
+                    ImageLoader.this.fileProgresses.remove(location);
+                    AndroidUtilities.runOnUIThread(new Runnable() {
+                        public void run() {
+                            if (SharedConfig.saveToGallery && ImageLoader.this.telegramPath != null && finalFile != null && ((location.endsWith(".mp4") || location.endsWith(".jpg")) && finalFile.toString().startsWith(ImageLoader.this.telegramPath.toString()))) {
+                                AndroidUtilities.addMediaToGallery(finalFile.toString());
+                            }
+                            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.FileDidLoaded, location);
+                            ImageLoader.this.fileDidLoaded(location, finalFile, type);
+                        }
+                    });
+                }
+
+                public void fileDidFailedLoad(final String location, final int canceled) {
+                    ImageLoader.this.fileProgresses.remove(location);
+                    AndroidUtilities.runOnUIThread(new Runnable() {
+                        public void run() {
+                            ImageLoader.this.fileDidFailedLoad(location, canceled);
+                            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.FileDidFailedLoad, location, Integer.valueOf(canceled));
+                        }
+                    });
+                }
+
+                public void fileLoadProgressChanged(final String location, final float progress) {
+                    ImageLoader.this.fileProgresses.put(location, Float.valueOf(progress));
+                    long currentTime = System.currentTimeMillis();
+                    if (ImageLoader.this.lastProgressUpdateTime == 0 || ImageLoader.this.lastProgressUpdateTime < currentTime - 500) {
+                        ImageLoader.this.lastProgressUpdateTime = currentTime;
+                        AndroidUtilities.runOnUIThread(new Runnable() {
+                            public void run() {
+                                NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.FileLoadProgressChanged, location, Float.valueOf(progress));
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        FileLoader.setMediaDirs(mediaDirs);
         BroadcastReceiver receiver = new BroadcastReceiver() {
             public void onReceive(Context arg0, Intent intent) {
                 FileLog.e("file system changed");
@@ -2005,22 +2028,6 @@ public class ImageLoader {
         filter.addAction("android.intent.action.MEDIA_UNMOUNTED");
         filter.addDataScheme("file");
         ApplicationLoader.applicationContext.registerReceiver(receiver, filter);
-        HashMap<Integer, File> mediaDirs = new HashMap();
-        File cachePath = AndroidUtilities.getCacheDir();
-        if (!cachePath.isDirectory()) {
-            try {
-                cachePath.mkdirs();
-            } catch (Throwable e) {
-                FileLog.e(e);
-            }
-        }
-        try {
-            new File(cachePath, ".nomedia").createNewFile();
-        } catch (Throwable e2) {
-            FileLog.e(e2);
-        }
-        mediaDirs.put(Integer.valueOf(4), cachePath);
-        FileLoader.getInstance().setMediaDirs(mediaDirs);
         checkMediaPaths();
     }
 
@@ -2030,7 +2037,7 @@ public class ImageLoader {
                 final HashMap<Integer, File> paths = ImageLoader.this.createMediaPaths();
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     public void run() {
-                        FileLoader.getInstance().setMediaDirs(paths);
+                        FileLoader.setMediaDirs(paths);
                     }
                 });
             }
@@ -2048,12 +2055,12 @@ public class ImageLoader {
         r7 = r1.isDirectory();
         if (r7 != 0) goto L_0x0012;
     L_0x000f:
-        r1.mkdirs();	 Catch:{ Exception -> 0x0166 }
+        r1.mkdirs();	 Catch:{ Exception -> 0x0162 }
     L_0x0012:
-        r7 = new java.io.File;	 Catch:{ Exception -> 0x016c }
+        r7 = new java.io.File;	 Catch:{ Exception -> 0x0168 }
         r8 = ".nomedia";
-        r7.<init>(r1, r8);	 Catch:{ Exception -> 0x016c }
-        r7.createNewFile();	 Catch:{ Exception -> 0x016c }
+        r7.<init>(r1, r8);	 Catch:{ Exception -> 0x0168 }
+        r7.createNewFile();	 Catch:{ Exception -> 0x0168 }
     L_0x001d:
         r7 = 4;
         r7 = java.lang.Integer.valueOf(r7);
@@ -2066,177 +2073,176 @@ public class ImageLoader {
         r7 = r7.toString();
         org.telegram.messenger.FileLog.e(r7);
         r7 = "mounted";
-        r8 = android.os.Environment.getExternalStorageState();	 Catch:{ Exception -> 0x0178 }
-        r7 = r7.equals(r8);	 Catch:{ Exception -> 0x0178 }
-        if (r7 == 0) goto L_0x018d;
+        r8 = android.os.Environment.getExternalStorageState();	 Catch:{ Exception -> 0x0174 }
+        r7 = r7.equals(r8);	 Catch:{ Exception -> 0x0174 }
+        if (r7 == 0) goto L_0x0189;
     L_0x0049:
-        r7 = new java.io.File;	 Catch:{ Exception -> 0x0178 }
-        r8 = android.os.Environment.getExternalStorageDirectory();	 Catch:{ Exception -> 0x0178 }
+        r7 = new java.io.File;	 Catch:{ Exception -> 0x0174 }
+        r8 = android.os.Environment.getExternalStorageDirectory();	 Catch:{ Exception -> 0x0174 }
         r9 = "Telegram";
-        r7.<init>(r8, r9);	 Catch:{ Exception -> 0x0178 }
-        r10.telegramPath = r7;	 Catch:{ Exception -> 0x0178 }
-        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x0178 }
-        r7.mkdirs();	 Catch:{ Exception -> 0x0178 }
-        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x0178 }
-        r7 = r7.isDirectory();	 Catch:{ Exception -> 0x0178 }
+        r7.<init>(r8, r9);	 Catch:{ Exception -> 0x0174 }
+        r10.telegramPath = r7;	 Catch:{ Exception -> 0x0174 }
+        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x0174 }
+        r7.mkdirs();	 Catch:{ Exception -> 0x0174 }
+        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x0174 }
+        r7 = r7.isDirectory();	 Catch:{ Exception -> 0x0174 }
         if (r7 == 0) goto L_0x015e;
     L_0x0064:
-        r4 = new java.io.File;	 Catch:{ Exception -> 0x0172 }
-        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x0172 }
+        r4 = new java.io.File;	 Catch:{ Exception -> 0x016e }
+        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x016e }
         r8 = "Telegram Images";
-        r4.<init>(r7, r8);	 Catch:{ Exception -> 0x0172 }
-        r4.mkdir();	 Catch:{ Exception -> 0x0172 }
-        r7 = r4.isDirectory();	 Catch:{ Exception -> 0x0172 }
+        r4.<init>(r7, r8);	 Catch:{ Exception -> 0x016e }
+        r4.mkdir();	 Catch:{ Exception -> 0x016e }
+        r7 = r4.isDirectory();	 Catch:{ Exception -> 0x016e }
         if (r7 == 0) goto L_0x009d;
     L_0x0077:
         r7 = 0;
-        r7 = r10.canMoveFiles(r1, r4, r7);	 Catch:{ Exception -> 0x0172 }
+        r7 = r10.canMoveFiles(r1, r4, r7);	 Catch:{ Exception -> 0x016e }
         if (r7 == 0) goto L_0x009d;
     L_0x007e:
         r7 = 0;
-        r7 = java.lang.Integer.valueOf(r7);	 Catch:{ Exception -> 0x0172 }
-        r5.put(r7, r4);	 Catch:{ Exception -> 0x0172 }
-        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0172 }
-        r7.<init>();	 Catch:{ Exception -> 0x0172 }
+        r7 = java.lang.Integer.valueOf(r7);	 Catch:{ Exception -> 0x016e }
+        r5.put(r7, r4);	 Catch:{ Exception -> 0x016e }
+        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x016e }
+        r7.<init>();	 Catch:{ Exception -> 0x016e }
         r8 = "image path = ";
-        r7 = r7.append(r8);	 Catch:{ Exception -> 0x0172 }
-        r7 = r7.append(r4);	 Catch:{ Exception -> 0x0172 }
-        r7 = r7.toString();	 Catch:{ Exception -> 0x0172 }
-        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x0172 }
+        r7 = r7.append(r8);	 Catch:{ Exception -> 0x016e }
+        r7 = r7.append(r4);	 Catch:{ Exception -> 0x016e }
+        r7 = r7.toString();	 Catch:{ Exception -> 0x016e }
+        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x016e }
     L_0x009d:
-        r6 = new java.io.File;	 Catch:{ Exception -> 0x017d }
-        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x017d }
+        r6 = new java.io.File;	 Catch:{ Exception -> 0x0179 }
+        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x0179 }
         r8 = "Telegram Video";
-        r6.<init>(r7, r8);	 Catch:{ Exception -> 0x017d }
-        r6.mkdir();	 Catch:{ Exception -> 0x017d }
-        r7 = r6.isDirectory();	 Catch:{ Exception -> 0x017d }
+        r6.<init>(r7, r8);	 Catch:{ Exception -> 0x0179 }
+        r6.mkdir();	 Catch:{ Exception -> 0x0179 }
+        r7 = r6.isDirectory();	 Catch:{ Exception -> 0x0179 }
         if (r7 == 0) goto L_0x00d6;
     L_0x00b0:
         r7 = 2;
-        r7 = r10.canMoveFiles(r1, r6, r7);	 Catch:{ Exception -> 0x017d }
+        r7 = r10.canMoveFiles(r1, r6, r7);	 Catch:{ Exception -> 0x0179 }
         if (r7 == 0) goto L_0x00d6;
     L_0x00b7:
         r7 = 2;
-        r7 = java.lang.Integer.valueOf(r7);	 Catch:{ Exception -> 0x017d }
-        r5.put(r7, r6);	 Catch:{ Exception -> 0x017d }
-        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x017d }
-        r7.<init>();	 Catch:{ Exception -> 0x017d }
+        r7 = java.lang.Integer.valueOf(r7);	 Catch:{ Exception -> 0x0179 }
+        r5.put(r7, r6);	 Catch:{ Exception -> 0x0179 }
+        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0179 }
+        r7.<init>();	 Catch:{ Exception -> 0x0179 }
         r8 = "video path = ";
-        r7 = r7.append(r8);	 Catch:{ Exception -> 0x017d }
-        r7 = r7.append(r6);	 Catch:{ Exception -> 0x017d }
-        r7 = r7.toString();	 Catch:{ Exception -> 0x017d }
-        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x017d }
+        r7 = r7.append(r8);	 Catch:{ Exception -> 0x0179 }
+        r7 = r7.append(r6);	 Catch:{ Exception -> 0x0179 }
+        r7 = r7.toString();	 Catch:{ Exception -> 0x0179 }
+        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x0179 }
     L_0x00d6:
-        r0 = new java.io.File;	 Catch:{ Exception -> 0x0183 }
-        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x0183 }
+        r0 = new java.io.File;	 Catch:{ Exception -> 0x017f }
+        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x017f }
         r8 = "Telegram Audio";
-        r0.<init>(r7, r8);	 Catch:{ Exception -> 0x0183 }
-        r0.mkdir();	 Catch:{ Exception -> 0x0183 }
-        r7 = r0.isDirectory();	 Catch:{ Exception -> 0x0183 }
+        r0.<init>(r7, r8);	 Catch:{ Exception -> 0x017f }
+        r0.mkdir();	 Catch:{ Exception -> 0x017f }
+        r7 = r0.isDirectory();	 Catch:{ Exception -> 0x017f }
         if (r7 == 0) goto L_0x011a;
     L_0x00e9:
         r7 = 1;
-        r7 = r10.canMoveFiles(r1, r0, r7);	 Catch:{ Exception -> 0x0183 }
+        r7 = r10.canMoveFiles(r1, r0, r7);	 Catch:{ Exception -> 0x017f }
         if (r7 == 0) goto L_0x011a;
     L_0x00f0:
-        r7 = new java.io.File;	 Catch:{ Exception -> 0x0183 }
+        r7 = new java.io.File;	 Catch:{ Exception -> 0x017f }
         r8 = ".nomedia";
-        r7.<init>(r0, r8);	 Catch:{ Exception -> 0x0183 }
-        r7.createNewFile();	 Catch:{ Exception -> 0x0183 }
+        r7.<init>(r0, r8);	 Catch:{ Exception -> 0x017f }
+        r7.createNewFile();	 Catch:{ Exception -> 0x017f }
         r7 = 1;
-        r7 = java.lang.Integer.valueOf(r7);	 Catch:{ Exception -> 0x0183 }
-        r5.put(r7, r0);	 Catch:{ Exception -> 0x0183 }
-        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0183 }
-        r7.<init>();	 Catch:{ Exception -> 0x0183 }
+        r7 = java.lang.Integer.valueOf(r7);	 Catch:{ Exception -> 0x017f }
+        r5.put(r7, r0);	 Catch:{ Exception -> 0x017f }
+        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x017f }
+        r7.<init>();	 Catch:{ Exception -> 0x017f }
         r8 = "audio path = ";
-        r7 = r7.append(r8);	 Catch:{ Exception -> 0x0183 }
-        r7 = r7.append(r0);	 Catch:{ Exception -> 0x0183 }
-        r7 = r7.toString();	 Catch:{ Exception -> 0x0183 }
-        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x0183 }
+        r7 = r7.append(r8);	 Catch:{ Exception -> 0x017f }
+        r7 = r7.append(r0);	 Catch:{ Exception -> 0x017f }
+        r7 = r7.toString();	 Catch:{ Exception -> 0x017f }
+        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x017f }
     L_0x011a:
-        r2 = new java.io.File;	 Catch:{ Exception -> 0x0188 }
-        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x0188 }
+        r2 = new java.io.File;	 Catch:{ Exception -> 0x0184 }
+        r7 = r10.telegramPath;	 Catch:{ Exception -> 0x0184 }
         r8 = "Telegram Documents";
-        r2.<init>(r7, r8);	 Catch:{ Exception -> 0x0188 }
-        r2.mkdir();	 Catch:{ Exception -> 0x0188 }
-        r7 = r2.isDirectory();	 Catch:{ Exception -> 0x0188 }
+        r2.<init>(r7, r8);	 Catch:{ Exception -> 0x0184 }
+        r2.mkdir();	 Catch:{ Exception -> 0x0184 }
+        r7 = r2.isDirectory();	 Catch:{ Exception -> 0x0184 }
         if (r7 == 0) goto L_0x015e;
     L_0x012d:
         r7 = 3;
-        r7 = r10.canMoveFiles(r1, r2, r7);	 Catch:{ Exception -> 0x0188 }
+        r7 = r10.canMoveFiles(r1, r2, r7);	 Catch:{ Exception -> 0x0184 }
         if (r7 == 0) goto L_0x015e;
     L_0x0134:
-        r7 = new java.io.File;	 Catch:{ Exception -> 0x0188 }
+        r7 = new java.io.File;	 Catch:{ Exception -> 0x0184 }
         r8 = ".nomedia";
-        r7.<init>(r2, r8);	 Catch:{ Exception -> 0x0188 }
-        r7.createNewFile();	 Catch:{ Exception -> 0x0188 }
+        r7.<init>(r2, r8);	 Catch:{ Exception -> 0x0184 }
+        r7.createNewFile();	 Catch:{ Exception -> 0x0184 }
         r7 = 3;
-        r7 = java.lang.Integer.valueOf(r7);	 Catch:{ Exception -> 0x0188 }
-        r5.put(r7, r2);	 Catch:{ Exception -> 0x0188 }
-        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0188 }
-        r7.<init>();	 Catch:{ Exception -> 0x0188 }
+        r7 = java.lang.Integer.valueOf(r7);	 Catch:{ Exception -> 0x0184 }
+        r5.put(r7, r2);	 Catch:{ Exception -> 0x0184 }
+        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0184 }
+        r7.<init>();	 Catch:{ Exception -> 0x0184 }
         r8 = "documents path = ";
-        r7 = r7.append(r8);	 Catch:{ Exception -> 0x0188 }
-        r7 = r7.append(r2);	 Catch:{ Exception -> 0x0188 }
-        r7 = r7.toString();	 Catch:{ Exception -> 0x0188 }
-        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x0188 }
+        r7 = r7.append(r8);	 Catch:{ Exception -> 0x0184 }
+        r7 = r7.append(r2);	 Catch:{ Exception -> 0x0184 }
+        r7 = r7.toString();	 Catch:{ Exception -> 0x0184 }
+        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x0184 }
     L_0x015e:
-        r7 = org.telegram.messenger.MediaController.getInstance();	 Catch:{ Exception -> 0x0178 }
-        r7.checkSaveToGalleryFiles();	 Catch:{ Exception -> 0x0178 }
-    L_0x0165:
+        org.telegram.messenger.SharedConfig.checkSaveToGalleryFiles();	 Catch:{ Exception -> 0x0174 }
+    L_0x0161:
         return r5;
-    L_0x0166:
+    L_0x0162:
         r3 = move-exception;
         org.telegram.messenger.FileLog.e(r3);
         goto L_0x0012;
-    L_0x016c:
+    L_0x0168:
         r3 = move-exception;
         org.telegram.messenger.FileLog.e(r3);
         goto L_0x001d;
-    L_0x0172:
+    L_0x016e:
         r3 = move-exception;
-        org.telegram.messenger.FileLog.e(r3);	 Catch:{ Exception -> 0x0178 }
+        org.telegram.messenger.FileLog.e(r3);	 Catch:{ Exception -> 0x0174 }
         goto L_0x009d;
-    L_0x0178:
+    L_0x0174:
         r3 = move-exception;
         org.telegram.messenger.FileLog.e(r3);
-        goto L_0x0165;
-    L_0x017d:
+        goto L_0x0161;
+    L_0x0179:
         r3 = move-exception;
-        org.telegram.messenger.FileLog.e(r3);	 Catch:{ Exception -> 0x0178 }
+        org.telegram.messenger.FileLog.e(r3);	 Catch:{ Exception -> 0x0174 }
         goto L_0x00d6;
-    L_0x0183:
+    L_0x017f:
         r3 = move-exception;
-        org.telegram.messenger.FileLog.e(r3);	 Catch:{ Exception -> 0x0178 }
+        org.telegram.messenger.FileLog.e(r3);	 Catch:{ Exception -> 0x0174 }
         goto L_0x011a;
-    L_0x0188:
+    L_0x0184:
         r3 = move-exception;
-        org.telegram.messenger.FileLog.e(r3);	 Catch:{ Exception -> 0x0178 }
+        org.telegram.messenger.FileLog.e(r3);	 Catch:{ Exception -> 0x0174 }
         goto L_0x015e;
-    L_0x018d:
+    L_0x0189:
         r7 = "this Android can't rename files";
-        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x0178 }
+        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x0174 }
         goto L_0x015e;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.ImageLoader.createMediaPaths():java.util.HashMap<java.lang.Integer, java.io.File>");
     }
 
     private boolean canMoveFiles(File from, File to, int type) {
-        File srcFile;
         Throwable e;
         Throwable th;
         RandomAccessFile file = null;
-        File srcFile2 = null;
+        File srcFile = null;
         File dstFile = null;
+        File srcFile2;
         if (type == 0) {
             try {
-                srcFile = new File(from, "000000000_999999_temp.jpg");
+                srcFile2 = new File(from, "000000000_999999_temp.jpg");
                 try {
                     dstFile = new File(to, "000000000_999999.jpg");
-                    srcFile2 = srcFile;
+                    srcFile = srcFile2;
                 } catch (Exception e2) {
                     e = e2;
-                    srcFile2 = srcFile;
+                    srcFile = srcFile2;
                     try {
                         FileLog.e(e);
                         if (file != null) {
@@ -2268,27 +2274,27 @@ public class ImageLoader {
                 return false;
             }
         } else if (type == 3) {
-            srcFile = new File(from, "000000000_999999_temp.doc");
+            srcFile2 = new File(from, "000000000_999999_temp.doc");
             dstFile = new File(to, "000000000_999999.doc");
-            srcFile2 = srcFile;
+            srcFile = srcFile2;
         } else if (type == 1) {
-            srcFile = new File(from, "000000000_999999_temp.ogg");
+            srcFile2 = new File(from, "000000000_999999_temp.ogg");
             dstFile = new File(to, "000000000_999999.ogg");
-            srcFile2 = srcFile;
+            srcFile = srcFile2;
         } else if (type == 2) {
-            srcFile = new File(from, "000000000_999999_temp.mp4");
+            srcFile2 = new File(from, "000000000_999999_temp.mp4");
             dstFile = new File(to, "000000000_999999.mp4");
-            srcFile2 = srcFile;
+            srcFile = srcFile2;
         }
         byte[] buffer = new byte[1024];
-        srcFile2.createNewFile();
-        RandomAccessFile file2 = new RandomAccessFile(srcFile2, "rws");
+        srcFile.createNewFile();
+        RandomAccessFile file2 = new RandomAccessFile(srcFile, "rws");
         try {
             file2.write(buffer);
             file2.close();
             file = null;
-            boolean canRename = srcFile2.renameTo(dstFile);
-            srcFile2.delete();
+            boolean canRename = srcFile.renameTo(dstFile);
+            srcFile.delete();
             dstFile.delete();
             if (!canRename) {
                 if (file != null) {
@@ -2478,12 +2484,12 @@ public class ImageLoader {
             for (int a = 0; a < arr.size(); a++) {
                 String filter = (String) arr.get(a);
                 performReplace(oldKey + "@" + filter, newKey + "@" + filter);
-                NotificationCenter.getInstance().postNotificationName(NotificationCenter.didReplacedPhotoInMemCache, oldK, newK, newLocation);
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didReplacedPhotoInMemCache, oldK, newK, newLocation);
             }
             return;
         }
         performReplace(oldKey, newKey);
-        NotificationCenter.getInstance().postNotificationName(NotificationCenter.didReplacedPhotoInMemCache, oldKey, newKey, newLocation);
+        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didReplacedPhotoInMemCache, oldKey, newKey, newLocation);
     }
 
     public void replaceImageInCache(final String oldKey, final String newKey, final FileLocation newLocation, boolean post) {
@@ -2538,6 +2544,7 @@ public class ImageLoader {
             final boolean finalIsNeedsQualityThumb = imageReceiver.isNeedsQualityThumb();
             final MessageObject parentMessageObject = imageReceiver.getParentMessageObject();
             final boolean shouldGenerateQualityThumb = imageReceiver.isShouldGenerateQualityThumb();
+            final int currentAccount = imageReceiver.getcurrentAccount();
             final int i = thumb;
             final String str = url;
             final String str2 = key;
@@ -2600,7 +2607,7 @@ public class ImageLoader {
                             }
                         } else if (i != 0) {
                             if (finalIsNeedsQualityThumb) {
-                                cacheFile = new File(FileLoader.getInstance().getDirectory(4), "q_" + str);
+                                cacheFile = new File(FileLoader.getDirectory(4), "q_" + str);
                                 if (cacheFile.exists()) {
                                     cacheFileExists = true;
                                 } else {
@@ -2623,7 +2630,7 @@ public class ImageLoader {
                                     ThumbGenerateInfo info = (ThumbGenerateInfo) ImageLoader.this.waitingForQualityThumb.get(location);
                                     if (info == null) {
                                         ThumbGenerateInfo thumbGenerateInfo = new ThumbGenerateInfo();
-                                        thumbGenerateInfo.fileLocation = (TL_fileLocation) tLObject;
+                                        thumbGenerateInfo.fileLocation = (FileLocation) tLObject;
                                         thumbGenerateInfo.filter = str3;
                                         ImageLoader.this.waitingForQualityThumb.put(location, thumbGenerateInfo);
                                     }
@@ -2648,14 +2655,14 @@ public class ImageLoader {
                             }
                             if (cacheFile == null) {
                                 if (i2 != 0 || i3 <= 0 || str4 != null || isEncrypted) {
-                                    cacheFile = new File(FileLoader.getInstance().getDirectory(4), str);
+                                    cacheFile = new File(FileLoader.getDirectory(4), str);
                                     if (cacheFile.exists()) {
                                         cacheFileExists = true;
                                     } else if (i2 == 2) {
-                                        cacheFile = new File(FileLoader.getInstance().getDirectory(4), str + ".enc");
+                                        cacheFile = new File(FileLoader.getDirectory(4), str + ".enc");
                                     }
                                 } else {
-                                    cacheFile = tLObject instanceof Document ? MessageObject.isVideoDocument((Document) tLObject) ? new File(FileLoader.getInstance().getDirectory(2), str) : new File(FileLoader.getInstance().getDirectory(3), str) : tLObject instanceof TL_webDocument ? new File(FileLoader.getInstance().getDirectory(3), str) : new File(FileLoader.getInstance().getDirectory(0), str);
+                                    cacheFile = tLObject instanceof Document ? MessageObject.isVideoDocument((Document) tLObject) ? new File(FileLoader.getDirectory(2), str) : new File(FileLoader.getDirectory(3), str) : tLObject instanceof TL_webDocument ? new File(FileLoader.getDirectory(3), str) : new File(FileLoader.getDirectory(0), str);
                                 }
                             }
                             img.selfThumb = i != 0;
@@ -2663,6 +2670,7 @@ public class ImageLoader {
                             img.filter = str3;
                             img.httpUrl = str4;
                             img.ext = str5;
+                            img.currentAccount = currentAccount;
                             if (i2 == 2) {
                                 img.encryptionKeyPath = new File(FileLoader.getInternalCacheDir(), str + ".enc.key");
                             }
@@ -2689,11 +2697,11 @@ public class ImageLoader {
                                     if (localCacheType == 0 && (i3 <= 0 || location2.key != null)) {
                                         localCacheType = 1;
                                     }
-                                    FileLoader.getInstance().loadFile(location2, str5, i3, localCacheType);
+                                    FileLoader.getInstance(currentAccount).loadFile(location2, str5, i3, localCacheType);
                                 } else if (tLObject instanceof Document) {
-                                    FileLoader.getInstance().loadFile((Document) tLObject, true, i2);
+                                    FileLoader.getInstance(currentAccount).loadFile((Document) tLObject, true, i2);
                                 } else if (tLObject instanceof TL_webDocument) {
-                                    FileLoader.getInstance().loadFile((TL_webDocument) tLObject, true, i2);
+                                    FileLoader.getInstance(currentAccount).loadFile((TL_webDocument) tLObject, true, i2);
                                 }
                                 if (imageReceiver2.isForceLoding()) {
                                     ImageLoader.this.forceLoadingImages.put(img.key, Integer.valueOf(0));
@@ -2701,7 +2709,7 @@ public class ImageLoader {
                                 }
                                 return;
                             }
-                            img.tempFilePath = new File(FileLoader.getInstance().getDirectory(4), Utilities.MD5(str4) + "_temp.jpg");
+                            img.tempFilePath = new File(FileLoader.getDirectory(4), Utilities.MD5(str4) + "_temp.jpg");
                             img.finalFilePath = cacheFile;
                             img.httpTask = new HttpImageTask(img, i3);
                             ImageLoader.this.httpTasks.add(img.httpTask);
@@ -2788,7 +2796,7 @@ public class ImageLoader {
                                     if (document2.mime_type == null && document2.mime_type.equals(MimeTypes.VIDEO_MP4)) {
                                         docExt = ".mp4";
                                     } else {
-                                        docExt = "";
+                                        docExt = TtmlNode.ANONYMOUS_REGION_ID;
                                     }
                                 }
                                 url = key + docExt;
@@ -2802,11 +2810,11 @@ public class ImageLoader {
                                 }
                             }
                         }
-                        docExt = "";
+                        docExt = TtmlNode.ANONYMOUS_REGION_ID;
                         if (docExt.length() <= 1) {
                             if (document2.mime_type == null) {
                             }
-                            docExt = "";
+                            docExt = TtmlNode.ANONYMOUS_REGION_ID;
                         }
                         url = key + docExt;
                         if (null != null) {
@@ -2892,6 +2900,7 @@ public class ImageLoader {
                         CacheImage cacheImage = (CacheImage) ImageLoader.this.imageLoadingByKeys.get(key);
                         if (cacheImage == null) {
                             cacheImage = new CacheImage();
+                            cacheImage.currentAccount = img.currentAccount;
                             cacheImage.finalFilePath = finalFile;
                             cacheImage.key = key;
                             cacheImage.httpUrl = img.httpUrl;
@@ -2946,12 +2955,12 @@ public class ImageLoader {
         return this.httpFileLoadTasksByKeys.containsKey(url);
     }
 
-    public void loadHttpFile(String url, String defaultExt) {
+    public void loadHttpFile(String url, String defaultExt, int currentAccount) {
         if (url != null && url.length() != 0 && !this.httpFileLoadTasksByKeys.containsKey(url)) {
             String ext = getHttpUrlExtension(url, defaultExt);
-            File file = new File(FileLoader.getInstance().getDirectory(4), Utilities.MD5(url) + "_temp." + ext);
+            File file = new File(FileLoader.getDirectory(4), Utilities.MD5(url) + "_temp." + ext);
             file.delete();
-            HttpFileTask task = new HttpFileTask(url, file, ext);
+            HttpFileTask task = new HttpFileTask(url, file, ext, currentAccount);
             this.httpFileLoadTasks.add(task);
             this.httpFileLoadTasksByKeys.put(url, task);
             runHttpFileLoadTasks(null, 0);
@@ -2981,7 +2990,7 @@ public class ImageLoader {
                 if (oldTask != null) {
                     if (reason == 1) {
                         if (oldTask.canRetry) {
-                            final HttpFileTask newTask = new HttpFileTask(oldTask.url, oldTask.tempFile, oldTask.ext);
+                            final HttpFileTask newTask = new HttpFileTask(oldTask.url, oldTask.tempFile, oldTask.ext, oldTask.currentAccount);
                             Runnable runnable = new Runnable() {
                                 public void run() {
                                     ImageLoader.this.httpFileLoadTasks.add(newTask);
@@ -2992,13 +3001,13 @@ public class ImageLoader {
                             AndroidUtilities.runOnUIThread(runnable, 1000);
                         } else {
                             ImageLoader.this.httpFileLoadTasksByKeys.remove(oldTask.url);
-                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.httpFileDidFailedLoad, oldTask.url, Integer.valueOf(0));
+                            NotificationCenter.getInstance(oldTask.currentAccount).postNotificationName(NotificationCenter.httpFileDidFailedLoad, oldTask.url, Integer.valueOf(0));
                         }
                     } else if (reason == 2) {
                         ImageLoader.this.httpFileLoadTasksByKeys.remove(oldTask.url);
-                        File file = new File(FileLoader.getInstance().getDirectory(4), Utilities.MD5(oldTask.url) + "." + oldTask.ext);
+                        File file = new File(FileLoader.getDirectory(4), Utilities.MD5(oldTask.url) + "." + oldTask.ext);
                         String result = oldTask.tempFile.renameTo(file) ? file.toString() : oldTask.tempFile.toString();
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.httpFileDidLoaded, oldTask.url, result);
+                        NotificationCenter.getInstance(oldTask.currentAccount).postNotificationName(NotificationCenter.httpFileDidLoaded, oldTask.url, result);
                     }
                 }
                 while (ImageLoader.this.currentHttpFileLoadTasksCount < 2 && !ImageLoader.this.httpFileLoadTasks.isEmpty()) {
@@ -3126,7 +3135,7 @@ public class ImageLoader {
         r6 = 0;
         if (r13 == 0) goto L_0x00c9;
     L_0x00b2:
-        r12 = new android.media.ExifInterface;	 Catch:{ Throwable -> 0x01a3 }
+        r12 = new android.support.media.ExifInterface;	 Catch:{ Throwable -> 0x01a3 }
         r12.<init>(r13);	 Catch:{ Throwable -> 0x01a3 }
         r2 = "Orientation";
         r3 = 1;
@@ -3309,8 +3318,8 @@ public class ImageLoader {
         TL_fileLocation location = new TL_fileLocation();
         location.volume_id = -2147483648L;
         location.dc_id = Integer.MIN_VALUE;
-        location.local_id = UserConfig.lastLocalId;
-        UserConfig.lastLocalId--;
+        location.local_id = SharedConfig.lastLocalId;
+        SharedConfig.lastLocalId--;
         PhotoSize size = new TL_photoSize();
         size.location = location;
         size.w = scaledBitmap.getWidth();
@@ -3326,7 +3335,7 @@ public class ImageLoader {
         } else {
             size.type = "y";
         }
-        FileOutputStream stream = new FileOutputStream(new File(FileLoader.getInstance().getDirectory(4), location.volume_id + "_" + location.local_id + ".jpg"));
+        FileOutputStream stream = new FileOutputStream(new File(FileLoader.getDirectory(4), location.volume_id + "_" + location.local_id + ".jpg"));
         scaledBitmap.compress(CompressFormat.JPEG, quality, stream);
         if (cache) {
             ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
@@ -3430,8 +3439,8 @@ public class ImageLoader {
                 photoSize.location = new TL_fileLocation();
                 photoSize.location.volume_id = -2147483648L;
                 photoSize.location.dc_id = Integer.MIN_VALUE;
-                photoSize.location.local_id = UserConfig.lastLocalId;
-                UserConfig.lastLocalId--;
+                photoSize.location.local_id = SharedConfig.lastLocalId;
+                SharedConfig.lastLocalId--;
             }
             File file = FileLoader.getPathToAttach(photoSize, true);
             boolean isEncrypted = false;

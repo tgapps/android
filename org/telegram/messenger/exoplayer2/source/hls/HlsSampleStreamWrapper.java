@@ -29,7 +29,7 @@ import org.telegram.messenger.exoplayer2.util.Assertions;
 import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.messenger.exoplayer2.util.Util;
 
-final class HlsSampleStreamWrapper implements org.telegram.messenger.exoplayer2.upstream.Loader.Callback<Chunk>, ReleaseCallback, SequenceableLoader, ExtractorOutput, UpstreamFormatChangedListener {
+final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatChangedListener, SequenceableLoader, org.telegram.messenger.exoplayer2.upstream.Loader.Callback<Chunk>, ReleaseCallback {
     private static final int PRIMARY_TYPE_AUDIO = 2;
     private static final int PRIMARY_TYPE_NONE = 0;
     private static final int PRIMARY_TYPE_TEXT = 1;

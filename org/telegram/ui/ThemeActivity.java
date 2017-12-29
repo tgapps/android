@@ -26,6 +26,7 @@ import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.support.widget.LinearLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView.ViewHolder;
@@ -84,12 +85,12 @@ public class ThemeActivity extends BaseFragment {
                                 Builder builder = new Builder(ThemeActivity.this.getParentActivity());
                                 builder.setItems(themeInfo.pathToFile == null ? new CharSequence[]{LocaleController.getString("ShareFile", R.string.ShareFile)} : new CharSequence[]{LocaleController.getString("ShareFile", R.string.ShareFile), LocaleController.getString("Edit", R.string.Edit), LocaleController.getString("Delete", R.string.Delete)}, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
-                                        File currentFile;
                                         Throwable e;
                                         File finalFile;
                                         Intent intent;
                                         Throwable th;
                                         if (which == 0) {
+                                            File currentFile;
                                             if (themeInfo.pathToFile == null && themeInfo.assetName == null) {
                                                 StringBuilder result = new StringBuilder();
                                                 for (Entry<String, Integer> entry : Theme.getDefaultColors().entrySet()) {
@@ -122,19 +123,19 @@ public class ThemeActivity extends BaseFragment {
                                                                     FileLog.e("tmessage", e22);
                                                                 }
                                                             }
-                                                            finalFile = new File(FileLoader.getInstance().getDirectory(4), currentFile.getName());
+                                                            finalFile = new File(FileLoader.getDirectory(4), currentFile.getName());
                                                             if (!AndroidUtilities.copyFile(currentFile, finalFile)) {
                                                                 intent = new Intent("android.intent.action.SEND");
                                                                 intent.setType("text/xml");
                                                                 if (VERSION.SDK_INT >= 24) {
+                                                                    intent.putExtra("android.intent.extra.STREAM", Uri.fromFile(finalFile));
+                                                                } else {
                                                                     try {
                                                                         intent.putExtra("android.intent.extra.STREAM", FileProvider.getUriForFile(ThemeActivity.this.getParentActivity(), "org.telegram.messenger.beta.provider", finalFile));
                                                                         intent.setFlags(1);
                                                                     } catch (Exception e4) {
                                                                         intent.putExtra("android.intent.extra.STREAM", Uri.fromFile(finalFile));
                                                                     }
-                                                                } else {
-                                                                    intent.putExtra("android.intent.extra.STREAM", Uri.fromFile(finalFile));
                                                                 }
                                                                 ThemeActivity.this.startActivityForResult(Intent.createChooser(intent, LocaleController.getString("ShareFile", R.string.ShareFile)), 500);
                                                             }
@@ -163,22 +164,22 @@ public class ThemeActivity extends BaseFragment {
                                                     if (stream != null) {
                                                         stream.close();
                                                     }
-                                                    finalFile = new File(FileLoader.getInstance().getDirectory(4), currentFile.getName());
+                                                    finalFile = new File(FileLoader.getDirectory(4), currentFile.getName());
                                                     if (!AndroidUtilities.copyFile(currentFile, finalFile)) {
                                                         intent = new Intent("android.intent.action.SEND");
                                                         intent.setType("text/xml");
                                                         if (VERSION.SDK_INT >= 24) {
-                                                            intent.putExtra("android.intent.extra.STREAM", Uri.fromFile(finalFile));
-                                                        } else {
                                                             intent.putExtra("android.intent.extra.STREAM", FileProvider.getUriForFile(ThemeActivity.this.getParentActivity(), "org.telegram.messenger.beta.provider", finalFile));
                                                             intent.setFlags(1);
+                                                        } else {
+                                                            intent.putExtra("android.intent.extra.STREAM", Uri.fromFile(finalFile));
                                                         }
                                                         ThemeActivity.this.startActivityForResult(Intent.createChooser(intent, LocaleController.getString("ShareFile", R.string.ShareFile)), 500);
                                                     }
                                                 }
                                             }
                                             currentFile = themeInfo.assetName != null ? Theme.getAssetFile(themeInfo.assetName) : new File(themeInfo.pathToFile);
-                                            finalFile = new File(FileLoader.getInstance().getDirectory(4), currentFile.getName());
+                                            finalFile = new File(FileLoader.getDirectory(4), currentFile.getName());
                                             try {
                                                 if (!AndroidUtilities.copyFile(currentFile, finalFile)) {
                                                     intent = new Intent("android.intent.action.SEND");
@@ -360,7 +361,7 @@ public class ThemeActivity extends BaseFragment {
                             Theme.saveCurrentTheme(name, true);
                             ThemeActivity.this.listAdapter.notifyDataSetChanged();
                             alertDialog.dismiss();
-                            SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0);
+                            SharedPreferences preferences = MessagesController.getGlobalMainSettings();
                             if (!preferences.getBoolean("themehint", false)) {
                                 preferences.edit().putBoolean("themehint", true).commit();
                                 try {

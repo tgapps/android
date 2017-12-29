@@ -25,6 +25,7 @@ public class DecoderConfigDescriptor extends BaseDescriptor {
     int upStream;
 
     public void parseDetail(ByteBuffer bb) throws IOException {
+        BaseDescriptor descriptor;
         Object valueOf;
         this.objectTypeIndication = IsoTypeReader.readUInt8(bb);
         int data = IsoTypeReader.readUInt8(bb);
@@ -34,7 +35,6 @@ public class DecoderConfigDescriptor extends BaseDescriptor {
         this.maxBitRate = IsoTypeReader.readUInt32(bb);
         this.avgBitRate = IsoTypeReader.readUInt32(bb);
         if (bb.remaining() > 2) {
-            BaseDescriptor descriptor;
             int begin = bb.position();
             descriptor = ObjectDescriptorFactory.createFrom(this.objectTypeIndication, bb);
             int read = bb.position() - begin;
@@ -97,64 +97,24 @@ public class DecoderConfigDescriptor extends BaseDescriptor {
         return out;
     }
 
-    public DecoderSpecificInfo getDecoderSpecificInfo() {
-        return this.decoderSpecificInfo;
-    }
-
-    public AudioSpecificConfig getAudioSpecificInfo() {
-        return this.audioSpecificInfo;
-    }
-
     public void setAudioSpecificInfo(AudioSpecificConfig audioSpecificInfo) {
         this.audioSpecificInfo = audioSpecificInfo;
-    }
-
-    public List<ProfileLevelIndicationDescriptor> getProfileLevelIndicationDescriptors() {
-        return this.profileLevelIndicationDescriptors;
-    }
-
-    public int getObjectTypeIndication() {
-        return this.objectTypeIndication;
     }
 
     public void setObjectTypeIndication(int objectTypeIndication) {
         this.objectTypeIndication = objectTypeIndication;
     }
 
-    public int getStreamType() {
-        return this.streamType;
-    }
-
     public void setStreamType(int streamType) {
         this.streamType = streamType;
-    }
-
-    public int getUpStream() {
-        return this.upStream;
-    }
-
-    public void setUpStream(int upStream) {
-        this.upStream = upStream;
-    }
-
-    public int getBufferSizeDB() {
-        return this.bufferSizeDB;
     }
 
     public void setBufferSizeDB(int bufferSizeDB) {
         this.bufferSizeDB = bufferSizeDB;
     }
 
-    public long getMaxBitRate() {
-        return this.maxBitRate;
-    }
-
     public void setMaxBitRate(long maxBitRate) {
         this.maxBitRate = maxBitRate;
-    }
-
-    public long getAvgBitRate() {
-        return this.avgBitRate;
     }
 
     public void setAvgBitRate(long avgBitRate) {

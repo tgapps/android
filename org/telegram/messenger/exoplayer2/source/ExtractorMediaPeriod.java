@@ -31,7 +31,7 @@ import org.telegram.messenger.exoplayer2.util.ConditionVariable;
 import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.messenger.exoplayer2.util.Util;
 
-final class ExtractorMediaPeriod implements MediaPeriod, ExtractorOutput, Callback<ExtractingLoadable>, ReleaseCallback, UpstreamFormatChangedListener {
+final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, UpstreamFormatChangedListener, Callback<ExtractingLoadable>, ReleaseCallback {
     private static final long DEFAULT_LAST_SAMPLE_DURATION_US = 10000;
     private final Allocator allocator;
     private MediaPeriod.Callback callback;
@@ -154,10 +154,10 @@ final class ExtractorMediaPeriod implements MediaPeriod, ExtractorOutput, Callba
         }
 
         public void load() throws IOException, InterruptedException {
+            ExtractorInput input;
             Throwable th;
             int result = 0;
             while (result == 0 && !this.loadCanceled) {
-                ExtractorInput input;
                 try {
                     long position = this.positionHolder.position;
                     this.length = this.dataSource.open(new DataSpec(this.uri, position, -1, ExtractorMediaPeriod.this.customCacheKey));
@@ -293,7 +293,6 @@ final class ExtractorMediaPeriod implements MediaPeriod, ExtractorOutput, Callba
     }
 
     public long selectTracks(TrackSelection[] selections, boolean[] mayRetainStreamFlags, SampleStream[] streams, boolean[] streamResetFlags, long positionUs) {
-        SampleQueue sampleQueue;
         Assertions.checkState(this.prepared);
         int oldEnabledTrackCount = this.enabledTrackCount;
         int i = 0;
@@ -321,6 +320,7 @@ final class ExtractorMediaPeriod implements MediaPeriod, ExtractorOutput, Callba
                 streams[i] = new SampleStreamImpl(track);
                 streamResetFlags[i] = true;
                 if (!seekRequired) {
+                    SampleQueue sampleQueue;
                     sampleQueue = this.sampleQueues[track];
                     sampleQueue.rewind();
                     if (sampleQueue.advanceTo(positionUs, true, true) || sampleQueue.getReadIndex() == 0) {

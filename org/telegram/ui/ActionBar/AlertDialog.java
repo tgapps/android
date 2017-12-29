@@ -300,7 +300,7 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = r0.topImageView;
         r3 = r24.getContext();
         r3 = r3.getResources();
-        r4 = 2131100040; // 0x7f060188 float:1.781245E38 double:1.0529033176E-314;
+        r4 = 2131165592; // 0x7f070198 float:1.7945405E38 double:1.0529357046E-314;
         r3 = r3.getDrawable(r4);
         r2.setBackgroundDrawable(r3);
         r0 = r24;
@@ -466,7 +466,7 @@ public class AlertDialog extends Dialog implements Callback {
         r4 = 0;
         r2 = r24.getContext();
         r2 = r2.getResources();
-        r5 = 2131099791; // 0x7f06008f float:1.7811945E38 double:1.0529031946E-314;
+        r5 = 2131165331; // 0x7f070093 float:1.7944876E38 double:1.0529355757E-314;
         r2 = r2.getDrawable(r5);
         r2 = r2.mutate();
         r2 = (android.graphics.drawable.BitmapDrawable) r2;
@@ -476,7 +476,7 @@ public class AlertDialog extends Dialog implements Callback {
         r4 = 1;
         r2 = r24.getContext();
         r2 = r2.getResources();
-        r5 = 2131099792; // 0x7f060090 float:1.7811947E38 double:1.052903195E-314;
+        r5 = 2131165332; // 0x7f070094 float:1.7944878E38 double:1.052935576E-314;
         r2 = r2.getDrawable(r5);
         r2 = r2.mutate();
         r2 = (android.graphics.drawable.BitmapDrawable) r2;

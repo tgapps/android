@@ -2,6 +2,7 @@ package org.telegram.messenger.exoplayer2.util;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.exoplayer2.extractor.ts.PsExtractor;
 
 public final class ParsableByteArray {
@@ -386,7 +387,7 @@ public final class ParsableByteArray {
     }
 
     public String readString(int length) {
-        return readString(length, Charset.forName("UTF-8"));
+        return readString(length, Charset.forName(C.UTF8_NAME));
     }
 
     public String readString(int length, Charset charset) {
@@ -397,7 +398,7 @@ public final class ParsableByteArray {
 
     public String readNullTerminatedString(int length) {
         if (length == 0) {
-            return "";
+            return TtmlNode.ANONYMOUS_REGION_ID;
         }
         int stringLength = length;
         int lastIndex = (this.position + length) - 1;
@@ -457,10 +458,10 @@ public final class ParsableByteArray {
 
     public long readUtf8EncodedLong() {
         int i;
-        int x;
         int length = 0;
         long value = (long) this.data[this.position];
         for (int j = 7; j >= 0; j--) {
+            int x;
             if ((((long) (1 << j)) & value) == 0) {
                 if (j < 6) {
                     value &= (long) ((1 << j) - 1);

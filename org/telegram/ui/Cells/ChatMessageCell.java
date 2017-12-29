@@ -28,10 +28,10 @@ import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.view.ViewStructure;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import net.hockeyapp.android.UpdateFragment;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ContactsController;
@@ -50,12 +50,14 @@ import org.telegram.messenger.MessageObject.GroupedMessages;
 import org.telegram.messenger.MessageObject.TextLayoutBlock;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.SendMessagesHelper;
+import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
+import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.TLRPC.Chat;
 import org.telegram.tgnet.TLRPC.Document;
 import org.telegram.tgnet.TLRPC.DocumentAttribute;
@@ -102,7 +104,7 @@ import org.telegram.ui.Components.URLSpanNoUnderline;
 import org.telegram.ui.PhotoViewer;
 import org.telegram.ui.SecretMediaViewer;
 
-public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageReceiverDelegate, FileDownloadProgressListener {
+public class ChatMessageCell extends BaseCell implements ImageReceiverDelegate, FileDownloadProgressListener, SeekBarDelegate {
     private static final int DOCUMENT_ATTACH_TYPE_AUDIO = 3;
     private static final int DOCUMENT_ATTACH_TYPE_DOCUMENT = 1;
     private static final int DOCUMENT_ATTACH_TYPE_GIF = 2;
@@ -138,6 +140,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     private int captionY;
     private AvatarDrawable contactAvatarDrawable;
     private float controlsAlpha = 1.0f;
+    private int currentAccount = UserConfig.selectedAccount;
     private Drawable currentBackgroundDrawable;
     private Chat currentChat;
     private Chat currentForwardChannel;
@@ -388,7 +391,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         this.replyImageReceiver = new ImageReceiver(this);
         this.locationImageReceiver = new ImageReceiver(this);
         this.locationImageReceiver.setRoundRadius(AndroidUtilities.dp(26.1f));
-        this.TAG = MediaController.getInstance().generateObserverTag();
+        this.TAG = MediaController.getInstance(this.currentAccount).generateObserverTag();
         this.contactAvatarDrawable = new AvatarDrawable();
         this.photoImage = new ImageReceiver(this);
         this.photoImage.setDelegate(this);
@@ -734,7 +737,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         } else if (this.documentAttachType != 1 && this.drawPhotoImage && this.photoImage.isInsideImage((float) x, (float) y)) {
                             this.linkPreviewPressed = true;
                             webPage = this.currentMessageObject.messageOwner.media.webpage;
-                            if (this.documentAttachType != 2 || this.buttonState != -1 || !MediaController.getInstance().canAutoplayGifs() || (this.photoImage.getAnimation() != null && TextUtils.isEmpty(webPage.embed_url))) {
+                            if (this.documentAttachType != 2 || this.buttonState != -1 || !SharedConfig.autoplayGifs || (this.photoImage.getAnimation() != null && TextUtils.isEmpty(webPage.embed_url))) {
                                 return true;
                             }
                             this.linkPreviewPressed = false;
@@ -769,10 +772,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         resetPressedLink(2);
                     } else {
                         if (this.documentAttachType == 7) {
-                            if (!MediaController.getInstance().isPlayingMessage(this.currentMessageObject) || MediaController.getInstance().isMessagePaused()) {
+                            if (!MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject) || MediaController.getInstance(this.currentAccount).isMessagePaused()) {
                                 this.delegate.needPlayMessage(this.currentMessageObject);
                             } else {
-                                MediaController.getInstance().pauseMessage(this.currentMessageObject);
+                                MediaController.getInstance(this.currentAccount).pauseMessage(this.currentMessageObject);
                             }
                         } else if (this.documentAttachType != 2 || !this.drawImageButton) {
                             webPage = this.currentMessageObject.messageOwner.media.webpage;
@@ -785,7 +788,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                                 Browser.openUrl(getContext(), webPage.url);
                             }
                         } else if (this.buttonState == -1) {
-                            if (MediaController.getInstance().canAutoplayGifs()) {
+                            if (SharedConfig.autoplayGifs) {
                                 this.delegate.didPressedImage(this);
                             } else {
                                 this.buttonState = 2;
@@ -838,7 +841,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     result = true;
                     invalidate();
                 }
-            } else if (x >= this.otherX - AndroidUtilities.dp(20.0f) && x <= this.otherX + AndroidUtilities.dp(20.0f) && y >= this.otherY - AndroidUtilities.dp(4.0f) && y <= this.otherY + AndroidUtilities.dp(BitmapDescriptorFactory.HUE_ORANGE)) {
+            } else if (x >= this.otherX - AndroidUtilities.dp(20.0f) && x <= this.otherX + AndroidUtilities.dp(20.0f) && y >= this.otherY - AndroidUtilities.dp(4.0f) && y <= this.otherY + AndroidUtilities.dp(30.0f)) {
                 this.otherPressed = true;
                 result = true;
                 invalidate();
@@ -875,7 +878,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     this.imagePressed = true;
                     result = true;
                 }
-                if (this.currentMessageObject.type == 12 && MessagesController.getInstance().getUser(Integer.valueOf(this.currentMessageObject.messageOwner.media.user_id)) == null) {
+                if (this.currentMessageObject.type == 12 && MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(this.currentMessageObject.messageOwner.media.user_id)) == null) {
                     this.imagePressed = false;
                     result = false;
                 }
@@ -886,7 +889,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             if (this.currentMessageObject.isSendError()) {
                 this.imagePressed = false;
                 return false;
-            } else if (this.currentMessageObject.type == 8 && this.buttonState == -1 && MediaController.getInstance().canAutoplayGifs() && this.photoImage.getAnimation() == null) {
+            } else if (this.currentMessageObject.type == 8 && this.buttonState == -1 && SharedConfig.autoplayGifs && this.photoImage.getAnimation() == null) {
                 this.imagePressed = false;
                 return false;
             } else if (this.currentMessageObject.type != 5 || this.buttonState == -1) {
@@ -1259,7 +1262,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         break;
                     }
                 }
-                if (MediaController.getInstance().isPlayingMessage(this.currentMessageObject)) {
+                if (MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject)) {
                     duration = Math.max(0, duration - this.currentMessageObject.audioProgressSec);
                 }
                 if (this.lastTime != duration) {
@@ -1279,7 +1282,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 }
                 duration = 0;
                 if (this.documentAttachType == 3) {
-                    if (MediaController.getInstance().isPlayingMessage(this.currentMessageObject)) {
+                    if (MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject)) {
                         duration = this.currentMessageObject.audioProgressSec;
                     } else {
                         for (a = 0; a < this.documentAttach.attributes.size(); a++) {
@@ -1305,7 +1308,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                             break;
                         }
                     }
-                    if (MediaController.getInstance().isPlayingMessage(this.currentMessageObject)) {
+                    if (MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject)) {
                         currentProgress = this.currentMessageObject.audioProgressSec;
                     }
                     if (this.lastTime != currentProgress) {
@@ -1321,7 +1324,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
 
     public void downloadAudioIfNeed() {
         if (this.documentAttachType == 3 && this.buttonState == 2) {
-            FileLoader.getInstance().loadFile(this.documentAttach, true, 0);
+            FileLoader.getInstance(this.currentAccount).loadFile(this.documentAttach, true, 0);
             this.buttonState = 4;
             this.radialProgress.setBackground(getDrawableForCurrentState(), false, false);
         }
@@ -1418,16 +1421,16 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 didPressedButton(false);
             }
         } else if (this.currentMessageObject.type == 12) {
-            this.delegate.didPressedUserAvatar(this, MessagesController.getInstance().getUser(Integer.valueOf(this.currentMessageObject.messageOwner.media.user_id)));
+            this.delegate.didPressedUserAvatar(this, MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(this.currentMessageObject.messageOwner.media.user_id)));
         } else if (this.currentMessageObject.type == 5) {
-            if (!MediaController.getInstance().isPlayingMessage(this.currentMessageObject) || MediaController.getInstance().isMessagePaused()) {
+            if (!MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject) || MediaController.getInstance(this.currentAccount).isMessagePaused()) {
                 this.delegate.needPlayMessage(this.currentMessageObject);
             } else {
-                MediaController.getInstance().pauseMessage(this.currentMessageObject);
+                MediaController.getInstance(this.currentAccount).pauseMessage(this.currentMessageObject);
             }
         } else if (this.currentMessageObject.type == 8) {
             if (this.buttonState == -1) {
-                if (MediaController.getInstance().canAutoplayGifs()) {
+                if (SharedConfig.autoplayGifs) {
                     this.delegate.didPressedImage(this);
                     return;
                 }
@@ -1594,7 +1597,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         this.replyImageReceiver.onDetachedFromWindow();
         this.locationImageReceiver.onDetachedFromWindow();
         this.photoImage.onDetachedFromWindow();
-        MediaController.getInstance().removeLoadingFileObserver(this);
+        MediaController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
     }
 
     protected void onAttachedToWindow() {
@@ -1615,7 +1618,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
 
     public void checkRoundVideoPlayback(boolean allowStart) {
         if (allowStart) {
-            allowStart = MediaController.getInstance().getPlayingMessageObject() == null;
+            allowStart = MediaController.getInstance(this.currentAccount).getPlayingMessageObject() == null;
         }
         this.photoImage.setAllowStartAnimation(allowStart);
         if (allowStart) {
@@ -1715,7 +1718,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     public void onSeekBarDrag(float progress) {
         if (this.currentMessageObject != null) {
             this.currentMessageObject.audioProgress = progress;
-            MediaController.getInstance().seekToProgress(this.currentMessageObject, progress);
+            MediaController.getInstance(this.currentAccount).seekToProgress(this.currentMessageObject, progress);
         }
     }
 
@@ -1725,7 +1728,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 DocumentAttribute attribute = (DocumentAttribute) this.documentAttach.attributes.get(a);
                 if (attribute instanceof TL_documentAttributeAudio) {
                     if (attribute.waveform == null || attribute.waveform.length == 0) {
-                        MediaController.getInstance().generateWaveform(this.currentMessageObject);
+                        MediaController.getInstance(this.currentAccount).generateWaveform(this.currentMessageObject);
                     }
                     this.useSeekBarWaweform = attribute.waveform != null;
                     this.seekBarWaveform.setWaveform(attribute.waveform);
@@ -1811,7 +1814,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             boolean z = (this.documentAttach.mime_type != null && this.documentAttach.mime_type.toLowerCase().startsWith("image/")) || ((this.documentAttach.thumb instanceof TL_photoSize) && !(this.documentAttach.thumb.location instanceof TL_fileLocationUnavailable));
             this.drawPhotoImage = z;
             if (!this.drawPhotoImage) {
-                maxWidth += AndroidUtilities.dp(BitmapDescriptorFactory.HUE_ORANGE);
+                maxWidth += AndroidUtilities.dp(30.0f);
             }
             this.documentAttachType = 1;
             String name = FileLoader.getDocumentFileName(this.documentAttach);
@@ -1832,7 +1835,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 width = Math.min(maxWidth, maxLineWidth);
             }
             str = AndroidUtilities.formatFileSize((long) this.documentAttach.size) + " " + FileLoader.getDocumentExtension(this.documentAttach);
-            this.infoWidth = Math.min(maxWidth - AndroidUtilities.dp(BitmapDescriptorFactory.HUE_ORANGE), (int) Math.ceil((double) Theme.chat_infoPaint.measureText(str)));
+            this.infoWidth = Math.min(maxWidth - AndroidUtilities.dp(30.0f), (int) Math.ceil((double) Theme.chat_infoPaint.measureText(str)));
             CharSequence str2 = TextUtils.ellipsize(str, Theme.chat_infoPaint, (float) this.infoWidth, TruncateAt.END);
             try {
                 if (this.infoWidth < 0) {
@@ -1928,11 +1931,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
 
     private boolean isCurrentLocationTimeExpired(MessageObject messageObject) {
         if (this.currentMessageObject.messageOwner.media.period % 60 == 0) {
-            if (Math.abs(ConnectionsManager.getInstance().getCurrentTime() - messageObject.messageOwner.date) > messageObject.messageOwner.media.period) {
+            if (Math.abs(ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() - messageObject.messageOwner.date) > messageObject.messageOwner.media.period) {
                 return true;
             }
             return false;
-        } else if (Math.abs(ConnectionsManager.getInstance().getCurrentTime() - messageObject.messageOwner.date) <= messageObject.messageOwner.media.period - 5) {
+        } else if (Math.abs(ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() - messageObject.messageOwner.date) <= messageObject.messageOwner.media.period - 5) {
             return false;
         } else {
             return true;
@@ -2065,7 +2068,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r4 = r0.pinnedTop;
         r0 = r150;
-        if (r4 == r0) goto L_0x377f;
+        if (r4 == r0) goto L_0x37fb;
     L_0x00a6:
         r0 = r149;
         r1 = r146;
@@ -2439,7 +2442,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     L_0x0322:
         r0 = r147;
         r4 = r0.type;
-        if (r4 != 0) goto L_0x1ba5;
+        if (r4 != 0) goto L_0x1c03;
     L_0x0328:
         r4 = 1;
         r0 = r146;
@@ -2561,7 +2564,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     L_0x03f8:
         r0 = r146;
         r4 = r0.drawInstantView;
-        if (r4 != 0) goto L_0x08b5;
+        if (r4 != 0) goto L_0x08cc;
     L_0x03fe:
         r4 = "telegram_channel";
         r0 = r142;
@@ -2585,7 +2588,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     L_0x041f:
         r0 = r146;
         r4 = r0.instantViewSelectorDrawable;
-        if (r4 != 0) goto L_0x0988;
+        if (r4 != 0) goto L_0x09c5;
     L_0x0425:
         r92 = new android.graphics.Paint;
         r4 = 1;
@@ -2611,7 +2614,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.isOutOwner();
-        if (r4 == 0) goto L_0x0983;
+        if (r4 == 0) goto L_0x09c0;
     L_0x0456:
         r4 = "chat_outPreviewInstantText";
     L_0x0459:
@@ -2658,7 +2661,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.lastLineWidth;
         r4 = r26 - r4;
         r0 = r132;
-        if (r4 >= r0) goto L_0x09ab;
+        if (r4 >= r0) goto L_0x09e8;
     L_0x04aa:
         r0 = r146;
         r4 = r0.backgroundWidth;
@@ -2697,7 +2700,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     L_0x04f4:
         r0 = r146;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x09ed;
+        if (r4 == 0) goto L_0x0a2a;
     L_0x04fa:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
@@ -2755,22 +2758,22 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     L_0x0566:
         r0 = r146;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x1b8e;
+        if (r4 == 0) goto L_0x1bec;
     L_0x056c:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x09fe;
+        if (r4 == 0) goto L_0x0a3b;
     L_0x0572:
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x09f0;
+        if (r4 == 0) goto L_0x0a2d;
     L_0x0578:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x09f0;
+        if (r4 == 0) goto L_0x0a2d;
     L_0x057e:
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.isOut();
-        if (r4 != 0) goto L_0x09f0;
+        if (r4 != 0) goto L_0x0a2d;
     L_0x0588:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r6 = 1124335616; // 0x43040000 float:132.0 double:5.554956023E-315;
@@ -2787,7 +2790,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     L_0x05a2:
         r0 = r146;
         r4 = r0.hasLinkPreview;
-        if (r4 == 0) goto L_0x0a47;
+        if (r4 == 0) goto L_0x0a84;
     L_0x05a8:
         r0 = r147;
         r4 = r0.messageOwner;
@@ -2836,15 +2839,15 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = r6.textWidth;
         r87 = java.lang.Math.max(r4, r6);
     L_0x0604:
-        if (r126 != 0) goto L_0x0a40;
+        if (r126 != 0) goto L_0x0a7d;
     L_0x0606:
         r0 = r146;
         r4 = r0.drawInstantView;
-        if (r4 != 0) goto L_0x0a40;
+        if (r4 != 0) goto L_0x0a7d;
     L_0x060c:
-        if (r67 != 0) goto L_0x0a40;
+        if (r67 != 0) goto L_0x0a7d;
     L_0x060e:
-        if (r136 == 0) goto L_0x0a40;
+        if (r136 == 0) goto L_0x0a7d;
     L_0x0610:
         r4 = "app";
         r0 = r136;
@@ -2859,21 +2862,21 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = "article";
         r0 = r136;
         r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x0a40;
+        if (r4 == 0) goto L_0x0a7d;
     L_0x0631:
         r127 = 1;
     L_0x0633:
-        if (r126 != 0) goto L_0x0a44;
+        if (r126 != 0) goto L_0x0a81;
     L_0x0635:
         r0 = r146;
         r4 = r0.drawInstantView;
-        if (r4 != 0) goto L_0x0a44;
+        if (r4 != 0) goto L_0x0a81;
     L_0x063b:
-        if (r67 != 0) goto L_0x0a44;
+        if (r67 != 0) goto L_0x0a81;
     L_0x063d:
-        if (r65 == 0) goto L_0x0a44;
+        if (r65 == 0) goto L_0x0a81;
     L_0x063f:
-        if (r136 == 0) goto L_0x0a44;
+        if (r136 == 0) goto L_0x0a81;
     L_0x0641:
         r4 = "app";
         r0 = r136;
@@ -2888,12 +2891,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = "article";
         r0 = r136;
         r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x0a44;
+        if (r4 == 0) goto L_0x0a81;
     L_0x0662:
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.photoThumbs;
-        if (r4 == 0) goto L_0x0a44;
+        if (r4 == 0) goto L_0x0a81;
     L_0x066a:
         r4 = 1;
     L_0x066b:
@@ -2903,7 +2906,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     L_0x0671:
         r0 = r146;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x0abb;
+        if (r4 == 0) goto L_0x0af8;
     L_0x0677:
         r42 = 0;
     L_0x0679:
@@ -2924,152 +2927,152 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     L_0x0691:
         if (r7 == 0) goto L_0x06fa;
     L_0x0693:
-        r4 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0ac3 }
-        r4 = r4.measureText(r7);	 Catch:{ Exception -> 0x0ac3 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0ac3 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0ac3 }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x0ac3 }
+        r4 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0b00 }
+        r4 = r4.measureText(r7);	 Catch:{ Exception -> 0x0b00 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0b00 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0b00 }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x0b00 }
         r143 = r0;
-        r6 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x0ac3 }
-        r8 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0ac3 }
+        r6 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x0b00 }
+        r8 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0b00 }
         r0 = r143;
         r1 = r87;
-        r9 = java.lang.Math.min(r0, r1);	 Catch:{ Exception -> 0x0ac3 }
-        r10 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0ac3 }
+        r9 = java.lang.Math.min(r0, r1);	 Catch:{ Exception -> 0x0b00 }
+        r10 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0b00 }
         r11 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r12 = 0;
         r13 = 0;
-        r6.<init>(r7, r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0ac3 }
+        r6.<init>(r7, r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0b00 }
         r0 = r146;
-        r0.siteNameLayout = r6;	 Catch:{ Exception -> 0x0ac3 }
+        r0.siteNameLayout = r6;	 Catch:{ Exception -> 0x0b00 }
         r0 = r146;
-        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0ac3 }
+        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0b00 }
         r0 = r146;
-        r6 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0ac3 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0ac3 }
+        r6 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0b00 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0b00 }
         r6 = r6 + -1;
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0ac3 }
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0b00 }
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0ac3 }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0b00 }
         r4 = r4 + r79;
         r0 = r146;
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0ac3 }
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0b00 }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0ac3 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0b00 }
         r4 = r4 + r79;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0ac3 }
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0b00 }
         r44 = r44 + r79;
         r0 = r146;
-        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0ac3 }
-        r143 = r4.getWidth();	 Catch:{ Exception -> 0x0ac3 }
+        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0b00 }
+        r143 = r4.getWidth();	 Catch:{ Exception -> 0x0b00 }
         r4 = r143 + r42;
         r0 = r95;
-        r95 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0ac3 }
+        r95 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b00 }
         r4 = r143 + r42;
         r0 = r98;
-        r98 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0ac3 }
+        r98 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b00 }
     L_0x06fa:
         r135 = 0;
-        if (r134 == 0) goto L_0x0b07;
+        if (r134 == 0) goto L_0x0b44;
     L_0x06fe:
         r4 = 2147483647; // 0x7fffffff float:NaN double:1.060997895E-314;
         r0 = r146;
-        r0.titleX = r4;	 Catch:{ Exception -> 0x37d8 }
+        r0.titleX = r4;	 Catch:{ Exception -> 0x3854 }
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x37d8 }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3854 }
         if (r4 == 0) goto L_0x0729;
     L_0x070b:
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x37d8 }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3854 }
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x37d8 }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3854 }
         r4 = r4 + r6;
         r0 = r146;
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x37d8 }
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x3854 }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x37d8 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3854 }
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x37d8 }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3854 }
         r4 = r4 + r6;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x37d8 }
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3854 }
     L_0x0729:
         r118 = 0;
         r0 = r146;
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x37d8 }
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x3854 }
         if (r4 == 0) goto L_0x0733;
     L_0x0731:
-        if (r65 != 0) goto L_0x0ac9;
+        if (r65 != 0) goto L_0x0b06;
     L_0x0733:
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x37d8 }
-        r11 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x37d8 }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x3854 }
+        r11 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3854 }
         r12 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x37d8 }
-        r13 = (float) r4;	 Catch:{ Exception -> 0x37d8 }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3854 }
+        r13 = (float) r4;	 Catch:{ Exception -> 0x3854 }
         r14 = 0;
-        r15 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x37d8 }
+        r15 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x3854 }
         r17 = 4;
         r8 = r134;
         r10 = r87;
         r16 = r87;
-        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r8, r9, r10, r11, r12, r13, r14, r15, r16, r17);	 Catch:{ Exception -> 0x37d8 }
+        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r8, r9, r10, r11, r12, r13, r14, r15, r16, r17);	 Catch:{ Exception -> 0x3854 }
         r0 = r146;
-        r0.titleLayout = r4;	 Catch:{ Exception -> 0x37d8 }
+        r0.titleLayout = r4;	 Catch:{ Exception -> 0x3854 }
         r12 = r119;
     L_0x0755:
         r0 = r146;
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b3e }
         r0 = r146;
-        r6 = r0.titleLayout;	 Catch:{ Exception -> 0x0b01 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0b01 }
+        r6 = r0.titleLayout;	 Catch:{ Exception -> 0x0b3e }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0b3e }
         r6 = r6 + -1;
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0b01 }
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0b3e }
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0b3e }
         r4 = r4 + r79;
         r0 = r146;
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0b01 }
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0b3e }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0b3e }
         r4 = r4 + r79;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0b01 }
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0b3e }
         r58 = 1;
         r41 = 0;
     L_0x077f:
         r0 = r146;
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b01 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b3e }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0b3e }
         r0 = r41;
-        if (r0 >= r4) goto L_0x0c7b;
+        if (r0 >= r4) goto L_0x0cb8;
     L_0x078b:
         r0 = r146;
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b3e }
         r0 = r41;
-        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0b01 }
-        r0 = (int) r4;	 Catch:{ Exception -> 0x0b01 }
+        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0b3e }
+        r0 = (int) r4;	 Catch:{ Exception -> 0x0b3e }
         r86 = r0;
         if (r86 == 0) goto L_0x079c;
     L_0x079a:
         r135 = 1;
     L_0x079c:
         r0 = r146;
-        r4 = r0.titleX;	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.titleX;	 Catch:{ Exception -> 0x0b3e }
         r6 = 2147483647; // 0x7fffffff float:NaN double:1.060997895E-314;
-        if (r4 != r6) goto L_0x0af0;
+        if (r4 != r6) goto L_0x0b2d;
     L_0x07a5:
         r0 = r86;
         r4 = -r0;
         r0 = r146;
-        r0.titleX = r4;	 Catch:{ Exception -> 0x0b01 }
+        r0.titleX = r4;	 Catch:{ Exception -> 0x0b3e }
     L_0x07ac:
-        if (r86 == 0) goto L_0x0c67;
+        if (r86 == 0) goto L_0x0ca4;
     L_0x07ae:
         r0 = r146;
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b01 }
-        r4 = r4.getWidth();	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b3e }
+        r4 = r4.getWidth();	 Catch:{ Exception -> 0x0b3e }
         r143 = r4 - r86;
     L_0x07b8:
         r0 = r41;
@@ -3079,19 +3082,19 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         if (r86 == 0) goto L_0x07ce;
     L_0x07c0:
         r0 = r146;
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0b3e }
         if (r4 == 0) goto L_0x07ce;
     L_0x07c6:
         r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0b01 }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0b3e }
         r143 = r143 + r4;
     L_0x07ce:
         r4 = r143 + r42;
         r0 = r95;
-        r95 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b01 }
+        r95 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b3e }
         r4 = r143 + r42;
         r0 = r98;
-        r98 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b01 }
+        r98 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b3e }
         r41 = r41 + 1;
         goto L_0x077f;
     L_0x07e1:
@@ -3219,7 +3222,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = "telegram_megagroup";
         r0 = r142;
         r4 = r4.equals(r0);
-        if (r4 == 0) goto L_0x0413;
+        if (r4 == 0) goto L_0x08b5;
     L_0x08a9:
         r4 = 1;
         r0 = r146;
@@ -3229,19 +3232,42 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.drawInstantViewType = r4;
         goto L_0x0413;
     L_0x08b5:
+        r4 = "telegram_message";
+        r0 = r142;
+        r4 = r4.equals(r0);
+        if (r4 == 0) goto L_0x0413;
+    L_0x08c0:
+        r4 = 1;
+        r0 = r146;
+        r0.drawInstantView = r4;
+        r4 = 3;
+        r0 = r146;
+        r0.drawInstantViewType = r4;
+        goto L_0x0413;
+    L_0x08cc:
         if (r125 == 0) goto L_0x0413;
-    L_0x08b7:
+    L_0x08ce:
         r125 = r125.toLowerCase();
         r4 = "instagram";
         r0 = r125;
         r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x08d1;
-    L_0x08c6:
+        if (r4 != 0) goto L_0x08fe;
+    L_0x08dd:
         r4 = "twitter";
         r0 = r125;
         r4 = r0.equals(r4);
+        if (r4 != 0) goto L_0x08fe;
+    L_0x08e8:
+        r4 = "telegram";
+        r0 = r125;
+        r4 = r0.equals(r4);
+        if (r4 != 0) goto L_0x08fe;
+    L_0x08f3:
+        r4 = "telegram_album";
+        r0 = r142;
+        r4 = r4.equals(r0);
         if (r4 == 0) goto L_0x0413;
-    L_0x08d1:
+    L_0x08fe:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -3249,15 +3275,23 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4.cached_page;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_pageFull;
         if (r4 == 0) goto L_0x0413;
-    L_0x08df:
+    L_0x090c:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
         r4 = r4.photo;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_photo;
+        if (r4 != 0) goto L_0x092a;
+    L_0x091a:
+        r0 = r147;
+        r4 = r0.messageOwner;
+        r4 = r4.media;
+        r4 = r4.webpage;
+        r4 = r4.document;
+        r4 = org.telegram.messenger.MessageObject.isVideoDocument(r4);
         if (r4 == 0) goto L_0x0413;
-    L_0x08ed:
+    L_0x092a:
         r4 = 0;
         r0 = r146;
         r0.drawInstantView = r4;
@@ -3271,41 +3305,41 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r52 = r0;
         r60 = 1;
         r41 = 0;
-    L_0x0906:
+    L_0x0943:
         r4 = r52.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x0940;
-    L_0x090e:
+        if (r0 >= r4) goto L_0x097d;
+    L_0x094b:
         r0 = r52;
         r1 = r41;
         r51 = r0.get(r1);
         r51 = (org.telegram.tgnet.TLRPC.PageBlock) r51;
         r0 = r51;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_pageBlockSlideshow;
-        if (r4 == 0) goto L_0x092d;
-    L_0x091e:
+        if (r4 == 0) goto L_0x096a;
+    L_0x095b:
         r50 = r51;
         r50 = (org.telegram.tgnet.TLRPC.TL_pageBlockSlideshow) r50;
         r0 = r50;
         r4 = r0.items;
         r60 = r4.size();
-    L_0x092a:
+    L_0x0967:
         r41 = r41 + 1;
-        goto L_0x0906;
-    L_0x092d:
+        goto L_0x0943;
+    L_0x096a:
         r0 = r51;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_pageBlockCollage;
-        if (r4 == 0) goto L_0x092a;
-    L_0x0933:
+        if (r4 == 0) goto L_0x0967;
+    L_0x0970:
         r50 = r51;
         r50 = (org.telegram.tgnet.TLRPC.TL_pageBlockCollage) r50;
         r0 = r50;
         r4 = r0.items;
         r60 = r4.size();
-        goto L_0x092a;
-    L_0x0940:
+        goto L_0x0967;
+    L_0x097d:
         r4 = "Of";
-        r6 = 2131428436; // 0x7f0b0454 float:1.8478516E38 double:1.053065567E-314;
+        r6 = 2131493978; // 0x7f0c045a float:1.8611451E38 double:1.053097949E-314;
         r8 = 2;
         r8 = new java.lang.Object[r8];
         r9 = 0;
@@ -3335,40 +3369,40 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r0.photosCountLayout = r4;
         goto L_0x0413;
-    L_0x0983:
+    L_0x09c0:
         r4 = "chat_inPreviewInstantText";
         goto L_0x0459;
-    L_0x0988:
+    L_0x09c5:
         r0 = r146;
         r6 = r0.instantViewSelectorDrawable;
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.isOutOwner();
-        if (r4 == 0) goto L_0x09a7;
-    L_0x0996:
+        if (r4 == 0) goto L_0x09e4;
+    L_0x09d3:
         r4 = "chat_outPreviewInstantText";
-    L_0x0999:
+    L_0x09d6:
         r4 = org.telegram.ui.ActionBar.Theme.getColor(r4);
         r8 = 1610612735; // 0x5fffffff float:3.6893486E19 double:7.95748421E-315;
         r4 = r4 & r8;
         r8 = 1;
         org.telegram.ui.ActionBar.Theme.setSelectorDrawableColor(r6, r4, r8);
         goto L_0x047f;
-    L_0x09a7:
+    L_0x09e4:
         r4 = "chat_inPreviewInstantText";
-        goto L_0x0999;
-    L_0x09ab:
+        goto L_0x09d6;
+    L_0x09e8:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r0 = r147;
         r6 = r0.lastLineWidth;
         r66 = r4 - r6;
-        if (r66 < 0) goto L_0x09d2;
-    L_0x09b7:
+        if (r66 < 0) goto L_0x0a0f;
+    L_0x09f4:
         r0 = r66;
         r1 = r132;
-        if (r0 > r1) goto L_0x09d2;
-    L_0x09bd:
+        if (r0 > r1) goto L_0x0a0f;
+    L_0x09fa:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r4 = r4 + r132;
@@ -3379,7 +3413,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r0.backgroundWidth = r4;
         goto L_0x04d8;
-    L_0x09d2:
+    L_0x0a0f:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r0 = r147;
@@ -3392,28 +3426,28 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r0.backgroundWidth = r4;
         goto L_0x04d8;
-    L_0x09ed:
+    L_0x0a2a:
         r4 = 0;
         goto L_0x0500;
-    L_0x09f0:
+    L_0x0a2d:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r6 = 1117782016; // 0x42a00000 float:80.0 double:5.522576936E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r87 = r4 - r6;
         goto L_0x0594;
-    L_0x09fe:
+    L_0x0a3b:
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x0a2a;
-    L_0x0a04:
+        if (r4 == 0) goto L_0x0a67;
+    L_0x0a41:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x0a2a;
-    L_0x0a0a:
+        if (r4 == 0) goto L_0x0a67;
+    L_0x0a47:
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.isOutOwner();
-        if (r4 != 0) goto L_0x0a2a;
-    L_0x0a14:
+        if (r4 != 0) goto L_0x0a67;
+    L_0x0a51:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -3423,7 +3457,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r87 = r4 - r6;
         goto L_0x0594;
-    L_0x0a2a:
+    L_0x0a67:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -3433,17 +3467,17 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r87 = r4 - r6;
         goto L_0x0594;
-    L_0x0a40:
+    L_0x0a7d:
         r127 = 0;
         goto L_0x0633;
-    L_0x0a44:
+    L_0x0a81:
         r4 = 0;
         goto L_0x066b;
-    L_0x0a47:
+    L_0x0a84:
         r0 = r146;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x0a79;
-    L_0x0a4d:
+        if (r4 == 0) goto L_0x0ab6;
+    L_0x0a8a:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -3466,7 +3500,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r127 = 0;
         r140 = r14;
         goto L_0x0671;
-    L_0x0a79:
+    L_0x0ab6:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -3479,12 +3513,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r147;
         r4 = r0.messageText;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 == 0) goto L_0x0ab8;
-    L_0x0a94:
+        if (r4 == 0) goto L_0x0af5;
+    L_0x0ad1:
         r0 = r74;
         r0 = r0.description;
         r65 = r0;
-    L_0x0a9a:
+    L_0x0ad7:
         r0 = r74;
         r0 = r0.photo;
         r110 = r0;
@@ -3500,352 +3534,351 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r127 = 0;
         r140 = r14;
         goto L_0x0671;
-    L_0x0ab8:
+    L_0x0af5:
         r65 = 0;
-        goto L_0x0a9a;
-    L_0x0abb:
+        goto L_0x0ad7;
+    L_0x0af8:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r42 = org.telegram.messenger.AndroidUtilities.dp(r4);
         goto L_0x0679;
-    L_0x0ac3:
+    L_0x0b00:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
         goto L_0x06fa;
-    L_0x0ac9:
+    L_0x0b06:
         r118 = r119;
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x37d8 }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x3854 }
         r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x37d8 }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3854 }
         r11 = r87 - r4;
         r13 = 4;
         r8 = r134;
         r10 = r87;
         r12 = r119;
-        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x37d8 }
+        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x3854 }
         r0 = r146;
-        r0.titleLayout = r4;	 Catch:{ Exception -> 0x37d8 }
+        r0.titleLayout = r4;	 Catch:{ Exception -> 0x3854 }
         r0 = r146;
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x37d8 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x37d8 }
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x3854 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x3854 }
         r12 = r119 - r4;
         goto L_0x0755;
-    L_0x0af0:
+    L_0x0b2d:
         r0 = r146;
-        r4 = r0.titleX;	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.titleX;	 Catch:{ Exception -> 0x0b3e }
         r0 = r86;
         r6 = -r0;
-        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x0b01 }
+        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x0b3e }
         r0 = r146;
-        r0.titleX = r4;	 Catch:{ Exception -> 0x0b01 }
+        r0.titleX = r4;	 Catch:{ Exception -> 0x0b3e }
         goto L_0x07ac;
-    L_0x0b01:
+    L_0x0b3e:
         r70 = move-exception;
-    L_0x0b02:
+    L_0x0b3f:
         org.telegram.messenger.FileLog.e(r70);
         r119 = r12;
-    L_0x0b07:
+    L_0x0b44:
         r48 = 0;
-        if (r47 == 0) goto L_0x37ed;
-    L_0x0b0b:
-        if (r134 != 0) goto L_0x37ed;
-    L_0x0b0d:
+        if (r47 == 0) goto L_0x3869;
+    L_0x0b48:
+        if (r134 != 0) goto L_0x3869;
+    L_0x0b4a:
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0cb7 }
-        if (r4 == 0) goto L_0x0b31;
-    L_0x0b13:
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0cf4 }
+        if (r4 == 0) goto L_0x0b6e;
+    L_0x0b50:
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0cb7 }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0cf4 }
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0cb7 }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0cf4 }
         r4 = r4 + r6;
         r0 = r146;
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0cb7 }
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0cf4 }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0cb7 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0cf4 }
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0cb7 }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0cf4 }
         r4 = r4 + r6;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0cb7 }
-    L_0x0b31:
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0cf4 }
+    L_0x0b6e:
         r4 = 3;
         r0 = r119;
-        if (r0 != r4) goto L_0x0c7f;
-    L_0x0b36:
+        if (r0 != r4) goto L_0x0cbc;
+    L_0x0b73:
         r0 = r146;
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0cb7 }
-        if (r4 == 0) goto L_0x0b3e;
-    L_0x0b3c:
-        if (r65 != 0) goto L_0x0c7f;
-    L_0x0b3e:
-        r8 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x0cb7 }
-        r10 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0cb7 }
-        r12 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0cb7 }
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0cf4 }
+        if (r4 == 0) goto L_0x0b7b;
+    L_0x0b79:
+        if (r65 != 0) goto L_0x0cbc;
+    L_0x0b7b:
+        r8 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x0cf4 }
+        r10 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0cf4 }
+        r12 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0cf4 }
         r13 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r14 = 0;
         r15 = 0;
         r9 = r47;
         r11 = r87;
-        r8.<init>(r9, r10, r11, r12, r13, r14, r15);	 Catch:{ Exception -> 0x0cb7 }
+        r8.<init>(r9, r10, r11, r12, r13, r14, r15);	 Catch:{ Exception -> 0x0cf4 }
         r0 = r146;
-        r0.authorLayout = r8;	 Catch:{ Exception -> 0x0cb7 }
+        r0.authorLayout = r8;	 Catch:{ Exception -> 0x0cf4 }
         r12 = r119;
-    L_0x0b55:
+    L_0x0b92:
         r0 = r146;
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x37d5 }
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3851 }
         r0 = r146;
-        r6 = r0.authorLayout;	 Catch:{ Exception -> 0x37d5 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x37d5 }
+        r6 = r0.authorLayout;	 Catch:{ Exception -> 0x3851 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x3851 }
         r6 = r6 + -1;
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x37d5 }
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x3851 }
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x37d5 }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3851 }
         r4 = r4 + r79;
         r0 = r146;
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x37d5 }
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x3851 }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x37d5 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3851 }
         r4 = r4 + r79;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x37d5 }
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3851 }
         r0 = r146;
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x37d5 }
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3851 }
         r6 = 0;
-        r4 = r4.getLineLeft(r6);	 Catch:{ Exception -> 0x37d5 }
-        r0 = (int) r4;	 Catch:{ Exception -> 0x37d5 }
+        r4 = r4.getLineLeft(r6);	 Catch:{ Exception -> 0x3851 }
+        r0 = (int) r4;	 Catch:{ Exception -> 0x3851 }
         r86 = r0;
         r0 = r86;
         r4 = -r0;
         r0 = r146;
-        r0.authorX = r4;	 Catch:{ Exception -> 0x37d5 }
-        if (r86 == 0) goto L_0x0ca4;
-    L_0x0b90:
+        r0.authorX = r4;	 Catch:{ Exception -> 0x3851 }
+        if (r86 == 0) goto L_0x0ce1;
+    L_0x0bcd:
         r0 = r146;
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x37d5 }
-        r4 = r4.getWidth();	 Catch:{ Exception -> 0x37d5 }
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3851 }
+        r4 = r4.getWidth();	 Catch:{ Exception -> 0x3851 }
         r143 = r4 - r86;
         r48 = 1;
-    L_0x0b9c:
+    L_0x0bd9:
         r4 = r143 + r42;
         r0 = r95;
-        r95 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x37d5 }
+        r95 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x3851 }
         r4 = r143 + r42;
         r0 = r98;
-        r98 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x37d5 }
-    L_0x0bac:
-        if (r65 == 0) goto L_0x0ce0;
-    L_0x0bae:
+        r98 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x3851 }
+    L_0x0be9:
+        if (r65 == 0) goto L_0x0d1d;
+    L_0x0beb:
         r4 = 0;
         r0 = r146;
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0cdc }
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d19 }
         r0 = r146;
-        r4 = r0.currentMessageObject;	 Catch:{ Exception -> 0x0cdc }
-        r4.generateLinkDescription();	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.currentMessageObject;	 Catch:{ Exception -> 0x0d19 }
+        r4.generateLinkDescription();	 Catch:{ Exception -> 0x0d19 }
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0cdc }
-        if (r4 == 0) goto L_0x0bde;
-    L_0x0bc0:
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d19 }
+        if (r4 == 0) goto L_0x0c1b;
+    L_0x0bfd:
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d19 }
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0cdc }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d19 }
         r4 = r4 + r6;
         r0 = r146;
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0cdc }
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0d19 }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0d19 }
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0cdc }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d19 }
         r4 = r4 + r6;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0cdc }
-    L_0x0bde:
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0d19 }
+    L_0x0c1b:
         r118 = 0;
         r4 = 3;
-        if (r12 != r4) goto L_0x0cbf;
-    L_0x0be3:
+        if (r12 != r4) goto L_0x0cfc;
+    L_0x0c20:
         r0 = r146;
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0cdc }
-        if (r4 != 0) goto L_0x0cbf;
-    L_0x0be9:
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0d19 }
+        if (r4 != 0) goto L_0x0cfc;
+    L_0x0c26:
         r0 = r147;
-        r8 = r0.linkDescription;	 Catch:{ Exception -> 0x0cdc }
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x0cdc }
-        r11 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0cdc }
+        r8 = r0.linkDescription;	 Catch:{ Exception -> 0x0d19 }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x0d19 }
+        r11 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0d19 }
         r12 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0cdc }
-        r13 = (float) r4;	 Catch:{ Exception -> 0x0cdc }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d19 }
+        r13 = (float) r4;	 Catch:{ Exception -> 0x0d19 }
         r14 = 0;
-        r15 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x0cdc }
+        r15 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x0d19 }
         r17 = 6;
         r10 = r87;
         r16 = r87;
-        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r8, r9, r10, r11, r12, r13, r14, r15, r16, r17);	 Catch:{ Exception -> 0x0cdc }
+        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r8, r9, r10, r11, r12, r13, r14, r15, r16, r17);	 Catch:{ Exception -> 0x0d19 }
         r0 = r146;
-        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x0cdc }
-    L_0x0c0b:
+        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x0d19 }
+    L_0x0c48:
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d19 }
         r0 = r146;
-        r6 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0cdc }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0cdc }
+        r6 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d19 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0d19 }
         r6 = r6 + -1;
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0cdc }
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0d19 }
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d19 }
         r4 = r4 + r79;
         r0 = r146;
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0cdc }
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0d19 }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0d19 }
         r4 = r4 + r79;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0cdc }
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0d19 }
         r78 = 0;
         r41 = 0;
-    L_0x0c35:
+    L_0x0c72:
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0cdc }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d19 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0d19 }
         r0 = r41;
-        if (r0 >= r4) goto L_0x13a6;
-    L_0x0c41:
+        if (r0 >= r4) goto L_0x13dd;
+    L_0x0c7e:
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d19 }
         r0 = r41;
-        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0cdc }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0cdc }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0cdc }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0d19 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0d19 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0d19 }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x0d19 }
         r86 = r0;
-        if (r86 == 0) goto L_0x0c64;
-    L_0x0c55:
+        if (r86 == 0) goto L_0x0ca1;
+    L_0x0c92:
         r78 = 1;
         r0 = r146;
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0cdc }
-        if (r4 != 0) goto L_0x1395;
-    L_0x0c5d:
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0d19 }
+        if (r4 != 0) goto L_0x13cc;
+    L_0x0c9a:
         r0 = r86;
         r4 = -r0;
         r0 = r146;
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0cdc }
-    L_0x0c64:
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d19 }
+    L_0x0ca1:
         r41 = r41 + 1;
-        goto L_0x0c35;
-    L_0x0c67:
+        goto L_0x0c72;
+    L_0x0ca4:
         r0 = r146;
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b01 }
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0b3e }
         r0 = r41;
-        r4 = r4.getLineWidth(r0);	 Catch:{ Exception -> 0x0b01 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0b01 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0b01 }
+        r4 = r4.getLineWidth(r0);	 Catch:{ Exception -> 0x0b3e }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0b3e }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0b3e }
         r0 = (int) r8;
         r143 = r0;
         goto L_0x07b8;
-    L_0x0c7b:
+    L_0x0cb8:
         r119 = r12;
-        goto L_0x0b07;
-    L_0x0c7f:
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0cb7 }
+        goto L_0x0b44;
+    L_0x0cbc:
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0cf4 }
         r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0cb7 }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0cf4 }
         r11 = r87 - r4;
         r13 = 1;
         r8 = r47;
         r10 = r87;
         r12 = r119;
-        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0cb7 }
+        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0cf4 }
         r0 = r146;
-        r0.authorLayout = r4;	 Catch:{ Exception -> 0x0cb7 }
+        r0.authorLayout = r4;	 Catch:{ Exception -> 0x0cf4 }
         r0 = r146;
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x0cb7 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0cb7 }
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x0cf4 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0cf4 }
         r12 = r119 - r4;
-        goto L_0x0b55;
-    L_0x0ca4:
+        goto L_0x0b92;
+    L_0x0ce1:
         r0 = r146;
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x37d5 }
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3851 }
         r6 = 0;
-        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x37d5 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x37d5 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x37d5 }
+        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x3851 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x3851 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x3851 }
         r0 = (int) r8;
         r143 = r0;
-        goto L_0x0b9c;
-    L_0x0cb7:
+        goto L_0x0bd9;
+    L_0x0cf4:
         r70 = move-exception;
         r12 = r119;
-    L_0x0cba:
+    L_0x0cf7:
         org.telegram.messenger.FileLog.e(r70);
-        goto L_0x0bac;
-    L_0x0cbf:
+        goto L_0x0be9;
+    L_0x0cfc:
         r118 = r12;
         r0 = r147;
-        r8 = r0.linkDescription;	 Catch:{ Exception -> 0x0cdc }
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x0cdc }
+        r8 = r0.linkDescription;	 Catch:{ Exception -> 0x0d19 }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x0d19 }
         r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0cdc }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d19 }
         r11 = r87 - r4;
         r13 = 6;
         r10 = r87;
-        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0cdc }
+        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0d19 }
         r0 = r146;
-        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x0cdc }
-        goto L_0x0c0b;
-    L_0x0cdc:
+        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x0d19 }
+        goto L_0x0c48;
+    L_0x0d19:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-    L_0x0ce0:
-        if (r127 == 0) goto L_0x0d00;
-    L_0x0ce2:
+    L_0x0d1d:
+        if (r127 == 0) goto L_0x0d3d;
+    L_0x0d1f:
         r0 = r146;
         r4 = r0.descriptionLayout;
-        if (r4 == 0) goto L_0x0cf9;
-    L_0x0ce8:
+        if (r4 == 0) goto L_0x0d36;
+    L_0x0d25:
         r0 = r146;
         r4 = r0.descriptionLayout;
-        if (r4 == 0) goto L_0x0d00;
-    L_0x0cee:
+        if (r4 == 0) goto L_0x0d3d;
+    L_0x0d2b:
         r0 = r146;
         r4 = r0.descriptionLayout;
         r4 = r4.getLineCount();
         r6 = 1;
-        if (r4 != r6) goto L_0x0d00;
-    L_0x0cf9:
+        if (r4 != r6) goto L_0x0d3d;
+    L_0x0d36:
         r127 = 0;
         r4 = 0;
         r0 = r146;
         r0.isSmallImage = r4;
-    L_0x0d00:
-        if (r127 == 0) goto L_0x1444;
-    L_0x0d02:
+    L_0x0d3d:
+        if (r127 == 0) goto L_0x147b;
+    L_0x0d3f:
         r4 = 1111490560; // 0x42400000 float:48.0 double:5.491493014E-315;
         r97 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x0d08:
-        if (r67 == 0) goto L_0x1790;
-    L_0x0d0a:
+    L_0x0d45:
+        if (r67 == 0) goto L_0x17c7;
+    L_0x0d47:
         r4 = org.telegram.messenger.MessageObject.isGifDocument(r67);
-        if (r4 == 0) goto L_0x144f;
-    L_0x0d10:
-        r4 = org.telegram.messenger.MediaController.getInstance();
-        r4 = r4.canAutoplayGifs();
-        if (r4 != 0) goto L_0x0d20;
-    L_0x0d1a:
+        if (r4 == 0) goto L_0x1486;
+    L_0x0d4d:
+        r4 = org.telegram.messenger.SharedConfig.autoplayGifs;
+        if (r4 != 0) goto L_0x0d57;
+    L_0x0d51:
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r0 = r147;
         r0.gifState = r4;
-    L_0x0d20:
+    L_0x0d57:
         r0 = r146;
         r6 = r0.photoImage;
         r0 = r147;
         r4 = r0.gifState;
         r8 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r4 = (r4 > r8 ? 1 : (r4 == r8 ? 0 : -1));
-        if (r4 == 0) goto L_0x1448;
-    L_0x0d2e:
+        if (r4 == 0) goto L_0x147f;
+    L_0x0d65:
         r4 = 1;
-    L_0x0d2f:
+    L_0x0d66:
         r6.setAllowStartAnimation(r4);
         r0 = r67;
         r4 = r0.thumb;
@@ -3853,26 +3886,26 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.currentPhotoObject = r4;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x0dac;
-    L_0x0d40:
+        if (r4 == 0) goto L_0x0de3;
+    L_0x0d77:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x0d50;
-    L_0x0d48:
+        if (r4 == 0) goto L_0x0d87;
+    L_0x0d7f:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x0dac;
-    L_0x0d50:
+        if (r4 != 0) goto L_0x0de3;
+    L_0x0d87:
         r41 = 0;
-    L_0x0d52:
+    L_0x0d89:
         r0 = r67;
         r4 = r0.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x0d8a;
-    L_0x0d5e:
+        if (r0 >= r4) goto L_0x0dc1;
+    L_0x0d95:
         r0 = r67;
         r4 = r0.attributes;
         r0 = r41;
@@ -3880,12 +3913,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeImageSize;
-        if (r4 != 0) goto L_0x0d76;
-    L_0x0d70:
+        if (r4 != 0) goto L_0x0dad;
+    L_0x0da7:
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeVideo;
-        if (r4 == 0) goto L_0x144b;
-    L_0x0d76:
+        if (r4 == 0) goto L_0x1482;
+    L_0x0dad:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r46;
@@ -3896,17 +3929,17 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r46;
         r6 = r0.h;
         r4.h = r6;
-    L_0x0d8a:
+    L_0x0dc1:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x0d9a;
-    L_0x0d92:
+        if (r4 == 0) goto L_0x0dd1;
+    L_0x0dc9:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x0dac;
-    L_0x0d9a:
+        if (r4 != 0) goto L_0x0de3;
+    L_0x0dd1:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r146;
@@ -3915,68 +3948,68 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r8 = org.telegram.messenger.AndroidUtilities.dp(r8);
         r6.h = r8;
         r4.w = r8;
-    L_0x0dac:
+    L_0x0de3:
         r4 = 2;
         r0 = r146;
         r0.documentAttachType = r4;
         r14 = r140;
-    L_0x0db3:
+    L_0x0dea:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 5;
-        if (r4 == r6) goto L_0x10b3;
-    L_0x0dba:
+        if (r4 == r6) goto L_0x10ea;
+    L_0x0df1:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 3;
-        if (r4 == r6) goto L_0x10b3;
-    L_0x0dc1:
+        if (r4 == r6) goto L_0x10ea;
+    L_0x0df8:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 1;
-        if (r4 == r6) goto L_0x10b3;
-    L_0x0dc8:
+        if (r4 == r6) goto L_0x10ea;
+    L_0x0dff:
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 != 0) goto L_0x0dd0;
-    L_0x0dce:
-        if (r14 == 0) goto L_0x1b00;
-    L_0x0dd0:
-        if (r136 == 0) goto L_0x1800;
-    L_0x0dd2:
+        if (r4 != 0) goto L_0x0e07;
+    L_0x0e05:
+        if (r14 == 0) goto L_0x1b4b;
+    L_0x0e07:
+        if (r136 == 0) goto L_0x1837;
+    L_0x0e09:
         r4 = "photo";
         r0 = r136;
         r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x0e01;
-    L_0x0ddd:
+        if (r4 != 0) goto L_0x0e38;
+    L_0x0e14:
         r4 = "document";
         r0 = r136;
         r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x0def;
-    L_0x0de8:
+        if (r4 == 0) goto L_0x0e26;
+    L_0x0e1f:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 6;
-        if (r4 != r6) goto L_0x0e01;
-    L_0x0def:
+        if (r4 != r6) goto L_0x0e38;
+    L_0x0e26:
         r4 = "gif";
         r0 = r136;
         r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x0e01;
-    L_0x0dfa:
+        if (r4 != 0) goto L_0x0e38;
+    L_0x0e31:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 4;
-        if (r4 != r6) goto L_0x1800;
-    L_0x0e01:
+        if (r4 != r6) goto L_0x1837;
+    L_0x0e38:
         r4 = 1;
-    L_0x0e02:
+    L_0x0e39:
         r0 = r146;
         r0.drawImageButton = r4;
         r0 = r146;
         r4 = r0.linkPreviewHeight;
-        if (r4 == 0) goto L_0x0e2a;
-    L_0x0e0c:
+        if (r4 == 0) goto L_0x0e61;
+    L_0x0e43:
         r0 = r146;
         r4 = r0.linkPreviewHeight;
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
@@ -3991,71 +4024,71 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.totalHeight = r4;
-    L_0x0e2a:
+    L_0x0e61:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 6;
-        if (r4 != r6) goto L_0x1810;
-    L_0x0e31:
+        if (r4 != r6) goto L_0x1847;
+    L_0x0e68:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x1803;
-    L_0x0e37:
+        if (r4 == 0) goto L_0x183a;
+    L_0x0e6e:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r4 = (float) r4;
         r6 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
         r4 = r4 * r6;
         r0 = (int) r4;
         r97 = r0;
-    L_0x0e42:
+    L_0x0e79:
         r0 = r146;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x1823;
-    L_0x0e48:
+        if (r4 == 0) goto L_0x185a;
+    L_0x0e7f:
         r4 = 1094713344; // 0x41400000 float:12.0 double:5.408602553E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x0e4e:
+    L_0x0e85:
         r4 = r97 - r4;
         r4 = r4 + r42;
         r0 = r95;
         r95 = java.lang.Math.max(r0, r4);
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x1826;
-    L_0x0e5e:
+        if (r4 == 0) goto L_0x185d;
+    L_0x0e95:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r6 = -1;
         r4.size = r6;
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x0e72;
-    L_0x0e6b:
+        if (r4 == 0) goto L_0x0ea9;
+    L_0x0ea2:
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
         r6 = -1;
         r4.size = r6;
-    L_0x0e72:
-        if (r127 != 0) goto L_0x0e7b;
-    L_0x0e74:
+    L_0x0ea9:
+        if (r127 != 0) goto L_0x0eb2;
+    L_0x0eab:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 7;
-        if (r4 != r6) goto L_0x182b;
-    L_0x0e7b:
+        if (r4 != r6) goto L_0x1862;
+    L_0x0eb2:
         r79 = r97;
         r143 = r97;
-    L_0x0e7f:
+    L_0x0eb6:
         r0 = r146;
         r4 = r0.isSmallImage;
-        if (r4 == 0) goto L_0x18c4;
-    L_0x0e85:
+        if (r4 == 0) goto L_0x18fb;
+    L_0x0ebc:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r4 + r44;
         r0 = r146;
         r6 = r0.linkPreviewHeight;
-        if (r4 <= r6) goto L_0x0ebc;
-    L_0x0e93:
+        if (r4 <= r6) goto L_0x0ef3;
+    L_0x0eca:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
@@ -4075,7 +4108,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r44;
         r0 = r146;
         r0.linkPreviewHeight = r4;
-    L_0x0ebc:
+    L_0x0ef3:
         r0 = r146;
         r4 = r0.linkPreviewHeight;
         r6 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
@@ -4083,7 +4116,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.linkPreviewHeight = r4;
-    L_0x0ecb:
+    L_0x0f02:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = 0;
@@ -4117,8 +4150,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.String.format(r4, r6, r8);
         r0 = r146;
         r0.currentPhotoFilterThumb = r4;
-        if (r14 == 0) goto L_0x18e1;
-    L_0x0f16:
+        if (r14 == 0) goto L_0x1918;
+    L_0x0f4d:
         r0 = r146;
         r13 = r0.photoImage;
         r15 = 0;
@@ -4133,19 +4166,19 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r21 = 0;
         r22 = 1;
         r13.setImage(r14, r15, r16, r17, r18, r19, r20, r21, r22);
-    L_0x0f33:
+    L_0x0f6a:
         r4 = 1;
         r0 = r146;
         r0.drawPhotoImage = r4;
-        if (r136 == 0) goto L_0x1abf;
-    L_0x0f3a:
+        if (r136 == 0) goto L_0x1b0a;
+    L_0x0f71:
         r4 = "video";
         r0 = r136;
         r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x1abf;
-    L_0x0f45:
-        if (r68 == 0) goto L_0x1abf;
-    L_0x0f47:
+        if (r4 == 0) goto L_0x1b0a;
+    L_0x0f7c:
+        if (r68 == 0) goto L_0x1b0a;
+    L_0x0f7e:
         r102 = r68 / 60;
         r4 = r102 * 60;
         r124 = r68 - r4;
@@ -4179,23 +4212,23 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r15.<init>(r16, r17, r18, r19, r20, r21, r22);
         r0 = r146;
         r0.videoInfoLayout = r15;
-    L_0x0f90:
+    L_0x0fc7:
         r0 = r146;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x1079;
-    L_0x0f96:
+        if (r4 == 0) goto L_0x10b0;
+    L_0x0fcd:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.flags;
         r4 = r4 & 4;
-        if (r4 == 0) goto L_0x1b2a;
-    L_0x0fa2:
+        if (r4 == 0) goto L_0x1b75;
+    L_0x0fd9:
         r4 = "PaymentReceipt";
-        r6 = 2131428520; // 0x7f0b04a8 float:1.8478687E38 double:1.0530656083E-314;
+        r6 = 2131494063; // 0x7f0c04af float:1.8611624E38 double:1.053097991E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
-    L_0x0fb0:
+    L_0x0fe7:
         r4 = org.telegram.messenger.LocaleController.getInstance();
         r0 = r147;
         r6 = r0.messageOwner;
@@ -4252,8 +4285,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.videoInfoLayout = r15;
         r0 = r146;
         r4 = r0.drawPhotoImage;
-        if (r4 != 0) goto L_0x1079;
-    L_0x103d:
+        if (r4 != 0) goto L_0x10b0;
+    L_0x1074:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1086324736; // 0x40c00000 float:6.0 double:5.367157323E-315;
@@ -4270,8 +4303,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r4 = r4 + r6;
         r0 = r26;
-        if (r4 <= r0) goto L_0x1b54;
-    L_0x1060:
+        if (r4 <= r0) goto L_0x1b9f;
+    L_0x1097:
         r0 = r146;
         r4 = r0.durationWidth;
         r0 = r95;
@@ -4283,15 +4316,15 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.totalHeight = r4;
-    L_0x1079:
+    L_0x10b0:
         r0 = r146;
         r4 = r0.hasGamePreview;
-        if (r4 == 0) goto L_0x10a8;
-    L_0x107f:
+        if (r4 == 0) goto L_0x10df;
+    L_0x10b6:
         r0 = r147;
         r4 = r0.textHeight;
-        if (r4 == 0) goto L_0x10a8;
-    L_0x1085:
+        if (r4 == 0) goto L_0x10df;
+    L_0x10bc:
         r0 = r146;
         r4 = r0.linkPreviewHeight;
         r0 = r147;
@@ -4309,17 +4342,17 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.totalHeight = r4;
-    L_0x10a8:
+    L_0x10df:
         r0 = r146;
         r1 = r26;
         r2 = r132;
         r3 = r95;
         r0.calcBackgroundWidth(r1, r2, r3);
-    L_0x10b3:
+    L_0x10ea:
         r0 = r146;
         r4 = r0.drawInstantView;
-        if (r4 == 0) goto L_0x116a;
-    L_0x10b9:
+        if (r4 == 0) goto L_0x11a1;
+    L_0x10f0:
         r4 = 1107558400; // 0x42040000 float:33.0 double:5.47206556E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r146;
@@ -4327,12 +4360,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r4 = r0.drawInstantViewType;
         r6 = 1;
-        if (r4 != r6) goto L_0x1b6c;
-    L_0x10ca:
+        if (r4 != r6) goto L_0x1bb7;
+    L_0x1101:
         r4 = "OpenChannel";
-        r6 = 2131428448; // 0x7f0b0460 float:1.847854E38 double:1.0530655727E-314;
+        r6 = 2131493990; // 0x7f0c0466 float:1.8611476E38 double:1.053097955E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
-    L_0x10d4:
+    L_0x110b:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1117126656; // 0x42960000 float:75.0 double:5.51933903E-315;
@@ -4369,13 +4402,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.totalHeight = r4;
         r0 = r146;
         r4 = r0.instantViewLayout;
-        if (r4 == 0) goto L_0x116a;
-    L_0x1124:
+        if (r4 == 0) goto L_0x11a1;
+    L_0x115b:
         r0 = r146;
         r4 = r0.instantViewLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x116a;
-    L_0x112e:
+        if (r4 <= 0) goto L_0x11a1;
+    L_0x1165:
         r0 = r146;
         r4 = r0.instantWidth;
         r8 = (double) r4;
@@ -4390,11 +4423,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = r4 / 2;
         r0 = r146;
         r4 = r0.drawInstantViewType;
-        if (r4 != 0) goto L_0x1b8b;
-    L_0x114b:
+        if (r4 != 0) goto L_0x1be9;
+    L_0x1182:
         r4 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x1151:
+    L_0x1188:
         r4 = r4 + r6;
         r0 = r146;
         r0.instantTextX = r4;
@@ -4409,143 +4442,143 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.instantTextX = r4;
-    L_0x116a:
+    L_0x11a1:
         r0 = r146;
         r4 = r0.currentPosition;
-        if (r4 != 0) goto L_0x340a;
-    L_0x1170:
+        if (r4 != 0) goto L_0x3486;
+    L_0x11a7:
         r0 = r146;
         r4 = r0.captionLayout;
-        if (r4 != 0) goto L_0x340a;
-    L_0x1176:
+        if (r4 != 0) goto L_0x3486;
+    L_0x11ad:
         r0 = r147;
         r4 = r0.caption;
-        if (r4 == 0) goto L_0x340a;
-    L_0x117c:
+        if (r4 == 0) goto L_0x3486;
+    L_0x11b3:
         r0 = r147;
         r4 = r0.type;
         r6 = 13;
-        if (r4 == r6) goto L_0x340a;
-    L_0x1184:
+        if (r4 == r6) goto L_0x3486;
+    L_0x11bb:
         r0 = r146;
-        r4 = r0.backgroundWidth;	 Catch:{ Exception -> 0x3401 }
+        r4 = r0.backgroundWidth;	 Catch:{ Exception -> 0x347d }
         r6 = 1106771968; // 0x41f80000 float:31.0 double:5.46818007E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3401 }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x347d }
         r143 = r4 - r6;
-        r4 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x3401 }
+        r4 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x347d }
         r6 = 24;
-        if (r4 < r6) goto L_0x33dc;
-    L_0x1196:
+        if (r4 < r6) goto L_0x3458;
+    L_0x11cd:
         r0 = r147;
-        r4 = r0.caption;	 Catch:{ Exception -> 0x3401 }
+        r4 = r0.caption;	 Catch:{ Exception -> 0x347d }
         r6 = 0;
         r0 = r147;
-        r8 = r0.caption;	 Catch:{ Exception -> 0x3401 }
-        r8 = r8.length();	 Catch:{ Exception -> 0x3401 }
-        r9 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x3401 }
+        r8 = r0.caption;	 Catch:{ Exception -> 0x347d }
+        r8 = r8.length();	 Catch:{ Exception -> 0x347d }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x347d }
         r10 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        r10 = org.telegram.messenger.AndroidUtilities.dp(r10);	 Catch:{ Exception -> 0x3401 }
+        r10 = org.telegram.messenger.AndroidUtilities.dp(r10);	 Catch:{ Exception -> 0x347d }
         r10 = r143 - r10;
-        r4 = android.text.StaticLayout.Builder.obtain(r4, r6, r8, r9, r10);	 Catch:{ Exception -> 0x3401 }
+        r4 = android.text.StaticLayout.Builder.obtain(r4, r6, r8, r9, r10);	 Catch:{ Exception -> 0x347d }
         r6 = 1;
-        r4 = r4.setBreakStrategy(r6);	 Catch:{ Exception -> 0x3401 }
+        r4 = r4.setBreakStrategy(r6);	 Catch:{ Exception -> 0x347d }
         r6 = 0;
-        r4 = r4.setHyphenationFrequency(r6);	 Catch:{ Exception -> 0x3401 }
-        r6 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3401 }
-        r4 = r4.setAlignment(r6);	 Catch:{ Exception -> 0x3401 }
-        r4 = r4.build();	 Catch:{ Exception -> 0x3401 }
+        r4 = r4.setHyphenationFrequency(r6);	 Catch:{ Exception -> 0x347d }
+        r6 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x347d }
+        r4 = r4.setAlignment(r6);	 Catch:{ Exception -> 0x347d }
+        r4 = r4.build();	 Catch:{ Exception -> 0x347d }
         r0 = r146;
-        r0.captionLayout = r4;	 Catch:{ Exception -> 0x3401 }
-    L_0x11c9:
+        r0.captionLayout = r4;	 Catch:{ Exception -> 0x347d }
+    L_0x1200:
         r0 = r146;
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x3401 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x3401 }
-        if (r4 <= 0) goto L_0x125d;
-    L_0x11d3:
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x347d }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x347d }
+        if (r4 <= 0) goto L_0x1294;
+    L_0x120a:
         r0 = r146;
-        r6 = r0.timeWidth;	 Catch:{ Exception -> 0x3401 }
-        r4 = r147.isOutOwner();	 Catch:{ Exception -> 0x3401 }
-        if (r4 == 0) goto L_0x3407;
-    L_0x11dd:
+        r6 = r0.timeWidth;	 Catch:{ Exception -> 0x347d }
+        r4 = r147.isOutOwner();	 Catch:{ Exception -> 0x347d }
+        if (r4 == 0) goto L_0x3483;
+    L_0x1214:
         r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3401 }
-    L_0x11e3:
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x347d }
+    L_0x121a:
         r133 = r6 + r4;
         r0 = r146;
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x3401 }
-        r4 = r4.getHeight();	 Catch:{ Exception -> 0x3401 }
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x347d }
+        r4 = r4.getHeight();	 Catch:{ Exception -> 0x347d }
         r0 = r146;
-        r0.captionHeight = r4;	 Catch:{ Exception -> 0x3401 }
+        r0.captionHeight = r4;	 Catch:{ Exception -> 0x347d }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3401 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x347d }
         r0 = r146;
-        r6 = r0.captionHeight;	 Catch:{ Exception -> 0x3401 }
+        r6 = r0.captionHeight;	 Catch:{ Exception -> 0x347d }
         r8 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
-        r8 = org.telegram.messenger.AndroidUtilities.dp(r8);	 Catch:{ Exception -> 0x3401 }
+        r8 = org.telegram.messenger.AndroidUtilities.dp(r8);	 Catch:{ Exception -> 0x347d }
         r6 = r6 + r8;
         r4 = r4 + r6;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3401 }
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x347d }
         r0 = r146;
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x3401 }
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x347d }
         r0 = r146;
-        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x3401 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x3401 }
+        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x347d }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x347d }
         r6 = r6 + -1;
-        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x3401 }
+        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x347d }
         r0 = r146;
-        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x3401 }
+        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x347d }
         r0 = r146;
-        r8 = r0.captionLayout;	 Catch:{ Exception -> 0x3401 }
-        r8 = r8.getLineCount();	 Catch:{ Exception -> 0x3401 }
+        r8 = r0.captionLayout;	 Catch:{ Exception -> 0x347d }
+        r8 = r8.getLineCount();	 Catch:{ Exception -> 0x347d }
         r8 = r8 + -1;
-        r6 = r6.getLineLeft(r8);	 Catch:{ Exception -> 0x3401 }
+        r6 = r6.getLineLeft(r8);	 Catch:{ Exception -> 0x347d }
         r82 = r4 + r6;
         r4 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3401 }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x347d }
         r4 = r143 - r4;
-        r4 = (float) r4;	 Catch:{ Exception -> 0x3401 }
+        r4 = (float) r4;	 Catch:{ Exception -> 0x347d }
         r4 = r4 - r82;
         r0 = r133;
-        r6 = (float) r0;	 Catch:{ Exception -> 0x3401 }
+        r6 = (float) r0;	 Catch:{ Exception -> 0x347d }
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 >= 0) goto L_0x125d;
-    L_0x123d:
+        if (r4 >= 0) goto L_0x1294;
+    L_0x1274:
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3401 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x347d }
         r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3401 }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x347d }
         r4 = r4 + r6;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3401 }
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x347d }
         r0 = r146;
-        r4 = r0.captionHeight;	 Catch:{ Exception -> 0x3401 }
+        r4 = r0.captionHeight;	 Catch:{ Exception -> 0x347d }
         r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3401 }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x347d }
         r4 = r4 + r6;
         r0 = r146;
-        r0.captionHeight = r4;	 Catch:{ Exception -> 0x3401 }
+        r0.captionHeight = r4;	 Catch:{ Exception -> 0x347d }
         r57 = 2;
-    L_0x125d:
+    L_0x1294:
         r0 = r146;
         r4 = r0.currentMessageObject;
         r8 = r4.eventId;
         r10 = 0;
         r4 = (r8 > r10 ? 1 : (r8 == r10 ? 0 : -1));
-        if (r4 == 0) goto L_0x3480;
-    L_0x1269:
+        if (r4 == 0) goto L_0x34fc;
+    L_0x12a0:
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.isMediaEmpty();
-        if (r4 != 0) goto L_0x3480;
-    L_0x1273:
+        if (r4 != 0) goto L_0x34fc;
+    L_0x12aa:
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
-        if (r4 == 0) goto L_0x3480;
-    L_0x127f:
+        if (r4 == 0) goto L_0x34fc;
+    L_0x12b6:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1109655552; // 0x42240000 float:41.0 double:5.48242687E-315;
@@ -4563,272 +4596,272 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4.media;
         r0 = r4.webpage;
         r141 = r0;
-        r4 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x3431 }
+        r4 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x34ad }
         r0 = r141;
-        r6 = r0.site_name;	 Catch:{ Exception -> 0x3431 }
-        r4 = r4.measureText(r6);	 Catch:{ Exception -> 0x3431 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x3431 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x3431 }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x3431 }
+        r6 = r0.site_name;	 Catch:{ Exception -> 0x34ad }
+        r4 = r4.measureText(r6);	 Catch:{ Exception -> 0x34ad }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x34ad }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x34ad }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x34ad }
         r143 = r0;
-        r31 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x3431 }
+        r31 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x34ad }
         r0 = r141;
-        r0 = r0.site_name;	 Catch:{ Exception -> 0x3431 }
+        r0 = r0.site_name;	 Catch:{ Exception -> 0x34ad }
         r32 = r0;
-        r33 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x3431 }
+        r33 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x34ad }
         r0 = r143;
         r1 = r87;
-        r34 = java.lang.Math.min(r0, r1);	 Catch:{ Exception -> 0x3431 }
-        r35 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3431 }
+        r34 = java.lang.Math.min(r0, r1);	 Catch:{ Exception -> 0x34ad }
+        r35 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x34ad }
         r36 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r37 = 0;
         r38 = 0;
-        r31.<init>(r32, r33, r34, r35, r36, r37, r38);	 Catch:{ Exception -> 0x3431 }
+        r31.<init>(r32, r33, r34, r35, r36, r37, r38);	 Catch:{ Exception -> 0x34ad }
         r0 = r31;
         r1 = r146;
-        r1.siteNameLayout = r0;	 Catch:{ Exception -> 0x3431 }
+        r1.siteNameLayout = r0;	 Catch:{ Exception -> 0x34ad }
         r0 = r146;
-        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x3431 }
+        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x34ad }
         r0 = r146;
-        r6 = r0.siteNameLayout;	 Catch:{ Exception -> 0x3431 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x3431 }
+        r6 = r0.siteNameLayout;	 Catch:{ Exception -> 0x34ad }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x34ad }
         r6 = r6 + -1;
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x3431 }
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x34ad }
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3431 }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x34ad }
         r4 = r4 + r79;
         r0 = r146;
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x3431 }
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x34ad }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3431 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x34ad }
         r4 = r4 + r79;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3431 }
-    L_0x12fc:
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x34ad }
+    L_0x1333:
         r4 = 0;
         r0 = r146;
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x3448 }
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x34c4 }
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3448 }
-        if (r4 == 0) goto L_0x1316;
-    L_0x1307:
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x34c4 }
+        if (r4 == 0) goto L_0x134d;
+    L_0x133e:
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3448 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x34c4 }
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3448 }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x34c4 }
         r4 = r4 + r6;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3448 }
-    L_0x1316:
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x34c4 }
+    L_0x134d:
         r0 = r141;
-        r0 = r0.description;	 Catch:{ Exception -> 0x3448 }
+        r0 = r0.description;	 Catch:{ Exception -> 0x34c4 }
         r31 = r0;
-        r32 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x3448 }
-        r34 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3448 }
+        r32 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x34c4 }
+        r34 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x34c4 }
         r35 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3448 }
-        r0 = (float) r4;	 Catch:{ Exception -> 0x3448 }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x34c4 }
+        r0 = (float) r4;	 Catch:{ Exception -> 0x34c4 }
         r36 = r0;
         r37 = 0;
-        r38 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x3448 }
+        r38 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x34c4 }
         r40 = 6;
         r33 = r87;
         r39 = r87;
-        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r31, r32, r33, r34, r35, r36, r37, r38, r39, r40);	 Catch:{ Exception -> 0x3448 }
+        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r31, r32, r33, r34, r35, r36, r37, r38, r39, r40);	 Catch:{ Exception -> 0x34c4 }
         r0 = r146;
-        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x3448 }
+        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x34c4 }
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x3448 }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x34c4 }
         r0 = r146;
-        r6 = r0.descriptionLayout;	 Catch:{ Exception -> 0x3448 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x3448 }
+        r6 = r0.descriptionLayout;	 Catch:{ Exception -> 0x34c4 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x34c4 }
         r6 = r6 + -1;
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x3448 }
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x34c4 }
         r0 = r146;
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3448 }
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x34c4 }
         r4 = r4 + r79;
         r0 = r146;
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x3448 }
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x34c4 }
         r0 = r146;
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3448 }
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x34c4 }
         r4 = r4 + r79;
         r0 = r146;
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3448 }
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x34c4 }
         r41 = 0;
-    L_0x1365:
+    L_0x139c:
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x3448 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x3448 }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x34c4 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x34c4 }
         r0 = r41;
-        if (r0 >= r4) goto L_0x344c;
-    L_0x1371:
+        if (r0 >= r4) goto L_0x34c8;
+    L_0x13a8:
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x3448 }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x34c4 }
         r0 = r41;
-        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x3448 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x3448 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x3448 }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x3448 }
+        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x34c4 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x34c4 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x34c4 }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x34c4 }
         r86 = r0;
-        if (r86 == 0) goto L_0x1392;
-    L_0x1385:
+        if (r86 == 0) goto L_0x13c9;
+    L_0x13bc:
         r0 = r146;
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x3448 }
-        if (r4 != 0) goto L_0x3437;
-    L_0x138b:
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x34c4 }
+        if (r4 != 0) goto L_0x34b3;
+    L_0x13c2:
         r0 = r86;
         r4 = -r0;
         r0 = r146;
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x3448 }
-    L_0x1392:
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x34c4 }
+    L_0x13c9:
         r41 = r41 + 1;
-        goto L_0x1365;
-    L_0x1395:
+        goto L_0x139c;
+    L_0x13cc:
         r0 = r146;
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0d19 }
         r0 = r86;
         r6 = -r0;
-        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x0cdc }
+        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x0d19 }
         r0 = r146;
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0cdc }
-        goto L_0x0c64;
-    L_0x13a6:
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d19 }
+        goto L_0x0ca1;
+    L_0x13dd:
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0cdc }
-        r129 = r4.getWidth();	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d19 }
+        r129 = r4.getWidth();	 Catch:{ Exception -> 0x0d19 }
         r41 = 0;
-    L_0x13b0:
+    L_0x13e7:
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0cdc }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d19 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0d19 }
         r0 = r41;
-        if (r0 >= r4) goto L_0x0ce0;
-    L_0x13bc:
+        if (r0 >= r4) goto L_0x0d1d;
+    L_0x13f3:
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d19 }
         r0 = r41;
-        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0cdc }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0cdc }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0cdc }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0d19 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0d19 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0d19 }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x0d19 }
         r86 = r0;
-        if (r86 != 0) goto L_0x13db;
-    L_0x13d0:
+        if (r86 != 0) goto L_0x1412;
+    L_0x1407:
         r0 = r146;
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0cdc }
-        if (r4 == 0) goto L_0x13db;
-    L_0x13d6:
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0d19 }
+        if (r4 == 0) goto L_0x1412;
+    L_0x140d:
         r4 = 0;
         r0 = r146;
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0cdc }
-    L_0x13db:
-        if (r86 == 0) goto L_0x1428;
-    L_0x13dd:
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d19 }
+    L_0x1412:
+        if (r86 == 0) goto L_0x145f;
+    L_0x1414:
         r143 = r129 - r86;
-    L_0x13df:
+    L_0x1416:
         r0 = r41;
         r1 = r118;
-        if (r0 < r1) goto L_0x13ef;
-    L_0x13e5:
-        if (r118 == 0) goto L_0x13f7;
-    L_0x13e7:
-        if (r86 == 0) goto L_0x13f7;
-    L_0x13e9:
+        if (r0 < r1) goto L_0x1426;
+    L_0x141c:
+        if (r118 == 0) goto L_0x142e;
+    L_0x141e:
+        if (r86 == 0) goto L_0x142e;
+    L_0x1420:
         r0 = r146;
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0cdc }
-        if (r4 == 0) goto L_0x13f7;
-    L_0x13ef:
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0d19 }
+        if (r4 == 0) goto L_0x142e;
+    L_0x1426:
         r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0cdc }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d19 }
         r143 = r143 + r4;
-    L_0x13f7:
+    L_0x142e:
         r4 = r143 + r42;
         r0 = r98;
-        if (r0 >= r4) goto L_0x141d;
-    L_0x13fd:
-        if (r135 == 0) goto L_0x140c;
-    L_0x13ff:
+        if (r0 >= r4) goto L_0x1454;
+    L_0x1434:
+        if (r135 == 0) goto L_0x1443;
+    L_0x1436:
         r0 = r146;
-        r4 = r0.titleX;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.titleX;	 Catch:{ Exception -> 0x0d19 }
         r6 = r143 + r42;
         r6 = r6 - r98;
         r4 = r4 + r6;
         r0 = r146;
-        r0.titleX = r4;	 Catch:{ Exception -> 0x0cdc }
-    L_0x140c:
-        if (r48 == 0) goto L_0x141b;
-    L_0x140e:
+        r0.titleX = r4;	 Catch:{ Exception -> 0x0d19 }
+    L_0x1443:
+        if (r48 == 0) goto L_0x1452;
+    L_0x1445:
         r0 = r146;
-        r4 = r0.authorX;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.authorX;	 Catch:{ Exception -> 0x0d19 }
         r6 = r143 + r42;
         r6 = r6 - r98;
         r4 = r4 + r6;
         r0 = r146;
-        r0.authorX = r4;	 Catch:{ Exception -> 0x0cdc }
-    L_0x141b:
+        r0.authorX = r4;	 Catch:{ Exception -> 0x0d19 }
+    L_0x1452:
         r98 = r143 + r42;
-    L_0x141d:
+    L_0x1454:
         r4 = r143 + r42;
         r0 = r95;
-        r95 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0cdc }
+        r95 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0d19 }
         r41 = r41 + 1;
-        goto L_0x13b0;
-    L_0x1428:
-        if (r78 == 0) goto L_0x142d;
-    L_0x142a:
+        goto L_0x13e7;
+    L_0x145f:
+        if (r78 == 0) goto L_0x1464;
+    L_0x1461:
         r143 = r129;
-        goto L_0x13df;
-    L_0x142d:
+        goto L_0x1416;
+    L_0x1464:
         r0 = r146;
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d19 }
         r0 = r41;
-        r4 = r4.getLineWidth(r0);	 Catch:{ Exception -> 0x0cdc }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0cdc }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0cdc }
-        r4 = (int) r8;	 Catch:{ Exception -> 0x0cdc }
+        r4 = r4.getLineWidth(r0);	 Catch:{ Exception -> 0x0d19 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0d19 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0d19 }
+        r4 = (int) r8;	 Catch:{ Exception -> 0x0d19 }
         r0 = r129;
-        r143 = java.lang.Math.min(r4, r0);	 Catch:{ Exception -> 0x0cdc }
-        goto L_0x13df;
-    L_0x1444:
+        r143 = java.lang.Math.min(r4, r0);	 Catch:{ Exception -> 0x0d19 }
+        goto L_0x1416;
+    L_0x147b:
         r97 = r87;
-        goto L_0x0d08;
-    L_0x1448:
+        goto L_0x0d45;
+    L_0x147f:
         r4 = 0;
-        goto L_0x0d2f;
-    L_0x144b:
+        goto L_0x0d66;
+    L_0x1482:
         r41 = r41 + 1;
-        goto L_0x0d52;
-    L_0x144f:
+        goto L_0x0d89;
+    L_0x1486:
         r4 = org.telegram.messenger.MessageObject.isVideoDocument(r67);
-        if (r4 == 0) goto L_0x14d8;
-    L_0x1455:
+        if (r4 == 0) goto L_0x150f;
+    L_0x148c:
         r0 = r67;
         r4 = r0.thumb;
         r0 = r146;
         r0.currentPhotoObject = r4;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x14c9;
-    L_0x1463:
+        if (r4 == 0) goto L_0x1500;
+    L_0x149a:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x1473;
-    L_0x146b:
+        if (r4 == 0) goto L_0x14aa;
+    L_0x14a2:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x14c9;
-    L_0x1473:
+        if (r4 != 0) goto L_0x1500;
+    L_0x14aa:
         r41 = 0;
-    L_0x1475:
+    L_0x14ac:
         r0 = r67;
         r4 = r0.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x14a7;
-    L_0x1481:
+        if (r0 >= r4) goto L_0x14de;
+    L_0x14b8:
         r0 = r67;
         r4 = r0.attributes;
         r0 = r41;
@@ -4836,8 +4869,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeVideo;
-        if (r4 == 0) goto L_0x14d5;
-    L_0x1493:
+        if (r4 == 0) goto L_0x150c;
+    L_0x14ca:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r46;
@@ -4848,17 +4881,17 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r46;
         r6 = r0.h;
         r4.h = r6;
-    L_0x14a7:
+    L_0x14de:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x14b7;
-    L_0x14af:
+        if (r4 == 0) goto L_0x14ee;
+    L_0x14e6:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x14c9;
-    L_0x14b7:
+        if (r4 != 0) goto L_0x1500;
+    L_0x14ee:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r146;
@@ -4867,46 +4900,46 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r8 = org.telegram.messenger.AndroidUtilities.dp(r8);
         r6.h = r8;
         r4.w = r8;
-    L_0x14c9:
+    L_0x1500:
         r4 = 0;
         r0 = r146;
         r1 = r147;
         r0.createDocumentLayout(r4, r1);
         r14 = r140;
-        goto L_0x0db3;
-    L_0x14d5:
+        goto L_0x0dea;
+    L_0x150c:
         r41 = r41 + 1;
-        goto L_0x1475;
-    L_0x14d8:
+        goto L_0x14ac;
+    L_0x150f:
         r4 = org.telegram.messenger.MessageObject.isStickerDocument(r67);
-        if (r4 == 0) goto L_0x1564;
-    L_0x14de:
+        if (r4 == 0) goto L_0x159b;
+    L_0x1515:
         r0 = r67;
         r4 = r0.thumb;
         r0 = r146;
         r0.currentPhotoObject = r4;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x1552;
-    L_0x14ec:
+        if (r4 == 0) goto L_0x1589;
+    L_0x1523:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x14fc;
-    L_0x14f4:
+        if (r4 == 0) goto L_0x1533;
+    L_0x152b:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x1552;
-    L_0x14fc:
+        if (r4 != 0) goto L_0x1589;
+    L_0x1533:
         r41 = 0;
-    L_0x14fe:
+    L_0x1535:
         r0 = r67;
         r4 = r0.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x1530;
-    L_0x150a:
+        if (r0 >= r4) goto L_0x1567;
+    L_0x1541:
         r0 = r67;
         r4 = r0.attributes;
         r0 = r41;
@@ -4914,8 +4947,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeImageSize;
-        if (r4 == 0) goto L_0x1561;
-    L_0x151c:
+        if (r4 == 0) goto L_0x1598;
+    L_0x1553:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r46;
@@ -4926,17 +4959,17 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r46;
         r6 = r0.h;
         r4.h = r6;
-    L_0x1530:
+    L_0x1567:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x1540;
-    L_0x1538:
+        if (r4 == 0) goto L_0x1577;
+    L_0x156f:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x1552;
-    L_0x1540:
+        if (r4 != 0) goto L_0x1589;
+    L_0x1577:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r146;
@@ -4945,7 +4978,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r8 = org.telegram.messenger.AndroidUtilities.dp(r8);
         r6.h = r8;
         r4.w = r8;
-    L_0x1552:
+    L_0x1589:
         r0 = r67;
         r1 = r146;
         r1.documentAttach = r0;
@@ -4953,14 +4986,14 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r0.documentAttachType = r4;
         r14 = r140;
-        goto L_0x0db3;
-    L_0x1561:
+        goto L_0x0dea;
+    L_0x1598:
         r41 = r41 + 1;
-        goto L_0x14fe;
-    L_0x1564:
+        goto L_0x1535;
+    L_0x159b:
         r4 = org.telegram.messenger.MessageObject.isRoundVideoDocument(r67);
-        if (r4 == 0) goto L_0x1581;
-    L_0x156a:
+        if (r4 == 0) goto L_0x15b8;
+    L_0x15a1:
         r0 = r67;
         r4 = r0.thumb;
         r0 = r146;
@@ -4972,32 +5005,32 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r0.documentAttachType = r4;
         r14 = r140;
-        goto L_0x0db3;
-    L_0x1581:
+        goto L_0x0dea;
+    L_0x15b8:
         r0 = r146;
         r1 = r26;
         r2 = r132;
         r3 = r95;
         r0.calcBackgroundWidth(r1, r2, r3);
         r4 = org.telegram.messenger.MessageObject.isStickerDocument(r67);
-        if (r4 != 0) goto L_0x37e9;
-    L_0x1592:
+        if (r4 != 0) goto L_0x3865;
+    L_0x15c9:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r6 = r6 + r26;
-        if (r4 >= r6) goto L_0x15ac;
-    L_0x15a0:
+        if (r4 >= r6) goto L_0x15e3;
+    L_0x15d7:
         r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r4 + r26;
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x15ac:
+    L_0x15e3:
         r4 = org.telegram.messenger.MessageObject.isVoiceDocument(r67);
-        if (r4 == 0) goto L_0x1607;
-    L_0x15b2:
+        if (r4 == 0) goto L_0x163e;
+    L_0x15e9:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
@@ -5037,11 +5070,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r3 = r95;
         r0.calcBackgroundWidth(r1, r2, r3);
         r14 = r140;
-        goto L_0x0db3;
-    L_0x1607:
+        goto L_0x0dea;
+    L_0x163e:
         r4 = org.telegram.messenger.MessageObject.isMusicDocument(r67);
-        if (r4 == 0) goto L_0x16d8;
-    L_0x160d:
+        if (r4 == 0) goto L_0x170f;
+    L_0x1644:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
@@ -5086,13 +5119,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r95 = java.lang.Math.max(r0, r4);
         r0 = r146;
         r4 = r0.songLayout;
-        if (r4 == 0) goto L_0x169a;
-    L_0x1671:
+        if (r4 == 0) goto L_0x16d1;
+    L_0x16a8:
         r0 = r146;
         r4 = r0.songLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x169a;
-    L_0x167b:
+        if (r4 <= 0) goto L_0x16d1;
+    L_0x16b2:
         r0 = r95;
         r4 = (float) r0;
         r0 = r146;
@@ -5109,16 +5142,16 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.max(r4, r6);
         r0 = (int) r4;
         r95 = r0;
-    L_0x169a:
+    L_0x16d1:
         r0 = r146;
         r4 = r0.performerLayout;
-        if (r4 == 0) goto L_0x16c9;
-    L_0x16a0:
+        if (r4 == 0) goto L_0x1700;
+    L_0x16d7:
         r0 = r146;
         r4 = r0.performerLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x16c9;
-    L_0x16aa:
+        if (r4 <= 0) goto L_0x1700;
+    L_0x16e1:
         r0 = r95;
         r4 = (float) r0;
         r0 = r146;
@@ -5135,15 +5168,15 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.max(r4, r6);
         r0 = (int) r4;
         r95 = r0;
-    L_0x16c9:
+    L_0x1700:
         r0 = r146;
         r1 = r26;
         r2 = r132;
         r3 = r95;
         r0.calcBackgroundWidth(r1, r2, r3);
         r14 = r140;
-        goto L_0x0db3;
-    L_0x16d8:
+        goto L_0x0dea;
+    L_0x170f:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1126694912; // 0x43280000 float:168.0 double:5.566612494E-315;
@@ -5157,8 +5190,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.drawImageButton = r4;
         r0 = r146;
         r4 = r0.drawPhotoImage;
-        if (r4 == 0) goto L_0x1734;
-    L_0x16f5:
+        if (r4 == 0) goto L_0x176b;
+    L_0x172c:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
@@ -5187,8 +5220,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r10 = org.telegram.messenger.AndroidUtilities.dp(r10);
         r4.setImageCoords(r6, r8, r9, r10);
         r14 = r140;
-        goto L_0x0db3;
-    L_0x1734:
+        goto L_0x0dea;
+    L_0x176b:
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.textHeight;
@@ -5231,35 +5264,35 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r0.linkPreviewHeight = r4;
         r14 = r140;
-        goto L_0x0db3;
-    L_0x1790:
-        if (r110 == 0) goto L_0x17e9;
-    L_0x1792:
-        if (r136 == 0) goto L_0x17e2;
-    L_0x1794:
+        goto L_0x0dea;
+    L_0x17c7:
+        if (r110 == 0) goto L_0x1820;
+    L_0x17c9:
+        if (r136 == 0) goto L_0x1819;
+    L_0x17cb:
         r4 = "photo";
         r0 = r136;
         r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x17e2;
-    L_0x179f:
+        if (r4 == 0) goto L_0x1819;
+    L_0x17d6:
         r4 = 1;
-    L_0x17a0:
+    L_0x17d7:
         r0 = r146;
         r0.drawImageButton = r4;
         r0 = r147;
         r8 = r0.photoThumbs;
         r0 = r146;
         r4 = r0.drawImageButton;
-        if (r4 == 0) goto L_0x17e4;
-    L_0x17ae:
+        if (r4 == 0) goto L_0x181b;
+    L_0x17e5:
         r4 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
-    L_0x17b2:
+    L_0x17e9:
         r0 = r146;
         r6 = r0.drawImageButton;
-        if (r6 != 0) goto L_0x17e7;
-    L_0x17b8:
+        if (r6 != 0) goto L_0x181e;
+    L_0x17ef:
         r6 = 1;
-    L_0x17b9:
+    L_0x17f0:
         r4 = org.telegram.messenger.FileLoader.getClosestPhotoSizeWithSize(r8, r4, r6);
         r0 = r146;
         r0.currentPhotoObject = r4;
@@ -5273,41 +5306,41 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.currentPhotoObjectThumb;
         r0 = r146;
         r6 = r0.currentPhotoObject;
-        if (r4 != r6) goto L_0x37e9;
-    L_0x17d9:
+        if (r4 != r6) goto L_0x3865;
+    L_0x1810:
         r4 = 0;
         r0 = r146;
         r0.currentPhotoObjectThumb = r4;
         r14 = r140;
-        goto L_0x0db3;
-    L_0x17e2:
+        goto L_0x0dea;
+    L_0x1819:
         r4 = 0;
-        goto L_0x17a0;
-    L_0x17e4:
+        goto L_0x17d7;
+    L_0x181b:
         r4 = r97;
-        goto L_0x17b2;
-    L_0x17e7:
+        goto L_0x17e9;
+    L_0x181e:
         r6 = 0;
-        goto L_0x17b9;
-    L_0x17e9:
-        if (r140 == 0) goto L_0x37e9;
-    L_0x17eb:
+        goto L_0x17f0;
+    L_0x1820:
+        if (r140 == 0) goto L_0x3865;
+    L_0x1822:
         r0 = r140;
         r4 = r0.mime_type;
         r6 = "image/";
         r4 = r4.startsWith(r6);
-        if (r4 != 0) goto L_0x37e5;
-    L_0x17f8:
+        if (r4 != 0) goto L_0x3861;
+    L_0x182f:
         r14 = 0;
-    L_0x17f9:
+    L_0x1830:
         r4 = 0;
         r0 = r146;
         r0.drawImageButton = r4;
-        goto L_0x0db3;
-    L_0x1800:
+        goto L_0x0dea;
+    L_0x1837:
         r4 = 0;
-        goto L_0x0e02;
-    L_0x1803:
+        goto L_0x0e39;
+    L_0x183a:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r4 = (float) r4;
@@ -5315,35 +5348,35 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 * r6;
         r0 = (int) r4;
         r97 = r0;
-        goto L_0x0e42;
-    L_0x1810:
+        goto L_0x0e79;
+    L_0x1847:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 7;
-        if (r4 != r6) goto L_0x0e42;
-    L_0x1817:
+        if (r4 != r6) goto L_0x0e79;
+    L_0x184e:
         r97 = org.telegram.messenger.AndroidUtilities.roundMessageSize;
         r0 = r146;
         r4 = r0.photoImage;
         r6 = 1;
         r4.setAllowDecodeSingleFrame(r6);
-        goto L_0x0e42;
-    L_0x1823:
+        goto L_0x0e79;
+    L_0x185a:
         r4 = 0;
-        goto L_0x0e4e;
-    L_0x1826:
+        goto L_0x0e85;
+    L_0x185d:
         r4 = -1;
         r14.size = r4;
-        goto L_0x0e72;
-    L_0x182b:
+        goto L_0x0ea9;
+    L_0x1862:
         r0 = r146;
         r4 = r0.hasGamePreview;
-        if (r4 != 0) goto L_0x1837;
-    L_0x1831:
+        if (r4 != 0) goto L_0x186e;
+    L_0x1868:
         r0 = r146;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x185b;
-    L_0x1837:
+        if (r4 == 0) goto L_0x1892;
+    L_0x186e:
         r143 = 640; // 0x280 float:8.97E-43 double:3.16E-321;
         r79 = 360; // 0x168 float:5.04E-43 double:1.78E-321;
         r0 = r143;
@@ -5363,8 +5396,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 / r122;
         r0 = (int) r4;
         r79 = r0;
-        goto L_0x0e7f;
-    L_0x185b:
+        goto L_0x0eb6;
+    L_0x1892:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r4.w;
@@ -5390,41 +5423,41 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 / r122;
         r0 = (int) r4;
         r79 = r0;
-        if (r7 == 0) goto L_0x18a0;
-    L_0x188b:
-        if (r7 == 0) goto L_0x18b2;
-    L_0x188d:
+        if (r7 == 0) goto L_0x18d7;
+    L_0x18c2:
+        if (r7 == 0) goto L_0x18e9;
+    L_0x18c4:
         r4 = r7.toLowerCase();
         r6 = "instagram";
         r4 = r4.equals(r6);
-        if (r4 != 0) goto L_0x18b2;
-    L_0x189a:
+        if (r4 != 0) goto L_0x18e9;
+    L_0x18d1:
         r0 = r146;
         r4 = r0.documentAttachType;
-        if (r4 != 0) goto L_0x18b2;
-    L_0x18a0:
+        if (r4 != 0) goto L_0x18e9;
+    L_0x18d7:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.y;
         r4 = r4 / 3;
         r0 = r79;
-        if (r0 <= r4) goto L_0x0e7f;
-    L_0x18aa:
+        if (r0 <= r4) goto L_0x0eb6;
+    L_0x18e1:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.y;
         r79 = r4 / 3;
-        goto L_0x0e7f;
-    L_0x18b2:
+        goto L_0x0eb6;
+    L_0x18e9:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.y;
         r4 = r4 / 2;
         r0 = r79;
-        if (r0 <= r4) goto L_0x0e7f;
-    L_0x18bc:
+        if (r0 <= r4) goto L_0x0eb6;
+    L_0x18f3:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.y;
         r79 = r4 / 2;
-        goto L_0x0e7f;
-    L_0x18c4:
+        goto L_0x0eb6;
+    L_0x18fb:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1094713344; // 0x41400000 float:12.0 double:5.408602553E-315;
@@ -5438,13 +5471,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r79;
         r0 = r146;
         r0.linkPreviewHeight = r4;
-        goto L_0x0ecb;
-    L_0x18e1:
+        goto L_0x0f02;
+    L_0x1918:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 6;
-        if (r4 != r6) goto L_0x1922;
-    L_0x18e8:
+        if (r4 != r6) goto L_0x1959;
+    L_0x191f:
         r0 = r146;
         r15 = r0.photoImage;
         r0 = r146;
@@ -5457,13 +5490,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r19 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x191f;
-    L_0x1902:
+        if (r4 == 0) goto L_0x1956;
+    L_0x1939:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r20 = r0;
-    L_0x190a:
+    L_0x1941:
         r21 = "b1";
         r0 = r146;
         r4 = r0.documentAttach;
@@ -5472,16 +5505,16 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r23 = "webp";
         r24 = 1;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22, r23, r24);
-        goto L_0x0f33;
-    L_0x191f:
+        goto L_0x0f6a;
+    L_0x1956:
         r20 = 0;
-        goto L_0x190a;
-    L_0x1922:
+        goto L_0x1941;
+    L_0x1959:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 4;
-        if (r4 != r6) goto L_0x194a;
-    L_0x1929:
+        if (r4 != r6) goto L_0x1981;
+    L_0x1960:
         r0 = r146;
         r15 = r0.photoImage;
         r16 = 0;
@@ -5497,42 +5530,46 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r21 = 0;
         r22 = 0;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0f33;
-    L_0x194a:
+        goto L_0x0f6a;
+    L_0x1981:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 2;
-        if (r4 == r6) goto L_0x1958;
-    L_0x1951:
+        if (r4 == r6) goto L_0x198f;
+    L_0x1988:
         r0 = r146;
         r4 = r0.documentAttachType;
         r6 = 7;
-        if (r4 != r6) goto L_0x1a0a;
-    L_0x1958:
+        if (r4 != r6) goto L_0x1a4d;
+    L_0x198f:
         r71 = org.telegram.messenger.FileLoader.getAttachFileName(r67);
         r49 = 0;
         r4 = org.telegram.messenger.MessageObject.isNewGifDocument(r67);
-        if (r4 == 0) goto L_0x19ba;
-    L_0x1964:
-        r4 = org.telegram.messenger.MediaController.getInstance();
+        if (r4 == 0) goto L_0x19f9;
+    L_0x199b:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MediaController.getInstance(r4);
         r0 = r146;
         r6 = r0.currentMessageObject;
         r49 = r4.canDownloadMedia(r6);
-    L_0x1970:
+    L_0x19ab:
         r4 = r147.isSending();
-        if (r4 != 0) goto L_0x19db;
-    L_0x1976:
+        if (r4 != 0) goto L_0x1a1e;
+    L_0x19b1:
         r0 = r147;
         r4 = r0.mediaExists;
-        if (r4 != 0) goto L_0x198a;
-    L_0x197c:
-        r4 = org.telegram.messenger.FileLoader.getInstance();
+        if (r4 != 0) goto L_0x19c9;
+    L_0x19b7:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.FileLoader.getInstance(r4);
         r0 = r71;
         r4 = r4.isLoadingFile(r0);
-        if (r4 != 0) goto L_0x198a;
-    L_0x1988:
-        if (r49 == 0) goto L_0x19db;
-    L_0x198a:
+        if (r4 != 0) goto L_0x19c9;
+    L_0x19c7:
+        if (r49 == 0) goto L_0x1a1e;
+    L_0x19c9:
         r4 = 0;
         r0 = r146;
         r0.photoNotSet = r4;
@@ -5541,13 +5578,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r17 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x19d8;
-    L_0x199b:
+        if (r4 == 0) goto L_0x1a1b;
+    L_0x19da:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r18 = r0;
-    L_0x19a3:
+    L_0x19e2:
         r0 = r146;
         r0 = r0.currentPhotoFilterThumb;
         r19 = r0;
@@ -5558,25 +5595,27 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r22 = 0;
         r16 = r67;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0f33;
-    L_0x19ba:
+        goto L_0x0f6a;
+    L_0x19f9:
         r4 = org.telegram.messenger.MessageObject.isRoundVideoDocument(r67);
-        if (r4 == 0) goto L_0x1970;
-    L_0x19c0:
+        if (r4 == 0) goto L_0x19ab;
+    L_0x19ff:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = org.telegram.messenger.AndroidUtilities.roundMessageSize;
         r6 = r6 / 2;
         r4.setRoundRadius(r6);
-        r4 = org.telegram.messenger.MediaController.getInstance();
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MediaController.getInstance(r4);
         r0 = r146;
         r6 = r0.currentMessageObject;
         r49 = r4.canDownloadMedia(r6);
-        goto L_0x1970;
-    L_0x19d8:
+        goto L_0x19ab;
+    L_0x1a1b:
         r18 = 0;
-        goto L_0x19a3;
-    L_0x19db:
+        goto L_0x19e2;
+    L_0x1a1e:
         r4 = 1;
         r0 = r146;
         r0.photoNotSet = r4;
@@ -5586,13 +5625,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r17 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x1a07;
-    L_0x19ee:
+        if (r4 == 0) goto L_0x1a4a;
+    L_0x1a31:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r18 = r0;
-    L_0x19f6:
+    L_0x1a39:
         r0 = r146;
         r0 = r0.currentPhotoFilterThumb;
         r19 = r0;
@@ -5600,11 +5639,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r21 = 0;
         r22 = 0;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0f33;
-    L_0x1a07:
+        goto L_0x0f6a;
+    L_0x1a4a:
         r18 = 0;
-        goto L_0x19f6;
-    L_0x1a0a:
+        goto L_0x1a39;
+    L_0x1a4d:
         r0 = r147;
         r0 = r0.mediaExists;
         r111 = r0;
@@ -5613,21 +5652,25 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r71 = org.telegram.messenger.FileLoader.getAttachFileName(r4);
         r0 = r146;
         r4 = r0.hasGamePreview;
-        if (r4 != 0) goto L_0x1a3a;
-    L_0x1a1e:
-        if (r111 != 0) goto L_0x1a3a;
-    L_0x1a20:
-        r4 = org.telegram.messenger.MediaController.getInstance();
+        if (r4 != 0) goto L_0x1a85;
+    L_0x1a61:
+        if (r111 != 0) goto L_0x1a85;
+    L_0x1a63:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MediaController.getInstance(r4);
         r0 = r146;
         r6 = r0.currentMessageObject;
         r4 = r4.canDownloadMedia(r6);
-        if (r4 != 0) goto L_0x1a3a;
-    L_0x1a2e:
-        r4 = org.telegram.messenger.FileLoader.getInstance();
+        if (r4 != 0) goto L_0x1a85;
+    L_0x1a75:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.FileLoader.getInstance(r4);
         r0 = r71;
         r4 = r4.isLoadingFile(r0);
-        if (r4 == 0) goto L_0x1a73;
-    L_0x1a3a:
+        if (r4 == 0) goto L_0x1abe;
+    L_0x1a85:
         r4 = 0;
         r0 = r146;
         r0.photoNotSet = r4;
@@ -5642,13 +5685,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r17 = r0;
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x1a70;
-    L_0x1a57:
+        if (r4 == 0) goto L_0x1abb;
+    L_0x1aa2:
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
         r0 = r4.location;
         r18 = r0;
-    L_0x1a5f:
+    L_0x1aaa:
         r0 = r146;
         r0 = r0.currentPhotoFilterThumb;
         r19 = r0;
@@ -5656,18 +5699,18 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r21 = 0;
         r22 = 0;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0f33;
-    L_0x1a70:
+        goto L_0x0f6a;
+    L_0x1abb:
         r18 = 0;
-        goto L_0x1a5f;
-    L_0x1a73:
+        goto L_0x1aaa;
+    L_0x1abe:
         r4 = 1;
         r0 = r146;
         r0.photoNotSet = r4;
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x1ab3;
-    L_0x1a7e:
+        if (r4 == 0) goto L_0x1afe;
+    L_0x1ac9:
         r0 = r146;
         r15 = r0.photoImage;
         r16 = 0;
@@ -5691,21 +5734,21 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r21 = 0;
         r22 = 0;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0f33;
-    L_0x1ab3:
+        goto L_0x0f6a;
+    L_0x1afe:
         r0 = r146;
         r6 = r0.photoImage;
         r4 = 0;
         r4 = (android.graphics.drawable.Drawable) r4;
         r6.setImageBitmap(r4);
-        goto L_0x0f33;
-    L_0x1abf:
+        goto L_0x0f6a;
+    L_0x1b0a:
         r0 = r146;
         r4 = r0.hasGamePreview;
-        if (r4 == 0) goto L_0x0f90;
-    L_0x1ac5:
+        if (r4 == 0) goto L_0x0fc7;
+    L_0x1b10:
         r4 = "AttachGame";
-        r6 = 2131427484; // 0x7f0b009c float:1.8476586E38 double:1.0530650964E-314;
+        r6 = 2131493023; // 0x7f0c009f float:1.8609514E38 double:1.053097477E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
         r4 = org.telegram.ui.ActionBar.Theme.chat_gamePaint;
@@ -5728,8 +5771,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r15.<init>(r16, r17, r18, r19, r20, r21, r22);
         r0 = r146;
         r0.videoInfoLayout = r15;
-        goto L_0x0f90;
-    L_0x1b00:
+        goto L_0x0fc7;
+    L_0x1b4b:
         r0 = r146;
         r6 = r0.photoImage;
         r4 = 0;
@@ -5749,26 +5792,26 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.totalHeight = r4;
-        goto L_0x0f90;
-    L_0x1b2a:
+        goto L_0x0fc7;
+    L_0x1b75:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.test;
-        if (r4 == 0) goto L_0x1b44;
-    L_0x1b34:
+        if (r4 == 0) goto L_0x1b8f;
+    L_0x1b7f:
         r4 = "PaymentTestInvoice";
-        r6 = 2131428538; // 0x7f0b04ba float:1.8478723E38 double:1.053065617E-314;
+        r6 = 2131494081; // 0x7f0c04c1 float:1.861166E38 double:1.0530979997E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
-        goto L_0x0fb0;
-    L_0x1b44:
+        goto L_0x0fe7;
+    L_0x1b8f:
         r4 = "PaymentInvoice";
-        r6 = 2131428507; // 0x7f0b049b float:1.847866E38 double:1.053065602E-314;
+        r6 = 2131494050; // 0x7f0c04a2 float:1.8611597E38 double:1.0530979844E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
-        goto L_0x0fb0;
-    L_0x1b54:
+        goto L_0x0fe7;
+    L_0x1b9f:
         r0 = r146;
         r4 = r0.durationWidth;
         r0 = r146;
@@ -5779,26 +5822,36 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r95;
         r95 = java.lang.Math.max(r4, r0);
-        goto L_0x1079;
-    L_0x1b6c:
+        goto L_0x10b0;
+    L_0x1bb7:
         r0 = r146;
         r4 = r0.drawInstantViewType;
         r6 = 2;
-        if (r4 != r6) goto L_0x1b7f;
-    L_0x1b73:
+        if (r4 != r6) goto L_0x1bca;
+    L_0x1bbe:
         r4 = "OpenGroup";
-        r6 = 2131428449; // 0x7f0b0461 float:1.8478543E38 double:1.053065573E-314;
+        r6 = 2131493991; // 0x7f0c0467 float:1.8611478E38 double:1.0530979553E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x10d4;
-    L_0x1b7f:
+        goto L_0x110b;
+    L_0x1bca:
+        r0 = r146;
+        r4 = r0.drawInstantViewType;
+        r6 = 3;
+        if (r4 != r6) goto L_0x1bdd;
+    L_0x1bd1:
+        r4 = "OpenMessage";
+        r6 = 2131493994; // 0x7f0c046a float:1.8611484E38 double:1.0530979568E-314;
+        r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
+        goto L_0x110b;
+    L_0x1bdd:
         r4 = "InstantView";
-        r6 = 2131428106; // 0x7f0b030a float:1.8477847E38 double:1.053065404E-314;
+        r6 = 2131493646; // 0x7f0c030e float:1.8610778E38 double:1.053097785E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x10d4;
-    L_0x1b8b:
+        goto L_0x110b;
+    L_0x1be9:
         r4 = 0;
-        goto L_0x1151;
-    L_0x1b8e:
+        goto L_0x1188;
+    L_0x1bec:
         r0 = r146;
         r6 = r0.photoImage;
         r4 = 0;
@@ -5809,13 +5862,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r2 = r132;
         r3 = r95;
         r0.calcBackgroundWidth(r1, r2, r3);
-        goto L_0x116a;
-    L_0x1ba5:
+        goto L_0x11a1;
+    L_0x1c03:
         r0 = r147;
         r4 = r0.type;
         r6 = 16;
-        if (r4 != r6) goto L_0x1d5f;
-    L_0x1bad:
+        if (r4 != r6) goto L_0x1dbd;
+    L_0x1c0b:
         r4 = 0;
         r0 = r146;
         r0.drawName = r4;
@@ -5826,21 +5879,21 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r0.drawPhotoImage = r4;
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x1cf4;
-    L_0x1bc2:
+        if (r4 == 0) goto L_0x1d52;
+    L_0x1c20:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x1cf0;
-    L_0x1bcc:
+        if (r4 == 0) goto L_0x1d4e;
+    L_0x1c2a:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x1cf0;
-    L_0x1bd2:
+        if (r4 == 0) goto L_0x1d4e;
+    L_0x1c30:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x1cf0;
-    L_0x1bd8:
+        if (r4 != 0) goto L_0x1d4e;
+    L_0x1c36:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x1bda:
+    L_0x1c38:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -5848,7 +5901,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x1bee:
+    L_0x1c4c:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1106771968; // 0x41f80000 float:31.0 double:5.46818007E-315;
@@ -5860,12 +5913,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r26 = r4 - r6;
-        if (r26 >= 0) goto L_0x37e1;
-    L_0x1c0b:
+        if (r26 >= 0) goto L_0x385d;
+    L_0x1c69:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r26 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r99 = r26;
-    L_0x1c13:
+    L_0x1c71:
         r4 = org.telegram.messenger.LocaleController.getInstance();
         r4 = r4.formatterDay;
         r0 = r147;
@@ -5885,18 +5938,18 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r4 instanceof org.telegram.tgnet.TLRPC.TL_phoneCallDiscardReasonMissed;
         r80 = r0;
         r4 = r147.isOutOwner();
-        if (r4 == 0) goto L_0x1d31;
-    L_0x1c3f:
-        if (r80 == 0) goto L_0x1d25;
-    L_0x1c41:
+        if (r4 == 0) goto L_0x1d8f;
+    L_0x1c9d:
+        if (r80 == 0) goto L_0x1d83;
+    L_0x1c9f:
         r4 = "CallMessageOutgoingMissed";
-        r6 = 2131427556; // 0x7f0b00e4 float:1.8476732E38 double:1.053065132E-314;
+        r6 = 2131493095; // 0x7f0c00e7 float:1.860966E38 double:1.0530975126E-314;
         r128 = org.telegram.messenger.LocaleController.getString(r4, r6);
-    L_0x1c4b:
+    L_0x1ca9:
         r0 = r56;
         r4 = r0.duration;
-        if (r4 <= 0) goto L_0x1c73;
-    L_0x1c51:
+        if (r4 <= 0) goto L_0x1cd1;
+    L_0x1caf:
         r4 = new java.lang.StringBuilder;
         r4.<init>();
         r0 = r130;
@@ -5908,7 +5961,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = org.telegram.messenger.LocaleController.formatCallDuration(r6);
         r4 = r4.append(r6);
         r130 = r4.toString();
-    L_0x1c73:
+    L_0x1cd1:
         r21 = new android.text.StaticLayout;
         r4 = org.telegram.ui.ActionBar.Theme.chat_audioTitlePaint;
         r0 = r99;
@@ -5957,8 +6010,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.totalHeight = r4;
         r0 = r146;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x116a;
-    L_0x1cdf:
+        if (r4 == 0) goto L_0x11a1;
+    L_0x1d3d:
         r0 = r146;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -5966,25 +6019,25 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.namesOffset = r4;
-        goto L_0x116a;
-    L_0x1cf0:
+        goto L_0x11a1;
+    L_0x1d4e:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x1bda;
-    L_0x1cf4:
+        goto L_0x1c38;
+    L_0x1d52:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x1d22;
-    L_0x1cfe:
+        if (r4 == 0) goto L_0x1d80;
+    L_0x1d5c:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x1d22;
-    L_0x1d04:
+        if (r4 == 0) goto L_0x1d80;
+    L_0x1d62:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x1d22;
-    L_0x1d0a:
+        if (r4 != 0) goto L_0x1d80;
+    L_0x1d68:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x1d0c:
+    L_0x1d6a:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -5992,43 +6045,43 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-        goto L_0x1bee;
-    L_0x1d22:
+        goto L_0x1c4c;
+    L_0x1d80:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x1d0c;
-    L_0x1d25:
+        goto L_0x1d6a;
+    L_0x1d83:
         r4 = "CallMessageOutgoing";
-        r6 = 2131427555; // 0x7f0b00e3 float:1.847673E38 double:1.0530651315E-314;
+        r6 = 2131493094; // 0x7f0c00e6 float:1.8609658E38 double:1.053097512E-314;
         r128 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1c4b;
-    L_0x1d31:
-        if (r80 == 0) goto L_0x1d3f;
-    L_0x1d33:
+        goto L_0x1ca9;
+    L_0x1d8f:
+        if (r80 == 0) goto L_0x1d9d;
+    L_0x1d91:
         r4 = "CallMessageIncomingMissed";
-        r6 = 2131427554; // 0x7f0b00e2 float:1.8476728E38 double:1.053065131E-314;
+        r6 = 2131493093; // 0x7f0c00e5 float:1.8609656E38 double:1.0530975116E-314;
         r128 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1c4b;
-    L_0x1d3f:
+        goto L_0x1ca9;
+    L_0x1d9d:
         r0 = r56;
         r4 = r0.reason;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_phoneCallDiscardReasonBusy;
-        if (r4 == 0) goto L_0x1d53;
-    L_0x1d47:
+        if (r4 == 0) goto L_0x1db1;
+    L_0x1da5:
         r4 = "CallMessageIncomingDeclined";
-        r6 = 2131427553; // 0x7f0b00e1 float:1.8476725E38 double:1.0530651305E-314;
+        r6 = 2131493092; // 0x7f0c00e4 float:1.8609654E38 double:1.053097511E-314;
         r128 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1c4b;
-    L_0x1d53:
+        goto L_0x1ca9;
+    L_0x1db1:
         r4 = "CallMessageIncoming";
-        r6 = 2131427552; // 0x7f0b00e0 float:1.8476723E38 double:1.05306513E-314;
+        r6 = 2131493091; // 0x7f0c00e3 float:1.8609652E38 double:1.0530975106E-314;
         r128 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1c4b;
-    L_0x1d5f:
+        goto L_0x1ca9;
+    L_0x1dbd:
         r0 = r147;
         r4 = r0.type;
         r6 = 12;
-        if (r4 != r6) goto L_0x1fbd;
-    L_0x1d67:
+        if (r4 != r6) goto L_0x201f;
+    L_0x1dc5:
         r4 = 0;
         r0 = r146;
         r0.drawName = r4;
@@ -6044,21 +6097,21 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r4.setRoundRadius(r6);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x1f52;
-    L_0x1d89:
+        if (r4 == 0) goto L_0x1fb4;
+    L_0x1de7:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x1f4e;
-    L_0x1d93:
+        if (r4 == 0) goto L_0x1fb0;
+    L_0x1df1:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x1f4e;
-    L_0x1d99:
+        if (r4 == 0) goto L_0x1fb0;
+    L_0x1df7:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x1f4e;
-    L_0x1d9f:
+        if (r4 != 0) goto L_0x1fb0;
+    L_0x1dfd:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x1da1:
+    L_0x1dff:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6066,7 +6119,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x1db5:
+    L_0x1e13:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1106771968; // 0x41f80000 float:31.0 double:5.46818007E-315;
@@ -6079,46 +6132,48 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4.media;
         r0 = r4.user_id;
         r137 = r0;
-        r4 = org.telegram.messenger.MessagesController.getInstance();
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MessagesController.getInstance(r4);
         r6 = java.lang.Integer.valueOf(r137);
         r138 = r4.getUser(r6);
         r4 = r146.getMaxNameWidth();
         r6 = 1121714176; // 0x42dc0000 float:110.0 double:5.54200439E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r26 = r4 - r6;
-        if (r26 >= 0) goto L_0x37dd;
-    L_0x1de8:
+        if (r26 >= 0) goto L_0x3859;
+    L_0x1e4a:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r26 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r99 = r26;
-    L_0x1df0:
+    L_0x1e52:
         r22 = 0;
-        if (r138 == 0) goto L_0x1e0b;
-    L_0x1df4:
+        if (r138 == 0) goto L_0x1e6d;
+    L_0x1e56:
         r0 = r138;
         r4 = r0.photo;
-        if (r4 == 0) goto L_0x1e02;
-    L_0x1dfa:
+        if (r4 == 0) goto L_0x1e64;
+    L_0x1e5c:
         r0 = r138;
         r4 = r0.photo;
         r0 = r4.photo_small;
         r22 = r0;
-    L_0x1e02:
+    L_0x1e64:
         r0 = r146;
         r4 = r0.contactAvatarDrawable;
         r0 = r138;
         r4.setInfo(r0);
-    L_0x1e0b:
+    L_0x1e6d:
         r0 = r146;
         r0 = r0.photoImage;
         r21 = r0;
         r23 = "50_50";
-        if (r138 == 0) goto L_0x1f83;
-    L_0x1e16:
+        if (r138 == 0) goto L_0x1fe5;
+    L_0x1e78:
         r0 = r146;
         r0 = r0.contactAvatarDrawable;
         r24 = r0;
-    L_0x1e1c:
+    L_0x1e7e:
         r25 = 0;
         r26 = 0;
         r21.setImage(r22, r23, r24, r25, r26);
@@ -6127,15 +6182,15 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4.media;
         r0 = r4.phone_number;
         r109 = r0;
-        if (r109 == 0) goto L_0x1f92;
-    L_0x1e2f:
+        if (r109 == 0) goto L_0x1ff4;
+    L_0x1e91:
         r4 = r109.length();
-        if (r4 == 0) goto L_0x1f92;
-    L_0x1e35:
+        if (r4 == 0) goto L_0x1ff4;
+    L_0x1e97:
         r4 = org.telegram.PhoneFormat.PhoneFormat.getInstance();
         r0 = r109;
         r109 = r4.format(r0);
-    L_0x1e3f:
+    L_0x1ea1:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -6149,10 +6204,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r8 = 32;
         r62 = r4.replace(r6, r8);
         r4 = r62.length();
-        if (r4 != 0) goto L_0x1e63;
-    L_0x1e61:
+        if (r4 != 0) goto L_0x1ec5;
+    L_0x1ec3:
         r62 = r109;
-    L_0x1e63:
+    L_0x1ec5:
         r23 = new android.text.StaticLayout;
         r4 = org.telegram.ui.ActionBar.Theme.chat_contactNamePaint;
         r0 = r99;
@@ -6197,20 +6252,20 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r146.setMessageObjectInternal(r147);
         r0 = r146;
         r4 = r0.drawForwardedName;
-        if (r4 == 0) goto L_0x1f9e;
-    L_0x1ec8:
+        if (r4 == 0) goto L_0x2000;
+    L_0x1f2a:
         r4 = r147.needDrawForwarded();
-        if (r4 == 0) goto L_0x1f9e;
-    L_0x1ece:
+        if (r4 == 0) goto L_0x2000;
+    L_0x1f30:
         r0 = r146;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x1edc;
-    L_0x1ed4:
+        if (r4 == 0) goto L_0x1f3e;
+    L_0x1f36:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.minY;
-        if (r4 != 0) goto L_0x1f9e;
-    L_0x1edc:
+        if (r4 != 0) goto L_0x2000;
+    L_0x1f3e:
         r0 = r146;
         r4 = r0.namesOffset;
         r6 = 1084227584; // 0x40a00000 float:5.0 double:5.356796015E-315;
@@ -6218,7 +6273,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.namesOffset = r4;
-    L_0x1eeb:
+    L_0x1f4d:
         r4 = 1116471296; // 0x428c0000 float:70.0 double:5.51610112E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r146;
@@ -6228,8 +6283,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.totalHeight = r4;
         r0 = r146;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x1f0f;
-    L_0x1f00:
+        if (r4 == 0) goto L_0x1f71;
+    L_0x1f62:
         r0 = r146;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -6237,12 +6292,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.namesOffset = r4;
-    L_0x1f0f:
+    L_0x1f71:
         r0 = r146;
         r4 = r0.docTitleLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x116a;
-    L_0x1f19:
+        if (r4 <= 0) goto L_0x11a1;
+    L_0x1f7b:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1121714176; // 0x42dc0000 float:110.0 double:5.54200439E-315;
@@ -6259,8 +6314,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r4 = r0.timeWidth;
         r0 = r131;
-        if (r0 >= r4) goto L_0x116a;
-    L_0x1f3d:
+        if (r0 >= r4) goto L_0x11a1;
+    L_0x1f9f:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
@@ -6268,25 +6323,25 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.totalHeight = r4;
-        goto L_0x116a;
-    L_0x1f4e:
+        goto L_0x11a1;
+    L_0x1fb0:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x1da1;
-    L_0x1f52:
+        goto L_0x1dff;
+    L_0x1fb4:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x1f80;
-    L_0x1f5c:
+        if (r4 == 0) goto L_0x1fe2;
+    L_0x1fbe:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x1f80;
-    L_0x1f62:
+        if (r4 == 0) goto L_0x1fe2;
+    L_0x1fc4:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x1f80;
-    L_0x1f68:
+        if (r4 != 0) goto L_0x1fe2;
+    L_0x1fca:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x1f6a:
+    L_0x1fcc:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6294,37 +6349,37 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-        goto L_0x1db5;
-    L_0x1f80:
+        goto L_0x1e13;
+    L_0x1fe2:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x1f6a;
-    L_0x1f83:
+        goto L_0x1fcc;
+    L_0x1fe5:
         r6 = org.telegram.ui.ActionBar.Theme.chat_contactDrawable;
         r4 = r147.isOutOwner();
-        if (r4 == 0) goto L_0x1f90;
-    L_0x1f8b:
+        if (r4 == 0) goto L_0x1ff2;
+    L_0x1fed:
         r4 = 1;
-    L_0x1f8c:
+    L_0x1fee:
         r24 = r6[r4];
-        goto L_0x1e1c;
-    L_0x1f90:
+        goto L_0x1e7e;
+    L_0x1ff2:
         r4 = 0;
-        goto L_0x1f8c;
-    L_0x1f92:
+        goto L_0x1fee;
+    L_0x1ff4:
         r4 = "NumberUnknown";
-        r6 = 2131428434; // 0x7f0b0452 float:1.8478512E38 double:1.053065566E-314;
+        r6 = 2131493976; // 0x7f0c0458 float:1.8611447E38 double:1.053097948E-314;
         r109 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1e3f;
-    L_0x1f9e:
+        goto L_0x1ea1;
+    L_0x2000:
         r0 = r146;
         r4 = r0.drawNameLayout;
-        if (r4 == 0) goto L_0x1eeb;
-    L_0x1fa4:
+        if (r4 == 0) goto L_0x1f4d;
+    L_0x2006:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.reply_to_msg_id;
-        if (r4 != 0) goto L_0x1eeb;
-    L_0x1fac:
+        if (r4 != 0) goto L_0x1f4d;
+    L_0x200e:
         r0 = r146;
         r4 = r0.namesOffset;
         r6 = 1088421888; // 0x40e00000 float:7.0 double:5.37751863E-315;
@@ -6332,32 +6387,32 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.namesOffset = r4;
-        goto L_0x1eeb;
-    L_0x1fbd:
+        goto L_0x1f4d;
+    L_0x201f:
         r0 = r147;
         r4 = r0.type;
         r6 = 2;
-        if (r4 != r6) goto L_0x2062;
-    L_0x1fc4:
+        if (r4 != r6) goto L_0x20c4;
+    L_0x2026:
         r4 = 1;
         r0 = r146;
         r0.drawForwardedName = r4;
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2032;
-    L_0x1fcf:
+        if (r4 == 0) goto L_0x2094;
+    L_0x2031:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x202f;
-    L_0x1fd9:
+        if (r4 == 0) goto L_0x2091;
+    L_0x203b:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x202f;
-    L_0x1fdf:
+        if (r4 == 0) goto L_0x2091;
+    L_0x2041:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x202f;
-    L_0x1fe5:
+        if (r4 != 0) goto L_0x2091;
+    L_0x2047:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x1fe7:
+    L_0x2049:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6365,7 +6420,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x1ffb:
+    L_0x205d:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r0 = r146;
@@ -6381,8 +6436,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.totalHeight = r4;
         r0 = r146;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x116a;
-    L_0x201e:
+        if (r4 == 0) goto L_0x11a1;
+    L_0x2080:
         r0 = r146;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -6390,25 +6445,25 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.namesOffset = r4;
-        goto L_0x116a;
-    L_0x202f:
+        goto L_0x11a1;
+    L_0x2091:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x1fe7;
-    L_0x2032:
+        goto L_0x2049;
+    L_0x2094:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x205f;
-    L_0x203c:
+        if (r4 == 0) goto L_0x20c1;
+    L_0x209e:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x205f;
-    L_0x2042:
+        if (r4 == 0) goto L_0x20c1;
+    L_0x20a4:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x205f;
-    L_0x2048:
+        if (r4 != 0) goto L_0x20c1;
+    L_0x20aa:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x204a:
+    L_0x20ac:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6416,32 +6471,32 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-        goto L_0x1ffb;
-    L_0x205f:
+        goto L_0x205d;
+    L_0x20c1:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x204a;
-    L_0x2062:
+        goto L_0x20ac;
+    L_0x20c4:
         r0 = r147;
         r4 = r0.type;
         r6 = 14;
-        if (r4 != r6) goto L_0x2103;
-    L_0x206a:
+        if (r4 != r6) goto L_0x2165;
+    L_0x20cc:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x20d3;
-    L_0x2070:
+        if (r4 == 0) goto L_0x2135;
+    L_0x20d2:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x20d0;
-    L_0x207a:
+        if (r4 == 0) goto L_0x2132;
+    L_0x20dc:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x20d0;
-    L_0x2080:
+        if (r4 == 0) goto L_0x2132;
+    L_0x20e2:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x20d0;
-    L_0x2086:
+        if (r4 != 0) goto L_0x2132;
+    L_0x20e8:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x2088:
+    L_0x20ea:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6449,7 +6504,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x209c:
+    L_0x20fe:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r0 = r146;
@@ -6465,8 +6520,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.totalHeight = r4;
         r0 = r146;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x116a;
-    L_0x20bf:
+        if (r4 == 0) goto L_0x11a1;
+    L_0x2121:
         r0 = r146;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -6474,25 +6529,25 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.namesOffset = r4;
-        goto L_0x116a;
-    L_0x20d0:
+        goto L_0x11a1;
+    L_0x2132:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x2088;
-    L_0x20d3:
+        goto L_0x20ea;
+    L_0x2135:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2100;
-    L_0x20dd:
+        if (r4 == 0) goto L_0x2162;
+    L_0x213f:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x2100;
-    L_0x20e3:
+        if (r4 == 0) goto L_0x2162;
+    L_0x2145:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x2100;
-    L_0x20e9:
+        if (r4 != 0) goto L_0x2162;
+    L_0x214b:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x20eb:
+    L_0x214d:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6500,32 +6555,32 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-        goto L_0x209c;
-    L_0x2100:
+        goto L_0x20fe;
+    L_0x2162:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x20eb;
-    L_0x2103:
+        goto L_0x214d;
+    L_0x2165:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.fwd_from;
-        if (r4 == 0) goto L_0x2350;
-    L_0x210b:
+        if (r4 == 0) goto L_0x23b0;
+    L_0x216d:
         r0 = r147;
         r4 = r0.type;
         r6 = 13;
-        if (r4 == r6) goto L_0x2350;
-    L_0x2113:
+        if (r4 == r6) goto L_0x23b0;
+    L_0x2175:
         r4 = 1;
-    L_0x2114:
+    L_0x2176:
         r0 = r146;
         r0.drawForwardedName = r4;
         r0 = r147;
         r4 = r0.type;
         r6 = 9;
-        if (r4 == r6) goto L_0x2353;
-    L_0x2120:
+        if (r4 == r6) goto L_0x23b3;
+    L_0x2182:
         r4 = 1;
-    L_0x2121:
+    L_0x2183:
         r0 = r146;
         r0.mediaBackground = r4;
         r4 = 1;
@@ -6541,43 +6596,44 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.gifState;
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 == 0) goto L_0x215e;
-    L_0x213f:
-        r4 = org.telegram.messenger.MediaController.getInstance();
-        r4 = r4.canAutoplayGifs();
-        if (r4 != 0) goto L_0x215e;
-    L_0x2149:
+        if (r4 == 0) goto L_0x21ba;
+    L_0x21a1:
+        r4 = org.telegram.messenger.SharedConfig.autoplayGifs;
+        if (r4 != 0) goto L_0x21ba;
+    L_0x21a5:
         r0 = r147;
         r4 = r0.type;
         r6 = 8;
-        if (r4 == r6) goto L_0x2158;
-    L_0x2151:
+        if (r4 == r6) goto L_0x21b4;
+    L_0x21ad:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x215e;
-    L_0x2158:
+        if (r4 != r6) goto L_0x21ba;
+    L_0x21b4:
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r0 = r147;
         r0.gifState = r4;
-    L_0x215e:
+    L_0x21ba:
         r4 = r147.isRoundVideo();
-        if (r4 == 0) goto L_0x2359;
-    L_0x2164:
+        if (r4 == 0) goto L_0x23b9;
+    L_0x21c0:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = 1;
         r4.setAllowDecodeSingleFrame(r6);
         r0 = r146;
         r6 = r0.photoImage;
-        r4 = org.telegram.messenger.MediaController.getInstance();
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MediaController.getInstance(r4);
         r4 = r4.getPlayingMessageObject();
-        if (r4 != 0) goto L_0x2356;
-    L_0x217a:
+        if (r4 != 0) goto L_0x23b6;
+    L_0x21da:
         r4 = 1;
-    L_0x217b:
+    L_0x21db:
         r6.setAllowStartAnimation(r4);
-    L_0x217e:
+    L_0x21de:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = r147.isSecretPhoto();
@@ -6585,24 +6641,24 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r147;
         r4 = r0.type;
         r6 = 9;
-        if (r4 != r6) goto L_0x23c6;
-    L_0x2191:
+        if (r4 != r6) goto L_0x2426;
+    L_0x21f1:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2372;
-    L_0x2197:
+        if (r4 == 0) goto L_0x23d2;
+    L_0x21f7:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x236e;
-    L_0x21a1:
+        if (r4 == 0) goto L_0x23ce;
+    L_0x2201:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x236e;
-    L_0x21a7:
+        if (r4 == 0) goto L_0x23ce;
+    L_0x2207:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x236e;
-    L_0x21ad:
+        if (r4 != 0) goto L_0x23ce;
+    L_0x220d:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x21af:
+    L_0x220f:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6610,10 +6666,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x21c3:
+    L_0x2223:
         r4 = r146.checkNeedDrawShareButton(r147);
-        if (r4 == 0) goto L_0x21d8;
-    L_0x21c9:
+        if (r4 == 0) goto L_0x2238;
+    L_0x2229:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
@@ -6621,7 +6677,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x21d8:
+    L_0x2238:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1124728832; // 0x430a0000 float:138.0 double:5.55689877E-315;
@@ -6634,38 +6690,38 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r147;
         r4 = r0.caption;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 != 0) goto L_0x21ff;
-    L_0x21f7:
+        if (r4 != 0) goto L_0x225f;
+    L_0x2257:
         r4 = 1118568448; // 0x42ac0000 float:86.0 double:5.526462427E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r26 = r26 + r4;
-    L_0x21ff:
+    L_0x225f:
         r0 = r146;
         r4 = r0.drawPhotoImage;
-        if (r4 == 0) goto L_0x23a3;
-    L_0x2205:
+        if (r4 == 0) goto L_0x2403;
+    L_0x2265:
         r4 = 1118568448; // 0x42ac0000 float:86.0 double:5.526462427E-315;
         r113 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = 1118568448; // 0x42ac0000 float:86.0 double:5.526462427E-315;
         r112 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x2211:
+    L_0x2271:
         r0 = r26;
         r1 = r146;
         r1.availableTimeWidth = r0;
         r0 = r146;
         r4 = r0.drawPhotoImage;
-        if (r4 != 0) goto L_0x2260;
-    L_0x221d:
+        if (r4 != 0) goto L_0x22c0;
+    L_0x227d:
         r0 = r147;
         r4 = r0.caption;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 == 0) goto L_0x2260;
-    L_0x2227:
+        if (r4 == 0) goto L_0x22c0;
+    L_0x2287:
         r0 = r146;
         r4 = r0.infoLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x2260;
-    L_0x2231:
+        if (r4 <= 0) goto L_0x22c0;
+    L_0x2291:
         r146.measureTime(r147);
         r0 = r146;
         r4 = r0.backgroundWidth;
@@ -6683,34 +6739,34 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r4 = r0.timeWidth;
         r0 = r131;
-        if (r0 >= r4) goto L_0x2260;
-    L_0x2258:
+        if (r0 >= r4) goto L_0x22c0;
+    L_0x22b8:
         r4 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r112 = r112 + r4;
-    L_0x2260:
+    L_0x22c0:
         r146.setMessageObjectInternal(r147);
         r0 = r146;
         r4 = r0.drawForwardedName;
-        if (r4 == 0) goto L_0x33bd;
-    L_0x2269:
+        if (r4 == 0) goto L_0x3439;
+    L_0x22c9:
         r4 = r147.needDrawForwarded();
-        if (r4 == 0) goto L_0x33bd;
-    L_0x226f:
+        if (r4 == 0) goto L_0x3439;
+    L_0x22cf:
         r0 = r146;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x227d;
-    L_0x2275:
+        if (r4 == 0) goto L_0x22dd;
+    L_0x22d5:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.minY;
-        if (r4 != 0) goto L_0x33bd;
-    L_0x227d:
+        if (r4 != 0) goto L_0x3439;
+    L_0x22dd:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 == r6) goto L_0x2293;
-    L_0x2284:
+        if (r4 == r6) goto L_0x22f3;
+    L_0x22e4:
         r0 = r146;
         r4 = r0.namesOffset;
         r6 = 1084227584; // 0x40a00000 float:5.0 double:5.356796015E-315;
@@ -6718,7 +6774,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.namesOffset = r4;
-    L_0x2293:
+    L_0x22f3:
         r4 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r4 + r112;
@@ -6730,14 +6786,14 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.totalHeight = r4;
         r0 = r146;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x22c5;
-    L_0x22ac:
+        if (r4 == 0) goto L_0x2325;
+    L_0x230c:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 8;
-        if (r4 != 0) goto L_0x22c5;
-    L_0x22b6:
+        if (r4 != 0) goto L_0x2325;
+    L_0x2316:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
@@ -6745,59 +6801,59 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.totalHeight = r4;
-    L_0x22c5:
+    L_0x2325:
         r45 = 0;
         r0 = r146;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x231d;
-    L_0x22cd:
+        if (r4 == 0) goto L_0x237d;
+    L_0x232d:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 2;
-        if (r4 != 0) goto L_0x22df;
-    L_0x22d7:
+        if (r4 != 0) goto L_0x233f;
+    L_0x2337:
         r4 = 1082130432; // 0x40800000 float:4.0 double:5.34643471E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r113 = r113 + r4;
-    L_0x22df:
+    L_0x233f:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 1;
-        if (r4 != 0) goto L_0x22f1;
-    L_0x22e9:
+        if (r4 != 0) goto L_0x2351;
+    L_0x2349:
         r4 = 1082130432; // 0x40800000 float:4.0 double:5.34643471E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r113 = r113 + r4;
-    L_0x22f1:
+    L_0x2351:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 4;
-        if (r4 != 0) goto L_0x230b;
-    L_0x22fb:
+        if (r4 != 0) goto L_0x236b;
+    L_0x235b:
         r4 = 1082130432; // 0x40800000 float:4.0 double:5.34643471E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r112 = r112 + r4;
         r4 = 1082130432; // 0x40800000 float:4.0 double:5.34643471E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r45 = r45 - r4;
-    L_0x230b:
+    L_0x236b:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 8;
-        if (r4 != 0) goto L_0x231d;
-    L_0x2315:
+        if (r4 != 0) goto L_0x237d;
+    L_0x2375:
         r4 = 1082130432; // 0x40800000 float:4.0 double:5.34643471E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r112 = r112 + r4;
-    L_0x231d:
+    L_0x237d:
         r0 = r146;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x2332;
-    L_0x2323:
+        if (r4 == 0) goto L_0x2392;
+    L_0x2383:
         r0 = r146;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -6805,7 +6861,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.namesOffset = r4;
-    L_0x2332:
+    L_0x2392:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = 0;
@@ -6819,50 +6875,50 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r1 = r112;
         r4.setImageCoords(r6, r8, r0, r1);
         r146.invalidate();
-        goto L_0x116a;
-    L_0x2350:
+        goto L_0x11a1;
+    L_0x23b0:
         r4 = 0;
-        goto L_0x2114;
-    L_0x2353:
+        goto L_0x2176;
+    L_0x23b3:
         r4 = 0;
-        goto L_0x2121;
-    L_0x2356:
+        goto L_0x2183;
+    L_0x23b6:
         r4 = 0;
-        goto L_0x217b;
-    L_0x2359:
+        goto L_0x21db;
+    L_0x23b9:
         r0 = r146;
         r6 = r0.photoImage;
         r0 = r147;
         r4 = r0.gifState;
         r8 = 0;
         r4 = (r4 > r8 ? 1 : (r4 == r8 ? 0 : -1));
-        if (r4 != 0) goto L_0x236c;
-    L_0x2366:
+        if (r4 != 0) goto L_0x23cc;
+    L_0x23c6:
         r4 = 1;
-    L_0x2367:
+    L_0x23c7:
         r6.setAllowStartAnimation(r4);
-        goto L_0x217e;
-    L_0x236c:
+        goto L_0x21de;
+    L_0x23cc:
         r4 = 0;
-        goto L_0x2367;
-    L_0x236e:
+        goto L_0x23c7;
+    L_0x23ce:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x21af;
-    L_0x2372:
+        goto L_0x220f;
+    L_0x23d2:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x23a0;
-    L_0x237c:
+        if (r4 == 0) goto L_0x2400;
+    L_0x23dc:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x23a0;
-    L_0x2382:
+        if (r4 == 0) goto L_0x2400;
+    L_0x23e2:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x23a0;
-    L_0x2388:
+        if (r4 != 0) goto L_0x2400;
+    L_0x23e8:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x238a:
+    L_0x23ea:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6870,11 +6926,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-        goto L_0x21c3;
-    L_0x23a0:
+        goto L_0x2223;
+    L_0x2400:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x238a;
-    L_0x23a3:
+        goto L_0x23ea;
+    L_0x2403:
         r4 = 1113587712; // 0x42600000 float:56.0 double:5.50185432E-315;
         r113 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = 1113587712; // 0x42600000 float:56.0 double:5.50185432E-315;
@@ -6882,22 +6938,22 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r147;
         r4 = r0.caption;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 == 0) goto L_0x23c3;
-    L_0x23b9:
+        if (r4 == 0) goto L_0x2423;
+    L_0x2419:
         r4 = 1112276992; // 0x424c0000 float:51.0 double:5.495378504E-315;
-    L_0x23bb:
+    L_0x241b:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r26 = r26 + r4;
-        goto L_0x2211;
-    L_0x23c3:
+        goto L_0x2271;
+    L_0x2423:
         r4 = 1101529088; // 0x41a80000 float:21.0 double:5.442276803E-315;
-        goto L_0x23bb;
-    L_0x23c6:
+        goto L_0x241b;
+    L_0x2426:
         r0 = r147;
         r4 = r0.type;
         r6 = 4;
-        if (r4 != r6) goto L_0x2854;
-    L_0x23cd:
+        if (r4 != r6) goto L_0x28b4;
+    L_0x242d:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -6914,24 +6970,24 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaGeoLive;
-        if (r4 == 0) goto L_0x2686;
-    L_0x23ef:
+        if (r4 == 0) goto L_0x26e6;
+    L_0x244f:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2615;
-    L_0x23f5:
+        if (r4 == 0) goto L_0x2675;
+    L_0x2455:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2611;
-    L_0x23ff:
+        if (r4 == 0) goto L_0x2671;
+    L_0x245f:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x2611;
-    L_0x2405:
+        if (r4 == 0) goto L_0x2671;
+    L_0x2465:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x2611;
-    L_0x240b:
+        if (r4 != 0) goto L_0x2671;
+    L_0x246b:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x240d:
+    L_0x246d:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1133543424; // 0x43908000 float:289.0 double:5.60044864E-315;
@@ -6939,10 +6995,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x2422:
+    L_0x2482:
         r4 = r146.checkNeedDrawShareButton(r147);
-        if (r4 == 0) goto L_0x2437;
-    L_0x2428:
+        if (r4 == 0) goto L_0x2497;
+    L_0x2488:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
@@ -6950,7 +7006,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x2437:
+    L_0x2497:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1108606976; // 0x42140000 float:37.0 double:5.477246216E-315;
@@ -7062,8 +7118,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r146.isCurrentLocationTimeExpired(r147);
         r0 = r146;
         r0.locationExpired = r4;
-        if (r4 != 0) goto L_0x2647;
-    L_0x2541:
+        if (r4 != 0) goto L_0x26a7;
+    L_0x25a1:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = 1;
@@ -7080,10 +7136,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = 1;
         r0 = r146;
         r0.scheduledInvalidate = r4;
-    L_0x2562:
+    L_0x25c2:
         r23 = new android.text.StaticLayout;
         r4 = "AttachLiveLocation";
-        r6 = 2131427488; // 0x7f0b00a0 float:1.8476594E38 double:1.0530650984E-314;
+        r6 = 2131493027; // 0x7f0c00a3 float:1.8609523E38 double:1.053097479E-314;
         r24 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r25 = org.telegram.ui.ActionBar.Theme.chat_locationTitlePaint;
         r27 = android.text.Layout.Alignment.ALIGN_NORMAL;
@@ -7098,25 +7154,25 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r146.updateCurrentUserAndChat();
         r0 = r146;
         r4 = r0.currentUser;
-        if (r4 == 0) goto L_0x2658;
-    L_0x258c:
+        if (r4 == 0) goto L_0x26b8;
+    L_0x25ec:
         r0 = r146;
         r4 = r0.currentUser;
         r4 = r4.photo;
-        if (r4 == 0) goto L_0x259e;
-    L_0x2594:
+        if (r4 == 0) goto L_0x25fe;
+    L_0x25f4:
         r0 = r146;
         r4 = r0.currentUser;
         r4 = r4.photo;
         r0 = r4.photo_small;
         r22 = r0;
-    L_0x259e:
+    L_0x25fe:
         r0 = r146;
         r4 = r0.contactAvatarDrawable;
         r0 = r146;
         r6 = r0.currentUser;
         r4.setInfo(r6);
-    L_0x25a9:
+    L_0x2609:
         r0 = r146;
         r0 = r0.locationImageReceiver;
         r27 = r0;
@@ -7132,13 +7188,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.edit_date;
-        if (r4 == 0) goto L_0x267d;
-    L_0x25cb:
+        if (r4 == 0) goto L_0x26dd;
+    L_0x262b:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.edit_date;
         r8 = (long) r4;
-    L_0x25d2:
+    L_0x2632:
         r24 = org.telegram.messenger.LocaleController.formatLocationUpdateDate(r8);
         r25 = org.telegram.ui.ActionBar.Theme.chat_locationAddressPaint;
         r27 = android.text.Layout.Alignment.ALIGN_NORMAL;
@@ -7149,11 +7205,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r23;
         r1 = r146;
         r1.infoLayout = r0;
-    L_0x25e9:
+    L_0x2649:
         r0 = r146;
         r4 = r0.currentUrl;
-        if (r4 == 0) goto L_0x2260;
-    L_0x25ef:
+        if (r4 == 0) goto L_0x22c0;
+    L_0x264f:
         r0 = r146;
         r0 = r0.photoImage;
         r27 = r0;
@@ -7163,33 +7219,33 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r29 = 0;
         r6 = org.telegram.ui.ActionBar.Theme.chat_locationDrawable;
         r4 = r147.isOutOwner();
-        if (r4 == 0) goto L_0x2851;
-    L_0x2605:
+        if (r4 == 0) goto L_0x28b1;
+    L_0x2665:
         r4 = 1;
-    L_0x2606:
+    L_0x2666:
         r30 = r6[r4];
         r31 = 0;
         r32 = 0;
         r27.setImage(r28, r29, r30, r31, r32);
-        goto L_0x2260;
-    L_0x2611:
+        goto L_0x22c0;
+    L_0x2671:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x240d;
-    L_0x2615:
+        goto L_0x246d;
+    L_0x2675:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2644;
-    L_0x261f:
+        if (r4 == 0) goto L_0x26a4;
+    L_0x267f:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x2644;
-    L_0x2625:
+        if (r4 == 0) goto L_0x26a4;
+    L_0x2685:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x2644;
-    L_0x262b:
+        if (r4 != 0) goto L_0x26a4;
+    L_0x268b:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x262d:
+    L_0x268d:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1133543424; // 0x43908000 float:289.0 double:5.60044864E-315;
@@ -7197,11 +7253,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-        goto L_0x2422;
-    L_0x2644:
+        goto L_0x2482;
+    L_0x26a4:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x262d;
-    L_0x2647:
+        goto L_0x268d;
+    L_0x26a7:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
@@ -7209,59 +7265,59 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.backgroundWidth = r4;
-        goto L_0x2562;
-    L_0x2658:
+        goto L_0x25c2;
+    L_0x26b8:
         r0 = r146;
         r4 = r0.currentChat;
-        if (r4 == 0) goto L_0x25a9;
-    L_0x265e:
+        if (r4 == 0) goto L_0x2609;
+    L_0x26be:
         r0 = r146;
         r4 = r0.currentChat;
         r4 = r4.photo;
-        if (r4 == 0) goto L_0x2670;
-    L_0x2666:
+        if (r4 == 0) goto L_0x26d0;
+    L_0x26c6:
         r0 = r146;
         r4 = r0.currentChat;
         r4 = r4.photo;
         r0 = r4.photo_small;
         r22 = r0;
-    L_0x2670:
+    L_0x26d0:
         r0 = r146;
         r4 = r0.contactAvatarDrawable;
         r0 = r146;
         r6 = r0.currentChat;
         r4.setInfo(r6);
-        goto L_0x25a9;
-    L_0x267d:
+        goto L_0x2609;
+    L_0x26dd:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.date;
         r8 = (long) r4;
-        goto L_0x25d2;
-    L_0x2686:
+        goto L_0x2632;
+    L_0x26e6:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.title;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 != 0) goto L_0x27e9;
-    L_0x2694:
+        if (r4 != 0) goto L_0x2849;
+    L_0x26f4:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x27b1;
-    L_0x269a:
+        if (r4 == 0) goto L_0x2811;
+    L_0x26fa:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x27ad;
-    L_0x26a4:
+        if (r4 == 0) goto L_0x280d;
+    L_0x2704:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x27ad;
-    L_0x26aa:
+        if (r4 == 0) goto L_0x280d;
+    L_0x270a:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x27ad;
-    L_0x26b0:
+        if (r4 != 0) goto L_0x280d;
+    L_0x2710:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x26b2:
+    L_0x2712:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -7269,10 +7325,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x26c6:
+    L_0x2726:
         r4 = r146.checkNeedDrawShareButton(r147);
-        if (r4 == 0) goto L_0x26db;
-    L_0x26cc:
+        if (r4 == 0) goto L_0x273b;
+    L_0x272c:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
@@ -7280,7 +7336,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x26db:
+    L_0x273b:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1123418112; // 0x42f60000 float:123.0 double:5.55042295E-315;
@@ -7309,15 +7365,15 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.address;
-        if (r4 == 0) goto L_0x27e2;
-    L_0x271b:
+        if (r4 == 0) goto L_0x2842;
+    L_0x277b:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.address;
         r4 = r4.length();
-        if (r4 <= 0) goto L_0x27e2;
-    L_0x2729:
+        if (r4 <= 0) goto L_0x2842;
+    L_0x2789:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7336,7 +7392,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r24, r25, r26, r27, r28, r29, r30, r31, r32, r33);
         r0 = r146;
         r0.infoLayout = r4;
-    L_0x2750:
+    L_0x27b0:
         r4 = 0;
         r0 = r146;
         r0.mediaBackground = r4;
@@ -7377,25 +7433,25 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.String.format(r4, r6, r8);
         r0 = r146;
         r0.currentUrl = r4;
-        goto L_0x25e9;
-    L_0x27ad:
+        goto L_0x2649;
+    L_0x280d:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x26b2;
-    L_0x27b1:
+        goto L_0x2712;
+    L_0x2811:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x27df;
-    L_0x27bb:
+        if (r4 == 0) goto L_0x283f;
+    L_0x281b:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x27df;
-    L_0x27c1:
+        if (r4 == 0) goto L_0x283f;
+    L_0x2821:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x27df;
-    L_0x27c7:
+        if (r4 != 0) goto L_0x283f;
+    L_0x2827:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x27c9:
+    L_0x2829:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -7403,16 +7459,16 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.Math.min(r4, r6);
         r0 = r146;
         r0.backgroundWidth = r4;
-        goto L_0x26c6;
-    L_0x27df:
+        goto L_0x2726;
+    L_0x283f:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x27c9;
-    L_0x27e2:
+        goto L_0x2829;
+    L_0x2842:
         r4 = 0;
         r0 = r146;
         r0.infoLayout = r4;
-        goto L_0x2750;
-    L_0x27e9:
+        goto L_0x27b0;
+    L_0x2849:
         r4 = 1127874560; // 0x433a0000 float:186.0 double:5.57244073E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r146;
@@ -7456,21 +7512,21 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = java.lang.String.format(r4, r6, r8);
         r0 = r146;
         r0.currentUrl = r4;
-        goto L_0x25e9;
-    L_0x2851:
+        goto L_0x2649;
+    L_0x28b1:
         r4 = 0;
-        goto L_0x2606;
-    L_0x2854:
+        goto L_0x2666;
+    L_0x28b4:
         r0 = r147;
         r4 = r0.type;
         r6 = 13;
-        if (r4 != r6) goto L_0x29eb;
-    L_0x285c:
+        if (r4 != r6) goto L_0x2a4b;
+    L_0x28bc:
         r4 = 0;
         r0 = r146;
         r0.drawBackground = r4;
         r41 = 0;
-    L_0x2863:
+    L_0x28c3:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7478,8 +7534,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x2899;
-    L_0x2875:
+        if (r0 >= r4) goto L_0x28f9;
+    L_0x28d5:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7490,33 +7546,33 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeImageSize;
-        if (r4 == 0) goto L_0x2967;
-    L_0x288d:
+        if (r4 == 0) goto L_0x29c7;
+    L_0x28ed:
         r0 = r46;
         r0 = r0.w;
         r113 = r0;
         r0 = r46;
         r0 = r0.h;
         r112 = r0;
-    L_0x2899:
+    L_0x28f9:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x296b;
-    L_0x289f:
+        if (r4 == 0) goto L_0x29cb;
+    L_0x28ff:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r4 = (float) r4;
         r6 = 1053609165; // 0x3ecccccd float:0.4 double:5.205520926E-315;
         r26 = r4 * r6;
         r96 = r26;
-    L_0x28ab:
-        if (r113 != 0) goto L_0x28ba;
-    L_0x28ad:
+    L_0x290b:
+        if (r113 != 0) goto L_0x291a;
+    L_0x290d:
         r0 = r96;
         r0 = (int) r0;
         r112 = r0;
         r4 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r113 = r112 + r4;
-    L_0x28ba:
+    L_0x291a:
         r0 = r112;
         r4 = (float) r0;
         r0 = r113;
@@ -7531,8 +7587,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r112;
         r4 = (float) r0;
         r4 = (r4 > r96 ? 1 : (r4 == r96 ? 0 : -1));
-        if (r4 <= 0) goto L_0x28e3;
-    L_0x28d2:
+        if (r4 <= 0) goto L_0x2943;
+    L_0x2932:
         r0 = r113;
         r4 = (float) r0;
         r0 = r112;
@@ -7544,7 +7600,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r96;
         r0 = (int) r0;
         r112 = r0;
-    L_0x28e3:
+    L_0x2943:
         r4 = 6;
         r0 = r146;
         r0.documentAttachType = r4;
@@ -7566,8 +7622,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.currentPhotoObjectThumb = r4;
         r0 = r147;
         r4 = r0.attachPathExists;
-        if (r4 == 0) goto L_0x2983;
-    L_0x2914:
+        if (r4 == 0) goto L_0x29e3;
+    L_0x2974:
         r0 = r146;
         r0 = r0.photoImage;
         r27 = r0;
@@ -7590,13 +7646,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r31 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x2980;
-    L_0x2946:
+        if (r4 == 0) goto L_0x29e0;
+    L_0x29a6:
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
         r0 = r4.location;
         r32 = r0;
-    L_0x294e:
+    L_0x29ae:
         r33 = "b1";
         r0 = r147;
         r4 = r0.messageOwner;
@@ -7607,11 +7663,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r35 = "webp";
         r36 = 1;
         r27.setImage(r28, r29, r30, r31, r32, r33, r34, r35, r36);
-        goto L_0x2260;
-    L_0x2967:
+        goto L_0x22c0;
+    L_0x29c7:
         r41 = r41 + 1;
-        goto L_0x2863;
-    L_0x296b:
+        goto L_0x28c3;
+    L_0x29cb:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -7621,11 +7677,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
         r26 = r4 * r6;
         r96 = r26;
-        goto L_0x28ab;
-    L_0x2980:
+        goto L_0x290b;
+    L_0x29e0:
         r32 = 0;
-        goto L_0x294e;
-    L_0x2983:
+        goto L_0x29ae;
+    L_0x29e3:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7633,8 +7689,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r8 = r4.id;
         r10 = 0;
         r4 = (r8 > r10 ? 1 : (r8 == r10 ? 0 : -1));
-        if (r4 == 0) goto L_0x2260;
-    L_0x2993:
+        if (r4 == 0) goto L_0x22c0;
+    L_0x29f3:
         r0 = r146;
         r0 = r0.photoImage;
         r27 = r0;
@@ -7658,13 +7714,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r31 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x29e8;
-    L_0x29c7:
+        if (r4 == 0) goto L_0x2a48;
+    L_0x2a27:
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
         r0 = r4.location;
         r32 = r0;
-    L_0x29cf:
+    L_0x2a2f:
         r33 = "b1";
         r0 = r147;
         r4 = r0.messageOwner;
@@ -7675,54 +7731,54 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r35 = "webp";
         r36 = 1;
         r27.setImage(r28, r29, r30, r31, r32, r33, r34, r35, r36);
-        goto L_0x2260;
-    L_0x29e8:
+        goto L_0x22c0;
+    L_0x2a48:
         r32 = 0;
-        goto L_0x29cf;
-    L_0x29eb:
+        goto L_0x2a2f;
+    L_0x2a4b:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x2bd8;
-    L_0x29f2:
+        if (r4 != r6) goto L_0x2c38;
+    L_0x2a52:
         r113 = org.telegram.messenger.AndroidUtilities.roundMessageSize;
         r97 = r113;
-    L_0x29f6:
+    L_0x2a56:
         r4 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r112 = r113 + r4;
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 == r6) goto L_0x2a1b;
-    L_0x2a05:
+        if (r4 == r6) goto L_0x2a7b;
+    L_0x2a65:
         r4 = r146.checkNeedDrawShareButton(r147);
-        if (r4 == 0) goto L_0x2a1b;
-    L_0x2a0b:
+        if (r4 == 0) goto L_0x2a7b;
+    L_0x2a6b:
         r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r97 = r97 - r4;
         r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r113 = r113 - r4;
-    L_0x2a1b:
+    L_0x2a7b:
         r4 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
         r0 = r113;
-        if (r0 <= r4) goto L_0x2a27;
-    L_0x2a23:
+        if (r0 <= r4) goto L_0x2a87;
+    L_0x2a83:
         r113 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
-    L_0x2a27:
+    L_0x2a87:
         r4 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
         r0 = r112;
-        if (r0 <= r4) goto L_0x2a33;
-    L_0x2a2f:
+        if (r0 <= r4) goto L_0x2a93;
+    L_0x2a8f:
         r112 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
-    L_0x2a33:
+    L_0x2a93:
         r0 = r147;
         r4 = r0.type;
         r6 = 1;
-        if (r4 != r6) goto L_0x2c06;
-    L_0x2a3a:
+        if (r4 != r6) goto L_0x2c66;
+    L_0x2a9a:
         r146.updateSecretTimeText(r147);
         r0 = r147;
         r4 = r0.photoThumbs;
@@ -7730,19 +7786,19 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = org.telegram.messenger.FileLoader.getClosestPhotoSizeWithSize(r4, r6);
         r0 = r146;
         r0.currentPhotoObjectThumb = r4;
-    L_0x2a4b:
+    L_0x2aab:
         r0 = r146;
         r4 = r0.currentMessagesGroup;
-        if (r4 != 0) goto L_0x2a5c;
-    L_0x2a51:
+        if (r4 != 0) goto L_0x2abc;
+    L_0x2ab1:
         r0 = r147;
         r4 = r0.caption;
-        if (r4 == 0) goto L_0x2a5c;
-    L_0x2a57:
+        if (r4 == 0) goto L_0x2abc;
+    L_0x2ab7:
         r4 = 0;
         r0 = r146;
         r0.mediaBackground = r4;
-    L_0x2a5c:
+    L_0x2abc:
         r0 = r147;
         r4 = r0.photoThumbs;
         r6 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
@@ -7753,22 +7809,22 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r76 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x2a85;
-    L_0x2a76:
+        if (r4 == 0) goto L_0x2ae5;
+    L_0x2ad6:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r146;
         r6 = r0.currentPhotoObjectThumb;
-        if (r4 != r6) goto L_0x2a85;
-    L_0x2a80:
+        if (r4 != r6) goto L_0x2ae5;
+    L_0x2ae0:
         r4 = 0;
         r0 = r146;
         r0.currentPhotoObjectThumb = r4;
-    L_0x2a85:
+    L_0x2ae5:
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x2ad9;
-    L_0x2a8b:
+        if (r4 == 0) goto L_0x2b39;
+    L_0x2aeb:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
@@ -7790,20 +7846,20 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 / r122;
         r0 = (int) r4;
         r76 = r0;
-        if (r139 != 0) goto L_0x2ab7;
-    L_0x2ab1:
+        if (r139 != 0) goto L_0x2b17;
+    L_0x2b11:
         r4 = 1125515264; // 0x43160000 float:150.0 double:5.56078426E-315;
         r139 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x2ab7:
-        if (r76 != 0) goto L_0x2abf;
-    L_0x2ab9:
+    L_0x2b17:
+        if (r76 != 0) goto L_0x2b1f;
+    L_0x2b19:
         r4 = 1125515264; // 0x43160000 float:150.0 double:5.56078426E-315;
         r76 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x2abf:
+    L_0x2b1f:
         r0 = r76;
         r1 = r112;
-        if (r0 <= r1) goto L_0x2cc6;
-    L_0x2ac5:
+        if (r0 <= r1) goto L_0x2d26;
+    L_0x2b25:
         r0 = r76;
         r0 = (float) r0;
         r123 = r0;
@@ -7816,26 +7872,26 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 / r123;
         r0 = (int) r4;
         r139 = r0;
-    L_0x2ad9:
+    L_0x2b39:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x2ae4;
-    L_0x2ae0:
+        if (r4 != r6) goto L_0x2b44;
+    L_0x2b40:
         r76 = org.telegram.messenger.AndroidUtilities.roundMessageSize;
         r139 = r76;
-    L_0x2ae4:
-        if (r139 == 0) goto L_0x2ae8;
-    L_0x2ae6:
-        if (r76 != 0) goto L_0x2b5a;
-    L_0x2ae8:
+    L_0x2b44:
+        if (r139 == 0) goto L_0x2b48;
+    L_0x2b46:
+        if (r76 != 0) goto L_0x2bba;
+    L_0x2b48:
         r0 = r147;
         r4 = r0.type;
         r6 = 8;
-        if (r4 != r6) goto L_0x2b5a;
-    L_0x2af0:
+        if (r4 != r6) goto L_0x2bba;
+    L_0x2b50:
         r41 = 0;
-    L_0x2af2:
+    L_0x2b52:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7843,8 +7899,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x2b5a;
-    L_0x2b04:
+        if (r0 >= r4) goto L_0x2bba;
+    L_0x2b64:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7855,12 +7911,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeImageSize;
-        if (r4 != 0) goto L_0x2b22;
-    L_0x2b1c:
+        if (r4 != 0) goto L_0x2b82;
+    L_0x2b7c:
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeVideo;
-        if (r4 == 0) goto L_0x2d34;
-    L_0x2b22:
+        if (r4 == 0) goto L_0x2d94;
+    L_0x2b82:
         r0 = r46;
         r4 = r0.w;
         r4 = (float) r4;
@@ -7881,8 +7937,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r76 = r0;
         r0 = r76;
         r1 = r112;
-        if (r0 <= r1) goto L_0x2d00;
-    L_0x2b46:
+        if (r0 <= r1) goto L_0x2d60;
+    L_0x2ba6:
         r0 = r76;
         r0 = (float) r0;
         r123 = r0;
@@ -7895,49 +7951,49 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 / r123;
         r0 = (int) r4;
         r139 = r0;
-    L_0x2b5a:
-        if (r139 == 0) goto L_0x2b5e;
-    L_0x2b5c:
-        if (r76 != 0) goto L_0x2b66;
-    L_0x2b5e:
+    L_0x2bba:
+        if (r139 == 0) goto L_0x2bbe;
+    L_0x2bbc:
+        if (r76 != 0) goto L_0x2bc6;
+    L_0x2bbe:
         r4 = 1125515264; // 0x43160000 float:150.0 double:5.56078426E-315;
         r76 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r139 = r76;
-    L_0x2b66:
+    L_0x2bc6:
         r0 = r147;
         r4 = r0.type;
         r6 = 3;
-        if (r4 != r6) goto L_0x2b88;
-    L_0x2b6d:
+        if (r4 != r6) goto L_0x2be8;
+    L_0x2bcd:
         r0 = r146;
         r4 = r0.infoWidth;
         r6 = 1109393408; // 0x42200000 float:40.0 double:5.481131706E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r4 = r4 + r6;
         r0 = r139;
-        if (r0 >= r4) goto L_0x2b88;
-    L_0x2b7c:
+        if (r0 >= r4) goto L_0x2be8;
+    L_0x2bdc:
         r0 = r146;
         r4 = r0.infoWidth;
         r6 = 1109393408; // 0x42200000 float:40.0 double:5.481131706E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r139 = r4 + r6;
-    L_0x2b88:
+    L_0x2be8:
         r0 = r146;
         r4 = r0.currentMessagesGroup;
-        if (r4 == 0) goto L_0x2e66;
-    L_0x2b8e:
+        if (r4 == 0) goto L_0x2ec6;
+    L_0x2bee:
         r72 = 0;
         r63 = r146.getGroupPhotosWidth();
         r41 = 0;
-    L_0x2b96:
+    L_0x2bf6:
         r0 = r146;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x2d38;
-    L_0x2ba4:
+        if (r0 >= r4) goto L_0x2d98;
+    L_0x2c04:
         r0 = r146;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
@@ -7946,8 +8002,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r114 = (org.telegram.messenger.MessageObject.GroupedMessagePosition) r114;
         r0 = r114;
         r4 = r0.minY;
-        if (r4 != 0) goto L_0x2d38;
-    L_0x2bb8:
+        if (r4 != 0) goto L_0x2d98;
+    L_0x2c18:
         r0 = r72;
         r8 = (double) r0;
         r0 = r114;
@@ -7967,11 +8023,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = (int) r8;
         r72 = r0;
         r41 = r41 + 1;
-        goto L_0x2b96;
-    L_0x2bd8:
+        goto L_0x2bf6;
+    L_0x2c38:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2bee;
-    L_0x2bde:
+        if (r4 == 0) goto L_0x2c4e;
+    L_0x2c3e:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r4 = (float) r4;
         r6 = 1060320051; // 0x3f333333 float:0.7 double:5.23867711E-315;
@@ -7979,8 +8035,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = (int) r4;
         r113 = r0;
         r97 = r113;
-        goto L_0x29f6;
-    L_0x2bee:
+        goto L_0x2a56;
+    L_0x2c4e:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -7992,21 +8048,21 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = (int) r4;
         r113 = r0;
         r97 = r113;
-        goto L_0x29f6;
-    L_0x2c06:
+        goto L_0x2a56;
+    L_0x2c66:
         r0 = r147;
         r4 = r0.type;
         r6 = 3;
-        if (r4 != r6) goto L_0x2c39;
-    L_0x2c0d:
+        if (r4 != r6) goto L_0x2c99;
+    L_0x2c6d:
         r4 = 0;
         r0 = r146;
         r1 = r147;
         r0.createDocumentLayout(r4, r1);
         r146.updateSecretTimeText(r147);
         r4 = r147.isSecretPhoto();
-        if (r4 != 0) goto L_0x2c2e;
-    L_0x2c1e:
+        if (r4 != 0) goto L_0x2c8e;
+    L_0x2c7e:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = 1;
@@ -8015,21 +8071,21 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.photoImage;
         r6 = 1;
         r4.setShouldGenerateQualityThumb(r6);
-    L_0x2c2e:
+    L_0x2c8e:
         r0 = r146;
         r4 = r0.photoImage;
         r0 = r147;
         r4.setParentMessageObject(r0);
-        goto L_0x2a4b;
-    L_0x2c39:
+        goto L_0x2aab;
+    L_0x2c99:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x2c61;
-    L_0x2c40:
+        if (r4 != r6) goto L_0x2cc1;
+    L_0x2ca0:
         r4 = r147.isSecretPhoto();
-        if (r4 != 0) goto L_0x2c56;
-    L_0x2c46:
+        if (r4 != 0) goto L_0x2cb6;
+    L_0x2ca6:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = 1;
@@ -8038,18 +8094,18 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.photoImage;
         r6 = 1;
         r4.setShouldGenerateQualityThumb(r6);
-    L_0x2c56:
+    L_0x2cb6:
         r0 = r146;
         r4 = r0.photoImage;
         r0 = r147;
         r4.setParentMessageObject(r0);
-        goto L_0x2a4b;
-    L_0x2c61:
+        goto L_0x2aab;
+    L_0x2cc1:
         r0 = r147;
         r4 = r0.type;
         r6 = 8;
-        if (r4 != r6) goto L_0x2a4b;
-    L_0x2c69:
+        if (r4 != r6) goto L_0x2aab;
+    L_0x2cc9:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -8079,8 +8135,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r1 = r146;
         r1.infoLayout = r0;
         r4 = r147.isSecretPhoto();
-        if (r4 != 0) goto L_0x2cbb;
-    L_0x2cab:
+        if (r4 != 0) goto L_0x2d1b;
+    L_0x2d0b:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = 1;
@@ -8089,18 +8145,18 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.photoImage;
         r6 = 1;
         r4.setShouldGenerateQualityThumb(r6);
-    L_0x2cbb:
+    L_0x2d1b:
         r0 = r146;
         r4 = r0.photoImage;
         r0 = r147;
         r4.setParentMessageObject(r0);
-        goto L_0x2a4b;
-    L_0x2cc6:
+        goto L_0x2aab;
+    L_0x2d26:
         r4 = 1123024896; // 0x42f00000 float:120.0 double:5.548480205E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r76;
-        if (r0 >= r4) goto L_0x2ad9;
-    L_0x2cd0:
+        if (r0 >= r4) goto L_0x2b39;
+    L_0x2d30:
         r4 = 1123024896; // 0x42f00000 float:120.0 double:5.548480205E-315;
         r76 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r146;
@@ -8118,8 +8174,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r113;
         r6 = (float) r0;
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 >= 0) goto L_0x2ad9;
-    L_0x2cf2:
+        if (r4 >= 0) goto L_0x2b39;
+    L_0x2d52:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
@@ -8127,13 +8183,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 / r77;
         r0 = (int) r4;
         r139 = r0;
-        goto L_0x2ad9;
-    L_0x2d00:
+        goto L_0x2b39;
+    L_0x2d60:
         r4 = 1123024896; // 0x42f00000 float:120.0 double:5.548480205E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r76;
-        if (r0 >= r4) goto L_0x2b5a;
-    L_0x2d0a:
+        if (r0 >= r4) goto L_0x2bba;
+    L_0x2d6a:
         r4 = 1123024896; // 0x42f00000 float:120.0 double:5.548480205E-315;
         r76 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r46;
@@ -8149,30 +8205,30 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r113;
         r6 = (float) r0;
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 >= 0) goto L_0x2b5a;
-    L_0x2d28:
+        if (r4 >= 0) goto L_0x2bba;
+    L_0x2d88:
         r0 = r46;
         r4 = r0.w;
         r4 = (float) r4;
         r4 = r4 / r77;
         r0 = (int) r4;
         r139 = r0;
-        goto L_0x2b5a;
-    L_0x2d34:
+        goto L_0x2bba;
+    L_0x2d94:
         r41 = r41 + 1;
-        goto L_0x2af2;
-    L_0x2d38:
+        goto L_0x2b52;
+    L_0x2d98:
         r4 = 1108082688; // 0x420c0000 float:35.0 double:5.47465589E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r72 - r4;
         r0 = r146;
         r0.availableTimeWidth = r4;
-    L_0x2d44:
+    L_0x2da4:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x2d6f;
-    L_0x2d4b:
+        if (r4 != r6) goto L_0x2dcf;
+    L_0x2dab:
         r0 = r146;
         r4 = r0.availableTimeWidth;
         r8 = (double) r4;
@@ -8190,28 +8246,28 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = (int) r8;
         r0 = r146;
         r0.availableTimeWidth = r4;
-    L_0x2d6f:
+    L_0x2dcf:
         r146.measureTime(r147);
         r0 = r146;
         r6 = r0.timeWidth;
         r4 = r147.isOutOwner();
-        if (r4 == 0) goto L_0x2e74;
-    L_0x2d7c:
+        if (r4 == 0) goto L_0x2ed4;
+    L_0x2ddc:
         r4 = 20;
-    L_0x2d7e:
+    L_0x2dde:
         r4 = r4 + 14;
         r4 = (float) r4;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r133 = r6 + r4;
         r0 = r139;
         r1 = r133;
-        if (r0 >= r1) goto L_0x2d8f;
-    L_0x2d8d:
+        if (r0 >= r1) goto L_0x2def;
+    L_0x2ded:
         r139 = r133;
-    L_0x2d8f:
+    L_0x2def:
         r4 = r147.isRoundVideo();
-        if (r4 == 0) goto L_0x2e77;
-    L_0x2d95:
+        if (r4 == 0) goto L_0x2ed7;
+    L_0x2df5:
         r0 = r139;
         r1 = r76;
         r76 = java.lang.Math.min(r0, r1);
@@ -8223,13 +8279,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.photoImage;
         r6 = r139 / 2;
         r4.setRoundRadius(r6);
-    L_0x2dad:
+    L_0x2e0d:
         r28 = 0;
         r30 = 0;
         r0 = r146;
         r4 = r0.currentMessagesGroup;
-        if (r4 == 0) goto L_0x3105;
-    L_0x2db7:
+        if (r4 == 0) goto L_0x3165;
+    L_0x2e17:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -8255,37 +8311,37 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.minY;
-        if (r4 == 0) goto L_0x2efe;
-    L_0x2dea:
+        if (r4 == 0) goto L_0x2f5e;
+    L_0x2e4a:
         r4 = r147.isOutOwner();
-        if (r4 == 0) goto L_0x2dfa;
-    L_0x2df0:
+        if (r4 == 0) goto L_0x2e5a;
+    L_0x2e50:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 1;
-        if (r4 != 0) goto L_0x2e0a;
-    L_0x2dfa:
+        if (r4 != 0) goto L_0x2e6a;
+    L_0x2e5a:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x2efe;
-    L_0x2e00:
+        if (r4 != 0) goto L_0x2f5e;
+    L_0x2e60:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 2;
-        if (r4 == 0) goto L_0x2efe;
-    L_0x2e0a:
+        if (r4 == 0) goto L_0x2f5e;
+    L_0x2e6a:
         r72 = 0;
         r61 = 0;
         r41 = 0;
-    L_0x2e10:
+    L_0x2e70:
         r0 = r146;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x2efa;
-    L_0x2e1e:
+        if (r0 >= r4) goto L_0x2f5a;
+    L_0x2e7e:
         r0 = r146;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
@@ -8294,8 +8350,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r114 = (org.telegram.messenger.MessageObject.GroupedMessagePosition) r114;
         r0 = r114;
         r4 = r0.minY;
-        if (r4 != 0) goto L_0x2eac;
-    L_0x2e32:
+        if (r4 != 0) goto L_0x2f0c;
+    L_0x2e92:
         r0 = r72;
         r10 = (double) r0;
         r0 = r114;
@@ -8310,8 +8366,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r18 = java.lang.Math.ceil(r8);
         r0 = r114;
         r4 = r0.leftSpanOffset;
-        if (r4 == 0) goto L_0x2ea9;
-    L_0x2e4c:
+        if (r4 == 0) goto L_0x2f09;
+    L_0x2eac:
         r0 = r114;
         r4 = r0.leftSpanOffset;
         r4 = (float) r4;
@@ -8322,31 +8378,31 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 * r6;
         r8 = (double) r4;
         r8 = java.lang.Math.ceil(r8);
-    L_0x2e5d:
+    L_0x2ebd:
         r8 = r8 + r18;
         r8 = r8 + r10;
         r0 = (int) r8;
         r72 = r0;
-    L_0x2e63:
+    L_0x2ec3:
         r41 = r41 + 1;
-        goto L_0x2e10;
-    L_0x2e66:
+        goto L_0x2e70;
+    L_0x2ec6:
         r4 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r97 - r4;
         r0 = r146;
         r0.availableTimeWidth = r4;
-        goto L_0x2d44;
-    L_0x2e74:
+        goto L_0x2da4;
+    L_0x2ed4:
         r4 = 0;
-        goto L_0x2d7e;
-    L_0x2e77:
+        goto L_0x2dde;
+    L_0x2ed7:
         r4 = r147.isSecretPhoto();
-        if (r4 == 0) goto L_0x2dad;
-    L_0x2e7d:
+        if (r4 == 0) goto L_0x2e0d;
+    L_0x2edd:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2e92;
-    L_0x2e83:
+        if (r4 == 0) goto L_0x2ef2;
+    L_0x2ee3:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r4 = (float) r4;
         r6 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
@@ -8354,8 +8410,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = (int) r4;
         r76 = r0;
         r139 = r76;
-        goto L_0x2dad;
-    L_0x2e92:
+        goto L_0x2e0d;
+    L_0x2ef2:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -8367,18 +8423,18 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = (int) r4;
         r76 = r0;
         r139 = r76;
-        goto L_0x2dad;
-    L_0x2ea9:
+        goto L_0x2e0d;
+    L_0x2f09:
         r8 = 0;
-        goto L_0x2e5d;
-    L_0x2eac:
+        goto L_0x2ebd;
+    L_0x2f0c:
         r0 = r114;
         r4 = r0.minY;
         r0 = r146;
         r6 = r0.currentPosition;
         r6 = r6.minY;
-        if (r4 != r6) goto L_0x2eee;
-    L_0x2eb8:
+        if (r4 != r6) goto L_0x2f4e;
+    L_0x2f18:
         r0 = r61;
         r10 = (double) r0;
         r0 = r114;
@@ -8393,8 +8449,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r18 = java.lang.Math.ceil(r8);
         r0 = r114;
         r4 = r0.leftSpanOffset;
-        if (r4 == 0) goto L_0x2eeb;
-    L_0x2ed2:
+        if (r4 == 0) goto L_0x2f4b;
+    L_0x2f32:
         r0 = r114;
         r4 = r0.leftSpanOffset;
         r4 = (float) r4;
@@ -8405,52 +8461,52 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 * r6;
         r8 = (double) r4;
         r8 = java.lang.Math.ceil(r8);
-    L_0x2ee3:
+    L_0x2f43:
         r8 = r8 + r18;
         r8 = r8 + r10;
         r0 = (int) r8;
         r61 = r0;
-        goto L_0x2e63;
-    L_0x2eeb:
+        goto L_0x2ec3;
+    L_0x2f4b:
         r8 = 0;
-        goto L_0x2ee3;
-    L_0x2eee:
+        goto L_0x2f43;
+    L_0x2f4e:
         r0 = r114;
         r4 = r0.minY;
         r0 = r146;
         r6 = r0.currentPosition;
         r6 = r6.minY;
-        if (r4 <= r6) goto L_0x2e63;
-    L_0x2efa:
+        if (r4 <= r6) goto L_0x2ec3;
+    L_0x2f5a:
         r4 = r72 - r61;
         r139 = r139 + r4;
-    L_0x2efe:
+    L_0x2f5e:
         r4 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r139 = r139 - r4;
         r0 = r146;
         r4 = r0.isAvatarVisible;
-        if (r4 == 0) goto L_0x2f14;
-    L_0x2f0c:
+        if (r4 == 0) goto L_0x2f74;
+    L_0x2f6c:
         r4 = 1111490560; // 0x42400000 float:48.0 double:5.491493014E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r139 = r139 - r4;
-    L_0x2f14:
+    L_0x2f74:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.siblingHeights;
-        if (r4 == 0) goto L_0x30f3;
-    L_0x2f1c:
+        if (r4 == 0) goto L_0x3153;
+    L_0x2f7c:
         r76 = 0;
         r41 = 0;
-    L_0x2f20:
+    L_0x2f80:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.siblingHeights;
         r4 = r4.length;
         r0 = r41;
-        if (r0 >= r4) goto L_0x2f40;
-    L_0x2f2b:
+        if (r0 >= r4) goto L_0x2fa0;
+    L_0x2f8b:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.siblingHeights;
@@ -8461,8 +8517,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = (int) r8;
         r76 = r76 + r4;
         r41 = r41 + 1;
-        goto L_0x2f20;
-    L_0x2f40:
+        goto L_0x2f80;
+    L_0x2fa0:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.maxY;
@@ -8474,7 +8530,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r4 = r4 * r6;
         r76 = r76 + r4;
-    L_0x2f56:
+    L_0x2fb6:
         r0 = r139;
         r1 = r146;
         r1.backgroundWidth = r0;
@@ -8485,82 +8541,82 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.edge;
-        if (r4 != 0) goto L_0x2f76;
-    L_0x2f6e:
+        if (r4 != 0) goto L_0x2fd6;
+    L_0x2fce:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r113 = r113 + r4;
-    L_0x2f76:
+    L_0x2fd6:
         r112 = r76;
-    L_0x2f78:
-        if (r28 == 0) goto L_0x300c;
-    L_0x2f7a:
-        r4 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x3151 }
+    L_0x2fd8:
+        if (r28 == 0) goto L_0x306c;
+    L_0x2fda:
+        r4 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x31b1 }
         r6 = 24;
-        if (r4 < r6) goto L_0x313a;
-    L_0x2f80:
+        if (r4 < r6) goto L_0x319a;
+    L_0x2fe0:
         r4 = 0;
-        r6 = r28.length();	 Catch:{ Exception -> 0x3151 }
-        r8 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x3151 }
+        r6 = r28.length();	 Catch:{ Exception -> 0x31b1 }
+        r8 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x31b1 }
         r0 = r28;
         r1 = r30;
-        r4 = android.text.StaticLayout.Builder.obtain(r0, r4, r6, r8, r1);	 Catch:{ Exception -> 0x3151 }
+        r4 = android.text.StaticLayout.Builder.obtain(r0, r4, r6, r8, r1);	 Catch:{ Exception -> 0x31b1 }
         r6 = 1;
-        r4 = r4.setBreakStrategy(r6);	 Catch:{ Exception -> 0x3151 }
+        r4 = r4.setBreakStrategy(r6);	 Catch:{ Exception -> 0x31b1 }
         r6 = 0;
-        r4 = r4.setHyphenationFrequency(r6);	 Catch:{ Exception -> 0x3151 }
-        r6 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3151 }
-        r4 = r4.setAlignment(r6);	 Catch:{ Exception -> 0x3151 }
-        r4 = r4.build();	 Catch:{ Exception -> 0x3151 }
+        r4 = r4.setHyphenationFrequency(r6);	 Catch:{ Exception -> 0x31b1 }
+        r6 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x31b1 }
+        r4 = r4.setAlignment(r6);	 Catch:{ Exception -> 0x31b1 }
+        r4 = r4.build();	 Catch:{ Exception -> 0x31b1 }
         r0 = r146;
-        r0.captionLayout = r4;	 Catch:{ Exception -> 0x3151 }
-    L_0x2fa7:
+        r0.captionLayout = r4;	 Catch:{ Exception -> 0x31b1 }
+    L_0x3007:
         r0 = r146;
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x3151 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x3151 }
-        if (r4 <= 0) goto L_0x300c;
-    L_0x2fb1:
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x31b1 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x31b1 }
+        if (r4 <= 0) goto L_0x306c;
+    L_0x3011:
         r0 = r146;
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x3151 }
-        r4 = r4.getHeight();	 Catch:{ Exception -> 0x3151 }
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x31b1 }
+        r4 = r4.getHeight();	 Catch:{ Exception -> 0x31b1 }
         r0 = r146;
-        r0.captionHeight = r4;	 Catch:{ Exception -> 0x3151 }
+        r0.captionHeight = r4;	 Catch:{ Exception -> 0x31b1 }
         r0 = r146;
-        r4 = r0.captionHeight;	 Catch:{ Exception -> 0x3151 }
+        r4 = r0.captionHeight;	 Catch:{ Exception -> 0x31b1 }
         r6 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3151 }
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x31b1 }
         r4 = r4 + r6;
         r43 = r43 + r4;
         r0 = r146;
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x3151 }
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x31b1 }
         r0 = r146;
-        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x3151 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x3151 }
+        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x31b1 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x31b1 }
         r6 = r6 + -1;
-        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x3151 }
+        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x31b1 }
         r0 = r146;
-        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x3151 }
+        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x31b1 }
         r0 = r146;
-        r8 = r0.captionLayout;	 Catch:{ Exception -> 0x3151 }
-        r8 = r8.getLineCount();	 Catch:{ Exception -> 0x3151 }
+        r8 = r0.captionLayout;	 Catch:{ Exception -> 0x31b1 }
+        r8 = r8.getLineCount();	 Catch:{ Exception -> 0x31b1 }
         r8 = r8 + -1;
-        r6 = r6.getLineLeft(r8);	 Catch:{ Exception -> 0x3151 }
+        r6 = r6.getLineLeft(r8);	 Catch:{ Exception -> 0x31b1 }
         r82 = r4 + r6;
         r4 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3151 }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x31b1 }
         r4 = r4 + r30;
-        r4 = (float) r4;	 Catch:{ Exception -> 0x3151 }
+        r4 = (float) r4;	 Catch:{ Exception -> 0x31b1 }
         r4 = r4 - r82;
         r0 = r133;
-        r6 = (float) r0;	 Catch:{ Exception -> 0x3151 }
+        r6 = (float) r0;	 Catch:{ Exception -> 0x31b1 }
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 >= 0) goto L_0x300c;
-    L_0x3002:
+        if (r4 >= 0) goto L_0x306c;
+    L_0x3062:
         r4 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3151 }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x31b1 }
         r43 = r43 + r4;
         r57 = 1;
-    L_0x300c:
+    L_0x306c:
         r4 = java.util.Locale.US;
         r6 = "%d_%d";
         r8 = 2;
@@ -8588,32 +8644,32 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.currentPhotoFilter = r4;
         r0 = r147;
         r4 = r0.photoThumbs;
-        if (r4 == 0) goto L_0x304d;
-    L_0x3042:
+        if (r4 == 0) goto L_0x30ad;
+    L_0x30a2:
         r0 = r147;
         r4 = r0.photoThumbs;
         r4 = r4.size();
         r6 = 1;
-        if (r4 > r6) goto L_0x3063;
-    L_0x304d:
+        if (r4 > r6) goto L_0x30c3;
+    L_0x30ad:
         r0 = r147;
         r4 = r0.type;
         r6 = 3;
-        if (r4 == r6) goto L_0x3063;
-    L_0x3054:
+        if (r4 == r6) goto L_0x30c3;
+    L_0x30b4:
         r0 = r147;
         r4 = r0.type;
         r6 = 8;
-        if (r4 == r6) goto L_0x3063;
-    L_0x305c:
+        if (r4 == r6) goto L_0x30c3;
+    L_0x30bc:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x30a1;
-    L_0x3063:
+        if (r4 != r6) goto L_0x3101;
+    L_0x30c3:
         r4 = r147.isSecretPhoto();
-        if (r4 == 0) goto L_0x3157;
-    L_0x3069:
+        if (r4 == 0) goto L_0x31b7;
+    L_0x30c9:
         r4 = new java.lang.StringBuilder;
         r4.<init>();
         r0 = r146;
@@ -8634,58 +8690,58 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4.toString();
         r0 = r146;
         r0.currentPhotoFilterThumb = r4;
-    L_0x30a1:
+    L_0x3101:
         r104 = 0;
         r0 = r147;
         r4 = r0.type;
         r6 = 3;
-        if (r4 == r6) goto L_0x30b9;
-    L_0x30aa:
+        if (r4 == r6) goto L_0x3119;
+    L_0x310a:
         r0 = r147;
         r4 = r0.type;
         r6 = 8;
-        if (r4 == r6) goto L_0x30b9;
-    L_0x30b2:
+        if (r4 == r6) goto L_0x3119;
+    L_0x3112:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x30bb;
-    L_0x30b9:
+        if (r4 != r6) goto L_0x311b;
+    L_0x3119:
         r104 = 1;
-    L_0x30bb:
+    L_0x311b:
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x30d2;
-    L_0x30c1:
-        if (r104 != 0) goto L_0x30d2;
-    L_0x30c3:
+        if (r4 == 0) goto L_0x3132;
+    L_0x3121:
+        if (r104 != 0) goto L_0x3132;
+    L_0x3123:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r4 = r4.size;
-        if (r4 != 0) goto L_0x30d2;
-    L_0x30cb:
+        if (r4 != 0) goto L_0x3132;
+    L_0x312b:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r6 = -1;
         r4.size = r6;
-    L_0x30d2:
+    L_0x3132:
         r0 = r147;
         r4 = r0.type;
         r6 = 1;
-        if (r4 != r6) goto L_0x3254;
-    L_0x30d9:
+        if (r4 != r6) goto L_0x32c0;
+    L_0x3139:
         r0 = r147;
         r4 = r0.useCustomPhoto;
-        if (r4 == 0) goto L_0x3175;
-    L_0x30df:
+        if (r4 == 0) goto L_0x31d5;
+    L_0x313f:
         r0 = r146;
         r4 = r0.photoImage;
         r6 = r146.getResources();
-        r8 = 2131100097; // 0x7f0601c1 float:1.7812566E38 double:1.052903346E-314;
+        r8 = 2131165649; // 0x7f0701d1 float:1.7945521E38 double:1.052935733E-314;
         r6 = r6.getDrawable(r8);
         r4.setImageBitmap(r6);
-        goto L_0x2260;
-    L_0x30f3:
+        goto L_0x22c0;
+    L_0x3153:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.ph;
@@ -8694,8 +8750,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r8 = java.lang.Math.ceil(r8);
         r0 = (int) r8;
         r76 = r0;
-        goto L_0x2f56;
-    L_0x3105:
+        goto L_0x2fb6;
+    L_0x3165:
         r113 = r139;
         r112 = r76;
         r4 = 1094713344; // 0x41400000 float:12.0 double:5.408602553E-315;
@@ -8705,8 +8761,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.backgroundWidth = r4;
         r0 = r146;
         r4 = r0.mediaBackground;
-        if (r4 != 0) goto L_0x312a;
-    L_0x311b:
+        if (r4 != 0) goto L_0x318a;
+    L_0x317b:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r6 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
@@ -8714,31 +8770,31 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.backgroundWidth = r4;
-    L_0x312a:
+    L_0x318a:
         r0 = r147;
         r0 = r0.caption;
         r28 = r0;
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r30 = r113 - r4;
-        goto L_0x2f78;
-    L_0x313a:
-        r27 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x3151 }
-        r29 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x3151 }
-        r31 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3151 }
+        goto L_0x2fd8;
+    L_0x319a:
+        r27 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x31b1 }
+        r29 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x31b1 }
+        r31 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x31b1 }
         r32 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r33 = 0;
         r34 = 0;
-        r27.<init>(r28, r29, r30, r31, r32, r33, r34);	 Catch:{ Exception -> 0x3151 }
+        r27.<init>(r28, r29, r30, r31, r32, r33, r34);	 Catch:{ Exception -> 0x31b1 }
         r0 = r27;
         r1 = r146;
-        r1.captionLayout = r0;	 Catch:{ Exception -> 0x3151 }
-        goto L_0x2fa7;
-    L_0x3151:
+        r1.captionLayout = r0;	 Catch:{ Exception -> 0x31b1 }
+        goto L_0x3007;
+    L_0x31b1:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-        goto L_0x300c;
-    L_0x3157:
+        goto L_0x306c;
+    L_0x31b7:
         r4 = new java.lang.StringBuilder;
         r4.<init>();
         r0 = r146;
@@ -8749,37 +8805,43 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4.toString();
         r0 = r146;
         r0.currentPhotoFilterThumb = r4;
-        goto L_0x30a1;
-    L_0x3175:
+        goto L_0x3101;
+    L_0x31d5:
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x3248;
-    L_0x317b:
+        if (r4 == 0) goto L_0x32b4;
+    L_0x31db:
         r111 = 1;
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r71 = org.telegram.messenger.FileLoader.getAttachFileName(r4);
         r0 = r147;
         r4 = r0.mediaExists;
-        if (r4 == 0) goto L_0x31ef;
-    L_0x318b:
-        r4 = org.telegram.messenger.MediaController.getInstance();
+        if (r4 == 0) goto L_0x325b;
+    L_0x31eb:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MediaController.getInstance(r4);
         r0 = r146;
         r4.removeLoadingFileObserver(r0);
-    L_0x3194:
-        if (r111 != 0) goto L_0x31b0;
-    L_0x3196:
-        r4 = org.telegram.messenger.MediaController.getInstance();
+    L_0x31f8:
+        if (r111 != 0) goto L_0x321c;
+    L_0x31fa:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MediaController.getInstance(r4);
         r0 = r146;
         r6 = r0.currentMessageObject;
         r4 = r4.canDownloadMedia(r6);
-        if (r4 != 0) goto L_0x31b0;
-    L_0x31a4:
-        r4 = org.telegram.messenger.FileLoader.getInstance();
+        if (r4 != 0) goto L_0x321c;
+    L_0x320c:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.FileLoader.getInstance(r4);
         r0 = r71;
         r4 = r4.isLoadingFile(r0);
-        if (r4 == 0) goto L_0x3201;
-    L_0x31b0:
+        if (r4 == 0) goto L_0x326d;
+    L_0x321c:
         r0 = r146;
         r0 = r0.photoImage;
         r31 = r0;
@@ -8792,53 +8854,53 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r33 = r0;
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x31f2;
-    L_0x31ca:
+        if (r4 == 0) goto L_0x325e;
+    L_0x3236:
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
         r0 = r4.location;
         r34 = r0;
-    L_0x31d2:
+    L_0x323e:
         r0 = r146;
         r0 = r0.currentPhotoFilterThumb;
         r35 = r0;
-        if (r104 == 0) goto L_0x31f5;
-    L_0x31da:
+        if (r104 == 0) goto L_0x3261;
+    L_0x3246:
         r36 = 0;
-    L_0x31dc:
+    L_0x3248:
         r37 = 0;
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.shouldEncryptPhotoOrVideo();
-        if (r4 == 0) goto L_0x31fe;
-    L_0x31e8:
+        if (r4 == 0) goto L_0x326a;
+    L_0x3254:
         r38 = 2;
-    L_0x31ea:
+    L_0x3256:
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2260;
-    L_0x31ef:
+        goto L_0x22c0;
+    L_0x325b:
         r111 = 0;
-        goto L_0x3194;
-    L_0x31f2:
+        goto L_0x31f8;
+    L_0x325e:
         r34 = 0;
-        goto L_0x31d2;
-    L_0x31f5:
+        goto L_0x323e;
+    L_0x3261:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r4.size;
         r36 = r0;
-        goto L_0x31dc;
-    L_0x31fe:
+        goto L_0x3248;
+    L_0x326a:
         r38 = 0;
-        goto L_0x31ea;
-    L_0x3201:
+        goto L_0x3256;
+    L_0x326d:
         r4 = 1;
         r0 = r146;
         r0.photoNotSet = r4;
         r0 = r146;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x323c;
-    L_0x320c:
+        if (r4 == 0) goto L_0x32a8;
+    L_0x3278:
         r0 = r146;
         r0 = r0.photoImage;
         r31 = r0;
@@ -8856,40 +8918,40 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.shouldEncryptPhotoOrVideo();
-        if (r4 == 0) goto L_0x3239;
-    L_0x3232:
+        if (r4 == 0) goto L_0x32a5;
+    L_0x329e:
         r38 = 2;
-    L_0x3234:
+    L_0x32a0:
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2260;
-    L_0x3239:
+        goto L_0x22c0;
+    L_0x32a5:
         r38 = 0;
-        goto L_0x3234;
-    L_0x323c:
+        goto L_0x32a0;
+    L_0x32a8:
         r0 = r146;
         r6 = r0.photoImage;
         r4 = 0;
         r4 = (android.graphics.drawable.Drawable) r4;
         r6.setImageBitmap(r4);
-        goto L_0x2260;
-    L_0x3248:
+        goto L_0x22c0;
+    L_0x32b4:
         r0 = r146;
         r6 = r0.photoImage;
         r4 = 0;
         r4 = (android.graphics.drawable.BitmapDrawable) r4;
         r6.setImageBitmap(r4);
-        goto L_0x2260;
-    L_0x3254:
+        goto L_0x22c0;
+    L_0x32c0:
         r0 = r147;
         r4 = r0.type;
         r6 = 8;
-        if (r4 == r6) goto L_0x3263;
-    L_0x325c:
+        if (r4 == r6) goto L_0x32cf;
+    L_0x32c8:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x3384;
-    L_0x3263:
+        if (r4 != r6) goto L_0x3400;
+    L_0x32cf:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -8898,62 +8960,68 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r88 = 0;
         r0 = r147;
         r4 = r0.attachPathExists;
-        if (r4 == 0) goto L_0x32ec;
-    L_0x3277:
-        r4 = org.telegram.messenger.MediaController.getInstance();
+        if (r4 == 0) goto L_0x3364;
+    L_0x32e3:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MediaController.getInstance(r4);
         r0 = r146;
         r4.removeLoadingFileObserver(r0);
         r88 = 1;
-    L_0x3282:
+    L_0x32f2:
         r49 = 0;
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.document;
         r4 = org.telegram.messenger.MessageObject.isNewGifDocument(r4);
-        if (r4 == 0) goto L_0x32f5;
-    L_0x3292:
-        r4 = org.telegram.messenger.MediaController.getInstance();
+        if (r4 == 0) goto L_0x336d;
+    L_0x3302:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MediaController.getInstance(r4);
         r0 = r146;
         r6 = r0.currentMessageObject;
         r49 = r4.canDownloadMedia(r6);
-    L_0x329e:
+    L_0x3312:
         r4 = r147.isSending();
-        if (r4 != 0) goto L_0x3353;
-    L_0x32a4:
-        if (r88 != 0) goto L_0x32b4;
-    L_0x32a6:
-        r4 = org.telegram.messenger.FileLoader.getInstance();
+        if (r4 != 0) goto L_0x33cf;
+    L_0x3318:
+        if (r88 != 0) goto L_0x332c;
+    L_0x331a:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.FileLoader.getInstance(r4);
         r0 = r71;
         r4 = r4.isLoadingFile(r0);
-        if (r4 != 0) goto L_0x32b4;
-    L_0x32b2:
-        if (r49 == 0) goto L_0x3353;
-    L_0x32b4:
+        if (r4 != 0) goto L_0x332c;
+    L_0x332a:
+        if (r49 == 0) goto L_0x33cf;
+    L_0x332c:
         r4 = 1;
         r0 = r88;
-        if (r0 != r4) goto L_0x3315;
-    L_0x32b9:
+        if (r0 != r4) goto L_0x3391;
+    L_0x3331:
         r0 = r146;
         r0 = r0.photoImage;
         r31 = r0;
         r32 = 0;
         r4 = r147.isSendError();
-        if (r4 == 0) goto L_0x3309;
-    L_0x32c7:
+        if (r4 == 0) goto L_0x3385;
+    L_0x333f:
         r33 = 0;
-    L_0x32c9:
+    L_0x3341:
         r34 = 0;
         r35 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x3312;
-    L_0x32d3:
+        if (r4 == 0) goto L_0x338e;
+    L_0x334b:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r36 = r0;
-    L_0x32db:
+    L_0x3353:
         r0 = r146;
         r0 = r0.currentPhotoFilterThumb;
         r37 = r0;
@@ -8961,35 +9029,37 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r39 = 0;
         r40 = 0;
         r31.setImage(r32, r33, r34, r35, r36, r37, r38, r39, r40);
-        goto L_0x2260;
-    L_0x32ec:
+        goto L_0x22c0;
+    L_0x3364:
         r0 = r147;
         r4 = r0.mediaExists;
-        if (r4 == 0) goto L_0x3282;
-    L_0x32f2:
+        if (r4 == 0) goto L_0x32f2;
+    L_0x336a:
         r88 = 2;
-        goto L_0x3282;
-    L_0x32f5:
+        goto L_0x32f2;
+    L_0x336d:
         r0 = r147;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x329e;
-    L_0x32fc:
-        r4 = org.telegram.messenger.MediaController.getInstance();
+        if (r4 != r6) goto L_0x3312;
+    L_0x3374:
+        r0 = r146;
+        r4 = r0.currentAccount;
+        r4 = org.telegram.messenger.MediaController.getInstance(r4);
         r0 = r146;
         r6 = r0.currentMessageObject;
         r49 = r4.canDownloadMedia(r6);
-        goto L_0x329e;
-    L_0x3309:
+        goto L_0x3312;
+    L_0x3385:
         r0 = r147;
         r4 = r0.messageOwner;
         r0 = r4.attachPath;
         r33 = r0;
-        goto L_0x32c9;
-    L_0x3312:
+        goto L_0x3341;
+    L_0x338e:
         r36 = 0;
-        goto L_0x32db;
-    L_0x3315:
+        goto L_0x3353;
+    L_0x3391:
         r0 = r146;
         r0 = r0.photoImage;
         r31 = r0;
@@ -9001,13 +9071,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r33 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x3350;
-    L_0x332d:
+        if (r4 == 0) goto L_0x33cc;
+    L_0x33a9:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r34 = r0;
-    L_0x3335:
+    L_0x33b1:
         r0 = r146;
         r0 = r0.currentPhotoFilterThumb;
         r35 = r0;
@@ -9020,11 +9090,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r37 = 0;
         r38 = 0;
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2260;
-    L_0x3350:
+        goto L_0x22c0;
+    L_0x33cc:
         r34 = 0;
-        goto L_0x3335;
-    L_0x3353:
+        goto L_0x33b1;
+    L_0x33cf:
         r4 = 1;
         r0 = r146;
         r0.photoNotSet = r4;
@@ -9035,13 +9105,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r33 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x3381;
-    L_0x3368:
+        if (r4 == 0) goto L_0x33fd;
+    L_0x33e4:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r34 = r0;
-    L_0x3370:
+    L_0x33ec:
         r0 = r146;
         r0 = r0.currentPhotoFilterThumb;
         r35 = r0;
@@ -9049,11 +9119,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r37 = 0;
         r38 = 0;
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2260;
-    L_0x3381:
+        goto L_0x22c0;
+    L_0x33fd:
         r34 = 0;
-        goto L_0x3370;
-    L_0x3384:
+        goto L_0x33ec;
+    L_0x3400:
         r0 = r146;
         r0 = r0.photoImage;
         r31 = r0;
@@ -9061,13 +9131,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r33 = 0;
         r0 = r146;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x33b7;
-    L_0x3394:
+        if (r4 == 0) goto L_0x3433;
+    L_0x3410:
         r0 = r146;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r34 = r0;
-    L_0x339c:
+    L_0x3418:
         r0 = r146;
         r0 = r0.currentPhotoFilterThumb;
         r35 = r0;
@@ -9076,28 +9146,28 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r4 = r0.currentMessageObject;
         r4 = r4.shouldEncryptPhotoOrVideo();
-        if (r4 == 0) goto L_0x33ba;
-    L_0x33b0:
+        if (r4 == 0) goto L_0x3436;
+    L_0x342c:
         r38 = 2;
-    L_0x33b2:
+    L_0x342e:
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2260;
-    L_0x33b7:
+        goto L_0x22c0;
+    L_0x3433:
         r34 = 0;
-        goto L_0x339c;
-    L_0x33ba:
+        goto L_0x3418;
+    L_0x3436:
         r38 = 0;
-        goto L_0x33b2;
-    L_0x33bd:
+        goto L_0x342e;
+    L_0x3439:
         r0 = r146;
         r4 = r0.drawNameLayout;
-        if (r4 == 0) goto L_0x2293;
-    L_0x33c3:
+        if (r4 == 0) goto L_0x22f3;
+    L_0x343f:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.reply_to_msg_id;
-        if (r4 != 0) goto L_0x2293;
-    L_0x33cb:
+        if (r4 != 0) goto L_0x22f3;
+    L_0x3447:
         r0 = r146;
         r4 = r0.namesOffset;
         r6 = 1088421888; // 0x40e00000 float:7.0 double:5.37751863E-315;
@@ -9105,38 +9175,38 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.namesOffset = r4;
-        goto L_0x2293;
-    L_0x33dc:
-        r31 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x3401 }
+        goto L_0x22f3;
+    L_0x3458:
+        r31 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x347d }
         r0 = r147;
-        r0 = r0.caption;	 Catch:{ Exception -> 0x3401 }
+        r0 = r0.caption;	 Catch:{ Exception -> 0x347d }
         r32 = r0;
-        r33 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x3401 }
+        r33 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x347d }
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3401 }
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x347d }
         r34 = r143 - r4;
-        r35 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3401 }
+        r35 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x347d }
         r36 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r37 = 0;
         r38 = 0;
-        r31.<init>(r32, r33, r34, r35, r36, r37, r38);	 Catch:{ Exception -> 0x3401 }
+        r31.<init>(r32, r33, r34, r35, r36, r37, r38);	 Catch:{ Exception -> 0x347d }
         r0 = r31;
         r1 = r146;
-        r1.captionLayout = r0;	 Catch:{ Exception -> 0x3401 }
-        goto L_0x11c9;
-    L_0x3401:
+        r1.captionLayout = r0;	 Catch:{ Exception -> 0x347d }
+        goto L_0x1200;
+    L_0x347d:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-        goto L_0x125d;
-    L_0x3407:
+        goto L_0x1294;
+    L_0x3483:
         r4 = 0;
-        goto L_0x11e3;
-    L_0x340a:
+        goto L_0x121a;
+    L_0x3486:
         r0 = r146;
         r4 = r0.widthBeforeNewTimeLine;
         r6 = -1;
-        if (r4 == r6) goto L_0x125d;
-    L_0x3411:
+        if (r4 == r6) goto L_0x1294;
+    L_0x348d:
         r0 = r146;
         r4 = r0.availableTimeWidth;
         r0 = r146;
@@ -9144,8 +9214,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r6 = r0.timeWidth;
-        if (r4 >= r6) goto L_0x125d;
-    L_0x3420:
+        if (r4 >= r6) goto L_0x1294;
+    L_0x349c:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
@@ -9153,24 +9223,24 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.totalHeight = r4;
-        goto L_0x125d;
-    L_0x3431:
+        goto L_0x1294;
+    L_0x34ad:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-        goto L_0x12fc;
-    L_0x3437:
+        goto L_0x1333;
+    L_0x34b3:
         r0 = r146;
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x3448 }
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x34c4 }
         r0 = r86;
         r6 = -r0;
-        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x3448 }
+        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x34c4 }
         r0 = r146;
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x3448 }
-        goto L_0x1392;
-    L_0x3448:
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x34c4 }
+        goto L_0x13c9;
+    L_0x34c4:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-    L_0x344c:
+    L_0x34c8:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1099431936; // 0x41880000 float:17.0 double:5.431915495E-315;
@@ -9178,8 +9248,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 + r6;
         r0 = r146;
         r0.totalHeight = r4;
-        if (r57 == 0) goto L_0x3480;
-    L_0x345d:
+        if (r57 == 0) goto L_0x34fc;
+    L_0x34d9:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
@@ -9189,8 +9259,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.totalHeight = r4;
         r4 = 2;
         r0 = r57;
-        if (r0 != r4) goto L_0x3480;
-    L_0x3471:
+        if (r0 != r4) goto L_0x34fc;
+    L_0x34ed:
         r0 = r146;
         r4 = r0.captionHeight;
         r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
@@ -9198,12 +9268,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.captionHeight = r4;
-    L_0x3480:
+    L_0x34fc:
         r0 = r146;
         r4 = r0.botButtons;
         r4.clear();
-        if (r101 == 0) goto L_0x349c;
-    L_0x3489:
+        if (r101 == 0) goto L_0x3518;
+    L_0x3505:
         r0 = r146;
         r4 = r0.botButtonsByData;
         r4.clear();
@@ -9213,17 +9283,17 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = 0;
         r0 = r146;
         r0.botButtonsLayout = r4;
-    L_0x349c:
+    L_0x3518:
         r0 = r146;
         r4 = r0.currentPosition;
-        if (r4 != 0) goto L_0x378a;
-    L_0x34a2:
+        if (r4 != 0) goto L_0x3806;
+    L_0x351e:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.reply_markup;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_replyInlineMarkup;
-        if (r4 == 0) goto L_0x378a;
-    L_0x34ac:
+        if (r4 == 0) goto L_0x3806;
+    L_0x3528:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.reply_markup;
@@ -9248,29 +9318,29 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r0.wantedBotKeyboardWidth;
         r0 = r146;
         r6 = r0.widthForButtons;
-        if (r4 <= r6) goto L_0x3522;
-    L_0x34e3:
+        if (r4 <= r6) goto L_0x359e;
+    L_0x355f:
         r0 = r146;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x3584;
-    L_0x34e9:
+        if (r4 == 0) goto L_0x3600;
+    L_0x3565:
         r4 = r147.needDrawAvatar();
-        if (r4 == 0) goto L_0x3584;
-    L_0x34ef:
+        if (r4 == 0) goto L_0x3600;
+    L_0x356b:
         r4 = r147.isOutOwner();
-        if (r4 != 0) goto L_0x3584;
-    L_0x34f5:
+        if (r4 != 0) goto L_0x3600;
+    L_0x3571:
         r4 = 1115160576; // 0x42780000 float:62.0 double:5.5096253E-315;
-    L_0x34f7:
+    L_0x3573:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = -r4;
         r93 = r0;
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x3588;
-    L_0x3504:
+        if (r4 == 0) goto L_0x3604;
+    L_0x3580:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r93 = r93 + r4;
-    L_0x350a:
+    L_0x3586:
         r0 = r146;
         r4 = r0.backgroundWidth;
         r0 = r147;
@@ -9281,7 +9351,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r146;
         r0.widthForButtons = r4;
         r73 = 1;
-    L_0x3522:
+    L_0x359e:
         r94 = 0;
         r107 = new java.util.HashMap;
         r0 = r146;
@@ -9290,35 +9360,35 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.<init>(r4);
         r0 = r147;
         r4 = r0.botButtonsLayout;
-        if (r4 == 0) goto L_0x3598;
-    L_0x3535:
+        if (r4 == 0) goto L_0x3614;
+    L_0x35b1:
         r0 = r146;
         r4 = r0.botButtonsLayout;
-        if (r4 == 0) goto L_0x3598;
-    L_0x353b:
+        if (r4 == 0) goto L_0x3614;
+    L_0x35b7:
         r0 = r146;
         r4 = r0.botButtonsLayout;
         r0 = r147;
         r6 = r0.botButtonsLayout;
         r6 = r6.toString();
         r4 = r4.equals(r6);
-        if (r4 == 0) goto L_0x3598;
-    L_0x354d:
+        if (r4 == 0) goto L_0x3614;
+    L_0x35c9:
         r108 = new java.util.HashMap;
         r0 = r146;
         r4 = r0.botButtonsByPosition;
         r0 = r108;
         r0.<init>(r4);
-    L_0x3558:
+    L_0x35d4:
         r0 = r146;
         r4 = r0.botButtonsByData;
         r4.clear();
         r41 = 0;
-    L_0x3561:
+    L_0x35dd:
         r0 = r41;
         r1 = r121;
-        if (r0 >= r1) goto L_0x3740;
-    L_0x3567:
+        if (r0 >= r1) goto L_0x37bc;
+    L_0x35e3:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.reply_markup;
@@ -9329,35 +9399,35 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r120;
         r4 = r0.buttons;
         r55 = r4.size();
-        if (r55 != 0) goto L_0x35ad;
-    L_0x3581:
+        if (r55 != 0) goto L_0x3629;
+    L_0x35fd:
         r41 = r41 + 1;
-        goto L_0x3561;
-    L_0x3584:
+        goto L_0x35dd;
+    L_0x3600:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        goto L_0x34f7;
-    L_0x3588:
+        goto L_0x3573;
+    L_0x3604:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r6.y;
         r4 = java.lang.Math.min(r4, r6);
         r93 = r93 + r4;
-        goto L_0x350a;
-    L_0x3598:
+        goto L_0x3586;
+    L_0x3614:
         r0 = r147;
         r4 = r0.botButtonsLayout;
-        if (r4 == 0) goto L_0x35aa;
-    L_0x359e:
+        if (r4 == 0) goto L_0x3626;
+    L_0x361a:
         r0 = r147;
         r4 = r0.botButtonsLayout;
         r4 = r4.toString();
         r0 = r146;
         r0.botButtonsLayout = r4;
-    L_0x35aa:
+    L_0x3626:
         r108 = 0;
-        goto L_0x3558;
-    L_0x35ad:
+        goto L_0x35d4;
+    L_0x3629:
         r0 = r146;
         r4 = r0.widthForButtons;
         r6 = 1084227584; // 0x40a00000 float:5.0 double:5.356796015E-315;
@@ -9365,14 +9435,14 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r8 = r55 + -1;
         r6 = r6 * r8;
         r6 = r4 - r6;
-        if (r73 != 0) goto L_0x36f9;
-    L_0x35be:
+        if (r73 != 0) goto L_0x3775;
+    L_0x363a:
         r0 = r146;
         r4 = r0.mediaBackground;
-        if (r4 == 0) goto L_0x36f9;
-    L_0x35c4:
+        if (r4 == 0) goto L_0x3775;
+    L_0x3640:
         r4 = 0;
-    L_0x35c5:
+    L_0x3641:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
@@ -9380,13 +9450,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r54 = r4 / r55;
         r50 = 0;
-    L_0x35d6:
+    L_0x3652:
         r0 = r120;
         r4 = r0.buttons;
         r4 = r4.size();
         r0 = r50;
-        if (r0 >= r4) goto L_0x3581;
-    L_0x35e2:
+        if (r0 >= r4) goto L_0x35fd;
+    L_0x365e:
         r53 = new org.telegram.ui.Cells.ChatMessageCell$BotButton;
         r4 = 0;
         r0 = r53;
@@ -9411,15 +9481,15 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0 = r50;
         r4 = r4.append(r0);
         r114 = r4.toString();
-        if (r108 == 0) goto L_0x36fd;
-    L_0x3625:
+        if (r108 == 0) goto L_0x3779;
+    L_0x36a1:
         r0 = r108;
         r1 = r114;
         r106 = r0.get(r1);
         r106 = (org.telegram.ui.Cells.ChatMessageCell.BotButton) r106;
-    L_0x362f:
-        if (r106 == 0) goto L_0x3709;
-    L_0x3631:
+    L_0x36ab:
+        if (r106 == 0) goto L_0x3785;
+    L_0x36ad:
         r4 = r106.progressAlpha;
         r0 = r53;
         r0.progressAlpha = r4;
@@ -9429,7 +9499,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r8 = r106.lastUpdateTime;
         r0 = r53;
         r0.lastUpdateTime = r8;
-    L_0x364c:
+    L_0x36c8:
         r0 = r146;
         r4 = r0.botButtonsByData;
         r0 = r81;
@@ -9461,19 +9531,19 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r0.height = r4;
         r4 = r53.button;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_keyboardButtonBuy;
-        if (r4 == 0) goto L_0x3714;
-    L_0x369b:
+        if (r4 == 0) goto L_0x3790;
+    L_0x3717:
         r0 = r147;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.flags;
         r4 = r4 & 4;
-        if (r4 == 0) goto L_0x3714;
-    L_0x36a7:
+        if (r4 == 0) goto L_0x3790;
+    L_0x3723:
         r4 = "PaymentReceipt";
-        r6 = 2131428520; // 0x7f0b04a8 float:1.8478687E38 double:1.0530656083E-314;
+        r6 = 2131494063; // 0x7f0c04af float:1.8611624E38 double:1.053097991E-314;
         r32 = org.telegram.messenger.LocaleController.getString(r4, r6);
-    L_0x36b1:
+    L_0x372d:
         r31 = new android.text.StaticLayout;
         r33 = org.telegram.ui.ActionBar.Theme.chat_botButtonPaint;
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
@@ -9496,31 +9566,31 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4.size();
         r4 = r4 + -1;
         r0 = r50;
-        if (r0 != r4) goto L_0x36f5;
-    L_0x36e6:
+        if (r0 != r4) goto L_0x3771;
+    L_0x3762:
         r4 = r53.x;
         r6 = r53.width;
         r4 = r4 + r6;
         r0 = r94;
         r94 = java.lang.Math.max(r0, r4);
-    L_0x36f5:
+    L_0x3771:
         r50 = r50 + 1;
-        goto L_0x35d6;
-    L_0x36f9:
+        goto L_0x3652;
+    L_0x3775:
         r4 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
-        goto L_0x35c5;
-    L_0x36fd:
+        goto L_0x3641;
+    L_0x3779:
         r0 = r107;
         r1 = r81;
         r106 = r0.get(r1);
         r106 = (org.telegram.ui.Cells.ChatMessageCell.BotButton) r106;
-        goto L_0x362f;
-    L_0x3709:
+        goto L_0x36ab;
+    L_0x3785:
         r8 = java.lang.System.currentTimeMillis();
         r0 = r53;
         r0.lastUpdateTime = r8;
-        goto L_0x364c;
-    L_0x3714:
+        goto L_0x36c8;
+    L_0x3790:
         r4 = r53.button;
         r4 = r4.text;
         r6 = org.telegram.ui.ActionBar.Theme.chat_botButtonPaint;
@@ -9537,20 +9607,20 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r8 = android.text.TextUtils.TruncateAt.END;
         r0 = r32;
         r32 = android.text.TextUtils.ellipsize(r0, r4, r6, r8);
-        goto L_0x36b1;
-    L_0x3740:
+        goto L_0x372d;
+    L_0x37bc:
         r0 = r94;
         r1 = r146;
         r1.widthForButtons = r0;
-    L_0x3746:
+    L_0x37c2:
         r0 = r146;
         r4 = r0.drawPinnedBottom;
-        if (r4 == 0) goto L_0x3795;
-    L_0x374c:
+        if (r4 == 0) goto L_0x3811;
+    L_0x37c8:
         r0 = r146;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x3795;
-    L_0x3752:
+        if (r4 == 0) goto L_0x3811;
+    L_0x37ce:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
@@ -9558,41 +9628,41 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.totalHeight = r4;
-    L_0x3761:
+    L_0x37dd:
         r0 = r147;
         r4 = r0.type;
         r6 = 13;
-        if (r4 != r6) goto L_0x377f;
-    L_0x3769:
+        if (r4 != r6) goto L_0x37fb;
+    L_0x37e5:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1116471296; // 0x428c0000 float:70.0 double:5.51610112E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
-        if (r4 >= r6) goto L_0x377f;
-    L_0x3775:
+        if (r4 >= r6) goto L_0x37fb;
+    L_0x37f1:
         r4 = 1116471296; // 0x428c0000 float:70.0 double:5.51610112E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r146;
         r0.totalHeight = r4;
-    L_0x377f:
+    L_0x37fb:
         r146.updateWaveform();
         r0 = r146;
         r1 = r64;
         r0.updateButtonState(r1);
         return;
-    L_0x378a:
+    L_0x3806:
         r4 = 0;
         r0 = r146;
         r0.substractBackgroundHeight = r4;
         r4 = 0;
         r0 = r146;
         r0.keyboardHeight = r4;
-        goto L_0x3746;
-    L_0x3795:
+        goto L_0x37c2;
+    L_0x3811:
         r0 = r146;
         r4 = r0.drawPinnedBottom;
-        if (r4 == 0) goto L_0x37ab;
-    L_0x379b:
+        if (r4 == 0) goto L_0x3827;
+    L_0x3817:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -9600,25 +9670,25 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.totalHeight = r4;
-        goto L_0x3761;
-    L_0x37ab:
+        goto L_0x37dd;
+    L_0x3827:
         r0 = r146;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x3761;
-    L_0x37b1:
+        if (r4 == 0) goto L_0x37dd;
+    L_0x382d:
         r0 = r146;
         r4 = r0.pinnedBottom;
-        if (r4 == 0) goto L_0x3761;
-    L_0x37b7:
+        if (r4 == 0) goto L_0x37dd;
+    L_0x3833:
         r0 = r146;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x3761;
-    L_0x37bd:
+        if (r4 == 0) goto L_0x37dd;
+    L_0x3839:
         r0 = r146;
         r4 = r0.currentPosition;
         r4 = r4.siblingHeights;
-        if (r4 != 0) goto L_0x3761;
-    L_0x37c5:
+        if (r4 != 0) goto L_0x37dd;
+    L_0x3841:
         r0 = r146;
         r4 = r0.totalHeight;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -9626,29 +9696,29 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         r4 = r4 - r6;
         r0 = r146;
         r0.totalHeight = r4;
-        goto L_0x3761;
-    L_0x37d5:
+        goto L_0x37dd;
+    L_0x3851:
         r70 = move-exception;
-        goto L_0x0cba;
-    L_0x37d8:
+        goto L_0x0cf7;
+    L_0x3854:
         r70 = move-exception;
         r12 = r119;
-        goto L_0x0b02;
-    L_0x37dd:
+        goto L_0x0b3f;
+    L_0x3859:
         r99 = r26;
-        goto L_0x1df0;
-    L_0x37e1:
+        goto L_0x1e52;
+    L_0x385d:
         r99 = r26;
-        goto L_0x1c13;
-    L_0x37e5:
+        goto L_0x1c71;
+    L_0x3861:
         r14 = r140;
-        goto L_0x17f9;
-    L_0x37e9:
+        goto L_0x1830;
+    L_0x3865:
         r14 = r140;
-        goto L_0x0db3;
-    L_0x37ed:
+        goto L_0x0dea;
+    L_0x3869:
         r12 = r119;
-        goto L_0x0bac;
+        goto L_0x0be9;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.setMessageObject(org.telegram.messenger.MessageObject, org.telegram.messenger.MessageObject$GroupedMessages, boolean, boolean):void");
     }
@@ -9748,8 +9818,8 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     this.buttonX += AndroidUtilities.dp(10.0f);
                     this.timeAudioX += AndroidUtilities.dp(10.0f);
                 }
-                this.seekBarWaveform.setSize(this.backgroundWidth - AndroidUtilities.dp((float) ((this.hasLinkPreview ? 10 : 0) + 92)), AndroidUtilities.dp(BitmapDescriptorFactory.HUE_ORANGE));
-                this.seekBar.setSize(this.backgroundWidth - AndroidUtilities.dp((float) ((this.hasLinkPreview ? 10 : 0) + 72)), AndroidUtilities.dp(BitmapDescriptorFactory.HUE_ORANGE));
+                this.seekBarWaveform.setSize(this.backgroundWidth - AndroidUtilities.dp((float) ((this.hasLinkPreview ? 10 : 0) + 92)), AndroidUtilities.dp(30.0f));
+                this.seekBar.setSize(this.backgroundWidth - AndroidUtilities.dp((float) ((this.hasLinkPreview ? 10 : 0) + 72)), AndroidUtilities.dp(30.0f));
                 this.seekBarY = (AndroidUtilities.dp(13.0f) + this.namesOffset) + this.mediaOffsetY;
                 this.buttonY = (AndroidUtilities.dp(13.0f) + this.namesOffset) + this.mediaOffsetY;
                 this.radialProgress.setProgressRect(this.buttonX, this.buttonY, this.buttonX + AndroidUtilities.dp(44.0f), this.buttonY + AndroidUtilities.dp(44.0f));
@@ -9773,7 +9843,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     this.buttonX += AndroidUtilities.dp(10.0f);
                     this.timeAudioX += AndroidUtilities.dp(10.0f);
                 }
-                this.seekBar.setSize(this.backgroundWidth - AndroidUtilities.dp((float) ((this.hasLinkPreview ? 10 : 0) + 65)), AndroidUtilities.dp(BitmapDescriptorFactory.HUE_ORANGE));
+                this.seekBar.setSize(this.backgroundWidth - AndroidUtilities.dp((float) ((this.hasLinkPreview ? 10 : 0) + 65)), AndroidUtilities.dp(30.0f));
                 this.seekBarY = (AndroidUtilities.dp(29.0f) + this.namesOffset) + this.mediaOffsetY;
                 this.buttonY = (AndroidUtilities.dp(13.0f) + this.namesOffset) + this.mediaOffsetY;
                 this.radialProgress.setProgressRect(this.buttonX, this.buttonY, this.buttonX + AndroidUtilities.dp(44.0f), this.buttonY + AndroidUtilities.dp(44.0f));
@@ -9854,7 +9924,6 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         int linkPreviewY;
         int x;
         int y;
-        float progress;
         int x1;
         int y1;
         RadialProgress radialProgress;
@@ -10065,7 +10134,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                             this.radialProgress.setProgressRect(this.buttonX, this.buttonY, this.buttonX + size, this.buttonY + size);
                         }
                     }
-                    if (this.currentMessageObject.isRoundVideo() && MediaController.getInstance().isPlayingMessage(this.currentMessageObject) && MediaController.getInstance().isRoundVideoDrawingReady()) {
+                    if (this.currentMessageObject.isRoundVideo() && MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject) && MediaController.getInstance(this.currentAccount).isRoundVideoDrawingReady()) {
                         imageDrawn = true;
                         this.drawTime = true;
                     } else {
@@ -10136,7 +10205,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     this.rect.set((float) linkX, (float) instantY, (float) (this.instantWidth + linkX), (float) (AndroidUtilities.dp(36.0f) + instantY));
                     canvas.drawRoundRect(this.rect, (float) AndroidUtilities.dp(6.0f), (float) AndroidUtilities.dp(6.0f), backPaint);
                     if (this.drawInstantViewType == 0) {
-                        setDrawableBounds(instantDrawable, (this.instantTextX + linkX) - AndroidUtilities.dp(15.0f), instantY + AndroidUtilities.dp(11.5f), AndroidUtilities.dp(9.0f), AndroidUtilities.dp(13.0f));
+                        BaseCell.setDrawableBounds(instantDrawable, (this.instantTextX + linkX) - AndroidUtilities.dp(15.0f), AndroidUtilities.dp(11.5f) + instantY, AndroidUtilities.dp(9.0f), AndroidUtilities.dp(13.0f));
                         instantDrawable.draw(canvas);
                     }
                     if (this.instantViewLayout != null) {
@@ -10149,7 +10218,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             }
             this.drawTime = true;
         } else if (this.drawPhotoImage) {
-            if (this.currentMessageObject.isRoundVideo() && MediaController.getInstance().isPlayingMessage(this.currentMessageObject) && MediaController.getInstance().isRoundVideoDrawingReady()) {
+            if (this.currentMessageObject.isRoundVideo() && MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject) && MediaController.getInstance(this.currentAccount).isRoundVideoDrawingReady()) {
                 imageDrawn = true;
                 this.drawTime = true;
             } else {
@@ -10189,7 +10258,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 }
             }
         }
-        if (this.buttonState == -1 && this.currentMessageObject.isSecretPhoto() && !MediaController.getInstance().isPlayingMessage(this.currentMessageObject) && this.photoImage.getVisible()) {
+        if (this.buttonState == -1 && this.currentMessageObject.isSecretPhoto() && !MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject) && this.photoImage.getVisible()) {
             int drawable = 4;
             if (this.currentMessageObject.messageOwner.destroyTime != 0) {
                 if (this.currentMessageObject.isOutOwner()) {
@@ -10198,12 +10267,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     drawable = 5;
                 }
             }
-            setDrawableBounds(Theme.chat_photoStatesDrawables[drawable][this.buttonPressed], this.buttonX, this.buttonY);
+            BaseCell.setDrawableBounds(Theme.chat_photoStatesDrawables[drawable][this.buttonPressed], this.buttonX, this.buttonY);
             Theme.chat_photoStatesDrawables[drawable][this.buttonPressed].setAlpha((int) ((255.0f * (1.0f - this.radialProgress.getAlpha())) * this.controlsAlpha));
             Theme.chat_photoStatesDrawables[drawable][this.buttonPressed].draw(canvas);
             if (this.currentMessageObject.messageOwner.destroyTime != 0) {
                 if (!this.currentMessageObject.isOutOwner()) {
-                    progress = ((float) Math.max(0, (((long) this.currentMessageObject.messageOwner.destroyTime) * 1000) - (System.currentTimeMillis() + ((long) (ConnectionsManager.getInstance().getTimeDifference() * 1000))))) / (((float) this.currentMessageObject.messageOwner.ttl) * 1000.0f);
+                    float progress;
+                    progress = ((float) Math.max(0, (((long) this.currentMessageObject.messageOwner.destroyTime) * 1000) - (System.currentTimeMillis() + ((long) (ConnectionsManager.getInstance(this.currentAccount).getTimeDifference() * 1000))))) / (((float) this.currentMessageObject.messageOwner.ttl) * 1000.0f);
                     Theme.chat_deleteProgressPaint.setAlpha((int) (255.0f * this.controlsAlpha));
                     canvas.drawArc(this.deleteProgressRect, -90.0f, -360.0f * progress, true, Theme.chat_deleteProgressPaint);
                     if (progress != 0.0f) {
@@ -10223,16 +10293,16 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 this.otherX = i2;
                 int imageY = this.photoImage.getImageY() + AndroidUtilities.dp(8.1f);
                 this.otherY = imageY;
-                setDrawableBounds(drawable2, i2, imageY);
+                BaseCell.setDrawableBounds(drawable2, i2, imageY);
                 Theme.chat_msgMediaMenuDrawable.draw(canvas);
                 Theme.chat_msgMediaMenuDrawable.setAlpha(oldAlpha);
             }
         } else if (this.documentAttachType == 7 || this.currentMessageObject.type == 5) {
             if (this.durationLayout != null) {
-                boolean playing = MediaController.getInstance().isPlayingMessage(this.currentMessageObject);
+                boolean playing = MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject);
                 if (playing) {
                     this.rect.set(((float) this.photoImage.getImageX()) + AndroidUtilities.dpf2(1.5f), ((float) this.photoImage.getImageY()) + AndroidUtilities.dpf2(1.5f), ((float) this.photoImage.getImageX2()) - AndroidUtilities.dpf2(1.5f), ((float) this.photoImage.getImageY2()) - AndroidUtilities.dpf2(1.5f));
-                    canvas.drawArc(this.rect, -90.0f, 360.0f * this.currentMessageObject.audioProgress, false, Theme.chat_radialProgressPaint);
+                    canvas.drawArc(this.rect, -90.0f, this.currentMessageObject.audioProgress * 360.0f, false, Theme.chat_radialProgressPaint);
                 }
                 if (this.documentAttachType == 7) {
                     x1 = this.backgroundDrawableLeft + AndroidUtilities.dp(this.currentMessageObject.isOutOwner() ? 12.0f : 18.0f);
@@ -10249,12 +10319,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     this.rect.set((float) x1, (float) y1, (float) ((this.timeWidthAudio + x1) + AndroidUtilities.dp(22.0f)), (float) (AndroidUtilities.dp(17.0f) + y1));
                     canvas.drawRoundRect(this.rect, (float) AndroidUtilities.dp(4.0f), (float) AndroidUtilities.dp(4.0f), Theme.chat_actionBackgroundPaint);
                     if (playing || !this.currentMessageObject.isContentUnread()) {
-                        if (!playing || MediaController.getInstance().isMessagePaused()) {
+                        if (!playing || MediaController.getInstance(this.currentAccount).isMessagePaused()) {
                             this.roundVideoPlayingDrawable.stop();
                         } else {
                             this.roundVideoPlayingDrawable.start();
                         }
-                        setDrawableBounds(this.roundVideoPlayingDrawable, (this.timeWidthAudio + x1) + AndroidUtilities.dp(6.0f), AndroidUtilities.dp(2.3f) + y1);
+                        BaseCell.setDrawableBounds(this.roundVideoPlayingDrawable, (this.timeWidthAudio + x1) + AndroidUtilities.dp(6.0f), AndroidUtilities.dp(2.3f) + y1);
                         this.roundVideoPlayingDrawable.draw(canvas);
                     } else {
                         Theme.chat_docBackPaint.setColor(Theme.getColor(Theme.key_chat_mediaTimeText));
@@ -10290,7 +10360,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             this.songLayout.draw(canvas);
             canvas.restore();
             canvas.save();
-            if (MediaController.getInstance().isPlayingMessage(this.currentMessageObject)) {
+            if (MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject)) {
                 canvas.translate((float) this.seekBarX, (float) this.seekBarY);
                 this.seekBar.draw(canvas);
             } else {
@@ -10307,7 +10377,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             this.otherX = i;
             i2 = this.buttonY - AndroidUtilities.dp(5.0f);
             this.otherY = i2;
-            setDrawableBounds(menuDrawable, i, i2);
+            BaseCell.setDrawableBounds(menuDrawable, i, i2);
             menuDrawable.draw(canvas);
         } else if (this.documentAttachType == 3) {
             if (this.currentMessageObject.isOutOwner()) {
@@ -10350,7 +10420,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     this.otherX = i2;
                     imageY = this.photoImage.getImageY() + AndroidUtilities.dp(8.1f);
                     this.otherY = imageY;
-                    setDrawableBounds(drawable2, i2, imageY);
+                    BaseCell.setDrawableBounds(drawable2, i2, imageY);
                     Theme.chat_msgMediaMenuDrawable.draw(canvas);
                     Theme.chat_msgMediaMenuDrawable.setAlpha(oldAlpha);
                 }
@@ -10389,10 +10459,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     Theme.chat_locationAddressPaint.setColor(Theme.getColor(isDrawSelectedBackground() ? Theme.key_chat_inVenueInfoSelectedText : Theme.key_chat_inVenueInfoText));
                 }
                 if (this.currentMessageObject.messageOwner.media instanceof TL_messageMediaGeoLive) {
-                    int cy = this.photoImage.getImageY2() + AndroidUtilities.dp(BitmapDescriptorFactory.HUE_ORANGE);
+                    int cy = this.photoImage.getImageY2() + AndroidUtilities.dp(30.0f);
                     if (!this.locationExpired) {
                         this.forceNotDrawTime = true;
-                        progress = 1.0f - (((float) Math.abs(ConnectionsManager.getInstance().getCurrentTime() - this.currentMessageObject.messageOwner.date)) / ((float) this.currentMessageObject.messageOwner.media.period));
+                        progress = 1.0f - (((float) Math.abs(ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() - this.currentMessageObject.messageOwner.date)) / ((float) this.currentMessageObject.messageOwner.media.period));
                         this.rect.set((float) (this.photoImage.getImageX2() - AndroidUtilities.dp(43.0f)), (float) (cy - AndroidUtilities.dp(15.0f)), (float) (this.photoImage.getImageX2() - AndroidUtilities.dp(13.0f)), (float) (AndroidUtilities.dp(15.0f) + cy));
                         if (this.currentMessageObject.isOutOwner()) {
                             Theme.chat_radialProgress2Paint.setColor(Theme.getColor(Theme.key_chat_outInstant));
@@ -10405,7 +10475,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         canvas.drawCircle(this.rect.centerX(), this.rect.centerY(), (float) AndroidUtilities.dp(15.0f), Theme.chat_radialProgress2Paint);
                         Theme.chat_radialProgress2Paint.setAlpha(255);
                         canvas.drawArc(this.rect, -90.0f, -360.0f * progress, false, Theme.chat_radialProgress2Paint);
-                        String text = LocaleController.formatLocationLeftTime(Math.abs(this.currentMessageObject.messageOwner.media.period - (ConnectionsManager.getInstance().getCurrentTime() - this.currentMessageObject.messageOwner.date)));
+                        String text = LocaleController.formatLocationLeftTime(Math.abs(this.currentMessageObject.messageOwner.media.period - (ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() - this.currentMessageObject.messageOwner.date)));
                         canvas.drawText(text, this.rect.centerX() - (Theme.chat_livePaint.measureText(text) / 2.0f), (float) (AndroidUtilities.dp(4.0f) + cy), Theme.chat_livePaint);
                         canvas.save();
                         canvas.translate((float) (this.photoImage.getImageX() + AndroidUtilities.dp(10.0f)), (float) (this.photoImage.getImageY2() + AndroidUtilities.dp(10.0f)));
@@ -10416,7 +10486,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     }
                     int cx = (this.photoImage.getImageX() + (this.photoImage.getImageWidth() / 2)) - AndroidUtilities.dp(31.0f);
                     cy = (this.photoImage.getImageY() + (this.photoImage.getImageHeight() / 2)) - AndroidUtilities.dp(38.0f);
-                    setDrawableBounds(Theme.chat_msgAvatarLiveLocationDrawable, cx, cy);
+                    BaseCell.setDrawableBounds(Theme.chat_msgAvatarLiveLocationDrawable, cx, cy);
                     Theme.chat_msgAvatarLiveLocationDrawable.draw(canvas);
                     this.locationImageReceiver.setImageCoords(AndroidUtilities.dp(5.0f) + cx, AndroidUtilities.dp(5.0f) + cy, AndroidUtilities.dp(52.0f), AndroidUtilities.dp(52.0f));
                     this.locationImageReceiver.draw(canvas);
@@ -10476,12 +10546,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 }
                 phone = (isDrawSelectedBackground() || this.otherPressed) ? Theme.chat_msgInCallSelectedDrawable : Theme.chat_msgInCallDrawable;
             }
-            setDrawableBounds(icon, x - AndroidUtilities.dp(3.0f), AndroidUtilities.dp(36.0f) + this.namesOffset);
+            BaseCell.setDrawableBounds(icon, x - AndroidUtilities.dp(3.0f), AndroidUtilities.dp(36.0f) + this.namesOffset);
             icon.draw(canvas);
             i = AndroidUtilities.dp(205.0f) + x;
             i2 = AndroidUtilities.dp(22.0f);
             this.otherY = i2;
-            setDrawableBounds(phone, i, i2);
+            BaseCell.setDrawableBounds(phone, i, i2);
             phone.draw(canvas);
         } else if (this.currentMessageObject.type == 12) {
             Theme.chat_contactNamePaint.setColor(Theme.getColor(this.currentMessageObject.isOutOwner() ? Theme.key_chat_outContactNameText : Theme.key_chat_inContactNameText));
@@ -10503,7 +10573,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             this.otherX = i;
             i2 = this.photoImage.getImageY() - AndroidUtilities.dp(5.0f);
             this.otherY = i2;
-            setDrawableBounds(menuDrawable, i, i2);
+            BaseCell.setDrawableBounds(menuDrawable, i, i2);
             menuDrawable.draw(canvas);
         }
         if (this.currentPosition == null) {
@@ -10568,13 +10638,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     this.otherX = i;
                     i2 = this.photoImage.getImageY() + AndroidUtilities.dp(1.0f);
                     this.otherY = i2;
-                    setDrawableBounds(menuDrawable, i, i2);
+                    BaseCell.setDrawableBounds(menuDrawable, i, i2);
                 } else {
                     i = (this.photoImage.getImageX() + this.backgroundWidth) - AndroidUtilities.dp(40.0f);
                     this.otherX = i;
                     i2 = this.photoImage.getImageY() + AndroidUtilities.dp(1.0f);
                     this.otherY = i2;
-                    setDrawableBounds(menuDrawable, i, i2);
+                    BaseCell.setDrawableBounds(menuDrawable, i, i2);
                 }
                 x = (this.photoImage.getImageX() + this.photoImage.getImageWidth()) + AndroidUtilities.dp(10.0f);
                 titleY = this.photoImage.getImageY() + AndroidUtilities.dp(8.0f);
@@ -10620,7 +10690,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 this.otherX = i;
                 i2 = this.buttonY - AndroidUtilities.dp(5.0f);
                 this.otherY = i2;
-                setDrawableBounds(menuDrawable, i, i2);
+                BaseCell.setDrawableBounds(menuDrawable, i, i2);
                 x = this.buttonX + AndroidUtilities.dp(53.0f);
                 titleY = this.buttonY + AndroidUtilities.dp(4.0f);
                 subtitleY = this.buttonY + AndroidUtilities.dp(27.0f);
@@ -10685,13 +10755,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 button.title.draw(canvas);
                 canvas.restore();
                 if (button.button instanceof TL_keyboardButtonUrl) {
-                    setDrawableBounds(Theme.chat_botLinkDrawalbe, (((button.x + button.width) - AndroidUtilities.dp(3.0f)) - Theme.chat_botLinkDrawalbe.getIntrinsicWidth()) + addX, AndroidUtilities.dp(3.0f) + y);
+                    BaseCell.setDrawableBounds(Theme.chat_botLinkDrawalbe, (((button.x + button.width) - AndroidUtilities.dp(3.0f)) - Theme.chat_botLinkDrawalbe.getIntrinsicWidth()) + addX, AndroidUtilities.dp(3.0f) + y);
                     Theme.chat_botLinkDrawalbe.draw(canvas);
                 } else if (button.button instanceof TL_keyboardButtonSwitchInline) {
-                    setDrawableBounds(Theme.chat_botInlineDrawable, (((button.x + button.width) - AndroidUtilities.dp(3.0f)) - Theme.chat_botInlineDrawable.getIntrinsicWidth()) + addX, AndroidUtilities.dp(3.0f) + y);
+                    BaseCell.setDrawableBounds(Theme.chat_botInlineDrawable, (((button.x + button.width) - AndroidUtilities.dp(3.0f)) - Theme.chat_botInlineDrawable.getIntrinsicWidth()) + addX, AndroidUtilities.dp(3.0f) + y);
                     Theme.chat_botInlineDrawable.draw(canvas);
                 } else if ((button.button instanceof TL_keyboardButtonCallback) || (button.button instanceof TL_keyboardButtonRequestGeoLocation) || (button.button instanceof TL_keyboardButtonGame) || (button.button instanceof TL_keyboardButtonBuy)) {
-                    boolean drawProgress = (((button.button instanceof TL_keyboardButtonCallback) || (button.button instanceof TL_keyboardButtonGame) || (button.button instanceof TL_keyboardButtonBuy)) && SendMessagesHelper.getInstance().isSendingCallback(this.currentMessageObject, button.button)) || ((button.button instanceof TL_keyboardButtonRequestGeoLocation) && SendMessagesHelper.getInstance().isSendingCurrentLocation(this.currentMessageObject, button.button));
+                    boolean drawProgress = (((button.button instanceof TL_keyboardButtonCallback) || (button.button instanceof TL_keyboardButtonGame) || (button.button instanceof TL_keyboardButtonBuy)) && SendMessagesHelper.getInstance(this.currentAccount).isSendingCallback(this.currentMessageObject, button.button)) || ((button.button instanceof TL_keyboardButtonRequestGeoLocation) && SendMessagesHelper.getInstance(this.currentAccount).isSendingCurrentLocation(this.currentMessageObject, button.button));
                     if (drawProgress || !(drawProgress || button.progressAlpha == 0.0f)) {
                         Theme.chat_botProgressPaint.setAlpha(Math.min(255, (int) (button.progressAlpha * 255.0f)));
                         x = ((button.x + button.width) - AndroidUtilities.dp(12.0f)) + addX;
@@ -10866,7 +10936,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         Float progress;
         if (this.documentAttachType == 3 || this.documentAttachType == 5) {
             if ((this.currentMessageObject.isOut() && this.currentMessageObject.isSending()) || (this.currentMessageObject.isSendError() && fromBot)) {
-                MediaController.getInstance().addLoadingFileObserver(this.currentMessageObject.messageOwner.attachPath, this.currentMessageObject, this);
+                MediaController.getInstance(this.currentAccount).addLoadingFileObserver(this.currentMessageObject.messageOwner.attachPath, this.currentMessageObject, this);
                 this.buttonState = 4;
                 this.radialProgress.setBackground(getDrawableForCurrentState(), !fromBot, animated);
                 if (fromBot) {
@@ -10874,7 +10944,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 } else {
                     float floatValue;
                     progress = ImageLoader.getInstance().getFileProgress(this.currentMessageObject.messageOwner.attachPath);
-                    if (progress == null && SendMessagesHelper.getInstance().isSendingMessage(this.currentMessageObject.getId())) {
+                    if (progress == null && SendMessagesHelper.getInstance(this.currentAccount).isSendingMessage(this.currentMessageObject.getId())) {
                         progress = Float.valueOf(1.0f);
                     }
                     RadialProgress radialProgress = this.radialProgress;
@@ -10886,17 +10956,17 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     radialProgress.setProgress(floatValue, false);
                 }
             } else if (fileExists) {
-                MediaController.getInstance().removeLoadingFileObserver(this);
-                boolean playing = MediaController.getInstance().isPlayingMessage(this.currentMessageObject);
-                if (!playing || (playing && MediaController.getInstance().isMessagePaused())) {
+                MediaController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
+                boolean playing = MediaController.getInstance(this.currentAccount).isPlayingMessage(this.currentMessageObject);
+                if (!playing || (playing && MediaController.getInstance(this.currentAccount).isMessagePaused())) {
                     this.buttonState = 0;
                 } else {
                     this.buttonState = 1;
                 }
                 this.radialProgress.setBackground(getDrawableForCurrentState(), false, animated);
             } else {
-                MediaController.getInstance().addLoadingFileObserver(fileName, this.currentMessageObject, this);
-                if (FileLoader.getInstance().isLoadingFile(fileName)) {
+                MediaController.getInstance(this.currentAccount).addLoadingFileObserver(fileName, this.currentMessageObject, this);
+                if (FileLoader.getInstance(this.currentAccount).isLoadingFile(fileName)) {
                     this.buttonState = 4;
                     progress = ImageLoader.getInstance().getFileProgress(fileName);
                     if (progress != null) {
@@ -10915,10 +10985,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         } else if (this.currentMessageObject.type != 0 || this.documentAttachType == 1 || this.documentAttachType == 4) {
             if (!this.currentMessageObject.isOut() || !this.currentMessageObject.isSending()) {
                 if (!(this.currentMessageObject.messageOwner.attachPath == null || this.currentMessageObject.messageOwner.attachPath.length() == 0)) {
-                    MediaController.getInstance().removeLoadingFileObserver(this);
+                    MediaController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
                 }
                 if (fileExists) {
-                    MediaController.getInstance().removeLoadingFileObserver(this);
+                    MediaController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
                     if (this.currentMessageObject.isSecretPhoto()) {
                         this.buttonState = -1;
                     } else if (this.currentMessageObject.type == 8 && !this.photoImage.isAllowStartAnimation()) {
@@ -10935,10 +11005,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     invalidate();
                     return;
                 }
-                MediaController.getInstance().addLoadingFileObserver(fileName, this.currentMessageObject, this);
+                MediaController.getInstance(this.currentAccount).addLoadingFileObserver(fileName, this.currentMessageObject, this);
                 setProgress = 0.0f;
                 progressVisible = false;
-                if (FileLoader.getInstance().isLoadingFile(fileName)) {
+                if (FileLoader.getInstance(this.currentAccount).isLoadingFile(fileName)) {
                     progressVisible = true;
                     this.buttonState = 1;
                     progress = ImageLoader.getInstance().getFileProgress(fileName);
@@ -10946,11 +11016,11 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 } else {
                     boolean autoDownload = false;
                     if (this.currentMessageObject.type == 1) {
-                        autoDownload = MediaController.getInstance().canDownloadMedia(this.currentMessageObject);
+                        autoDownload = MediaController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject);
                     } else if (this.currentMessageObject.type == 8 && MessageObject.isNewGifDocument(this.currentMessageObject.messageOwner.media.document)) {
-                        autoDownload = MediaController.getInstance().canDownloadMedia(this.currentMessageObject);
+                        autoDownload = MediaController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject);
                     } else if (this.currentMessageObject.type == 5) {
-                        autoDownload = MediaController.getInstance().canDownloadMedia(this.currentMessageObject);
+                        autoDownload = MediaController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject);
                     }
                     if (this.cancelLoading || !autoDownload) {
                         this.buttonState = 0;
@@ -10963,16 +11033,16 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 this.radialProgress.setProgress(setProgress, false);
                 invalidate();
             } else if (this.currentMessageObject.messageOwner.attachPath != null && this.currentMessageObject.messageOwner.attachPath.length() > 0) {
-                MediaController.getInstance().addLoadingFileObserver(this.currentMessageObject.messageOwner.attachPath, this.currentMessageObject, this);
+                MediaController.getInstance(this.currentAccount).addLoadingFileObserver(this.currentMessageObject.messageOwner.attachPath, this.currentMessageObject, this);
                 boolean needProgress = this.currentMessageObject.messageOwner.attachPath == null || !this.currentMessageObject.messageOwner.attachPath.startsWith("http");
                 HashMap<String, String> params = this.currentMessageObject.messageOwner.params;
-                if (this.currentMessageObject.messageOwner.message == null || params == null || !(params.containsKey("url") || params.containsKey("bot"))) {
+                if (this.currentMessageObject.messageOwner.message == null || params == null || !(params.containsKey(UpdateFragment.FRAGMENT_URL) || params.containsKey("bot"))) {
                     this.buttonState = 1;
                 } else {
                     needProgress = false;
                     this.buttonState = -1;
                 }
-                boolean sending = SendMessagesHelper.getInstance().isSendingMessage(this.currentMessageObject.getId());
+                boolean sending = SendMessagesHelper.getInstance(this.currentAccount).isSendingMessage(this.currentMessageObject.getId());
                 if (this.currentPosition != null && sending && this.buttonState == 1) {
                     this.drawRadialCheckBackground = true;
                     this.radialProgress.setCheckBackground(false, animated);
@@ -10992,7 +11062,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             }
         } else if (this.currentPhotoObject != null && this.drawImageButton) {
             if (fileExists) {
-                MediaController.getInstance().removeLoadingFileObserver(this);
+                MediaController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
                 if (this.documentAttachType != 2 || this.photoImage.isAllowStartAnimation()) {
                     this.buttonState = -1;
                 } else {
@@ -11002,15 +11072,15 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 invalidate();
                 return;
             }
-            MediaController.getInstance().addLoadingFileObserver(fileName, this.currentMessageObject, this);
+            MediaController.getInstance(this.currentAccount).addLoadingFileObserver(fileName, this.currentMessageObject, this);
             setProgress = 0.0f;
             progressVisible = false;
-            if (FileLoader.getInstance().isLoadingFile(fileName)) {
+            if (FileLoader.getInstance(this.currentAccount).isLoadingFile(fileName)) {
                 progressVisible = true;
                 this.buttonState = 1;
                 progress = ImageLoader.getInstance().getFileProgress(fileName);
                 setProgress = progress != null ? progress.floatValue() : 0.0f;
-            } else if (this.cancelLoading || !((this.documentAttachType == 0 && MediaController.getInstance().canDownloadMedia(this.currentMessageObject)) || (this.documentAttachType == 2 && MediaController.getInstance().canDownloadMedia(this.currentMessageObject)))) {
+            } else if (this.cancelLoading || !((this.documentAttachType == 0 && MediaController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject)) || (this.documentAttachType == 2 && MediaController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject)))) {
                 this.buttonState = 0;
             } else {
                 progressVisible = true;
@@ -11053,7 +11123,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     this.photoImage.setImage(this.currentMessageObject.messageOwner.media.document, null, this.currentPhotoObject != null ? this.currentPhotoObject.location : null, this.currentPhotoFilterThumb, this.currentMessageObject.messageOwner.media.document.size, null, 0);
                 } else if (this.currentMessageObject.isRoundVideo()) {
                     if (this.currentMessageObject.isSecretMedia()) {
-                        FileLoader.getInstance().loadFile(this.currentMessageObject.getDocument(), true, 1);
+                        FileLoader.getInstance(this.currentAccount).loadFile(this.currentMessageObject.getDocument(), true, 1);
                     } else {
                         this.currentMessageObject.gifState = 2.0f;
                         Document document = this.currentMessageObject.getDocument();
@@ -11061,9 +11131,9 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         this.photoImage.setImage(document, null, this.currentPhotoObject != null ? this.currentPhotoObject.location : null, this.currentPhotoFilterThumb, document.size, null, 0);
                     }
                 } else if (this.currentMessageObject.type == 9) {
-                    FileLoader.getInstance().loadFile(this.currentMessageObject.messageOwner.media.document, false, 0);
+                    FileLoader.getInstance(this.currentAccount).loadFile(this.currentMessageObject.messageOwner.media.document, false, 0);
                 } else if (this.documentAttachType == 4) {
-                    FileLoader.getInstance().loadFile(this.documentAttach, true, this.currentMessageObject.shouldEncryptPhotoOrVideo() ? 2 : 0);
+                    FileLoader.getInstance(this.currentAccount).loadFile(this.documentAttach, true, this.currentMessageObject.shouldEncryptPhotoOrVideo() ? 2 : 0);
                 } else if (this.currentMessageObject.type != 0 || this.documentAttachType == 0) {
                     this.photoImage.setForceLoading(true);
                     this.photoImage.setImage(this.currentPhotoObject.location, this.currentPhotoFilter, this.currentPhotoObjectThumb != null ? this.currentPhotoObjectThumb.location : null, this.currentPhotoFilterThumb, 0, null, 0);
@@ -11072,7 +11142,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     this.photoImage.setImage(this.currentMessageObject.messageOwner.media.webpage.document, null, this.currentPhotoObject.location, this.currentPhotoFilterThumb, this.currentMessageObject.messageOwner.media.webpage.document.size, null, 0);
                     this.currentMessageObject.gifState = 2.0f;
                 } else if (this.documentAttachType == 1) {
-                    FileLoader.getInstance().loadFile(this.currentMessageObject.messageOwner.media.webpage.document, false, 0);
+                    FileLoader.getInstance(this.currentAccount).loadFile(this.currentMessageObject.messageOwner.media.webpage.document, false, 0);
                 }
                 this.buttonState = 1;
                 this.radialProgress.setBackground(getDrawableForCurrentState(), true, animated);
@@ -11084,7 +11154,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             }
         } else if (this.buttonState == 1) {
             if (this.documentAttachType == 3 || this.documentAttachType == 5) {
-                if (MediaController.getInstance().pauseMessage(this.currentMessageObject)) {
+                if (MediaController.getInstance(this.currentAccount).pauseMessage(this.currentMessageObject)) {
                     this.buttonState = 0;
                     this.radialProgress.setBackground(getDrawableForCurrentState(), false, false);
                     invalidate();
@@ -11094,12 +11164,12 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             } else {
                 this.cancelLoading = true;
                 if (this.documentAttachType == 4 || this.documentAttachType == 1) {
-                    FileLoader.getInstance().cancelLoadFile(this.documentAttach);
+                    FileLoader.getInstance(this.currentAccount).cancelLoadFile(this.documentAttach);
                 } else if (this.currentMessageObject.type == 0 || this.currentMessageObject.type == 1 || this.currentMessageObject.type == 8 || this.currentMessageObject.type == 5) {
                     ImageLoader.getInstance().cancelForceLoadingForImageReceiver(this.photoImage);
                     this.photoImage.cancelLoadImage();
                 } else if (this.currentMessageObject.type == 9) {
-                    FileLoader.getInstance().cancelLoadFile(this.currentMessageObject.messageOwner.media.document);
+                    FileLoader.getInstance(this.currentAccount).cancelLoadFile(this.currentMessageObject.messageOwner.media.document);
                 }
                 this.buttonState = 0;
                 this.radialProgress.setBackground(getDrawableForCurrentState(), false, animated);
@@ -11108,7 +11178,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         } else if (this.buttonState == 2) {
             if (this.documentAttachType == 3 || this.documentAttachType == 5) {
                 this.radialProgress.setProgress(0.0f, false);
-                FileLoader.getInstance().loadFile(this.documentAttach, true, 0);
+                FileLoader.getInstance(this.currentAccount).loadFile(this.documentAttach, true, 0);
                 this.buttonState = 4;
                 this.radialProgress.setBackground(getDrawableForCurrentState(), true, false);
                 invalidate();
@@ -11127,7 +11197,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 return;
             }
             if ((!this.currentMessageObject.isOut() || !this.currentMessageObject.isSending()) && !this.currentMessageObject.isSendError()) {
-                FileLoader.getInstance().cancelLoadFile(this.documentAttach);
+                FileLoader.getInstance(this.currentAccount).cancelLoadFile(this.documentAttach);
                 this.buttonState = 2;
                 this.radialProgress.setBackground(getDrawableForCurrentState(), false, false);
                 invalidate();
@@ -11192,7 +11262,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
 
     public void onProgressUpload(String fileName, float progress, boolean isEncrypted) {
         this.radialProgress.setProgress(progress, true);
-        if (progress == 1.0f && this.currentPosition != null && SendMessagesHelper.getInstance().isSendingMessage(this.currentMessageObject.getId()) && this.buttonState == 1) {
+        if (progress == 1.0f && this.currentPosition != null && SendMessagesHelper.getInstance(this.currentAccount).isSendingMessage(this.currentMessageObject.getId()) && this.buttonState == 1) {
             this.drawRadialCheckBackground = true;
             this.radialProgress.setCheckBackground(false, true);
         }
@@ -11221,13 +11291,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         CharSequence signString;
         String timeString;
         if (messageObject.messageOwner.post_author != null) {
-            signString = messageObject.messageOwner.post_author.replace("\n", "");
+            signString = messageObject.messageOwner.post_author.replace("\n", TtmlNode.ANONYMOUS_REGION_ID);
         } else if (messageObject.messageOwner.fwd_from != null && messageObject.messageOwner.fwd_from.post_author != null) {
-            signString = messageObject.messageOwner.fwd_from.post_author.replace("\n", "");
+            signString = messageObject.messageOwner.fwd_from.post_author.replace("\n", TtmlNode.ANONYMOUS_REGION_ID);
         } else if (messageObject.isOutOwner() || messageObject.messageOwner.from_id <= 0 || !messageObject.messageOwner.post) {
             signString = null;
         } else {
-            User signUser = MessagesController.getInstance().getUser(Integer.valueOf(messageObject.messageOwner.from_id));
+            User signUser = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.messageOwner.from_id));
             if (signUser != null) {
                 signString = ContactsController.formatName(signUser.first_name, signUser.last_name).replace('\n', ' ');
             } else {
@@ -11236,9 +11306,9 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         }
         User author = null;
         if (this.currentMessageObject.isFromUser()) {
-            author = MessagesController.getInstance().getUser(Integer.valueOf(messageObject.messageOwner.from_id));
+            author = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.messageOwner.from_id));
         }
-        if (messageObject.isLiveLocation() || messageObject.messageOwner.via_bot_id != 0 || messageObject.messageOwner.via_bot_name != null || ((author != null && author.bot) || (messageObject.messageOwner.flags & 32768) == 0 || this.currentPosition != null)) {
+        if (messageObject.isLiveLocation() || messageObject.messageOwner.via_bot_id != 0 || messageObject.messageOwner.via_bot_name != null || ((author != null && author.bot) || (messageObject.messageOwner.flags & TLRPC.MESSAGE_FLAG_EDITED) == 0 || this.currentPosition != null)) {
             timeString = LocaleController.getInstance().formatterDay.format(((long) messageObject.messageOwner.date) * 1000);
         } else {
             timeString = LocaleController.getString("EditedMessage", R.string.EditedMessage) + " " + LocaleController.getInstance().formatterDay.format(((long) messageObject.messageOwner.date) * 1000);
@@ -11271,7 +11341,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             int width = (int) Math.ceil((double) Theme.chat_timePaint.measureText(signString, 0, signString.length()));
             if (width > widthForSign) {
                 if (widthForSign <= 0) {
-                    signString = "";
+                    signString = TtmlNode.ANONYMOUS_REGION_ID;
                     width = 0;
                 } else {
                     signString = TextUtils.ellipsize(signString, Theme.chat_timePaint, (float) widthForSign, TruncateAt.END);
@@ -11299,7 +11369,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         if (messageObject.eventId != 0) {
             return false;
         }
-        if (messageObject.messageOwner.fwd_from != null && !messageObject.isOutOwner() && messageObject.messageOwner.fwd_from.saved_from_peer != null && messageObject.getDialogId() == ((long) UserConfig.getClientUserId())) {
+        if (messageObject.messageOwner.fwd_from != null && !messageObject.isOutOwner() && messageObject.messageOwner.fwd_from.saved_from_peer != null && messageObject.getDialogId() == ((long) UserConfig.getInstance(this.currentAccount).getClientUserId())) {
             this.drwaShareGoIcon = true;
             return true;
         } else if (messageObject.type == 13) {
@@ -11312,7 +11382,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 if ((messageObject.messageOwner.media instanceof TL_messageMediaEmpty) || messageObject.messageOwner.media == null || ((messageObject.messageOwner.media instanceof TL_messageMediaWebPage) && !(messageObject.messageOwner.media.webpage instanceof TL_webPage))) {
                     return false;
                 }
-                User user = MessagesController.getInstance().getUser(Integer.valueOf(messageObject.messageOwner.from_id));
+                User user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.messageOwner.from_id));
                 if (user != null && user.bot) {
                     return true;
                 }
@@ -11321,7 +11391,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         return true;
                     }
                     if (messageObject.isMegagroup()) {
-                        Chat chat = MessagesController.getInstance().getChat(Integer.valueOf(messageObject.messageOwner.to_id.channel_id));
+                        Chat chat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(messageObject.messageOwner.to_id.channel_id));
                         if (chat == null || chat.username == null || chat.username.length() <= 0 || (messageObject.messageOwner.media instanceof TL_messageMediaContact) || (messageObject.messageOwner.media instanceof TL_messageMediaGeo)) {
                             return false;
                         }
@@ -11340,38 +11410,39 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
     }
 
     private void updateCurrentUserAndChat() {
+        MessagesController messagesController = MessagesController.getInstance(this.currentAccount);
         MessageFwdHeader fwd_from = this.currentMessageObject.messageOwner.fwd_from;
-        int currentUserId = UserConfig.getClientUserId();
+        int currentUserId = UserConfig.getInstance(this.currentAccount).getClientUserId();
         if (fwd_from != null && fwd_from.channel_id != 0 && this.currentMessageObject.getDialogId() == ((long) currentUserId)) {
-            this.currentChat = MessagesController.getInstance().getChat(Integer.valueOf(fwd_from.channel_id));
+            this.currentChat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(fwd_from.channel_id));
         } else if (fwd_from == null || fwd_from.saved_from_peer == null) {
             if (fwd_from != null && fwd_from.from_id != 0 && fwd_from.channel_id == 0 && this.currentMessageObject.getDialogId() == ((long) currentUserId)) {
-                this.currentUser = MessagesController.getInstance().getUser(Integer.valueOf(fwd_from.from_id));
+                this.currentUser = messagesController.getUser(Integer.valueOf(fwd_from.from_id));
             } else if (this.currentMessageObject.isFromUser()) {
-                this.currentUser = MessagesController.getInstance().getUser(Integer.valueOf(this.currentMessageObject.messageOwner.from_id));
+                this.currentUser = messagesController.getUser(Integer.valueOf(this.currentMessageObject.messageOwner.from_id));
             } else if (this.currentMessageObject.messageOwner.from_id < 0) {
-                this.currentChat = MessagesController.getInstance().getChat(Integer.valueOf(-this.currentMessageObject.messageOwner.from_id));
+                this.currentChat = messagesController.getChat(Integer.valueOf(-this.currentMessageObject.messageOwner.from_id));
             } else if (this.currentMessageObject.messageOwner.post) {
-                this.currentChat = MessagesController.getInstance().getChat(Integer.valueOf(this.currentMessageObject.messageOwner.to_id.channel_id));
+                this.currentChat = messagesController.getChat(Integer.valueOf(this.currentMessageObject.messageOwner.to_id.channel_id));
             }
         } else if (fwd_from.saved_from_peer.user_id != 0) {
             if (fwd_from.from_id != 0) {
-                this.currentUser = MessagesController.getInstance().getUser(Integer.valueOf(fwd_from.from_id));
+                this.currentUser = messagesController.getUser(Integer.valueOf(fwd_from.from_id));
             } else {
-                this.currentUser = MessagesController.getInstance().getUser(Integer.valueOf(fwd_from.saved_from_peer.user_id));
+                this.currentUser = messagesController.getUser(Integer.valueOf(fwd_from.saved_from_peer.user_id));
             }
         } else if (fwd_from.saved_from_peer.channel_id != 0) {
             if (!this.currentMessageObject.isSavedFromMegagroup() || fwd_from.from_id == 0) {
-                this.currentChat = MessagesController.getInstance().getChat(Integer.valueOf(fwd_from.saved_from_peer.channel_id));
+                this.currentChat = messagesController.getChat(Integer.valueOf(fwd_from.saved_from_peer.channel_id));
             } else {
-                this.currentUser = MessagesController.getInstance().getUser(Integer.valueOf(fwd_from.from_id));
+                this.currentUser = messagesController.getUser(Integer.valueOf(fwd_from.from_id));
             }
         } else if (fwd_from.saved_from_peer.chat_id == 0) {
         } else {
             if (fwd_from.from_id != 0) {
-                this.currentUser = MessagesController.getInstance().getUser(Integer.valueOf(fwd_from.from_id));
+                this.currentUser = messagesController.getUser(Integer.valueOf(fwd_from.from_id));
             } else {
-                this.currentChat = MessagesController.getInstance().getChat(Integer.valueOf(fwd_from.saved_from_peer.chat_id));
+                this.currentChat = messagesController.getChat(Integer.valueOf(fwd_from.saved_from_peer.chat_id));
             }
         }
     }
@@ -11380,7 +11451,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         SpannableStringBuilder spannableStringBuilder;
         String name;
         if (!((messageObject.messageOwner.flags & 1024) == 0 || this.currentMessageObject.viewsReloaded)) {
-            MessagesController.getInstance().addToViewsQueue(this.currentMessageObject.messageOwner);
+            MessagesController.getInstance(this.currentAccount).addToViewsQueue(this.currentMessageObject.messageOwner);
             this.currentMessageObject.viewsReloaded = true;
         }
         updateCurrentUserAndChat();
@@ -11410,7 +11481,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         String viaUsername = null;
         CharSequence viaString = null;
         if (messageObject.messageOwner.via_bot_id != 0) {
-            User botUser = MessagesController.getInstance().getUser(Integer.valueOf(messageObject.messageOwner.via_bot_id));
+            User botUser = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.messageOwner.via_bot_id));
             if (!(botUser == null || botUser.username == null || botUser.username.length() <= 0)) {
                 viaUsername = "@" + botUser.username;
                 viaString = AndroidUtilities.replaceTags(String.format(" via <b>%s</b>", new Object[]{viaUsername}));
@@ -11441,7 +11512,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 this.nameWidth -= adminWidth;
             }
             if (!authorName) {
-                this.currentNameString = "";
+                this.currentNameString = TtmlNode.ANONYMOUS_REGION_ID;
             } else if (this.currentUser != null) {
                 this.currentNameString = UserObject.getUserName(this.currentUser);
             } else if (this.currentChat != null) {
@@ -11510,10 +11581,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
         this.forwardedNameWidth = 0;
         if (this.drawForwardedName && messageObject.needDrawForwarded() && (this.currentPosition == null || this.currentPosition.minY == (byte) 0)) {
             if (messageObject.messageOwner.fwd_from.channel_id != 0) {
-                this.currentForwardChannel = MessagesController.getInstance().getChat(Integer.valueOf(messageObject.messageOwner.fwd_from.channel_id));
+                this.currentForwardChannel = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(messageObject.messageOwner.fwd_from.channel_id));
             }
             if (messageObject.messageOwner.fwd_from.from_id != 0) {
-                this.currentForwardUser = MessagesController.getInstance().getUser(Integer.valueOf(messageObject.messageOwner.fwd_from.from_id));
+                this.currentForwardUser = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.messageOwner.fwd_from.from_id));
             }
             if (!(this.currentForwardUser == null && this.currentForwardChannel == null)) {
                 if (this.currentForwardChannel != null) {
@@ -11584,17 +11655,17 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
             if (messageObject.customReplyName != null) {
                 name = messageObject.customReplyName;
             } else if (messageObject.replyMessageObject.isFromUser()) {
-                User user = MessagesController.getInstance().getUser(Integer.valueOf(messageObject.replyMessageObject.messageOwner.from_id));
+                User user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.replyMessageObject.messageOwner.from_id));
                 if (user != null) {
                     name = UserObject.getUserName(user);
                 }
             } else if (messageObject.replyMessageObject.messageOwner.from_id < 0) {
-                chat = MessagesController.getInstance().getChat(Integer.valueOf(-messageObject.replyMessageObject.messageOwner.from_id));
+                chat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(-messageObject.replyMessageObject.messageOwner.from_id));
                 if (chat != null) {
                     name = chat.title;
                 }
             } else {
-                chat = MessagesController.getInstance().getChat(Integer.valueOf(messageObject.replyMessageObject.messageOwner.to_id.channel_id));
+                chat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(messageObject.replyMessageObject.messageOwner.to_id.channel_id));
                 if (chat != null) {
                     name = chat.title;
                 }
@@ -11753,9 +11824,9 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     }
                     i2 = (this.drawPinnedTop || (this.drawPinnedTop && this.drawPinnedBottom)) ? 0 : AndroidUtilities.dp(1.0f);
                     backgroundTop = additionalTop + i2;
-                    setDrawableBounds(this.currentBackgroundDrawable, backgroundLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
-                    setDrawableBounds(currentBackgroundSelectedDrawable, backgroundLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
-                    setDrawableBounds(currentBackgroundShadowDrawable, backgroundLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
+                    BaseCell.setDrawableBounds(this.currentBackgroundDrawable, backgroundLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
+                    BaseCell.setDrawableBounds(currentBackgroundSelectedDrawable, backgroundLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
+                    BaseCell.setDrawableBounds(currentBackgroundShadowDrawable, backgroundLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
                 } else {
                     if (this.mediaBackground || this.drawPinnedBottom) {
                         this.currentBackgroundDrawable = Theme.chat_msgInMediaDrawable;
@@ -11813,9 +11884,9 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     }
                     i2 = (this.drawPinnedTop || (this.drawPinnedTop && this.drawPinnedBottom)) ? 0 : AndroidUtilities.dp(1.0f);
                     backgroundTop = additionalTop + i2;
-                    setDrawableBounds(this.currentBackgroundDrawable, this.backgroundDrawableLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
-                    setDrawableBounds(currentBackgroundSelectedDrawable, this.backgroundDrawableLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
-                    setDrawableBounds(currentBackgroundShadowDrawable, this.backgroundDrawableLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
+                    BaseCell.setDrawableBounds(this.currentBackgroundDrawable, this.backgroundDrawableLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
+                    BaseCell.setDrawableBounds(currentBackgroundSelectedDrawable, this.backgroundDrawableLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
+                    BaseCell.setDrawableBounds(currentBackgroundShadowDrawable, this.backgroundDrawableLeft, backgroundTop, this.backgroundDrawableRight, (this.layoutHeight - offsetBottom) + additionalBottom);
                 }
                 if (this.drawBackground && this.currentBackgroundDrawable != null) {
                     if (this.isHighlightedAnimated) {
@@ -11824,7 +11895,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         if (this.highlightProgress >= 300) {
                             alpha = 1.0f;
                         } else {
-                            alpha = ((float) this.highlightProgress) / BitmapDescriptorFactory.HUE_MAGENTA;
+                            alpha = ((float) this.highlightProgress) / 300.0f;
                         }
                         if (this.currentPosition == null) {
                             currentBackgroundSelectedDrawable.setAlpha((int) (255.0f * alpha));
@@ -11864,13 +11935,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     i = this.shareStartX;
                     int dp = this.layoutHeight - AndroidUtilities.dp(41.0f);
                     this.shareStartY = dp;
-                    setDrawableBounds(drawable, i, dp);
+                    BaseCell.setDrawableBounds(drawable, i, dp);
                     Theme.chat_shareDrawable.draw(canvas);
                     if (this.drwaShareGoIcon) {
-                        setDrawableBounds(Theme.chat_goIconDrawable, this.shareStartX + AndroidUtilities.dp(12.0f), this.shareStartY + AndroidUtilities.dp(9.0f));
+                        BaseCell.setDrawableBounds(Theme.chat_goIconDrawable, this.shareStartX + AndroidUtilities.dp(12.0f), this.shareStartY + AndroidUtilities.dp(9.0f));
                         Theme.chat_goIconDrawable.draw(canvas);
                     } else {
-                        setDrawableBounds(Theme.chat_shareIconDrawable, this.shareStartX + AndroidUtilities.dp(9.0f), this.shareStartY + AndroidUtilities.dp(9.0f));
+                        BaseCell.setDrawableBounds(Theme.chat_shareIconDrawable, this.shareStartX + AndroidUtilities.dp(9.0f), this.shareStartY + AndroidUtilities.dp(9.0f));
                         Theme.chat_shareIconDrawable.draw(canvas);
                     }
                 }
@@ -12210,7 +12281,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     additionalX += (int) (((float) this.timeWidth) - this.timeLayout.getLineWidth(0));
                     if (this.currentMessageObject.isSending()) {
                         if (!this.currentMessageObject.isOutOwner()) {
-                            setDrawableBounds(Theme.chat_msgMediaClockDrawable, this.timeX + AndroidUtilities.dp(11.0f), (this.layoutHeight - AndroidUtilities.dp(14.0f)) - Theme.chat_msgMediaClockDrawable.getIntrinsicHeight());
+                            BaseCell.setDrawableBounds(Theme.chat_msgMediaClockDrawable, this.timeX + AndroidUtilities.dp(11.0f), (this.layoutHeight - AndroidUtilities.dp(14.0f)) - Theme.chat_msgMediaClockDrawable.getIntrinsicHeight());
                             Theme.chat_msgMediaClockDrawable.draw(canvas);
                         }
                     } else if (!this.currentMessageObject.isSendError()) {
@@ -12221,7 +12292,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         }
                         oldAlpha = ((BitmapDrawable) viewsDrawable).getPaint().getAlpha();
                         viewsDrawable.setAlpha((int) (this.timeAlpha * ((float) oldAlpha)));
-                        setDrawableBounds(viewsDrawable, this.timeX, (this.layoutHeight - AndroidUtilities.dp(10.5f)) - this.timeLayout.getHeight());
+                        BaseCell.setDrawableBounds(viewsDrawable, this.timeX, (this.layoutHeight - AndroidUtilities.dp(10.5f)) - this.timeLayout.getHeight());
                         viewsDrawable.draw(canvas);
                         viewsDrawable.setAlpha(oldAlpha);
                         if (this.viewsLayout != null) {
@@ -12235,7 +12306,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         y = this.layoutHeight - AndroidUtilities.dp(27.5f);
                         this.rect.set((float) x, (float) y, (float) (AndroidUtilities.dp(14.0f) + x), (float) (AndroidUtilities.dp(14.0f) + y));
                         canvas.drawRoundRect(this.rect, (float) AndroidUtilities.dp(1.0f), (float) AndroidUtilities.dp(1.0f), Theme.chat_msgErrorPaint);
-                        setDrawableBounds(Theme.chat_msgErrorDrawable, AndroidUtilities.dp(6.0f) + x, AndroidUtilities.dp(2.0f) + y);
+                        BaseCell.setDrawableBounds(Theme.chat_msgErrorDrawable, AndroidUtilities.dp(6.0f) + x, AndroidUtilities.dp(2.0f) + y);
                         Theme.chat_msgErrorDrawable.draw(canvas);
                     }
                 }
@@ -12251,17 +12322,17 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     if (this.currentMessageObject.isSending()) {
                         if (!this.currentMessageObject.isOutOwner()) {
                             Drawable clockDrawable = isDrawSelectedBackground() ? Theme.chat_msgInSelectedClockDrawable : Theme.chat_msgInClockDrawable;
-                            setDrawableBounds(clockDrawable, this.timeX + AndroidUtilities.dp(11.0f), (this.layoutHeight - AndroidUtilities.dp(8.5f)) - clockDrawable.getIntrinsicHeight());
+                            BaseCell.setDrawableBounds(clockDrawable, this.timeX + AndroidUtilities.dp(11.0f), (this.layoutHeight - AndroidUtilities.dp(8.5f)) - clockDrawable.getIntrinsicHeight());
                             clockDrawable.draw(canvas);
                         }
                     } else if (!this.currentMessageObject.isSendError()) {
                         if (this.currentMessageObject.isOutOwner()) {
                             viewsDrawable = isDrawSelectedBackground() ? Theme.chat_msgOutViewsSelectedDrawable : Theme.chat_msgOutViewsDrawable;
-                            setDrawableBounds(viewsDrawable, this.timeX, (this.layoutHeight - AndroidUtilities.dp(4.5f)) - this.timeLayout.getHeight());
+                            BaseCell.setDrawableBounds(viewsDrawable, this.timeX, (this.layoutHeight - AndroidUtilities.dp(4.5f)) - this.timeLayout.getHeight());
                             viewsDrawable.draw(canvas);
                         } else {
                             viewsDrawable = isDrawSelectedBackground() ? Theme.chat_msgInViewsSelectedDrawable : Theme.chat_msgInViewsDrawable;
-                            setDrawableBounds(viewsDrawable, this.timeX, (this.layoutHeight - AndroidUtilities.dp(4.5f)) - this.timeLayout.getHeight());
+                            BaseCell.setDrawableBounds(viewsDrawable, this.timeX, (this.layoutHeight - AndroidUtilities.dp(4.5f)) - this.timeLayout.getHeight());
                             viewsDrawable.draw(canvas);
                         }
                         if (this.viewsLayout != null) {
@@ -12275,7 +12346,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         y = this.layoutHeight - AndroidUtilities.dp(20.5f);
                         this.rect.set((float) x, (float) y, (float) (AndroidUtilities.dp(14.0f) + x), (float) (AndroidUtilities.dp(14.0f) + y));
                         canvas.drawRoundRect(this.rect, (float) AndroidUtilities.dp(1.0f), (float) AndroidUtilities.dp(1.0f), Theme.chat_msgErrorPaint);
-                        setDrawableBounds(Theme.chat_msgErrorDrawable, AndroidUtilities.dp(6.0f) + x, AndroidUtilities.dp(2.0f) + y);
+                        BaseCell.setDrawableBounds(Theme.chat_msgErrorDrawable, AndroidUtilities.dp(6.0f) + x, AndroidUtilities.dp(2.0f) + y);
                         Theme.chat_msgErrorDrawable.draw(canvas);
                     }
                 }
@@ -12313,13 +12384,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                 }
                 if (drawClock) {
                     if (!this.mediaBackground || this.captionLayout != null) {
-                        setDrawableBounds(Theme.chat_msgOutClockDrawable, (this.layoutWidth - AndroidUtilities.dp(18.5f)) - Theme.chat_msgOutClockDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.5f)) - Theme.chat_msgOutClockDrawable.getIntrinsicHeight());
+                        BaseCell.setDrawableBounds(Theme.chat_msgOutClockDrawable, (this.layoutWidth - AndroidUtilities.dp(18.5f)) - Theme.chat_msgOutClockDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.5f)) - Theme.chat_msgOutClockDrawable.getIntrinsicHeight());
                         Theme.chat_msgOutClockDrawable.draw(canvas);
                     } else if (this.currentMessageObject.type == 13 || this.currentMessageObject.type == 5) {
-                        setDrawableBounds(Theme.chat_msgStickerClockDrawable, (this.layoutWidth - AndroidUtilities.dp(22.0f)) - Theme.chat_msgStickerClockDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgStickerClockDrawable.getIntrinsicHeight());
+                        BaseCell.setDrawableBounds(Theme.chat_msgStickerClockDrawable, (this.layoutWidth - AndroidUtilities.dp(22.0f)) - Theme.chat_msgStickerClockDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgStickerClockDrawable.getIntrinsicHeight());
                         Theme.chat_msgStickerClockDrawable.draw(canvas);
                     } else {
-                        setDrawableBounds(Theme.chat_msgMediaClockDrawable, (this.layoutWidth - AndroidUtilities.dp(22.0f)) - Theme.chat_msgMediaClockDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgMediaClockDrawable.getIntrinsicHeight());
+                        BaseCell.setDrawableBounds(Theme.chat_msgMediaClockDrawable, (this.layoutWidth - AndroidUtilities.dp(22.0f)) - Theme.chat_msgMediaClockDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgMediaClockDrawable.getIntrinsicHeight());
                         Theme.chat_msgMediaClockDrawable.draw(canvas);
                     }
                 }
@@ -12329,23 +12400,23 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                         if (!this.mediaBackground || this.captionLayout != null) {
                             drawable = isDrawSelectedBackground() ? Theme.chat_msgOutCheckSelectedDrawable : Theme.chat_msgOutCheckDrawable;
                             if (drawCheck1) {
-                                setDrawableBounds(drawable, (this.layoutWidth - AndroidUtilities.dp(22.5f)) - drawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.0f)) - drawable.getIntrinsicHeight());
+                                BaseCell.setDrawableBounds(drawable, (this.layoutWidth - AndroidUtilities.dp(22.5f)) - drawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.0f)) - drawable.getIntrinsicHeight());
                             } else {
-                                setDrawableBounds(drawable, (this.layoutWidth - AndroidUtilities.dp(18.5f)) - drawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.0f)) - drawable.getIntrinsicHeight());
+                                BaseCell.setDrawableBounds(drawable, (this.layoutWidth - AndroidUtilities.dp(18.5f)) - drawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.0f)) - drawable.getIntrinsicHeight());
                             }
                             drawable.draw(canvas);
                         } else if (this.currentMessageObject.type == 13 || this.currentMessageObject.type == 5) {
                             if (drawCheck1) {
-                                setDrawableBounds(Theme.chat_msgStickerCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(26.3f)) - Theme.chat_msgStickerCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgStickerCheckDrawable.getIntrinsicHeight());
+                                BaseCell.setDrawableBounds(Theme.chat_msgStickerCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(26.3f)) - Theme.chat_msgStickerCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgStickerCheckDrawable.getIntrinsicHeight());
                             } else {
-                                setDrawableBounds(Theme.chat_msgStickerCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(21.5f)) - Theme.chat_msgStickerCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgStickerCheckDrawable.getIntrinsicHeight());
+                                BaseCell.setDrawableBounds(Theme.chat_msgStickerCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(21.5f)) - Theme.chat_msgStickerCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgStickerCheckDrawable.getIntrinsicHeight());
                             }
                             Theme.chat_msgStickerCheckDrawable.draw(canvas);
                         } else {
                             if (drawCheck1) {
-                                setDrawableBounds(Theme.chat_msgMediaCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(26.3f)) - Theme.chat_msgMediaCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgMediaCheckDrawable.getIntrinsicHeight());
+                                BaseCell.setDrawableBounds(Theme.chat_msgMediaCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(26.3f)) - Theme.chat_msgMediaCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgMediaCheckDrawable.getIntrinsicHeight());
                             } else {
-                                setDrawableBounds(Theme.chat_msgMediaCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(21.5f)) - Theme.chat_msgMediaCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgMediaCheckDrawable.getIntrinsicHeight());
+                                BaseCell.setDrawableBounds(Theme.chat_msgMediaCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(21.5f)) - Theme.chat_msgMediaCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgMediaCheckDrawable.getIntrinsicHeight());
                             }
                             Theme.chat_msgMediaCheckDrawable.setAlpha((int) (255.0f * this.timeAlpha));
                             Theme.chat_msgMediaCheckDrawable.draw(canvas);
@@ -12355,13 +12426,13 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     if (drawCheck1) {
                         if (!this.mediaBackground || this.captionLayout != null) {
                             drawable = isDrawSelectedBackground() ? Theme.chat_msgOutHalfCheckSelectedDrawable : Theme.chat_msgOutHalfCheckDrawable;
-                            setDrawableBounds(drawable, (this.layoutWidth - AndroidUtilities.dp(18.0f)) - drawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.0f)) - drawable.getIntrinsicHeight());
+                            BaseCell.setDrawableBounds(drawable, (this.layoutWidth - AndroidUtilities.dp(18.0f)) - drawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.0f)) - drawable.getIntrinsicHeight());
                             drawable.draw(canvas);
                         } else if (this.currentMessageObject.type == 13 || this.currentMessageObject.type == 5) {
-                            setDrawableBounds(Theme.chat_msgStickerHalfCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(21.5f)) - Theme.chat_msgStickerHalfCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgStickerHalfCheckDrawable.getIntrinsicHeight());
+                            BaseCell.setDrawableBounds(Theme.chat_msgStickerHalfCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(21.5f)) - Theme.chat_msgStickerHalfCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgStickerHalfCheckDrawable.getIntrinsicHeight());
                             Theme.chat_msgStickerHalfCheckDrawable.draw(canvas);
                         } else {
-                            setDrawableBounds(Theme.chat_msgMediaHalfCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(21.5f)) - Theme.chat_msgMediaHalfCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgMediaHalfCheckDrawable.getIntrinsicHeight());
+                            BaseCell.setDrawableBounds(Theme.chat_msgMediaHalfCheckDrawable, (this.layoutWidth - AndroidUtilities.dp(21.5f)) - Theme.chat_msgMediaHalfCheckDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(13.5f)) - Theme.chat_msgMediaHalfCheckDrawable.getIntrinsicHeight());
                             Theme.chat_msgMediaHalfCheckDrawable.setAlpha((int) (255.0f * this.timeAlpha));
                             Theme.chat_msgMediaHalfCheckDrawable.draw(canvas);
                             Theme.chat_msgMediaHalfCheckDrawable.setAlpha(255);
@@ -12369,10 +12440,10 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     }
                 } else if (drawCheck1 || drawCheck2) {
                     if (this.mediaBackground && this.captionLayout == null) {
-                        setDrawableBounds(Theme.chat_msgBroadcastMediaDrawable, (this.layoutWidth - AndroidUtilities.dp(24.0f)) - Theme.chat_msgBroadcastMediaDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(14.0f)) - Theme.chat_msgBroadcastMediaDrawable.getIntrinsicHeight());
+                        BaseCell.setDrawableBounds(Theme.chat_msgBroadcastMediaDrawable, (this.layoutWidth - AndroidUtilities.dp(24.0f)) - Theme.chat_msgBroadcastMediaDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(14.0f)) - Theme.chat_msgBroadcastMediaDrawable.getIntrinsicHeight());
                         Theme.chat_msgBroadcastMediaDrawable.draw(canvas);
                     } else {
-                        setDrawableBounds(Theme.chat_msgBroadcastDrawable, (this.layoutWidth - AndroidUtilities.dp(20.5f)) - Theme.chat_msgBroadcastDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.0f)) - Theme.chat_msgBroadcastDrawable.getIntrinsicHeight());
+                        BaseCell.setDrawableBounds(Theme.chat_msgBroadcastDrawable, (this.layoutWidth - AndroidUtilities.dp(20.5f)) - Theme.chat_msgBroadcastDrawable.getIntrinsicWidth(), (this.layoutHeight - AndroidUtilities.dp(8.0f)) - Theme.chat_msgBroadcastDrawable.getIntrinsicHeight());
                         Theme.chat_msgBroadcastDrawable.draw(canvas);
                     }
                 }
@@ -12386,7 +12457,7 @@ public class ChatMessageCell extends BaseCell implements SeekBarDelegate, ImageR
                     }
                     this.rect.set((float) x, (float) y, (float) (AndroidUtilities.dp(14.0f) + x), (float) (AndroidUtilities.dp(14.0f) + y));
                     canvas.drawRoundRect(this.rect, (float) AndroidUtilities.dp(1.0f), (float) AndroidUtilities.dp(1.0f), Theme.chat_msgErrorPaint);
-                    setDrawableBounds(Theme.chat_msgErrorDrawable, AndroidUtilities.dp(6.0f) + x, AndroidUtilities.dp(2.0f) + y);
+                    BaseCell.setDrawableBounds(Theme.chat_msgErrorDrawable, AndroidUtilities.dp(6.0f) + x, AndroidUtilities.dp(2.0f) + y);
                     Theme.chat_msgErrorDrawable.draw(canvas);
                 }
             }

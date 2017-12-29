@@ -176,7 +176,7 @@ public final class SsaDecoder extends SimpleSubtitleDecoder {
                 return;
             }
         }
-        cues.add(new Cue(lineValues[this.formatTextIndex].replaceAll("\\{.*?\\}", "").replaceAll("\\\\N", "\n").replaceAll("\\\\n", "\n")));
+        cues.add(new Cue(lineValues[this.formatTextIndex].replaceAll("\\{.*?\\}", TtmlNode.ANONYMOUS_REGION_ID).replaceAll("\\\\N", "\n").replaceAll("\\\\n", "\n")));
         cueTimesUs.add(startTimeUs);
         if (endTimeUs != C.TIME_UNSET) {
             cues.add(null);
