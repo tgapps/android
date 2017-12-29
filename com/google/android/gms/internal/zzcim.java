@@ -3084,11 +3084,11 @@ public class zzcim {
     }
 
     public final void zzbah() {
-        String str;
         zzawx().zzve();
         zzxf();
         this.zzjgf = true;
         String zzayf;
+        String str;
         try {
             Boolean zzbas = zzawp().zzbas();
             if (zzbas == null) {
