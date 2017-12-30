@@ -993,11 +993,16 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         }
 
         public boolean onTouchEvent(MotionEvent event) {
-            boolean result = this.gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
-            if (this.scrolling && event.getAction() == 1 && this.scroll.isFinished()) {
-                stopScrolling();
+            boolean z = false;
+            if (!this.currentPhotos.isEmpty()) {
+                if (this.gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)) {
+                    z = true;
+                }
+                if (this.scrolling && event.getAction() == 1 && this.scroll.isFinished()) {
+                    stopScrolling();
+                }
             }
-            return result;
+            return z;
         }
 
         private int getMinScrollX() {
@@ -1911,7 +1916,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                         setImageIndex(0, true);
                     }
                     if (fromCache) {
-                        MessagesController.getAccountInstance().loadDialogPhotos(this.avatarsDialogId, 80, 0, false, this.classGuid);
+                        MessagesController.getInstance(this.currentAccount).loadDialogPhotos(this.avatarsDialogId, 80, 0, false, this.classGuid);
                     }
                 }
             }
@@ -1926,7 +1931,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                 if (this.needSearchImageInArr && this.isFirstLoading) {
                     this.isFirstLoading = false;
                     this.loadingMoreImages = true;
-                    DataQuery.getAccountInstance().loadMedia(this.currentDialogId, 80, 0, 0, true, this.classGuid);
+                    DataQuery.getInstance(this.currentAccount).loadMedia(this.currentDialogId, 80, 0, 0, true, this.classGuid);
                 } else if (!this.imagesArr.isEmpty()) {
                     if (this.opennedFromMedia) {
                         this.actionBar.setTitle(LocaleController.formatString("Of", R.string.Of, Integer.valueOf(this.currentIndex + 1), Integer.valueOf(this.totalImagesCount + this.totalImagesCountMerge)));
@@ -2043,16 +2048,16 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                         this.loadingMoreImages = true;
                         if (this.opennedFromMedia) {
                             long j;
-                            DataQuery accountInstance = DataQuery.getAccountInstance();
+                            DataQuery instance = DataQuery.getInstance(this.currentAccount);
                             if (loadIndex == 0) {
                                 j = this.currentDialogId;
                             } else {
                                 j = this.mergeDialogId;
                             }
-                            accountInstance.loadMedia(j, 80, loadFromMaxId, 0, true, this.classGuid);
+                            instance.loadMedia(j, 80, loadFromMaxId, 0, true, this.classGuid);
                             return;
                         }
-                        DataQuery.getAccountInstance().loadMedia(loadIndex == 0 ? this.currentDialogId : this.mergeDialogId, 80, loadFromMaxId, 0, true, this.classGuid);
+                        DataQuery.getInstance(this.currentAccount).loadMedia(loadIndex == 0 ? this.currentDialogId : this.mergeDialogId, 80, loadFromMaxId, 0, true, this.classGuid);
                     }
                 } else {
                     this.needSearchImageInArr = false;
@@ -2406,7 +2411,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                             } else if (lower_part > 0) {
                                 args.putInt("user_id", lower_part);
                             } else if (lower_part < 0) {
-                                Chat chat = MessagesController.getAccountInstance().getChat(Integer.valueOf(-lower_part));
+                                Chat chat = MessagesController.getInstance(PhotoViewer.this.currentAccount).getChat(Integer.valueOf(-lower_part));
                                 if (!(chat == null || chat.migrated_to == null)) {
                                     args.putInt("migrated_to", lower_part);
                                     lower_part = -chat.migrated_to.channel_id;
@@ -2485,14 +2490,14 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                                     User currentUser;
                                     Chat currentChat;
                                     if (lower_id > 0) {
-                                        currentUser = MessagesController.getAccountInstance().getUser(Integer.valueOf(lower_id));
+                                        currentUser = MessagesController.getInstance(PhotoViewer.this.currentAccount).getUser(Integer.valueOf(lower_id));
                                         currentChat = null;
                                     } else {
                                         currentUser = null;
-                                        currentChat = MessagesController.getAccountInstance().getChat(Integer.valueOf(-lower_id));
+                                        currentChat = MessagesController.getInstance(PhotoViewer.this.currentAccount).getChat(Integer.valueOf(-lower_id));
                                     }
                                     if (!(currentUser == null && ChatObject.isChannel(currentChat))) {
-                                        int currentDate = ConnectionsManager.getAccountInstance().getCurrentTime();
+                                        int currentDate = ConnectionsManager.getInstance(PhotoViewer.this.currentAccount).getCurrentTime();
                                         if (!((currentUser == null || currentUser.id == UserConfig.getInstance(PhotoViewer.this.currentAccount).getClientUserId()) && currentChat == null) && ((PhotoViewer.this.currentMessageObject.messageOwner.action == null || (PhotoViewer.this.currentMessageObject.messageOwner.action instanceof TL_messageActionEmpty)) && PhotoViewer.this.currentMessageObject.isOut() && currentDate - PhotoViewer.this.currentMessageObject.messageOwner.date <= 172800)) {
                                             int dp;
                                             View frameLayout = new FrameLayout(PhotoViewer.this.parentActivity);
@@ -2561,14 +2566,14 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                                                 }
                                             }
                                             if (current) {
-                                                MessagesController.getAccountInstance().deleteUserPhoto(null);
+                                                MessagesController.getInstance(PhotoViewer.this.currentAccount).deleteUserPhoto(null);
                                                 PhotoViewer.this.closePhoto(false, false);
                                             } else if (photo != null) {
                                                 TL_inputPhoto inputPhoto = new TL_inputPhoto();
                                                 inputPhoto.id = photo.id;
                                                 inputPhoto.access_hash = photo.access_hash;
-                                                MessagesController.getAccountInstance().deleteUserPhoto(inputPhoto);
-                                                MessagesStorage.getAccountInstance().clearUserPhoto(PhotoViewer.this.avatarsDialogId, photo.id);
+                                                MessagesController.getInstance(PhotoViewer.this.currentAccount).deleteUserPhoto(inputPhoto);
+                                                MessagesStorage.getInstance(PhotoViewer.this.currentAccount).clearUserPhoto(PhotoViewer.this.avatarsDialogId, photo.id);
                                                 PhotoViewer.this.imagesArrLocations.remove(PhotoViewer.this.currentIndex);
                                                 PhotoViewer.this.imagesArrLocationsSizes.remove(PhotoViewer.this.currentIndex);
                                                 PhotoViewer.this.avatarsArr.remove(PhotoViewer.this.currentIndex);
@@ -2599,9 +2604,9 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                                             if (((int) obj.getDialogId()) == 0 && obj.messageOwner.random_id != 0) {
                                                 random_ids = new ArrayList();
                                                 random_ids.add(Long.valueOf(obj.messageOwner.random_id));
-                                                encryptedChat = MessagesController.getAccountInstance().getEncryptedChat(Integer.valueOf((int) (obj.getDialogId() >> 32)));
+                                                encryptedChat = MessagesController.getInstance(PhotoViewer.this.currentAccount).getEncryptedChat(Integer.valueOf((int) (obj.getDialogId() >> 32)));
                                             }
-                                            MessagesController.getAccountInstance().deleteMessages(arr, random_ids, encryptedChat, obj.messageOwner.to_id.channel_id, zArr[0]);
+                                            MessagesController.getInstance(PhotoViewer.this.currentAccount).deleteMessages(arr, random_ids, encryptedChat, obj.messageOwner.to_id.channel_id, zArr[0]);
                                         }
                                     }
                                 }
@@ -5191,21 +5196,21 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r3 = 0;
         goto L_0x0104;
     L_0x02b6:
-        if (r23 == 0) goto L_0x048f;
+        if (r23 == 0) goto L_0x048c;
     L_0x02b8:
-        if (r25 != 0) goto L_0x048f;
+        if (r25 != 0) goto L_0x048c;
     L_0x02ba:
         r0 = r23;
         r3 = r0.messageOwner;
         r3 = r3.media;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaWebPage;
-        if (r3 == 0) goto L_0x038f;
+        if (r3 == 0) goto L_0x0384;
     L_0x02c4:
         r0 = r23;
         r3 = r0.messageOwner;
         r3 = r3.media;
         r3 = r3.webpage;
-        if (r3 == 0) goto L_0x038f;
+        if (r3 == 0) goto L_0x0384;
     L_0x02ce:
         r0 = r23;
         r3 = r0.messageOwner;
@@ -5215,73 +5220,68 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r21;
         r0 = r0.site_name;
         r19 = r0;
-        if (r19 == 0) goto L_0x038f;
+        if (r19 == 0) goto L_0x0384;
     L_0x02e0:
         r19 = r19.toLowerCase();
         r3 = "instagram";
         r0 = r19;
         r3 = r0.equals(r3);
-        if (r3 != 0) goto L_0x0312;
+        if (r3 != 0) goto L_0x0307;
     L_0x02ef:
         r3 = "twitter";
         r0 = r19;
         r3 = r0.equals(r3);
-        if (r3 != 0) goto L_0x0312;
+        if (r3 != 0) goto L_0x0307;
     L_0x02fa:
-        r3 = "telegram";
-        r0 = r19;
-        r3 = r0.equals(r3);
-        if (r3 != 0) goto L_0x0312;
-    L_0x0305:
         r3 = "telegram_album";
         r0 = r21;
         r4 = r0.type;
         r3 = r3.equals(r4);
-        if (r3 == 0) goto L_0x038f;
-    L_0x0312:
+        if (r3 == 0) goto L_0x0384;
+    L_0x0307:
         r0 = r21;
         r3 = r0.author;
         r3 = android.text.TextUtils.isEmpty(r3);
-        if (r3 != 0) goto L_0x0324;
-    L_0x031c:
+        if (r3 != 0) goto L_0x0319;
+    L_0x0311:
         r0 = r21;
         r3 = r0.author;
         r0 = r22;
         r0.nameOverride = r3;
-    L_0x0324:
+    L_0x0319:
         r0 = r21;
         r3 = r0.cached_page;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_pageFull;
-        if (r3 == 0) goto L_0x0351;
-    L_0x032c:
+        if (r3 == 0) goto L_0x0346;
+    L_0x0321:
         r2 = 0;
-    L_0x032d:
+    L_0x0322:
         r0 = r21;
         r3 = r0.cached_page;
         r3 = r3.blocks;
         r3 = r3.size();
-        if (r2 >= r3) goto L_0x0351;
-    L_0x0339:
+        if (r2 >= r3) goto L_0x0346;
+    L_0x032e:
         r0 = r21;
         r3 = r0.cached_page;
         r3 = r3.blocks;
         r13 = r3.get(r2);
         r13 = (org.telegram.tgnet.TLRPC.PageBlock) r13;
         r3 = r13 instanceof org.telegram.tgnet.TLRPC.TL_pageBlockAuthorDate;
-        if (r3 == 0) goto L_0x043a;
-    L_0x0349:
+        if (r3 == 0) goto L_0x0437;
+    L_0x033e:
         r13 = (org.telegram.tgnet.TLRPC.TL_pageBlockAuthorDate) r13;
         r3 = r13.published_date;
         r0 = r22;
         r0.dateOverride = r3;
-    L_0x0351:
+    L_0x0346:
         r3 = 0;
         r4 = 0;
         r0 = r23;
         r12 = r0.getWebPagePhotos(r3, r4);
         r3 = r12.isEmpty();
-        if (r3 != 0) goto L_0x038f;
-    L_0x035f:
+        if (r3 != 0) goto L_0x0384;
+    L_0x0354:
         r3 = r23.getId();
         r0 = r22;
         r0.slideshowMessageId = r3;
@@ -5303,53 +5303,55 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = 1;
         r0 = r22;
         r0.setImageIndex(r3, r4);
-    L_0x038f:
+    L_0x0384:
         r0 = r22;
         r3 = r0.slideshowMessageId;
-        if (r3 != 0) goto L_0x03ba;
-    L_0x0395:
+        if (r3 != 0) goto L_0x03af;
+    L_0x038a:
         r0 = r22;
         r3 = r0.imagesArr;
         r0 = r23;
         r3.add(r0);
         r0 = r22;
         r3 = r0.currentAnimation;
-        if (r3 != 0) goto L_0x03ae;
-    L_0x03a4:
+        if (r3 != 0) goto L_0x03a3;
+    L_0x0399:
         r0 = r23;
         r4 = r0.eventId;
         r6 = 0;
         r3 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r3 == 0) goto L_0x043e;
-    L_0x03ae:
+        if (r3 == 0) goto L_0x043b;
+    L_0x03a3:
         r3 = 0;
         r0 = r22;
         r0.needSearchImageInArr = r3;
-    L_0x03b3:
+    L_0x03a8:
         r3 = 0;
         r4 = 1;
         r0 = r22;
         r0.setImageIndex(r3, r4);
-    L_0x03ba:
+    L_0x03af:
         r0 = r22;
         r3 = r0.currentAnimation;
-        if (r3 != 0) goto L_0x0402;
-    L_0x03c0:
+        if (r3 != 0) goto L_0x03ff;
+    L_0x03b5:
         r0 = r22;
         r3 = r0.isEvent;
-        if (r3 != 0) goto L_0x0402;
-    L_0x03c6:
+        if (r3 != 0) goto L_0x03ff;
+    L_0x03bb:
         r0 = r22;
         r4 = r0.currentDialogId;
         r6 = 0;
         r3 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r3 == 0) goto L_0x06e9;
-    L_0x03d0:
+        if (r3 == 0) goto L_0x06e6;
+    L_0x03c5:
         r0 = r22;
         r3 = r0.totalImagesCount;
-        if (r3 != 0) goto L_0x06e9;
-    L_0x03d6:
-        r3 = org.telegram.messenger.DataQuery.getAccountInstance();
+        if (r3 != 0) goto L_0x06e6;
+    L_0x03cb:
+        r0 = r22;
+        r3 = r0.currentAccount;
+        r3 = org.telegram.messenger.DataQuery.getInstance(r3);
         r0 = r22;
         r4 = r0.currentDialogId;
         r6 = 0;
@@ -5361,9 +5363,11 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = r0.mergeDialogId;
         r6 = 0;
         r3 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r3 == 0) goto L_0x0402;
-    L_0x03f1:
-        r3 = org.telegram.messenger.DataQuery.getAccountInstance();
+        if (r3 == 0) goto L_0x03ff;
+    L_0x03ea:
+        r0 = r22;
+        r3 = r0.currentAccount;
+        r3 = org.telegram.messenger.DataQuery.getInstance(r3);
         r0 = r22;
         r4 = r0.mergeDialogId;
         r6 = 0;
@@ -5371,65 +5375,65 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r7 = r0.classGuid;
         r8 = 1;
         r3.getMediaCount(r4, r6, r7, r8);
-    L_0x0402:
+    L_0x03ff:
         r0 = r22;
         r3 = r0.currentMessageObject;
-        if (r3 == 0) goto L_0x0412;
-    L_0x0408:
+        if (r3 == 0) goto L_0x040f;
+    L_0x0405:
         r0 = r22;
         r3 = r0.currentMessageObject;
         r3 = r3.isVideo();
-        if (r3 != 0) goto L_0x0433;
-    L_0x0412:
+        if (r3 != 0) goto L_0x0430;
+    L_0x040f:
         r0 = r22;
         r3 = r0.currentBotInlineResult;
-        if (r3 == 0) goto L_0x0705;
-    L_0x0418:
+        if (r3 == 0) goto L_0x0706;
+    L_0x0415:
         r0 = r22;
         r3 = r0.currentBotInlineResult;
         r3 = r3.type;
         r4 = "video";
         r3 = r3.equals(r4);
-        if (r3 != 0) goto L_0x0433;
-    L_0x0427:
+        if (r3 != 0) goto L_0x0430;
+    L_0x0424:
         r0 = r22;
         r3 = r0.currentBotInlineResult;
         r3 = r3.document;
         r3 = org.telegram.messenger.MessageObject.isVideoDocument(r3);
-        if (r3 == 0) goto L_0x0705;
-    L_0x0433:
+        if (r3 == 0) goto L_0x0706;
+    L_0x0430:
         r3 = 0;
         r0 = r22;
         r0.onActionClick(r3);
-    L_0x0439:
+    L_0x0436:
         return;
-    L_0x043a:
+    L_0x0437:
         r2 = r2 + 1;
-        goto L_0x032d;
-    L_0x043e:
+        goto L_0x0322;
+    L_0x043b:
         r0 = r23;
         r3 = r0.messageOwner;
         r3 = r3.media;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaInvoice;
-        if (r3 != 0) goto L_0x03b3;
-    L_0x0448:
+        if (r3 != 0) goto L_0x03a8;
+    L_0x0445:
         r0 = r23;
         r3 = r0.messageOwner;
         r3 = r3.media;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaWebPage;
-        if (r3 != 0) goto L_0x03b3;
-    L_0x0452:
+        if (r3 != 0) goto L_0x03a8;
+    L_0x044f:
         r0 = r23;
         r3 = r0.messageOwner;
         r3 = r3.action;
-        if (r3 == 0) goto L_0x0464;
-    L_0x045a:
+        if (r3 == 0) goto L_0x0461;
+    L_0x0457:
         r0 = r23;
         r3 = r0.messageOwner;
         r3 = r3.action;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_messageActionEmpty;
-        if (r3 == 0) goto L_0x03b3;
-    L_0x0464:
+        if (r3 == 0) goto L_0x03a8;
+    L_0x0461:
         r3 = 1;
         r0 = r22;
         r0.needSearchImageInArr = r3;
@@ -5449,10 +5453,10 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r3 = r0.sendItem;
         r4 = 0;
         r3.setVisibility(r4);
-        goto L_0x03b3;
-    L_0x048f:
-        if (r24 == 0) goto L_0x050b;
-    L_0x0491:
+        goto L_0x03a8;
+    L_0x048c:
+        if (r24 == 0) goto L_0x0508;
+    L_0x048e:
         r0 = r28;
         r3 = r0.dialogId;
         r0 = r22;
@@ -5477,10 +5481,10 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r22;
         r3 = r0.videoPlayerControlFrameLayout;
         r3 = r3.getVisibility();
-        if (r3 == 0) goto L_0x04fe;
-    L_0x04cb:
+        if (r3 == 0) goto L_0x04fb;
+    L_0x04c8:
         r3 = 0;
-    L_0x04cc:
+    L_0x04c9:
         r4.setVisibility(r3);
         r3 = 1;
         r0 = r22;
@@ -5492,13 +5496,13 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r22;
         r3 = r0.shareButton;
         r3 = r3.getVisibility();
-        if (r3 != 0) goto L_0x0501;
-    L_0x04e6:
+        if (r3 != 0) goto L_0x04fe;
+    L_0x04e3:
         r0 = r22;
         r3 = r0.menuItem;
         r4 = 10;
         r3.hideSubItem(r4);
-    L_0x04ef:
+    L_0x04ec:
         r3 = 0;
         r4 = 1;
         r0 = r22;
@@ -5506,19 +5510,19 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r24;
         r1 = r22;
         r1.currentUserAvatarLocation = r0;
-        goto L_0x03ba;
-    L_0x04fe:
+        goto L_0x03af;
+    L_0x04fb:
         r3 = 8;
-        goto L_0x04cc;
-    L_0x0501:
+        goto L_0x04c9;
+    L_0x04fe:
         r0 = r22;
         r3 = r0.menuItem;
         r4 = 10;
         r3.showSubItem(r4);
-        goto L_0x04ef;
-    L_0x050b:
-        if (r25 == 0) goto L_0x056f;
-    L_0x050d:
+        goto L_0x04ec;
+    L_0x0508:
+        if (r25 == 0) goto L_0x056c;
+    L_0x050a:
         r3 = 1;
         r0 = r22;
         r0.opennedFromMedia = r3;
@@ -5535,12 +5539,12 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r25;
         r3.addAll(r0);
         r2 = 0;
-    L_0x052c:
+    L_0x0529:
         r0 = r22;
         r3 = r0.imagesArr;
         r3 = r3.size();
-        if (r2 >= r3) goto L_0x0565;
-    L_0x0536:
+        if (r2 >= r3) goto L_0x0562;
+    L_0x0533:
         r0 = r22;
         r3 = r0.imagesArr;
         r16 = r3.get(r2);
@@ -5551,33 +5555,33 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r22;
         r8 = r0.currentDialogId;
         r3 = (r6 > r8 ? 1 : (r6 == r8 ? 0 : -1));
-        if (r3 != 0) goto L_0x0563;
-    L_0x0550:
+        if (r3 != 0) goto L_0x0560;
+    L_0x054d:
         r3 = 0;
-    L_0x0551:
+    L_0x054e:
         r3 = r4[r3];
         r4 = r16.getId();
         r4 = java.lang.Integer.valueOf(r4);
         r0 = r16;
         r3.put(r4, r0);
         r2 = r2 + 1;
-        goto L_0x052c;
-    L_0x0563:
+        goto L_0x0529;
+    L_0x0560:
         r3 = 1;
-        goto L_0x0551;
-    L_0x0565:
+        goto L_0x054e;
+    L_0x0562:
         r3 = 1;
         r0 = r22;
         r1 = r27;
         r0.setImageIndex(r1, r3);
-        goto L_0x03ba;
-    L_0x056f:
-        if (r26 == 0) goto L_0x03ba;
-    L_0x0571:
+        goto L_0x03af;
+    L_0x056c:
+        if (r26 == 0) goto L_0x03af;
+    L_0x056e:
         r0 = r22;
         r3 = r0.sendPhotoType;
-        if (r3 != 0) goto L_0x0594;
-    L_0x0577:
+        if (r3 != 0) goto L_0x0591;
+    L_0x0574:
         r0 = r22;
         r3 = r0.checkImageView;
         r4 = 0;
@@ -5591,7 +5595,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r3.setTitleRightMargin(r4);
-    L_0x0594:
+    L_0x0591:
         r0 = r22;
         r3 = r0.menuItem;
         r4 = 8;
@@ -5606,13 +5610,13 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r17 = r3.get(r0);
         r0 = r17;
         r3 = r0 instanceof org.telegram.messenger.MediaController.PhotoEntry;
-        if (r3 == 0) goto L_0x06a5;
-    L_0x05b6:
+        if (r3 == 0) goto L_0x06a2;
+    L_0x05b3:
         r17 = (org.telegram.messenger.MediaController.PhotoEntry) r17;
         r0 = r17;
         r3 = r0.isVideo;
-        if (r3 == 0) goto L_0x069b;
-    L_0x05be:
+        if (r3 == 0) goto L_0x0698;
+    L_0x05bb:
         r0 = r22;
         r3 = r0.cropItem;
         r4 = 8;
@@ -5628,26 +5632,26 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = -r4;
         r4 = (float) r4;
         r3.setTranslationY(r4);
-    L_0x05de:
+    L_0x05db:
         r10 = 1;
-    L_0x05df:
+    L_0x05dc:
         r0 = r22;
         r3 = r0.parentChatActivity;
-        if (r3 == 0) goto L_0x065a;
-    L_0x05e5:
+        if (r3 == 0) goto L_0x0657;
+    L_0x05e2:
         r0 = r22;
         r3 = r0.parentChatActivity;
         r3 = r3.currentEncryptedChat;
-        if (r3 == 0) goto L_0x05fd;
-    L_0x05ed:
+        if (r3 == 0) goto L_0x05fa;
+    L_0x05ea:
         r0 = r22;
         r3 = r0.parentChatActivity;
         r3 = r3.currentEncryptedChat;
         r3 = r3.layer;
         r3 = org.telegram.messenger.AndroidUtilities.getPeerLayerVersion(r3);
         r4 = 46;
-        if (r3 < r4) goto L_0x065a;
-    L_0x05fd:
+        if (r3 < r4) goto L_0x0657;
+    L_0x05fa:
         r0 = r22;
         r3 = r0.mentionsAdapter;
         r0 = r22;
@@ -5659,51 +5663,51 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r22;
         r3 = r0.parentChatActivity;
         r3 = r3.currentChat;
-        if (r3 == 0) goto L_0x06df;
-    L_0x0616:
+        if (r3 == 0) goto L_0x06dc;
+    L_0x0613:
         r3 = 1;
-    L_0x0617:
+    L_0x0614:
         r4.setNeedUsernames(r3);
         r0 = r22;
         r3 = r0.mentionsAdapter;
         r4 = 0;
         r3.setNeedBotContext(r4);
-        if (r10 == 0) goto L_0x06e2;
-    L_0x0624:
+        if (r10 == 0) goto L_0x06df;
+    L_0x0621:
         r0 = r22;
         r3 = r0.placeProvider;
-        if (r3 == 0) goto L_0x063a;
-    L_0x062a:
+        if (r3 == 0) goto L_0x0637;
+    L_0x0627:
         r0 = r22;
         r3 = r0.placeProvider;
-        if (r3 == 0) goto L_0x06e2;
-    L_0x0630:
+        if (r3 == 0) goto L_0x06df;
+    L_0x062d:
         r0 = r22;
         r3 = r0.placeProvider;
         r3 = r3.allowCaption();
-        if (r3 == 0) goto L_0x06e2;
-    L_0x063a:
+        if (r3 == 0) goto L_0x06df;
+    L_0x0637:
         r3 = 1;
-    L_0x063b:
+    L_0x0638:
         r0 = r22;
         r0.needCaptionLayout = r3;
         r0 = r22;
         r4 = r0.captionEditText;
         r0 = r22;
         r3 = r0.needCaptionLayout;
-        if (r3 == 0) goto L_0x06e5;
-    L_0x0649:
+        if (r3 == 0) goto L_0x06e2;
+    L_0x0646:
         r3 = 0;
-    L_0x064a:
+    L_0x0647:
         r4.setVisibility(r3);
         r0 = r22;
         r3 = r0.needCaptionLayout;
-        if (r3 == 0) goto L_0x065a;
-    L_0x0653:
+        if (r3 == 0) goto L_0x0657;
+    L_0x0650:
         r0 = r22;
         r3 = r0.captionEditText;
         r3.onCreate();
-    L_0x065a:
+    L_0x0657:
         r0 = r22;
         r3 = r0.pickerView;
         r4 = 0;
@@ -5732,68 +5736,70 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = r4.getVisibility();
         r3.setVisibility(r4);
         r22.updateSelectedCount();
-        goto L_0x03ba;
-    L_0x069b:
+        goto L_0x03af;
+    L_0x0698:
         r0 = r22;
         r3 = r0.cropItem;
         r4 = 0;
         r3.setVisibility(r4);
-        goto L_0x05de;
-    L_0x06a5:
+        goto L_0x05db;
+    L_0x06a2:
         r0 = r17;
         r3 = r0 instanceof org.telegram.tgnet.TLRPC.BotInlineResult;
-        if (r3 == 0) goto L_0x06b7;
-    L_0x06ab:
+        if (r3 == 0) goto L_0x06b4;
+    L_0x06a8:
         r0 = r22;
         r3 = r0.cropItem;
         r4 = 8;
         r3.setVisibility(r4);
         r10 = 0;
-        goto L_0x05df;
-    L_0x06b7:
+        goto L_0x05dc;
+    L_0x06b4:
         r0 = r22;
         r4 = r0.cropItem;
         r0 = r17;
         r3 = r0 instanceof org.telegram.messenger.MediaController.SearchImage;
-        if (r3 == 0) goto L_0x06da;
-    L_0x06c1:
+        if (r3 == 0) goto L_0x06d7;
+    L_0x06be:
         r17 = (org.telegram.messenger.MediaController.SearchImage) r17;
         r0 = r17;
         r3 = r0.type;
-        if (r3 != 0) goto L_0x06da;
-    L_0x06c9:
+        if (r3 != 0) goto L_0x06d7;
+    L_0x06c6:
         r3 = 0;
-    L_0x06ca:
+    L_0x06c7:
         r4.setVisibility(r3);
         r0 = r22;
         r3 = r0.cropItem;
         r3 = r3.getVisibility();
-        if (r3 != 0) goto L_0x06dd;
-    L_0x06d7:
+        if (r3 != 0) goto L_0x06da;
+    L_0x06d4:
         r10 = 1;
-    L_0x06d8:
-        goto L_0x05df;
-    L_0x06da:
+    L_0x06d5:
+        goto L_0x05dc;
+    L_0x06d7:
         r3 = 8;
-        goto L_0x06ca;
-    L_0x06dd:
+        goto L_0x06c7;
+    L_0x06da:
         r10 = 0;
-        goto L_0x06d8;
+        goto L_0x06d5;
+    L_0x06dc:
+        r3 = 0;
+        goto L_0x0614;
     L_0x06df:
         r3 = 0;
-        goto L_0x0617;
+        goto L_0x0638;
     L_0x06e2:
-        r3 = 0;
-        goto L_0x063b;
-    L_0x06e5:
         r3 = 8;
-        goto L_0x064a;
-    L_0x06e9:
+        goto L_0x0647;
+    L_0x06e6:
         r0 = r22;
         r3 = r0.avatarsDialogId;
-        if (r3 == 0) goto L_0x0402;
-    L_0x06ef:
-        r3 = org.telegram.messenger.MessagesController.getAccountInstance();
+        if (r3 == 0) goto L_0x03ff;
+    L_0x06ec:
+        r0 = r22;
+        r3 = r0.currentAccount;
+        r3 = org.telegram.messenger.MessagesController.getInstance(r3);
         r0 = r22;
         r4 = r0.avatarsDialogId;
         r5 = 80;
@@ -5802,13 +5808,13 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r22;
         r9 = r0.classGuid;
         r3.loadDialogPhotos(r4, r5, r6, r8, r9);
-        goto L_0x0402;
-    L_0x0705:
+        goto L_0x03ff;
+    L_0x0706:
         r0 = r22;
         r3 = r0.imagesArrLocals;
         r3 = r3.isEmpty();
-        if (r3 != 0) goto L_0x0439;
-    L_0x070f:
+        if (r3 != 0) goto L_0x0436;
+    L_0x0710:
         r0 = r22;
         r3 = r0.imagesArrLocals;
         r0 = r27;
@@ -5816,38 +5822,38 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r14 = 0;
         r0 = r22;
         r3 = r0.parentChatActivity;
-        if (r3 == 0) goto L_0x076b;
-    L_0x0720:
+        if (r3 == 0) goto L_0x076c;
+    L_0x0721:
         r0 = r22;
         r3 = r0.parentChatActivity;
         r20 = r3.getCurrentUser();
-    L_0x0728:
+    L_0x0729:
         r0 = r22;
         r3 = r0.parentChatActivity;
-        if (r3 == 0) goto L_0x076e;
-    L_0x072e:
+        if (r3 == 0) goto L_0x076f;
+    L_0x072f:
         r0 = r22;
         r3 = r0.parentChatActivity;
         r3 = r3.isSecretChat();
-        if (r3 != 0) goto L_0x076e;
-    L_0x0738:
-        if (r20 == 0) goto L_0x076e;
-    L_0x073a:
+        if (r3 != 0) goto L_0x076f;
+    L_0x0739:
+        if (r20 == 0) goto L_0x076f;
+    L_0x073b:
         r0 = r20;
         r3 = r0.bot;
-        if (r3 != 0) goto L_0x076e;
-    L_0x0740:
-        r11 = 1;
+        if (r3 != 0) goto L_0x076f;
     L_0x0741:
+        r11 = 1;
+    L_0x0742:
         r3 = r15 instanceof org.telegram.messenger.MediaController.PhotoEntry;
-        if (r3 == 0) goto L_0x0770;
-    L_0x0745:
+        if (r3 == 0) goto L_0x0771;
+    L_0x0746:
         r18 = r15;
         r18 = (org.telegram.messenger.MediaController.PhotoEntry) r18;
         r0 = r18;
         r3 = r0.isVideo;
-        if (r3 == 0) goto L_0x075f;
-    L_0x074f:
+        if (r3 == 0) goto L_0x0760;
+    L_0x0750:
         r3 = new java.io.File;
         r0 = r18;
         r4 = r0.path;
@@ -5856,36 +5862,36 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r5 = 0;
         r0 = r22;
         r0.preparePlayer(r3, r4, r5);
-    L_0x075f:
-        if (r11 == 0) goto L_0x0439;
-    L_0x0761:
+    L_0x0760:
+        if (r11 == 0) goto L_0x0436;
+    L_0x0762:
         r0 = r22;
         r3 = r0.timeItem;
         r4 = 0;
         r3.setVisibility(r4);
-        goto L_0x0439;
-    L_0x076b:
+        goto L_0x0436;
+    L_0x076c:
         r20 = 0;
-        goto L_0x0728;
-    L_0x076e:
+        goto L_0x0729;
+    L_0x076f:
         r11 = 0;
-        goto L_0x0741;
-    L_0x0770:
-        if (r11 == 0) goto L_0x075f;
-    L_0x0772:
+        goto L_0x0742;
+    L_0x0771:
+        if (r11 == 0) goto L_0x0760;
+    L_0x0773:
         r3 = r15 instanceof org.telegram.messenger.MediaController.SearchImage;
-        if (r3 == 0) goto L_0x075f;
-    L_0x0776:
+        if (r3 == 0) goto L_0x0760;
+    L_0x0777:
         r15 = (org.telegram.messenger.MediaController.SearchImage) r15;
         r3 = r15.type;
-        if (r3 != 0) goto L_0x077e;
-    L_0x077c:
-        r11 = 1;
+        if (r3 != 0) goto L_0x077f;
     L_0x077d:
-        goto L_0x075f;
+        r11 = 1;
     L_0x077e:
+        goto L_0x0760;
+    L_0x077f:
         r11 = 0;
-        goto L_0x077d;
+        goto L_0x077e;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.onPhotoShow(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, java.util.ArrayList, java.util.ArrayList, int, org.telegram.ui.PhotoViewer$PlaceProviderObject):void");
     }
@@ -6119,14 +6125,14 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                     if (this.nameOverride != null) {
                         this.nameTextView.setText(this.nameOverride);
                     } else if (this.currentMessageObject.isFromUser()) {
-                        user = MessagesController.getAccountInstance().getUser(Integer.valueOf(this.currentMessageObject.messageOwner.from_id));
+                        user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(this.currentMessageObject.messageOwner.from_id));
                         if (user != null) {
                             this.nameTextView.setText(UserObject.getUserName(user));
                         } else {
                             this.nameTextView.setText(TtmlNode.ANONYMOUS_REGION_ID);
                         }
                     } else {
-                        chat = MessagesController.getAccountInstance().getChat(Integer.valueOf(this.currentMessageObject.messageOwner.to_id.channel_id));
+                        chat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(this.currentMessageObject.messageOwner.to_id.channel_id));
                         if (chat != null) {
                             this.nameTextView.setText(chat.title);
                         } else {
@@ -6176,7 +6182,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                                     loadFromMaxId = 0;
                                 }
                             }
-                            DataQuery.getAccountInstance().loadMedia(loadIndex == 0 ? this.currentDialogId : this.mergeDialogId, 80, loadFromMaxId, 0, true, this.classGuid);
+                            DataQuery.getInstance(this.currentAccount).loadMedia(loadIndex == 0 ? this.currentDialogId : this.mergeDialogId, 80, loadFromMaxId, 0, true, this.classGuid);
                             this.loadingMoreImages = true;
                         }
                         this.actionBar.setTitle(LocaleController.formatString("Of", R.string.Of, Integer.valueOf(this.currentIndex + 1), Integer.valueOf(this.totalImagesCount + this.totalImagesCountMerge)));
@@ -6190,7 +6196,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                                     loadFromMaxId = 0;
                                 }
                             }
-                            DataQuery.getAccountInstance().loadMedia(loadIndex == 0 ? this.currentDialogId : this.mergeDialogId, 80, loadFromMaxId, 0, true, this.classGuid);
+                            DataQuery.getInstance(this.currentAccount).loadMedia(loadIndex == 0 ? this.currentDialogId : this.mergeDialogId, 80, loadFromMaxId, 0, true, this.classGuid);
                             this.loadingMoreImages = true;
                         }
                         this.actionBar.setTitle(LocaleController.formatString("Of", R.string.Of, Integer.valueOf((((this.totalImagesCount + this.totalImagesCountMerge) - this.imagesArr.size()) + this.currentIndex) + 1), Integer.valueOf(this.totalImagesCount + this.totalImagesCountMerge)));
@@ -6946,7 +6952,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiDidLoaded);
                         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.FilePreparingFailed);
                         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.FileNewChunkAvailable);
-                        ConnectionsManager.getAccountInstance().cancelRequestsForGuid(this.classGuid);
+                        ConnectionsManager.getInstance(this.currentAccount).cancelRequestsForGuid(this.classGuid);
                         this.isActionBarVisible = false;
                         if (this.velocityTracker != null) {
                             this.velocityTracker.recycle();

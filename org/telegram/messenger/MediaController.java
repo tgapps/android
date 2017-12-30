@@ -2205,7 +2205,6 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
             } else {
                 cacheFile = FileLoader.getPathToMessage(messageObject.messageOwner);
             }
-            Intent intent;
             if (cacheFile == null || cacheFile == file || cacheFile.exists()) {
                 this.downloadingCurrentMessage = false;
                 if (messageObject.isMusic()) {
@@ -2503,13 +2502,8 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                     });
                 }
                 if (this.playingMessageObject.isMusic()) {
-                    intent = new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class);
                     try {
-                        if (VERSION.SDK_INT >= 26) {
-                            ApplicationLoader.applicationContext.startForegroundService(intent);
-                        } else {
-                            ApplicationLoader.applicationContext.startService(intent);
-                        }
+                        ApplicationLoader.applicationContext.startService(new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class));
                     } catch (Throwable e2222) {
                         FileLog.e(e2222);
                     }
@@ -2526,13 +2520,8 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
             this.audioInfo = null;
             this.playingMessageObject = messageObject;
             if (this.playingMessageObject.isMusic()) {
-                intent = new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class);
                 try {
-                    if (VERSION.SDK_INT >= 26) {
-                        ApplicationLoader.applicationContext.startForegroundService(intent);
-                    } else {
-                        ApplicationLoader.applicationContext.startService(intent);
-                    }
+                    ApplicationLoader.applicationContext.startService(new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class));
                 } catch (Throwable e22222) {
                     FileLog.e(e22222);
                 }
@@ -3841,13 +3830,21 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 this.cancelCurrentVideoConversion = true;
             }
         } else if (!this.videoConvertQueue.isEmpty()) {
-            if (this.videoConvertQueue.get(0) == messageObject) {
-                synchronized (this.videoConvertSync) {
-                    this.cancelCurrentVideoConversion = true;
+            int a = 0;
+            while (a < this.videoConvertQueue.size()) {
+                MessageObject object = (MessageObject) this.videoConvertQueue.get(a);
+                if (object.getId() != messageObject.getId() || object.currentAccount != messageObject.currentAccount) {
+                    a++;
+                } else if (a == 0) {
+                    synchronized (this.videoConvertSync) {
+                        this.cancelCurrentVideoConversion = true;
+                    }
+                    return;
+                } else {
+                    this.videoConvertQueue.remove(a);
+                    return;
                 }
-                return;
             }
-            this.videoConvertQueue.remove(messageObject);
         }
     }
 

@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.Keep;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -888,6 +889,7 @@ public class GroupCreateActivity extends BaseFragment implements OnClickListener
         }
     }
 
+    @Keep
     public void setContainerHeight(int value) {
         this.containerHeight = value;
         if (this.spansContainer != null) {
