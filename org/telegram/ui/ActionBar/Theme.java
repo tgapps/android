@@ -53,6 +53,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
+import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.exoplayer2.C;
@@ -75,6 +76,7 @@ public class Theme {
     public static Drawable avatar_broadcastDrawable = null;
     public static Drawable avatar_photoDrawable = null;
     public static Drawable avatar_savedDrawable = null;
+    private static boolean canStartHolidayAnimation = false;
     public static Paint chat_actionBackgroundPaint = null;
     public static TextPaint chat_actionTextPaint = null;
     public static TextPaint chat_adminPaint = null;
@@ -1514,64 +1516,85 @@ public class Theme {
         return stateListDrawable;
     }
 
+    public static boolean canStartHolidayAnimation() {
+        return canStartHolidayAnimation;
+    }
+
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public static android.graphics.drawable.Drawable getCurrentHolidayDrawable() {
         /*
-        r4 = 31;
-        r3 = dialogs_holidayDrawable;
-        if (r3 != 0) goto L_0x005d;
-    L_0x0006:
-        r6 = java.lang.System.currentTimeMillis();
-        r8 = lastHolidayCheckTime;
-        r6 = r6 - r8;
-        r8 = 3600000; // 0x36ee80 float:5.044674E-39 double:1.7786363E-317;
-        r3 = (r6 > r8 ? 1 : (r6 == r8 ? 0 : -1));
-        if (r3 < 0) goto L_0x005d;
+        r6 = 31;
+        r13 = 11;
+        r12 = 0;
+        r7 = 1;
+        r8 = java.lang.System.currentTimeMillis();
+        r10 = lastHolidayCheckTime;
+        r8 = r8 - r10;
+        r10 = 60000; // 0xea60 float:8.4078E-41 double:2.9644E-319;
+        r5 = (r8 > r10 ? 1 : (r8 == r10 ? 0 : -1));
+        if (r5 < 0) goto L_0x0073;
     L_0x0014:
-        r6 = java.lang.System.currentTimeMillis();
-        lastHolidayCheckTime = r6;
+        r8 = java.lang.System.currentTimeMillis();
+        lastHolidayCheckTime = r8;
         r0 = java.util.Calendar.getInstance();
-        r6 = java.lang.System.currentTimeMillis();
-        r0.setTimeInMillis(r6);
-        r3 = 2;
-        r2 = r0.get(r3);
-        r3 = 5;
-        r1 = r0.get(r3);
-        r3 = 11;
-        if (r2 != r3) goto L_0x003d;
-    L_0x0033:
-        r3 = org.telegram.messenger.BuildVars.DEBUG_PRIVATE_VERSION;
-        if (r3 == 0) goto L_0x0060;
-    L_0x0037:
-        r3 = 29;
-    L_0x0039:
-        if (r1 < r3) goto L_0x003d;
+        r8 = java.lang.System.currentTimeMillis();
+        r0.setTimeInMillis(r8);
+        r5 = 2;
+        r4 = r0.get(r5);
+        r5 = 5;
+        r1 = r0.get(r5);
+        r5 = 12;
+        r3 = r0.get(r5);
+        r2 = r0.get(r13);
+        if (r4 != 0) goto L_0x0076;
     L_0x003b:
-        if (r1 <= r4) goto L_0x0042;
+        if (r1 != r7) goto L_0x0076;
     L_0x003d:
-        if (r2 != 0) goto L_0x005d;
-    L_0x003f:
-        r3 = 1;
-        if (r1 != r3) goto L_0x005d;
-    L_0x0042:
-        r3 = org.telegram.messenger.ApplicationLoader.applicationContext;
-        r3 = r3.getResources();
-        r4 = 2131165524; // 0x7f070154 float:1.7945268E38 double:1.052935671E-314;
-        r3 = r3.getDrawable(r4);
-        dialogs_holidayDrawable = r3;
-        r3 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
-        r3 = org.telegram.messenger.AndroidUtilities.dp(r3);
-        r3 = -r3;
-        dialogs_holidayDrawableOffsetX = r3;
-        r3 = 0;
-        dialogs_holidayDrawableOffsetY = r3;
-    L_0x005d:
-        r3 = dialogs_holidayDrawable;
-        return r3;
-    L_0x0060:
-        r3 = r4;
-        goto L_0x0039;
+        r5 = 10;
+        if (r3 > r5) goto L_0x0076;
+    L_0x0041:
+        if (r2 != 0) goto L_0x0076;
+    L_0x0043:
+        canStartHolidayAnimation = r7;
+    L_0x0045:
+        r5 = dialogs_holidayDrawable;
+        if (r5 != 0) goto L_0x0073;
+    L_0x0049:
+        if (r4 != r13) goto L_0x0055;
+    L_0x004b:
+        r5 = org.telegram.messenger.BuildVars.DEBUG_PRIVATE_VERSION;
+        if (r5 == 0) goto L_0x0079;
+    L_0x004f:
+        r5 = 29;
+    L_0x0051:
+        if (r1 < r5) goto L_0x0055;
+    L_0x0053:
+        if (r1 <= r6) goto L_0x0059;
+    L_0x0055:
+        if (r4 != 0) goto L_0x0073;
+    L_0x0057:
+        if (r1 != r7) goto L_0x0073;
+    L_0x0059:
+        r5 = org.telegram.messenger.ApplicationLoader.applicationContext;
+        r5 = r5.getResources();
+        r6 = 2131165524; // 0x7f070154 float:1.7945268E38 double:1.052935671E-314;
+        r5 = r5.getDrawable(r6);
+        dialogs_holidayDrawable = r5;
+        r5 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r5 = org.telegram.messenger.AndroidUtilities.dp(r5);
+        r5 = -r5;
+        dialogs_holidayDrawableOffsetX = r5;
+        dialogs_holidayDrawableOffsetY = r12;
+    L_0x0073:
+        r5 = dialogs_holidayDrawable;
+        return r5;
+    L_0x0076:
+        canStartHolidayAnimation = r12;
+        goto L_0x0045;
+    L_0x0079:
+        r5 = r6;
+        goto L_0x0051;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.Theme.getCurrentHolidayDrawable():android.graphics.drawable.Drawable");
     }
@@ -2519,7 +2542,7 @@ public class Theme {
         chat_msgTextPaintOneEmoji.setTextSize((float) AndroidUtilities.dp(28.0f));
         chat_msgTextPaintTwoEmoji.setTextSize((float) AndroidUtilities.dp(24.0f));
         chat_msgTextPaintThreeEmoji.setTextSize((float) AndroidUtilities.dp(20.0f));
-        chat_msgTextPaint.setTextSize((float) AndroidUtilities.dp((float) MessagesController.getAccountInstance().fontSize));
+        chat_msgTextPaint.setTextSize((float) AndroidUtilities.dp((float) SharedConfig.fontSize));
         chat_msgGameTextPaint.setTextSize((float) AndroidUtilities.dp(14.0f));
         chat_msgBotButtonPaint.setTextSize((float) AndroidUtilities.dp(15.0f));
         if (!fontsOnly && chat_botProgressPaint != null) {
@@ -2547,7 +2570,7 @@ public class Theme {
             chat_instantViewPaint.setTextSize((float) AndroidUtilities.dp(13.0f));
             chat_instantViewRectPaint.setStrokeWidth((float) AndroidUtilities.dp(1.0f));
             chat_statusRecordPaint.setStrokeWidth((float) AndroidUtilities.dp(2.0f));
-            chat_actionTextPaint.setTextSize((float) AndroidUtilities.dp((float) (Math.max(16, MessagesController.getAccountInstance().fontSize) - 2)));
+            chat_actionTextPaint.setTextSize((float) AndroidUtilities.dp((float) (Math.max(16, SharedConfig.fontSize) - 2)));
             chat_contextResult_titleTextPaint.setTextSize((float) AndroidUtilities.dp(15.0f));
             chat_contextResult_descriptionTextPaint.setTextSize((float) AndroidUtilities.dp(13.0f));
             chat_radialProgressPaint.setStrokeWidth((float) AndroidUtilities.dp(3.0f));
@@ -2906,12 +2929,12 @@ public class Theme {
             Utilities.searchQueue.postRunnable(new Runnable() {
                 public void run() {
                     Throwable e;
-                    int selectedBackground;
+                    SharedPreferences preferences;
                     File toFile;
                     Throwable th;
                     synchronized (Theme.wallpaperSync) {
                         int i;
-                        SharedPreferences preferences;
+                        int selectedBackground;
                         if (!MessagesController.getGlobalMainSettings().getBoolean("overrideThemeWallpaper", false)) {
                             Integer backgroundColor = (Integer) Theme.currentColors.get(Theme.key_chat_wallpaper);
                             if (backgroundColor != null) {
