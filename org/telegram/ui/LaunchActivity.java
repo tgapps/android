@@ -4022,9 +4022,10 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         int lower_part = (int) did;
         int high_id = (int) (did >> 32);
         Bundle args = new Bundle();
+        int account = dialogsFragment != null ? dialogsFragment.getCurrentAccount() : this.currentAccount;
         args.putBoolean("scrollToTopOnResume", true);
         if (!AndroidUtilities.isTablet()) {
-            NotificationCenter.getInstance(dialogsFragment.getCurrentAccount()).postNotificationName(NotificationCenter.closeChats, new Object[0]);
+            NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.closeChats, new Object[0]);
         }
         if (lower_part == 0) {
             args.putInt("enc_id", high_id);
@@ -4035,10 +4036,10 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         } else if (lower_part < 0) {
             args.putInt("chat_id", -lower_part);
         }
-        if (MessagesController.getInstance(dialogsFragment.getCurrentAccount()).checkCanOpenChat(args, dialogsFragment)) {
+        if (MessagesController.getInstance(account).checkCanOpenChat(args, dialogsFragment)) {
             boolean z;
             boolean z2;
-            ChatActivity fragment = new ChatActivity(args);
+            BaseFragment chatActivity = new ChatActivity(args);
             ActionBarLayout actionBarLayout = this.actionBarLayout;
             if (dialogsFragment != null) {
                 z = true;
@@ -4050,9 +4051,9 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
             } else {
                 z2 = false;
             }
-            actionBarLayout.presentFragment(fragment, z, z2, true);
+            actionBarLayout.presentFragment(chatActivity, z, z2, true);
             if (this.videoPath != null) {
-                fragment.openVideoEditor(this.videoPath, this.sendingText);
+                chatActivity.openVideoEditor(this.videoPath, this.sendingText);
                 this.sendingText = null;
             }
             if (this.photoPathsArray != null) {
@@ -4071,7 +4072,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
             if (!(this.contactsToSend == null || this.contactsToSend.isEmpty())) {
                 Iterator it = this.contactsToSend.iterator();
                 while (it.hasNext()) {
-                    SendMessagesHelper.getInstance(dialogsFragment.getCurrentAccount()).sendMessage((User) it.next(), did, null, null, null);
+                    SendMessagesHelper.getInstance(account).sendMessage((User) it.next(), did, null, null, null);
                 }
             }
             this.photoPathsArray = null;

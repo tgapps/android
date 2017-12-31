@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 import org.telegram.PhoneFormat.PhoneFormat;
@@ -99,18 +100,19 @@ public class MessagesStorage {
     private File cacheFile;
     private int currentAccount;
     private SQLiteDatabase database;
-    public int lastDateValue = 0;
-    public int lastPtsValue = 0;
-    public int lastQtsValue = 0;
+    private int lastDateValue = 0;
+    private int lastPtsValue = 0;
+    private int lastQtsValue = 0;
     private int lastSavedDate = 0;
     private int lastSavedPts = 0;
     private int lastSavedQts = 0;
     private int lastSavedSeq = 0;
-    public int lastSecretVersion = 0;
-    public int lastSeqValue = 0;
+    private int lastSecretVersion = 0;
+    private int lastSeqValue = 0;
     private AtomicLong lastTaskId = new AtomicLong(System.currentTimeMillis());
-    public int secretG = 0;
-    public byte[] secretPBytes = null;
+    private CountDownLatch openSync = new CountDownLatch(1);
+    private int secretG = 0;
+    private byte[] secretPBytes = null;
     private DispatchQueue storageQueue = new DispatchQueue("storageQueue");
 
     private class Hole {
@@ -161,10 +163,91 @@ public class MessagesStorage {
         return localInstance;
     }
 
+    private void ensureOpened() {
+        try {
+            this.openSync.await();
+        } catch (Throwable th) {
+        }
+    }
+
+    public int getLastDateValue() {
+        ensureOpened();
+        return this.lastDateValue;
+    }
+
+    public void setLastDateValue(int value) {
+        ensureOpened();
+        this.lastDateValue = value;
+    }
+
+    public int getLastPtsValue() {
+        ensureOpened();
+        return this.lastPtsValue;
+    }
+
+    public void setLastPtsValue(int value) {
+        ensureOpened();
+        this.lastPtsValue = value;
+    }
+
+    public int getLastQtsValue() {
+        ensureOpened();
+        return this.lastQtsValue;
+    }
+
+    public void setLastQtsValue(int value) {
+        ensureOpened();
+        this.lastQtsValue = value;
+    }
+
+    public int getLastSeqValue() {
+        ensureOpened();
+        return this.lastSeqValue;
+    }
+
+    public void setLastSeqValue(int value) {
+        ensureOpened();
+        this.lastSeqValue = value;
+    }
+
+    public int getLastSecretVersion() {
+        ensureOpened();
+        return this.lastSecretVersion;
+    }
+
+    public void setLastSecretVersion(int value) {
+        ensureOpened();
+        this.lastSecretVersion = value;
+    }
+
+    public byte[] getSecretPBytes() {
+        ensureOpened();
+        return this.secretPBytes;
+    }
+
+    public void setSecretPBytes(byte[] value) {
+        ensureOpened();
+        this.secretPBytes = value;
+    }
+
+    public int getSecretG() {
+        ensureOpened();
+        return this.secretG;
+    }
+
+    public void setSecretG(int value) {
+        ensureOpened();
+        this.secretG = value;
+    }
+
     public MessagesStorage(int instance) {
         this.currentAccount = instance;
         this.storageQueue.setPriority(10);
-        openDatabase(true);
+        this.storageQueue.postRunnable(new Runnable() {
+            public void run() {
+                MessagesStorage.this.openDatabase(true);
+            }
+        });
     }
 
     public SQLiteDatabase getDatabase() {
@@ -315,6 +398,10 @@ public class MessagesStorage {
         }
         loadUnreadMessages();
         loadPendingTasks();
+        try {
+            this.openSync.countDown();
+        } catch (Throwable th) {
+        }
     }
 
     private void updateDbToLastVersion(final int currentVersion) {
@@ -2749,7 +2836,7 @@ Error: java.util.NoSuchElementException
             L_0x0080:
                 throw r5;
                 */
-                throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.45.run():void");
+                throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.46.run():void");
             }
         });
         try {
@@ -3996,7 +4083,7 @@ Error: java.util.NoSuchElementException
                 r6.release();
                 throw r5;
                 */
-                throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.58.run():void");
+                throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.59.run():void");
             }
         });
         try {
@@ -4114,7 +4201,7 @@ Error: java.util.NoSuchElementException
                 L_0x0087:
                     throw r5;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.59.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.60.run():void");
                 }
             });
         }
@@ -4226,7 +4313,7 @@ Error: java.util.NoSuchElementException
                 L_0x009a:
                     throw r4;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.60.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.61.run():void");
                 }
             });
         }
@@ -4291,7 +4378,7 @@ Error: java.util.NoSuchElementException
                 L_0x0037:
                     throw r2;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.61.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.62.run():void");
                 }
             });
         }
@@ -4356,7 +4443,7 @@ Error: java.util.NoSuchElementException
                 L_0x0037:
                     throw r2;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.62.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.63.run():void");
                 }
             });
         }
@@ -4588,7 +4675,7 @@ Error: java.util.NoSuchElementException
                 L_0x016a:
                     throw r7;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.63.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.64.run():void");
                 }
             });
         }
@@ -4704,7 +4791,7 @@ Error: java.util.NoSuchElementException
                     r5.release();
                     throw r4;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.66.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.67.run():void");
                 }
             });
         }
@@ -6981,6 +7068,7 @@ Error: java.util.NoSuchElementException
     public void getDialogs(final int offset, final int count) {
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
+                Message message;
                 messages_Dialogs dialogs = new TL_messages_dialogs();
                 ArrayList<EncryptedChat> encryptedChats = new ArrayList();
                 ArrayList<Integer> usersToLoad = new ArrayList();
@@ -6991,7 +7079,6 @@ Error: java.util.NoSuchElementException
                 HashMap<Long, Message> replyMessageOwners = new HashMap();
                 SQLiteCursor cursor = MessagesStorage.this.database.queryFinalized(String.format(Locale.US, "SELECT d.did, d.last_mid, d.unread_count, d.date, m.data, m.read_state, m.mid, m.send_state, s.flags, m.date, d.pts, d.inbox_max, d.outbox_max, m.replydata, d.pinned, d.unread_count_i FROM dialogs as d LEFT JOIN messages as m ON d.last_mid = m.mid LEFT JOIN dialog_settings as s ON d.did = s.did ORDER BY d.pinned DESC, d.date DESC LIMIT %d,%d", new Object[]{Integer.valueOf(offset), Integer.valueOf(count)}), new Object[0]);
                 while (cursor.next()) {
-                    Message message;
                     TL_dialog dialog = new TL_dialog();
                     dialog.id = cursor.longValue(0);
                     dialog.top_message = cursor.intValue(1);
