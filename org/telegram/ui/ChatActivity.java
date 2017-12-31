@@ -76,7 +76,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AndroidUtilities;
@@ -1521,7 +1521,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
     }
 
     public boolean onFragmentCreate() {
-        Semaphore semaphore;
+        CountDownLatch countDownLatch;
         int chatId = this.arguments.getInt("chat_id", 0);
         int userId = this.arguments.getInt("user_id", 0);
         int encId = this.arguments.getInt("enc_id", 0);
@@ -1533,23 +1533,23 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         MessagesStorage messagesStorage;
         final MessagesStorage messagesStorage2;
         final int i;
-        final Semaphore semaphore2;
+        final CountDownLatch countDownLatch2;
         if (chatId != 0) {
             this.currentChat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(chatId));
             if (this.currentChat == null) {
-                semaphore = new Semaphore(0);
+                countDownLatch = new CountDownLatch(1);
                 messagesStorage = MessagesStorage.getInstance(this.currentAccount);
                 messagesStorage2 = messagesStorage;
                 i = chatId;
-                semaphore2 = semaphore;
+                countDownLatch2 = countDownLatch;
                 messagesStorage.getStorageQueue().postRunnable(new Runnable() {
                     public void run() {
                         ChatActivity.this.currentChat = messagesStorage2.getChat(i);
-                        semaphore2.release();
+                        countDownLatch2.countDown();
                     }
                 });
                 try {
-                    semaphore.acquire();
+                    countDownLatch.await();
                 } catch (Throwable e) {
                     FileLog.e(e);
                 }
@@ -1571,18 +1571,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
             this.currentUser = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(userId));
             if (this.currentUser == null) {
                 messagesStorage = MessagesStorage.getInstance(this.currentAccount);
-                semaphore = new Semaphore(0);
+                countDownLatch = new CountDownLatch(1);
                 messagesStorage2 = messagesStorage;
                 i = userId;
-                semaphore2 = semaphore;
+                countDownLatch2 = countDownLatch;
                 messagesStorage.getStorageQueue().postRunnable(new Runnable() {
                     public void run() {
                         ChatActivity.this.currentUser = messagesStorage2.getUser(i);
-                        semaphore2.release();
+                        countDownLatch2.countDown();
                     }
                 });
                 try {
-                    semaphore.acquire();
+                    countDownLatch.await();
                 } catch (Throwable e2) {
                     FileLog.e(e2);
                 }
@@ -1602,18 +1602,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
             this.currentEncryptedChat = MessagesController.getInstance(this.currentAccount).getEncryptedChat(Integer.valueOf(encId));
             messagesStorage = MessagesStorage.getInstance(this.currentAccount);
             if (this.currentEncryptedChat == null) {
-                semaphore = new Semaphore(0);
+                countDownLatch = new CountDownLatch(1);
                 messagesStorage2 = messagesStorage;
                 i = encId;
-                semaphore2 = semaphore;
+                countDownLatch2 = countDownLatch;
                 messagesStorage.getStorageQueue().postRunnable(new Runnable() {
                     public void run() {
                         ChatActivity.this.currentEncryptedChat = messagesStorage2.getEncryptedChat(i);
-                        semaphore2.release();
+                        countDownLatch2.countDown();
                     }
                 });
                 try {
-                    semaphore.acquire();
+                    countDownLatch.await();
                 } catch (Throwable e22) {
                     FileLog.e(e22);
                 }
@@ -1624,17 +1624,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
             }
             this.currentUser = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(this.currentEncryptedChat.user_id));
             if (this.currentUser == null) {
-                semaphore = new Semaphore(0);
+                countDownLatch = new CountDownLatch(1);
                 messagesStorage2 = messagesStorage;
-                final Semaphore semaphore3 = semaphore;
+                final CountDownLatch countDownLatch3 = countDownLatch;
                 messagesStorage.getStorageQueue().postRunnable(new Runnable() {
                     public void run() {
                         ChatActivity.this.currentUser = messagesStorage2.getUser(ChatActivity.this.currentEncryptedChat.user_id);
-                        semaphore3.release();
+                        countDownLatch3.countDown();
                     }
                 });
                 try {
-                    semaphore.acquire();
+                    countDownLatch.await();
                 } catch (Throwable e222) {
                     FileLog.e(e222);
                 }
@@ -1759,14 +1759,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
             instance.loadMessages(j, i2, 0, 0, true, 0, i3, 2, 0, isChannel, i4);
         }
         if (this.currentChat != null) {
-            Semaphore semaphore4 = null;
+            CountDownLatch countDownLatch4 = null;
             if (this.isBroadcast) {
-                semaphore = new Semaphore(0);
+                countDownLatch = new CountDownLatch(1);
             }
-            MessagesController.getInstance(this.currentAccount).loadChatInfo(this.currentChat.id, semaphore4, ChatObject.isChannel(this.currentChat));
-            if (this.isBroadcast && semaphore4 != null) {
+            MessagesController.getInstance(this.currentAccount).loadChatInfo(this.currentChat.id, countDownLatch4, ChatObject.isChannel(this.currentChat));
+            if (this.isBroadcast && countDownLatch4 != null) {
                 try {
-                    semaphore4.acquire();
+                    countDownLatch4.await();
                 } catch (Throwable e2222) {
                     FileLog.e(e2222);
                 }

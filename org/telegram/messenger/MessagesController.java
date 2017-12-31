@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.CountDownLatch;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.messenger.NotificationCenter.NotificationCenterDelegate;
 import org.telegram.messenger.beta.R;
@@ -1044,11 +1044,11 @@ public class MessagesController implements NotificationCenterDelegate {
                 return chat;
             }
         }
-        Semaphore semaphore = new Semaphore(0);
+        CountDownLatch countDownLatch = new CountDownLatch(1);
         ArrayList<TLObject> result = new ArrayList();
-        MessagesStorage.getInstance(this.currentAccount).getEncryptedChat(chat_id, semaphore, result);
+        MessagesStorage.getInstance(this.currentAccount).getEncryptedChat(chat_id, countDownLatch, result);
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -2703,8 +2703,8 @@ public class MessagesController implements NotificationCenterDelegate {
         }
     }
 
-    public void loadChatInfo(int chat_id, Semaphore semaphore, boolean force) {
-        MessagesStorage.getInstance(this.currentAccount).loadChatInfo(chat_id, semaphore, force, false);
+    public void loadChatInfo(int chat_id, CountDownLatch countDownLatch, boolean force) {
+        MessagesStorage.getInstance(this.currentAccount).loadChatInfo(chat_id, countDownLatch, force, false);
     }
 
     public void processChatInfo(int chat_id, ChatFull info, ArrayList<User> usersArr, boolean fromCache, boolean force, boolean byChannelUsers, MessageObject pinnedMessageObject) {

@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.SQLite.SQLiteCursor;
@@ -2738,7 +2737,7 @@ public class MessagesStorage {
     }
 
     public boolean isMigratedChat(final int chat_id) {
-        final Semaphore semaphore = new Semaphore(0);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final boolean[] result = new boolean[1];
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
@@ -2770,7 +2769,7 @@ Error: java.util.NoSuchElementException
                 r7.<init>();	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
                 r8 = "SELECT info FROM chat_settings_v2 WHERE uid = ";	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
                 r7 = r7.append(r8);	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
-                r8 = r7;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
+                r8 = r6;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
                 r7 = r7.append(r8);	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
                 r7 = r7.toString();	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
                 r8 = 0;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
@@ -2793,7 +2792,7 @@ Error: java.util.NoSuchElementException
                 r1.reuse();	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
             L_0x0044:
                 r0.dispose();	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
-                r6 = r1;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
+                r6 = r2;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
                 r7 = 0;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
                 r8 = r3 instanceof org.telegram.tgnet.TLRPC.TL_channelFull;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
                 if (r8 == 0) goto L_0x0053;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
@@ -2804,35 +2803,35 @@ Error: java.util.NoSuchElementException
                 r5 = 1;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
             L_0x0053:
                 r6[r7] = r5;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
-                r5 = r2;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
+                r5 = r0;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
                 if (r5 == 0) goto L_0x005e;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
             L_0x0059:
-                r5 = r2;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
-                r5.release();	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
+                r5 = r0;	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
+                r5.countDown();	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
             L_0x005e:
-                r5 = r2;
+                r5 = r0;
                 if (r5 == 0) goto L_0x0067;
             L_0x0062:
-                r5 = r2;
-                r5.release();
+                r5 = r0;
+                r5.countDown();
             L_0x0067:
                 return;
             L_0x0068:
                 r2 = move-exception;
                 org.telegram.messenger.FileLog.e(r2);	 Catch:{ Exception -> 0x0068, all -> 0x0076 }
-                r5 = r2;
+                r5 = r0;
                 if (r5 == 0) goto L_0x0067;
             L_0x0070:
-                r5 = r2;
-                r5.release();
+                r5 = r0;
+                r5.countDown();
                 goto L_0x0067;
             L_0x0076:
                 r5 = move-exception;
-                r6 = r2;
+                r6 = r0;
                 if (r6 == 0) goto L_0x0080;
             L_0x007b:
-                r6 = r2;
-                r6.release();
+                r6 = r0;
+                r6.countDown();
             L_0x0080:
                 throw r5;
                 */
@@ -2840,16 +2839,16 @@ Error: java.util.NoSuchElementException
             }
         });
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }
         return result[0];
     }
 
-    public void loadChatInfo(int chat_id, Semaphore semaphore, boolean force, boolean byChannelUsers) {
+    public void loadChatInfo(int chat_id, CountDownLatch countDownLatch, boolean force, boolean byChannelUsers) {
         final int i = chat_id;
-        final Semaphore semaphore2 = semaphore;
+        final CountDownLatch countDownLatch2 = countDownLatch;
         final boolean z = force;
         final boolean z2 = byChannelUsers;
         this.storageQueue.postRunnable(new Runnable() {
@@ -2930,27 +2929,27 @@ Error: java.util.NoSuchElementException
                             MessagesStorage.this.getUsersInternal(usersToLoad.toString(), loadedUsers);
                         }
                     }
-                    if (semaphore2 != null) {
-                        semaphore2.release();
+                    if (countDownLatch2 != null) {
+                        countDownLatch2.countDown();
                     }
                     if ((info instanceof TL_channelFull) && info.pinned_msg_id != 0) {
                         pinnedMessageObject = DataQuery.getInstance(MessagesStorage.this.currentAccount).loadPinnedMessage(i, info.pinned_msg_id, false);
                     }
                     MessagesController.getInstance(MessagesStorage.this.currentAccount).processChatInfo(i, info, loadedUsers, true, z, z2, pinnedMessageObject);
-                    if (semaphore2 != null) {
-                        semaphore2.release();
+                    if (countDownLatch2 != null) {
+                        countDownLatch2.countDown();
                     }
                 } catch (Throwable e2) {
                     FileLog.e(e2);
                     MessagesController.getInstance(MessagesStorage.this.currentAccount).processChatInfo(i, info, loadedUsers, true, z, z2, null);
-                    if (semaphore2 != null) {
-                        semaphore2.release();
+                    if (countDownLatch2 != null) {
+                        countDownLatch2.countDown();
                     }
                 } catch (Throwable th) {
                     Throwable th2 = th;
                     MessagesController.getInstance(MessagesStorage.this.currentAccount).processChatInfo(i, info, loadedUsers, true, z, z2, null);
-                    if (semaphore2 != null) {
-                        semaphore2.release();
+                    if (countDownLatch2 != null) {
+                        countDownLatch2.countDown();
                     }
                 }
             }
@@ -3339,7 +3338,7 @@ Error: java.util.NoSuchElementException
 
     public boolean checkMessageId(long dialog_id, int mid) {
         final boolean[] result = new boolean[1];
-        final Semaphore semaphore = new Semaphore(0);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final long j = dialog_id;
         final int i = mid;
         this.storageQueue.postRunnable(new Runnable() {
@@ -3363,11 +3362,11 @@ Error: java.util.NoSuchElementException
                         cursor.dispose();
                     }
                 }
-                semaphore.release();
+                countDownLatch.countDown();
             }
         });
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -4006,7 +4005,7 @@ Error: java.util.NoSuchElementException
         if (path == null || path.endsWith("attheme")) {
             return null;
         }
-        final Semaphore semaphore = new Semaphore(0);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final ArrayList<TLObject> result = new ArrayList();
         final String str = path;
         final int i = type;
@@ -4059,7 +4058,7 @@ Error: java.util.NoSuchElementException
                 r0.dispose();	 Catch:{ Exception -> 0x006b }
             L_0x0057:
                 r5 = r5;
-                r5.release();
+                r5.countDown();
             L_0x005c:
                 return;
             L_0x005d:
@@ -4075,19 +4074,19 @@ Error: java.util.NoSuchElementException
                 r2 = move-exception;
                 org.telegram.messenger.FileLog.e(r2);	 Catch:{ all -> 0x0075 }
                 r5 = r5;
-                r5.release();
+                r5.countDown();
                 goto L_0x005c;
             L_0x0075:
                 r5 = move-exception;
                 r6 = r5;
-                r6.release();
+                r6.countDown();
                 throw r5;
                 */
                 throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.59.run():void");
             }
         });
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -4682,7 +4681,7 @@ Error: java.util.NoSuchElementException
     }
 
     public boolean isDialogHasMessages(long did) {
-        final Semaphore semaphore = new Semaphore(0);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final boolean[] result = new boolean[1];
         final long j = did;
         this.storageQueue.postRunnable(new Runnable() {
@@ -4694,12 +4693,12 @@ Error: java.util.NoSuchElementException
                 } catch (Throwable e) {
                     FileLog.e(e);
                 } finally {
-                    semaphore.release();
+                    countDownLatch.countDown();
                 }
             }
         });
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -4707,7 +4706,7 @@ Error: java.util.NoSuchElementException
     }
 
     public boolean hasAuthMessage(final int date) {
-        final Semaphore semaphore = new Semaphore(0);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final boolean[] result = new boolean[1];
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
@@ -4718,20 +4717,20 @@ Error: java.util.NoSuchElementException
                 } catch (Throwable e) {
                     FileLog.e(e);
                 } finally {
-                    semaphore.release();
+                    countDownLatch.countDown();
                 }
             }
         });
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }
         return result[0];
     }
 
-    public void getEncryptedChat(final int chat_id, final Semaphore semaphore, final ArrayList<TLObject> result) {
-        if (semaphore != null && result != null) {
+    public void getEncryptedChat(final int chat_id, final CountDownLatch countDownLatch, final ArrayList<TLObject> result) {
+        if (countDownLatch != null && result != null) {
             this.storageQueue.postRunnable(new Runnable() {
                 /* JADX WARNING: inconsistent code. */
                 /* Code decompiled incorrectly, please refer to instructions dump. */
@@ -4776,19 +4775,19 @@ Error: java.util.NoSuchElementException
                     r4.add(r5);	 Catch:{ Exception -> 0x0062 }
                 L_0x005c:
                     r4 = r4;
-                    r4.release();
+                    r4.countDown();
                 L_0x0061:
                     return;
                 L_0x0062:
                     r0 = move-exception;
                     org.telegram.messenger.FileLog.e(r0);	 Catch:{ all -> 0x006c }
                     r4 = r4;
-                    r4.release();
+                    r4.countDown();
                     goto L_0x0061;
                 L_0x006c:
                     r4 = move-exception;
                     r5 = r4;
-                    r5.release();
+                    r5.countDown();
                     throw r4;
                     */
                     throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.67.run():void");
@@ -5889,7 +5888,6 @@ Error: java.util.NoSuchElementException
     }
 
     private long[] updateMessageStateAndIdInternal(long random_id, Integer _oldId, int newId, int date, int channelId) {
-        SQLitePreparedStatement state;
         SQLiteCursor cursor = null;
         long newMessageId = (long) newId;
         if (_oldId == null) {
@@ -5942,6 +5940,7 @@ Error: java.util.NoSuchElementException
         if (did == 0) {
             return null;
         }
+        SQLitePreparedStatement state;
         if (oldMessageId != newMessageId || date == 0) {
             state = null;
             try {
@@ -7418,7 +7417,7 @@ Error: java.util.NoSuchElementException
     }
 
     public int getDialogReadMax(boolean outbox, long dialog_id) {
-        final Semaphore semaphore = new Semaphore(0);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Integer[] max = new Integer[]{Integer.valueOf(0)};
         final boolean z = outbox;
         final long j = dialog_id;
@@ -7447,11 +7446,11 @@ Error: java.util.NoSuchElementException
                         cursor.dispose();
                     }
                 }
-                semaphore.release();
+                countDownLatch.countDown();
             }
         });
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -7459,7 +7458,7 @@ Error: java.util.NoSuchElementException
     }
 
     public int getChannelPtsSync(final int channelId) {
-        final Semaphore semaphore = new Semaphore(0);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Integer[] pts = new Integer[]{Integer.valueOf(0)};
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
@@ -7483,8 +7482,8 @@ Error: java.util.NoSuchElementException
                     }
                 }
                 try {
-                    if (semaphore != null) {
-                        semaphore.release();
+                    if (countDownLatch != null) {
+                        countDownLatch.countDown();
                     }
                 } catch (Throwable e2) {
                     FileLog.e(e2);
@@ -7492,7 +7491,7 @@ Error: java.util.NoSuchElementException
             }
         });
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -7500,16 +7499,16 @@ Error: java.util.NoSuchElementException
     }
 
     public User getUserSync(final int user_id) {
-        final Semaphore semaphore = new Semaphore(0);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final User[] user = new User[1];
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
                 user[0] = MessagesStorage.this.getUser(user_id);
-                semaphore.release();
+                countDownLatch.countDown();
             }
         });
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -7517,16 +7516,16 @@ Error: java.util.NoSuchElementException
     }
 
     public Chat getChatSync(final int chat_id) {
-        final Semaphore semaphore = new Semaphore(0);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Chat[] chat = new Chat[1];
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
                 chat[0] = MessagesStorage.this.getChat(chat_id);
-                semaphore.release();
+                countDownLatch.countDown();
             }
         });
         try {
-            semaphore.acquire();
+            countDownLatch.await();
         } catch (Throwable e) {
             FileLog.e(e);
         }

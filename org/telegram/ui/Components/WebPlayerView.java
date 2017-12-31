@@ -43,7 +43,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.hockeyapp.android.UpdateFragment;
@@ -942,8 +942,8 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
 
     private class YoutubeVideoTask extends AsyncTask<Void, Void, String[]> {
         private boolean canRetry = true;
+        private CountDownLatch countDownLatch = new CountDownLatch(1);
         private String[] result = new String[2];
-        private Semaphore semaphore = new Semaphore(0);
         private String sig;
         private String videoId;
 
@@ -1111,7 +1111,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
                                             WebPlayerView.this.webView.evaluateJavascript(functionCodeFinal, new ValueCallback<String>() {
                                                 public void onReceiveValue(String value) {
                                                     YoutubeVideoTask.this.result[0] = YoutubeVideoTask.this.result[0].replace(YoutubeVideoTask.this.sig, "/signature/" + value.substring(1, value.length() - 1));
-                                                    YoutubeVideoTask.this.semaphore.release();
+                                                    YoutubeVideoTask.this.countDownLatch.countDown();
                                                 }
                                             });
                                             return;
@@ -1123,7 +1123,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
                                         }
                                     }
                                 });
-                                this.semaphore.acquire();
+                                this.countDownLatch.await();
                                 encrypted = false;
                             } catch (Throwable e22222) {
                                 FileLog.e(e22222);
@@ -1140,7 +1140,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
 
         private void onInterfaceResult(String value) {
             this.result[0] = this.result[0].replace(this.sig, "/signature/" + value);
-            this.semaphore.release();
+            this.countDownLatch.countDown();
         }
 
         protected void onPostExecute(String[] result) {
