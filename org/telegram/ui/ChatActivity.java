@@ -764,9 +764,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                                     arrayList.add(messageObject);
                                 }
                                 ChatActivity chatActivity = ChatActivity.this;
-                                Context access$28200 = ChatActivityAdapter.this.mContext;
+                                Context access$28300 = ChatActivityAdapter.this.mContext;
                                 boolean z = ChatObject.isChannel(ChatActivity.this.currentChat) && !ChatActivity.this.currentChat.megagroup && ChatActivity.this.currentChat.username != null && ChatActivity.this.currentChat.username.length() > 0;
-                                chatActivity.showDialog(new ShareAlert(access$28200, arrayList, null, z, null, false));
+                                chatActivity.showDialog(new ShareAlert(access$28300, arrayList, null, z, null, false));
                                 return;
                             }
                             Bundle args = new Bundle();
@@ -2747,6 +2747,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                         this.maybeStartTracking = false;
                         this.startedTracking = true;
                         this.startedTrackingX = (int) e.getX();
+                        if (getParent() != null) {
+                            getParent().requestDisallowInterceptTouchEvent(true);
+                        }
                     } else if (this.startedTracking) {
                         if (Math.abs(dx) < AndroidUtilities.dp(50.0f)) {
                             this.wasTrackingVibrate = false;
@@ -2758,6 +2761,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                             this.wasTrackingVibrate = true;
                         }
                         this.slidingView.setTranslationX((float) dx);
+                        if (this.slidingView.getMessageObject().isRoundVideo()) {
+                            ChatActivity.this.updateTextureViewPosition();
+                        }
                         setGroupTranslationX(this.slidingView, (float) dx);
                         invalidate();
                     }
@@ -2842,6 +2848,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                         }
                         setGroupTranslationX(this.slidingView, translationX);
                         this.slidingView.setTranslationX(translationX);
+                        if (this.slidingView.getMessageObject().isRoundVideo()) {
+                            ChatActivity.this.updateTextureViewPosition();
+                        }
                         invalidate();
                     }
                     drawReplyButton(c);
@@ -3182,10 +3191,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                         ChatActivity.this.floatingDateView.setTag(Integer.valueOf(1));
                         ChatActivity.this.floatingDateAnimation = new AnimatorSet();
                         ChatActivity.this.floatingDateAnimation.setDuration(150);
-                        AnimatorSet access$12000 = ChatActivity.this.floatingDateAnimation;
+                        AnimatorSet access$12100 = ChatActivity.this.floatingDateAnimation;
                         Animator[] animatorArr = new Animator[1];
                         animatorArr[0] = ObjectAnimator.ofFloat(ChatActivity.this.floatingDateView, "alpha", new float[]{1.0f});
-                        access$12000.playTogether(animatorArr);
+                        access$12100.playTogether(animatorArr);
                         ChatActivity.this.floatingDateAnimation.addListener(new AnimatorListenerAdapter() {
                             public void onAnimationEnd(Animator animation) {
                                 if (animation.equals(ChatActivity.this.floatingDateAnimation)) {
@@ -3787,10 +3796,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                     }
                     if (ChatActivity.this.allowStickersPanel) {
                         ChatActivity.this.mentionListAnimation = new AnimatorSet();
-                        AnimatorSet access$15900 = ChatActivity.this.mentionListAnimation;
+                        AnimatorSet access$16000 = ChatActivity.this.mentionListAnimation;
                         Animator[] animatorArr = new Animator[1];
                         animatorArr[0] = ObjectAnimator.ofFloat(ChatActivity.this.mentionContainer, "alpha", new float[]{0.0f});
-                        access$15900.playTogether(animatorArr);
+                        access$16000.playTogether(animatorArr);
                         ChatActivity.this.mentionListAnimation.addListener(new AnimatorListenerAdapter() {
                             public void onAnimationEnd(Animator animation) {
                                 if (ChatActivity.this.mentionListAnimation != null && ChatActivity.this.mentionListAnimation.equals(animation)) {
@@ -4973,9 +4982,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                                 if (ChatActivity.this.stickersPanel.getVisibility() != 4) {
                                     float f2;
                                     ChatActivity.this.runningAnimation = new AnimatorSet();
-                                    AnimatorSet access$21800 = ChatActivity.this.runningAnimation;
+                                    AnimatorSet access$21900 = ChatActivity.this.runningAnimation;
                                     Animator[] animatorArr = new Animator[1];
-                                    FrameLayout access$18300 = ChatActivity.this.stickersPanel;
+                                    FrameLayout access$18400 = ChatActivity.this.stickersPanel;
                                     String str = "alpha";
                                     float[] fArr = new float[2];
                                     if (show) {
@@ -4988,8 +4997,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                                         f = 0.0f;
                                     }
                                     fArr[1] = f;
-                                    animatorArr[0] = ObjectAnimator.ofFloat(access$18300, str, fArr);
-                                    access$21800.playTogether(animatorArr);
+                                    animatorArr[0] = ObjectAnimator.ofFloat(access$18400, str, fArr);
+                                    access$21900.playTogether(animatorArr);
                                     ChatActivity.this.runningAnimation.setDuration(150);
                                     ChatActivity.this.runningAnimation.addListener(new AnimatorListenerAdapter() {
                                         public void onAnimationEnd(Animator animation) {
@@ -6210,7 +6219,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                     messageObject = messageCell.getMessageObject();
                     if (this.roundVideoContainer != null && messageObject.isRoundVideo() && MediaController.getInstance().isPlayingMessage(messageObject)) {
                         ImageReceiver imageReceiver = messageCell.getPhotoImage();
-                        this.roundVideoContainer.setTranslationX((float) imageReceiver.getImageX());
+                        this.roundVideoContainer.setTranslationX(((float) imageReceiver.getImageX()) + messageCell.getTranslationX());
                         this.roundVideoContainer.setTranslationY((float) (((this.fragmentView.getPaddingTop() + messageCell.getTop()) + imageReceiver.getImageY()) - additionalTop));
                         this.fragmentView.invalidate();
                         this.roundVideoContainer.invalidate();
@@ -6221,21 +6230,20 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
             }
             if (this.roundVideoContainer != null) {
                 messageObject = MediaController.getInstance().getPlayingMessageObject();
-                if (messageObject.eventId != 0) {
-                    return;
-                }
-                if (foundTextureViewMessage) {
-                    MediaController.getInstance().setCurrentRoundVisible(true);
-                    scrollToMessageId(messageObject.getId(), 0, false, 0, true);
-                    return;
-                }
-                this.roundVideoContainer.setTranslationY((float) ((-AndroidUtilities.roundMessageSize) - 100));
-                this.fragmentView.invalidate();
-                if (messageObject != null && messageObject.isRoundVideo()) {
-                    if (this.checkTextureViewPosition || PipRoundVideoView.getInstance() != null) {
-                        MediaController.getInstance().setCurrentRoundVisible(false);
-                    } else {
+                if (messageObject != null && messageObject.eventId == 0) {
+                    if (foundTextureViewMessage) {
+                        MediaController.getInstance().setCurrentRoundVisible(true);
                         scrollToMessageId(messageObject.getId(), 0, false, 0, true);
+                        return;
+                    }
+                    this.roundVideoContainer.setTranslationY((float) ((-AndroidUtilities.roundMessageSize) - 100));
+                    this.fragmentView.invalidate();
+                    if (messageObject != null && messageObject.isRoundVideo()) {
+                        if (this.checkTextureViewPosition || PipRoundVideoView.getInstance() != null) {
+                            MediaController.getInstance().setCurrentRoundVisible(false);
+                        } else {
+                            scrollToMessageId(messageObject.getId(), 0, false, 0, true);
+                        }
                     }
                 }
             }
@@ -6274,7 +6282,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                     messageObject = messageCell.getMessageObject();
                     if (this.roundVideoContainer != null && messageObject.isRoundVideo() && MediaController.getInstance().isPlayingMessage(messageObject)) {
                         ImageReceiver imageReceiver = messageCell.getPhotoImage();
-                        this.roundVideoContainer.setTranslationX((float) imageReceiver.getImageX());
+                        this.roundVideoContainer.setTranslationX(((float) imageReceiver.getImageX()) + messageCell.getTranslationX());
                         this.roundVideoContainer.setTranslationY((float) (((this.fragmentView.getPaddingTop() + top) + imageReceiver.getImageY()) - additionalTop));
                         this.fragmentView.invalidate();
                         this.roundVideoContainer.invalidate();
@@ -15656,10 +15664,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                             ChatActivity.this.alertViewAnimator = null;
                         }
                         ChatActivity.this.alertViewAnimator = new AnimatorSet();
-                        AnimatorSet access$25500 = ChatActivity.this.alertViewAnimator;
+                        AnimatorSet access$25600 = ChatActivity.this.alertViewAnimator;
                         Animator[] animatorArr = new Animator[1];
                         animatorArr[0] = ObjectAnimator.ofFloat(ChatActivity.this.alertView, "translationY", new float[]{(float) (-AndroidUtilities.dp(50.0f))});
-                        access$25500.playTogether(animatorArr);
+                        access$25600.playTogether(animatorArr);
                         ChatActivity.this.alertViewAnimator.setDuration(200);
                         ChatActivity.this.alertViewAnimator.addListener(new AnimatorListenerAdapter() {
                             public void onAnimationEnd(Animator animation) {

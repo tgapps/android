@@ -53,33 +53,33 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
     }
 
     protected Long doInBackground(Void... args) {
-        OutputStream output;
         IOException e;
-        Long valueOf;
         Throwable th;
         InputStream input = null;
-        OutputStream output2 = null;
+        OutputStream output = null;
         URLConnection connection = createConnection(new URL(getURLString()), 6);
         connection.connect();
         int lengthOfFile = connection.getContentLength();
         String contentType = connection.getContentType();
+        Long valueOf;
         if (contentType == null || !contentType.contains(MimeTypes.BASE_TYPE_TEXT)) {
             try {
                 File dir = new File(this.mFilePath);
                 if (dir.mkdirs() || dir.exists()) {
+                    OutputStream output2;
                     File file = new File(dir, this.mFilename);
                     InputStream input2 = new BufferedInputStream(connection.getInputStream());
                     try {
-                        output = new FileOutputStream(file);
+                        output2 = new FileOutputStream(file);
                     } catch (IOException e2) {
                         e = e2;
                         input = input2;
                         try {
                             e.printStackTrace();
                             valueOf = Long.valueOf(0);
-                            if (output2 != null) {
+                            if (output != null) {
                                 try {
-                                    output2.close();
+                                    output.close();
                                 } catch (IOException e3) {
                                     e3.printStackTrace();
                                 }
@@ -90,9 +90,9 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                             return valueOf;
                         } catch (Throwable th2) {
                             th = th2;
-                            if (output2 != null) {
+                            if (output != null) {
                                 try {
-                                    output2.close();
+                                    output.close();
                                 } catch (IOException e32) {
                                     e32.printStackTrace();
                                     throw th;
@@ -106,8 +106,8 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                     } catch (Throwable th3) {
                         th = th3;
                         input = input2;
-                        if (output2 != null) {
-                            output2.close();
+                        if (output != null) {
+                            output.close();
                         }
                         if (input != null) {
                             input.close();
@@ -124,13 +124,13 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                             }
                             total += (long) count;
                             publishProgress(new Integer[]{Integer.valueOf(Math.round((((float) total) * 100.0f) / ((float) lengthOfFile)))});
-                            output.write(data, 0, count);
+                            output2.write(data, 0, count);
                         }
-                        output.flush();
+                        output2.flush();
                         valueOf = Long.valueOf(total);
-                        if (output != null) {
+                        if (output2 != null) {
                             try {
-                                output.close();
+                                output2.close();
                             } catch (IOException e322) {
                                 e322.printStackTrace();
                             }
@@ -138,16 +138,16 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                         if (input2 != null) {
                             input2.close();
                         }
-                        output2 = output;
+                        output = output2;
                         input = input2;
                     } catch (IOException e4) {
                         e322 = e4;
-                        output2 = output;
+                        output = output2;
                         input = input2;
                         e322.printStackTrace();
                         valueOf = Long.valueOf(0);
-                        if (output2 != null) {
-                            output2.close();
+                        if (output != null) {
+                            output.close();
                         }
                         if (input != null) {
                             input.close();
@@ -155,10 +155,10 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                         return valueOf;
                     } catch (Throwable th4) {
                         th = th4;
-                        output2 = output;
+                        output = output2;
                         input = input2;
-                        if (output2 != null) {
-                            output2.close();
+                        if (output != null) {
+                            output.close();
                         }
                         if (input != null) {
                             input.close();
@@ -172,8 +172,8 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                 e322 = e5;
                 e322.printStackTrace();
                 valueOf = Long.valueOf(0);
-                if (output2 != null) {
-                    output2.close();
+                if (output != null) {
+                    output.close();
                 }
                 if (input != null) {
                     input.close();
@@ -183,9 +183,9 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
         }
         this.mDownloadErrorMessage = "The requested download does not appear to be a file.";
         valueOf = Long.valueOf(0);
-        if (output2 != null) {
+        if (output != null) {
             try {
-                output2.close();
+                output.close();
             } catch (IOException e3222) {
                 e3222.printStackTrace();
             }
