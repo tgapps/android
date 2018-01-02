@@ -238,10 +238,10 @@ public class SearchAdapter extends SelectionAdapter {
     public void onBindViewHolder(ViewHolder holder, int position) {
         Throwable e;
         Object username;
+        UserCell userCell;
         if (holder.getItemViewType() == 0) {
             TLObject object = getItem(position);
             if (object != null) {
-                UserCell userCell;
                 ProfileSearchCell profileSearchCell;
                 boolean z;
                 int id = 0;

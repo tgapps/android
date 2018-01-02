@@ -2922,10 +2922,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                     if (size > 0) {
                         for (a = 0; a < size; a++) {
                             cell = (ChatMessageCell) this.drawCaptionAfter.get(a);
-                            canvas.save();
-                            canvas.translate(((float) cell.getLeft()) + cell.getTranslationX(), (float) cell.getTop());
-                            cell.drawCaptionLayout(canvas);
-                            canvas.restore();
+                            if (cell.getCurrentPosition() != null) {
+                                canvas.save();
+                                canvas.translate(((float) cell.getLeft()) + cell.getTranslationX(), (float) cell.getTop());
+                                cell.drawCaptionLayout(canvas, (cell.getCurrentPosition().flags & 1) == 0);
+                                canvas.restore();
+                            }
                         }
                         this.drawCaptionAfter.clear();
                     }
@@ -2957,11 +2959,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                         if (num == count - 1) {
                             canvas.save();
                             canvas.translate(((float) chatMessageCell.getLeft()) + chatMessageCell.getTranslationX(), (float) chatMessageCell.getTop());
-                            if (!(!chatMessageCell.hasCaptionLayout() || (position.flags & 8) == 0 || (position.flags & 1) == 0)) {
-                                chatMessageCell.drawCaptionLayout(canvas);
+                            if (chatMessageCell.hasCaptionLayout() && (position.flags & 8) != 0) {
+                                chatMessageCell.drawCaptionLayout(canvas, (position.flags & 1) == 0);
                             }
                             canvas.restore();
-                        } else if (!(!chatMessageCell.hasCaptionLayout() || (position.flags & 8) == 0 || (position.flags & 1) == 0)) {
+                        } else if (chatMessageCell.hasCaptionLayout() && (position.flags & 8) != 0) {
                             this.drawCaptionAfter.add(chatMessageCell);
                         }
                     }
@@ -17307,7 +17309,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
     }
 
     private void processSelectedOption(int option) {
-        if (this.selectedObject != null) {
+        if (this.selectedObject != null && getParentActivity() != null) {
             int a;
             Bundle args;
             File file;
@@ -17474,7 +17476,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                     this.selectedObject = null;
                     this.selectedObjectGroup = null;
                     return;
-                    break;
                 case 8:
                     showReplyPanel(true, this.selectedObject, null, null, false);
                     break;
@@ -17504,7 +17505,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                     this.selectedObject = null;
                     this.selectedObjectGroup = null;
                     return;
-                    break;
                 case 11:
                     Document document = this.selectedObject.getDocument();
                     MessagesController.getInstance(this.currentAccount).saveGif(document);

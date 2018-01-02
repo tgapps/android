@@ -688,13 +688,12 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                 if (finalSize != 0) {
                     arr = (ArrayList) this.delayedMessages.get(messageObject.messageOwner.attachPath);
                     if (arr != null) {
-                        a = 0;
-                        while (a < arr.size()) {
+                        for (a = 0; a < arr.size(); a++) {
                             message = (DelayedMessage) arr.get(a);
                             ArrayList messages;
                             if (message.type == 4) {
-                                while (0 < message.messageObjects.size()) {
-                                    MessageObject obj2 = (MessageObject) message.messageObjects.get(a);
+                                for (b = 0; b < message.messageObjects.size(); b++) {
+                                    MessageObject obj2 = (MessageObject) message.messageObjects.get(b);
                                     if (obj2 == messageObject) {
                                         obj2.videoEditedInfo = null;
                                         obj2.messageOwner.message = "-1";
@@ -704,7 +703,6 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                                         MessagesStorage.getInstance(this.currentAccount).putMessages(messages, false, true, false, 0);
                                         break;
                                     }
-                                    a++;
                                 }
                             } else if (message.obj == messageObject) {
                                 message.obj.videoEditedInfo = null;
@@ -715,7 +713,6 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                                 MessagesStorage.getInstance(this.currentAccount).putMessages(messages, false, true, false, 0);
                                 return;
                             }
-                            a++;
                         }
                     }
                 }
@@ -731,7 +728,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     while (a < arr.size()) {
                         message = (DelayedMessage) arr.get(a);
                         if (message.type == 4) {
-                            for (int b = 0; b < message.messages.size(); b++) {
+                            for (b = 0; b < message.messages.size(); b++) {
                                 if (message.messageObjects.get(b) == messageObject) {
                                     message.markAsError();
                                     arr.remove(a);

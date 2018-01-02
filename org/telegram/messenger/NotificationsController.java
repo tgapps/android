@@ -236,7 +236,7 @@ public class NotificationsController {
                 } catch (Throwable e) {
                     FileLog.e(e);
                 }
-                NotificationsController.this.setBadge(0);
+                NotificationsController.this.setBadge(NotificationsController.this.getTotalAllUnreadCount());
                 Editor editor = MessagesController.getNotificationsSettings(NotificationsController.this.currentAccount).edit();
                 editor.clear();
                 editor.commit();
@@ -515,7 +515,7 @@ public class NotificationsController {
                 }
                 NotificationsController.this.notifyCheck = false;
                 if (NotificationsController.this.showBadgeNumber) {
-                    NotificationsController.this.setBadge(NotificationsController.this.total_unread_count);
+                    NotificationsController.this.setBadge(NotificationsController.this.getTotalAllUnreadCount());
                 }
             }
         });
@@ -593,7 +593,7 @@ public class NotificationsController {
                 }
                 NotificationsController.this.notifyCheck = false;
                 if (NotificationsController.this.showBadgeNumber) {
-                    NotificationsController.this.setBadge(NotificationsController.this.total_unread_count);
+                    NotificationsController.this.setBadge(NotificationsController.this.getTotalAllUnreadCount());
                 }
             }
         });
@@ -878,7 +878,7 @@ public class NotificationsController {
                 }
                 NotificationsController.this.notifyCheck = false;
                 if (NotificationsController.this.showBadgeNumber) {
-                    NotificationsController.this.setBadge(NotificationsController.this.total_unread_count);
+                    NotificationsController.this.setBadge(NotificationsController.this.getTotalAllUnreadCount());
                 }
             }
         });
@@ -964,14 +964,28 @@ public class NotificationsController {
                 });
                 NotificationsController.this.showOrUpdateNotification(SystemClock.uptimeMillis() / 1000 < 60);
                 if (NotificationsController.this.showBadgeNumber) {
-                    NotificationsController.this.setBadge(NotificationsController.this.total_unread_count);
+                    NotificationsController.this.setBadge(NotificationsController.this.getTotalAllUnreadCount());
                 }
             }
         });
     }
 
+    private int getTotalAllUnreadCount() {
+        int count = 0;
+        for (int a = 0; a < 3; a++) {
+            if (UserConfig.getInstance(a).isClientActivated()) {
+                NotificationsController controller = getInstance(a);
+                if (controller.showBadgeNumber) {
+                    count += controller.total_unread_count;
+                }
+            }
+        }
+        return count;
+    }
+
     public void setBadgeEnabled(boolean enabled) {
-        setBadge(enabled ? this.total_unread_count : 0);
+        this.showBadgeNumber = enabled;
+        setBadge(getTotalAllUnreadCount());
     }
 
     private void setBadge(final int count) {
