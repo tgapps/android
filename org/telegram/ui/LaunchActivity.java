@@ -4261,6 +4261,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         StickerPreviewViewer.getInstance().destroy();
         PipRoundVideoView pipRoundVideoView = PipRoundVideoView.getInstance();
         MediaController.getInstance().setBaseActivity(this, false);
+        MediaController.getInstance().setFeedbackView(this.actionBarLayout, false);
         if (pipRoundVideoView != null) {
             pipRoundVideoView.close(false);
         }
@@ -4294,6 +4295,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
 
     protected void onResume() {
         super.onResume();
+        MediaController.getInstance().setFeedbackView(this.actionBarLayout, true);
         showLanguageAlert(false);
         ApplicationLoader.mainInterfacePaused = false;
         Utilities.stageQueue.postRunnable(new Runnable() {

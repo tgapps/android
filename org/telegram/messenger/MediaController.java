@@ -35,13 +35,13 @@ import android.os.Build.VERSION;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.os.Vibrator;
 import android.provider.MediaStore.Images.Media;
 import android.provider.MediaStore.Video;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.TextureView;
+import android.view.View;
 import android.widget.FrameLayout;
 import java.io.File;
 import java.io.FileInputStream;
@@ -81,6 +81,7 @@ import org.telegram.tgnet.TLRPC.TL_photoSizeEmpty;
 import org.telegram.tgnet.TLRPC.User;
 import org.telegram.tgnet.TLRPC.messages_Messages;
 import org.telegram.ui.ActionBar.AlertDialog;
+import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.EmbedBottomSheet;
 import org.telegram.ui.Components.PhotoFilterView.CurvesToolValue;
@@ -135,9 +136,11 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     private boolean decodingFinished = false;
     private boolean downloadingCurrentMessage;
     private ExternalObserver externalObserver;
+    private View feedbackView;
     private ByteBuffer fileBuffer;
     private DispatchQueue fileDecodingQueue;
     private DispatchQueue fileEncodingQueue;
+    private BaseFragment flagSecureFragment;
     private boolean forceLoopCurrentPlaylist;
     private ArrayList<AudioBuffer> freePlayerBuffers = new ArrayList();
     private HashMap<String, MessageObject> generatingWaveform = new HashMap();
@@ -2170,11 +2173,35 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         }
     }
 
+    public void setFlagSecure(BaseFragment parentFragment, boolean set) {
+        if (set) {
+            try {
+                parentFragment.getParentActivity().getWindow().setFlags(MessagesController.UPDATE_MASK_CHANNEL, MessagesController.UPDATE_MASK_CHANNEL);
+            } catch (Exception e) {
+            }
+            this.flagSecureFragment = parentFragment;
+        } else if (this.flagSecureFragment == parentFragment) {
+            try {
+                parentFragment.getParentActivity().getWindow().clearFlags(MessagesController.UPDATE_MASK_CHANNEL);
+            } catch (Exception e2) {
+            }
+            this.flagSecureFragment = null;
+        }
+    }
+
     public void setBaseActivity(Activity activity, boolean set) {
         if (set) {
             this.baseActivity = activity;
         } else if (this.baseActivity == activity) {
             this.baseActivity = null;
+        }
+    }
+
+    public void setFeedbackView(View view, boolean set) {
+        if (set) {
+            this.feedbackView = view;
+        } else if (this.feedbackView == view) {
+            this.feedbackView = null;
         }
     }
 
@@ -2735,9 +2762,8 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
             pauseMessage(this.playingMessageObject);
         }
         try {
-            ((Vibrator) ApplicationLoader.applicationContext.getSystemService("vibrator")).vibrate(20);
-        } catch (Throwable e) {
-            FileLog.e(e);
+            this.feedbackView.performHapticFeedback(3, 2);
+        } catch (Exception e) {
         }
         DispatchQueue dispatchQueue = this.recordQueue;
         final int i = currentAccount;
@@ -2934,9 +2960,8 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                         MediaController.this.stopRecordingInternal(0);
                     }
                     try {
-                        ((Vibrator) ApplicationLoader.applicationContext.getSystemService("vibrator")).vibrate(20);
-                    } catch (Throwable e2) {
-                        FileLog.e(e2);
+                        MediaController.this.feedbackView.performHapticFeedback(3, 2);
+                    } catch (Exception e2) {
                     }
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         public void run() {

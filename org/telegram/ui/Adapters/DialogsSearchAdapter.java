@@ -75,7 +75,7 @@ public class DialogsSearchAdapter extends SelectionAdapter {
     private ArrayList<RecentSearchObject> recentSearchObjects = new ArrayList();
     private HashMap<Long, RecentSearchObject> recentSearchObjectsById = new HashMap();
     private int reqId = 0;
-    private SearchAdapterHelper searchAdapterHelper = new SearchAdapterHelper();
+    private SearchAdapterHelper searchAdapterHelper = new SearchAdapterHelper(false);
     private ArrayList<TLObject> searchResult = new ArrayList();
     private ArrayList<String> searchResultHashtags = new ArrayList();
     private ArrayList<MessageObject> searchResultMessages = new ArrayList();
@@ -1064,9 +1064,9 @@ public class DialogsSearchAdapter extends SelectionAdapter {
     }
 
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Object username;
         switch (holder.getItemViewType()) {
             case 0:
+                Object username;
                 TLObject tLObject;
                 ProfileSearchCell cell = holder.itemView;
                 TLObject user = null;

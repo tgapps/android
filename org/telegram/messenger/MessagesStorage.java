@@ -257,6 +257,10 @@ public class MessagesStorage {
         return this.storageQueue;
     }
 
+    public File getDatabaseFile() {
+        return this.cacheFile;
+    }
+
     public void openDatabase(boolean first) {
         if (this.currentAccount == 0) {
             this.cacheFile = new File(ApplicationLoader.getFilesDirFixed(), "cache4.db");
@@ -5431,12 +5435,12 @@ Error: java.util.NoSuchElementException
 
     private void putMessagesInternal(ArrayList<Message> messages, boolean withTransaction, boolean doNotUpdateDialogDate, int downloadMask, boolean ifNoLastMessage) {
         Message lastMessage;
-        SQLiteCursor cursor;
         int a;
         Integer type;
         Integer count;
         if (ifNoLastMessage) {
             try {
+                SQLiteCursor cursor;
                 lastMessage = (Message) messages.get(0);
                 if (lastMessage.dialog_id == 0) {
                     if (lastMessage.to_id.user_id != 0) {
