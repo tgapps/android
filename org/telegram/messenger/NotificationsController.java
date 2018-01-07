@@ -35,15 +35,16 @@ import android.support.v4.app.NotificationCompat.WearableExtender;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.RemoteInput;
 import android.text.TextUtils;
+import android.util.LongSparseArray;
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.exoplayer2.util.MimeTypes;
+import org.telegram.messenger.support.SparseLongArray;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
@@ -114,12 +115,12 @@ public class NotificationsController {
     private int personal_count = 0;
     public ArrayList<MessageObject> popupMessages = new ArrayList();
     public ArrayList<MessageObject> popupReplyMessages = new ArrayList();
-    private HashMap<Long, Integer> pushDialogs = new HashMap();
-    private HashMap<Long, Integer> pushDialogsOverrideMention = new HashMap();
+    private LongSparseArray<Integer> pushDialogs = new LongSparseArray();
+    private LongSparseArray<Integer> pushDialogsOverrideMention = new LongSparseArray();
     private ArrayList<MessageObject> pushMessages = new ArrayList();
-    private HashMap<Long, MessageObject> pushMessagesDict = new HashMap();
+    private LongSparseArray<MessageObject> pushMessagesDict = new LongSparseArray();
     public boolean showBadgeNumber;
-    private HashMap<Long, Point> smartNotificationsDialogs = new HashMap();
+    private LongSparseArray<Point> smartNotificationsDialogs = new LongSparseArray();
     private int soundIn;
     private boolean soundInLoaded;
     private int soundOut;
@@ -128,7 +129,7 @@ public class NotificationsController {
     private int soundRecord;
     private boolean soundRecordLoaded;
     private int total_unread_count = 0;
-    private HashMap<Long, Integer> wearNotificationsIds = new HashMap();
+    private LongSparseArray<Integer> wearNotificationsIds = new LongSparseArray();
 
     static {
         notificationManager = null;
@@ -198,7 +199,9 @@ public class NotificationsController {
         }
         this.notificationDelayRunnable = new Runnable() {
             public void run() {
-                FileLog.e("delay reached");
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("delay reached");
+                }
                 if (!NotificationsController.this.delayedPushMessages.isEmpty()) {
                     NotificationsController.this.showOrUpdateNotification(true);
                     NotificationsController.this.delayedPushMessages.clear();
@@ -274,7 +277,9 @@ public class NotificationsController {
     public void setLastOnlineFromOtherDevice(final int time) {
         notificationsQueue.postRunnable(new Runnable() {
             public void run() {
-                FileLog.e("set last online from other device = " + time);
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("set last online from other device = " + time);
+                }
                 NotificationsController.this.lastOnlineFromOtherDevice = time;
             }
         });
@@ -282,8 +287,8 @@ public class NotificationsController {
 
     public void removeNotificationsForDialog(long did) {
         getInstance(this.currentAccount).processReadMessages(null, did, 0, ConnectionsManager.DEFAULT_DATACENTER_ID, false);
-        HashMap<Long, Integer> dialogsToUpdate = new HashMap();
-        dialogsToUpdate.put(Long.valueOf(did), Integer.valueOf(0));
+        LongSparseArray<Integer> dialogsToUpdate = new LongSparseArray();
+        dialogsToUpdate.put(did, Integer.valueOf(0));
         getInstance(this.currentAccount).processDialogsUpdateRead(dialogsToUpdate);
     }
 
@@ -346,13 +351,13 @@ public class NotificationsController {
                         intent.setAction("com.tmessages.openchat" + Math.random() + ConnectionsManager.DEFAULT_DATACENTER_ID);
                         intent.setFlags(TLRPC.MESSAGE_FLAG_EDITED);
                         PendingIntent contentIntent = PendingIntent.getActivity(ApplicationLoader.applicationContext, 0, intent, 1073741824);
-                        String name = LocaleController.getString("AppName", R.string.AppName);
+                        String name = LocaleController.getString("YouHaveNewMessage", R.string.YouHaveNewMessage);
                         Builder mBuilder = new Builder(ApplicationLoader.applicationContext).setContentTitle(name).setSmallIcon(R.drawable.notification).setAutoCancel(true).setNumber(NotificationsController.this.total_unread_count).setContentIntent(contentIntent).setGroup(NotificationsController.this.notificationGroup).setGroupSummary(true).setColor(-13851168);
                         long[] vibrationPattern = null;
                         int importance = 0;
                         Uri sound = null;
                         mBuilder.setCategory("msg");
-                        String lastMessage = LocaleController.getString("YouHaveNewMessage", R.string.YouHaveNewMessage);
+                        String lastMessage = LocaleController.getString("BackgroundRestricted", R.string.BackgroundRestricted);
                         mBuilder.setContentText(lastMessage);
                         mBuilder.setStyle(new BigTextStyle().bigText(lastMessage));
                         if (priority == 0) {
@@ -455,16 +460,16 @@ public class NotificationsController {
                     int key = deletedMessages.keyAt(a);
                     long dialog_id = (long) (-key);
                     ArrayList<Integer> mids = (ArrayList) deletedMessages.get(key);
-                    Integer currentCount = (Integer) NotificationsController.this.pushDialogs.get(Long.valueOf(dialog_id));
+                    Integer currentCount = (Integer) NotificationsController.this.pushDialogs.get(dialog_id);
                     if (currentCount == null) {
                         currentCount = Integer.valueOf(0);
                     }
                     Integer newCount = currentCount;
                     for (int b = 0; b < mids.size(); b++) {
                         long mid = ((long) ((Integer) mids.get(b)).intValue()) | (((long) key) << 32);
-                        MessageObject messageObject = (MessageObject) NotificationsController.this.pushMessagesDict.get(Long.valueOf(mid));
+                        MessageObject messageObject = (MessageObject) NotificationsController.this.pushMessagesDict.get(mid);
                         if (messageObject != null) {
-                            NotificationsController.this.pushMessagesDict.remove(Long.valueOf(mid));
+                            NotificationsController.this.pushMessagesDict.remove(mid);
                             NotificationsController.this.delayedPushMessages.remove(messageObject);
                             NotificationsController.this.pushMessages.remove(messageObject);
                             if (NotificationsController.this.isPersonalMessage(messageObject)) {
@@ -478,16 +483,16 @@ public class NotificationsController {
                     }
                     if (newCount.intValue() <= 0) {
                         newCount = Integer.valueOf(0);
-                        NotificationsController.this.smartNotificationsDialogs.remove(Long.valueOf(dialog_id));
+                        NotificationsController.this.smartNotificationsDialogs.remove(dialog_id);
                     }
                     if (!newCount.equals(currentCount)) {
                         NotificationsController.this.total_unread_count = NotificationsController.this.total_unread_count - currentCount.intValue();
                         NotificationsController.this.total_unread_count = NotificationsController.this.total_unread_count + newCount.intValue();
-                        NotificationsController.this.pushDialogs.put(Long.valueOf(dialog_id), newCount);
+                        NotificationsController.this.pushDialogs.put(dialog_id, newCount);
                     }
                     if (newCount.intValue() == 0) {
-                        NotificationsController.this.pushDialogs.remove(Long.valueOf(dialog_id));
-                        NotificationsController.this.pushDialogsOverrideMention.remove(Long.valueOf(dialog_id));
+                        NotificationsController.this.pushDialogs.remove(dialog_id);
+                        NotificationsController.this.pushDialogsOverrideMention.remove(dialog_id);
                         if (!(popupArray == null || !NotificationsController.this.pushMessages.isEmpty() || popupArray.isEmpty())) {
                             popupArray.clear();
                         }
@@ -521,7 +526,7 @@ public class NotificationsController {
         });
     }
 
-    public void removeDeletedHisoryFromNotifications(final SparseArray<Integer> deletedMessages) {
+    public void removeDeletedHisoryFromNotifications(final SparseIntArray deletedMessages) {
         final ArrayList<MessageObject> popupArray = this.popupMessages.isEmpty() ? null : new ArrayList(this.popupMessages);
         notificationsQueue.postRunnable(new Runnable() {
             public void run() {
@@ -530,8 +535,8 @@ public class NotificationsController {
                 for (int a = 0; a < deletedMessages.size(); a++) {
                     int key = deletedMessages.keyAt(a);
                     long dialog_id = (long) (-key);
-                    Integer id = (Integer) deletedMessages.get(key);
-                    Integer currentCount = (Integer) NotificationsController.this.pushDialogs.get(Long.valueOf(dialog_id));
+                    int id = deletedMessages.get(key);
+                    Integer currentCount = (Integer) NotificationsController.this.pushDialogs.get(dialog_id);
                     if (currentCount == null) {
                         currentCount = Integer.valueOf(0);
                     }
@@ -539,8 +544,8 @@ public class NotificationsController {
                     int c = 0;
                     while (c < NotificationsController.this.pushMessages.size()) {
                         MessageObject messageObject = (MessageObject) NotificationsController.this.pushMessages.get(c);
-                        if (messageObject.getDialogId() == dialog_id && messageObject.getId() <= id.intValue()) {
-                            NotificationsController.this.pushMessagesDict.remove(Long.valueOf(messageObject.getIdWithChannel()));
+                        if (messageObject.getDialogId() == dialog_id && messageObject.getId() <= id) {
+                            NotificationsController.this.pushMessagesDict.remove(messageObject.getIdWithChannel());
                             NotificationsController.this.delayedPushMessages.remove(messageObject);
                             NotificationsController.this.pushMessages.remove(messageObject);
                             c--;
@@ -556,16 +561,16 @@ public class NotificationsController {
                     }
                     if (newCount.intValue() <= 0) {
                         newCount = Integer.valueOf(0);
-                        NotificationsController.this.smartNotificationsDialogs.remove(Long.valueOf(dialog_id));
+                        NotificationsController.this.smartNotificationsDialogs.remove(dialog_id);
                     }
                     if (!newCount.equals(currentCount)) {
                         NotificationsController.this.total_unread_count = NotificationsController.this.total_unread_count - currentCount.intValue();
                         NotificationsController.this.total_unread_count = NotificationsController.this.total_unread_count + newCount.intValue();
-                        NotificationsController.this.pushDialogs.put(Long.valueOf(dialog_id), newCount);
+                        NotificationsController.this.pushDialogs.put(dialog_id, newCount);
                     }
                     if (newCount.intValue() == 0) {
-                        NotificationsController.this.pushDialogs.remove(Long.valueOf(dialog_id));
-                        NotificationsController.this.pushDialogsOverrideMention.remove(Long.valueOf(dialog_id));
+                        NotificationsController.this.pushDialogs.remove(dialog_id);
+                        NotificationsController.this.pushDialogsOverrideMention.remove(dialog_id);
                         if (!(popupArray == null || !NotificationsController.this.pushMessages.isEmpty() || popupArray.isEmpty())) {
                             popupArray.clear();
                         }
@@ -599,9 +604,9 @@ public class NotificationsController {
         });
     }
 
-    public void processReadMessages(SparseArray<Long> inbox, long dialog_id, int max_date, int max_id, boolean isPopup) {
+    public void processReadMessages(SparseLongArray inbox, long dialog_id, int max_date, int max_id, boolean isPopup) {
         final ArrayList<MessageObject> popupArray = this.popupMessages.isEmpty() ? null : new ArrayList(this.popupMessages);
-        final SparseArray<Long> sparseArray = inbox;
+        final SparseLongArray sparseLongArray = inbox;
         final long j = dialog_id;
         final int i = max_id;
         final int i2 = max_date;
@@ -612,10 +617,10 @@ public class NotificationsController {
                 MessageObject messageObject;
                 long mid;
                 int oldCount = popupArray != null ? popupArray.size() : 0;
-                if (sparseArray != null) {
-                    for (int b = 0; b < sparseArray.size(); b++) {
-                        int key = sparseArray.keyAt(b);
-                        long messageId = ((Long) sparseArray.get(key)).longValue();
+                if (sparseLongArray != null) {
+                    for (int b = 0; b < sparseLongArray.size(); b++) {
+                        int key = sparseLongArray.keyAt(b);
+                        long messageId = sparseLongArray.get(key);
                         a = 0;
                         while (a < NotificationsController.this.pushMessages.size()) {
                             messageObject = (MessageObject) NotificationsController.this.pushMessages.get(a);
@@ -630,7 +635,7 @@ public class NotificationsController {
                                 if (messageObject.messageOwner.to_id.channel_id != 0) {
                                     mid |= ((long) messageObject.messageOwner.to_id.channel_id) << 32;
                                 }
-                                NotificationsController.this.pushMessagesDict.remove(Long.valueOf(mid));
+                                NotificationsController.this.pushMessagesDict.remove(mid);
                                 NotificationsController.this.delayedPushMessages.remove(messageObject);
                                 NotificationsController.this.pushMessages.remove(a);
                                 a--;
@@ -672,7 +677,7 @@ public class NotificationsController {
                                 if (messageObject.messageOwner.to_id.channel_id != 0) {
                                     mid |= ((long) messageObject.messageOwner.to_id.channel_id) << 32;
                                 }
-                                NotificationsController.this.pushMessagesDict.remove(Long.valueOf(mid));
+                                NotificationsController.this.pushMessagesDict.remove(mid);
                                 a--;
                             }
                         }
@@ -701,7 +706,7 @@ public class NotificationsController {
                 public void run() {
                     boolean added = false;
                     int oldCount = popupArray.size();
-                    HashMap<Long, Boolean> settingsCache = new HashMap();
+                    LongSparseArray<Boolean> settingsCache = new LongSparseArray();
                     SharedPreferences preferences = MessagesController.getNotificationsSettings(NotificationsController.this.currentAccount);
                     boolean allowPinned = preferences.getBoolean("PinnedMessages", true);
                     int popup = 0;
@@ -711,7 +716,7 @@ public class NotificationsController {
                         if (messageObject.messageOwner.to_id.channel_id != 0) {
                             mid |= ((long) messageObject.messageOwner.to_id.channel_id) << 32;
                         }
-                        if (!NotificationsController.this.pushMessagesDict.containsKey(Long.valueOf(mid))) {
+                        if (NotificationsController.this.pushMessagesDict.indexOfKey(mid) < 0) {
                             long dialog_id = messageObject.getDialogId();
                             long original_dialog_id = dialog_id;
                             if (dialog_id == NotificationsController.this.opened_dialog_id && ApplicationLoader.isScreenOn) {
@@ -726,7 +731,7 @@ public class NotificationsController {
                                     NotificationsController.this.personal_count = NotificationsController.this.personal_count + 1;
                                 }
                                 added = true;
-                                Boolean value = (Boolean) settingsCache.get(Long.valueOf(dialog_id));
+                                Boolean value = (Boolean) settingsCache.get(dialog_id);
                                 int lower_id = (int) dialog_id;
                                 boolean isChat = lower_id < 0;
                                 if (lower_id != 0) {
@@ -747,7 +752,7 @@ public class NotificationsController {
                                     int notifyOverride = NotificationsController.this.getNotifyOverride(preferences, dialog_id);
                                     boolean z = notifyOverride != 2 && ((preferences.getBoolean("EnableAll", true) && (!isChat || preferences.getBoolean("EnableGroup", true))) || notifyOverride != 0);
                                     value = Boolean.valueOf(z);
-                                    settingsCache.put(Long.valueOf(dialog_id), value);
+                                    settingsCache.put(dialog_id, value);
                                 }
                                 if (!(popup == 0 || messageObject.messageOwner.to_id.channel_id == 0 || messageObject.isMegagroup())) {
                                     popup = 0;
@@ -758,9 +763,9 @@ public class NotificationsController {
                                     }
                                     NotificationsController.this.delayedPushMessages.add(messageObject);
                                     NotificationsController.this.pushMessages.add(0, messageObject);
-                                    NotificationsController.this.pushMessagesDict.put(Long.valueOf(mid), messageObject);
+                                    NotificationsController.this.pushMessagesDict.put(mid, messageObject);
                                     if (original_dialog_id != dialog_id) {
-                                        NotificationsController.this.pushDialogsOverrideMention.put(Long.valueOf(original_dialog_id), Integer.valueOf(1));
+                                        NotificationsController.this.pushDialogsOverrideMention.put(original_dialog_id, Integer.valueOf(1));
                                     }
                                 }
                             }
@@ -794,30 +799,31 @@ public class NotificationsController {
         return this.total_unread_count;
     }
 
-    public void processDialogsUpdateRead(final HashMap<Long, Integer> dialogsToUpdate) {
+    public void processDialogsUpdateRead(final LongSparseArray<Integer> dialogsToUpdate) {
         final ArrayList<MessageObject> popupArray = this.popupMessages.isEmpty() ? null : new ArrayList(this.popupMessages);
         notificationsQueue.postRunnable(new Runnable() {
             public void run() {
                 int old_unread_count = NotificationsController.this.total_unread_count;
                 SharedPreferences preferences = MessagesController.getNotificationsSettings(NotificationsController.this.currentAccount);
-                for (Entry<Long, Integer> entry : dialogsToUpdate.entrySet()) {
-                    long dialog_id = ((Long) entry.getKey()).longValue();
+                for (int b = 0; b < dialogsToUpdate.size(); b++) {
+                    long dialog_id = dialogsToUpdate.keyAt(b);
                     int notifyOverride = NotificationsController.this.getNotifyOverride(preferences, dialog_id);
                     if (NotificationsController.this.notifyCheck) {
-                        Integer override = (Integer) NotificationsController.this.pushDialogsOverrideMention.get(Long.valueOf(dialog_id));
+                        Integer override = (Integer) NotificationsController.this.pushDialogsOverrideMention.get(dialog_id);
                         if (override != null && override.intValue() == 1) {
-                            NotificationsController.this.pushDialogsOverrideMention.put(Long.valueOf(dialog_id), Integer.valueOf(0));
+                            NotificationsController.this.pushDialogsOverrideMention.put(dialog_id, Integer.valueOf(0));
                             notifyOverride = 1;
                         }
                     }
                     boolean canAddValue = notifyOverride != 2 && ((preferences.getBoolean("EnableAll", true) && (((int) dialog_id) >= 0 || preferences.getBoolean("EnableGroup", true))) || notifyOverride != 0);
-                    Integer currentCount = (Integer) NotificationsController.this.pushDialogs.get(Long.valueOf(dialog_id));
-                    Integer newCount = (Integer) entry.getValue();
+                    Integer currentCount = (Integer) NotificationsController.this.pushDialogs.get(dialog_id);
+                    Integer newCount = (Integer) dialogsToUpdate.get(dialog_id);
                     if (newCount.intValue() == 0) {
-                        NotificationsController.this.smartNotificationsDialogs.remove(Long.valueOf(dialog_id));
+                        NotificationsController.this.smartNotificationsDialogs.remove(dialog_id);
                     }
                     if (newCount.intValue() < 0) {
-                        if (currentCount != null) {
+                        if (currentCount == null) {
+                        } else {
                             newCount = Integer.valueOf(currentCount.intValue() + newCount.intValue());
                         }
                     }
@@ -825,8 +831,8 @@ public class NotificationsController {
                         NotificationsController.this.total_unread_count = NotificationsController.this.total_unread_count - currentCount.intValue();
                     }
                     if (newCount.intValue() == 0) {
-                        NotificationsController.this.pushDialogs.remove(Long.valueOf(dialog_id));
-                        NotificationsController.this.pushDialogsOverrideMention.remove(Long.valueOf(dialog_id));
+                        NotificationsController.this.pushDialogs.remove(dialog_id);
+                        NotificationsController.this.pushDialogsOverrideMention.remove(dialog_id);
                         int a = 0;
                         while (a < NotificationsController.this.pushMessages.size()) {
                             MessageObject messageObject = (MessageObject) NotificationsController.this.pushMessages.get(a);
@@ -841,7 +847,7 @@ public class NotificationsController {
                                 if (messageObject.messageOwner.to_id.channel_id != 0) {
                                     mid |= ((long) messageObject.messageOwner.to_id.channel_id) << 32;
                                 }
-                                NotificationsController.this.pushMessagesDict.remove(Long.valueOf(mid));
+                                NotificationsController.this.pushMessagesDict.remove(mid);
                                 if (popupArray != null) {
                                     popupArray.remove(messageObject);
                                 }
@@ -853,7 +859,7 @@ public class NotificationsController {
                         }
                     } else if (canAddValue) {
                         NotificationsController.this.total_unread_count = NotificationsController.this.total_unread_count + newCount.intValue();
-                        NotificationsController.this.pushDialogs.put(Long.valueOf(dialog_id), newCount);
+                        NotificationsController.this.pushDialogs.put(dialog_id, newCount);
                     }
                 }
                 if (popupArray != null) {
@@ -884,12 +890,13 @@ public class NotificationsController {
         });
     }
 
-    public void processLoadedUnreadMessages(final HashMap<Long, Integer> dialogs, final ArrayList<Message> messages, ArrayList<User> users, ArrayList<Chat> chats, ArrayList<EncryptedChat> encryptedChats) {
+    public void processLoadedUnreadMessages(final LongSparseArray<Integer> dialogs, final ArrayList<Message> messages, ArrayList<User> users, ArrayList<Chat> chats, ArrayList<EncryptedChat> encryptedChats) {
         MessagesController.getInstance(this.currentAccount).putUsers(users, true);
         MessagesController.getInstance(this.currentAccount).putChats(chats, true);
         MessagesController.getInstance(this.currentAccount).putEncryptedChats(encryptedChats, true);
         notificationsQueue.postRunnable(new Runnable() {
             public void run() {
+                int a;
                 long dialog_id;
                 Boolean value;
                 NotificationsController.this.pushDialogs.clear();
@@ -898,16 +905,16 @@ public class NotificationsController {
                 NotificationsController.this.total_unread_count = 0;
                 NotificationsController.this.personal_count = 0;
                 SharedPreferences preferences = MessagesController.getNotificationsSettings(NotificationsController.this.currentAccount);
-                HashMap<Long, Boolean> settingsCache = new HashMap();
+                LongSparseArray<Boolean> settingsCache = new LongSparseArray();
                 if (messages != null) {
-                    for (int a = 0; a < messages.size(); a++) {
+                    for (a = 0; a < messages.size(); a++) {
                         Message message = (Message) messages.get(a);
                         long mid = (long) message.id;
                         if (message.to_id.channel_id != 0) {
                             mid |= ((long) message.to_id.channel_id) << 32;
                         }
-                        if (!NotificationsController.this.pushMessagesDict.containsKey(Long.valueOf(mid))) {
-                            MessageObject messageObject = new MessageObject(NotificationsController.this.currentAccount, message, null, false);
+                        if (NotificationsController.this.pushMessagesDict.indexOfKey(mid) < 0) {
+                            MessageObject messageObject = new MessageObject(NotificationsController.this.currentAccount, message, false);
                             if (NotificationsController.this.isPersonalMessage(messageObject)) {
                                 NotificationsController.this.personal_count = NotificationsController.this.personal_count + 1;
                             }
@@ -916,40 +923,40 @@ public class NotificationsController {
                             if (messageObject.messageOwner.mentioned) {
                                 dialog_id = (long) messageObject.messageOwner.from_id;
                             }
-                            value = (Boolean) settingsCache.get(Long.valueOf(dialog_id));
+                            value = (Boolean) settingsCache.get(dialog_id);
                             if (value == null) {
                                 int notifyOverride = NotificationsController.this.getNotifyOverride(preferences, dialog_id);
                                 boolean z = notifyOverride != 2 && ((preferences.getBoolean("EnableAll", true) && (((int) dialog_id) >= 0 || preferences.getBoolean("EnableGroup", true))) || notifyOverride != 0);
                                 value = Boolean.valueOf(z);
-                                settingsCache.put(Long.valueOf(dialog_id), value);
+                                settingsCache.put(dialog_id, value);
                             }
                             if (value.booleanValue() && !(dialog_id == NotificationsController.this.opened_dialog_id && ApplicationLoader.isScreenOn)) {
-                                NotificationsController.this.pushMessagesDict.put(Long.valueOf(mid), messageObject);
+                                NotificationsController.this.pushMessagesDict.put(mid, messageObject);
                                 NotificationsController.this.pushMessages.add(0, messageObject);
                                 if (original_dialog_id != dialog_id) {
-                                    NotificationsController.this.pushDialogsOverrideMention.put(Long.valueOf(original_dialog_id), Integer.valueOf(1));
+                                    NotificationsController.this.pushDialogsOverrideMention.put(original_dialog_id, Integer.valueOf(1));
                                 }
                             }
                         }
                     }
                 }
-                for (Entry<Long, Integer> entry : dialogs.entrySet()) {
-                    dialog_id = ((Long) entry.getKey()).longValue();
-                    value = (Boolean) settingsCache.get(Long.valueOf(dialog_id));
+                for (a = 0; a < dialogs.size(); a++) {
+                    dialog_id = dialogs.keyAt(a);
+                    value = (Boolean) settingsCache.get(dialog_id);
                     if (value == null) {
                         notifyOverride = NotificationsController.this.getNotifyOverride(preferences, dialog_id);
-                        Integer override = (Integer) NotificationsController.this.pushDialogsOverrideMention.get(Long.valueOf(dialog_id));
+                        Integer override = (Integer) NotificationsController.this.pushDialogsOverrideMention.get(dialog_id);
                         if (override != null && override.intValue() == 1) {
-                            NotificationsController.this.pushDialogsOverrideMention.put(Long.valueOf(dialog_id), Integer.valueOf(0));
+                            NotificationsController.this.pushDialogsOverrideMention.put(dialog_id, Integer.valueOf(0));
                             notifyOverride = 1;
                         }
                         z = notifyOverride != 2 && ((preferences.getBoolean("EnableAll", true) && (((int) dialog_id) >= 0 || preferences.getBoolean("EnableGroup", true))) || notifyOverride != 0);
                         value = Boolean.valueOf(z);
-                        settingsCache.put(Long.valueOf(dialog_id), value);
+                        settingsCache.put(dialog_id, value);
                     }
                     if (value.booleanValue()) {
-                        int count = ((Integer) entry.getValue()).intValue();
-                        NotificationsController.this.pushDialogs.put(Long.valueOf(dialog_id), Integer.valueOf(count));
+                        int count = ((Integer) dialogs.valueAt(a)).intValue();
+                        NotificationsController.this.pushDialogs.put(dialog_id, Integer.valueOf(count));
                         NotificationsController.this.total_unread_count = NotificationsController.this.total_unread_count + count;
                     }
                 }
@@ -1481,8 +1488,8 @@ public class NotificationsController {
             notificationManager.cancel(this.notificationId);
             this.pushMessages.clear();
             this.pushMessagesDict.clear();
-            for (Entry<Long, Integer> entry : this.wearNotificationsIds.entrySet()) {
-                notificationManager.cancel(((Integer) entry.getValue()).intValue());
+            for (int a = 0; a < this.wearNotificationsIds.size(); a++) {
+                notificationManager.cancel(((Integer) this.wearNotificationsIds.valueAt(a)).intValue());
             }
             this.wearNotificationsIds.clear();
             AndroidUtilities.runOnUIThread(new Runnable() {
@@ -1550,7 +1557,9 @@ public class NotificationsController {
 
     private void scheduleNotificationDelay(boolean onlineReason) {
         try {
-            FileLog.e("delay notification start, onlineReason = " + onlineReason);
+            if (BuildVars.LOGS_ENABLED) {
+                FileLog.d("delay notification start, onlineReason = " + onlineReason);
+            }
             this.notificationDelayWakelock.acquire(10000);
             AndroidUtilities.cancelRunOnUIThread(this.notificationDelayRunnable);
             AndroidUtilities.runOnUIThread(this.notificationDelayRunnable, (long) (onlineReason ? 3000 : 1000));
@@ -1688,7 +1697,7 @@ public class NotificationsController {
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.chat_id;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0659;
+        if (r5 == 0) goto L_0x0651;
     L_0x007c:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
@@ -1700,7 +1709,7 @@ public class NotificationsController {
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.user_id;	 Catch:{ Exception -> 0x0052 }
         r63 = r0;
-        if (r63 != 0) goto L_0x0663;
+        if (r63 != 0) goto L_0x065b;
     L_0x0090:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
@@ -1756,12 +1765,12 @@ public class NotificationsController {
     L_0x00f7:
         r47 = 1;
     L_0x00f9:
-        if (r47 != 0) goto L_0x0187;
+        if (r47 != 0) goto L_0x017f;
     L_0x00fb:
         r5 = (r6 > r52 ? 1 : (r6 == r52 ? 0 : -1));
-        if (r5 != 0) goto L_0x0187;
+        if (r5 != 0) goto L_0x017f;
     L_0x00ff:
-        if (r14 == 0) goto L_0x0187;
+        if (r14 == 0) goto L_0x017f;
     L_0x0101:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -1772,7 +1781,7 @@ public class NotificationsController {
         r13 = 0;
         r0 = r54;
         r5 = r0.getBoolean(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x067d;
+        if (r5 == 0) goto L_0x0675;
     L_0x011e:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -1793,15 +1802,14 @@ public class NotificationsController {
         r0 = r54;
         r46 = r0.getInt(r5, r13);	 Catch:{ Exception -> 0x0052 }
     L_0x0155:
-        if (r48 == 0) goto L_0x0187;
+        if (r48 == 0) goto L_0x017f;
     L_0x0157:
         r0 = r72;
         r5 = r0.smartNotificationsDialogs;	 Catch:{ Exception -> 0x0052 }
-        r13 = java.lang.Long.valueOf(r6);	 Catch:{ Exception -> 0x0052 }
-        r22 = r5.get(r13);	 Catch:{ Exception -> 0x0052 }
+        r22 = r5.get(r6);	 Catch:{ Exception -> 0x0052 }
         r22 = (android.graphics.Point) r22;	 Catch:{ Exception -> 0x0052 }
-        if (r22 != 0) goto L_0x0683;
-    L_0x0167:
+        if (r22 != 0) goto L_0x067b;
+    L_0x0163:
         r22 = new android.graphics.Point;	 Catch:{ Exception -> 0x0052 }
         r5 = 1;
         r66 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0052 }
@@ -1813,14 +1821,13 @@ public class NotificationsController {
         r0.<init>(r5, r13);	 Catch:{ Exception -> 0x0052 }
         r0 = r72;
         r5 = r0.smartNotificationsDialogs;	 Catch:{ Exception -> 0x0052 }
-        r13 = java.lang.Long.valueOf(r6);	 Catch:{ Exception -> 0x0052 }
         r0 = r22;
-        r5.put(r13, r0);	 Catch:{ Exception -> 0x0052 }
-    L_0x0187:
+        r5.put(r6, r0);	 Catch:{ Exception -> 0x0052 }
+    L_0x017f:
         r5 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0052 }
         r20 = r5.getPath();	 Catch:{ Exception -> 0x0052 }
-        if (r47 != 0) goto L_0x02e8;
-    L_0x018f:
+        if (r47 != 0) goto L_0x02e0;
+    L_0x0187:
         r5 = "EnableInAppSounds";
         r13 = 1;
         r0 = r54;
@@ -1846,8 +1853,8 @@ public class NotificationsController {
         r13 = 0;
         r0 = r54;
         r19 = r0.getBoolean(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        if (r19 == 0) goto L_0x06d1;
-    L_0x01d4:
+        if (r19 == 0) goto L_0x06c9;
+    L_0x01cc:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = "vibrate_";
@@ -1875,19 +1882,19 @@ public class NotificationsController {
         r13 = 0;
         r0 = r54;
         r16 = r0.getString(r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x0225:
+    L_0x021d:
         r64 = 0;
-        if (r15 == 0) goto L_0x06e8;
-    L_0x0229:
-        if (r16 == 0) goto L_0x06d9;
-    L_0x022b:
+        if (r15 == 0) goto L_0x06e0;
+    L_0x0221:
+        if (r16 == 0) goto L_0x06d1;
+    L_0x0223:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x06d9;
-    L_0x0235:
+        if (r5 == 0) goto L_0x06d1;
+    L_0x022d:
         r16 = 0;
-    L_0x0237:
+    L_0x022f:
         r5 = "vibrate_group";
         r13 = 0;
         r0 = r54;
@@ -1900,9 +1907,9 @@ public class NotificationsController {
         r13 = -16776961; // 0xffffffffff0000ff float:-1.7014636E38 double:NaN;
         r0 = r54;
         r10 = r0.getInt(r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x0257:
-        if (r19 == 0) goto L_0x0290;
-    L_0x0259:
+    L_0x024f:
+        if (r19 == 0) goto L_0x0288;
+    L_0x0251:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = "color_";
@@ -1911,8 +1918,8 @@ public class NotificationsController {
         r5 = r5.toString();	 Catch:{ Exception -> 0x0052 }
         r0 = r54;
         r5 = r0.contains(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0290;
-    L_0x0275:
+        if (r5 == 0) goto L_0x0288;
+    L_0x026d:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = "color_";
@@ -1922,79 +1929,79 @@ public class NotificationsController {
         r13 = 0;
         r0 = r54;
         r10 = r0.getInt(r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x0290:
+    L_0x0288:
         r5 = 3;
         r0 = r56;
-        if (r0 == r5) goto L_0x0297;
-    L_0x0295:
+        if (r0 == r5) goto L_0x028f;
+    L_0x028d:
         r55 = r56;
-    L_0x0297:
+    L_0x028f:
         r5 = 4;
         r0 = r45;
-        if (r0 != r5) goto L_0x02a0;
-    L_0x029c:
+        if (r0 != r5) goto L_0x0298;
+    L_0x0294:
         r64 = 1;
         r45 = 0;
-    L_0x02a0:
+    L_0x0298:
         r5 = 2;
         r0 = r45;
-        if (r0 != r5) goto L_0x02af;
-    L_0x02a5:
+        if (r0 != r5) goto L_0x02a7;
+    L_0x029d:
         r5 = 1;
         r0 = r65;
-        if (r0 == r5) goto L_0x02c0;
-    L_0x02aa:
+        if (r0 == r5) goto L_0x02b8;
+    L_0x02a2:
         r5 = 3;
         r0 = r65;
-        if (r0 == r5) goto L_0x02c0;
-    L_0x02af:
+        if (r0 == r5) goto L_0x02b8;
+    L_0x02a7:
         r5 = 2;
         r0 = r45;
-        if (r0 == r5) goto L_0x02b9;
-    L_0x02b4:
+        if (r0 == r5) goto L_0x02b1;
+    L_0x02ac:
         r5 = 2;
         r0 = r65;
-        if (r0 == r5) goto L_0x02c0;
-    L_0x02b9:
-        if (r65 == 0) goto L_0x02c2;
-    L_0x02bb:
+        if (r0 == r5) goto L_0x02b8;
+    L_0x02b1:
+        if (r65 == 0) goto L_0x02ba;
+    L_0x02b3:
         r5 = 4;
         r0 = r65;
-        if (r0 == r5) goto L_0x02c2;
-    L_0x02c0:
+        if (r0 == r5) goto L_0x02ba;
+    L_0x02b8:
         r45 = r65;
-    L_0x02c2:
+    L_0x02ba:
         r5 = org.telegram.messenger.ApplicationLoader.mainInterfacePaused;	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x02d2;
-    L_0x02c6:
-        if (r32 != 0) goto L_0x02ca;
-    L_0x02c8:
+        if (r5 != 0) goto L_0x02ca;
+    L_0x02be:
+        if (r32 != 0) goto L_0x02c2;
+    L_0x02c0:
         r16 = 0;
-    L_0x02ca:
-        if (r33 != 0) goto L_0x02ce;
-    L_0x02cc:
+    L_0x02c2:
+        if (r33 != 0) goto L_0x02c6;
+    L_0x02c4:
         r45 = 2;
-    L_0x02ce:
-        if (r31 != 0) goto L_0x0728;
-    L_0x02d0:
+    L_0x02c6:
+        if (r31 != 0) goto L_0x0720;
+    L_0x02c8:
         r55 = 0;
-    L_0x02d2:
-        if (r64 == 0) goto L_0x02e8;
-    L_0x02d4:
+    L_0x02ca:
+        if (r64 == 0) goto L_0x02e0;
+    L_0x02cc:
         r5 = 2;
         r0 = r45;
-        if (r0 == r5) goto L_0x02e8;
+        if (r0 == r5) goto L_0x02e0;
+    L_0x02d1:
+        r5 = audioManager;	 Catch:{ Exception -> 0x0729 }
+        r43 = r5.getRingerMode();	 Catch:{ Exception -> 0x0729 }
+        if (r43 == 0) goto L_0x02e0;
     L_0x02d9:
-        r5 = audioManager;	 Catch:{ Exception -> 0x0731 }
-        r43 = r5.getRingerMode();	 Catch:{ Exception -> 0x0731 }
-        if (r43 == 0) goto L_0x02e8;
-    L_0x02e1:
         r5 = 1;
         r0 = r43;
-        if (r0 == r5) goto L_0x02e8;
-    L_0x02e6:
+        if (r0 == r5) goto L_0x02e0;
+    L_0x02de:
         r45 = 2;
-    L_0x02e8:
+    L_0x02e0:
         r35 = new android.content.Intent;	 Catch:{ Exception -> 0x0052 }
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
         r13 = org.telegram.ui.LaunchActivity.class;
@@ -2016,29 +2023,29 @@ public class NotificationsController {
         r0 = r35;
         r0.setFlags(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = (int) r6;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x07ae;
-    L_0x0324:
+        if (r5 == 0) goto L_0x07a6;
+    L_0x031c:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x0339;
-    L_0x032f:
-        if (r15 == 0) goto L_0x0737;
-    L_0x0331:
+        if (r5 != r13) goto L_0x0331;
+    L_0x0327:
+        if (r15 == 0) goto L_0x072f;
+    L_0x0329:
         r5 = "chatId";
         r0 = r35;
         r0.putExtra(r5, r15);	 Catch:{ Exception -> 0x0052 }
-    L_0x0339:
+    L_0x0331:
         r5 = 0;
         r5 = org.telegram.messenger.AndroidUtilities.needShowPasscode(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x0344;
-    L_0x0340:
+        if (r5 != 0) goto L_0x033c;
+    L_0x0338:
         r5 = org.telegram.messenger.SharedConfig.isWaitingForPasscodeEnter;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0745;
-    L_0x0344:
+        if (r5 == 0) goto L_0x073d;
+    L_0x033c:
         r51 = 0;
-    L_0x0346:
+    L_0x033e:
         r5 = "currentAccount";
         r0 = r72;
         r13 = r0.currentAccount;	 Catch:{ Exception -> 0x0052 }
@@ -2051,35 +2058,35 @@ public class NotificationsController {
         r1 = r66;
         r17 = android.app.PendingIntent.getActivity(r5, r13, r0, r1);	 Catch:{ Exception -> 0x0052 }
         r57 = 1;
-        if (r14 == 0) goto L_0x07ca;
-    L_0x0363:
+        if (r14 == 0) goto L_0x07c2;
+    L_0x035b:
         r8 = r14.title;	 Catch:{ Exception -> 0x0052 }
-    L_0x0365:
+    L_0x035d:
         r5 = (int) r6;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x037e;
-    L_0x0368:
+        if (r5 == 0) goto L_0x0376;
+    L_0x0360:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 > r13) goto L_0x037e;
-    L_0x0373:
+        if (r5 > r13) goto L_0x0376;
+    L_0x036b:
         r5 = 0;
         r5 = org.telegram.messenger.AndroidUtilities.needShowPasscode(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x037e;
-    L_0x037a:
+        if (r5 != 0) goto L_0x0376;
+    L_0x0372:
         r5 = org.telegram.messenger.SharedConfig.isWaitingForPasscodeEnter;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x07d0;
-    L_0x037e:
+        if (r5 == 0) goto L_0x07c8;
+    L_0x0376:
         r5 = "AppName";
-        r13 = 2131492978; // 0x7f0c0072 float:1.8609423E38 double:1.053097455E-314;
+        r13 = 2131492979; // 0x7f0c0073 float:1.8609425E38 double:1.0530974553E-314;
         r44 = org.telegram.messenger.LocaleController.getString(r5, r13);	 Catch:{ Exception -> 0x0052 }
         r57 = 0;
-    L_0x038a:
+    L_0x0382:
         r5 = org.telegram.messenger.UserConfig.getActivatedAccountsCount();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 <= r13) goto L_0x07d4;
-    L_0x0391:
+        if (r5 <= r13) goto L_0x07cc;
+    L_0x0389:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r72;
@@ -2091,13 +2098,13 @@ public class NotificationsController {
         r13 = "・";
         r5 = r5.append(r13);	 Catch:{ Exception -> 0x0052 }
         r21 = r5.toString();	 Catch:{ Exception -> 0x0052 }
-    L_0x03b5:
+    L_0x03ad:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x07d9;
-    L_0x03c0:
+        if (r5 != r13) goto L_0x07d1;
+    L_0x03b8:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r21;
@@ -2110,7 +2117,7 @@ public class NotificationsController {
         r13 = org.telegram.messenger.LocaleController.formatPluralString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r5 = r5.append(r13);	 Catch:{ Exception -> 0x0052 }
         r21 = r5.toString();	 Catch:{ Exception -> 0x0052 }
-    L_0x03e2:
+    L_0x03da:
         r5 = new android.support.v4.app.NotificationCompat$Builder;	 Catch:{ Exception -> 0x0052 }
         r13 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
         r5.<init>(r13);	 Catch:{ Exception -> 0x0052 }
@@ -2138,19 +2145,19 @@ public class NotificationsController {
         r5 = "msg";
         r0 = r39;
         r0.setCategory(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r14 != 0) goto L_0x0459;
-    L_0x042a:
-        if (r62 == 0) goto L_0x0459;
-    L_0x042c:
+        if (r14 != 0) goto L_0x0451;
+    L_0x0422:
+        if (r62 == 0) goto L_0x0451;
+    L_0x0424:
         r0 = r62;
         r5 = r0.phone;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0459;
-    L_0x0432:
+        if (r5 == 0) goto L_0x0451;
+    L_0x042a:
         r0 = r62;
         r5 = r0.phone;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.length();	 Catch:{ Exception -> 0x0052 }
-        if (r5 <= 0) goto L_0x0459;
-    L_0x043c:
+        if (r5 <= 0) goto L_0x0451;
+    L_0x0434:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = "tel:+";
@@ -2161,7 +2168,7 @@ public class NotificationsController {
         r5 = r5.toString();	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.addPerson(r5);	 Catch:{ Exception -> 0x0052 }
-    L_0x0459:
+    L_0x0451:
         r60 = 2;
         r36 = 0;
         r27 = 0;
@@ -2169,8 +2176,8 @@ public class NotificationsController {
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x0875;
-    L_0x046a:
+        if (r5 != r13) goto L_0x086d;
+    L_0x0462:
         r0 = r72;
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0052 }
         r13 = 0;
@@ -2188,16 +2195,16 @@ public class NotificationsController {
         r0 = r41;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.silent;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x082a;
-    L_0x048f:
+        if (r5 == 0) goto L_0x0822;
+    L_0x0487:
         r60 = 1;
-    L_0x0491:
+    L_0x0489:
         if (r40 == 0) goto L_0x001b;
-    L_0x0493:
-        if (r57 == 0) goto L_0x04b6;
-    L_0x0495:
-        if (r14 == 0) goto L_0x082e;
-    L_0x0497:
+    L_0x048b:
+        if (r57 == 0) goto L_0x04ae;
+    L_0x048d:
+        if (r14 == 0) goto L_0x0826;
+    L_0x048f:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = " @ ";
@@ -2208,7 +2215,7 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x04b6:
+    L_0x04ae:
         r39.setContentText(r40);	 Catch:{ Exception -> 0x0052 }
         r5 = new android.support.v4.app.NotificationCompat$BigTextStyle;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -2216,7 +2223,7 @@ public class NotificationsController {
         r5 = r5.bigText(r0);	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setStyle(r5);	 Catch:{ Exception -> 0x0052 }
-    L_0x04c9:
+    L_0x04c1:
         r24 = new android.content.Intent;	 Catch:{ Exception -> 0x0052 }
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
         r13 = org.telegram.messenger.NotificationDismissReceiver.class;
@@ -2241,50 +2248,50 @@ public class NotificationsController {
         r5 = android.app.PendingIntent.getBroadcast(r5, r13, r0, r1);	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setDeleteIntent(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r51 == 0) goto L_0x051d;
-    L_0x0502:
+        if (r51 == 0) goto L_0x0515;
+    L_0x04fa:
         r5 = org.telegram.messenger.ImageLoader.getInstance();	 Catch:{ Exception -> 0x0052 }
         r13 = 0;
         r66 = "50_50";
         r0 = r51;
         r1 = r66;
         r29 = r5.getImageFromMemory(r0, r13, r1);	 Catch:{ Exception -> 0x0052 }
-        if (r29 == 0) goto L_0x0968;
-    L_0x0514:
+        if (r29 == 0) goto L_0x0960;
+    L_0x050c:
         r5 = r29.getBitmap();	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setLargeIcon(r5);	 Catch:{ Exception -> 0x0052 }
-    L_0x051d:
-        if (r73 == 0) goto L_0x0524;
-    L_0x051f:
+    L_0x0515:
+        if (r73 == 0) goto L_0x051c;
+    L_0x0517:
         r5 = 1;
         r0 = r60;
-        if (r0 != r5) goto L_0x09aa;
-    L_0x0524:
+        if (r0 != r5) goto L_0x09a2;
+    L_0x051c:
         r5 = -1;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x0531;
-    L_0x0530:
+        if (r5 < r13) goto L_0x0529;
+    L_0x0528:
         r12 = 2;
-    L_0x0531:
+    L_0x0529:
         r5 = 1;
         r0 = r60;
-        if (r0 == r5) goto L_0x0a3f;
-    L_0x0536:
-        if (r47 != 0) goto L_0x0a3f;
-    L_0x0538:
+        if (r0 == r5) goto L_0x0a37;
+    L_0x052e:
+        if (r47 != 0) goto L_0x0a37;
+    L_0x0530:
         r5 = org.telegram.messenger.ApplicationLoader.mainInterfacePaused;	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x053e;
-    L_0x053c:
-        if (r30 == 0) goto L_0x057c;
-    L_0x053e:
+        if (r5 != 0) goto L_0x0536;
+    L_0x0534:
+        if (r30 == 0) goto L_0x0574;
+    L_0x0536:
         r5 = r36.length();	 Catch:{ Exception -> 0x0052 }
         r13 = 100;
-        if (r5 <= r13) goto L_0x0575;
-    L_0x0546:
+        if (r5 <= r13) goto L_0x056d;
+    L_0x053e:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = 0;
@@ -2302,65 +2309,65 @@ public class NotificationsController {
         r13 = "...";
         r5 = r5.append(r13);	 Catch:{ Exception -> 0x0052 }
         r36 = r5.toString();	 Catch:{ Exception -> 0x0052 }
-    L_0x0575:
+    L_0x056d:
         r0 = r39;
         r1 = r36;
         r0.setTicker(r1);	 Catch:{ Exception -> 0x0052 }
-    L_0x057c:
+    L_0x0574:
         r5 = org.telegram.messenger.MediaController.getInstance();	 Catch:{ Exception -> 0x0052 }
         r5 = r5.isRecordingAudio();	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x05a5;
-    L_0x0586:
-        if (r16 == 0) goto L_0x05a5;
-    L_0x0588:
+        if (r5 != 0) goto L_0x059d;
+    L_0x057e:
+        if (r16 == 0) goto L_0x059d;
+    L_0x0580:
         r5 = "NoSound";
         r0 = r16;
         r5 = r0.equals(r5);	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x05a5;
-    L_0x0593:
+        if (r5 != 0) goto L_0x059d;
+    L_0x058b:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x09e9;
-    L_0x0599:
+        if (r5 < r13) goto L_0x09e1;
+    L_0x0591:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x09e3;
-    L_0x05a3:
+        if (r5 == 0) goto L_0x09db;
+    L_0x059b:
         r11 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0052 }
-    L_0x05a5:
-        if (r10 == 0) goto L_0x05b0;
-    L_0x05a7:
+    L_0x059d:
+        if (r10 == 0) goto L_0x05a8;
+    L_0x059f:
         r5 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r13 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r0 = r39;
         r0.setLights(r10, r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x05b0:
+    L_0x05a8:
         r5 = 2;
         r0 = r45;
-        if (r0 == r5) goto L_0x05bf;
-    L_0x05b5:
+        if (r0 == r5) goto L_0x05b7;
+    L_0x05ad:
         r5 = org.telegram.messenger.MediaController.getInstance();	 Catch:{ Exception -> 0x0052 }
         r5 = r5.isRecordingAudio();	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0a09;
-    L_0x05bf:
+        if (r5 == 0) goto L_0x0a01;
+    L_0x05b7:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 0};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
-    L_0x05ca:
+    L_0x05c2:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 24;
-        if (r5 >= r13) goto L_0x0623;
-    L_0x05d0:
+        if (r5 >= r13) goto L_0x061b;
+    L_0x05c8:
         r5 = org.telegram.messenger.SharedConfig.passcodeHash;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.length();	 Catch:{ Exception -> 0x0052 }
-        if (r5 != 0) goto L_0x0623;
-    L_0x05d8:
+        if (r5 != 0) goto L_0x061b;
+    L_0x05d0:
         r5 = r72.hasMessagesToReply();	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0623;
-    L_0x05de:
+        if (r5 == 0) goto L_0x061b;
+    L_0x05d6:
         r58 = new android.content.Intent;	 Catch:{ Exception -> 0x0052 }
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
         r13 = org.telegram.messenger.PopupReplyReceiver.class;
@@ -2373,11 +2380,11 @@ public class NotificationsController {
         r0.putExtra(r5, r13);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 19;
-        if (r5 > r13) goto L_0x0a4c;
-    L_0x05fb:
+        if (r5 > r13) goto L_0x0a44;
+    L_0x05f3:
         r5 = 2131165345; // 0x7f0700a1 float:1.7944904E38 double:1.0529355826E-314;
         r13 = "Reply";
-        r66 = 2131494170; // 0x7f0c051a float:1.861184E38 double:1.0530980437E-314;
+        r66 = 2131494180; // 0x7f0c0524 float:1.8611861E38 double:1.0530980486E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
@@ -2391,24 +2398,24 @@ public class NotificationsController {
         r0 = r39;
         r1 = r66;
         r0.addAction(r5, r13, r1);	 Catch:{ Exception -> 0x0052 }
-    L_0x0623:
+    L_0x061b:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x063c;
-    L_0x0629:
+        if (r5 < r13) goto L_0x0634;
+    L_0x0621:
         r5 = 1;
         r0 = r60;
-        if (r0 == r5) goto L_0x0630;
-    L_0x062e:
-        if (r47 == 0) goto L_0x0a76;
-    L_0x0630:
+        if (r0 == r5) goto L_0x0628;
+    L_0x0626:
+        if (r47 == 0) goto L_0x0a6e;
+    L_0x0628:
         r13 = 1;
-    L_0x0631:
+    L_0x0629:
         r5 = r72;
         r5 = r5.validateChannelId(r6, r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setChannelId(r5);	 Catch:{ Exception -> 0x0052 }
-    L_0x063c:
+    L_0x0634:
         r5 = notificationManager;	 Catch:{ Exception -> 0x0052 }
         r0 = r72;
         r13 = r0.notificationId;	 Catch:{ Exception -> 0x0052 }
@@ -2421,30 +2428,30 @@ public class NotificationsController {
         r0.showExtraNotifications(r1, r2);	 Catch:{ Exception -> 0x0052 }
         r72.scheduleNotificationRepeat();	 Catch:{ Exception -> 0x0052 }
         goto L_0x001b;
-    L_0x0659:
+    L_0x0651:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0052 }
         r15 = r5.channel_id;	 Catch:{ Exception -> 0x0052 }
         goto L_0x0084;
-    L_0x0663:
+    L_0x065b:
         r0 = r72;
         r5 = r0.currentAccount;	 Catch:{ Exception -> 0x0052 }
         r5 = org.telegram.messenger.UserConfig.getInstance(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = r5.getClientUserId();	 Catch:{ Exception -> 0x0052 }
         r0 = r63;
         if (r0 != r5) goto L_0x0098;
-    L_0x0673:
+    L_0x066b:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.from_id;	 Catch:{ Exception -> 0x0052 }
         r63 = r0;
         goto L_0x0098;
-    L_0x067d:
+    L_0x0675:
         r48 = 2;
         r46 = 180; // 0xb4 float:2.52E-43 double:8.9E-322;
         goto L_0x0155;
-    L_0x0683:
+    L_0x067b:
         r0 = r22;
         r0 = r0.y;	 Catch:{ Exception -> 0x0052 }
         r38 = r0;
@@ -2455,8 +2462,8 @@ public class NotificationsController {
         r70 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r68 = r68 / r70;
         r5 = (r66 > r68 ? 1 : (r66 == r68 ? 0 : -1));
-        if (r5 >= 0) goto L_0x06ad;
-    L_0x069a:
+        if (r5 >= 0) goto L_0x06a5;
+    L_0x0692:
         r5 = 1;
         r66 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0052 }
         r68 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
@@ -2465,15 +2472,15 @@ public class NotificationsController {
         r13 = (int) r0;	 Catch:{ Exception -> 0x0052 }
         r0 = r22;
         r0.set(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0187;
-    L_0x06ad:
+        goto L_0x017f;
+    L_0x06a5:
         r0 = r22;
         r0 = r0.x;	 Catch:{ Exception -> 0x0052 }
         r18 = r0;
         r0 = r18;
         r1 = r48;
-        if (r0 >= r1) goto L_0x06cd;
-    L_0x06b9:
+        if (r0 >= r1) goto L_0x06c5;
+    L_0x06b1:
         r5 = r18 + 1;
         r66 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0052 }
         r68 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
@@ -2482,35 +2489,35 @@ public class NotificationsController {
         r13 = (int) r0;	 Catch:{ Exception -> 0x0052 }
         r0 = r22;
         r0.set(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0187;
-    L_0x06cd:
+        goto L_0x017f;
+    L_0x06c5:
         r47 = 1;
-        goto L_0x0187;
-    L_0x06d1:
+        goto L_0x017f;
+    L_0x06c9:
         r65 = 0;
         r56 = 3;
         r16 = 0;
-        goto L_0x0225;
-    L_0x06d9:
-        if (r16 != 0) goto L_0x0237;
-    L_0x06db:
+        goto L_0x021d;
+    L_0x06d1:
+        if (r16 != 0) goto L_0x022f;
+    L_0x06d3:
         r5 = "GroupSoundPath";
         r0 = r54;
         r1 = r20;
         r16 = r0.getString(r5, r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0237;
-    L_0x06e8:
-        if (r63 == 0) goto L_0x0257;
-    L_0x06ea:
-        if (r16 == 0) goto L_0x071a;
-    L_0x06ec:
+        goto L_0x022f;
+    L_0x06e0:
+        if (r63 == 0) goto L_0x024f;
+    L_0x06e2:
+        if (r16 == 0) goto L_0x0712;
+    L_0x06e4:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x071a;
-    L_0x06f6:
+        if (r5 == 0) goto L_0x0712;
+    L_0x06ee:
         r16 = 0;
-    L_0x06f8:
+    L_0x06f0:
         r5 = "vibrate_messages";
         r13 = 0;
         r0 = r54;
@@ -2523,106 +2530,106 @@ public class NotificationsController {
         r13 = -16776961; // 0xffffffffff0000ff float:-1.7014636E38 double:NaN;
         r0 = r54;
         r10 = r0.getInt(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0257;
-    L_0x071a:
-        if (r16 != 0) goto L_0x06f8;
-    L_0x071c:
+        goto L_0x024f;
+    L_0x0712:
+        if (r16 != 0) goto L_0x06f0;
+    L_0x0714:
         r5 = "GlobalSoundPath";
         r0 = r54;
         r1 = r20;
         r16 = r0.getString(r5, r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x06f8;
-    L_0x0728:
+        goto L_0x06f0;
+    L_0x0720:
         r5 = 2;
         r0 = r55;
-        if (r0 != r5) goto L_0x02d2;
-    L_0x072d:
+        if (r0 != r5) goto L_0x02ca;
+    L_0x0725:
         r55 = 1;
-        goto L_0x02d2;
-    L_0x0731:
+        goto L_0x02ca;
+    L_0x0729:
         r25 = move-exception;
         org.telegram.messenger.FileLog.e(r25);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x02e8;
-    L_0x0737:
-        if (r63 == 0) goto L_0x0339;
-    L_0x0739:
+        goto L_0x02e0;
+    L_0x072f:
+        if (r63 == 0) goto L_0x0331;
+    L_0x0731:
         r5 = "userId";
         r0 = r35;
         r1 = r63;
         r0.putExtra(r5, r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0339;
-    L_0x0745:
+        goto L_0x0331;
+    L_0x073d:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x0346;
-    L_0x0750:
-        if (r14 == 0) goto L_0x077a;
-    L_0x0752:
+        if (r5 != r13) goto L_0x033e;
+    L_0x0748:
+        if (r14 == 0) goto L_0x0772;
+    L_0x074a:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0346;
-    L_0x0756:
+        if (r5 == 0) goto L_0x033e;
+    L_0x074e:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0346;
-    L_0x075c:
+        if (r5 == 0) goto L_0x033e;
+    L_0x0754:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.volume_id;	 Catch:{ Exception -> 0x0052 }
         r66 = r0;
         r68 = 0;
         r5 = (r66 > r68 ? 1 : (r66 == r68 ? 0 : -1));
-        if (r5 == 0) goto L_0x0346;
-    L_0x076a:
+        if (r5 == 0) goto L_0x033e;
+    L_0x0762:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.local_id;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0346;
-    L_0x0772:
+        if (r5 == 0) goto L_0x033e;
+    L_0x076a:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r51 = r0;
-        goto L_0x0346;
-    L_0x077a:
-        if (r62 == 0) goto L_0x0346;
-    L_0x077c:
+        goto L_0x033e;
+    L_0x0772:
+        if (r62 == 0) goto L_0x033e;
+    L_0x0774:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0346;
+        if (r5 == 0) goto L_0x033e;
+    L_0x077a:
+        r0 = r62;
+        r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
+        r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
+        if (r5 == 0) goto L_0x033e;
     L_0x0782:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0346;
-    L_0x078a:
-        r0 = r62;
-        r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
-        r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.volume_id;	 Catch:{ Exception -> 0x0052 }
         r66 = r0;
         r68 = 0;
         r5 = (r66 > r68 ? 1 : (r66 == r68 ? 0 : -1));
-        if (r5 == 0) goto L_0x0346;
-    L_0x079a:
+        if (r5 == 0) goto L_0x033e;
+    L_0x0792:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.local_id;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0346;
-    L_0x07a4:
+        if (r5 == 0) goto L_0x033e;
+    L_0x079c:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r51 = r0;
-        goto L_0x0346;
-    L_0x07ae:
+        goto L_0x033e;
+    L_0x07a6:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x0346;
-    L_0x07b9:
+        if (r5 != r13) goto L_0x033e;
+    L_0x07b1:
         r5 = "encId";
         r13 = 32;
         r66 = r6 >> r13;
@@ -2630,23 +2637,23 @@ public class NotificationsController {
         r13 = (int) r0;	 Catch:{ Exception -> 0x0052 }
         r0 = r35;
         r0.putExtra(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0346;
-    L_0x07ca:
+        goto L_0x033e;
+    L_0x07c2:
         r8 = org.telegram.messenger.UserObject.getUserName(r62);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0365;
-    L_0x07d0:
+        goto L_0x035d;
+    L_0x07c8:
         r44 = r8;
-        goto L_0x038a;
-    L_0x07d4:
+        goto L_0x0382;
+    L_0x07cc:
         r21 = "";
-        goto L_0x03b5;
-    L_0x07d9:
+        goto L_0x03ad;
+    L_0x07d1:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r21;
         r5 = r5.append(r0);	 Catch:{ Exception -> 0x0052 }
         r13 = "NotificationMessagesPeopleDisplayOrder";
-        r66 = 2131493952; // 0x7f0c0440 float:1.8611399E38 double:1.053097936E-314;
+        r66 = 2131493962; // 0x7f0c044a float:1.8611419E38 double:1.053097941E-314;
         r67 = 2;
         r0 = r67;
         r0 = new java.lang.Object[r0];	 Catch:{ Exception -> 0x0052 }
@@ -2671,15 +2678,15 @@ public class NotificationsController {
         r13 = org.telegram.messenger.LocaleController.formatString(r13, r0, r1);	 Catch:{ Exception -> 0x0052 }
         r5 = r5.append(r13);	 Catch:{ Exception -> 0x0052 }
         r21 = r5.toString();	 Catch:{ Exception -> 0x0052 }
-        goto L_0x03e2;
-    L_0x082a:
+        goto L_0x03da;
+    L_0x0822:
         r60 = 0;
-        goto L_0x0491;
-    L_0x082e:
+        goto L_0x0489;
+    L_0x0826:
         r5 = 0;
         r5 = r61[r5];	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0854;
-    L_0x0833:
+        if (r5 == 0) goto L_0x084c;
+    L_0x082b:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2690,8 +2697,8 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x04b6;
-    L_0x0854:
+        goto L_0x04ae;
+    L_0x084c:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2702,8 +2709,8 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x04b6;
-    L_0x0875:
+        goto L_0x04ae;
+    L_0x086d:
         r0 = r39;
         r1 = r21;
         r0.setContentText(r1);	 Catch:{ Exception -> 0x0052 }
@@ -2721,11 +2728,11 @@ public class NotificationsController {
         r0 = new boolean[r5];	 Catch:{ Exception -> 0x0052 }
         r61 = r0;
         r28 = 0;
-    L_0x089d:
+    L_0x0895:
         r0 = r28;
         r1 = r18;
-        if (r0 >= r1) goto L_0x0958;
-    L_0x08a3:
+        if (r0 >= r1) goto L_0x0950;
+    L_0x089b:
         r0 = r72;
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0052 }
         r0 = r28;
@@ -2736,39 +2743,39 @@ public class NotificationsController {
         r1 = r41;
         r2 = r61;
         r40 = r0.getStringForMessage(r1, r5, r2);	 Catch:{ Exception -> 0x0052 }
-        if (r40 == 0) goto L_0x08c6;
-    L_0x08bc:
+        if (r40 == 0) goto L_0x08be;
+    L_0x08b4:
         r0 = r41;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.date;	 Catch:{ Exception -> 0x0052 }
         r0 = r23;
-        if (r5 > r0) goto L_0x08c9;
-    L_0x08c6:
+        if (r5 > r0) goto L_0x08c1;
+    L_0x08be:
         r28 = r28 + 1;
-        goto L_0x089d;
-    L_0x08c9:
+        goto L_0x0895;
+    L_0x08c1:
         r5 = 2;
         r0 = r60;
-        if (r0 != r5) goto L_0x08da;
-    L_0x08ce:
+        if (r0 != r5) goto L_0x08d2;
+    L_0x08c6:
         r36 = r40;
         r0 = r41;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.silent;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0910;
-    L_0x08d8:
+        if (r5 == 0) goto L_0x0908;
+    L_0x08d0:
         r60 = 1;
-    L_0x08da:
+    L_0x08d2:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x0908;
-    L_0x08e5:
-        if (r57 == 0) goto L_0x0908;
-    L_0x08e7:
-        if (r14 == 0) goto L_0x0913;
-    L_0x08e9:
+        if (r5 != r13) goto L_0x0900;
+    L_0x08dd:
+        if (r57 == 0) goto L_0x0900;
+    L_0x08df:
+        if (r14 == 0) goto L_0x090b;
+    L_0x08e1:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = " @ ";
@@ -2779,19 +2786,19 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x0908:
+    L_0x0900:
         r0 = r34;
         r1 = r40;
         r0.addLine(r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x08c6;
-    L_0x0910:
+        goto L_0x08be;
+    L_0x0908:
         r60 = 0;
-        goto L_0x08da;
-    L_0x0913:
+        goto L_0x08d2;
+    L_0x090b:
         r5 = 0;
         r5 = r61[r5];	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0938;
-    L_0x0918:
+        if (r5 == 0) goto L_0x0930;
+    L_0x0910:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2802,8 +2809,8 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0908;
-    L_0x0938:
+        goto L_0x0900;
+    L_0x0930:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2814,158 +2821,158 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0908;
-    L_0x0958:
+        goto L_0x0900;
+    L_0x0950:
         r0 = r34;
         r1 = r21;
         r0.setSummaryText(r1);	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r1 = r34;
         r0.setStyle(r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x04c9;
-    L_0x0968:
+        goto L_0x04c1;
+    L_0x0960:
         r5 = 1;
         r0 = r51;
-        r26 = org.telegram.messenger.FileLoader.getPathToAttach(r0, r5);	 Catch:{ Throwable -> 0x09a3 }
-        r5 = r26.exists();	 Catch:{ Throwable -> 0x09a3 }
-        if (r5 == 0) goto L_0x051d;
-    L_0x0975:
+        r26 = org.telegram.messenger.FileLoader.getPathToAttach(r0, r5);	 Catch:{ Throwable -> 0x099b }
+        r5 = r26.exists();	 Catch:{ Throwable -> 0x099b }
+        if (r5 == 0) goto L_0x0515;
+    L_0x096d:
         r5 = 1126170624; // 0x43200000 float:160.0 double:5.564022167E-315;
         r13 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        r13 = org.telegram.messenger.AndroidUtilities.dp(r13);	 Catch:{ Throwable -> 0x09a3 }
-        r13 = (float) r13;	 Catch:{ Throwable -> 0x09a3 }
+        r13 = org.telegram.messenger.AndroidUtilities.dp(r13);	 Catch:{ Throwable -> 0x099b }
+        r13 = (float) r13;	 Catch:{ Throwable -> 0x099b }
         r59 = r5 / r13;
-        r50 = new android.graphics.BitmapFactory$Options;	 Catch:{ Throwable -> 0x09a3 }
-        r50.<init>();	 Catch:{ Throwable -> 0x09a3 }
+        r50 = new android.graphics.BitmapFactory$Options;	 Catch:{ Throwable -> 0x099b }
+        r50.<init>();	 Catch:{ Throwable -> 0x099b }
         r5 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r5 = (r59 > r5 ? 1 : (r59 == r5 ? 0 : -1));
-        if (r5 >= 0) goto L_0x09a6;
-    L_0x098b:
+        if (r5 >= 0) goto L_0x099e;
+    L_0x0983:
         r5 = 1;
-    L_0x098c:
+    L_0x0984:
         r0 = r50;
-        r0.inSampleSize = r5;	 Catch:{ Throwable -> 0x09a3 }
-        r5 = r26.getAbsolutePath();	 Catch:{ Throwable -> 0x09a3 }
+        r0.inSampleSize = r5;	 Catch:{ Throwable -> 0x099b }
+        r5 = r26.getAbsolutePath();	 Catch:{ Throwable -> 0x099b }
         r0 = r50;
-        r4 = android.graphics.BitmapFactory.decodeFile(r5, r0);	 Catch:{ Throwable -> 0x09a3 }
-        if (r4 == 0) goto L_0x051d;
-    L_0x099c:
+        r4 = android.graphics.BitmapFactory.decodeFile(r5, r0);	 Catch:{ Throwable -> 0x099b }
+        if (r4 == 0) goto L_0x0515;
+    L_0x0994:
         r0 = r39;
-        r0.setLargeIcon(r4);	 Catch:{ Throwable -> 0x09a3 }
-        goto L_0x051d;
-    L_0x09a3:
+        r0.setLargeIcon(r4);	 Catch:{ Throwable -> 0x099b }
+        goto L_0x0515;
+    L_0x099b:
         r5 = move-exception;
-        goto L_0x051d;
-    L_0x09a6:
+        goto L_0x0515;
+    L_0x099e:
         r0 = r59;
         r5 = (int) r0;
-        goto L_0x098c;
-    L_0x09aa:
-        if (r55 != 0) goto L_0x09bb;
-    L_0x09ac:
+        goto L_0x0984;
+    L_0x09a2:
+        if (r55 != 0) goto L_0x09b3;
+    L_0x09a4:
         r5 = 0;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x0531;
-    L_0x09b8:
+        if (r5 < r13) goto L_0x0529;
+    L_0x09b0:
         r12 = 3;
-        goto L_0x0531;
-    L_0x09bb:
+        goto L_0x0529;
+    L_0x09b3:
         r5 = 1;
         r0 = r55;
-        if (r0 != r5) goto L_0x09cf;
-    L_0x09c0:
+        if (r0 != r5) goto L_0x09c7;
+    L_0x09b8:
         r5 = 1;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x0531;
-    L_0x09cc:
+        if (r5 < r13) goto L_0x0529;
+    L_0x09c4:
         r12 = 4;
-        goto L_0x0531;
-    L_0x09cf:
+        goto L_0x0529;
+    L_0x09c7:
         r5 = 2;
         r0 = r55;
-        if (r0 != r5) goto L_0x0531;
-    L_0x09d4:
+        if (r0 != r5) goto L_0x0529;
+    L_0x09cc:
         r5 = 2;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x0531;
-    L_0x09e0:
+        if (r5 < r13) goto L_0x0529;
+    L_0x09d8:
         r12 = 5;
-        goto L_0x0531;
-    L_0x09e3:
+        goto L_0x0529;
+    L_0x09db:
         r11 = android.net.Uri.parse(r16);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05a5;
-    L_0x09e9:
+        goto L_0x059d;
+    L_0x09e1:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x09fd;
-    L_0x09f3:
+        if (r5 == 0) goto L_0x09f5;
+    L_0x09eb:
         r5 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0052 }
         r13 = 5;
         r0 = r39;
         r0.setSound(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05a5;
-    L_0x09fd:
+        goto L_0x059d;
+    L_0x09f5:
         r5 = android.net.Uri.parse(r16);	 Catch:{ Exception -> 0x0052 }
         r13 = 5;
         r0 = r39;
         r0.setSound(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05a5;
-    L_0x0a09:
+        goto L_0x059d;
+    L_0x0a01:
         r5 = 1;
         r0 = r45;
-        if (r0 != r5) goto L_0x0a1b;
-    L_0x0a0e:
+        if (r0 != r5) goto L_0x0a13;
+    L_0x0a06:
         r5 = 4;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 100, 0, 100};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05ca;
-    L_0x0a1b:
-        if (r45 == 0) goto L_0x0a22;
-    L_0x0a1d:
+        goto L_0x05c2;
+    L_0x0a13:
+        if (r45 == 0) goto L_0x0a1a;
+    L_0x0a15:
         r5 = 4;
         r0 = r45;
-        if (r0 != r5) goto L_0x0a2d;
-    L_0x0a22:
+        if (r0 != r5) goto L_0x0a25;
+    L_0x0a1a:
         r5 = 2;
         r0 = r39;
         r0.setDefaults(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = 0;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05ca;
-    L_0x0a2d:
+        goto L_0x05c2;
+    L_0x0a25:
         r5 = 3;
         r0 = r45;
-        if (r0 != r5) goto L_0x05ca;
-    L_0x0a32:
+        if (r0 != r5) goto L_0x05c2;
+    L_0x0a2a:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 1000};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05ca;
-    L_0x0a3f:
+        goto L_0x05c2;
+    L_0x0a37:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 0};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x05ca;
-    L_0x0a4c:
+        goto L_0x05c2;
+    L_0x0a44:
         r5 = 2131165344; // 0x7f0700a0 float:1.7944902E38 double:1.052935582E-314;
         r13 = "Reply";
-        r66 = 2131494170; // 0x7f0c051a float:1.861184E38 double:1.0530980437E-314;
+        r66 = 2131494180; // 0x7f0c0524 float:1.8611861E38 double:1.0530980486E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
@@ -2979,10 +2986,10 @@ public class NotificationsController {
         r0 = r39;
         r1 = r66;
         r0.addAction(r5, r13, r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0623;
-    L_0x0a76:
+        goto L_0x061b;
+    L_0x0a6e:
         r13 = 0;
-        goto L_0x0631;
+        goto L_0x0629;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.NotificationsController.showOrUpdateNotification(boolean):void");
     }
@@ -2994,26 +3001,25 @@ public class NotificationsController {
             MessageObject messageObject;
             long dialog_id;
             ArrayList<Long> sortedDialogs = new ArrayList();
-            HashMap<Long, ArrayList<MessageObject>> messagesByDialogs = new HashMap();
+            LongSparseArray<ArrayList<MessageObject>> messagesByDialogs = new LongSparseArray();
             for (a = 0; a < this.pushMessages.size(); a++) {
                 messageObject = (MessageObject) this.pushMessages.get(a);
                 dialog_id = messageObject.getDialogId();
                 if (((int) dialog_id) != 0) {
-                    ArrayList<MessageObject> arrayList = (ArrayList) messagesByDialogs.get(Long.valueOf(dialog_id));
+                    ArrayList<MessageObject> arrayList = (ArrayList) messagesByDialogs.get(dialog_id);
                     if (arrayList == null) {
                         arrayList = new ArrayList();
-                        messagesByDialogs.put(Long.valueOf(dialog_id), arrayList);
+                        messagesByDialogs.put(dialog_id, arrayList);
                         sortedDialogs.add(0, Long.valueOf(dialog_id));
                     }
                     arrayList.add(messageObject);
                 }
             }
-            HashMap<Long, Integer> oldIdsWear = new HashMap();
-            oldIdsWear.putAll(this.wearNotificationsIds);
+            LongSparseArray<Integer> oldIdsWear = this.wearNotificationsIds.clone();
             this.wearNotificationsIds.clear();
             for (int b = 0; b < sortedDialogs.size(); b++) {
                 dialog_id = ((Long) sortedDialogs.get(b)).longValue();
-                ArrayList<MessageObject> messageObjects = (ArrayList) messagesByDialogs.get(Long.valueOf(dialog_id));
+                ArrayList<MessageObject> messageObjects = (ArrayList) messagesByDialogs.get(dialog_id);
                 int max_id = ((MessageObject) messageObjects.get(0)).getId();
                 int max_date = ((MessageObject) messageObjects.get(0)).messageOwner.date;
                 Chat chat = null;
@@ -3067,11 +3073,11 @@ public class NotificationsController {
                             photoPath = user.photo.photo_small;
                         }
                     }
-                    notificationId = (Integer) oldIdsWear.get(Long.valueOf(dialog_id));
+                    notificationId = (Integer) oldIdsWear.get(dialog_id);
                     if (notificationId != null) {
                         notificationId = Integer.valueOf((int) dialog_id);
                     } else {
-                        oldIdsWear.remove(Long.valueOf(dialog_id));
+                        oldIdsWear.remove(dialog_id);
                     }
                     unreadConvBuilder = new UnreadConversation.Builder(name).setLatestTimestamp(((long) max_date) * 1000);
                     intent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
@@ -3103,7 +3109,7 @@ public class NotificationsController {
                         }
                         wearReplyAction = new Action.Builder(R.drawable.ic_reply_icon, replyToString, replyPendingIntent).setAllowGeneratedReplies(true).addRemoteInput(remoteInputWear).build();
                     }
-                    count = (Integer) this.pushDialogs.get(Long.valueOf(dialog_id));
+                    count = (Integer) this.pushDialogs.get(dialog_id);
                     if (count == null) {
                         count = Integer.valueOf(0);
                     }
@@ -3187,7 +3193,7 @@ public class NotificationsController {
                         builder.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                     }
                     notificationManager.notify(notificationId.intValue(), builder.build());
-                    this.wearNotificationsIds.put(Long.valueOf(dialog_id), notificationId);
+                    this.wearNotificationsIds.put(dialog_id, notificationId);
                 } else {
                     chat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(-((int) dialog_id)));
                     if (chat == null) {
@@ -3201,9 +3207,9 @@ public class NotificationsController {
                     if (AndroidUtilities.needShowPasscode(false)) {
                     }
                     name = LocaleController.getString("AppName", R.string.AppName);
-                    notificationId = (Integer) oldIdsWear.get(Long.valueOf(dialog_id));
+                    notificationId = (Integer) oldIdsWear.get(dialog_id);
                     if (notificationId != null) {
-                        oldIdsWear.remove(Long.valueOf(dialog_id));
+                        oldIdsWear.remove(dialog_id);
                     } else {
                         notificationId = Integer.valueOf((int) dialog_id);
                     }
@@ -3235,7 +3241,7 @@ public class NotificationsController {
                         replyToString = LocaleController.formatString("ReplyToGroup", R.string.ReplyToGroup, name);
                     }
                     wearReplyAction = new Action.Builder(R.drawable.ic_reply_icon, replyToString, replyPendingIntent).setAllowGeneratedReplies(true).addRemoteInput(remoteInputWear).build();
-                    count = (Integer) this.pushDialogs.get(Long.valueOf(dialog_id));
+                    count = (Integer) this.pushDialogs.get(dialog_id);
                     if (count == null) {
                         count = Integer.valueOf(0);
                     }
@@ -3314,11 +3320,11 @@ public class NotificationsController {
                         builder.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                     }
                     notificationManager.notify(notificationId.intValue(), builder.build());
-                    this.wearNotificationsIds.put(Long.valueOf(dialog_id), notificationId);
+                    this.wearNotificationsIds.put(dialog_id, notificationId);
                 }
             }
-            for (Entry<Long, Integer> entry : oldIdsWear.entrySet()) {
-                notificationManager.cancel(((Integer) entry.getValue()).intValue());
+            for (a = 0; a < oldIdsWear.size(); a++) {
+                notificationManager.cancel(((Integer) oldIdsWear.valueAt(a)).intValue());
             }
         }
     }

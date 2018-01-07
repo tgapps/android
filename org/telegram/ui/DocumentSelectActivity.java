@@ -3,6 +3,7 @@ package org.telegram.ui;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,14 +17,19 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.widget.FrameLayout;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.StringTokenizer;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.beta.R;
@@ -590,380 +596,197 @@ public class DocumentSelectActivity extends BaseFragment {
         }
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    @android.annotation.SuppressLint({"NewApi"})
+    @SuppressLint({"NewApi"})
     private void listRoots() {
-        /*
-        r23 = this;
-        r21 = 0;
-        r0 = r21;
-        r1 = r23;
-        r1.currentDir = r0;
-        r0 = r23;
-        r0 = r0.items;
-        r21 = r0;
-        r21.clear();
-        r17 = new java.util.HashSet;
-        r17.<init>();
-        r21 = android.os.Environment.getExternalStorageDirectory();
-        r5 = r21.getPath();
-        r12 = android.os.Environment.isExternalStorageRemovable();
-        r6 = android.os.Environment.getExternalStorageState();
-        r21 = "mounted";
-        r0 = r21;
-        r21 = r6.equals(r0);
-        if (r21 != 0) goto L_0x003c;
-    L_0x0031:
-        r21 = "mounted_ro";
-        r0 = r21;
-        r21 = r6.equals(r0);
-        if (r21 == 0) goto L_0x0084;
-    L_0x003c:
-        r8 = new org.telegram.ui.DocumentSelectActivity$ListItem;
-        r21 = 0;
-        r0 = r23;
-        r1 = r21;
-        r8.<init>();
-        r21 = android.os.Environment.isExternalStorageRemovable();
-        if (r21 == 0) goto L_0x02aa;
-    L_0x004d:
-        r21 = "SdCard";
-        r22 = 2131494231; // 0x7f0c0557 float:1.8611965E38 double:1.053098074E-314;
-        r21 = org.telegram.messenger.LocaleController.getString(r21, r22);
-        r0 = r21;
-        r8.title = r0;
-        r21 = 2131165365; // 0x7f0700b5 float:1.7944945E38 double:1.0529355925E-314;
-        r0 = r21;
-        r8.icon = r0;
-    L_0x0062:
-        r0 = r23;
-        r21 = r0.getRootSubtitle(r5);
-        r0 = r21;
-        r8.subtitle = r0;
-        r21 = android.os.Environment.getExternalStorageDirectory();
-        r0 = r21;
-        r8.file = r0;
-        r0 = r23;
-        r0 = r0.items;
-        r21 = r0;
-        r0 = r21;
-        r0.add(r8);
-        r0 = r17;
-        r0.add(r5);
-    L_0x0084:
-        r3 = 0;
-        r4 = new java.io.BufferedReader;	 Catch:{ Exception -> 0x02fe }
-        r21 = new java.io.FileReader;	 Catch:{ Exception -> 0x02fe }
-        r22 = "/proc/mounts";
-        r21.<init>(r22);	 Catch:{ Exception -> 0x02fe }
-        r0 = r21;
-        r4.<init>(r0);	 Catch:{ Exception -> 0x02fe }
-    L_0x0094:
-        r14 = r4.readLine();	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r14 == 0) goto L_0x02d9;
-    L_0x009a:
-        r21 = "vfat";
-        r0 = r21;
-        r21 = r14.contains(r0);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 != 0) goto L_0x00b0;
-    L_0x00a5:
-        r21 = "/mnt";
-        r0 = r21;
-        r21 = r14.contains(r0);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 == 0) goto L_0x0094;
-    L_0x00b0:
-        org.telegram.messenger.FileLog.e(r14);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r19 = new java.util.StringTokenizer;	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r21 = " ";
-        r0 = r19;
-        r1 = r21;
-        r0.<init>(r14, r1);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r20 = r19.nextToken();	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r16 = r19.nextToken();	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r0 = r17;
-        r1 = r16;
-        r21 = r0.contains(r1);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 != 0) goto L_0x0094;
-    L_0x00d1:
-        r21 = "/dev/block/vold";
-        r0 = r21;
-        r21 = r14.contains(r0);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 == 0) goto L_0x0094;
-    L_0x00dc:
-        r21 = "/mnt/secure";
-        r0 = r21;
-        r21 = r14.contains(r0);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 != 0) goto L_0x0094;
-    L_0x00e7:
-        r21 = "/mnt/asec";
-        r0 = r21;
-        r21 = r14.contains(r0);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 != 0) goto L_0x0094;
-    L_0x00f2:
-        r21 = "/mnt/obb";
-        r0 = r21;
-        r21 = r14.contains(r0);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 != 0) goto L_0x0094;
-    L_0x00fd:
-        r21 = "/dev/mapper";
-        r0 = r21;
-        r21 = r14.contains(r0);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 != 0) goto L_0x0094;
-    L_0x0108:
-        r21 = "tmpfs";
-        r0 = r21;
-        r21 = r14.contains(r0);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 != 0) goto L_0x0094;
-    L_0x0113:
-        r21 = new java.io.File;	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r0 = r21;
-        r1 = r16;
-        r0.<init>(r1);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r21 = r21.isDirectory();	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 != 0) goto L_0x015f;
-    L_0x0122:
-        r21 = 47;
-        r0 = r16;
-        r1 = r21;
-        r11 = r0.lastIndexOf(r1);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r21 = -1;
-        r0 = r21;
-        if (r11 == r0) goto L_0x015f;
-    L_0x0132:
-        r21 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r21.<init>();	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r22 = "/storage/";
-        r21 = r21.append(r22);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r22 = r11 + 1;
-        r0 = r16;
-        r1 = r22;
-        r22 = r0.substring(r1);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r21 = r21.append(r22);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r15 = r21.toString();	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r21 = new java.io.File;	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r0 = r21;
-        r0.<init>(r15);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r21 = r21.isDirectory();	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        if (r21 == 0) goto L_0x015f;
-    L_0x015d:
-        r16 = r15;
-    L_0x015f:
-        r0 = r17;
-        r1 = r16;
-        r0.add(r1);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        r13 = new org.telegram.ui.DocumentSelectActivity$ListItem;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r21 = 0;
-        r0 = r23;
-        r1 = r21;
-        r13.<init>();	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r21 = r16.toLowerCase();	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r22 = "sd";
-        r21 = r21.contains(r22);	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        if (r21 == 0) goto L_0x02c1;
-    L_0x017e:
-        r21 = "SdCard";
-        r22 = 2131494231; // 0x7f0c0557 float:1.8611965E38 double:1.053098074E-314;
-        r21 = org.telegram.messenger.LocaleController.getString(r21, r22);	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r0 = r21;
-        r13.title = r0;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-    L_0x018c:
-        r21 = 2131165365; // 0x7f0700b5 float:1.7944945E38 double:1.0529355925E-314;
-        r0 = r21;
-        r13.icon = r0;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r0 = r23;
-        r1 = r16;
-        r21 = r0.getRootSubtitle(r1);	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r0 = r21;
-        r13.subtitle = r0;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r21 = new java.io.File;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r0 = r21;
-        r1 = r16;
-        r0.<init>(r1);	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r0 = r21;
-        r13.file = r0;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r0 = r23;
-        r0 = r0.items;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r21 = r0;
-        r0 = r21;
-        r0.add(r13);	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        goto L_0x0094;
-    L_0x01b9:
-        r7 = move-exception;
-        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x01bf, all -> 0x02d1 }
-        goto L_0x0094;
-    L_0x01bf:
-        r7 = move-exception;
-        r3 = r4;
-    L_0x01c1:
-        org.telegram.messenger.FileLog.e(r7);	 Catch:{ all -> 0x02fc }
-        if (r3 == 0) goto L_0x01c9;
-    L_0x01c6:
-        r3.close();	 Catch:{ Exception -> 0x02e8 }
-    L_0x01c9:
-        r9 = new org.telegram.ui.DocumentSelectActivity$ListItem;
-        r21 = 0;
-        r0 = r23;
-        r1 = r21;
-        r9.<init>();
-        r21 = "/";
-        r0 = r21;
-        r9.title = r0;
-        r21 = "SystemRoot";
-        r22 = 2131494387; // 0x7f0c05f3 float:1.861228E38 double:1.053098151E-314;
-        r21 = org.telegram.messenger.LocaleController.getString(r21, r22);
-        r0 = r21;
-        r9.subtitle = r0;
-        r21 = 2131165363; // 0x7f0700b3 float:1.794494E38 double:1.0529355915E-314;
-        r0 = r21;
-        r9.icon = r0;
-        r21 = new java.io.File;
-        r22 = "/";
-        r21.<init>(r22);
-        r0 = r21;
-        r9.file = r0;
-        r0 = r23;
-        r0 = r0.items;
-        r21 = r0;
-        r0 = r21;
-        r0.add(r9);
-        r18 = new java.io.File;	 Catch:{ Exception -> 0x02f3 }
-        r21 = android.os.Environment.getExternalStorageDirectory();	 Catch:{ Exception -> 0x02f3 }
-        r22 = "Telegram";
-        r0 = r18;
-        r1 = r21;
-        r2 = r22;
-        r0.<init>(r1, r2);	 Catch:{ Exception -> 0x02f3 }
-        r21 = r18.exists();	 Catch:{ Exception -> 0x02f3 }
-        if (r21 == 0) goto L_0x0250;
-    L_0x021f:
-        r10 = new org.telegram.ui.DocumentSelectActivity$ListItem;	 Catch:{ Exception -> 0x02f3 }
-        r21 = 0;
-        r0 = r23;
-        r1 = r21;
-        r10.<init>();	 Catch:{ Exception -> 0x02f3 }
-        r21 = "Telegram";
-        r0 = r21;
-        r10.title = r0;	 Catch:{ Exception -> 0x02f9 }
-        r21 = r18.toString();	 Catch:{ Exception -> 0x02f9 }
-        r0 = r21;
-        r10.subtitle = r0;	 Catch:{ Exception -> 0x02f9 }
-        r21 = 2131165363; // 0x7f0700b3 float:1.794494E38 double:1.0529355915E-314;
-        r0 = r21;
-        r10.icon = r0;	 Catch:{ Exception -> 0x02f9 }
-        r0 = r18;
-        r10.file = r0;	 Catch:{ Exception -> 0x02f9 }
-        r0 = r23;
-        r0 = r0.items;	 Catch:{ Exception -> 0x02f9 }
-        r21 = r0;
-        r0 = r21;
-        r0.add(r10);	 Catch:{ Exception -> 0x02f9 }
-        r9 = r10;
-    L_0x0250:
-        r9 = new org.telegram.ui.DocumentSelectActivity$ListItem;
-        r21 = 0;
-        r0 = r23;
-        r1 = r21;
-        r9.<init>();
-        r21 = "Gallery";
-        r22 = 2131493593; // 0x7f0c02d9 float:1.861067E38 double:1.0530977586E-314;
-        r21 = org.telegram.messenger.LocaleController.getString(r21, r22);
-        r0 = r21;
-        r9.title = r0;
-        r21 = "GalleryInfo";
-        r22 = 2131493594; // 0x7f0c02da float:1.8610673E38 double:1.053097759E-314;
-        r21 = org.telegram.messenger.LocaleController.getString(r21, r22);
-        r0 = r21;
-        r9.subtitle = r0;
-        r21 = 2131165412; // 0x7f0700e4 float:1.794504E38 double:1.0529356157E-314;
-        r0 = r21;
-        r9.icon = r0;
-        r21 = 0;
-        r0 = r21;
-        r9.file = r0;
-        r0 = r23;
-        r0 = r0.items;
-        r21 = r0;
-        r0 = r21;
-        r0.add(r9);
-        r0 = r23;
-        r0 = r0.listView;
-        r21 = r0;
-        org.telegram.messenger.AndroidUtilities.clearDrawableAnimation(r21);
-        r21 = 1;
-        r0 = r21;
-        r1 = r23;
-        r1.scrolling = r0;
-        r0 = r23;
-        r0 = r0.listAdapter;
-        r21 = r0;
-        r21.notifyDataSetChanged();
-        return;
-    L_0x02aa:
-        r21 = "InternalStorage";
-        r22 = 2131493648; // 0x7f0c0310 float:1.8610782E38 double:1.053097786E-314;
-        r21 = org.telegram.messenger.LocaleController.getString(r21, r22);
-        r0 = r21;
-        r8.title = r0;
-        r21 = 2131165411; // 0x7f0700e3 float:1.7945038E38 double:1.052935615E-314;
-        r0 = r21;
-        r8.icon = r0;
-        goto L_0x0062;
-    L_0x02c1:
-        r21 = "ExternalStorage";
-        r22 = 2131493503; // 0x7f0c027f float:1.8610488E38 double:1.053097714E-314;
-        r21 = org.telegram.messenger.LocaleController.getString(r21, r22);	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        r0 = r21;
-        r13.title = r0;	 Catch:{ Exception -> 0x01b9, all -> 0x02d1 }
-        goto L_0x018c;
-    L_0x02d1:
-        r21 = move-exception;
-        r3 = r4;
-    L_0x02d3:
-        if (r3 == 0) goto L_0x02d8;
-    L_0x02d5:
-        r3.close();	 Catch:{ Exception -> 0x02ee }
-    L_0x02d8:
-        throw r21;
-    L_0x02d9:
-        if (r4 == 0) goto L_0x0301;
-    L_0x02db:
-        r4.close();	 Catch:{ Exception -> 0x02e1 }
-        r3 = r4;
-        goto L_0x01c9;
-    L_0x02e1:
-        r7 = move-exception;
-        org.telegram.messenger.FileLog.e(r7);
-        r3 = r4;
-        goto L_0x01c9;
-    L_0x02e8:
-        r7 = move-exception;
-        org.telegram.messenger.FileLog.e(r7);
-        goto L_0x01c9;
-    L_0x02ee:
-        r7 = move-exception;
-        org.telegram.messenger.FileLog.e(r7);
-        goto L_0x02d8;
-    L_0x02f3:
-        r7 = move-exception;
-    L_0x02f4:
-        org.telegram.messenger.FileLog.e(r7);
-        goto L_0x0250;
-    L_0x02f9:
-        r7 = move-exception;
-        r9 = r10;
-        goto L_0x02f4;
-    L_0x02fc:
-        r21 = move-exception;
-        goto L_0x02d3;
-    L_0x02fe:
-        r7 = move-exception;
-        goto L_0x01c1;
-    L_0x0301:
-        r3 = r4;
-        goto L_0x01c9;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.DocumentSelectActivity.listRoots():void");
+        Throwable e;
+        Throwable th;
+        ListItem fs;
+        File file;
+        ListItem fs2;
+        this.currentDir = null;
+        this.items.clear();
+        HashSet<String> paths = new HashSet();
+        String defaultPath = Environment.getExternalStorageDirectory().getPath();
+        boolean isDefaultPathRemovable = Environment.isExternalStorageRemovable();
+        String defaultPathState = Environment.getExternalStorageState();
+        if (defaultPathState.equals("mounted") || defaultPathState.equals("mounted_ro")) {
+            ListItem ext = new ListItem();
+            if (Environment.isExternalStorageRemovable()) {
+                ext.title = LocaleController.getString("SdCard", R.string.SdCard);
+                ext.icon = R.drawable.ic_external_storage;
+            } else {
+                ext.title = LocaleController.getString("InternalStorage", R.string.InternalStorage);
+                ext.icon = R.drawable.ic_storage;
+            }
+            ext.subtitle = getRootSubtitle(defaultPath);
+            ext.file = Environment.getExternalStorageDirectory();
+            this.items.add(ext);
+            paths.add(defaultPath);
+        }
+        BufferedReader bufferedReader = null;
+        try {
+            BufferedReader bufferedReader2 = new BufferedReader(new FileReader("/proc/mounts"));
+            while (true) {
+                String line = bufferedReader2.readLine();
+                if (line == null) {
+                    break;
+                } else if (line.contains("vfat") || line.contains("/mnt")) {
+                    if (BuildVars.LOGS_ENABLED) {
+                        FileLog.d(line);
+                    }
+                    StringTokenizer stringTokenizer = new StringTokenizer(line, " ");
+                    String unused = stringTokenizer.nextToken();
+                    String path = stringTokenizer.nextToken();
+                    if (!(paths.contains(path) || !line.contains("/dev/block/vold") || line.contains("/mnt/secure") || line.contains("/mnt/asec") || line.contains("/mnt/obb") || line.contains("/dev/mapper") || line.contains("tmpfs"))) {
+                        if (!new File(path).isDirectory()) {
+                            int index = path.lastIndexOf(47);
+                            if (index != -1) {
+                                String newPath = "/storage/" + path.substring(index + 1);
+                                if (new File(newPath).isDirectory()) {
+                                    path = newPath;
+                                }
+                            }
+                        }
+                        paths.add(path);
+                        try {
+                            ListItem item = new ListItem();
+                            if (path.toLowerCase().contains("sd")) {
+                                item.title = LocaleController.getString("SdCard", R.string.SdCard);
+                            } else {
+                                item.title = LocaleController.getString("ExternalStorage", R.string.ExternalStorage);
+                            }
+                            item.icon = R.drawable.ic_external_storage;
+                            item.subtitle = getRootSubtitle(path);
+                            item.file = new File(path);
+                            this.items.add(item);
+                        } catch (Throwable e2) {
+                            try {
+                                FileLog.e(e2);
+                            } catch (Exception e3) {
+                                e2 = e3;
+                                bufferedReader = bufferedReader2;
+                            } catch (Throwable th2) {
+                                th = th2;
+                                bufferedReader = bufferedReader2;
+                            }
+                        } catch (Throwable th22) {
+                            th = th22;
+                            bufferedReader = bufferedReader2;
+                        }
+                    }
+                }
+            }
+            if (bufferedReader2 != null) {
+                try {
+                    bufferedReader2.close();
+                    bufferedReader = bufferedReader2;
+                } catch (Throwable e22) {
+                    FileLog.e(e22);
+                    bufferedReader = bufferedReader2;
+                }
+            }
+        } catch (Exception e4) {
+            e22 = e4;
+            try {
+                FileLog.e(e22);
+                if (bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (Throwable e222) {
+                        FileLog.e(e222);
+                    }
+                }
+                fs = new ListItem();
+                fs.title = "/";
+                fs.subtitle = LocaleController.getString("SystemRoot", R.string.SystemRoot);
+                fs.icon = R.drawable.ic_directory;
+                fs.file = new File("/");
+                this.items.add(fs);
+                file = new File(Environment.getExternalStorageDirectory(), "Telegram");
+                if (file.exists()) {
+                    fs2 = new ListItem();
+                    try {
+                        fs2.title = "Telegram";
+                        fs2.subtitle = file.toString();
+                        fs2.icon = R.drawable.ic_directory;
+                        fs2.file = file;
+                        this.items.add(fs2);
+                        fs = fs2;
+                    } catch (Exception e5) {
+                        e222 = e5;
+                        fs = fs2;
+                        FileLog.e(e222);
+                        fs = new ListItem();
+                        fs.title = LocaleController.getString("Gallery", R.string.Gallery);
+                        fs.subtitle = LocaleController.getString("GalleryInfo", R.string.GalleryInfo);
+                        fs.icon = R.drawable.ic_storage_gallery;
+                        fs.file = null;
+                        this.items.add(fs);
+                        AndroidUtilities.clearDrawableAnimation(this.listView);
+                        this.scrolling = true;
+                        this.listAdapter.notifyDataSetChanged();
+                    }
+                }
+                fs = new ListItem();
+                fs.title = LocaleController.getString("Gallery", R.string.Gallery);
+                fs.subtitle = LocaleController.getString("GalleryInfo", R.string.GalleryInfo);
+                fs.icon = R.drawable.ic_storage_gallery;
+                fs.file = null;
+                this.items.add(fs);
+                AndroidUtilities.clearDrawableAnimation(this.listView);
+                this.scrolling = true;
+                this.listAdapter.notifyDataSetChanged();
+            } catch (Throwable th3) {
+                th = th3;
+                if (bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (Throwable e2222) {
+                        FileLog.e(e2222);
+                    }
+                }
+                throw th;
+            }
+        }
+        fs = new ListItem();
+        fs.title = "/";
+        fs.subtitle = LocaleController.getString("SystemRoot", R.string.SystemRoot);
+        fs.icon = R.drawable.ic_directory;
+        fs.file = new File("/");
+        this.items.add(fs);
+        try {
+            file = new File(Environment.getExternalStorageDirectory(), "Telegram");
+            if (file.exists()) {
+                fs2 = new ListItem();
+                fs2.title = "Telegram";
+                fs2.subtitle = file.toString();
+                fs2.icon = R.drawable.ic_directory;
+                fs2.file = file;
+                this.items.add(fs2);
+                fs = fs2;
+            }
+        } catch (Exception e6) {
+            e2222 = e6;
+            FileLog.e(e2222);
+            fs = new ListItem();
+            fs.title = LocaleController.getString("Gallery", R.string.Gallery);
+            fs.subtitle = LocaleController.getString("GalleryInfo", R.string.GalleryInfo);
+            fs.icon = R.drawable.ic_storage_gallery;
+            fs.file = null;
+            this.items.add(fs);
+            AndroidUtilities.clearDrawableAnimation(this.listView);
+            this.scrolling = true;
+            this.listAdapter.notifyDataSetChanged();
+        }
+        fs = new ListItem();
+        fs.title = LocaleController.getString("Gallery", R.string.Gallery);
+        fs.subtitle = LocaleController.getString("GalleryInfo", R.string.GalleryInfo);
+        fs.icon = R.drawable.ic_storage_gallery;
+        fs.file = null;
+        this.items.add(fs);
+        AndroidUtilities.clearDrawableAnimation(this.listView);
+        this.scrolling = true;
+        this.listAdapter.notifyDataSetChanged();
     }
 
     private String getRootSubtitle(String path) {

@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -379,8 +380,8 @@ Error: java.util.NoSuchElementException
         if (pathString == null) {
             return false;
         }
+        String path;
         while (true) {
-            String path;
             String newPath = Utilities.readlink(pathString);
             if (newPath != null && !newPath.equals(pathString)) {
                 pathString = newPath;
@@ -465,7 +466,9 @@ Error: java.util.NoSuchElementException
                 try {
                     typefaceCache.put(assetPath, Typeface.createFromAsset(ApplicationLoader.applicationContext.getAssets(), assetPath));
                 } catch (Exception e) {
-                    FileLog.e("Could not get typeface '" + assetPath + "' because " + e.getMessage());
+                    if (BuildVars.LOGS_ENABLED) {
+                        FileLog.e("Could not get typeface '" + assetPath + "' because " + e.getMessage());
+                    }
                     typeface = null;
                 }
             }
@@ -637,7 +640,9 @@ Error: java.util.NoSuchElementException
                     roundMessageSize = (int) (((float) Math.min(displaySize.x, displaySize.y)) * 0.6f);
                 }
             }
-            FileLog.e("display size = " + displaySize.x + " " + displaySize.y + " " + displayMetrics.xdpi + "x" + displayMetrics.ydpi);
+            if (BuildVars.LOGS_ENABLED) {
+                FileLog.e("display size = " + displaySize.x + " " + displaySize.y + " " + displayMetrics.xdpi + "x" + displayMetrics.ydpi);
+            }
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -730,8 +735,8 @@ Error: java.util.NoSuchElementException
                 telephonyService = (ITelephony) m.invoke(tm, new Object[0]);
                 telephonyService.silenceRinger();
                 telephonyService.endCall();
-            } catch (Exception e) {
-                FileLog.e("tmessages", e);
+            } catch (Throwable e) {
+                FileLog.e(e);
             }
         }
     }
@@ -765,7 +770,9 @@ Error: java.util.NoSuchElementException
             while (cursor.moveToNext()) {
                 String number = cursor.getString(0);
                 long date = cursor.getLong(1);
-                FileLog.e("number = " + number);
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.e("number = " + number);
+                }
                 if (Math.abs(System.currentTimeMillis() - date) < 3600000 && checkPhonePattern(pattern, number)) {
                     if (cursor == null) {
                         return number;
@@ -1106,11 +1113,16 @@ Error: java.util.NoSuchElementException
             if (storageDir.mkdirs() || storageDir.exists()) {
                 return storageDir;
             }
-            FileLog.d("failed to create directory");
+            if (BuildVars.LOGS_ENABLED) {
+                FileLog.d("failed to create directory");
+            }
+            return null;
+        } else if (!BuildVars.LOGS_ENABLED) {
+            return null;
+        } else {
+            FileLog.d("External storage is not mounted READ/WRITE.");
             return null;
         }
-        FileLog.d("External storage is not mounted READ/WRITE.");
-        return null;
     }
 
     /* JADX WARNING: inconsistent code. */
@@ -1442,18 +1454,18 @@ Error: java.util.NoSuchElementException
     }
 
     public static boolean copyFile(File sourceFile, File destFile) throws IOException {
+        FileOutputStream destination;
         Throwable e;
         Throwable th;
         if (!destFile.exists()) {
             destFile.createNewFile();
         }
         FileInputStream source = null;
-        FileOutputStream destination = null;
+        FileOutputStream destination2 = null;
         try {
-            FileOutputStream destination2;
             FileInputStream source2 = new FileInputStream(sourceFile);
             try {
-                destination2 = new FileOutputStream(destFile);
+                destination = new FileOutputStream(destFile);
             } catch (Exception e2) {
                 e = e2;
                 source = source2;
@@ -1462,18 +1474,18 @@ Error: java.util.NoSuchElementException
                     if (source != null) {
                         source.close();
                     }
-                    if (destination != null) {
+                    if (destination2 != null) {
                         return false;
                     }
-                    destination.close();
+                    destination2.close();
                     return false;
                 } catch (Throwable th2) {
                     th = th2;
                     if (source != null) {
                         source.close();
                     }
-                    if (destination != null) {
-                        destination.close();
+                    if (destination2 != null) {
+                        destination2.close();
                     }
                     throw th;
                 }
@@ -1483,44 +1495,44 @@ Error: java.util.NoSuchElementException
                 if (source != null) {
                     source.close();
                 }
-                if (destination != null) {
-                    destination.close();
+                if (destination2 != null) {
+                    destination2.close();
                 }
                 throw th;
             }
             try {
-                destination2.getChannel().transferFrom(source2.getChannel(), 0, source2.getChannel().size());
+                destination.getChannel().transferFrom(source2.getChannel(), 0, source2.getChannel().size());
                 if (source2 != null) {
                     source2.close();
                 }
-                if (destination2 != null) {
-                    destination2.close();
+                if (destination != null) {
+                    destination.close();
                 }
-                destination = destination2;
+                destination2 = destination;
                 source = source2;
                 return true;
             } catch (Exception e3) {
                 e = e3;
-                destination = destination2;
+                destination2 = destination;
                 source = source2;
                 FileLog.e(e);
                 if (source != null) {
                     source.close();
                 }
-                if (destination != null) {
+                if (destination2 != null) {
                     return false;
                 }
-                destination.close();
+                destination2.close();
                 return false;
             } catch (Throwable th4) {
                 th = th4;
-                destination = destination2;
+                destination2 = destination;
                 source = source2;
                 if (source != null) {
                     source.close();
                 }
-                if (destination != null) {
-                    destination.close();
+                if (destination2 != null) {
+                    destination2.close();
                 }
                 throw th;
             }
@@ -1530,10 +1542,10 @@ Error: java.util.NoSuchElementException
             if (source != null) {
                 source.close();
             }
-            if (destination != null) {
+            if (destination2 != null) {
                 return false;
             }
-            destination.close();
+            destination2.close();
             return false;
         }
     }
@@ -1544,7 +1556,7 @@ Error: java.util.NoSuchElementException
         return key_hash;
     }
 
-    public static void openForView(MessageObject message, Activity activity) throws Exception {
+    public static void openForView(MessageObject message, final Activity activity) throws Exception {
         File f = null;
         String fileName = message.getFileName();
         if (!(message.messageOwner.attachPath == null || message.messageOwner.attachPath.length() == 0)) {
@@ -1570,26 +1582,44 @@ Error: java.util.NoSuchElementException
                     }
                 }
             }
-            if (VERSION.SDK_INT >= 24) {
-                intent.setDataAndType(FileProvider.getUriForFile(activity, "org.telegram.messenger.beta.provider", f), realMimeType != null ? realMimeType : "text/plain");
-            } else {
-                intent.setDataAndType(Uri.fromFile(f), realMimeType != null ? realMimeType : "text/plain");
-            }
-            if (realMimeType != null) {
-                try {
-                    activity.startActivityForResult(intent, 500);
-                    return;
-                } catch (Exception e) {
-                    if (VERSION.SDK_INT >= 24) {
-                        intent.setDataAndType(FileProvider.getUriForFile(activity, "org.telegram.messenger.beta.provider", f), "text/plain");
-                    } else {
-                        intent.setDataAndType(Uri.fromFile(f), "text/plain");
-                    }
-                    activity.startActivityForResult(intent, 500);
-                    return;
+            if (VERSION.SDK_INT < 26 || realMimeType == null || !realMimeType.equals("application/vnd.android.package-archive") || ApplicationLoader.applicationContext.getPackageManager().canRequestPackageInstalls()) {
+                if (VERSION.SDK_INT >= 24) {
+                    intent.setDataAndType(FileProvider.getUriForFile(activity, "org.telegram.messenger.beta.provider", f), realMimeType != null ? realMimeType : "text/plain");
+                } else {
+                    intent.setDataAndType(Uri.fromFile(f), realMimeType != null ? realMimeType : "text/plain");
                 }
+                if (realMimeType != null) {
+                    try {
+                        activity.startActivityForResult(intent, 500);
+                        return;
+                    } catch (Exception e) {
+                        if (VERSION.SDK_INT >= 24) {
+                            intent.setDataAndType(FileProvider.getUriForFile(activity, "org.telegram.messenger.beta.provider", f), "text/plain");
+                        } else {
+                            intent.setDataAndType(Uri.fromFile(f), "text/plain");
+                        }
+                        activity.startActivityForResult(intent, 500);
+                        return;
+                    }
+                }
+                activity.startActivityForResult(intent, 500);
+                return;
             }
-            activity.startActivityForResult(intent, 500);
+            Builder builder = new Builder(activity);
+            builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+            builder.setMessage(LocaleController.getString("ApkRestricted", R.string.ApkRestricted));
+            builder.setPositiveButton(LocaleController.getString("PermissionOpenSettings", R.string.PermissionOpenSettings), new OnClickListener() {
+                @TargetApi(26)
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    try {
+                        activity.startActivity(new Intent("android.settings.MANAGE_UNKNOWN_APP_SOURCES", Uri.parse("package:" + activity.getPackageName())));
+                    } catch (Throwable e) {
+                        FileLog.e(e);
+                    }
+                }
+            });
+            builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+            builder.show();
         }
     }
 

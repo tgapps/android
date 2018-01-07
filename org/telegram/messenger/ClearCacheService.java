@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.os.Build.VERSION;
 import android.system.Os;
 import android.system.StructStat;
+import android.util.SparseArray;
 import java.io.File;
-import java.util.Map.Entry;
 
 public class ClearCacheService extends IntentService {
     public ClearCacheService() {
@@ -29,9 +29,10 @@ public class ClearCacheService extends IntentService {
                         days = 3;
                     }
                     long diff = (long) (86400000 * days);
-                    for (Entry<Integer, File> entry : ImageLoader.getInstance().createMediaPaths().entrySet()) {
-                        if (((Integer) entry.getKey()).intValue() != 4) {
-                            File[] array = ((File) entry.getValue()).listFiles();
+                    SparseArray<File> paths = ImageLoader.getInstance().createMediaPaths();
+                    for (int a = 0; a < paths.size(); a++) {
+                        if (paths.keyAt(a) != 4) {
+                            File[] array = ((File) paths.valueAt(a)).listFiles();
                             if (array != null) {
                                 for (File f : array) {
                                     if (f.isFile() && !f.getName().equals(".nomedia")) {

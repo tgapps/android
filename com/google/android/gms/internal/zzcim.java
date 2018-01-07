@@ -610,6 +610,7 @@ public class zzcim {
     }
 
     private final void zzc(zzcha com_google_android_gms_internal_zzcha, zzcgi com_google_android_gms_internal_zzcgi) {
+        zzcme com_google_android_gms_internal_zzcme;
         zzbq.checkNotNull(com_google_android_gms_internal_zzcgi);
         zzbq.zzgm(com_google_android_gms_internal_zzcgi.packageName);
         long nanoTime = System.nanoTime();
@@ -648,7 +649,6 @@ public class zzcim {
                 zzaws().endTransaction();
                 return;
             }
-            zzcme com_google_android_gms_internal_zzcme;
             try {
                 boolean zzjz = zzclq.zzjz(com_google_android_gms_internal_zzcha.name);
                 boolean equals = "_err".equals(com_google_android_gms_internal_zzcha.name);
@@ -3084,11 +3084,11 @@ public class zzcim {
     }
 
     public final void zzbah() {
-        String zzayf;
         String str;
         zzawx().zzve();
         zzxf();
         this.zzjgf = true;
+        String zzayf;
         try {
             Boolean zzbas = zzawp().zzbas();
             if (zzbas == null) {

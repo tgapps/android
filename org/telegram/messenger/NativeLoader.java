@@ -1,5 +1,6 @@
 package org.telegram.messenger;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import java.io.File;
@@ -8,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import net.hockeyapp.android.Constants;
 
 public class NativeLoader {
     private static final String LIB_NAME = "tmessages.27";
@@ -35,6 +35,7 @@ public class NativeLoader {
         return file.isDirectory() ? file : null;
     }
 
+    @SuppressLint({"UnsafeDynamicallyLoadedCode", "SetWorldReadable"})
     private static boolean loadFromZip(Context context, File destDir, File destLocalFile, String folder) {
         Throwable e;
         Throwable th;
@@ -71,7 +72,6 @@ public class NativeLoader {
                 destLocalFile.setWritable(true);
                 try {
                     System.load(destLocalFile.getAbsolutePath());
-                    init(Constants.FILES_PATH, BuildVars.DEBUG_VERSION);
                     nativeLoaded = true;
                 } catch (Throwable e22) {
                     FileLog.e(e22);
@@ -156,155 +156,162 @@ public class NativeLoader {
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
+    @android.annotation.SuppressLint({"UnsafeDynamicallyLoadedCode"})
     public static synchronized void initNativeLibs(android.content.Context r10) {
         /*
         r8 = org.telegram.messenger.NativeLoader.class;
         monitor-enter(r8);
-        r7 = nativeLoaded;	 Catch:{ all -> 0x00d1 }
+        r7 = nativeLoaded;	 Catch:{ all -> 0x00c8 }
         if (r7 == 0) goto L_0x0009;
     L_0x0007:
         monitor-exit(r8);
         return;
     L_0x0009:
-        net.hockeyapp.android.Constants.loadFromContext(r10);	 Catch:{ all -> 0x00d1 }
-        r7 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x0122 }
+        net.hockeyapp.android.Constants.loadFromContext(r10);	 Catch:{ all -> 0x00c8 }
+        r7 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x011d }
         r9 = "armeabi-v7a";
-        r7 = r7.equalsIgnoreCase(r9);	 Catch:{ Exception -> 0x0122 }
-        if (r7 == 0) goto L_0x00d4;
+        r7 = r7.equalsIgnoreCase(r9);	 Catch:{ Exception -> 0x011d }
+        if (r7 == 0) goto L_0x00cb;
     L_0x0017:
         r5 = "armeabi-v7a";
     L_0x001a:
         r7 = "os.arch";
-        r6 = java.lang.System.getProperty(r7);	 Catch:{ Throwable -> 0x012b }
+        r6 = java.lang.System.getProperty(r7);	 Catch:{ Throwable -> 0x0126 }
         if (r6 == 0) goto L_0x002f;
     L_0x0023:
         r7 = "686";
-        r7 = r6.contains(r7);	 Catch:{ Throwable -> 0x012b }
+        r7 = r6.contains(r7);	 Catch:{ Throwable -> 0x0126 }
         if (r7 == 0) goto L_0x002f;
     L_0x002c:
         r5 = "x86";
     L_0x002f:
-        r1 = getNativeLibraryDir(r10);	 Catch:{ Throwable -> 0x012b }
-        if (r1 == 0) goto L_0x005f;
+        r1 = getNativeLibraryDir(r10);	 Catch:{ Throwable -> 0x0126 }
+        if (r1 == 0) goto L_0x005c;
     L_0x0035:
-        r2 = new java.io.File;	 Catch:{ Throwable -> 0x012b }
+        r2 = new java.io.File;	 Catch:{ Throwable -> 0x0126 }
         r7 = "libtmessages.27.so";
-        r2.<init>(r1, r7);	 Catch:{ Throwable -> 0x012b }
-        r7 = r2.exists();	 Catch:{ Throwable -> 0x012b }
-        if (r7 == 0) goto L_0x005e;
+        r2.<init>(r1, r7);	 Catch:{ Throwable -> 0x0126 }
+        r7 = r2.exists();	 Catch:{ Throwable -> 0x0126 }
+        if (r7 == 0) goto L_0x005b;
     L_0x0043:
+        r7 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Throwable -> 0x0126 }
+        if (r7 == 0) goto L_0x004d;
+    L_0x0047:
         r7 = "load normal lib";
-        org.telegram.messenger.FileLog.d(r7);	 Catch:{ Throwable -> 0x012b }
+        org.telegram.messenger.FileLog.d(r7);	 Catch:{ Throwable -> 0x0126 }
+    L_0x004d:
         r7 = "tmessages.27";
-        java.lang.System.loadLibrary(r7);	 Catch:{ Error -> 0x005a }
-        r7 = net.hockeyapp.android.Constants.FILES_PATH;	 Catch:{ Error -> 0x005a }
-        r9 = org.telegram.messenger.BuildVars.DEBUG_VERSION;	 Catch:{ Error -> 0x005a }
-        init(r7, r9);	 Catch:{ Error -> 0x005a }
+        java.lang.System.loadLibrary(r7);	 Catch:{ Error -> 0x0057 }
         r7 = 1;
-        nativeLoaded = r7;	 Catch:{ Error -> 0x005a }
+        nativeLoaded = r7;	 Catch:{ Error -> 0x0057 }
         goto L_0x0007;
-    L_0x005a:
+    L_0x0057:
         r4 = move-exception;
-        org.telegram.messenger.FileLog.e(r4);	 Catch:{ Throwable -> 0x012b }
-    L_0x005e:
+        org.telegram.messenger.FileLog.e(r4);	 Catch:{ Throwable -> 0x0126 }
+    L_0x005b:
         r1 = r2;
-    L_0x005f:
-        r0 = new java.io.File;	 Catch:{ Throwable -> 0x012b }
-        r7 = r10.getFilesDir();	 Catch:{ Throwable -> 0x012b }
+    L_0x005c:
+        r0 = new java.io.File;	 Catch:{ Throwable -> 0x0126 }
+        r7 = r10.getFilesDir();	 Catch:{ Throwable -> 0x0126 }
         r9 = "lib";
-        r0.<init>(r7, r9);	 Catch:{ Throwable -> 0x012b }
-        r0.mkdirs();	 Catch:{ Throwable -> 0x012b }
-        r3 = new java.io.File;	 Catch:{ Throwable -> 0x012b }
+        r0.<init>(r7, r9);	 Catch:{ Throwable -> 0x0126 }
+        r0.mkdirs();	 Catch:{ Throwable -> 0x0126 }
+        r3 = new java.io.File;	 Catch:{ Throwable -> 0x0126 }
         r7 = "libtmessages.27loc.so";
-        r3.<init>(r0, r7);	 Catch:{ Throwable -> 0x012b }
-        r7 = r3.exists();	 Catch:{ Throwable -> 0x012b }
-        if (r7 == 0) goto L_0x009c;
-    L_0x007c:
+        r3.<init>(r0, r7);	 Catch:{ Throwable -> 0x0126 }
+        r7 = r3.exists();	 Catch:{ Throwable -> 0x0126 }
+        if (r7 == 0) goto L_0x0096;
+    L_0x0079:
+        r7 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Error -> 0x008f }
+        if (r7 == 0) goto L_0x0083;
+    L_0x007d:
         r7 = "Load local lib";
-        org.telegram.messenger.FileLog.d(r7);	 Catch:{ Error -> 0x0095 }
-        r7 = r3.getAbsolutePath();	 Catch:{ Error -> 0x0095 }
-        java.lang.System.load(r7);	 Catch:{ Error -> 0x0095 }
-        r7 = net.hockeyapp.android.Constants.FILES_PATH;	 Catch:{ Error -> 0x0095 }
-        r9 = org.telegram.messenger.BuildVars.DEBUG_VERSION;	 Catch:{ Error -> 0x0095 }
-        init(r7, r9);	 Catch:{ Error -> 0x0095 }
+        org.telegram.messenger.FileLog.d(r7);	 Catch:{ Error -> 0x008f }
+    L_0x0083:
+        r7 = r3.getAbsolutePath();	 Catch:{ Error -> 0x008f }
+        java.lang.System.load(r7);	 Catch:{ Error -> 0x008f }
         r7 = 1;
-        nativeLoaded = r7;	 Catch:{ Error -> 0x0095 }
+        nativeLoaded = r7;	 Catch:{ Error -> 0x008f }
         goto L_0x0007;
-    L_0x0095:
+    L_0x008f:
         r4 = move-exception;
-        org.telegram.messenger.FileLog.e(r4);	 Catch:{ Throwable -> 0x012b }
-        r3.delete();	 Catch:{ Throwable -> 0x012b }
-    L_0x009c:
-        r7 = new java.lang.StringBuilder;	 Catch:{ Throwable -> 0x012b }
-        r7.<init>();	 Catch:{ Throwable -> 0x012b }
+        org.telegram.messenger.FileLog.e(r4);	 Catch:{ Throwable -> 0x0126 }
+        r3.delete();	 Catch:{ Throwable -> 0x0126 }
+    L_0x0096:
+        r7 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Throwable -> 0x0126 }
+        if (r7 == 0) goto L_0x00b1;
+    L_0x009a:
+        r7 = new java.lang.StringBuilder;	 Catch:{ Throwable -> 0x0126 }
+        r7.<init>();	 Catch:{ Throwable -> 0x0126 }
         r9 = "Library not found, arch = ";
-        r7 = r7.append(r9);	 Catch:{ Throwable -> 0x012b }
-        r7 = r7.append(r5);	 Catch:{ Throwable -> 0x012b }
-        r7 = r7.toString();	 Catch:{ Throwable -> 0x012b }
-        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Throwable -> 0x012b }
-        r7 = loadFromZip(r10, r0, r3, r5);	 Catch:{ Throwable -> 0x012b }
+        r7 = r7.append(r9);	 Catch:{ Throwable -> 0x0126 }
+        r7 = r7.append(r5);	 Catch:{ Throwable -> 0x0126 }
+        r7 = r7.toString();	 Catch:{ Throwable -> 0x0126 }
+        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Throwable -> 0x0126 }
+    L_0x00b1:
+        r7 = loadFromZip(r10, r0, r3, r5);	 Catch:{ Throwable -> 0x0126 }
         if (r7 != 0) goto L_0x0007;
-    L_0x00b9:
+    L_0x00b7:
         r7 = "tmessages.27";
-        java.lang.System.loadLibrary(r7);	 Catch:{ Error -> 0x00cb }
-        r7 = net.hockeyapp.android.Constants.FILES_PATH;	 Catch:{ Error -> 0x00cb }
-        r9 = org.telegram.messenger.BuildVars.DEBUG_VERSION;	 Catch:{ Error -> 0x00cb }
-        init(r7, r9);	 Catch:{ Error -> 0x00cb }
+        java.lang.System.loadLibrary(r7);	 Catch:{ Error -> 0x00c2 }
         r7 = 1;
-        nativeLoaded = r7;	 Catch:{ Error -> 0x00cb }
+        nativeLoaded = r7;	 Catch:{ Error -> 0x00c2 }
         goto L_0x0007;
-    L_0x00cb:
+    L_0x00c2:
         r4 = move-exception;
-        org.telegram.messenger.FileLog.e(r4);	 Catch:{ all -> 0x00d1 }
+        org.telegram.messenger.FileLog.e(r4);	 Catch:{ all -> 0x00c8 }
         goto L_0x0007;
-    L_0x00d1:
+    L_0x00c8:
         r7 = move-exception;
         monitor-exit(r8);
         throw r7;
-    L_0x00d4:
-        r7 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x0122 }
+    L_0x00cb:
+        r7 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x011d }
         r9 = "armeabi";
-        r7 = r7.equalsIgnoreCase(r9);	 Catch:{ Exception -> 0x0122 }
-        if (r7 == 0) goto L_0x00e4;
-    L_0x00df:
+        r7 = r7.equalsIgnoreCase(r9);	 Catch:{ Exception -> 0x011d }
+        if (r7 == 0) goto L_0x00db;
+    L_0x00d6:
         r5 = "armeabi";
         goto L_0x001a;
-    L_0x00e4:
-        r7 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x0122 }
+    L_0x00db:
+        r7 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x011d }
         r9 = "x86";
-        r7 = r7.equalsIgnoreCase(r9);	 Catch:{ Exception -> 0x0122 }
-        if (r7 == 0) goto L_0x00f4;
-    L_0x00ef:
+        r7 = r7.equalsIgnoreCase(r9);	 Catch:{ Exception -> 0x011d }
+        if (r7 == 0) goto L_0x00eb;
+    L_0x00e6:
         r5 = "x86";
         goto L_0x001a;
-    L_0x00f4:
-        r7 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x0122 }
+    L_0x00eb:
+        r7 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x011d }
         r9 = "mips";
-        r7 = r7.equalsIgnoreCase(r9);	 Catch:{ Exception -> 0x0122 }
-        if (r7 == 0) goto L_0x0104;
-    L_0x00ff:
+        r7 = r7.equalsIgnoreCase(r9);	 Catch:{ Exception -> 0x011d }
+        if (r7 == 0) goto L_0x00fb;
+    L_0x00f6:
         r5 = "mips";
         goto L_0x001a;
-    L_0x0104:
+    L_0x00fb:
         r5 = "armeabi";
-        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0122 }
-        r7.<init>();	 Catch:{ Exception -> 0x0122 }
+        r7 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Exception -> 0x011d }
+        if (r7 == 0) goto L_0x001a;
+    L_0x0102:
+        r7 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x011d }
+        r7.<init>();	 Catch:{ Exception -> 0x011d }
         r9 = "Unsupported arch: ";
-        r7 = r7.append(r9);	 Catch:{ Exception -> 0x0122 }
-        r9 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x0122 }
-        r7 = r7.append(r9);	 Catch:{ Exception -> 0x0122 }
-        r7 = r7.toString();	 Catch:{ Exception -> 0x0122 }
-        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x0122 }
+        r7 = r7.append(r9);	 Catch:{ Exception -> 0x011d }
+        r9 = android.os.Build.CPU_ABI;	 Catch:{ Exception -> 0x011d }
+        r7 = r7.append(r9);	 Catch:{ Exception -> 0x011d }
+        r7 = r7.toString();	 Catch:{ Exception -> 0x011d }
+        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x011d }
         goto L_0x001a;
-    L_0x0122:
+    L_0x011d:
         r4 = move-exception;
-        org.telegram.messenger.FileLog.e(r4);	 Catch:{ Throwable -> 0x012b }
+        org.telegram.messenger.FileLog.e(r4);	 Catch:{ Throwable -> 0x0126 }
         r5 = "armeabi";
         goto L_0x001a;
-    L_0x012b:
+    L_0x0126:
         r4 = move-exception;
-        r4.printStackTrace();	 Catch:{ all -> 0x00d1 }
-        goto L_0x00b9;
+        r4.printStackTrace();	 Catch:{ all -> 0x00c8 }
+        goto L_0x00b7;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.NativeLoader.initNativeLibs(android.content.Context):void");
     }

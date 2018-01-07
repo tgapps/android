@@ -39,6 +39,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
+import android.util.SparseArray;
 import android.view.ActionMode;
 import android.view.ActionMode.Callback;
 import android.view.ContextThemeWrapper;
@@ -85,6 +86,7 @@ import java.util.List;
 import java.util.Locale;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.DataQuery;
@@ -289,8 +291,8 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
     private ArrayList<FileLocation> imagesArrLocations = new ArrayList();
     private ArrayList<Integer> imagesArrLocationsSizes = new ArrayList();
     private ArrayList<MessageObject> imagesArrTemp = new ArrayList();
-    private HashMap<Integer, MessageObject>[] imagesByIds = new HashMap[]{new HashMap(), new HashMap()};
-    private HashMap<Integer, MessageObject>[] imagesByIdsTemp = new HashMap[]{new HashMap(), new HashMap()};
+    private SparseArray<MessageObject>[] imagesByIds = new SparseArray[]{new SparseArray(), new SparseArray()};
+    private SparseArray<MessageObject>[] imagesByIdsTemp = new SparseArray[]{new SparseArray(), new SparseArray()};
     private boolean inPreview;
     private DecelerateInterpolator interpolator = new DecelerateInterpolator(1.5f);
     private boolean invalidCoords;
@@ -1623,7 +1625,8 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
 
         protected void onDraw(Canvas canvas) {
             PhotoViewer.this.onDraw(canvas);
-            if (VERSION.SDK_INT >= 21 && AndroidUtilities.statusBarHeight != 0) {
+            if (VERSION.SDK_INT >= 21 && AndroidUtilities.statusBarHeight != 0 && PhotoViewer.this.actionBar != null) {
+                this.paint.setAlpha((int) ((255.0f * PhotoViewer.this.actionBar.getAlpha()) * 0.2f));
                 canvas.drawRect(0.0f, 0.0f, (float) getMeasuredWidth(), (float) AndroidUtilities.statusBarHeight, this.paint);
             }
         }
@@ -1956,14 +1959,14 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                     Iterator it = arr.iterator();
                     while (it.hasNext()) {
                         message = (MessageObject) it.next();
-                        if (!this.imagesByIds[loadIndex].containsKey(Integer.valueOf(message.getId()))) {
+                        if (this.imagesByIds[loadIndex].indexOfKey(message.getId()) < 0) {
                             added++;
                             if (this.opennedFromMedia) {
                                 this.imagesArr.add(message);
                             } else {
                                 this.imagesArr.add(0, message);
                             }
-                            this.imagesByIds[loadIndex].put(Integer.valueOf(message.getId()), message);
+                            this.imagesByIds[loadIndex].put(message.getId(), message);
                         }
                     }
                     if (this.opennedFromMedia) {
@@ -1985,8 +1988,8 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                     added = 0;
                     for (a = 0; a < arr.size(); a++) {
                         message = (MessageObject) arr.get(a);
-                        if (!this.imagesByIdsTemp[loadIndex].containsKey(Integer.valueOf(message.getId()))) {
-                            this.imagesByIdsTemp[loadIndex].put(Integer.valueOf(message.getId()), message);
+                        if (this.imagesByIdsTemp[loadIndex].indexOfKey(message.getId()) < 0) {
+                            this.imagesByIdsTemp[loadIndex].put(message.getId(), message);
                             if (this.opennedFromMedia) {
                                 this.imagesArrTemp.add(message);
                                 if (message.getId() == currentMessage.getId()) {
@@ -2010,8 +2013,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                         this.imagesArr.clear();
                         this.imagesArr.addAll(this.imagesArrTemp);
                         for (a = 0; a < 2; a++) {
-                            this.imagesByIds[a].clear();
-                            this.imagesByIds[a].putAll(this.imagesByIdsTemp[a]);
+                            this.imagesByIds[a] = this.imagesByIdsTemp[a].clone();
                             this.imagesByIdsTemp[a].clear();
                         }
                         this.imagesArrTemp.clear();
@@ -2345,7 +2347,12 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
             } else {
                 this.windowLayoutParams.flags = 8;
             }
-            this.actionBar = new ActionBar(activity);
+            this.actionBar = new ActionBar(activity) {
+                public void setAlpha(float alpha) {
+                    super.setAlpha(alpha);
+                    PhotoViewer.this.containerView.invalidate();
+                }
+            };
             this.actionBar.setTitleColor(-1);
             this.actionBar.setSubtitleColor(-1);
             this.actionBar.setBackgroundColor(Theme.ACTION_BAR_PHOTO_VIEWER_COLOR);
@@ -4535,6 +4542,20 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         this.isActionBarVisible = show;
         this.actionBar.setEnabled(show);
         this.bottomLayout.setEnabled(show);
+        if (VERSION.SDK_INT >= 21) {
+            LayoutParams layoutParams;
+            if (show) {
+                if ((this.windowLayoutParams.flags & 1024) != 0) {
+                    layoutParams = this.windowLayoutParams;
+                    layoutParams.flags &= -1025;
+                    ((WindowManager) this.parentActivity.getSystemService("window")).updateViewLayout(this.windowView, this.windowLayoutParams);
+                }
+            } else if ((this.windowLayoutParams.flags & 1024) == 0) {
+                layoutParams = this.windowLayoutParams;
+                layoutParams.flags |= 1024;
+                ((WindowManager) this.parentActivity.getSystemService("window")).updateViewLayout(this.windowView, this.windowLayoutParams);
+            }
+        }
         float f2;
         if (animated) {
             ArrayList<Animator> arrayList = new ArrayList();
@@ -5200,9 +5221,9 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r3 = 0;
         goto L_0x0104;
     L_0x02b6:
-        if (r23 == 0) goto L_0x048c;
+        if (r23 == 0) goto L_0x0488;
     L_0x02b8:
-        if (r25 != 0) goto L_0x048c;
+        if (r25 != 0) goto L_0x0488;
     L_0x02ba:
         r0 = r23;
         r3 = r0.messageOwner;
@@ -5347,11 +5368,11 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = r0.currentDialogId;
         r6 = 0;
         r3 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r3 == 0) goto L_0x06e6;
+        if (r3 == 0) goto L_0x06de;
     L_0x03c5:
         r0 = r22;
         r3 = r0.totalImagesCount;
-        if (r3 != 0) goto L_0x06e6;
+        if (r3 != 0) goto L_0x06de;
     L_0x03cb:
         r0 = r22;
         r3 = r0.currentAccount;
@@ -5391,7 +5412,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
     L_0x040f:
         r0 = r22;
         r3 = r0.currentBotInlineResult;
-        if (r3 == 0) goto L_0x0706;
+        if (r3 == 0) goto L_0x06fe;
     L_0x0415:
         r0 = r22;
         r3 = r0.currentBotInlineResult;
@@ -5404,7 +5425,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r3 = r0.currentBotInlineResult;
         r3 = r3.document;
         r3 = org.telegram.messenger.MessageObject.isVideoDocument(r3);
-        if (r3 == 0) goto L_0x0706;
+        if (r3 == 0) goto L_0x06fe;
     L_0x0430:
         r3 = 0;
         r0 = r22;
@@ -5446,7 +5467,6 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = 0;
         r3 = r3[r4];
         r4 = r23.getId();
-        r4 = java.lang.Integer.valueOf(r4);
         r0 = r23;
         r3.put(r4, r0);
         r0 = r22;
@@ -5458,9 +5478,9 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = 0;
         r3.setVisibility(r4);
         goto L_0x03a8;
-    L_0x048c:
-        if (r24 == 0) goto L_0x0508;
-    L_0x048e:
+    L_0x0488:
+        if (r24 == 0) goto L_0x0504;
+    L_0x048a:
         r0 = r28;
         r3 = r0.dialogId;
         r0 = r22;
@@ -5485,10 +5505,10 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r22;
         r3 = r0.videoPlayerControlFrameLayout;
         r3 = r3.getVisibility();
-        if (r3 == 0) goto L_0x04fb;
-    L_0x04c8:
+        if (r3 == 0) goto L_0x04f7;
+    L_0x04c4:
         r3 = 0;
-    L_0x04c9:
+    L_0x04c5:
         r4.setVisibility(r3);
         r3 = 1;
         r0 = r22;
@@ -5500,13 +5520,13 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r22;
         r3 = r0.shareButton;
         r3 = r3.getVisibility();
-        if (r3 != 0) goto L_0x04fe;
-    L_0x04e3:
+        if (r3 != 0) goto L_0x04fa;
+    L_0x04df:
         r0 = r22;
         r3 = r0.menuItem;
         r4 = 10;
         r3.hideSubItem(r4);
-    L_0x04ec:
+    L_0x04e8:
         r3 = 0;
         r4 = 1;
         r0 = r22;
@@ -5515,18 +5535,18 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r1 = r22;
         r1.currentUserAvatarLocation = r0;
         goto L_0x03af;
-    L_0x04fb:
+    L_0x04f7:
         r3 = 8;
-        goto L_0x04c9;
-    L_0x04fe:
+        goto L_0x04c5;
+    L_0x04fa:
         r0 = r22;
         r3 = r0.menuItem;
         r4 = 10;
         r3.showSubItem(r4);
-        goto L_0x04ec;
-    L_0x0508:
-        if (r25 == 0) goto L_0x056c;
-    L_0x050a:
+        goto L_0x04e8;
+    L_0x0504:
+        if (r25 == 0) goto L_0x0564;
+    L_0x0506:
         r3 = 1;
         r0 = r22;
         r0.opennedFromMedia = r3;
@@ -5543,12 +5563,12 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r25;
         r3.addAll(r0);
         r2 = 0;
-    L_0x0529:
+    L_0x0525:
         r0 = r22;
         r3 = r0.imagesArr;
         r3 = r3.size();
-        if (r2 >= r3) goto L_0x0562;
-    L_0x0533:
+        if (r2 >= r3) goto L_0x055a;
+    L_0x052f:
         r0 = r22;
         r3 = r0.imagesArr;
         r16 = r3.get(r2);
@@ -5559,33 +5579,32 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r22;
         r8 = r0.currentDialogId;
         r3 = (r6 > r8 ? 1 : (r6 == r8 ? 0 : -1));
-        if (r3 != 0) goto L_0x0560;
-    L_0x054d:
+        if (r3 != 0) goto L_0x0558;
+    L_0x0549:
         r3 = 0;
-    L_0x054e:
+    L_0x054a:
         r3 = r4[r3];
         r4 = r16.getId();
-        r4 = java.lang.Integer.valueOf(r4);
         r0 = r16;
         r3.put(r4, r0);
         r2 = r2 + 1;
-        goto L_0x0529;
-    L_0x0560:
+        goto L_0x0525;
+    L_0x0558:
         r3 = 1;
-        goto L_0x054e;
-    L_0x0562:
+        goto L_0x054a;
+    L_0x055a:
         r3 = 1;
         r0 = r22;
         r1 = r27;
         r0.setImageIndex(r1, r3);
         goto L_0x03af;
-    L_0x056c:
+    L_0x0564:
         if (r26 == 0) goto L_0x03af;
-    L_0x056e:
+    L_0x0566:
         r0 = r22;
         r3 = r0.sendPhotoType;
-        if (r3 != 0) goto L_0x0591;
-    L_0x0574:
+        if (r3 != 0) goto L_0x0589;
+    L_0x056c:
         r0 = r22;
         r3 = r0.checkImageView;
         r4 = 0;
@@ -5599,7 +5618,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r3.setTitleRightMargin(r4);
-    L_0x0591:
+    L_0x0589:
         r0 = r22;
         r3 = r0.menuItem;
         r4 = 8;
@@ -5614,13 +5633,13 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r17 = r3.get(r0);
         r0 = r17;
         r3 = r0 instanceof org.telegram.messenger.MediaController.PhotoEntry;
-        if (r3 == 0) goto L_0x06a2;
-    L_0x05b3:
+        if (r3 == 0) goto L_0x069a;
+    L_0x05ab:
         r17 = (org.telegram.messenger.MediaController.PhotoEntry) r17;
         r0 = r17;
         r3 = r0.isVideo;
-        if (r3 == 0) goto L_0x0698;
-    L_0x05bb:
+        if (r3 == 0) goto L_0x0690;
+    L_0x05b3:
         r0 = r22;
         r3 = r0.cropItem;
         r4 = 8;
@@ -5636,26 +5655,26 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r4 = -r4;
         r4 = (float) r4;
         r3.setTranslationY(r4);
-    L_0x05db:
+    L_0x05d3:
         r10 = 1;
-    L_0x05dc:
+    L_0x05d4:
         r0 = r22;
         r3 = r0.parentChatActivity;
-        if (r3 == 0) goto L_0x0657;
-    L_0x05e2:
+        if (r3 == 0) goto L_0x064f;
+    L_0x05da:
         r0 = r22;
         r3 = r0.parentChatActivity;
         r3 = r3.currentEncryptedChat;
-        if (r3 == 0) goto L_0x05fa;
-    L_0x05ea:
+        if (r3 == 0) goto L_0x05f2;
+    L_0x05e2:
         r0 = r22;
         r3 = r0.parentChatActivity;
         r3 = r3.currentEncryptedChat;
         r3 = r3.layer;
         r3 = org.telegram.messenger.AndroidUtilities.getPeerLayerVersion(r3);
         r4 = 46;
-        if (r3 < r4) goto L_0x0657;
-    L_0x05fa:
+        if (r3 < r4) goto L_0x064f;
+    L_0x05f2:
         r0 = r22;
         r3 = r0.mentionsAdapter;
         r0 = r22;
@@ -5667,51 +5686,51 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0 = r22;
         r3 = r0.parentChatActivity;
         r3 = r3.currentChat;
-        if (r3 == 0) goto L_0x06dc;
-    L_0x0613:
+        if (r3 == 0) goto L_0x06d4;
+    L_0x060b:
         r3 = 1;
-    L_0x0614:
+    L_0x060c:
         r4.setNeedUsernames(r3);
         r0 = r22;
         r3 = r0.mentionsAdapter;
         r4 = 0;
         r3.setNeedBotContext(r4);
-        if (r10 == 0) goto L_0x06df;
-    L_0x0621:
+        if (r10 == 0) goto L_0x06d7;
+    L_0x0619:
         r0 = r22;
         r3 = r0.placeProvider;
-        if (r3 == 0) goto L_0x0637;
-    L_0x0627:
+        if (r3 == 0) goto L_0x062f;
+    L_0x061f:
         r0 = r22;
         r3 = r0.placeProvider;
-        if (r3 == 0) goto L_0x06df;
-    L_0x062d:
+        if (r3 == 0) goto L_0x06d7;
+    L_0x0625:
         r0 = r22;
         r3 = r0.placeProvider;
         r3 = r3.allowCaption();
-        if (r3 == 0) goto L_0x06df;
-    L_0x0637:
+        if (r3 == 0) goto L_0x06d7;
+    L_0x062f:
         r3 = 1;
-    L_0x0638:
+    L_0x0630:
         r0 = r22;
         r0.needCaptionLayout = r3;
         r0 = r22;
         r4 = r0.captionEditText;
         r0 = r22;
         r3 = r0.needCaptionLayout;
-        if (r3 == 0) goto L_0x06e2;
-    L_0x0646:
+        if (r3 == 0) goto L_0x06da;
+    L_0x063e:
         r3 = 0;
-    L_0x0647:
+    L_0x063f:
         r4.setVisibility(r3);
         r0 = r22;
         r3 = r0.needCaptionLayout;
-        if (r3 == 0) goto L_0x0657;
-    L_0x0650:
+        if (r3 == 0) goto L_0x064f;
+    L_0x0648:
         r0 = r22;
         r3 = r0.captionEditText;
         r3.onCreate();
-    L_0x0657:
+    L_0x064f:
         r0 = r22;
         r3 = r0.pickerView;
         r4 = 0;
@@ -5741,66 +5760,66 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r3.setVisibility(r4);
         r22.updateSelectedCount();
         goto L_0x03af;
-    L_0x0698:
+    L_0x0690:
         r0 = r22;
         r3 = r0.cropItem;
         r4 = 0;
         r3.setVisibility(r4);
-        goto L_0x05db;
-    L_0x06a2:
+        goto L_0x05d3;
+    L_0x069a:
         r0 = r17;
         r3 = r0 instanceof org.telegram.tgnet.TLRPC.BotInlineResult;
-        if (r3 == 0) goto L_0x06b4;
-    L_0x06a8:
+        if (r3 == 0) goto L_0x06ac;
+    L_0x06a0:
         r0 = r22;
         r3 = r0.cropItem;
         r4 = 8;
         r3.setVisibility(r4);
         r10 = 0;
-        goto L_0x05dc;
-    L_0x06b4:
+        goto L_0x05d4;
+    L_0x06ac:
         r0 = r22;
         r4 = r0.cropItem;
         r0 = r17;
         r3 = r0 instanceof org.telegram.messenger.MediaController.SearchImage;
-        if (r3 == 0) goto L_0x06d7;
-    L_0x06be:
+        if (r3 == 0) goto L_0x06cf;
+    L_0x06b6:
         r17 = (org.telegram.messenger.MediaController.SearchImage) r17;
         r0 = r17;
         r3 = r0.type;
-        if (r3 != 0) goto L_0x06d7;
-    L_0x06c6:
+        if (r3 != 0) goto L_0x06cf;
+    L_0x06be:
         r3 = 0;
-    L_0x06c7:
+    L_0x06bf:
         r4.setVisibility(r3);
         r0 = r22;
         r3 = r0.cropItem;
         r3 = r3.getVisibility();
-        if (r3 != 0) goto L_0x06da;
-    L_0x06d4:
+        if (r3 != 0) goto L_0x06d2;
+    L_0x06cc:
         r10 = 1;
-    L_0x06d5:
-        goto L_0x05dc;
-    L_0x06d7:
+    L_0x06cd:
+        goto L_0x05d4;
+    L_0x06cf:
         r3 = 8;
-        goto L_0x06c7;
-    L_0x06da:
+        goto L_0x06bf;
+    L_0x06d2:
         r10 = 0;
-        goto L_0x06d5;
-    L_0x06dc:
+        goto L_0x06cd;
+    L_0x06d4:
         r3 = 0;
-        goto L_0x0614;
-    L_0x06df:
+        goto L_0x060c;
+    L_0x06d7:
         r3 = 0;
-        goto L_0x0638;
-    L_0x06e2:
+        goto L_0x0630;
+    L_0x06da:
         r3 = 8;
-        goto L_0x0647;
-    L_0x06e6:
+        goto L_0x063f;
+    L_0x06de:
         r0 = r22;
         r3 = r0.avatarsDialogId;
         if (r3 == 0) goto L_0x03ff;
-    L_0x06ec:
+    L_0x06e4:
         r0 = r22;
         r3 = r0.currentAccount;
         r3 = org.telegram.messenger.MessagesController.getInstance(r3);
@@ -5813,12 +5832,12 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r9 = r0.classGuid;
         r3.loadDialogPhotos(r4, r5, r6, r8, r9);
         goto L_0x03ff;
-    L_0x0706:
+    L_0x06fe:
         r0 = r22;
         r3 = r0.imagesArrLocals;
         r3 = r3.isEmpty();
         if (r3 != 0) goto L_0x0436;
-    L_0x0710:
+    L_0x0708:
         r0 = r22;
         r3 = r0.imagesArrLocals;
         r0 = r27;
@@ -5826,38 +5845,38 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r14 = 0;
         r0 = r22;
         r3 = r0.parentChatActivity;
-        if (r3 == 0) goto L_0x076c;
-    L_0x0721:
+        if (r3 == 0) goto L_0x0764;
+    L_0x0719:
         r0 = r22;
         r3 = r0.parentChatActivity;
         r20 = r3.getCurrentUser();
-    L_0x0729:
+    L_0x0721:
         r0 = r22;
         r3 = r0.parentChatActivity;
-        if (r3 == 0) goto L_0x076f;
-    L_0x072f:
+        if (r3 == 0) goto L_0x0767;
+    L_0x0727:
         r0 = r22;
         r3 = r0.parentChatActivity;
         r3 = r3.isSecretChat();
-        if (r3 != 0) goto L_0x076f;
-    L_0x0739:
-        if (r20 == 0) goto L_0x076f;
-    L_0x073b:
+        if (r3 != 0) goto L_0x0767;
+    L_0x0731:
+        if (r20 == 0) goto L_0x0767;
+    L_0x0733:
         r0 = r20;
         r3 = r0.bot;
-        if (r3 != 0) goto L_0x076f;
-    L_0x0741:
+        if (r3 != 0) goto L_0x0767;
+    L_0x0739:
         r11 = 1;
-    L_0x0742:
+    L_0x073a:
         r3 = r15 instanceof org.telegram.messenger.MediaController.PhotoEntry;
-        if (r3 == 0) goto L_0x0771;
-    L_0x0746:
+        if (r3 == 0) goto L_0x0769;
+    L_0x073e:
         r18 = r15;
         r18 = (org.telegram.messenger.MediaController.PhotoEntry) r18;
         r0 = r18;
         r3 = r0.isVideo;
-        if (r3 == 0) goto L_0x0760;
-    L_0x0750:
+        if (r3 == 0) goto L_0x0758;
+    L_0x0748:
         r3 = new java.io.File;
         r0 = r18;
         r4 = r0.path;
@@ -5866,36 +5885,36 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r5 = 0;
         r0 = r22;
         r0.preparePlayer(r3, r4, r5);
-    L_0x0760:
+    L_0x0758:
         if (r11 == 0) goto L_0x0436;
-    L_0x0762:
+    L_0x075a:
         r0 = r22;
         r3 = r0.timeItem;
         r4 = 0;
         r3.setVisibility(r4);
         goto L_0x0436;
-    L_0x076c:
+    L_0x0764:
         r20 = 0;
-        goto L_0x0729;
-    L_0x076f:
+        goto L_0x0721;
+    L_0x0767:
         r11 = 0;
-        goto L_0x0742;
-    L_0x0771:
-        if (r11 == 0) goto L_0x0760;
-    L_0x0773:
+        goto L_0x073a;
+    L_0x0769:
+        if (r11 == 0) goto L_0x0758;
+    L_0x076b:
         r3 = r15 instanceof org.telegram.messenger.MediaController.SearchImage;
-        if (r3 == 0) goto L_0x0760;
-    L_0x0777:
+        if (r3 == 0) goto L_0x0758;
+    L_0x076f:
         r15 = (org.telegram.messenger.MediaController.SearchImage) r15;
         r3 = r15.type;
-        if (r3 != 0) goto L_0x077f;
-    L_0x077d:
+        if (r3 != 0) goto L_0x0777;
+    L_0x0775:
         r11 = 1;
-    L_0x077e:
-        goto L_0x0760;
-    L_0x077f:
+    L_0x0776:
+        goto L_0x0758;
+    L_0x0777:
         r11 = 0;
-        goto L_0x077e;
+        goto L_0x0776;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.onPhotoShow(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, java.util.ArrayList, java.util.ArrayList, int, org.telegram.ui.PhotoViewer$PlaceProviderObject):void");
     }
@@ -6931,6 +6950,11 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                 } catch (Throwable e) {
                     FileLog.e(e);
                 }
+                if (!(VERSION.SDK_INT < 21 || this.actionBar == null || (this.windowLayoutParams.flags & 1024) == 0)) {
+                    LayoutParams layoutParams = this.windowLayoutParams;
+                    layoutParams.flags &= -1025;
+                    ((WindowManager) this.parentActivity.getSystemService("window")).updateViewLayout(this.windowView, this.windowLayoutParams);
+                }
                 if (this.currentEditMode != 0) {
                     if (this.currentEditMode == 2) {
                         this.photoFilterView.shutdown();
@@ -6963,7 +6987,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                             this.animatingImageView.setVisibility(0);
                             this.containerView.invalidate();
                             animatorSet = new AnimatorSet();
-                            ViewGroup.LayoutParams layoutParams = this.animatingImageView.getLayoutParams();
+                            ViewGroup.LayoutParams layoutParams2 = this.animatingImageView.getLayoutParams();
                             Rect drawRegion = null;
                             int orientation = this.centerImage.getOrientation();
                             int animatedOrientation = 0;
@@ -6977,25 +7001,25 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                             if (object != null) {
                                 this.animatingImageView.setNeedRadius(object.radius != 0);
                                 drawRegion = object.imageReceiver.getDrawRegion();
-                                layoutParams.width = drawRegion.right - drawRegion.left;
-                                layoutParams.height = drawRegion.bottom - drawRegion.top;
+                                layoutParams2.width = drawRegion.right - drawRegion.left;
+                                layoutParams2.height = drawRegion.bottom - drawRegion.top;
                                 this.animatingImageView.setImageBitmap(object.thumb);
                             } else {
                                 this.animatingImageView.setNeedRadius(false);
-                                layoutParams.width = this.centerImage.getImageWidth();
-                                layoutParams.height = this.centerImage.getImageHeight();
+                                layoutParams2.width = this.centerImage.getImageWidth();
+                                layoutParams2.height = this.centerImage.getImageHeight();
                                 this.animatingImageView.setImageBitmap(this.centerImage.getBitmapSafe());
                             }
-                            this.animatingImageView.setLayoutParams(layoutParams);
-                            float scaleX = ((float) AndroidUtilities.displaySize.x) / ((float) layoutParams.width);
-                            float scaleY = ((float) ((VERSION.SDK_INT >= 21 ? AndroidUtilities.statusBarHeight : 0) + AndroidUtilities.displaySize.y)) / ((float) layoutParams.height);
+                            this.animatingImageView.setLayoutParams(layoutParams2);
+                            float scaleX = ((float) AndroidUtilities.displaySize.x) / ((float) layoutParams2.width);
+                            float scaleY = ((float) ((VERSION.SDK_INT >= 21 ? AndroidUtilities.statusBarHeight : 0) + AndroidUtilities.displaySize.y)) / ((float) layoutParams2.height);
                             if (scaleX > scaleY) {
                                 scale2 = scaleY;
                             } else {
                                 scale2 = scaleX;
                             }
-                            float yPos = (((float) ((VERSION.SDK_INT >= 21 ? AndroidUtilities.statusBarHeight : 0) + AndroidUtilities.displaySize.y)) - ((((float) layoutParams.height) * this.scale) * scale2)) / 2.0f;
-                            this.animatingImageView.setTranslationX(this.translationX + ((((float) AndroidUtilities.displaySize.x) - ((((float) layoutParams.width) * this.scale) * scale2)) / 2.0f));
+                            float yPos = (((float) ((VERSION.SDK_INT >= 21 ? AndroidUtilities.statusBarHeight : 0) + AndroidUtilities.displaySize.y)) - ((((float) layoutParams2.height) * this.scale) * scale2)) / 2.0f;
+                            this.animatingImageView.setTranslationX(this.translationX + ((((float) AndroidUtilities.displaySize.x) - ((((float) layoutParams2.width) * this.scale) * scale2)) / 2.0f));
                             this.animatingImageView.setTranslationY(this.translationY + yPos);
                             this.animatingImageView.setScaleX(this.scale * scale2);
                             this.animatingImageView.setScaleY(this.scale * scale2);
@@ -7696,13 +7720,13 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                     this.hintAnimation = null;
                 } else {
                     AndroidUtilities.cancelRunOnUIThread(this.hintHideRunnable);
-                    Runnable anonymousClass64 = new Runnable() {
+                    Runnable anonymousClass65 = new Runnable() {
                         public void run() {
                             PhotoViewer.this.hideHint();
                         }
                     };
-                    this.hintHideRunnable = anonymousClass64;
-                    AndroidUtilities.runOnUIThread(anonymousClass64, 2000);
+                    this.hintHideRunnable = anonymousClass65;
+                    AndroidUtilities.runOnUIThread(anonymousClass65, 2000);
                     return;
                 }
             } else if (this.hintAnimation != null) {
@@ -8288,7 +8312,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                 message.message = TtmlNode.ANONYMOUS_REGION_ID;
                 message.media = new TL_messageMediaEmpty();
                 message.action = new TL_messageActionEmpty();
-                this.videoPreviewMessageObject = new MessageObject(UserConfig.selectedAccount, message, null, false);
+                this.videoPreviewMessageObject = new MessageObject(UserConfig.selectedAccount, message, false);
                 this.videoPreviewMessageObject.messageOwner.attachPath = new File(FileLoader.getDirectory(4), "video_preview.mp4").getAbsolutePath();
                 this.videoPreviewMessageObject.videoEditedInfo = new VideoEditedInfo();
                 this.videoPreviewMessageObject.videoEditedInfo.rotationValue = this.rotationValue;
@@ -8450,18 +8474,20 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         this.rotationValue = 0;
         this.originalSize = new File(videoPath).length();
         DispatchQueue dispatchQueue = Utilities.globalQueue;
-        Runnable anonymousClass69 = new Runnable() {
+        Runnable anonymousClass70 = new Runnable() {
             public void run() {
                 if (PhotoViewer.this.currentLoadingVideoRunnable == this) {
                     TrackHeaderBox trackHeaderBox = null;
                     boolean isAvc = true;
                     IsoFile isoFile = new IsoFile(videoPath);
                     List<Box> boxes = Path.getPaths(isoFile, "/moov/trak/");
-                    if (Path.getPath(isoFile, "/moov/trak/mdia/minf/stbl/stsd/mp4a/") == null) {
+                    if (Path.getPath(isoFile, "/moov/trak/mdia/minf/stbl/stsd/mp4a/") == null && BuildVars.LOGS_ENABLED) {
                         FileLog.d("video hasn't mp4a atom");
                     }
                     if (Path.getPath(isoFile, "/moov/trak/mdia/minf/stbl/stsd/avc1/") == null) {
-                        FileLog.d("video hasn't avc1 atom");
+                        if (BuildVars.LOGS_ENABLED) {
+                            FileLog.d("video hasn't avc1 atom");
+                        }
                         isAvc = false;
                     }
                     PhotoViewer.this.audioFramesSize = 0;
@@ -8490,33 +8516,34 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                             } catch (Throwable e) {
                                 FileLog.e(e);
                             }
-                            try {
-                                if (PhotoViewer.this.currentLoadingVideoRunnable == this) {
-                                    TrackHeaderBox headerBox = trackBox.getTrackHeaderBox();
-                                    if (headerBox.getWidth() == 0.0d || headerBox.getHeight() == 0.0d) {
+                            if (PhotoViewer.this.currentLoadingVideoRunnable == this) {
+                                TrackHeaderBox headerBox = trackBox.getTrackHeaderBox();
+                                if (headerBox.getWidth() == 0.0d || headerBox.getHeight() == 0.0d) {
+                                    try {
                                         PhotoViewer.this.audioFramesSize = PhotoViewer.this.audioFramesSize + sampleSizes;
-                                    } else if (trackHeaderBox == null || trackHeaderBox.getWidth() < headerBox.getWidth() || trackHeaderBox.getHeight() < headerBox.getHeight()) {
-                                        trackHeaderBox = headerBox;
-                                        PhotoViewer.this.originalBitrate = PhotoViewer.this.bitrate = (int) ((trackBitrate / 100000) * 100000);
-                                        if (PhotoViewer.this.bitrate > 900000) {
-                                            PhotoViewer.this.bitrate = 900000;
-                                        }
-                                        PhotoViewer.this.videoFramesSize = PhotoViewer.this.videoFramesSize + sampleSizes;
+                                    } catch (Throwable e2) {
+                                        FileLog.e(e2);
+                                        isAvc = false;
                                     }
-                                    b++;
-                                } else {
-                                    return;
+                                } else if (trackHeaderBox == null || trackHeaderBox.getWidth() < headerBox.getWidth() || trackHeaderBox.getHeight() < headerBox.getHeight()) {
+                                    trackHeaderBox = headerBox;
+                                    PhotoViewer.this.originalBitrate = PhotoViewer.this.bitrate = (int) ((trackBitrate / 100000) * 100000);
+                                    if (PhotoViewer.this.bitrate > 900000) {
+                                        PhotoViewer.this.bitrate = 900000;
+                                    }
+                                    PhotoViewer.this.videoFramesSize = PhotoViewer.this.videoFramesSize + sampleSizes;
                                 }
-                            } catch (Throwable e2) {
-                                FileLog.e(e2);
-                                isAvc = false;
+                                b++;
+                            } else {
+                                return;
                             }
-                        } else {
-                            return;
                         }
+                        return;
                     }
                     if (trackHeaderBox == null) {
-                        FileLog.d("video hasn't trackHeaderBox atom");
+                        if (BuildVars.LOGS_ENABLED) {
+                            FileLog.d("video hasn't trackHeaderBox atom");
+                        }
                         isAvc = false;
                     }
                     final boolean isAvcFinal = isAvc;
@@ -8563,20 +8590,28 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                                             z = false;
                                         }
                                         photoViewer.setCompressItemEnabled(z, true);
-                                        FileLog.d("compressionsCount = " + PhotoViewer.this.compressionsCount + " w = " + PhotoViewer.this.originalWidth + " h = " + PhotoViewer.this.originalHeight);
+                                        if (BuildVars.LOGS_ENABLED) {
+                                            FileLog.d("compressionsCount = " + PhotoViewer.this.compressionsCount + " w = " + PhotoViewer.this.originalWidth + " h = " + PhotoViewer.this.originalHeight);
+                                        }
                                         if (VERSION.SDK_INT < 18 && PhotoViewer.this.compressItem.getTag() != null) {
                                             try {
                                                 MediaCodecInfo codecInfo = MediaController.selectCodec("video/avc");
                                                 if (codecInfo == null) {
-                                                    FileLog.d("no codec info for video/avc");
+                                                    if (BuildVars.LOGS_ENABLED) {
+                                                        FileLog.d("no codec info for video/avc");
+                                                    }
                                                     PhotoViewer.this.setCompressItemEnabled(false, true);
                                                 } else {
                                                     String name = codecInfo.getName();
                                                     if (name.equals("OMX.google.h264.encoder") || name.equals("OMX.ST.VFM.H264Enc") || name.equals("OMX.Exynos.avc.enc") || name.equals("OMX.MARVELL.VIDEO.HW.CODA7542ENCODER") || name.equals("OMX.MARVELL.VIDEO.H264ENCODER") || name.equals("OMX.k3.video.encoder.avc") || name.equals("OMX.TI.DUCATI1.VIDEO.H264E")) {
-                                                        FileLog.d("unsupported encoder = " + name);
+                                                        if (BuildVars.LOGS_ENABLED) {
+                                                            FileLog.d("unsupported encoder = " + name);
+                                                        }
                                                         PhotoViewer.this.setCompressItemEnabled(false, true);
                                                     } else if (MediaController.selectColorFormat(codecInfo, "video/avc") == 0) {
-                                                        FileLog.d("no color format for video/avc");
+                                                        if (BuildVars.LOGS_ENABLED) {
+                                                            FileLog.d("no color format for video/avc");
+                                                        }
                                                         PhotoViewer.this.setCompressItemEnabled(false, true);
                                                     }
                                                 }
@@ -8598,8 +8633,8 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                 }
             }
         };
-        this.currentLoadingVideoRunnable = anonymousClass69;
-        dispatchQueue.postRunnable(anonymousClass69);
+        this.currentLoadingVideoRunnable = anonymousClass70;
+        dispatchQueue.postRunnable(anonymousClass70);
     }
 
     private void setCompressItemEnabled(boolean enabled, boolean animated) {

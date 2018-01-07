@@ -40,6 +40,7 @@ import android.provider.MediaStore.Video;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -313,7 +314,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     private VideoPlayer videoPlayer;
     private final Object videoQueueSync = new Object();
     private ArrayList<MessageObject> voiceMessagesPlaylist;
-    private HashMap<Integer, MessageObject> voiceMessagesPlaylistMap;
+    private SparseArray<MessageObject> voiceMessagesPlaylistMap;
     private boolean voiceMessagesPlaylistUnread;
 
     public static class AlbumEntry {
@@ -321,7 +322,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         public String bucketName;
         public PhotoEntry coverPhoto;
         public ArrayList<PhotoEntry> photos = new ArrayList();
-        public HashMap<Integer, PhotoEntry> photosByIds = new HashMap();
+        public SparseArray<PhotoEntry> photosByIds = new SparseArray();
 
         public AlbumEntry(int bucketId, String bucketName, PhotoEntry coverPhoto) {
             this.bucketId = bucketId;
@@ -331,7 +332,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
 
         public void addPhoto(PhotoEntry photoEntry) {
             this.photos.add(photoEntry);
-            this.photosByIds.put(Integer.valueOf(photoEntry.imageId), photoEntry);
+            this.photosByIds.put(photoEntry.imageId, photoEntry);
         }
     }
 
@@ -722,7 +723,9 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
             this.linearSensor = this.sensorManager.getDefaultSensor(10);
             this.gravitySensor = this.sensorManager.getDefaultSensor(9);
             if (this.linearSensor == null || this.gravitySensor == null) {
-                FileLog.e("gravity or linear sensor not found");
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("gravity or linear sensor not found");
+                }
                 this.accelerometerSensor = this.sensorManager.getDefaultSensor(1);
                 this.linearSensor = null;
                 this.gravitySensor = null;
@@ -779,8 +782,8 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                         public void run() {
                             EmbedBottomSheet embedBottomSheet;
                             if (state == 1) {
-                                if (MediaController.this.isPlayingMessage(MediaController.this.getPlayingMessageObject()) && !MediaController.this.isMessagePaused()) {
-                                    MediaController.this.pauseMessage(MediaController.this.getPlayingMessageObject());
+                                if (MediaController.this.isPlayingMessage(MediaController.this.playingMessageObject) && !MediaController.this.isMessagePaused()) {
+                                    MediaController.this.pauseMessage(MediaController.this.playingMessageObject);
                                 } else if (!(MediaController.this.recordStartRunnable == null && MediaController.this.recordingAudio == null)) {
                                     MediaController.this.stopRecording(2);
                                 }
@@ -814,7 +817,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     public void onAudioFocusChange(int focusChange) {
         if (focusChange == -1) {
             if (isPlayingMessage(getPlayingMessageObject()) && !isMessagePaused()) {
-                pauseMessage(getPlayingMessageObject());
+                pauseMessage(this.playingMessageObject);
             }
             this.hasAudioFocus = 0;
             this.audioFocus = 0;
@@ -831,7 +834,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         } else if (focusChange == -2) {
             this.audioFocus = 0;
             if (isPlayingMessage(getPlayingMessageObject()) && !isMessagePaused()) {
-                pauseMessage(getPlayingMessageObject());
+                pauseMessage(this.playingMessageObject);
                 this.resumeAudioOnFocusGain = true;
             }
         }
@@ -1106,7 +1109,9 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
             }
             if (this.voiceMessagesPlaylist != null && !this.voiceMessagesPlaylist.isEmpty() && channelId == ((MessageObject) this.voiceMessagesPlaylist.get(0)).messageOwner.to_id.channel_id) {
                 for (a = 0; a < markAsDeletedMessages.size(); a++) {
-                    messageObject = (MessageObject) this.voiceMessagesPlaylistMap.remove(markAsDeletedMessages.get(a));
+                    Integer key = (Integer) markAsDeletedMessages.get(a);
+                    messageObject = (MessageObject) this.voiceMessagesPlaylistMap.get(key.intValue());
+                    this.voiceMessagesPlaylistMap.remove(key.intValue());
                     if (messageObject != null) {
                         this.voiceMessagesPlaylist.remove(messageObject);
                     }
@@ -1136,7 +1141,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                     messageObject = (MessageObject) arr.get(a);
                     if ((messageObject.isVoice() || messageObject.isRoundVideo()) && (!this.voiceMessagesPlaylistUnread || (messageObject.isContentUnread() && !messageObject.isOut()))) {
                         this.voiceMessagesPlaylist.add(messageObject);
-                        this.voiceMessagesPlaylistMap.put(Integer.valueOf(messageObject.getId()), messageObject);
+                        this.voiceMessagesPlaylistMap.put(messageObject.getId(), messageObject);
                     }
                 }
             }
@@ -1329,7 +1334,9 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     public void onSensorChanged(SensorEvent event) {
         if (this.sensorsStarted && VoIPService.getSharedInstance() == null) {
             if (event.sensor == this.proximitySensor) {
-                FileLog.e("proximity changed to " + event.values[0]);
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("proximity changed to " + event.values[0]);
+                }
                 if (this.lastProximityValue == -100.0f) {
                     this.lastProximityValue = event.values[0];
                 } else if (this.lastProximityValue != event.values[0]) {
@@ -1420,10 +1427,14 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 this.accelerometerVertical = z;
             }
             if (this.raisedToBack == 6 && this.accelerometerVertical && this.proximityTouched && !NotificationsController.audioManager.isWiredHeadsetOn()) {
-                FileLog.e("sensor values reached");
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("sensor values reached");
+                }
                 if (this.playingMessageObject == null && this.recordStartRunnable == null && this.recordingAudio == null && !PhotoViewer.getInstance().isVisible() && ApplicationLoader.isScreenOn && !this.inputFieldHasText && this.allowStartRecord && this.raiseChat != null && !this.callInProgress) {
                     if (!this.raiseToEarRecord) {
-                        FileLog.e("start record");
+                        if (BuildVars.LOGS_ENABLED) {
+                            FileLog.d("start record");
+                        }
                         this.useFrontSpeaker = true;
                         if (!this.raiseChat.playFirstUnreadVoiceMessage()) {
                             this.raiseToEarRecord = true;
@@ -1439,7 +1450,9 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                         }
                     }
                 } else if (this.playingMessageObject != null && ((this.playingMessageObject.isVoice() || this.playingMessageObject.isRoundVideo()) && !this.useFrontSpeaker)) {
-                    FileLog.e("start listen");
+                    if (BuildVars.LOGS_ENABLED) {
+                        FileLog.d("start listen");
+                    }
                     if (!(!this.proximityHasDifferentValues || this.proximityWakeLock == null || this.proximityWakeLock.isHeld())) {
                         this.proximityWakeLock.acquire();
                     }
@@ -1452,7 +1465,9 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 this.countLess = 0;
             } else if (this.proximityTouched) {
                 if (this.playingMessageObject != null && ((this.playingMessageObject.isVoice() || this.playingMessageObject.isRoundVideo()) && !this.useFrontSpeaker)) {
-                    FileLog.e("start listen by proximity only");
+                    if (BuildVars.LOGS_ENABLED) {
+                        FileLog.d("start listen by proximity only");
+                    }
                     if (!(!this.proximityHasDifferentValues || this.proximityWakeLock == null || this.proximityWakeLock.isHeld())) {
                         this.proximityWakeLock.acquire();
                     }
@@ -1462,7 +1477,9 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 }
             } else if (!this.proximityTouched) {
                 if (this.raiseToEarRecord) {
-                    FileLog.e("stop record");
+                    if (BuildVars.LOGS_ENABLED) {
+                        FileLog.d("stop record");
+                    }
                     stopRecording(2);
                     this.raiseToEarRecord = false;
                     this.ignoreOnPause = false;
@@ -1470,7 +1487,9 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                         this.proximityWakeLock.release();
                     }
                 } else if (this.useFrontSpeaker) {
-                    FileLog.e("stop listen");
+                    if (BuildVars.LOGS_ENABLED) {
+                        FileLog.d("stop listen");
+                    }
                     this.useFrontSpeaker = false;
                     startAudioAgain(true);
                     this.ignoreOnPause = false;
@@ -1703,14 +1722,21 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         this.lastProgress = 0;
         this.buffersWrited = 0;
         this.isPaused = false;
+        if (!(this.useFrontSpeaker || SharedConfig.raiseToSpeak)) {
+            ChatActivity chat = this.raiseChat;
+            stopRaiseToEarSensors(this.raiseChat);
+            this.raiseChat = chat;
+        }
         if (this.playingMessageObject != null) {
             if (this.downloadingCurrentMessage) {
                 FileLoader.getInstance(this.playingMessageObject.currentAccount).cancelLoadFile(this.playingMessageObject.getDocument());
             }
             MessageObject lastFile = this.playingMessageObject;
-            this.playingMessageObject.audioProgress = 0.0f;
-            this.playingMessageObject.audioProgressSec = 0;
-            NotificationCenter.getInstance(lastFile.currentAccount).postNotificationName(NotificationCenter.messagePlayingProgressDidChanged, Integer.valueOf(this.playingMessageObject.getId()), Integer.valueOf(0));
+            if (notify) {
+                this.playingMessageObject.audioProgress = 0.0f;
+                this.playingMessageObject.audioProgressSec = 0;
+                NotificationCenter.getInstance(lastFile.currentAccount).postNotificationName(NotificationCenter.messagePlayingProgressDidChanged, Integer.valueOf(this.playingMessageObject.getId()), Integer.valueOf(0));
+            }
             this.playingMessageObject = null;
             this.downloadingCurrentMessage = false;
             if (notify) {
@@ -1719,7 +1745,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 if (this.voiceMessagesPlaylist != null) {
                     if (byVoiceEnd && this.voiceMessagesPlaylist.get(0) == lastFile) {
                         this.voiceMessagesPlaylist.remove(0);
-                        this.voiceMessagesPlaylistMap.remove(Integer.valueOf(lastFile.getId()));
+                        this.voiceMessagesPlaylistMap.remove(lastFile.getId());
                         if (this.voiceMessagesPlaylist.isEmpty()) {
                             this.voiceMessagesPlaylist = null;
                             this.voiceMessagesPlaylistMap = null;
@@ -1751,11 +1777,6 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
             if (stopService) {
                 ApplicationLoader.applicationContext.stopService(new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class));
             }
-        }
-        if (!this.useFrontSpeaker && !SharedConfig.raiseToSpeak) {
-            ChatActivity chat = this.raiseChat;
-            stopRaiseToEarSensors(this.raiseChat);
-            this.raiseChat = chat;
         }
     }
 
@@ -2075,10 +2096,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         this.voiceMessagesPlaylist = playlist;
         if (this.voiceMessagesPlaylist != null) {
             this.voiceMessagesPlaylistUnread = unread;
-            this.voiceMessagesPlaylistMap = new HashMap();
+            this.voiceMessagesPlaylistMap = new SparseArray();
             for (int a = 0; a < this.voiceMessagesPlaylist.size(); a++) {
                 MessageObject messageObject = (MessageObject) this.voiceMessagesPlaylist.get(a);
-                this.voiceMessagesPlaylistMap.put(Integer.valueOf(messageObject.getId()), messageObject);
+                this.voiceMessagesPlaylistMap.put(messageObject.getId(), messageObject);
             }
         }
     }
@@ -2217,6 +2238,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
             boolean notify = !this.playMusicAgain;
             if (this.playingMessageObject != null) {
                 notify = false;
+                if (!this.playMusicAgain) {
+                    this.playingMessageObject.audioProgress = 0.0f;
+                    this.playingMessageObject.audioProgressSec = 0;
+                }
             }
             cleanupPlayer(notify, false);
             this.playMusicAgain = false;
@@ -2375,6 +2400,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                     this.videoPlayer.setStreamType(this.useFrontSpeaker ? 0 : 3);
                     this.videoPlayer.play();
                 } else if (isOpusFile(cacheFile.getAbsolutePath()) == 1) {
+                    if (this.pipRoundVideoView != null) {
+                        this.pipRoundVideoView.close(true);
+                        this.pipRoundVideoView = null;
+                    }
                     this.playlist.clear();
                     this.shuffledPlaylist.clear();
                     synchronized (this.playerObjectSync) {
@@ -2426,6 +2455,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                         }
                     }
                 } else {
+                    if (this.pipRoundVideoView != null) {
+                        this.pipRoundVideoView.close(true);
+                        this.pipRoundVideoView = null;
+                    }
                     try {
                         this.audioPlayer = new MediaPlayer();
                         this.audioPlayer.setAudioStreamType(this.useFrontSpeaker ? 0 : 3);
@@ -2663,6 +2696,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 cleanupPlayer(true, true);
             }
         }
+    }
+
+    public boolean isCurrentPlayer(VideoPlayer player) {
+        return this.videoPlayer == player;
     }
 
     public boolean pauseMessage(MessageObject messageObject) {
@@ -3436,8 +3473,8 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 int a;
                 ArrayList<AlbumEntry> mediaAlbumsSorted = new ArrayList();
                 ArrayList<AlbumEntry> photoAlbumsSorted = new ArrayList();
-                HashMap<Integer, AlbumEntry> mediaAlbums = new HashMap();
-                HashMap<Integer, AlbumEntry> photoAlbums = new HashMap();
+                SparseArray<AlbumEntry> mediaAlbums = new SparseArray();
+                SparseArray<AlbumEntry> photoAlbums = new SparseArray();
                 AlbumEntry albumEntry3 = null;
                 AlbumEntry albumEntry4 = null;
                 String cameraFolder = null;
@@ -3493,10 +3530,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                                     }
                                     albumEntry3.addPhoto(photoEntry2);
                                     albumEntry4.addPhoto(photoEntry2);
-                                    albumEntry2 = (AlbumEntry) mediaAlbums.get(Integer.valueOf(bucketId));
+                                    albumEntry2 = (AlbumEntry) mediaAlbums.get(bucketId);
                                     if (albumEntry2 == null) {
                                         albumEntry = new AlbumEntry(bucketId, bucketName, photoEntry2);
-                                        mediaAlbums.put(Integer.valueOf(bucketId), albumEntry);
+                                        mediaAlbums.put(bucketId, albumEntry);
                                         if (num != null || cameraFolder == null || path == null || !path.startsWith(cameraFolder)) {
                                             mediaAlbumsSorted.add(albumEntry);
                                         } else {
@@ -3505,10 +3542,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                                         }
                                     }
                                     albumEntry2.addPhoto(photoEntry2);
-                                    albumEntry2 = (AlbumEntry) photoAlbums.get(Integer.valueOf(bucketId));
+                                    albumEntry2 = (AlbumEntry) photoAlbums.get(bucketId);
                                     if (albumEntry2 == null) {
                                         albumEntry = new AlbumEntry(bucketId, bucketName, photoEntry2);
-                                        photoAlbums.put(Integer.valueOf(bucketId), albumEntry);
+                                        photoAlbums.put(bucketId, albumEntry);
                                         if (photoCameraAlbumId != null || cameraFolder == null || path == null || !path.startsWith(cameraFolder)) {
                                             photoAlbumsSorted.add(albumEntry);
                                         } else {
@@ -3570,10 +3607,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                                         albumEntry4 = allMediaAlbum;
                                     }
                                     albumEntry4.addPhoto(photoEntry);
-                                    albumEntry2 = (AlbumEntry) mediaAlbums.get(Integer.valueOf(bucketId));
+                                    albumEntry2 = (AlbumEntry) mediaAlbums.get(bucketId);
                                     if (albumEntry2 == null) {
                                         albumEntry = new AlbumEntry(bucketId, bucketName, photoEntry);
-                                        mediaAlbums.put(Integer.valueOf(bucketId), albumEntry);
+                                        mediaAlbums.put(bucketId, albumEntry);
                                         if (mediaCameraAlbumId == null || cameraFolder == null || path == null || !path.startsWith(cameraFolder)) {
                                             mediaAlbumsSorted.add(albumEntry);
                                         } else {
@@ -3646,10 +3683,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                                 mediaAlbumsSorted.add(0, albumEntry4);
                             }
                             albumEntry4.addPhoto(photoEntry);
-                            albumEntry2 = (AlbumEntry) mediaAlbums.get(Integer.valueOf(bucketId));
+                            albumEntry2 = (AlbumEntry) mediaAlbums.get(bucketId);
                             if (albumEntry2 == null) {
                                 albumEntry = new AlbumEntry(bucketId, bucketName, photoEntry);
-                                mediaAlbums.put(Integer.valueOf(bucketId), albumEntry);
+                                mediaAlbums.put(bucketId, albumEntry);
                                 if (mediaCameraAlbumId == null) {
                                 }
                                 mediaAlbumsSorted.add(albumEntry);
@@ -3713,10 +3750,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                                     albumEntry4 = allMediaAlbum;
                                 }
                                 albumEntry4.addPhoto(photoEntry);
-                                albumEntry2 = (AlbumEntry) mediaAlbums.get(Integer.valueOf(bucketId));
+                                albumEntry2 = (AlbumEntry) mediaAlbums.get(bucketId);
                                 if (albumEntry2 == null) {
                                     albumEntry = new AlbumEntry(bucketId, bucketName, photoEntry);
-                                    mediaAlbums.put(Integer.valueOf(bucketId), albumEntry);
+                                    mediaAlbums.put(bucketId, albumEntry);
                                     if (mediaCameraAlbumId == null) {
                                     }
                                     mediaAlbumsSorted.add(albumEntry);
@@ -3762,10 +3799,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                                 mediaAlbumsSorted.add(0, albumEntry4);
                             }
                             albumEntry4.addPhoto(photoEntry);
-                            albumEntry2 = (AlbumEntry) mediaAlbums.get(Integer.valueOf(bucketId));
+                            albumEntry2 = (AlbumEntry) mediaAlbums.get(bucketId);
                             if (albumEntry2 == null) {
                                 albumEntry = new AlbumEntry(bucketId, bucketName, photoEntry);
-                                mediaAlbums.put(Integer.valueOf(bucketId), albumEntry);
+                                mediaAlbums.put(bucketId, albumEntry);
                                 if (mediaCameraAlbumId == null) {
                                 }
                                 mediaAlbumsSorted.add(albumEntry);
@@ -4254,36 +4291,36 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r43 = 0;
         r86 = r76;
         r80 = java.lang.System.currentTimeMillis();
-        if (r72 == 0) goto L_0x088c;
+        if (r72 == 0) goto L_0x08b1;
     L_0x0112:
-        if (r70 == 0) goto L_0x088c;
+        if (r70 == 0) goto L_0x08b1;
     L_0x0114:
         r57 = 0;
         r45 = 0;
-        r48 = new android.media.MediaCodec$BufferInfo;	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
-        r48.<init>();	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
-        r58 = new org.telegram.messenger.video.Mp4Movie;	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
-        r58.<init>();	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
+        r48 = new android.media.MediaCodec$BufferInfo;	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
+        r48.<init>();	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
+        r58 = new org.telegram.messenger.video.Mp4Movie;	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
+        r58.<init>();	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
         r0 = r58;
         r1 = r20;
-        r0.setCacheFile(r1);	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
+        r0.setCacheFile(r1);	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
         r0 = r58;
         r1 = r74;
-        r0.setRotation(r1);	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
+        r0.setRotation(r1);	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
         r0 = r58;
         r1 = r72;
         r2 = r70;
-        r0.setSize(r1, r2);	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
-        r6 = new org.telegram.messenger.video.MP4Builder;	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
-        r6.<init>();	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
+        r0.setSize(r1, r2);	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
+        r6 = new org.telegram.messenger.video.MP4Builder;	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
+        r6.<init>();	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
         r0 = r58;
-        r57 = r6.createMovie(r0);	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
-        r46 = new android.media.MediaExtractor;	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
-        r46.<init>();	 Catch:{ Exception -> 0x0850, all -> 0x08a9 }
+        r57 = r6.createMovie(r0);	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
+        r46 = new android.media.MediaExtractor;	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
+        r46.<init>();	 Catch:{ Exception -> 0x0871, all -> 0x08ce }
         r0 = r46;
         r1 = r84;
-        r0.setDataSource(r1);	 Catch:{ Exception -> 0x08b6, all -> 0x04d0 }
-        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x08b6, all -> 0x04d0 }
+        r0.setDataSource(r1);	 Catch:{ Exception -> 0x08db, all -> 0x04dc }
+        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x08db, all -> 0x04dc }
         r0 = r72;
         r1 = r61;
         if (r0 != r1) goto L_0x0169;
@@ -4295,15 +4332,15 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         if (r73 != 0) goto L_0x0169;
     L_0x0161:
         r0 = r91;
-        r6 = r0.videoEditedInfo;	 Catch:{ Exception -> 0x08b6, all -> 0x04d0 }
-        r6 = r6.roundVideo;	 Catch:{ Exception -> 0x08b6, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x082e;
+        r6 = r0.videoEditedInfo;	 Catch:{ Exception -> 0x08db, all -> 0x04dc }
+        r6 = r6.roundVideo;	 Catch:{ Exception -> 0x08db, all -> 0x04dc }
+        if (r6 == 0) goto L_0x084f;
     L_0x0169:
         r6 = 0;
         r0 = r90;
         r1 = r46;
-        r83 = r0.selectTrack(r1, r6);	 Catch:{ Exception -> 0x08b6, all -> 0x04d0 }
-        if (r83 < 0) goto L_0x08c5;
+        r83 = r0.selectTrack(r1, r6);	 Catch:{ Exception -> 0x08db, all -> 0x04dc }
+        if (r83 < 0) goto L_0x08ee;
     L_0x0174:
         r4 = 0;
         r37 = 0;
@@ -4316,52 +4353,52 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r78 = 0;
         r85 = -5;
         r69 = 0;
-        r6 = android.os.Build.MANUFACTURER;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r56 = r6.toLowerCase();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = android.os.Build.MANUFACTURER;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r56 = r6.toLowerCase();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 18;
-        if (r6 >= r10) goto L_0x0478;
+        if (r6 >= r10) goto L_0x0484;
     L_0x0195:
         r6 = "video/avc";
-        r26 = selectCodec(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r26 = selectCodec(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = "video/avc";
         r0 = r26;
-        r28 = selectColorFormat(r0, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r28 != 0) goto L_0x0239;
+        r28 = selectColorFormat(r0, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r28 != 0) goto L_0x023d;
     L_0x01a7:
-        r6 = new java.lang.RuntimeException;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = new java.lang.RuntimeException;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = "no supported color format";
-        r6.<init>(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        throw r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6.<init>(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        throw r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
     L_0x01b0:
         r35 = move-exception;
     L_0x01b1:
-        org.telegram.messenger.FileLog.e(r35);	 Catch:{ Exception -> 0x08b6, all -> 0x04d0 }
+        org.telegram.messenger.FileLog.e(r35);	 Catch:{ Exception -> 0x08db, all -> 0x04dc }
         r43 = 1;
         r16 = r86;
     L_0x01b8:
         r0 = r46;
         r1 = r83;
-        r0.unselectTrack(r1);	 Catch:{ Exception -> 0x08bc, all -> 0x08ae }
+        r0.unselectTrack(r1);	 Catch:{ Exception -> 0x08e1, all -> 0x08d3 }
         if (r64 == 0) goto L_0x01c4;
     L_0x01c1:
-        r64.release();	 Catch:{ Exception -> 0x08bc, all -> 0x08ae }
+        r64.release();	 Catch:{ Exception -> 0x08e1, all -> 0x08d3 }
     L_0x01c4:
         if (r53 == 0) goto L_0x01c9;
     L_0x01c6:
-        r53.release();	 Catch:{ Exception -> 0x08bc, all -> 0x08ae }
+        r53.release();	 Catch:{ Exception -> 0x08e1, all -> 0x08d3 }
     L_0x01c9:
         if (r4 == 0) goto L_0x01d1;
     L_0x01cb:
-        r4.stop();	 Catch:{ Exception -> 0x08bc, all -> 0x08ae }
-        r4.release();	 Catch:{ Exception -> 0x08bc, all -> 0x08ae }
+        r4.stop();	 Catch:{ Exception -> 0x08e1, all -> 0x08d3 }
+        r4.release();	 Catch:{ Exception -> 0x08e1, all -> 0x08d3 }
     L_0x01d1:
         if (r37 == 0) goto L_0x01d9;
     L_0x01d3:
-        r37.stop();	 Catch:{ Exception -> 0x08bc, all -> 0x08ae }
-        r37.release();	 Catch:{ Exception -> 0x08bc, all -> 0x08ae }
+        r37.stop();	 Catch:{ Exception -> 0x08e1, all -> 0x08d3 }
+        r37.release();	 Catch:{ Exception -> 0x08e1, all -> 0x08d3 }
     L_0x01d9:
-        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x08bc, all -> 0x08ae }
+        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x08e1, all -> 0x08d3 }
     L_0x01dc:
         if (r43 != 0) goto L_0x01f2;
     L_0x01de:
@@ -4375,7 +4412,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r13 = r46;
         r14 = r57;
         r15 = r48;
-        r11.readAndWriteTrack(r12, r13, r14, r15, r16, r18, r20, r21);	 Catch:{ Exception -> 0x08bc, all -> 0x08ae }
+        r11.readAndWriteTrack(r12, r13, r14, r15, r16, r18, r20, r21);	 Catch:{ Exception -> 0x08e1, all -> 0x08d3 }
     L_0x01f2:
         if (r46 == 0) goto L_0x01f7;
     L_0x01f4:
@@ -4383,8 +4420,11 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     L_0x01f7:
         if (r57 == 0) goto L_0x01fc;
     L_0x01f9:
-        r57.finishMovie();	 Catch:{ Exception -> 0x084a }
+        r57.finishMovie();	 Catch:{ Exception -> 0x086b }
     L_0x01fc:
+        r6 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
+        if (r6 == 0) goto L_0x08ea;
+    L_0x0200:
         r6 = new java.lang.StringBuilder;
         r6.<init>();
         r10 = "time = ";
@@ -4393,9 +4433,9 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r10 = r10 - r80;
         r6 = r6.append(r10);
         r6 = r6.toString();
-        org.telegram.messenger.FileLog.e(r6);
+        org.telegram.messenger.FileLog.d(r6);
         r45 = r46;
-    L_0x021b:
+    L_0x021f:
         r6 = r68.edit();
         r10 = "isPreviousOk";
         r11 = 1;
@@ -4409,65 +4449,72 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r0.didWriteData(r1, r2, r6, r3);
         r6 = 1;
         goto L_0x00ce;
-    L_0x0239:
-        r27 = r26.getName();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+    L_0x023d:
+        r27 = r26.getName();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = "OMX.qcom.";
         r0 = r27;
-        r6 = r0.contains(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x043a;
-    L_0x0248:
+        r6 = r0.contains(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x0446;
+    L_0x024c:
         r69 = 1;
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 16;
-        if (r6 != r10) goto L_0x0268;
-    L_0x0250:
+        if (r6 != r10) goto L_0x026c;
+    L_0x0254:
         r6 = "lge";
         r0 = r56;
-        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 != 0) goto L_0x0266;
-    L_0x025b:
+        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 != 0) goto L_0x026a;
+    L_0x025f:
         r6 = "nokia";
         r0 = r56;
-        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x0268;
-    L_0x0266:
+        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x026c;
+    L_0x026a:
         r78 = 1;
-    L_0x0268:
-        r6 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+    L_0x026c:
+        r6 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x02a5;
+    L_0x0270:
+        r6 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = "codec = ";
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10 = r26.getName();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10 = r26.getName();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = " manufacturer = ";
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r56;
-        r6 = r6.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = "device = ";
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10 = android.os.Build.MODEL;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = r6.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        org.telegram.messenger.FileLog.e(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x029d:
-        r6 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10 = android.os.Build.MODEL;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = r6.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        org.telegram.messenger.FileLog.d(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x02a5:
+        r6 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x02c2;
+    L_0x02a9:
+        r6 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = "colorFormat = ";
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r28;
-        r6 = r6.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = r6.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        org.telegram.messenger.FileLog.e(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = r6.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        org.telegram.messenger.FileLog.d(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x02c2:
         r71 = r70;
         r66 = 0;
         r6 = r72 * r70;
         r6 = r6 * 3;
         r25 = r6 / 2;
-        if (r69 != 0) goto L_0x047d;
-    L_0x02c2:
+        if (r69 != 0) goto L_0x0489;
+    L_0x02ce:
         r6 = r70 % 16;
-        if (r6 == 0) goto L_0x02d6;
-    L_0x02c6:
+        if (r6 == 0) goto L_0x02e2;
+    L_0x02d2:
         r6 = r70 % 16;
         r6 = 16 - r6;
         r71 = r71 + r6;
@@ -4476,245 +4523,245 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r6 = r66 * 5;
         r6 = r6 / 4;
         r25 = r25 + r6;
-    L_0x02d6:
+    L_0x02e2:
         r0 = r46;
         r1 = r83;
-        r0.selectTrack(r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.selectTrack(r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 0;
         r6 = (r76 > r10 ? 1 : (r76 == r10 ? 0 : -1));
-        if (r6 <= 0) goto L_0x04c6;
-    L_0x02e3:
+        if (r6 <= 0) goto L_0x04d2;
+    L_0x02ef:
         r6 = 0;
         r0 = r46;
         r1 = r76;
-        r0.seekTo(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x02eb:
+        r0.seekTo(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x02f7:
         r0 = r46;
         r1 = r83;
-        r52 = r0.getTrackFormat(r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r52 = r0.getTrackFormat(r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = "video/avc";
         r0 = r72;
         r1 = r70;
-        r63 = android.media.MediaFormat.createVideoFormat(r6, r0, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r63 = android.media.MediaFormat.createVideoFormat(r6, r0, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = "color-format";
         r0 = r63;
         r1 = r28;
-        r0.setInteger(r6, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.setInteger(r6, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = "bitrate";
-        if (r24 <= 0) goto L_0x04fd;
-    L_0x030d:
+        if (r24 <= 0) goto L_0x050d;
+    L_0x0319:
         r6 = r24;
-    L_0x030f:
+    L_0x031b:
         r0 = r63;
-        r0.setInteger(r10, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.setInteger(r10, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = "frame-rate";
         r10 = 25;
         r0 = r63;
-        r0.setInteger(r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.setInteger(r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = "i-frame-interval";
         r10 = 10;
         r0 = r63;
-        r0.setInteger(r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.setInteger(r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 18;
-        if (r6 >= r10) goto L_0x0342;
-    L_0x032e:
+        if (r6 >= r10) goto L_0x034e;
+    L_0x033a:
         r6 = "stride";
         r10 = r72 + 32;
         r0 = r63;
-        r0.setInteger(r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.setInteger(r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = "slice-height";
         r0 = r63;
         r1 = r70;
-        r0.setInteger(r6, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x0342:
+        r0.setInteger(r6, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x034e:
         r6 = "video/avc";
-        r37 = android.media.MediaCodec.createEncoderByType(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r37 = android.media.MediaCodec.createEncoderByType(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = 0;
         r10 = 0;
         r11 = 1;
         r0 = r37;
         r1 = r63;
-        r0.configure(r1, r6, r10, r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.configure(r1, r6, r10, r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 18;
-        if (r6 < r10) goto L_0x0369;
-    L_0x0359:
-        r54 = new org.telegram.messenger.video.InputSurface;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = r37.createInputSurface();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        if (r6 < r10) goto L_0x0375;
+    L_0x0365:
+        r54 = new org.telegram.messenger.video.InputSurface;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = r37.createInputSurface();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r54;
-        r0.<init>(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r54.makeCurrent();	 Catch:{ Exception -> 0x08c0, all -> 0x04d0 }
+        r0.<init>(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r54.makeCurrent();	 Catch:{ Exception -> 0x08e5, all -> 0x04dc }
         r53 = r54;
-    L_0x0369:
-        r37.start();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+    L_0x0375:
+        r37.start();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = "mime";
         r0 = r52;
-        r6 = r0.getString(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r4 = android.media.MediaCodec.createDecoderByType(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.getString(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r4 = android.media.MediaCodec.createDecoderByType(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 18;
-        if (r6 < r10) goto L_0x0502;
-    L_0x037f:
-        r65 = new org.telegram.messenger.video.OutputSurface;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r65.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        if (r6 < r10) goto L_0x0512;
+    L_0x038b:
+        r65 = new org.telegram.messenger.video.OutputSurface;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r65.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r64 = r65;
-    L_0x0386:
-        r6 = r64.getSurface();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+    L_0x0392:
+        r6 = r64.getSurface();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 0;
         r11 = 0;
         r0 = r52;
-        r4.configure(r0, r6, r10, r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r4.start();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r4.configure(r0, r6, r10, r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r4.start();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r22 = 2500; // 0x9c4 float:3.503E-42 double:1.235E-320;
         r31 = 0;
         r40 = 0;
         r38 = 0;
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 21;
-        if (r6 >= r10) goto L_0x03b4;
-    L_0x03a2:
-        r31 = r4.getInputBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r40 = r37.getOutputBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        if (r6 >= r10) goto L_0x03c0;
+    L_0x03ae:
+        r31 = r4.getInputBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r40 = r37.getOutputBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 18;
-        if (r6 >= r10) goto L_0x03b4;
-    L_0x03b0:
-        r38 = r37.getInputBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x03b4:
-        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x03b7:
-        if (r62 != 0) goto L_0x0824;
-    L_0x03b9:
-        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r50 != 0) goto L_0x0405;
-    L_0x03be:
+        if (r6 >= r10) goto L_0x03c0;
+    L_0x03bc:
+        r38 = r37.getInputBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x03c0:
+        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x03c3:
+        if (r62 != 0) goto L_0x0845;
+    L_0x03c5:
+        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r50 != 0) goto L_0x0411;
+    L_0x03ca:
         r42 = 0;
-        r47 = r46.getSampleTrackIndex();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r47 = r46.getSampleTrackIndex();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r47;
         r1 = r83;
-        if (r0 != r1) goto L_0x0527;
-    L_0x03ca:
+        if (r0 != r1) goto L_0x0537;
+    L_0x03d6:
         r10 = 2500; // 0x9c4 float:3.503E-42 double:1.235E-320;
-        r5 = r4.dequeueInputBuffer(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r5 < 0) goto L_0x03ef;
-    L_0x03d2:
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r5 = r4.dequeueInputBuffer(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r5 < 0) goto L_0x03fb;
+    L_0x03de:
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 21;
-        if (r6 >= r10) goto L_0x0513;
-    L_0x03d8:
-        r49 = r31[r5];	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x03da:
+        if (r6 >= r10) goto L_0x0523;
+    L_0x03e4:
+        r49 = r31[r5];	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x03e6:
         r6 = 0;
         r0 = r46;
         r1 = r49;
-        r7 = r0.readSampleData(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r7 >= 0) goto L_0x0519;
-    L_0x03e5:
+        r7 = r0.readSampleData(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r7 >= 0) goto L_0x0529;
+    L_0x03f1:
         r6 = 0;
         r7 = 0;
         r8 = 0;
         r10 = 4;
-        r4.queueInputBuffer(r5, r6, r7, r8, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r4.queueInputBuffer(r5, r6, r7, r8, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r50 = 1;
-    L_0x03ef:
-        if (r42 == 0) goto L_0x0405;
-    L_0x03f1:
+    L_0x03fb:
+        if (r42 == 0) goto L_0x0411;
+    L_0x03fd:
         r10 = 2500; // 0x9c4 float:3.503E-42 double:1.235E-320;
-        r5 = r4.dequeueInputBuffer(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r5 < 0) goto L_0x0405;
-    L_0x03f9:
+        r5 = r4.dequeueInputBuffer(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r5 < 0) goto L_0x0411;
+    L_0x0405:
         r10 = 0;
         r11 = 0;
         r12 = 0;
         r14 = 4;
         r8 = r4;
         r9 = r5;
-        r8.queueInputBuffer(r9, r10, r11, r12, r14);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r8.queueInputBuffer(r9, r10, r11, r12, r14);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r50 = 1;
-    L_0x0405:
-        if (r30 != 0) goto L_0x0530;
-    L_0x0407:
+    L_0x0411:
+        if (r30 != 0) goto L_0x0540;
+    L_0x0413:
         r32 = 1;
-    L_0x0409:
+    L_0x0415:
         r39 = 1;
-    L_0x040b:
-        if (r32 != 0) goto L_0x040f;
-    L_0x040d:
-        if (r39 == 0) goto L_0x03b7;
-    L_0x040f:
-        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+    L_0x0417:
+        if (r32 != 0) goto L_0x041b;
+    L_0x0419:
+        if (r39 == 0) goto L_0x03c3;
+    L_0x041b:
+        r90.checkConversionCanceled();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 2500; // 0x9c4 float:3.503E-42 double:1.235E-320;
         r0 = r37;
         r1 = r48;
-        r41 = r0.dequeueOutputBuffer(r1, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r41 = r0.dequeueOutputBuffer(r1, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = -1;
         r0 = r41;
-        if (r0 != r6) goto L_0x0534;
-    L_0x0421:
+        if (r0 != r6) goto L_0x0544;
+    L_0x042d:
         r39 = 0;
-    L_0x0423:
+    L_0x042f:
         r6 = -1;
         r0 = r41;
-        if (r0 != r6) goto L_0x040b;
-    L_0x0428:
-        if (r30 != 0) goto L_0x040b;
-    L_0x042a:
+        if (r0 != r6) goto L_0x0417;
+    L_0x0434:
+        if (r30 != 0) goto L_0x0417;
+    L_0x0436:
         r10 = 2500; // 0x9c4 float:3.503E-42 double:1.235E-320;
         r0 = r48;
-        r33 = r4.dequeueOutputBuffer(r0, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r33 = r4.dequeueOutputBuffer(r0, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = -1;
         r0 = r33;
-        if (r0 != r6) goto L_0x06ad;
-    L_0x0437:
+        if (r0 != r6) goto L_0x06bd;
+    L_0x0443:
         r32 = 0;
-        goto L_0x040b;
-    L_0x043a:
+        goto L_0x0417;
+    L_0x0446:
         r6 = "OMX.Intel.";
         r0 = r27;
-        r6 = r0.contains(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x0449;
-    L_0x0445:
+        r6 = r0.contains(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x0455;
+    L_0x0451:
         r69 = 2;
-        goto L_0x0268;
-    L_0x0449:
+        goto L_0x026c;
+    L_0x0455:
         r6 = "OMX.MTK.VIDEO.ENCODER.AVC";
         r0 = r27;
-        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x0458;
-    L_0x0454:
+        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x0464;
+    L_0x0460:
         r69 = 3;
-        goto L_0x0268;
-    L_0x0458:
+        goto L_0x026c;
+    L_0x0464:
         r6 = "OMX.SEC.AVC.Encoder";
         r0 = r27;
-        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x0469;
-    L_0x0463:
+        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x0475;
+    L_0x046f:
         r69 = 4;
         r78 = 1;
-        goto L_0x0268;
-    L_0x0469:
+        goto L_0x026c;
+    L_0x0475:
         r6 = "OMX.TI.DUCATI1.VIDEO.H264E";
         r0 = r27;
-        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x0268;
-    L_0x0474:
+        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x026c;
+    L_0x0480:
         r69 = 5;
-        goto L_0x0268;
-    L_0x0478:
+        goto L_0x026c;
+    L_0x0484:
         r28 = 2130708361; // 0x7f000789 float:1.701803E38 double:1.0527098025E-314;
-        goto L_0x029d;
-    L_0x047d:
+        goto L_0x02a5;
+    L_0x0489:
         r6 = 1;
         r0 = r69;
-        if (r0 != r6) goto L_0x049f;
-    L_0x0482:
-        r6 = r56.toLowerCase();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        if (r0 != r6) goto L_0x04ab;
+    L_0x048e:
+        r6 = r56.toLowerCase();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = "lge";
-        r6 = r6.equals(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 != 0) goto L_0x02d6;
-    L_0x048f:
+        r6 = r6.equals(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 != 0) goto L_0x02e2;
+    L_0x049b:
         r6 = r72 * r70;
         r6 = r6 + 2047;
         r0 = r6 & -2048;
@@ -4722,21 +4769,21 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r6 = r72 * r70;
         r66 = r82 - r6;
         r25 = r25 + r66;
-        goto L_0x02d6;
-    L_0x049f:
+        goto L_0x02e2;
+    L_0x04ab:
         r6 = 5;
         r0 = r69;
-        if (r0 == r6) goto L_0x02d6;
-    L_0x04a4:
+        if (r0 == r6) goto L_0x02e2;
+    L_0x04b0:
         r6 = 3;
         r0 = r69;
-        if (r0 != r6) goto L_0x02d6;
-    L_0x04a9:
+        if (r0 != r6) goto L_0x02e2;
+    L_0x04b5:
         r6 = "baidu";
         r0 = r56;
-        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x02d6;
-    L_0x04b4:
+        r6 = r0.equals(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x02e2;
+    L_0x04c0:
         r6 = r70 % 16;
         r6 = 16 - r6;
         r71 = r71 + r6;
@@ -4745,26 +4792,29 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r6 = r66 * 5;
         r6 = r6 / 4;
         r25 = r25 + r6;
-        goto L_0x02d6;
-    L_0x04c6:
+        goto L_0x02e2;
+    L_0x04d2:
         r10 = 0;
         r6 = 0;
         r0 = r46;
-        r0.seekTo(r10, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x02eb;
-    L_0x04d0:
+        r0.seekTo(r10, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x02f7;
+    L_0x04dc:
         r6 = move-exception;
         r45 = r46;
         r16 = r86;
-    L_0x04d5:
-        if (r45 == 0) goto L_0x04da;
-    L_0x04d7:
+    L_0x04e1:
+        if (r45 == 0) goto L_0x04e6;
+    L_0x04e3:
         r45.release();
-    L_0x04da:
-        if (r57 == 0) goto L_0x04df;
-    L_0x04dc:
-        r57.finishMovie();	 Catch:{ Exception -> 0x0886 }
-    L_0x04df:
+    L_0x04e6:
+        if (r57 == 0) goto L_0x04eb;
+    L_0x04e8:
+        r57.finishMovie();	 Catch:{ Exception -> 0x08ab }
+    L_0x04eb:
+        r10 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
+        if (r10 == 0) goto L_0x050c;
+    L_0x04ef:
         r10 = new java.lang.StringBuilder;
         r10.<init>();
         r11 = "time = ";
@@ -4773,459 +4823,473 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r12 = r12 - r80;
         r10 = r10.append(r12);
         r10 = r10.toString();
-        org.telegram.messenger.FileLog.e(r10);
+        org.telegram.messenger.FileLog.d(r10);
+    L_0x050c:
         throw r6;
-    L_0x04fd:
+    L_0x050d:
         r6 = 921600; // 0xe1000 float:1.291437E-39 double:4.55331E-318;
-        goto L_0x030f;
-    L_0x0502:
-        r65 = new org.telegram.messenger.video.OutputSurface;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        goto L_0x031b;
+    L_0x0512:
+        r65 = new org.telegram.messenger.video.OutputSurface;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r65;
         r1 = r72;
         r2 = r70;
         r3 = r73;
-        r0.<init>(r1, r2, r3);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.<init>(r1, r2, r3);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r64 = r65;
-        goto L_0x0386;
-    L_0x0513:
-        r49 = r4.getInputBuffer(r5);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x03da;
-    L_0x0519:
+        goto L_0x0392;
+    L_0x0523:
+        r49 = r4.getInputBuffer(r5);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x03e6;
+    L_0x0529:
         r6 = 0;
-        r8 = r46.getSampleTime();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r8 = r46.getSampleTime();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 0;
-        r4.queueInputBuffer(r5, r6, r7, r8, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r46.advance();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x03ef;
-    L_0x0527:
+        r4.queueInputBuffer(r5, r6, r7, r8, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r46.advance();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x03fb;
+    L_0x0537:
         r6 = -1;
         r0 = r47;
-        if (r0 != r6) goto L_0x03ef;
-    L_0x052c:
+        if (r0 != r6) goto L_0x03fb;
+    L_0x053c:
         r42 = 1;
-        goto L_0x03ef;
-    L_0x0530:
+        goto L_0x03fb;
+    L_0x0540:
         r32 = 0;
-        goto L_0x0409;
-    L_0x0534:
+        goto L_0x0415;
+    L_0x0544:
         r6 = -3;
         r0 = r41;
-        if (r0 != r6) goto L_0x0545;
-    L_0x0539:
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        if (r0 != r6) goto L_0x0555;
+    L_0x0549:
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 21;
-        if (r6 >= r10) goto L_0x0423;
-    L_0x053f:
-        r40 = r37.getOutputBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x0423;
-    L_0x0545:
+        if (r6 >= r10) goto L_0x042f;
+    L_0x054f:
+        r40 = r37.getOutputBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x042f;
+    L_0x0555:
         r6 = -2;
         r0 = r41;
-        if (r0 != r6) goto L_0x055e;
-    L_0x054a:
-        r59 = r37.getOutputFormat();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        if (r0 != r6) goto L_0x056e;
+    L_0x055a:
+        r59 = r37.getOutputFormat();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = -5;
         r0 = r85;
-        if (r0 != r6) goto L_0x0423;
-    L_0x0553:
+        if (r0 != r6) goto L_0x042f;
+    L_0x0563:
         r6 = 0;
         r0 = r57;
         r1 = r59;
-        r85 = r0.addTrack(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x0423;
-    L_0x055e:
-        if (r41 >= 0) goto L_0x057c;
-    L_0x0560:
-        r6 = new java.lang.RuntimeException;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r85 = r0.addTrack(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x042f;
+    L_0x056e:
+        if (r41 >= 0) goto L_0x058c;
+    L_0x0570:
+        r6 = new java.lang.RuntimeException;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r11 = "unexpected result from encoder.dequeueOutputBuffer: ";
-        r10 = r10.append(r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r10.append(r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r41;
-        r10 = r10.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10 = r10.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6.<init>(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        throw r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x057c:
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r10.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10 = r10.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6.<init>(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        throw r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x058c:
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 21;
-        if (r6 >= r10) goto L_0x05a9;
-    L_0x0582:
-        r36 = r40[r41];	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x0584:
-        if (r36 != 0) goto L_0x05b2;
-    L_0x0586:
-        r6 = new java.lang.RuntimeException;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        if (r6 >= r10) goto L_0x05b9;
+    L_0x0592:
+        r36 = r40[r41];	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x0594:
+        if (r36 != 0) goto L_0x05c2;
+    L_0x0596:
+        r6 = new java.lang.RuntimeException;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r11 = "encoderOutputBuffer ";
-        r10 = r10.append(r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r10.append(r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r41;
-        r10 = r10.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r10.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r11 = " was null";
-        r10 = r10.append(r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10 = r10.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6.<init>(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        throw r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x05a9:
+        r10 = r10.append(r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10 = r10.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6.<init>(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        throw r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x05b9:
         r0 = r37;
         r1 = r41;
-        r36 = r0.getOutputBuffer(r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x0584;
-    L_0x05b2:
+        r36 = r0.getOutputBuffer(r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x0594;
+    L_0x05c2:
         r0 = r48;
-        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 1;
-        if (r6 <= r10) goto L_0x05db;
-    L_0x05b9:
+        if (r6 <= r10) goto L_0x05eb;
+    L_0x05c9:
         r0 = r48;
-        r6 = r0.flags;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.flags;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = r6 & 2;
-        if (r6 != 0) goto L_0x05ef;
-    L_0x05c1:
+        if (r6 != 0) goto L_0x05ff;
+    L_0x05d1:
         r6 = 1;
         r0 = r57;
         r1 = r85;
         r2 = r36;
         r3 = r48;
-        r6 = r0.writeSampleData(r1, r2, r3, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x05db;
-    L_0x05d0:
+        r6 = r0.writeSampleData(r1, r2, r3, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x05eb;
+    L_0x05e0:
         r6 = 0;
         r10 = 0;
         r0 = r90;
         r1 = r91;
         r2 = r20;
-        r0.didWriteData(r1, r2, r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x05db:
+        r0.didWriteData(r1, r2, r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x05eb:
         r0 = r48;
-        r6 = r0.flags;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.flags;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = r6 & 4;
-        if (r6 == 0) goto L_0x06a9;
-    L_0x05e3:
+        if (r6 == 0) goto L_0x06b9;
+    L_0x05f3:
         r62 = 1;
-    L_0x05e5:
+    L_0x05f5:
         r6 = 0;
         r0 = r37;
         r1 = r41;
-        r0.releaseOutputBuffer(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x0423;
-    L_0x05ef:
+        r0.releaseOutputBuffer(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x042f;
+    L_0x05ff:
         r6 = -5;
         r0 = r85;
-        if (r0 != r6) goto L_0x05db;
-    L_0x05f4:
+        if (r0 != r6) goto L_0x05eb;
+    L_0x0604:
         r0 = r48;
-        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r0 = new byte[r6];	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r0 = new byte[r6];	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r29 = r0;
         r0 = r48;
-        r6 = r0.offset;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.offset;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r48;
-        r10 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = r6 + r10;
         r0 = r36;
-        r0.limit(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.limit(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r48;
-        r6 = r0.offset;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.offset;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r36;
-        r0.position(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.position(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r36;
         r1 = r29;
-        r0.get(r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.get(r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r75 = 0;
         r67 = 0;
         r0 = r48;
-        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r23 = r6 + -1;
-    L_0x0624:
-        if (r23 < 0) goto L_0x0677;
-    L_0x0626:
+    L_0x0634:
+        if (r23 < 0) goto L_0x0687;
+    L_0x0636:
         r6 = 3;
         r0 = r23;
-        if (r0 <= r6) goto L_0x0677;
-    L_0x062b:
-        r6 = r29[r23];	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        if (r0 <= r6) goto L_0x0687;
+    L_0x063b:
+        r6 = r29[r23];	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 1;
-        if (r6 != r10) goto L_0x06a5;
-    L_0x0630:
+        if (r6 != r10) goto L_0x06b5;
+    L_0x0640:
         r6 = r23 + -1;
-        r6 = r29[r6];	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 != 0) goto L_0x06a5;
-    L_0x0636:
+        r6 = r29[r6];	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 != 0) goto L_0x06b5;
+    L_0x0646:
         r6 = r23 + -2;
-        r6 = r29[r6];	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 != 0) goto L_0x06a5;
-    L_0x063c:
+        r6 = r29[r6];	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 != 0) goto L_0x06b5;
+    L_0x064c:
         r6 = r23 + -3;
-        r6 = r29[r6];	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 != 0) goto L_0x06a5;
-    L_0x0642:
+        r6 = r29[r6];	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 != 0) goto L_0x06b5;
+    L_0x0652:
         r6 = r23 + -3;
-        r75 = java.nio.ByteBuffer.allocate(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r75 = java.nio.ByteBuffer.allocate(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r48;
-        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = r23 + -3;
         r6 = r6 - r10;
-        r67 = java.nio.ByteBuffer.allocate(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r67 = java.nio.ByteBuffer.allocate(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = 0;
         r10 = r23 + -3;
         r0 = r75;
         r1 = r29;
-        r6 = r0.put(r1, r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.put(r1, r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 0;
-        r6.position(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6.position(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = r23 + -3;
         r0 = r48;
-        r10 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r11 = r23 + -3;
         r10 = r10 - r11;
         r0 = r67;
         r1 = r29;
-        r6 = r0.put(r1, r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.put(r1, r6, r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 0;
-        r6.position(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x0677:
+        r6.position(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x0687:
         r6 = "video/avc";
         r0 = r72;
         r1 = r70;
-        r59 = android.media.MediaFormat.createVideoFormat(r6, r0, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r75 == 0) goto L_0x069a;
-    L_0x0684:
-        if (r67 == 0) goto L_0x069a;
-    L_0x0686:
+        r59 = android.media.MediaFormat.createVideoFormat(r6, r0, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r75 == 0) goto L_0x06aa;
+    L_0x0694:
+        if (r67 == 0) goto L_0x06aa;
+    L_0x0696:
         r6 = "csd-0";
         r0 = r59;
         r1 = r75;
-        r0.setByteBuffer(r6, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.setByteBuffer(r6, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = "csd-1";
         r0 = r59;
         r1 = r67;
-        r0.setByteBuffer(r6, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x069a:
+        r0.setByteBuffer(r6, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x06aa:
         r6 = 0;
         r0 = r57;
         r1 = r59;
-        r85 = r0.addTrack(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x05db;
-    L_0x06a5:
+        r85 = r0.addTrack(r1, r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x05eb;
+    L_0x06b5:
         r23 = r23 + -1;
-        goto L_0x0624;
-    L_0x06a9:
+        goto L_0x0634;
+    L_0x06b9:
         r62 = 0;
-        goto L_0x05e5;
-    L_0x06ad:
+        goto L_0x05f5;
+    L_0x06bd:
         r6 = -3;
         r0 = r33;
-        if (r0 == r6) goto L_0x040b;
-    L_0x06b2:
+        if (r0 == r6) goto L_0x0417;
+    L_0x06c2:
         r6 = -2;
         r0 = r33;
-        if (r0 != r6) goto L_0x06d6;
-    L_0x06b7:
-        r59 = r4.getOutputFormat();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        if (r0 != r6) goto L_0x06ea;
+    L_0x06c7:
+        r59 = r4.getOutputFormat();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x0417;
+    L_0x06cf:
+        r6 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = "newFormat = ";
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r59;
-        r6 = r6.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = r6.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        org.telegram.messenger.FileLog.e(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x040b;
-    L_0x06d6:
-        if (r33 >= 0) goto L_0x06f4;
-    L_0x06d8:
-        r6 = new java.lang.RuntimeException;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = r6.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        org.telegram.messenger.FileLog.d(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x0417;
+    L_0x06ea:
+        if (r33 >= 0) goto L_0x0708;
+    L_0x06ec:
+        r6 = new java.lang.RuntimeException;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r11 = "unexpected result from decoder.dequeueOutputBuffer: ";
-        r10 = r10.append(r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r10.append(r11);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r33;
-        r10 = r10.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r10 = r10.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6.<init>(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        throw r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x06f4:
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r10.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r10 = r10.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6.<init>(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        throw r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x0708:
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 18;
-        if (r6 < r10) goto L_0x07a8;
-    L_0x06fa:
+        if (r6 < r10) goto L_0x07c4;
+    L_0x070e:
         r0 = r48;
-        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 == 0) goto L_0x07a4;
-    L_0x0700:
+        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x07c0;
+    L_0x0714:
         r34 = 1;
-    L_0x0702:
+    L_0x0716:
         r10 = 0;
         r6 = (r18 > r10 ? 1 : (r18 == r10 ? 0 : -1));
-        if (r6 <= 0) goto L_0x0720;
-    L_0x0708:
+        if (r6 <= 0) goto L_0x0734;
+    L_0x071c:
         r0 = r48;
-        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = (r10 > r18 ? 1 : (r10 == r18 ? 0 : -1));
-        if (r6 < 0) goto L_0x0720;
-    L_0x0710:
+        if (r6 < 0) goto L_0x0734;
+    L_0x0724:
         r50 = 1;
         r30 = 1;
         r34 = 0;
         r0 = r48;
-        r6 = r0.flags;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.flags;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = r6 | 4;
         r0 = r48;
-        r0.flags = r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x0720:
+        r0.flags = r6;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x0734:
         r10 = 0;
         r6 = (r76 > r10 ? 1 : (r76 == r10 ? 0 : -1));
-        if (r6 <= 0) goto L_0x075e;
-    L_0x0726:
+        if (r6 <= 0) goto L_0x0776;
+    L_0x073a:
         r10 = -1;
         r6 = (r88 > r10 ? 1 : (r88 == r10 ? 0 : -1));
-        if (r6 != 0) goto L_0x075e;
-    L_0x072c:
+        if (r6 != 0) goto L_0x0776;
+    L_0x0740:
         r0 = r48;
-        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = (r10 > r76 ? 1 : (r10 == r76 ? 0 : -1));
-        if (r6 >= 0) goto L_0x07bf;
-    L_0x0734:
+        if (r6 >= 0) goto L_0x07db;
+    L_0x0748:
         r34 = 0;
-        r6 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x0776;
+    L_0x074e:
+        r6 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6.<init>();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = "drop frame startTime = ";
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r76;
-        r6 = r6.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r0);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = " present time = ";
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r48;
-        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = r6.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        org.telegram.messenger.FileLog.e(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x075e:
+        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = r6.append(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r6 = r6.toString();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        org.telegram.messenger.FileLog.d(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x0776:
         r0 = r33;
         r1 = r34;
-        r4.releaseOutputBuffer(r0, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r34 == 0) goto L_0x0789;
-    L_0x0767:
+        r4.releaseOutputBuffer(r0, r1);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r34 == 0) goto L_0x07a1;
+    L_0x077f:
         r44 = 0;
-        r64.awaitNewImage();	 Catch:{ Exception -> 0x07c6, all -> 0x04d0 }
-    L_0x076c:
-        if (r44 != 0) goto L_0x0789;
-    L_0x076e:
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r64.awaitNewImage();	 Catch:{ Exception -> 0x07e2, all -> 0x04dc }
+    L_0x0784:
+        if (r44 != 0) goto L_0x07a1;
+    L_0x0786:
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 18;
-        if (r6 < r10) goto L_0x07cd;
-    L_0x0774:
+        if (r6 < r10) goto L_0x07e9;
+    L_0x078c:
         r6 = 0;
         r0 = r64;
-        r0.drawImage(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.drawImage(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r0 = r48;
-        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r12 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r10 = r10 * r12;
         r0 = r53;
-        r0.setPresentationTime(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r53.swapBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-    L_0x0789:
+        r0.setPresentationTime(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r53.swapBuffers();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x07a1:
         r0 = r48;
-        r6 = r0.flags;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r6 = r0.flags;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r6 = r6 & 4;
-        if (r6 == 0) goto L_0x040b;
-    L_0x0791:
+        if (r6 == 0) goto L_0x0417;
+    L_0x07a9:
         r32 = 0;
+        r6 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x07b5;
+    L_0x07af:
         r6 = "decoder stream end";
-        org.telegram.messenger.FileLog.e(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        org.telegram.messenger.FileLog.d(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+    L_0x07b5:
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = 18;
-        if (r6 < r10) goto L_0x080a;
-    L_0x079f:
-        r37.signalEndOfInputStream();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x040b;
-    L_0x07a4:
+        if (r6 < r10) goto L_0x082b;
+    L_0x07bb:
+        r37.signalEndOfInputStream();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x0417;
+    L_0x07c0:
         r34 = 0;
-        goto L_0x0702;
-    L_0x07a8:
+        goto L_0x0716;
+    L_0x07c4:
         r0 = r48;
-        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r6 != 0) goto L_0x07b8;
-    L_0x07ae:
+        r6 = r0.size;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 != 0) goto L_0x07d4;
+    L_0x07ca:
         r0 = r48;
-        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r10 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r12 = 0;
         r6 = (r10 > r12 ? 1 : (r10 == r12 ? 0 : -1));
-        if (r6 == 0) goto L_0x07bc;
-    L_0x07b8:
+        if (r6 == 0) goto L_0x07d8;
+    L_0x07d4:
         r34 = 1;
-    L_0x07ba:
-        goto L_0x0702;
-    L_0x07bc:
+    L_0x07d6:
+        goto L_0x0716;
+    L_0x07d8:
         r34 = 0;
-        goto L_0x07ba;
-    L_0x07bf:
+        goto L_0x07d6;
+    L_0x07db:
         r0 = r48;
-        r0 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r88 = r0;
-        goto L_0x075e;
-    L_0x07c6:
+        goto L_0x0776;
+    L_0x07e2:
         r35 = move-exception;
         r44 = 1;
-        org.telegram.messenger.FileLog.e(r35);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x076c;
-    L_0x07cd:
+        org.telegram.messenger.FileLog.e(r35);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x0784;
+    L_0x07e9:
         r10 = 2500; // 0x9c4 float:3.503E-42 double:1.235E-320;
         r0 = r37;
-        r5 = r0.dequeueInputBuffer(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r5 < 0) goto L_0x0803;
-    L_0x07d7:
+        r5 = r0.dequeueInputBuffer(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r5 < 0) goto L_0x081f;
+    L_0x07f3:
         r6 = 1;
         r0 = r64;
-        r0.drawImage(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r8 = r64.getFrame();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r9 = r38[r5];	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        r9.clear();	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r0.drawImage(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r8 = r64.getFrame();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r9 = r38[r5];	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        r9.clear();	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r10 = r28;
         r11 = r72;
         r12 = r70;
         r13 = r66;
         r14 = r78;
-        org.telegram.messenger.Utilities.convertVideoFrame(r8, r9, r10, r11, r12, r13, r14);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        org.telegram.messenger.Utilities.convertVideoFrame(r8, r9, r10, r11, r12, r13, r14);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r12 = 0;
         r0 = r48;
-        r14 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r14 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r16 = 0;
         r10 = r37;
         r11 = r5;
         r13 = r25;
-        r10.queueInputBuffer(r11, r12, r13, r14, r16);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x0789;
-    L_0x0803:
+        r10.queueInputBuffer(r11, r12, r13, r14, r16);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x07a1;
+    L_0x081f:
+        r6 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r6 == 0) goto L_0x07a1;
+    L_0x0823:
         r6 = "input buffer not available";
-        org.telegram.messenger.FileLog.e(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x0789;
-    L_0x080a:
+        org.telegram.messenger.FileLog.d(r6);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x07a1;
+    L_0x082b:
         r10 = 2500; // 0x9c4 float:3.503E-42 double:1.235E-320;
         r0 = r37;
-        r5 = r0.dequeueInputBuffer(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        if (r5 < 0) goto L_0x040b;
-    L_0x0814:
+        r5 = r0.dequeueInputBuffer(r10);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        if (r5 < 0) goto L_0x0417;
+    L_0x0835:
         r12 = 0;
         r13 = 1;
         r0 = r48;
-        r14 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
+        r14 = r0.presentationTimeUs;	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
         r16 = 4;
         r10 = r37;
         r11 = r5;
-        r10.queueInputBuffer(r11, r12, r13, r14, r16);	 Catch:{ Exception -> 0x01b0, all -> 0x04d0 }
-        goto L_0x040b;
-    L_0x0824:
+        r10.queueInputBuffer(r11, r12, r13, r14, r16);	 Catch:{ Exception -> 0x01b0, all -> 0x04dc }
+        goto L_0x0417;
+    L_0x0845:
         r10 = -1;
         r6 = (r88 > r10 ? 1 : (r88 == r10 ? 0 : -1));
-        if (r6 == 0) goto L_0x08c9;
-    L_0x082a:
+        if (r6 == 0) goto L_0x08f2;
+    L_0x084b:
         r16 = r88;
         goto L_0x01b8;
-    L_0x082e:
+    L_0x084f:
         r21 = 0;
         r11 = r90;
         r12 = r91;
@@ -5233,31 +5297,34 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r14 = r57;
         r15 = r48;
         r16 = r76;
-        r88 = r11.readAndWriteTrack(r12, r13, r14, r15, r16, r18, r20, r21);	 Catch:{ Exception -> 0x08b6, all -> 0x04d0 }
+        r88 = r11.readAndWriteTrack(r12, r13, r14, r15, r16, r18, r20, r21);	 Catch:{ Exception -> 0x08db, all -> 0x04dc }
         r10 = -1;
         r6 = (r88 > r10 ? 1 : (r88 == r10 ? 0 : -1));
-        if (r6 == 0) goto L_0x08c5;
-    L_0x0846:
+        if (r6 == 0) goto L_0x08ee;
+    L_0x0867:
         r16 = r88;
         goto L_0x01dc;
-    L_0x084a:
+    L_0x086b:
         r35 = move-exception;
         org.telegram.messenger.FileLog.e(r35);
         goto L_0x01fc;
-    L_0x0850:
+    L_0x0871:
         r35 = move-exception;
         r16 = r86;
-    L_0x0853:
+    L_0x0874:
         r43 = 1;
-        org.telegram.messenger.FileLog.e(r35);	 Catch:{ all -> 0x08b3 }
-        if (r45 == 0) goto L_0x085d;
-    L_0x085a:
+        org.telegram.messenger.FileLog.e(r35);	 Catch:{ all -> 0x08d8 }
+        if (r45 == 0) goto L_0x087e;
+    L_0x087b:
         r45.release();
-    L_0x085d:
-        if (r57 == 0) goto L_0x0862;
-    L_0x085f:
-        r57.finishMovie();	 Catch:{ Exception -> 0x0881 }
-    L_0x0862:
+    L_0x087e:
+        if (r57 == 0) goto L_0x0883;
+    L_0x0880:
+        r57.finishMovie();	 Catch:{ Exception -> 0x08a6 }
+    L_0x0883:
+        r6 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
+        if (r6 == 0) goto L_0x021f;
+    L_0x0887:
         r6 = new java.lang.StringBuilder;
         r6.<init>();
         r10 = "time = ";
@@ -5266,17 +5333,17 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r10 = r10 - r80;
         r6 = r6.append(r10);
         r6 = r6.toString();
-        org.telegram.messenger.FileLog.e(r6);
-        goto L_0x021b;
-    L_0x0881:
+        org.telegram.messenger.FileLog.d(r6);
+        goto L_0x021f;
+    L_0x08a6:
         r35 = move-exception;
         org.telegram.messenger.FileLog.e(r35);
-        goto L_0x0862;
-    L_0x0886:
+        goto L_0x0883;
+    L_0x08ab:
         r35 = move-exception;
         org.telegram.messenger.FileLog.e(r35);
-        goto L_0x04df;
-    L_0x088c:
+        goto L_0x04eb;
+    L_0x08b1:
         r6 = r68.edit();
         r10 = "isPreviousOk";
         r11 = 1;
@@ -5290,34 +5357,37 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         r0.didWriteData(r1, r2, r6, r10);
         r6 = 0;
         goto L_0x00ce;
-    L_0x08a9:
+    L_0x08ce:
         r6 = move-exception;
         r16 = r86;
-        goto L_0x04d5;
-    L_0x08ae:
+        goto L_0x04e1;
+    L_0x08d3:
         r6 = move-exception;
         r45 = r46;
-        goto L_0x04d5;
-    L_0x08b3:
+        goto L_0x04e1;
+    L_0x08d8:
         r6 = move-exception;
-        goto L_0x04d5;
-    L_0x08b6:
+        goto L_0x04e1;
+    L_0x08db:
         r35 = move-exception;
         r45 = r46;
         r16 = r86;
-        goto L_0x0853;
-    L_0x08bc:
+        goto L_0x0874;
+    L_0x08e1:
         r35 = move-exception;
         r45 = r46;
-        goto L_0x0853;
-    L_0x08c0:
+        goto L_0x0874;
+    L_0x08e5:
         r35 = move-exception;
         r53 = r54;
         goto L_0x01b1;
-    L_0x08c5:
+    L_0x08ea:
+        r45 = r46;
+        goto L_0x021f;
+    L_0x08ee:
         r16 = r86;
         goto L_0x01dc;
-    L_0x08c9:
+    L_0x08f2:
         r16 = r86;
         goto L_0x01b8;
         */
