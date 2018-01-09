@@ -1811,11 +1811,17 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         }
     }
 
-    public boolean seekToProgress(MessageObject messageObject, float progress) {
-        if ((this.audioTrackPlayer == null && this.audioPlayer == null && this.videoPlayer == null) || messageObject == null || this.playingMessageObject == null) {
-            return false;
+    private boolean isSamePlayingMessage(MessageObject messageObject) {
+        if (this.playingMessageObject != null && this.playingMessageObject.getDialogId() == messageObject.getDialogId() && this.playingMessageObject.getId() == messageObject.getId()) {
+            if ((this.playingMessageObject.eventId == 0) == (messageObject.eventId == 0)) {
+                return true;
+            }
         }
-        if (this.playingMessageObject != null && this.playingMessageObject.getId() != messageObject.getId()) {
+        return false;
+    }
+
+    public boolean seekToProgress(MessageObject messageObject, float progress) {
+        if ((this.audioTrackPlayer == null && this.audioPlayer == null && this.videoPlayer == null) || messageObject == null || this.playingMessageObject == null || isSamePlayingMessage(messageObject)) {
             return false;
         }
         try {
@@ -2165,30 +2171,32 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
 
     public void setTextureView(TextureView textureView, AspectRatioFrameLayout aspectRatioFrameLayout, FrameLayout container, boolean set) {
         boolean z = true;
-        if (!set && this.currentTextureView == textureView) {
-            this.pipSwitchingState = 1;
-            this.currentTextureView = null;
-            this.currentAspectRatioFrameLayout = null;
-            this.currentTextureViewContainer = null;
-        } else if (this.videoPlayer != null && textureView != this.currentTextureView) {
-            if (aspectRatioFrameLayout == null || !aspectRatioFrameLayout.isDrawingReady()) {
-                z = false;
-            }
-            this.isDrawingWasReady = z;
-            this.currentTextureView = textureView;
-            if (this.pipRoundVideoView != null) {
-                this.videoPlayer.setTextureView(this.pipRoundVideoView.getTextureView());
-            } else {
-                this.videoPlayer.setTextureView(this.currentTextureView);
-            }
-            this.currentAspectRatioFrameLayout = aspectRatioFrameLayout;
-            this.currentTextureViewContainer = container;
-            if (this.currentAspectRatioFrameLayoutReady && this.currentAspectRatioFrameLayout != null) {
-                if (this.currentAspectRatioFrameLayout != null) {
-                    this.currentAspectRatioFrameLayout.setAspectRatio(this.currentAspectRatioFrameLayoutRatio, this.currentAspectRatioFrameLayoutRotation);
+        if (textureView != null) {
+            if (!set && this.currentTextureView == textureView) {
+                this.pipSwitchingState = 1;
+                this.currentTextureView = null;
+                this.currentAspectRatioFrameLayout = null;
+                this.currentTextureViewContainer = null;
+            } else if (this.videoPlayer != null && textureView != this.currentTextureView) {
+                if (aspectRatioFrameLayout == null || !aspectRatioFrameLayout.isDrawingReady()) {
+                    z = false;
                 }
-                if (this.currentTextureViewContainer.getVisibility() != 0) {
-                    this.currentTextureViewContainer.setVisibility(0);
+                this.isDrawingWasReady = z;
+                this.currentTextureView = textureView;
+                if (this.pipRoundVideoView != null) {
+                    this.videoPlayer.setTextureView(this.pipRoundVideoView.getTextureView());
+                } else {
+                    this.videoPlayer.setTextureView(this.currentTextureView);
+                }
+                this.currentAspectRatioFrameLayout = aspectRatioFrameLayout;
+                this.currentTextureViewContainer = container;
+                if (this.currentAspectRatioFrameLayoutReady && this.currentAspectRatioFrameLayout != null) {
+                    if (this.currentAspectRatioFrameLayout != null) {
+                        this.currentAspectRatioFrameLayout.setAspectRatio(this.currentAspectRatioFrameLayoutRatio, this.currentAspectRatioFrameLayoutRotation);
+                    }
+                    if (this.currentTextureViewContainer.getVisibility() != 0) {
+                        this.currentTextureViewContainer.setVisibility(0);
+                    }
                 }
             }
         }
@@ -2230,274 +2238,231 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         if (messageObject == null) {
             return false;
         }
-        if ((this.audioTrackPlayer == null && this.audioPlayer == null && this.videoPlayer == null) || this.playingMessageObject == null || messageObject.getId() != this.playingMessageObject.getId()) {
-            File cacheFile;
-            if (!messageObject.isOut() && messageObject.isContentUnread()) {
-                MessagesController.getInstance(messageObject.currentAccount).markMessageContentAsRead(messageObject);
+        if (!(this.audioTrackPlayer == null && this.audioPlayer == null && this.videoPlayer == null) && isSamePlayingMessage(messageObject)) {
+            if (this.isPaused) {
+                resumeAudio(messageObject);
             }
-            boolean notify = !this.playMusicAgain;
-            if (this.playingMessageObject != null) {
-                notify = false;
-                if (!this.playMusicAgain) {
-                    this.playingMessageObject.audioProgress = 0.0f;
-                    this.playingMessageObject.audioProgressSec = 0;
-                }
+            if (!SharedConfig.raiseToSpeak) {
+                startRaiseToEarSensors(this.raiseChat);
             }
-            cleanupPlayer(notify, false);
-            this.playMusicAgain = false;
-            File file = null;
-            if (messageObject.messageOwner.attachPath != null && messageObject.messageOwner.attachPath.length() > 0) {
-                file = new File(messageObject.messageOwner.attachPath);
-                if (!file.exists()) {
-                    file = null;
-                }
+            return true;
+        }
+        File cacheFile;
+        if (!messageObject.isOut() && messageObject.isContentUnread()) {
+            MessagesController.getInstance(messageObject.currentAccount).markMessageContentAsRead(messageObject);
+        }
+        boolean notify = !this.playMusicAgain;
+        if (this.playingMessageObject != null) {
+            notify = false;
+            if (!this.playMusicAgain) {
+                this.playingMessageObject.audioProgress = 0.0f;
+                this.playingMessageObject.audioProgressSec = 0;
             }
-            if (file != null) {
-                cacheFile = file;
+        }
+        cleanupPlayer(notify, false);
+        this.playMusicAgain = false;
+        File file = null;
+        if (messageObject.messageOwner.attachPath != null && messageObject.messageOwner.attachPath.length() > 0) {
+            file = new File(messageObject.messageOwner.attachPath);
+            if (!file.exists()) {
+                file = null;
+            }
+        }
+        if (file != null) {
+            cacheFile = file;
+        } else {
+            cacheFile = FileLoader.getPathToMessage(messageObject.messageOwner);
+        }
+        if (cacheFile == null || cacheFile == file || cacheFile.exists()) {
+            this.downloadingCurrentMessage = false;
+            if (messageObject.isMusic()) {
+                checkIsNextMusicFileDownloaded(messageObject.currentAccount);
             } else {
-                cacheFile = FileLoader.getPathToMessage(messageObject.messageOwner);
+                checkIsNextVoiceFileDownloaded(messageObject.currentAccount);
             }
-            if (cacheFile == null || cacheFile == file || cacheFile.exists()) {
-                this.downloadingCurrentMessage = false;
-                if (messageObject.isMusic()) {
-                    checkIsNextMusicFileDownloaded(messageObject.currentAccount);
-                } else {
-                    checkIsNextVoiceFileDownloaded(messageObject.currentAccount);
-                }
-                if (this.currentAspectRatioFrameLayout != null) {
-                    this.isDrawingWasReady = false;
-                    this.currentAspectRatioFrameLayout.setDrawingReady(false);
-                }
-                if (messageObject.isRoundVideo()) {
-                    this.playlist.clear();
-                    this.shuffledPlaylist.clear();
-                    this.videoPlayer = new VideoPlayer();
-                    this.videoPlayer.setDelegate(new VideoPlayerDelegate() {
-                        public void onStateChanged(boolean playWhenReady, int playbackState) {
-                            if (MediaController.this.videoPlayer != null) {
-                                if (playbackState == 4 || playbackState == 1) {
-                                    try {
-                                        MediaController.this.baseActivity.getWindow().clearFlags(128);
-                                    } catch (Throwable e) {
-                                        FileLog.e(e);
-                                    }
-                                } else {
-                                    try {
-                                        MediaController.this.baseActivity.getWindow().addFlags(128);
-                                    } catch (Throwable e2) {
-                                        FileLog.e(e2);
-                                    }
+            if (this.currentAspectRatioFrameLayout != null) {
+                this.isDrawingWasReady = false;
+                this.currentAspectRatioFrameLayout.setDrawingReady(false);
+            }
+            if (messageObject.isRoundVideo()) {
+                this.playlist.clear();
+                this.shuffledPlaylist.clear();
+                this.videoPlayer = new VideoPlayer();
+                this.videoPlayer.setDelegate(new VideoPlayerDelegate() {
+                    public void onStateChanged(boolean playWhenReady, int playbackState) {
+                        if (MediaController.this.videoPlayer != null) {
+                            if (playbackState == 4 || playbackState == 1) {
+                                try {
+                                    MediaController.this.baseActivity.getWindow().clearFlags(128);
+                                } catch (Throwable e) {
+                                    FileLog.e(e);
                                 }
-                                if (playbackState == 3) {
-                                    MediaController.this.currentAspectRatioFrameLayoutReady = true;
-                                    if (MediaController.this.currentTextureViewContainer != null && MediaController.this.currentTextureViewContainer.getVisibility() != 0) {
-                                        MediaController.this.currentTextureViewContainer.setVisibility(0);
-                                    }
-                                } else if (MediaController.this.videoPlayer.isPlaying() && playbackState == 4) {
-                                    MediaController.this.cleanupPlayer(true, true, true);
+                            } else {
+                                try {
+                                    MediaController.this.baseActivity.getWindow().addFlags(128);
+                                } catch (Throwable e2) {
+                                    FileLog.e(e2);
                                 }
                             }
-                        }
-
-                        public void onError(Exception e) {
-                            FileLog.e((Throwable) e);
-                        }
-
-                        public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-                            MediaController.this.currentAspectRatioFrameLayoutRotation = unappliedRotationDegrees;
-                            if (unappliedRotationDegrees == 90 || unappliedRotationDegrees == 270) {
-                                int temp = width;
-                                width = height;
-                                height = temp;
-                            }
-                            MediaController.this.currentAspectRatioFrameLayoutRatio = height == 0 ? MediaController.VOLUME_NORMAL : (((float) width) * pixelWidthHeightRatio) / ((float) height);
-                            if (MediaController.this.currentAspectRatioFrameLayout != null) {
-                                MediaController.this.currentAspectRatioFrameLayout.setAspectRatio(MediaController.this.currentAspectRatioFrameLayoutRatio, MediaController.this.currentAspectRatioFrameLayoutRotation);
-                            }
-                        }
-
-                        public void onRenderedFirstFrame() {
-                            if (MediaController.this.currentAspectRatioFrameLayout != null && !MediaController.this.currentAspectRatioFrameLayout.isDrawingReady()) {
-                                MediaController.this.isDrawingWasReady = true;
-                                MediaController.this.currentAspectRatioFrameLayout.setDrawingReady(true);
+                            if (playbackState == 3) {
+                                MediaController.this.currentAspectRatioFrameLayoutReady = true;
                                 if (MediaController.this.currentTextureViewContainer != null && MediaController.this.currentTextureViewContainer.getVisibility() != 0) {
                                     MediaController.this.currentTextureViewContainer.setVisibility(0);
                                 }
+                            } else if (MediaController.this.videoPlayer.isPlaying() && playbackState == 4) {
+                                MediaController.this.cleanupPlayer(true, true, true);
                             }
                         }
-
-                        public boolean onSurfaceDestroyed(SurfaceTexture surfaceTexture) {
-                            if (MediaController.this.videoPlayer == null) {
-                                return false;
-                            }
-                            if (MediaController.this.pipSwitchingState == 2) {
-                                if (MediaController.this.currentAspectRatioFrameLayout != null) {
-                                    if (MediaController.this.isDrawingWasReady) {
-                                        MediaController.this.currentAspectRatioFrameLayout.setDrawingReady(true);
-                                    }
-                                    if (MediaController.this.currentAspectRatioFrameLayout.getParent() == null) {
-                                        MediaController.this.currentTextureViewContainer.addView(MediaController.this.currentAspectRatioFrameLayout);
-                                    }
-                                    if (MediaController.this.currentTextureView.getSurfaceTexture() != surfaceTexture) {
-                                        MediaController.this.currentTextureView.setSurfaceTexture(surfaceTexture);
-                                    }
-                                    MediaController.this.videoPlayer.setTextureView(MediaController.this.currentTextureView);
-                                }
-                                MediaController.this.pipSwitchingState = 0;
-                                return true;
-                            } else if (MediaController.this.pipSwitchingState != 1) {
-                                return false;
-                            } else {
-                                if (MediaController.this.baseActivity != null) {
-                                    if (MediaController.this.pipRoundVideoView == null) {
-                                        try {
-                                            MediaController.this.pipRoundVideoView = new PipRoundVideoView();
-                                            MediaController.this.pipRoundVideoView.show(MediaController.this.baseActivity, new Runnable() {
-                                                public void run() {
-                                                    MediaController.this.cleanupPlayer(true, true);
-                                                }
-                                            });
-                                        } catch (Exception e) {
-                                            MediaController.this.pipRoundVideoView = null;
-                                        }
-                                    }
-                                    if (MediaController.this.pipRoundVideoView != null) {
-                                        if (MediaController.this.pipRoundVideoView.getTextureView().getSurfaceTexture() != surfaceTexture) {
-                                            MediaController.this.pipRoundVideoView.getTextureView().setSurfaceTexture(surfaceTexture);
-                                        }
-                                        MediaController.this.videoPlayer.setTextureView(MediaController.this.pipRoundVideoView.getTextureView());
-                                    }
-                                }
-                                MediaController.this.pipSwitchingState = 0;
-                                return true;
-                            }
-                        }
-
-                        public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-                        }
-                    });
-                    this.currentAspectRatioFrameLayoutReady = false;
-                    if (this.pipRoundVideoView != null || !MessagesController.getInstance(messageObject.currentAccount).isDialogCreated(messageObject.getDialogId())) {
-                        if (this.pipRoundVideoView == null) {
-                            try {
-                                this.pipRoundVideoView = new PipRoundVideoView();
-                                this.pipRoundVideoView.show(this.baseActivity, new Runnable() {
-                                    public void run() {
-                                        MediaController.this.cleanupPlayer(true, true);
-                                    }
-                                });
-                            } catch (Exception e) {
-                                this.pipRoundVideoView = null;
-                            }
-                        }
-                        if (this.pipRoundVideoView != null) {
-                            this.videoPlayer.setTextureView(this.pipRoundVideoView.getTextureView());
-                        }
-                    } else if (this.currentTextureView != null) {
-                        this.videoPlayer.setTextureView(this.currentTextureView);
                     }
-                    this.videoPlayer.preparePlayer(Uri.fromFile(cacheFile), "other");
-                    this.videoPlayer.setStreamType(this.useFrontSpeaker ? 0 : 3);
-                    this.videoPlayer.play();
-                } else if (isOpusFile(cacheFile.getAbsolutePath()) == 1) {
-                    if (this.pipRoundVideoView != null) {
-                        this.pipRoundVideoView.close(true);
-                        this.pipRoundVideoView = null;
-                    }
-                    this.playlist.clear();
-                    this.shuffledPlaylist.clear();
-                    synchronized (this.playerObjectSync) {
-                        try {
-                            this.ignoreFirstProgress = 3;
-                            final CountDownLatch countDownLatch = new CountDownLatch(1);
-                            Boolean[] result = new Boolean[1];
-                            final Boolean[] boolArr = result;
-                            this.fileDecodingQueue.postRunnable(new Runnable() {
-                                public void run() {
-                                    boolean z;
-                                    Boolean[] boolArr = boolArr;
-                                    if (MediaController.this.openOpusFile(cacheFile.getAbsolutePath()) != 0) {
-                                        z = true;
-                                    } else {
-                                        z = false;
-                                    }
-                                    boolArr[0] = Boolean.valueOf(z);
-                                    countDownLatch.countDown();
-                                }
-                            });
-                            countDownLatch.await();
-                            if (result[0].booleanValue()) {
-                                this.currentTotalPcmDuration = getTotalPcmDuration();
-                                this.audioTrackPlayer = new AudioTrack(this.useFrontSpeaker ? 0 : 3, 48000, 4, 2, this.playerBufferSize, 1);
-                                this.audioTrackPlayer.setStereoVolume(VOLUME_NORMAL, VOLUME_NORMAL);
-                                this.audioTrackPlayer.setPlaybackPositionUpdateListener(new OnPlaybackPositionUpdateListener() {
-                                    public void onMarkerReached(AudioTrack audioTrack) {
-                                        MediaController.this.cleanupPlayer(true, true, true);
-                                    }
 
-                                    public void onPeriodicNotification(AudioTrack audioTrack) {
-                                    }
-                                });
-                                this.audioTrackPlayer.play();
-                            } else {
-                                return false;
+                    public void onError(Exception e) {
+                        FileLog.e((Throwable) e);
+                    }
+
+                    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+                        MediaController.this.currentAspectRatioFrameLayoutRotation = unappliedRotationDegrees;
+                        if (unappliedRotationDegrees == 90 || unappliedRotationDegrees == 270) {
+                            int temp = width;
+                            width = height;
+                            height = temp;
+                        }
+                        MediaController.this.currentAspectRatioFrameLayoutRatio = height == 0 ? MediaController.VOLUME_NORMAL : (((float) width) * pixelWidthHeightRatio) / ((float) height);
+                        if (MediaController.this.currentAspectRatioFrameLayout != null) {
+                            MediaController.this.currentAspectRatioFrameLayout.setAspectRatio(MediaController.this.currentAspectRatioFrameLayoutRatio, MediaController.this.currentAspectRatioFrameLayoutRotation);
+                        }
+                    }
+
+                    public void onRenderedFirstFrame() {
+                        if (MediaController.this.currentAspectRatioFrameLayout != null && !MediaController.this.currentAspectRatioFrameLayout.isDrawingReady()) {
+                            MediaController.this.isDrawingWasReady = true;
+                            MediaController.this.currentAspectRatioFrameLayout.setDrawingReady(true);
+                            if (MediaController.this.currentTextureViewContainer != null && MediaController.this.currentTextureViewContainer.getVisibility() != 0) {
+                                MediaController.this.currentTextureViewContainer.setVisibility(0);
                             }
-                        } catch (Throwable e2) {
-                            FileLog.e(e2);
-                            if (this.audioTrackPlayer != null) {
-                                this.audioTrackPlayer.release();
-                                this.audioTrackPlayer = null;
-                                this.isPaused = false;
-                                this.playingMessageObject = null;
-                                this.downloadingCurrentMessage = false;
-                            }
+                        }
+                    }
+
+                    public boolean onSurfaceDestroyed(SurfaceTexture surfaceTexture) {
+                        if (MediaController.this.videoPlayer == null) {
                             return false;
                         }
-                    }
-                } else {
-                    if (this.pipRoundVideoView != null) {
-                        this.pipRoundVideoView.close(true);
-                        this.pipRoundVideoView = null;
-                    }
-                    try {
-                        this.audioPlayer = new MediaPlayer();
-                        this.audioPlayer.setAudioStreamType(this.useFrontSpeaker ? 0 : 3);
-                        this.audioPlayer.setDataSource(cacheFile.getAbsolutePath());
-                        final MessageObject messageObject2 = messageObject;
-                        this.audioPlayer.setOnCompletionListener(new OnCompletionListener() {
-                            public void onCompletion(MediaPlayer mediaPlayer) {
-                                if (MediaController.this.playlist.isEmpty() || MediaController.this.playlist.size() <= 1) {
-                                    MediaController mediaController = MediaController.this;
-                                    boolean z = messageObject2 != null && messageObject2.isVoice();
-                                    mediaController.cleanupPlayer(true, true, z);
-                                    return;
+                        if (MediaController.this.pipSwitchingState == 2) {
+                            if (MediaController.this.currentAspectRatioFrameLayout != null) {
+                                if (MediaController.this.isDrawingWasReady) {
+                                    MediaController.this.currentAspectRatioFrameLayout.setDrawingReady(true);
                                 }
-                                MediaController.this.playNextMessageWithoutOrder(true);
+                                if (MediaController.this.currentAspectRatioFrameLayout.getParent() == null) {
+                                    MediaController.this.currentTextureViewContainer.addView(MediaController.this.currentAspectRatioFrameLayout);
+                                }
+                                if (MediaController.this.currentTextureView.getSurfaceTexture() != surfaceTexture) {
+                                    MediaController.this.currentTextureView.setSurfaceTexture(surfaceTexture);
+                                }
+                                MediaController.this.videoPlayer.setTextureView(MediaController.this.currentTextureView);
+                            }
+                            MediaController.this.pipSwitchingState = 0;
+                            return true;
+                        } else if (MediaController.this.pipSwitchingState != 1) {
+                            return false;
+                        } else {
+                            if (MediaController.this.baseActivity != null) {
+                                if (MediaController.this.pipRoundVideoView == null) {
+                                    try {
+                                        MediaController.this.pipRoundVideoView = new PipRoundVideoView();
+                                        MediaController.this.pipRoundVideoView.show(MediaController.this.baseActivity, new Runnable() {
+                                            public void run() {
+                                                MediaController.this.cleanupPlayer(true, true);
+                                            }
+                                        });
+                                    } catch (Exception e) {
+                                        MediaController.this.pipRoundVideoView = null;
+                                    }
+                                }
+                                if (MediaController.this.pipRoundVideoView != null) {
+                                    if (MediaController.this.pipRoundVideoView.getTextureView().getSurfaceTexture() != surfaceTexture) {
+                                        MediaController.this.pipRoundVideoView.getTextureView().setSurfaceTexture(surfaceTexture);
+                                    }
+                                    MediaController.this.videoPlayer.setTextureView(MediaController.this.pipRoundVideoView.getTextureView());
+                                }
+                            }
+                            MediaController.this.pipSwitchingState = 0;
+                            return true;
+                        }
+                    }
+
+                    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+                    }
+                });
+                this.currentAspectRatioFrameLayoutReady = false;
+                if (this.pipRoundVideoView != null || !MessagesController.getInstance(messageObject.currentAccount).isDialogCreated(messageObject.getDialogId())) {
+                    if (this.pipRoundVideoView == null) {
+                        try {
+                            this.pipRoundVideoView = new PipRoundVideoView();
+                            this.pipRoundVideoView.show(this.baseActivity, new Runnable() {
+                                public void run() {
+                                    MediaController.this.cleanupPlayer(true, true);
+                                }
+                            });
+                        } catch (Exception e) {
+                            this.pipRoundVideoView = null;
+                        }
+                    }
+                    if (this.pipRoundVideoView != null) {
+                        this.videoPlayer.setTextureView(this.pipRoundVideoView.getTextureView());
+                    }
+                } else if (this.currentTextureView != null) {
+                    this.videoPlayer.setTextureView(this.currentTextureView);
+                }
+                this.videoPlayer.preparePlayer(Uri.fromFile(cacheFile), "other");
+                this.videoPlayer.setStreamType(this.useFrontSpeaker ? 0 : 3);
+                this.videoPlayer.play();
+            } else if (isOpusFile(cacheFile.getAbsolutePath()) == 1) {
+                if (this.pipRoundVideoView != null) {
+                    this.pipRoundVideoView.close(true);
+                    this.pipRoundVideoView = null;
+                }
+                this.playlist.clear();
+                this.shuffledPlaylist.clear();
+                synchronized (this.playerObjectSync) {
+                    try {
+                        this.ignoreFirstProgress = 3;
+                        final CountDownLatch countDownLatch = new CountDownLatch(1);
+                        Boolean[] result = new Boolean[1];
+                        final Boolean[] boolArr = result;
+                        this.fileDecodingQueue.postRunnable(new Runnable() {
+                            public void run() {
+                                boolean z;
+                                Boolean[] boolArr = boolArr;
+                                if (MediaController.this.openOpusFile(cacheFile.getAbsolutePath()) != 0) {
+                                    z = true;
+                                } else {
+                                    z = false;
+                                }
+                                boolArr[0] = Boolean.valueOf(z);
+                                countDownLatch.countDown();
                             }
                         });
-                        this.audioPlayer.prepare();
-                        this.audioPlayer.start();
-                        if (messageObject.isVoice()) {
-                            this.audioInfo = null;
-                            this.playlist.clear();
-                            this.shuffledPlaylist.clear();
+                        countDownLatch.await();
+                        if (result[0].booleanValue()) {
+                            this.currentTotalPcmDuration = getTotalPcmDuration();
+                            this.audioTrackPlayer = new AudioTrack(this.useFrontSpeaker ? 0 : 3, 48000, 4, 2, this.playerBufferSize, 1);
+                            this.audioTrackPlayer.setStereoVolume(VOLUME_NORMAL, VOLUME_NORMAL);
+                            this.audioTrackPlayer.setPlaybackPositionUpdateListener(new OnPlaybackPositionUpdateListener() {
+                                public void onMarkerReached(AudioTrack audioTrack) {
+                                    MediaController.this.cleanupPlayer(true, true, true);
+                                }
+
+                                public void onPeriodicNotification(AudioTrack audioTrack) {
+                                }
+                            });
+                            this.audioTrackPlayer.play();
                         } else {
-                            try {
-                                this.audioInfo = AudioInfo.getAudioInfo(cacheFile);
-                            } catch (Throwable e22) {
-                                FileLog.e(e22);
-                            }
+                            return false;
                         }
-                    } catch (Throwable e222) {
-                        FileLog.e(e222);
-                        NotificationCenter instance = NotificationCenter.getInstance(messageObject.currentAccount);
-                        int i = NotificationCenter.messagePlayingPlayStateChanged;
-                        Object[] objArr = new Object[1];
-                        objArr[0] = Integer.valueOf(this.playingMessageObject != null ? this.playingMessageObject.getId() : 0);
-                        instance.postNotificationName(i, objArr);
-                        if (this.audioPlayer != null) {
-                            this.audioPlayer.release();
-                            this.audioPlayer = null;
+                    } catch (Throwable e2) {
+                        FileLog.e(e2);
+                        if (this.audioTrackPlayer != null) {
+                            this.audioTrackPlayer.release();
+                            this.audioTrackPlayer = null;
                             this.isPaused = false;
                             this.playingMessageObject = null;
                             this.downloadingCurrentMessage = false;
@@ -2505,98 +2470,141 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                         return false;
                     }
                 }
-                checkAudioFocus(messageObject);
-                setPlayerVolume();
-                this.isPaused = false;
-                this.lastProgress = 0;
-                this.lastPlayPcm = 0;
-                this.playingMessageObject = messageObject;
-                if (!SharedConfig.raiseToSpeak) {
-                    startRaiseToEarSensors(this.raiseChat);
+            } else {
+                if (this.pipRoundVideoView != null) {
+                    this.pipRoundVideoView.close(true);
+                    this.pipRoundVideoView = null;
                 }
-                startProgressTimer(this.playingMessageObject);
-                NotificationCenter.getInstance(messageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingDidStarted, messageObject);
-                if (this.videoPlayer != null) {
-                    try {
-                        if (this.playingMessageObject.audioProgress != 0.0f) {
-                            this.videoPlayer.seekTo((long) ((int) (((float) this.videoPlayer.getDuration()) * this.playingMessageObject.audioProgress)));
-                        }
-                    } catch (Throwable e23) {
-                        this.playingMessageObject.audioProgress = 0.0f;
-                        this.playingMessageObject.audioProgressSec = 0;
-                        NotificationCenter.getInstance(messageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingProgressDidChanged, Integer.valueOf(this.playingMessageObject.getId()), Integer.valueOf(0));
-                        FileLog.e(e23);
-                    }
-                } else if (this.audioPlayer != null) {
-                    try {
-                        if (this.playingMessageObject.audioProgress != 0.0f) {
-                            this.audioPlayer.seekTo((int) (((float) this.audioPlayer.getDuration()) * this.playingMessageObject.audioProgress));
-                        }
-                    } catch (Throwable e232) {
-                        this.playingMessageObject.audioProgress = 0.0f;
-                        this.playingMessageObject.audioProgressSec = 0;
-                        NotificationCenter.getInstance(messageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingProgressDidChanged, Integer.valueOf(this.playingMessageObject.getId()), Integer.valueOf(0));
-                        FileLog.e(e232);
-                    }
-                } else if (this.audioTrackPlayer != null) {
-                    if (this.playingMessageObject.audioProgress == VOLUME_NORMAL) {
-                        this.playingMessageObject.audioProgress = 0.0f;
-                    }
-                    this.fileDecodingQueue.postRunnable(new Runnable() {
-                        public void run() {
-                            try {
-                                if (!(MediaController.this.playingMessageObject == null || MediaController.this.playingMessageObject.audioProgress == 0.0f)) {
-                                    MediaController.this.lastPlayPcm = (long) (((float) MediaController.this.currentTotalPcmDuration) * MediaController.this.playingMessageObject.audioProgress);
-                                    MediaController.this.seekOpusFile(MediaController.this.playingMessageObject.audioProgress);
-                                }
-                            } catch (Throwable e) {
-                                FileLog.e(e);
+                try {
+                    this.audioPlayer = new MediaPlayer();
+                    this.audioPlayer.setAudioStreamType(this.useFrontSpeaker ? 0 : 3);
+                    this.audioPlayer.setDataSource(cacheFile.getAbsolutePath());
+                    final MessageObject messageObject2 = messageObject;
+                    this.audioPlayer.setOnCompletionListener(new OnCompletionListener() {
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            if (MediaController.this.playlist.isEmpty() || MediaController.this.playlist.size() <= 1) {
+                                MediaController mediaController = MediaController.this;
+                                boolean z = messageObject2 != null && messageObject2.isVoice();
+                                mediaController.cleanupPlayer(true, true, z);
+                                return;
                             }
-                            synchronized (MediaController.this.playerSync) {
-                                MediaController.this.freePlayerBuffers.addAll(MediaController.this.usedPlayerBuffers);
-                                MediaController.this.usedPlayerBuffers.clear();
-                            }
-                            MediaController.this.decodingFinished = false;
-                            MediaController.this.checkPlayerQueue();
+                            MediaController.this.playNextMessageWithoutOrder(true);
                         }
                     });
-                }
-                if (this.playingMessageObject.isMusic()) {
-                    try {
-                        ApplicationLoader.applicationContext.startService(new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class));
-                    } catch (Throwable e2222) {
-                        FileLog.e(e2222);
+                    this.audioPlayer.prepare();
+                    this.audioPlayer.start();
+                    if (messageObject.isVoice()) {
+                        this.audioInfo = null;
+                        this.playlist.clear();
+                        this.shuffledPlaylist.clear();
+                    } else {
+                        try {
+                            this.audioInfo = AudioInfo.getAudioInfo(cacheFile);
+                        } catch (Throwable e22) {
+                            FileLog.e(e22);
+                        }
                     }
-                } else {
-                    ApplicationLoader.applicationContext.stopService(new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class));
+                } catch (Throwable e222) {
+                    FileLog.e(e222);
+                    NotificationCenter instance = NotificationCenter.getInstance(messageObject.currentAccount);
+                    int i = NotificationCenter.messagePlayingPlayStateChanged;
+                    Object[] objArr = new Object[1];
+                    objArr[0] = Integer.valueOf(this.playingMessageObject != null ? this.playingMessageObject.getId() : 0);
+                    instance.postNotificationName(i, objArr);
+                    if (this.audioPlayer != null) {
+                        this.audioPlayer.release();
+                        this.audioPlayer = null;
+                        this.isPaused = false;
+                        this.playingMessageObject = null;
+                        this.downloadingCurrentMessage = false;
+                    }
+                    return false;
                 }
-                return true;
             }
-            FileLoader.getInstance(messageObject.currentAccount).loadFile(messageObject.getDocument(), false, 0);
-            this.downloadingCurrentMessage = true;
+            checkAudioFocus(messageObject);
+            setPlayerVolume();
             this.isPaused = false;
             this.lastProgress = 0;
             this.lastPlayPcm = 0;
-            this.audioInfo = null;
             this.playingMessageObject = messageObject;
+            if (!SharedConfig.raiseToSpeak) {
+                startRaiseToEarSensors(this.raiseChat);
+            }
+            startProgressTimer(this.playingMessageObject);
+            NotificationCenter.getInstance(messageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingDidStarted, messageObject);
+            if (this.videoPlayer != null) {
+                try {
+                    if (this.playingMessageObject.audioProgress != 0.0f) {
+                        this.videoPlayer.seekTo((long) ((int) (((float) this.videoPlayer.getDuration()) * this.playingMessageObject.audioProgress)));
+                    }
+                } catch (Throwable e23) {
+                    this.playingMessageObject.audioProgress = 0.0f;
+                    this.playingMessageObject.audioProgressSec = 0;
+                    NotificationCenter.getInstance(messageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingProgressDidChanged, Integer.valueOf(this.playingMessageObject.getId()), Integer.valueOf(0));
+                    FileLog.e(e23);
+                }
+            } else if (this.audioPlayer != null) {
+                try {
+                    if (this.playingMessageObject.audioProgress != 0.0f) {
+                        this.audioPlayer.seekTo((int) (((float) this.audioPlayer.getDuration()) * this.playingMessageObject.audioProgress));
+                    }
+                } catch (Throwable e232) {
+                    this.playingMessageObject.audioProgress = 0.0f;
+                    this.playingMessageObject.audioProgressSec = 0;
+                    NotificationCenter.getInstance(messageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingProgressDidChanged, Integer.valueOf(this.playingMessageObject.getId()), Integer.valueOf(0));
+                    FileLog.e(e232);
+                }
+            } else if (this.audioTrackPlayer != null) {
+                if (this.playingMessageObject.audioProgress == VOLUME_NORMAL) {
+                    this.playingMessageObject.audioProgress = 0.0f;
+                }
+                this.fileDecodingQueue.postRunnable(new Runnable() {
+                    public void run() {
+                        try {
+                            if (!(MediaController.this.playingMessageObject == null || MediaController.this.playingMessageObject.audioProgress == 0.0f)) {
+                                MediaController.this.lastPlayPcm = (long) (((float) MediaController.this.currentTotalPcmDuration) * MediaController.this.playingMessageObject.audioProgress);
+                                MediaController.this.seekOpusFile(MediaController.this.playingMessageObject.audioProgress);
+                            }
+                        } catch (Throwable e) {
+                            FileLog.e(e);
+                        }
+                        synchronized (MediaController.this.playerSync) {
+                            MediaController.this.freePlayerBuffers.addAll(MediaController.this.usedPlayerBuffers);
+                            MediaController.this.usedPlayerBuffers.clear();
+                        }
+                        MediaController.this.decodingFinished = false;
+                        MediaController.this.checkPlayerQueue();
+                    }
+                });
+            }
             if (this.playingMessageObject.isMusic()) {
                 try {
                     ApplicationLoader.applicationContext.startService(new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class));
-                } catch (Throwable e22222) {
-                    FileLog.e(e22222);
+                } catch (Throwable e2222) {
+                    FileLog.e(e2222);
                 }
             } else {
                 ApplicationLoader.applicationContext.stopService(new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class));
             }
-            NotificationCenter.getInstance(this.playingMessageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingPlayStateChanged, Integer.valueOf(this.playingMessageObject.getId()));
             return true;
         }
-        if (this.isPaused) {
-            resumeAudio(messageObject);
+        FileLoader.getInstance(messageObject.currentAccount).loadFile(messageObject.getDocument(), false, 0);
+        this.downloadingCurrentMessage = true;
+        this.isPaused = false;
+        this.lastProgress = 0;
+        this.lastPlayPcm = 0;
+        this.audioInfo = null;
+        this.playingMessageObject = messageObject;
+        if (this.playingMessageObject.isMusic()) {
+            try {
+                ApplicationLoader.applicationContext.startService(new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class));
+            } catch (Throwable e22222) {
+                FileLog.e(e22222);
+            }
+        } else {
+            ApplicationLoader.applicationContext.stopService(new Intent(ApplicationLoader.applicationContext, MusicPlayerService.class));
         }
-        if (!SharedConfig.raiseToSpeak) {
-            startRaiseToEarSensors(this.raiseChat);
-        }
+        NotificationCenter.getInstance(this.playingMessageObject.currentAccount).postNotificationName(NotificationCenter.messagePlayingPlayStateChanged, Integer.valueOf(this.playingMessageObject.getId()));
         return true;
     }
 
@@ -2703,10 +2711,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     }
 
     public boolean pauseMessage(MessageObject messageObject) {
-        if ((this.audioTrackPlayer == null && this.audioPlayer == null && this.videoPlayer == null) || messageObject == null || this.playingMessageObject == null) {
-            return false;
-        }
-        if (this.playingMessageObject != null && this.playingMessageObject.getId() != messageObject.getId()) {
+        if ((this.audioTrackPlayer == null && this.audioPlayer == null && this.videoPlayer == null) || messageObject == null || this.playingMessageObject == null || !isSamePlayingMessage(messageObject)) {
             return false;
         }
         stopProgressTimer();
@@ -2729,10 +2734,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     }
 
     public boolean resumeAudio(MessageObject messageObject) {
-        if ((this.audioTrackPlayer == null && this.audioPlayer == null && this.videoPlayer == null) || messageObject == null || this.playingMessageObject == null) {
-            return false;
-        }
-        if (this.playingMessageObject != null && this.playingMessageObject.getId() != messageObject.getId()) {
+        if ((this.audioTrackPlayer == null && this.audioPlayer == null && this.videoPlayer == null) || messageObject == null || this.playingMessageObject == null || !isSamePlayingMessage(messageObject)) {
             return false;
         }
         try {
@@ -2768,12 +2770,12 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         if ((this.audioTrackPlayer == null && this.audioPlayer == null && this.videoPlayer == null) || messageObject == null || this.playingMessageObject == null) {
             return false;
         }
-        if (this.playingMessageObject.eventId != 0 && this.playingMessageObject.eventId == this.playingMessageObject.eventId) {
+        if (this.playingMessageObject.eventId != 0 && this.playingMessageObject.eventId == messageObject.eventId) {
             if (this.downloadingCurrentMessage) {
                 z = false;
             }
             return z;
-        } else if (this.playingMessageObject.getDialogId() != messageObject.getDialogId() || this.playingMessageObject.getId() != messageObject.getId()) {
+        } else if (!isSamePlayingMessage(messageObject)) {
             return false;
         } else {
             if (this.downloadingCurrentMessage) {
@@ -3020,10 +3022,6 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
 
     public static void saveFile(String fullPath, Context context, int type, String name, String mime) {
         Throwable e;
-        final AlertDialog finalProgress;
-        final int i;
-        final String str;
-        final String str2;
         if (fullPath != null) {
             File file = null;
             if (!(fullPath == null || fullPath.length() == 0)) {
@@ -3036,6 +3034,10 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 final File sourceFile = file;
                 final boolean[] cancelled = new boolean[]{false};
                 if (sourceFile.exists()) {
+                    final AlertDialog finalProgress;
+                    final int i;
+                    final String str;
+                    final String str2;
                     AlertDialog progressDialog = null;
                     if (!(context == null || type == 0)) {
                         try {
