@@ -2436,7 +2436,6 @@ public class zzcim {
     }
 
     protected final void zza(int i, Throwable th, byte[] bArr) {
-        zzcjk zzaws;
         zzawx().zzve();
         zzxf();
         if (bArr == null) {
@@ -2456,6 +2455,7 @@ public class zzcim {
                 zzbaj();
                 zzawy().zzazj().zze("Successful upload. Got network response. code, size", Integer.valueOf(i), Integer.valueOf(bArr.length));
                 zzaws().beginTransaction();
+                zzcjk zzaws;
                 try {
                     for (Long l : list) {
                         zzaws = zzaws();
@@ -3084,10 +3084,10 @@ public class zzcim {
     }
 
     public final void zzbah() {
+        String zzayf;
         zzawx().zzve();
         zzxf();
         this.zzjgf = true;
-        String zzayf;
         String str;
         try {
             Boolean zzbas = zzawp().zzbas();
