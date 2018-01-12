@@ -3296,14 +3296,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0ec5:
         r4 = "selectAlertString";
         r5 = "SendContactTo";
-        r16 = 2131494291; // 0x7f0c0593 float:1.8612086E38 double:1.0530981035E-314;
+        r16 = 2131494292; // 0x7f0c0594 float:1.8612088E38 double:1.053098104E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendContactToGroup";
-        r16 = 2131494278; // 0x7f0c0586 float:1.861206E38 double:1.053098097E-314;
+        r16 = 2131494279; // 0x7f0c0587 float:1.8612062E38 double:1.0530980976E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -3377,14 +3377,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0f75:
         r4 = "selectAlertString";
         r5 = "SendMessagesTo";
-        r16 = 2131494291; // 0x7f0c0593 float:1.8612086E38 double:1.0530981035E-314;
+        r16 = 2131494292; // 0x7f0c0594 float:1.8612088E38 double:1.053098104E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendMessagesToGroup";
-        r16 = 2131494292; // 0x7f0c0594 float:1.8612088E38 double:1.053098104E-314;
+        r16 = 2131494293; // 0x7f0c0595 float:1.861209E38 double:1.0530981045E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;

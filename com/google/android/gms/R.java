@@ -157,26 +157,26 @@ public final class R {
     }
 
     public static final class string {
-        public static final int common_google_play_services_enable_button = 2131494600;
-        public static final int common_google_play_services_enable_text = 2131494601;
-        public static final int common_google_play_services_enable_title = 2131494602;
-        public static final int common_google_play_services_install_button = 2131494603;
-        public static final int common_google_play_services_install_text = 2131494604;
-        public static final int common_google_play_services_install_title = 2131494605;
-        public static final int common_google_play_services_notification_channel_name = 2131494606;
-        public static final int common_google_play_services_notification_ticker = 2131494607;
-        public static final int common_google_play_services_unknown_issue = 2131494608;
-        public static final int common_google_play_services_unsupported_text = 2131494609;
-        public static final int common_google_play_services_update_button = 2131494610;
-        public static final int common_google_play_services_update_text = 2131494611;
-        public static final int common_google_play_services_update_title = 2131494612;
-        public static final int common_google_play_services_updating_text = 2131494613;
-        public static final int common_google_play_services_wear_update_text = 2131494614;
-        public static final int common_open_on_phone = 2131494615;
-        public static final int common_signin_button_text = 2131494616;
-        public static final int common_signin_button_text_long = 2131494617;
-        public static final int gcm_fallback_notification_channel_label = 2131494635;
-        public static final int wallet_buy_button_place_holder = 2131494740;
+        public static final int common_google_play_services_enable_button = 2131494601;
+        public static final int common_google_play_services_enable_text = 2131494602;
+        public static final int common_google_play_services_enable_title = 2131494603;
+        public static final int common_google_play_services_install_button = 2131494604;
+        public static final int common_google_play_services_install_text = 2131494605;
+        public static final int common_google_play_services_install_title = 2131494606;
+        public static final int common_google_play_services_notification_channel_name = 2131494607;
+        public static final int common_google_play_services_notification_ticker = 2131494608;
+        public static final int common_google_play_services_unknown_issue = 2131494609;
+        public static final int common_google_play_services_unsupported_text = 2131494610;
+        public static final int common_google_play_services_update_button = 2131494611;
+        public static final int common_google_play_services_update_text = 2131494612;
+        public static final int common_google_play_services_update_title = 2131494613;
+        public static final int common_google_play_services_updating_text = 2131494614;
+        public static final int common_google_play_services_wear_update_text = 2131494615;
+        public static final int common_open_on_phone = 2131494616;
+        public static final int common_signin_button_text = 2131494617;
+        public static final int common_signin_button_text_long = 2131494618;
+        public static final int gcm_fallback_notification_channel_label = 2131494636;
+        public static final int wallet_buy_button_place_holder = 2131494741;
     }
 
     public static final class style {

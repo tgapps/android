@@ -2384,7 +2384,7 @@ public class NotificationsController {
     L_0x05f3:
         r5 = 2131165345; // 0x7f0700a1 float:1.7944904E38 double:1.0529355826E-314;
         r13 = "Reply";
-        r66 = 2131494180; // 0x7f0c0524 float:1.8611861E38 double:1.0530980486E-314;
+        r66 = 2131494181; // 0x7f0c0525 float:1.8611863E38 double:1.053098049E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
@@ -2653,7 +2653,7 @@ public class NotificationsController {
         r0 = r21;
         r5 = r5.append(r0);	 Catch:{ Exception -> 0x0052 }
         r13 = "NotificationMessagesPeopleDisplayOrder";
-        r66 = 2131493962; // 0x7f0c044a float:1.8611419E38 double:1.053097941E-314;
+        r66 = 2131493963; // 0x7f0c044b float:1.861142E38 double:1.0530979414E-314;
         r67 = 2;
         r0 = r67;
         r0 = new java.lang.Object[r0];	 Catch:{ Exception -> 0x0052 }
@@ -2972,7 +2972,7 @@ public class NotificationsController {
     L_0x0a44:
         r5 = 2131165344; // 0x7f0700a0 float:1.7944902E38 double:1.052935582E-314;
         r13 = "Reply";
-        r66 = 2131494180; // 0x7f0c0524 float:1.8611861E38 double:1.0530980486E-314;
+        r66 = 2131494181; // 0x7f0c0525 float:1.8611863E38 double:1.053098049E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }

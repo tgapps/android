@@ -1720,8 +1720,8 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
 
     public void sendGame(InputPeer peer, TL_inputMediaGame game, long random_id, long taskId) {
         Throwable e;
-        long newTaskId;
         if (peer != null && game != null) {
+            long newTaskId;
             TL_messages_sendMedia request = new TL_messages_sendMedia();
             request.peer = peer;
             if (request.peer instanceof TL_inputPeerChannel) {
@@ -6306,59 +6306,63 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    private static android.graphics.Bitmap createVideoThumbnail(java.lang.String r11, long r12) {
+    private static android.graphics.Bitmap createVideoThumbnail(java.lang.String r13, long r14) {
         /*
-        r10 = 1;
+        r11 = 1;
         r0 = 0;
         r4 = new android.media.MediaMetadataRetriever;
         r4.<init>();
-        r4.setDataSource(r11);	 Catch:{ Exception -> 0x0016, all -> 0x001d }
-        r8 = 1;
-        r0 = r4.getFrameAtTime(r12, r8);	 Catch:{ Exception -> 0x0016, all -> 0x001d }
-        r4.release();	 Catch:{ RuntimeException -> 0x0049 }
+        r4.setDataSource(r13);	 Catch:{ Exception -> 0x0016, all -> 0x001d }
+        r9 = 1;
+        r0 = r4.getFrameAtTime(r14, r9);	 Catch:{ Exception -> 0x0016, all -> 0x001d }
+        r4.release();	 Catch:{ RuntimeException -> 0x004f }
     L_0x0012:
         if (r0 != 0) goto L_0x0022;
     L_0x0014:
-        r8 = 0;
+        r9 = 0;
     L_0x0015:
-        return r8;
+        return r9;
     L_0x0016:
-        r8 = move-exception;
+        r9 = move-exception;
         r4.release();	 Catch:{ RuntimeException -> 0x001b }
         goto L_0x0012;
     L_0x001b:
-        r8 = move-exception;
+        r9 = move-exception;
         goto L_0x0012;
     L_0x001d:
-        r8 = move-exception;
-        r4.release();	 Catch:{ RuntimeException -> 0x004b }
-    L_0x0021:
-        throw r8;
-    L_0x0022:
-        r7 = r0.getWidth();
-        r2 = r0.getHeight();
-        r3 = java.lang.Math.max(r7, r2);
-        r8 = 90;
-        if (r3 <= r8) goto L_0x0047;
-    L_0x0032:
-        r8 = 1119092736; // 0x42b40000 float:90.0 double:5.529052754E-315;
-        r9 = (float) r3;
-        r5 = r8 / r9;
-        r8 = (float) r7;
-        r8 = r8 * r5;
-        r6 = java.lang.Math.round(r8);
-        r8 = (float) r2;
-        r8 = r8 * r5;
-        r1 = java.lang.Math.round(r8);
-        r0 = org.telegram.messenger.Bitmaps.createScaledBitmap(r0, r6, r1, r10);
-    L_0x0047:
-        r8 = r0;
-        goto L_0x0015;
-    L_0x0049:
-        r8 = move-exception;
-        goto L_0x0012;
-    L_0x004b:
         r9 = move-exception;
+        r4.release();	 Catch:{ RuntimeException -> 0x0051 }
+    L_0x0021:
+        throw r9;
+    L_0x0022:
+        r8 = r0.getWidth();
+        r2 = r0.getHeight();
+        r3 = java.lang.Math.max(r8, r2);
+        r9 = 90;
+        if (r3 <= r9) goto L_0x004d;
+    L_0x0032:
+        r9 = 1119092736; // 0x42b40000 float:90.0 double:5.529052754E-315;
+        r10 = (float) r3;
+        r5 = r9 / r10;
+        r9 = (float) r8;
+        r9 = r9 * r5;
+        r7 = java.lang.Math.round(r9);
+        r9 = (float) r2;
+        r9 = r9 * r5;
+        r1 = java.lang.Math.round(r9);
+        r6 = org.telegram.messenger.Bitmaps.createScaledBitmap(r0, r7, r1, r11);
+        if (r6 == r0) goto L_0x004d;
+    L_0x0049:
+        r0.recycle();
+        r0 = r6;
+    L_0x004d:
+        r9 = r0;
+        goto L_0x0015;
+    L_0x004f:
+        r9 = move-exception;
+        goto L_0x0012;
+    L_0x0051:
+        r10 = move-exception;
         goto L_0x0021;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.SendMessagesHelper.createVideoThumbnail(java.lang.String, long):android.graphics.Bitmap");
