@@ -102,6 +102,7 @@ public class NotificationsController {
     private ArrayList<MessageObject> delayedPushMessages = new ArrayList();
     private boolean inChatSoundEnabled = true;
     private int lastBadgeCount = -1;
+    private boolean lastNotificationIsNoData;
     private int lastOnlineFromOtherDevice = 0;
     private long lastSoundOutPlay;
     private long lastSoundPlay;
@@ -205,6 +206,8 @@ public class NotificationsController {
                 if (!NotificationsController.this.delayedPushMessages.isEmpty()) {
                     NotificationsController.this.showOrUpdateNotification(true);
                     NotificationsController.this.delayedPushMessages.clear();
+                } else if (NotificationsController.this.lastNotificationIsNoData) {
+                    NotificationsController.notificationManager.cancel(NotificationsController.this.notificationId);
                 }
                 try {
                     if (NotificationsController.this.notificationDelayWakelock.isHeld()) {
@@ -413,6 +416,7 @@ public class NotificationsController {
                         if (VERSION.SDK_INT >= 26) {
                             mBuilder.setChannelId(NotificationsController.this.validateChannelId(0, name, vibrationPattern, ledColor, sound, importance, notifyDisabled));
                         }
+                        NotificationsController.this.lastNotificationIsNoData = true;
                         NotificationsController.notificationManager.notify(NotificationsController.this.notificationId, mBuilder.build());
                     }
                 } catch (Throwable e2) {
@@ -1088,8 +1092,8 @@ public class NotificationsController {
                     return msg;
                 }
             } else if (messageObject.messageOwner.media instanceof TL_messageMediaPhoto) {
-                if (!shortMessage && VERSION.SDK_INT >= 19 && !TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
-                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "🖼 " + messageObject.messageOwner.media.caption);
+                if (!shortMessage && VERSION.SDK_INT >= 19 && !TextUtils.isEmpty(messageObject.messageOwner.message)) {
+                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "🖼 " + messageObject.messageOwner.message);
                     text[0] = true;
                     return msg;
                 } else if (messageObject.messageOwner.media.ttl_seconds != 0) {
@@ -1098,8 +1102,8 @@ public class NotificationsController {
                     return LocaleController.formatString("NotificationMessagePhoto", R.string.NotificationMessagePhoto, name);
                 }
             } else if (messageObject.isVideo()) {
-                if (!shortMessage && VERSION.SDK_INT >= 19 && !TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
-                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "📹 " + messageObject.messageOwner.media.caption);
+                if (!shortMessage && VERSION.SDK_INT >= 19 && !TextUtils.isEmpty(messageObject.messageOwner.message)) {
+                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "📹 " + messageObject.messageOwner.message);
                     text[0] = true;
                     return msg;
                 } else if (messageObject.messageOwner.media.ttl_seconds != 0) {
@@ -1130,16 +1134,16 @@ public class NotificationsController {
                     }
                     return LocaleController.formatString("NotificationMessageSticker", R.string.NotificationMessageSticker, name);
                 } else if (messageObject.isGif()) {
-                    if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                    if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                         return LocaleController.formatString("NotificationMessageGif", R.string.NotificationMessageGif, name);
                     }
-                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "🎬 " + messageObject.messageOwner.media.caption);
+                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "🎬 " + messageObject.messageOwner.message);
                     text[0] = true;
                     return msg;
-                } else if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                } else if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                     return LocaleController.formatString("NotificationMessageDocument", R.string.NotificationMessageDocument, name);
                 } else {
-                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "📎 " + messageObject.messageOwner.media.caption);
+                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "📎 " + messageObject.messageOwner.message);
                     text[0] = true;
                     return msg;
                 }
@@ -1229,16 +1233,16 @@ public class NotificationsController {
                                     if (object.isMusic()) {
                                         return LocaleController.formatString("NotificationActionPinnedMusicChannel", R.string.NotificationActionPinnedMusicChannel, chat.title);
                                     } else if (object.isVideo()) {
-                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.media.caption)) {
+                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.message)) {
                                             return LocaleController.formatString("NotificationActionPinnedVideoChannel", R.string.NotificationActionPinnedVideoChannel, chat.title);
                                         }
-                                        message = "📹 " + object.messageOwner.media.caption;
+                                        message = "📹 " + object.messageOwner.message;
                                         return LocaleController.formatString("NotificationActionPinnedTextChannel", R.string.NotificationActionPinnedTextChannel, chat.title, message);
                                     } else if (object.isGif()) {
-                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.media.caption)) {
+                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.message)) {
                                             return LocaleController.formatString("NotificationActionPinnedGifChannel", R.string.NotificationActionPinnedGifChannel, chat.title);
                                         }
-                                        message = "🎬 " + object.messageOwner.media.caption;
+                                        message = "🎬 " + object.messageOwner.message;
                                         return LocaleController.formatString("NotificationActionPinnedTextChannel", R.string.NotificationActionPinnedTextChannel, chat.title, message);
                                     } else if (object.isVoice()) {
                                         return LocaleController.formatString("NotificationActionPinnedVoiceChannel", R.string.NotificationActionPinnedVoiceChannel, chat.title);
@@ -1250,10 +1254,10 @@ public class NotificationsController {
                                         }
                                         return LocaleController.formatString("NotificationActionPinnedStickerChannel", R.string.NotificationActionPinnedStickerChannel, chat.title);
                                     } else if (object.messageOwner.media instanceof TL_messageMediaDocument) {
-                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.media.caption)) {
+                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.message)) {
                                             return LocaleController.formatString("NotificationActionPinnedFileChannel", R.string.NotificationActionPinnedFileChannel, chat.title);
                                         }
-                                        message = "📎 " + object.messageOwner.media.caption;
+                                        message = "📎 " + object.messageOwner.message;
                                         return LocaleController.formatString("NotificationActionPinnedTextChannel", R.string.NotificationActionPinnedTextChannel, chat.title, message);
                                     } else if ((object.messageOwner.media instanceof TL_messageMediaGeo) || (object.messageOwner.media instanceof TL_messageMediaVenue)) {
                                         return LocaleController.formatString("NotificationActionPinnedGeoChannel", R.string.NotificationActionPinnedGeoChannel, chat.title);
@@ -1262,10 +1266,10 @@ public class NotificationsController {
                                     } else if (object.messageOwner.media instanceof TL_messageMediaContact) {
                                         return LocaleController.formatString("NotificationActionPinnedContactChannel", R.string.NotificationActionPinnedContactChannel, chat.title);
                                     } else if (object.messageOwner.media instanceof TL_messageMediaPhoto) {
-                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.media.caption)) {
+                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.message)) {
                                             return LocaleController.formatString("NotificationActionPinnedPhotoChannel", R.string.NotificationActionPinnedPhotoChannel, chat.title);
                                         }
-                                        message = "🖼 " + object.messageOwner.media.caption;
+                                        message = "🖼 " + object.messageOwner.message;
                                         return LocaleController.formatString("NotificationActionPinnedTextChannel", R.string.NotificationActionPinnedTextChannel, chat.title, message);
                                     } else if (object.messageOwner.media instanceof TL_messageMediaGame) {
                                         return LocaleController.formatString("NotificationActionPinnedGameChannel", R.string.NotificationActionPinnedGameChannel, chat.title);
@@ -1285,16 +1289,16 @@ public class NotificationsController {
                                     if (object.isMusic()) {
                                         return LocaleController.formatString("NotificationActionPinnedMusic", R.string.NotificationActionPinnedMusic, name, chat.title);
                                     } else if (object.isVideo()) {
-                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.media.caption)) {
+                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.message)) {
                                             return LocaleController.formatString("NotificationActionPinnedVideo", R.string.NotificationActionPinnedVideo, name, chat.title);
                                         }
-                                        message = "📹 " + object.messageOwner.media.caption;
+                                        message = "📹 " + object.messageOwner.message;
                                         return LocaleController.formatString("NotificationActionPinnedText", R.string.NotificationActionPinnedText, name, message, chat.title);
                                     } else if (object.isGif()) {
-                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.media.caption)) {
+                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.message)) {
                                             return LocaleController.formatString("NotificationActionPinnedGif", R.string.NotificationActionPinnedGif, name, chat.title);
                                         }
-                                        message = "🎬 " + object.messageOwner.media.caption;
+                                        message = "🎬 " + object.messageOwner.message;
                                         return LocaleController.formatString("NotificationActionPinnedText", R.string.NotificationActionPinnedText, name, message, chat.title);
                                     } else if (object.isVoice()) {
                                         return LocaleController.formatString("NotificationActionPinnedVoice", R.string.NotificationActionPinnedVoice, name, chat.title);
@@ -1306,10 +1310,10 @@ public class NotificationsController {
                                         }
                                         return LocaleController.formatString("NotificationActionPinnedSticker", R.string.NotificationActionPinnedSticker, name, chat.title);
                                     } else if (object.messageOwner.media instanceof TL_messageMediaDocument) {
-                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.media.caption)) {
+                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.message)) {
                                             return LocaleController.formatString("NotificationActionPinnedFile", R.string.NotificationActionPinnedFile, name, chat.title);
                                         }
-                                        message = "📎 " + object.messageOwner.media.caption;
+                                        message = "📎 " + object.messageOwner.message;
                                         return LocaleController.formatString("NotificationActionPinnedText", R.string.NotificationActionPinnedText, name, message, chat.title);
                                     } else if ((object.messageOwner.media instanceof TL_messageMediaGeo) || (object.messageOwner.media instanceof TL_messageMediaVenue)) {
                                         return LocaleController.formatString("NotificationActionPinnedGeo", R.string.NotificationActionPinnedGeo, name, chat.title);
@@ -1318,10 +1322,10 @@ public class NotificationsController {
                                     } else if (object.messageOwner.media instanceof TL_messageMediaContact) {
                                         return LocaleController.formatString("NotificationActionPinnedContact", R.string.NotificationActionPinnedContact, name, chat.title);
                                     } else if (object.messageOwner.media instanceof TL_messageMediaPhoto) {
-                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.media.caption)) {
+                                        if (VERSION.SDK_INT < 19 || TextUtils.isEmpty(object.messageOwner.message)) {
                                             return LocaleController.formatString("NotificationActionPinnedPhoto", R.string.NotificationActionPinnedPhoto, name, chat.title);
                                         }
-                                        message = "🖼 " + object.messageOwner.media.caption;
+                                        message = "🖼 " + object.messageOwner.message;
                                         return LocaleController.formatString("NotificationActionPinnedText", R.string.NotificationActionPinnedText, name, message, chat.title);
                                     } else if (object.messageOwner.media instanceof TL_messageMediaGame) {
                                         return LocaleController.formatString("NotificationActionPinnedGame", R.string.NotificationActionPinnedGame, name, chat.title);
@@ -1349,15 +1353,15 @@ public class NotificationsController {
                         }
                         return LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, name, chat.title, messageObject.messageOwner.message);
                     } else if (messageObject.messageOwner.media instanceof TL_messageMediaPhoto) {
-                        if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                        if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                             return LocaleController.formatString("NotificationMessageGroupPhoto", R.string.NotificationMessageGroupPhoto, name, chat.title);
                         }
-                        return LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, name, chat.title, "🖼 " + messageObject.messageOwner.media.caption);
+                        return LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, name, chat.title, "🖼 " + messageObject.messageOwner.message);
                     } else if (messageObject.isVideo()) {
-                        if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                        if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                             return LocaleController.formatString("NotificationMessageGroupVideo", R.string.NotificationMessageGroupVideo, name, chat.title);
                         }
-                        return LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, name, chat.title, "📹 " + messageObject.messageOwner.media.caption);
+                        return LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, name, chat.title, "📹 " + messageObject.messageOwner.message);
                     } else if (messageObject.isVoice()) {
                         return LocaleController.formatString("NotificationMessageGroupAudio", R.string.NotificationMessageGroupAudio, name, chat.title);
                     } else if (messageObject.isRoundVideo()) {
@@ -1381,14 +1385,14 @@ public class NotificationsController {
                             }
                             return LocaleController.formatString("NotificationMessageGroupSticker", R.string.NotificationMessageGroupSticker, name, chat.title);
                         } else if (messageObject.isGif()) {
-                            if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                            if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                                 return LocaleController.formatString("NotificationMessageGroupGif", R.string.NotificationMessageGroupGif, name, chat.title);
                             }
-                            return LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, name, chat.title, "🎬 " + messageObject.messageOwner.media.caption);
-                        } else if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                            return LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, name, chat.title, "🎬 " + messageObject.messageOwner.message);
+                        } else if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                             return LocaleController.formatString("NotificationMessageGroupDocument", R.string.NotificationMessageGroupDocument, name, chat.title);
                         } else {
-                            return LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, name, chat.title, "📎 " + messageObject.messageOwner.media.caption);
+                            return LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, name, chat.title, "📎 " + messageObject.messageOwner.message);
                         }
                     }
                 } else if (messageObject.isMediaEmpty()) {
@@ -1399,17 +1403,17 @@ public class NotificationsController {
                     text[0] = true;
                     return msg;
                 } else if (messageObject.messageOwner.media instanceof TL_messageMediaPhoto) {
-                    if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                    if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                         return LocaleController.formatString("ChannelMessagePhoto", R.string.ChannelMessagePhoto, name);
                     }
-                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "🖼 " + messageObject.messageOwner.media.caption);
+                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "🖼 " + messageObject.messageOwner.message);
                     text[0] = true;
                     return msg;
                 } else if (messageObject.isVideo()) {
-                    if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                    if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                         return LocaleController.formatString("ChannelMessageVideo", R.string.ChannelMessageVideo, name);
                     }
-                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "📹 " + messageObject.messageOwner.media.caption);
+                    msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "📹 " + messageObject.messageOwner.message);
                     text[0] = true;
                     return msg;
                 } else if (messageObject.isVoice()) {
@@ -1433,16 +1437,16 @@ public class NotificationsController {
                         }
                         return LocaleController.formatString("ChannelMessageSticker", R.string.ChannelMessageSticker, name);
                     } else if (messageObject.isGif()) {
-                        if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                        if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                             return LocaleController.formatString("ChannelMessageGIF", R.string.ChannelMessageGIF, name);
                         }
-                        msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "🎬 " + messageObject.messageOwner.media.caption);
+                        msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "🎬 " + messageObject.messageOwner.message);
                         text[0] = true;
                         return msg;
-                    } else if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.media.caption)) {
+                    } else if (shortMessage || VERSION.SDK_INT < 19 || TextUtils.isEmpty(messageObject.messageOwner.message)) {
                         return LocaleController.formatString("ChannelMessageDocument", R.string.ChannelMessageDocument, name);
                     } else {
-                        msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "📎 " + messageObject.messageOwner.media.caption);
+                        msg = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, name, "📎 " + messageObject.messageOwner.message);
                         text[0] = true;
                         return msg;
                     }
@@ -1485,6 +1489,7 @@ public class NotificationsController {
 
     private void dismissNotification() {
         try {
+            this.lastNotificationIsNoData = false;
             notificationManager.cancel(this.notificationId);
             this.pushMessages.clear();
             this.pushMessagesDict.clear();
@@ -1697,7 +1702,7 @@ public class NotificationsController {
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.chat_id;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0651;
+        if (r5 == 0) goto L_0x0656;
     L_0x007c:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
@@ -1709,7 +1714,7 @@ public class NotificationsController {
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.user_id;	 Catch:{ Exception -> 0x0052 }
         r63 = r0;
-        if (r63 != 0) goto L_0x065b;
+        if (r63 != 0) goto L_0x0660;
     L_0x0090:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
@@ -1781,7 +1786,7 @@ public class NotificationsController {
         r13 = 0;
         r0 = r54;
         r5 = r0.getBoolean(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0675;
+        if (r5 == 0) goto L_0x067a;
     L_0x011e:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -1808,7 +1813,7 @@ public class NotificationsController {
         r5 = r0.smartNotificationsDialogs;	 Catch:{ Exception -> 0x0052 }
         r22 = r5.get(r6);	 Catch:{ Exception -> 0x0052 }
         r22 = (android.graphics.Point) r22;	 Catch:{ Exception -> 0x0052 }
-        if (r22 != 0) goto L_0x067b;
+        if (r22 != 0) goto L_0x0680;
     L_0x0163:
         r22 = new android.graphics.Point;	 Catch:{ Exception -> 0x0052 }
         r5 = 1;
@@ -1853,7 +1858,7 @@ public class NotificationsController {
         r13 = 0;
         r0 = r54;
         r19 = r0.getBoolean(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        if (r19 == 0) goto L_0x06c9;
+        if (r19 == 0) goto L_0x06ce;
     L_0x01cc:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -1884,14 +1889,14 @@ public class NotificationsController {
         r16 = r0.getString(r5, r13);	 Catch:{ Exception -> 0x0052 }
     L_0x021d:
         r64 = 0;
-        if (r15 == 0) goto L_0x06e0;
+        if (r15 == 0) goto L_0x06e5;
     L_0x0221:
-        if (r16 == 0) goto L_0x06d1;
+        if (r16 == 0) goto L_0x06d6;
     L_0x0223:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x06d1;
+        if (r5 == 0) goto L_0x06d6;
     L_0x022d:
         r16 = 0;
     L_0x022f:
@@ -1982,7 +1987,7 @@ public class NotificationsController {
     L_0x02c4:
         r45 = 2;
     L_0x02c6:
-        if (r31 != 0) goto L_0x0720;
+        if (r31 != 0) goto L_0x0725;
     L_0x02c8:
         r55 = 0;
     L_0x02ca:
@@ -1992,8 +1997,8 @@ public class NotificationsController {
         r0 = r45;
         if (r0 == r5) goto L_0x02e0;
     L_0x02d1:
-        r5 = audioManager;	 Catch:{ Exception -> 0x0729 }
-        r43 = r5.getRingerMode();	 Catch:{ Exception -> 0x0729 }
+        r5 = audioManager;	 Catch:{ Exception -> 0x072e }
+        r43 = r5.getRingerMode();	 Catch:{ Exception -> 0x072e }
         if (r43 == 0) goto L_0x02e0;
     L_0x02d9:
         r5 = 1;
@@ -2023,7 +2028,7 @@ public class NotificationsController {
         r0 = r35;
         r0.setFlags(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = (int) r6;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x07a6;
+        if (r5 == 0) goto L_0x07ab;
     L_0x031c:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
@@ -2031,7 +2036,7 @@ public class NotificationsController {
         r13 = 1;
         if (r5 != r13) goto L_0x0331;
     L_0x0327:
-        if (r15 == 0) goto L_0x072f;
+        if (r15 == 0) goto L_0x0734;
     L_0x0329:
         r5 = "chatId";
         r0 = r35;
@@ -2042,7 +2047,7 @@ public class NotificationsController {
         if (r5 != 0) goto L_0x033c;
     L_0x0338:
         r5 = org.telegram.messenger.SharedConfig.isWaitingForPasscodeEnter;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x073d;
+        if (r5 == 0) goto L_0x0742;
     L_0x033c:
         r51 = 0;
     L_0x033e:
@@ -2058,7 +2063,7 @@ public class NotificationsController {
         r1 = r66;
         r17 = android.app.PendingIntent.getActivity(r5, r13, r0, r1);	 Catch:{ Exception -> 0x0052 }
         r57 = 1;
-        if (r14 == 0) goto L_0x07c2;
+        if (r14 == 0) goto L_0x07c7;
     L_0x035b:
         r8 = r14.title;	 Catch:{ Exception -> 0x0052 }
     L_0x035d:
@@ -2076,7 +2081,7 @@ public class NotificationsController {
         if (r5 != 0) goto L_0x0376;
     L_0x0372:
         r5 = org.telegram.messenger.SharedConfig.isWaitingForPasscodeEnter;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x07c8;
+        if (r5 == 0) goto L_0x07cd;
     L_0x0376:
         r5 = "AppName";
         r13 = 2131492979; // 0x7f0c0073 float:1.8609425E38 double:1.0530974553E-314;
@@ -2085,7 +2090,7 @@ public class NotificationsController {
     L_0x0382:
         r5 = org.telegram.messenger.UserConfig.getActivatedAccountsCount();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 <= r13) goto L_0x07cc;
+        if (r5 <= r13) goto L_0x07d1;
     L_0x0389:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -2103,7 +2108,7 @@ public class NotificationsController {
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x07d1;
+        if (r5 != r13) goto L_0x07d6;
     L_0x03b8:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -2176,7 +2181,7 @@ public class NotificationsController {
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x086d;
+        if (r5 != r13) goto L_0x0872;
     L_0x0462:
         r0 = r72;
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0052 }
@@ -2195,7 +2200,7 @@ public class NotificationsController {
         r0 = r41;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.silent;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0822;
+        if (r5 == 0) goto L_0x0827;
     L_0x0487:
         r60 = 1;
     L_0x0489:
@@ -2203,7 +2208,7 @@ public class NotificationsController {
     L_0x048b:
         if (r57 == 0) goto L_0x04ae;
     L_0x048d:
-        if (r14 == 0) goto L_0x0826;
+        if (r14 == 0) goto L_0x082b;
     L_0x048f:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
@@ -2256,7 +2261,7 @@ public class NotificationsController {
         r0 = r51;
         r1 = r66;
         r29 = r5.getImageFromMemory(r0, r13, r1);	 Catch:{ Exception -> 0x0052 }
-        if (r29 == 0) goto L_0x0960;
+        if (r29 == 0) goto L_0x0965;
     L_0x050c:
         r5 = r29.getBitmap();	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
@@ -2266,7 +2271,7 @@ public class NotificationsController {
     L_0x0517:
         r5 = 1;
         r0 = r60;
-        if (r0 != r5) goto L_0x09a2;
+        if (r0 != r5) goto L_0x09a7;
     L_0x051c:
         r5 = -1;
         r0 = r39;
@@ -2279,9 +2284,9 @@ public class NotificationsController {
     L_0x0529:
         r5 = 1;
         r0 = r60;
-        if (r0 == r5) goto L_0x0a37;
+        if (r0 == r5) goto L_0x0a3c;
     L_0x052e:
-        if (r47 != 0) goto L_0x0a37;
+        if (r47 != 0) goto L_0x0a3c;
     L_0x0530:
         r5 = org.telegram.messenger.ApplicationLoader.mainInterfacePaused;	 Catch:{ Exception -> 0x0052 }
         if (r5 != 0) goto L_0x0536;
@@ -2327,12 +2332,12 @@ public class NotificationsController {
     L_0x058b:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
-        if (r5 < r13) goto L_0x09e1;
+        if (r5 < r13) goto L_0x09e6;
     L_0x0591:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x09db;
+        if (r5 == 0) goto L_0x09e0;
     L_0x059b:
         r11 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0052 }
     L_0x059d:
@@ -2349,7 +2354,7 @@ public class NotificationsController {
     L_0x05ad:
         r5 = org.telegram.messenger.MediaController.getInstance();	 Catch:{ Exception -> 0x0052 }
         r5 = r5.isRecordingAudio();	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0a01;
+        if (r5 == 0) goto L_0x0a06;
     L_0x05b7:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
@@ -2380,11 +2385,11 @@ public class NotificationsController {
         r0.putExtra(r5, r13);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 19;
-        if (r5 > r13) goto L_0x0a44;
+        if (r5 > r13) goto L_0x0a49;
     L_0x05f3:
-        r5 = 2131165345; // 0x7f0700a1 float:1.7944904E38 double:1.0529355826E-314;
+        r5 = 2131165347; // 0x7f0700a3 float:1.7944909E38 double:1.0529355836E-314;
         r13 = "Reply";
-        r66 = 2131494181; // 0x7f0c0525 float:1.8611863E38 double:1.053098049E-314;
+        r66 = 2131494184; // 0x7f0c0528 float:1.861187E38 double:1.0530980506E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
@@ -2407,7 +2412,7 @@ public class NotificationsController {
         r0 = r60;
         if (r0 == r5) goto L_0x0628;
     L_0x0626:
-        if (r47 == 0) goto L_0x0a6e;
+        if (r47 == 0) goto L_0x0a73;
     L_0x0628:
         r13 = 1;
     L_0x0629:
@@ -2422,36 +2427,39 @@ public class NotificationsController {
         r66 = r39.build();	 Catch:{ Exception -> 0x0052 }
         r0 = r66;
         r5.notify(r13, r0);	 Catch:{ Exception -> 0x0052 }
+        r5 = 0;
+        r0 = r72;
+        r0.lastNotificationIsNoData = r5;	 Catch:{ Exception -> 0x0052 }
         r0 = r72;
         r1 = r39;
         r2 = r73;
         r0.showExtraNotifications(r1, r2);	 Catch:{ Exception -> 0x0052 }
         r72.scheduleNotificationRepeat();	 Catch:{ Exception -> 0x0052 }
         goto L_0x001b;
-    L_0x0651:
+    L_0x0656:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0052 }
         r15 = r5.channel_id;	 Catch:{ Exception -> 0x0052 }
         goto L_0x0084;
-    L_0x065b:
+    L_0x0660:
         r0 = r72;
         r5 = r0.currentAccount;	 Catch:{ Exception -> 0x0052 }
         r5 = org.telegram.messenger.UserConfig.getInstance(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = r5.getClientUserId();	 Catch:{ Exception -> 0x0052 }
         r0 = r63;
         if (r0 != r5) goto L_0x0098;
-    L_0x066b:
+    L_0x0670:
         r0 = r37;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.from_id;	 Catch:{ Exception -> 0x0052 }
         r63 = r0;
         goto L_0x0098;
-    L_0x0675:
+    L_0x067a:
         r48 = 2;
         r46 = 180; // 0xb4 float:2.52E-43 double:8.9E-322;
         goto L_0x0155;
-    L_0x067b:
+    L_0x0680:
         r0 = r22;
         r0 = r0.y;	 Catch:{ Exception -> 0x0052 }
         r38 = r0;
@@ -2462,8 +2470,8 @@ public class NotificationsController {
         r70 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r68 = r68 / r70;
         r5 = (r66 > r68 ? 1 : (r66 == r68 ? 0 : -1));
-        if (r5 >= 0) goto L_0x06a5;
-    L_0x0692:
+        if (r5 >= 0) goto L_0x06aa;
+    L_0x0697:
         r5 = 1;
         r66 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0052 }
         r68 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
@@ -2473,14 +2481,14 @@ public class NotificationsController {
         r0 = r22;
         r0.set(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x017f;
-    L_0x06a5:
+    L_0x06aa:
         r0 = r22;
         r0 = r0.x;	 Catch:{ Exception -> 0x0052 }
         r18 = r0;
         r0 = r18;
         r1 = r48;
-        if (r0 >= r1) goto L_0x06c5;
-    L_0x06b1:
+        if (r0 >= r1) goto L_0x06ca;
+    L_0x06b6:
         r5 = r18 + 1;
         r66 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0052 }
         r68 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
@@ -2490,34 +2498,34 @@ public class NotificationsController {
         r0 = r22;
         r0.set(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x017f;
-    L_0x06c5:
+    L_0x06ca:
         r47 = 1;
         goto L_0x017f;
-    L_0x06c9:
+    L_0x06ce:
         r65 = 0;
         r56 = 3;
         r16 = 0;
         goto L_0x021d;
-    L_0x06d1:
+    L_0x06d6:
         if (r16 != 0) goto L_0x022f;
-    L_0x06d3:
+    L_0x06d8:
         r5 = "GroupSoundPath";
         r0 = r54;
         r1 = r20;
         r16 = r0.getString(r5, r1);	 Catch:{ Exception -> 0x0052 }
         goto L_0x022f;
-    L_0x06e0:
+    L_0x06e5:
         if (r63 == 0) goto L_0x024f;
-    L_0x06e2:
-        if (r16 == 0) goto L_0x0712;
-    L_0x06e4:
+    L_0x06e7:
+        if (r16 == 0) goto L_0x0717;
+    L_0x06e9:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0712;
-    L_0x06ee:
+        if (r5 == 0) goto L_0x0717;
+    L_0x06f3:
         r16 = 0;
-    L_0x06f0:
+    L_0x06f5:
         r5 = "vibrate_messages";
         r13 = 0;
         r0 = r54;
@@ -2531,49 +2539,49 @@ public class NotificationsController {
         r0 = r54;
         r10 = r0.getInt(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x024f;
-    L_0x0712:
-        if (r16 != 0) goto L_0x06f0;
-    L_0x0714:
+    L_0x0717:
+        if (r16 != 0) goto L_0x06f5;
+    L_0x0719:
         r5 = "GlobalSoundPath";
         r0 = r54;
         r1 = r20;
         r16 = r0.getString(r5, r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x06f0;
-    L_0x0720:
+        goto L_0x06f5;
+    L_0x0725:
         r5 = 2;
         r0 = r55;
         if (r0 != r5) goto L_0x02ca;
-    L_0x0725:
+    L_0x072a:
         r55 = 1;
         goto L_0x02ca;
-    L_0x0729:
+    L_0x072e:
         r25 = move-exception;
         org.telegram.messenger.FileLog.e(r25);	 Catch:{ Exception -> 0x0052 }
         goto L_0x02e0;
-    L_0x072f:
+    L_0x0734:
         if (r63 == 0) goto L_0x0331;
-    L_0x0731:
+    L_0x0736:
         r5 = "userId";
         r0 = r35;
         r1 = r63;
         r0.putExtra(r5, r1);	 Catch:{ Exception -> 0x0052 }
         goto L_0x0331;
-    L_0x073d:
+    L_0x0742:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
         if (r5 != r13) goto L_0x033e;
-    L_0x0748:
-        if (r14 == 0) goto L_0x0772;
-    L_0x074a:
+    L_0x074d:
+        if (r14 == 0) goto L_0x0777;
+    L_0x074f:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         if (r5 == 0) goto L_0x033e;
-    L_0x074e:
+    L_0x0753:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         if (r5 == 0) goto L_0x033e;
-    L_0x0754:
+    L_0x0759:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.volume_id;	 Catch:{ Exception -> 0x0052 }
@@ -2581,28 +2589,28 @@ public class NotificationsController {
         r68 = 0;
         r5 = (r66 > r68 ? 1 : (r66 == r68 ? 0 : -1));
         if (r5 == 0) goto L_0x033e;
-    L_0x0762:
+    L_0x0767:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.local_id;	 Catch:{ Exception -> 0x0052 }
         if (r5 == 0) goto L_0x033e;
-    L_0x076a:
+    L_0x076f:
         r5 = r14.photo;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r51 = r0;
         goto L_0x033e;
-    L_0x0772:
+    L_0x0777:
         if (r62 == 0) goto L_0x033e;
-    L_0x0774:
+    L_0x0779:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         if (r5 == 0) goto L_0x033e;
-    L_0x077a:
+    L_0x077f:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         if (r5 == 0) goto L_0x033e;
-    L_0x0782:
+    L_0x0787:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
@@ -2611,25 +2619,25 @@ public class NotificationsController {
         r68 = 0;
         r5 = (r66 > r68 ? 1 : (r66 == r68 ? 0 : -1));
         if (r5 == 0) goto L_0x033e;
-    L_0x0792:
+    L_0x0797:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.local_id;	 Catch:{ Exception -> 0x0052 }
         if (r5 == 0) goto L_0x033e;
-    L_0x079c:
+    L_0x07a1:
         r0 = r62;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0052 }
         r0 = r5.photo_small;	 Catch:{ Exception -> 0x0052 }
         r51 = r0;
         goto L_0x033e;
-    L_0x07a6:
+    L_0x07ab:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
         if (r5 != r13) goto L_0x033e;
-    L_0x07b1:
+    L_0x07b6:
         r5 = "encId";
         r13 = 32;
         r66 = r6 >> r13;
@@ -2638,22 +2646,22 @@ public class NotificationsController {
         r0 = r35;
         r0.putExtra(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x033e;
-    L_0x07c2:
+    L_0x07c7:
         r8 = org.telegram.messenger.UserObject.getUserName(r62);	 Catch:{ Exception -> 0x0052 }
         goto L_0x035d;
-    L_0x07c8:
+    L_0x07cd:
         r44 = r8;
         goto L_0x0382;
-    L_0x07cc:
+    L_0x07d1:
         r21 = "";
         goto L_0x03ad;
-    L_0x07d1:
+    L_0x07d6:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r21;
         r5 = r5.append(r0);	 Catch:{ Exception -> 0x0052 }
         r13 = "NotificationMessagesPeopleDisplayOrder";
-        r66 = 2131493963; // 0x7f0c044b float:1.861142E38 double:1.0530979414E-314;
+        r66 = 2131493966; // 0x7f0c044e float:1.8611427E38 double:1.053097943E-314;
         r67 = 2;
         r0 = r67;
         r0 = new java.lang.Object[r0];	 Catch:{ Exception -> 0x0052 }
@@ -2679,14 +2687,14 @@ public class NotificationsController {
         r5 = r5.append(r13);	 Catch:{ Exception -> 0x0052 }
         r21 = r5.toString();	 Catch:{ Exception -> 0x0052 }
         goto L_0x03da;
-    L_0x0822:
+    L_0x0827:
         r60 = 0;
         goto L_0x0489;
-    L_0x0826:
+    L_0x082b:
         r5 = 0;
         r5 = r61[r5];	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x084c;
-    L_0x082b:
+        if (r5 == 0) goto L_0x0851;
+    L_0x0830:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2698,7 +2706,7 @@ public class NotificationsController {
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x04ae;
-    L_0x084c:
+    L_0x0851:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2710,7 +2718,7 @@ public class NotificationsController {
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x04ae;
-    L_0x086d:
+    L_0x0872:
         r0 = r39;
         r1 = r21;
         r0.setContentText(r1);	 Catch:{ Exception -> 0x0052 }
@@ -2728,11 +2736,11 @@ public class NotificationsController {
         r0 = new boolean[r5];	 Catch:{ Exception -> 0x0052 }
         r61 = r0;
         r28 = 0;
-    L_0x0895:
+    L_0x089a:
         r0 = r28;
         r1 = r18;
-        if (r0 >= r1) goto L_0x0950;
-    L_0x089b:
+        if (r0 >= r1) goto L_0x0955;
+    L_0x08a0:
         r0 = r72;
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0052 }
         r0 = r28;
@@ -2743,39 +2751,39 @@ public class NotificationsController {
         r1 = r41;
         r2 = r61;
         r40 = r0.getStringForMessage(r1, r5, r2);	 Catch:{ Exception -> 0x0052 }
-        if (r40 == 0) goto L_0x08be;
-    L_0x08b4:
+        if (r40 == 0) goto L_0x08c3;
+    L_0x08b9:
         r0 = r41;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.date;	 Catch:{ Exception -> 0x0052 }
         r0 = r23;
-        if (r5 > r0) goto L_0x08c1;
-    L_0x08be:
+        if (r5 > r0) goto L_0x08c6;
+    L_0x08c3:
         r28 = r28 + 1;
-        goto L_0x0895;
-    L_0x08c1:
+        goto L_0x089a;
+    L_0x08c6:
         r5 = 2;
         r0 = r60;
-        if (r0 != r5) goto L_0x08d2;
-    L_0x08c6:
+        if (r0 != r5) goto L_0x08d7;
+    L_0x08cb:
         r36 = r40;
         r0 = r41;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.silent;	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0908;
-    L_0x08d0:
+        if (r5 == 0) goto L_0x090d;
+    L_0x08d5:
         r60 = 1;
-    L_0x08d2:
+    L_0x08d7:
         r0 = r72;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0052 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
-        if (r5 != r13) goto L_0x0900;
-    L_0x08dd:
-        if (r57 == 0) goto L_0x0900;
-    L_0x08df:
-        if (r14 == 0) goto L_0x090b;
-    L_0x08e1:
+        if (r5 != r13) goto L_0x0905;
+    L_0x08e2:
+        if (r57 == 0) goto L_0x0905;
+    L_0x08e4:
+        if (r14 == 0) goto L_0x0910;
+    L_0x08e6:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r13 = " @ ";
@@ -2786,19 +2794,19 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-    L_0x0900:
+    L_0x0905:
         r0 = r34;
         r1 = r40;
         r0.addLine(r1);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x08be;
-    L_0x0908:
+        goto L_0x08c3;
+    L_0x090d:
         r60 = 0;
-        goto L_0x08d2;
-    L_0x090b:
+        goto L_0x08d7;
+    L_0x0910:
         r5 = 0;
         r5 = r61[r5];	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x0930;
-    L_0x0910:
+        if (r5 == 0) goto L_0x0935;
+    L_0x0915:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2809,8 +2817,8 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0900;
-    L_0x0930:
+        goto L_0x0905;
+    L_0x0935:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0052 }
         r5.<init>();	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
@@ -2821,8 +2829,8 @@ public class NotificationsController {
         r13 = "";
         r0 = r40;
         r40 = r0.replace(r5, r13);	 Catch:{ Exception -> 0x0052 }
-        goto L_0x0900;
-    L_0x0950:
+        goto L_0x0905;
+    L_0x0955:
         r0 = r34;
         r1 = r21;
         r0.setSummaryText(r1);	 Catch:{ Exception -> 0x0052 }
@@ -2830,149 +2838,149 @@ public class NotificationsController {
         r1 = r34;
         r0.setStyle(r1);	 Catch:{ Exception -> 0x0052 }
         goto L_0x04c1;
-    L_0x0960:
+    L_0x0965:
         r5 = 1;
         r0 = r51;
-        r26 = org.telegram.messenger.FileLoader.getPathToAttach(r0, r5);	 Catch:{ Throwable -> 0x099b }
-        r5 = r26.exists();	 Catch:{ Throwable -> 0x099b }
+        r26 = org.telegram.messenger.FileLoader.getPathToAttach(r0, r5);	 Catch:{ Throwable -> 0x09a0 }
+        r5 = r26.exists();	 Catch:{ Throwable -> 0x09a0 }
         if (r5 == 0) goto L_0x0515;
-    L_0x096d:
+    L_0x0972:
         r5 = 1126170624; // 0x43200000 float:160.0 double:5.564022167E-315;
         r13 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        r13 = org.telegram.messenger.AndroidUtilities.dp(r13);	 Catch:{ Throwable -> 0x099b }
-        r13 = (float) r13;	 Catch:{ Throwable -> 0x099b }
+        r13 = org.telegram.messenger.AndroidUtilities.dp(r13);	 Catch:{ Throwable -> 0x09a0 }
+        r13 = (float) r13;	 Catch:{ Throwable -> 0x09a0 }
         r59 = r5 / r13;
-        r50 = new android.graphics.BitmapFactory$Options;	 Catch:{ Throwable -> 0x099b }
-        r50.<init>();	 Catch:{ Throwable -> 0x099b }
+        r50 = new android.graphics.BitmapFactory$Options;	 Catch:{ Throwable -> 0x09a0 }
+        r50.<init>();	 Catch:{ Throwable -> 0x09a0 }
         r5 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r5 = (r59 > r5 ? 1 : (r59 == r5 ? 0 : -1));
-        if (r5 >= 0) goto L_0x099e;
-    L_0x0983:
+        if (r5 >= 0) goto L_0x09a3;
+    L_0x0988:
         r5 = 1;
-    L_0x0984:
+    L_0x0989:
         r0 = r50;
-        r0.inSampleSize = r5;	 Catch:{ Throwable -> 0x099b }
-        r5 = r26.getAbsolutePath();	 Catch:{ Throwable -> 0x099b }
+        r0.inSampleSize = r5;	 Catch:{ Throwable -> 0x09a0 }
+        r5 = r26.getAbsolutePath();	 Catch:{ Throwable -> 0x09a0 }
         r0 = r50;
-        r4 = android.graphics.BitmapFactory.decodeFile(r5, r0);	 Catch:{ Throwable -> 0x099b }
+        r4 = android.graphics.BitmapFactory.decodeFile(r5, r0);	 Catch:{ Throwable -> 0x09a0 }
         if (r4 == 0) goto L_0x0515;
-    L_0x0994:
+    L_0x0999:
         r0 = r39;
-        r0.setLargeIcon(r4);	 Catch:{ Throwable -> 0x099b }
+        r0.setLargeIcon(r4);	 Catch:{ Throwable -> 0x09a0 }
         goto L_0x0515;
-    L_0x099b:
+    L_0x09a0:
         r5 = move-exception;
         goto L_0x0515;
-    L_0x099e:
+    L_0x09a3:
         r0 = r59;
         r5 = (int) r0;
-        goto L_0x0984;
-    L_0x09a2:
-        if (r55 != 0) goto L_0x09b3;
-    L_0x09a4:
+        goto L_0x0989;
+    L_0x09a7:
+        if (r55 != 0) goto L_0x09b8;
+    L_0x09a9:
         r5 = 0;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
         if (r5 < r13) goto L_0x0529;
-    L_0x09b0:
+    L_0x09b5:
         r12 = 3;
         goto L_0x0529;
-    L_0x09b3:
+    L_0x09b8:
         r5 = 1;
         r0 = r55;
-        if (r0 != r5) goto L_0x09c7;
-    L_0x09b8:
+        if (r0 != r5) goto L_0x09cc;
+    L_0x09bd:
         r5 = 1;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
         if (r5 < r13) goto L_0x0529;
-    L_0x09c4:
+    L_0x09c9:
         r12 = 4;
         goto L_0x0529;
-    L_0x09c7:
+    L_0x09cc:
         r5 = 2;
         r0 = r55;
         if (r0 != r5) goto L_0x0529;
-    L_0x09cc:
+    L_0x09d1:
         r5 = 2;
         r0 = r39;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0052 }
         r13 = 26;
         if (r5 < r13) goto L_0x0529;
-    L_0x09d8:
+    L_0x09dd:
         r12 = 5;
         goto L_0x0529;
-    L_0x09db:
+    L_0x09e0:
         r11 = android.net.Uri.parse(r16);	 Catch:{ Exception -> 0x0052 }
         goto L_0x059d;
-    L_0x09e1:
+    L_0x09e6:
         r0 = r16;
         r1 = r20;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0052 }
-        if (r5 == 0) goto L_0x09f5;
-    L_0x09eb:
+        if (r5 == 0) goto L_0x09fa;
+    L_0x09f0:
         r5 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0052 }
         r13 = 5;
         r0 = r39;
         r0.setSound(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x059d;
-    L_0x09f5:
+    L_0x09fa:
         r5 = android.net.Uri.parse(r16);	 Catch:{ Exception -> 0x0052 }
         r13 = 5;
         r0 = r39;
         r0.setSound(r5, r13);	 Catch:{ Exception -> 0x0052 }
         goto L_0x059d;
-    L_0x0a01:
+    L_0x0a06:
         r5 = 1;
         r0 = r45;
-        if (r0 != r5) goto L_0x0a13;
-    L_0x0a06:
+        if (r0 != r5) goto L_0x0a18;
+    L_0x0a0b:
         r5 = 4;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 100, 0, 100};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
         goto L_0x05c2;
-    L_0x0a13:
-        if (r45 == 0) goto L_0x0a1a;
-    L_0x0a15:
+    L_0x0a18:
+        if (r45 == 0) goto L_0x0a1f;
+    L_0x0a1a:
         r5 = 4;
         r0 = r45;
-        if (r0 != r5) goto L_0x0a25;
-    L_0x0a1a:
+        if (r0 != r5) goto L_0x0a2a;
+    L_0x0a1f:
         r5 = 2;
         r0 = r39;
         r0.setDefaults(r5);	 Catch:{ Exception -> 0x0052 }
         r5 = 0;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         goto L_0x05c2;
-    L_0x0a25:
+    L_0x0a2a:
         r5 = 3;
         r0 = r45;
         if (r0 != r5) goto L_0x05c2;
-    L_0x0a2a:
+    L_0x0a2f:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 1000};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
         goto L_0x05c2;
-    L_0x0a37:
+    L_0x0a3c:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0052 }
         r9 = {0, 0};	 Catch:{ Exception -> 0x0052 }
         r0 = r39;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0052 }
         goto L_0x05c2;
-    L_0x0a44:
-        r5 = 2131165344; // 0x7f0700a0 float:1.7944902E38 double:1.052935582E-314;
+    L_0x0a49:
+        r5 = 2131165346; // 0x7f0700a2 float:1.7944907E38 double:1.052935583E-314;
         r13 = "Reply";
-        r66 = 2131494181; // 0x7f0c0525 float:1.8611863E38 double:1.053098049E-314;
+        r66 = 2131494184; // 0x7f0c0528 float:1.861187E38 double:1.0530980506E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
@@ -2987,7 +2995,7 @@ public class NotificationsController {
         r1 = r66;
         r0.addAction(r5, r13, r1);	 Catch:{ Exception -> 0x0052 }
         goto L_0x061b;
-    L_0x0a6e:
+    L_0x0a73:
         r13 = 0;
         goto L_0x0629;
         */

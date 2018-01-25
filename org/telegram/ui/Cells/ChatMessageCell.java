@@ -209,6 +209,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
     private boolean hasGamePreview;
     private boolean hasInvoicePreview;
     private boolean hasLinkPreview;
+    private int hasMiniProgress;
     private boolean hasNewLineForTime;
     private boolean hasOldCaptionPreview;
     private int highlightProgress;
@@ -263,6 +264,8 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
     private boolean mediaBackground;
     private int mediaOffsetY;
     private boolean mediaWasInvisible;
+    private int miniButtonPressed;
+    private int miniButtonState;
     private StaticLayout nameLayout;
     private float nameOffsetX;
     private int nameWidth;
@@ -914,7 +917,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                 this.buttonPressed = 0;
                 playSoundEffect(0);
                 didPressedButton(false);
-                updateRadialProgressBackground(true);
+                updateRadialProgressBackground();
                 invalidate();
                 return false;
             } else if (!this.imagePressed) {
@@ -956,31 +959,40 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
             invalidate();
             return result;
         }
-        boolean area;
         int side = AndroidUtilities.dp(36.0f);
-        if (this.buttonState == 0 || this.buttonState == 1 || this.buttonState == 2) {
-            if (x >= this.buttonX - AndroidUtilities.dp(12.0f) && x <= (this.buttonX - AndroidUtilities.dp(12.0f)) + this.backgroundWidth) {
-                if (y >= (this.drawInstantView ? this.buttonY : this.namesOffset + this.mediaOffsetY)) {
-                    if (y <= (this.drawInstantView ? this.buttonY + side : (this.namesOffset + this.mediaOffsetY) + AndroidUtilities.dp(82.0f))) {
-                        area = true;
+        boolean area = false;
+        boolean area2 = false;
+        if (this.miniButtonState >= 0) {
+            int offset = AndroidUtilities.dp(27.0f);
+            area2 = x >= this.buttonX + offset && x <= (this.buttonX + offset) + side && y >= this.buttonY + offset && y <= (this.buttonY + offset) + side;
+        }
+        if (!area2) {
+            if (this.buttonState == 0 || this.buttonState == 1 || this.buttonState == 2) {
+                if (x >= this.buttonX - AndroidUtilities.dp(12.0f) && x <= (this.buttonX - AndroidUtilities.dp(12.0f)) + this.backgroundWidth) {
+                    if (y >= (this.drawInstantView ? this.buttonY : this.namesOffset + this.mediaOffsetY)) {
+                        if (y <= (this.drawInstantView ? this.buttonY + side : (this.namesOffset + this.mediaOffsetY) + AndroidUtilities.dp(82.0f))) {
+                            area = true;
+                        }
                     }
                 }
+                area = false;
+            } else {
+                area = x >= this.buttonX && x <= this.buttonX + side && y >= this.buttonY && y <= this.buttonY + side;
             }
-            area = false;
-        } else {
-            area = x >= this.buttonX && x <= this.buttonX + side && y >= this.buttonY && y <= this.buttonY + side;
         }
         if (event.getAction() == 0) {
-            if (!area) {
+            if (!area && !area2) {
                 return result;
             }
-            this.buttonPressed = 1;
+            if (area) {
+                this.buttonPressed = 1;
+            } else {
+                this.miniButtonPressed = 1;
+            }
             invalidate();
-            updateRadialProgressBackground(true);
+            updateRadialProgressBackground();
             return true;
-        } else if (this.buttonPressed == 0) {
-            return result;
-        } else {
+        } else if (this.buttonPressed != 0) {
             if (event.getAction() == 1) {
                 this.buttonPressed = 0;
                 playSoundEffect(0);
@@ -993,7 +1005,24 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                 this.buttonPressed = 0;
                 invalidate();
             }
-            updateRadialProgressBackground(true);
+            updateRadialProgressBackground();
+            return result;
+        } else if (this.miniButtonPressed == 0) {
+            return result;
+        } else {
+            if (event.getAction() == 1) {
+                this.miniButtonPressed = 0;
+                playSoundEffect(0);
+                didPressedMiniButton(true);
+                invalidate();
+            } else if (event.getAction() == 3) {
+                this.miniButtonPressed = 0;
+                invalidate();
+            } else if (event.getAction() == 2 && !area2) {
+                this.miniButtonPressed = 0;
+                invalidate();
+            }
+            updateRadialProgressBackground();
             return result;
         }
     }
@@ -1064,6 +1093,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         }
         if (event.getAction() == 3) {
             this.buttonPressed = 0;
+            this.miniButtonPressed = 0;
             this.pressedBotButton = -1;
             this.linkPreviewPressed = false;
             this.otherPressed = false;
@@ -1289,6 +1319,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                     }
                 } else if (!this.seekBar.isDragging()) {
                     this.seekBar.setProgress(this.currentMessageObject.audioProgress);
+                    this.seekBar.setBufferedProgress(this.currentMessageObject.bufferedProgress);
                 }
                 duration = 0;
                 if (this.documentAttachType == 3) {
@@ -1653,8 +1684,9 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
             return;
         }
         resetPressedLink(-1);
-        if (!(this.buttonPressed == 0 && this.pressedBotButton == -1)) {
+        if (!(this.buttonPressed == 0 && this.miniButtonPressed == 0 && this.pressedBotButton == -1)) {
             this.buttonPressed = 0;
+            this.miniButtonState = 0;
             this.pressedBotButton = -1;
             invalidate();
         }
@@ -1674,7 +1706,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
     public void setCheckPressed(boolean value, boolean pressed) {
         this.isCheckPressed = value;
         this.isPressed = pressed;
-        updateRadialProgressBackground(true);
+        updateRadialProgressBackground();
         if (this.useSeekBarWaweform) {
             this.seekBarWaveform.setSelected(isDrawSelectedBackground());
         } else {
@@ -1698,7 +1730,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                 this.isHighlightedAnimated = true;
                 this.highlightProgress = 300;
             }
-            updateRadialProgressBackground(true);
+            updateRadialProgressBackground();
             if (this.useSeekBarWaweform) {
                 this.seekBarWaveform.setSelected(isDrawSelectedBackground());
             } else {
@@ -1710,7 +1742,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
 
     public void setPressed(boolean pressed) {
         super.setPressed(pressed);
-        updateRadialProgressBackground(true);
+        updateRadialProgressBackground();
         if (this.useSeekBarWaweform) {
             this.seekBarWaveform.setSelected(isDrawSelectedBackground());
         } else {
@@ -1719,9 +1751,12 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         invalidate();
     }
 
-    private void updateRadialProgressBackground(boolean swap) {
-        if (!this.drawRadialCheckBackground && swap) {
+    private void updateRadialProgressBackground() {
+        if (!this.drawRadialCheckBackground) {
             this.radialProgress.swapBackground(getDrawableForCurrentState());
+            if (this.hasMiniProgress != 0) {
+                this.radialProgress.swapMiniBackground(getMiniDrawableForCurrentState());
+            }
         }
     }
 
@@ -1974,54 +2009,6 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public void setMessageObject(org.telegram.messenger.MessageObject r151, org.telegram.messenger.MessageObject.GroupedMessages r152, boolean r153, boolean r154) {
-        /* JADX: method processing error */
-/*
-Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
-	at java.util.BitSet.get(BitSet.java:615)
-	at jadx.core.dex.visitors.CodeShrinker$ArgsInfo.usedArgAssign(CodeShrinker.java:138)
-	at jadx.core.dex.visitors.CodeShrinker$ArgsInfo.access$300(CodeShrinker.java:43)
-	at jadx.core.dex.visitors.CodeShrinker.canMoveBetweenBlocks(CodeShrinker.java:282)
-	at jadx.core.dex.visitors.CodeShrinker.shrinkBlock(CodeShrinker.java:230)
-	at jadx.core.dex.visitors.CodeShrinker.shrinkMethod(CodeShrinker.java:38)
-	at jadx.core.dex.visitors.regions.LoopRegionVisitor.checkArrayForEach(LoopRegionVisitor.java:196)
-	at jadx.core.dex.visitors.regions.LoopRegionVisitor.checkForIndexedLoop(LoopRegionVisitor.java:119)
-	at jadx.core.dex.visitors.regions.LoopRegionVisitor.processLoopRegion(LoopRegionVisitor.java:65)
-	at jadx.core.dex.visitors.regions.LoopRegionVisitor.enterRegion(LoopRegionVisitor.java:52)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:56)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverseInternal(DepthRegionTraversal.java:58)
-	at jadx.core.dex.visitors.regions.DepthRegionTraversal.traverse(DepthRegionTraversal.java:18)
-	at jadx.core.dex.visitors.regions.LoopRegionVisitor.visit(LoopRegionVisitor.java:46)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.ProcessClass.process(ProcessClass.java:37)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-*/
         /*
         r150 = this;
         r4 = r151.checkLayout();
@@ -2049,7 +2036,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.currentMessageObject;
         r4 = r4.getId();
         r6 = r151.getId();
-        if (r4 == r6) goto L_0x084b;
+        if (r4 == r6) goto L_0x085a;
     L_0x002f:
         r103 = 1;
     L_0x0031:
@@ -2060,28 +2047,28 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
     L_0x0039:
         r0 = r151;
         r4 = r0.forceUpdate;
-        if (r4 == 0) goto L_0x084f;
+        if (r4 == 0) goto L_0x085e;
     L_0x003f:
         r102 = 1;
     L_0x0041:
         r0 = r150;
         r4 = r0.currentMessageObject;
         r0 = r151;
-        if (r4 != r0) goto L_0x0853;
+        if (r4 != r0) goto L_0x0862;
     L_0x0049:
         r4 = r150.isUserDataChanged();
         if (r4 != 0) goto L_0x0055;
     L_0x004f:
         r0 = r150;
         r4 = r0.photoNotSet;
-        if (r4 == 0) goto L_0x0853;
+        if (r4 == 0) goto L_0x0862;
     L_0x0055:
         r64 = 1;
     L_0x0057:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r0 = r152;
-        if (r0 == r4) goto L_0x0857;
+        if (r0 == r4) goto L_0x0866;
     L_0x005f:
         r75 = 1;
     L_0x0061:
@@ -2093,7 +2080,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.messages;
         r4 = r4.size();
         r6 = 1;
-        if (r4 <= r6) goto L_0x085b;
+        if (r4 <= r6) goto L_0x086a;
     L_0x0070:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
@@ -2106,7 +2093,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.currentPosition;
         r0 = r105;
-        if (r0 == r4) goto L_0x085f;
+        if (r0 == r4) goto L_0x086e;
     L_0x0088:
         r75 = 1;
     L_0x008a:
@@ -2127,7 +2114,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.pinnedTop;
         r0 = r154;
-        if (r4 == r0) goto L_0x3a31;
+        if (r4 == r0) goto L_0x3a40;
     L_0x00a6:
         r0 = r153;
         r1 = r150;
@@ -2152,14 +2139,14 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r1.currentMessagesGroup = r0;
         r0 = r150;
         r4 = r0.currentMessagesGroup;
-        if (r4 == 0) goto L_0x0863;
+        if (r4 == 0) goto L_0x0872;
     L_0x00d3:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
         r4 = r4.size();
         r6 = 1;
-        if (r4 <= r6) goto L_0x0863;
+        if (r4 <= r6) goto L_0x0872;
     L_0x00e0:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
@@ -2180,7 +2167,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
     L_0x00ff:
         r0 = r150;
         r4 = r0.pinnedTop;
-        if (r4 == 0) goto L_0x086f;
+        if (r4 == 0) goto L_0x087e;
     L_0x0105:
         r0 = r150;
         r4 = r0.currentPosition;
@@ -2190,7 +2177,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 4;
-        if (r4 == 0) goto L_0x086f;
+        if (r4 == 0) goto L_0x087e;
     L_0x0115:
         r4 = 1;
     L_0x0116:
@@ -2198,7 +2185,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.drawPinnedTop = r4;
         r0 = r150;
         r4 = r0.pinnedBottom;
-        if (r4 == 0) goto L_0x0872;
+        if (r4 == 0) goto L_0x0881;
     L_0x0120:
         r0 = r150;
         r4 = r0.currentPosition;
@@ -2208,7 +2195,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 8;
-        if (r4 == 0) goto L_0x0872;
+        if (r4 == 0) goto L_0x0881;
     L_0x0130:
         r4 = 1;
     L_0x0131:
@@ -2247,13 +2234,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.hasNewLineForTime = r4;
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x0875;
+        if (r4 == 0) goto L_0x0884;
     L_0x0175:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x0875;
+        if (r4 != 0) goto L_0x0884;
     L_0x017b:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x0875;
+        if (r4 == 0) goto L_0x0884;
     L_0x0181:
         r0 = r150;
         r4 = r0.currentPosition;
@@ -2262,7 +2249,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.edge;
-        if (r4 == 0) goto L_0x0875;
+        if (r4 == 0) goto L_0x0884;
     L_0x018f:
         r4 = 1;
     L_0x0190:
@@ -2377,6 +2364,9 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = 0;
         r0 = r150;
         r0.buttonPressed = r4;
+        r4 = 0;
+        r0 = r150;
+        r0.miniButtonPressed = r4;
         r4 = -1;
         r0 = r150;
         r0.pressedBotButton = r4;
@@ -2443,6 +2433,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = -1;
         r0 = r150;
         r0.buttonState = r4;
+        r4 = -1;
+        r0 = r150;
+        r0.miniButtonState = r4;
+        r4 = 0;
+        r0 = r150;
+        r0.hasMiniProgress = r4;
         r4 = 0;
         r0 = r150;
         r0.currentUrl = r4;
@@ -2499,8 +2495,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r4.setRoundRadius(r6);
-        if (r102 == 0) goto L_0x0336;
-    L_0x0327:
+        if (r102 == 0) goto L_0x0345;
+    L_0x0336:
         r4 = 0;
         r0 = r150;
         r0.firstVisibleBlockNum = r4;
@@ -2510,27 +2506,27 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = 1;
         r0 = r150;
         r0.needNewVisiblePart = r4;
-    L_0x0336:
+    L_0x0345:
         r0 = r151;
         r4 = r0.type;
-        if (r4 != 0) goto L_0x1c88;
-    L_0x033c:
+        if (r4 != 0) goto L_0x1c97;
+    L_0x034b:
         r4 = 1;
         r0 = r150;
         r0.drawForwardedName = r4;
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x089d;
-    L_0x0347:
+        if (r4 == 0) goto L_0x08ac;
+    L_0x0356:
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x0878;
-    L_0x034d:
+        if (r4 == 0) goto L_0x0887;
+    L_0x035c:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x0878;
-    L_0x0353:
+        if (r4 != 0) goto L_0x0887;
+    L_0x0362:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x0878;
-    L_0x0359:
+        if (r4 == 0) goto L_0x0887;
+    L_0x0368:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r6 = 1123287040; // 0x42f40000 float:122.0 double:5.54977537E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
@@ -2538,13 +2534,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = 1;
         r0 = r150;
         r0.drawName = r4;
-    L_0x036a:
+    L_0x0379:
         r0 = r26;
         r1 = r150;
         r1.availableTimeWidth = r0;
         r4 = r151.isRoundVideo();
-        if (r4 == 0) goto L_0x039b;
-    L_0x0376:
+        if (r4 == 0) goto L_0x03aa;
+    L_0x0385:
         r0 = r150;
         r4 = r0.availableTimeWidth;
         r8 = (double) r4;
@@ -2554,10 +2550,10 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r10 = (double) r4;
         r10 = java.lang.Math.ceil(r10);
         r4 = r151.isOutOwner();
-        if (r4 == 0) goto L_0x08f7;
-    L_0x038f:
+        if (r4 == 0) goto L_0x0906;
+    L_0x039e:
         r4 = 0;
-    L_0x0390:
+    L_0x039f:
         r0 = (double) r4;
         r18 = r0;
         r10 = r10 + r18;
@@ -2565,7 +2561,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = (int) r8;
         r0 = r150;
         r0.availableTimeWidth = r4;
-    L_0x039b:
+    L_0x03aa:
         r150.measureTime(r151);
         r0 = r150;
         r4 = r0.timeWidth;
@@ -2573,27 +2569,27 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r135 = r4 + r6;
         r4 = r151.isOutOwner();
-        if (r4 == 0) goto L_0x03b8;
-    L_0x03b0:
+        if (r4 == 0) goto L_0x03c7;
+    L_0x03bf:
         r4 = 1101266944; // 0x41a40000 float:20.5 double:5.44098164E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r135 = r135 + r4;
-    L_0x03b8:
+    L_0x03c7:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaGame;
-        if (r4 == 0) goto L_0x08ff;
-    L_0x03c2:
+        if (r4 == 0) goto L_0x090e;
+    L_0x03d1:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.game;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_game;
-        if (r4 == 0) goto L_0x08ff;
-    L_0x03ce:
+        if (r4 == 0) goto L_0x090e;
+    L_0x03dd:
         r4 = 1;
-    L_0x03cf:
+    L_0x03de:
         r0 = r150;
         r0.hasGamePreview = r4;
         r0 = r151;
@@ -2606,85 +2602,85 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaWebPage;
-        if (r4 == 0) goto L_0x0902;
-    L_0x03e9:
+        if (r4 == 0) goto L_0x0911;
+    L_0x03f8:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_webPage;
-        if (r4 == 0) goto L_0x0902;
-    L_0x03f5:
+        if (r4 == 0) goto L_0x0911;
+    L_0x0404:
         r4 = 1;
-    L_0x03f6:
+    L_0x0405:
         r0 = r150;
         r0.hasLinkPreview = r4;
         r0 = r150;
         r4 = r0.hasLinkPreview;
-        if (r4 == 0) goto L_0x0905;
-    L_0x0400:
+        if (r4 == 0) goto L_0x0914;
+    L_0x040f:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
         r4 = r4.cached_page;
-        if (r4 == 0) goto L_0x0905;
-    L_0x040c:
+        if (r4 == 0) goto L_0x0914;
+    L_0x041b:
         r4 = 1;
-    L_0x040d:
+    L_0x041c:
         r0 = r150;
         r0.drawInstantView = r4;
         r129 = 0;
         r0 = r150;
         r4 = r0.hasLinkPreview;
-        if (r4 == 0) goto L_0x0908;
-    L_0x0419:
+        if (r4 == 0) goto L_0x0917;
+    L_0x0428:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
         r0 = r4.site_name;
         r128 = r0;
-    L_0x0425:
+    L_0x0434:
         r0 = r150;
         r4 = r0.hasLinkPreview;
-        if (r4 == 0) goto L_0x090c;
-    L_0x042b:
+        if (r4 == 0) goto L_0x091b;
+    L_0x043a:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
         r0 = r4.type;
         r145 = r0;
-    L_0x0437:
+    L_0x0446:
         r0 = r150;
         r4 = r0.drawInstantView;
-        if (r4 != 0) goto L_0x093e;
-    L_0x043d:
+        if (r4 != 0) goto L_0x094d;
+    L_0x044c:
         r4 = "telegram_channel";
         r0 = r145;
         r4 = r4.equals(r0);
-        if (r4 == 0) goto L_0x0910;
-    L_0x0448:
+        if (r4 == 0) goto L_0x091f;
+    L_0x0457:
         r4 = 1;
         r0 = r150;
         r0.drawInstantView = r4;
         r4 = 1;
         r0 = r150;
         r0.drawInstantViewType = r4;
-    L_0x0452:
+    L_0x0461:
         r4 = android.os.Build.VERSION.SDK_INT;
         r6 = 21;
-        if (r4 < r6) goto L_0x04c7;
-    L_0x0458:
+        if (r4 < r6) goto L_0x04d6;
+    L_0x0467:
         r0 = r150;
         r4 = r0.drawInstantView;
-        if (r4 == 0) goto L_0x04c7;
-    L_0x045e:
+        if (r4 == 0) goto L_0x04d6;
+    L_0x046d:
         r0 = r150;
         r4 = r0.instantViewSelectorDrawable;
-        if (r4 != 0) goto L_0x0a2c;
-    L_0x0464:
+        if (r4 != 0) goto L_0x0a3b;
+    L_0x0473:
         r94 = new android.graphics.Paint;
         r4 = 1;
         r0 = r94;
@@ -2709,10 +2705,10 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.isOutOwner();
-        if (r4 == 0) goto L_0x0a27;
-    L_0x0495:
+        if (r4 == 0) goto L_0x0a36;
+    L_0x04a4:
         r4 = "chat_outPreviewInstantText";
-    L_0x0498:
+    L_0x04a7:
         r4 = org.telegram.ui.ActionBar.Theme.getColor(r4);
         r10 = 1610612735; // 0x5fffffff float:3.6893486E19 double:7.95748421E-315;
         r4 = r4 & r10;
@@ -2730,34 +2726,34 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.instantViewSelectorDrawable;
         r0 = r150;
         r4.setCallback(r0);
-    L_0x04be:
+    L_0x04cd:
         r0 = r150;
         r4 = r0.instantViewSelectorDrawable;
         r6 = 1;
         r8 = 0;
         r4.setVisible(r6, r8);
-    L_0x04c7:
+    L_0x04d6:
         r0 = r26;
         r1 = r150;
         r1.backgroundWidth = r0;
         r0 = r150;
         r4 = r0.hasLinkPreview;
-        if (r4 != 0) goto L_0x04e9;
-    L_0x04d3:
+        if (r4 != 0) goto L_0x04f8;
+    L_0x04e2:
         r0 = r150;
         r4 = r0.hasGamePreview;
-        if (r4 != 0) goto L_0x04e9;
-    L_0x04d9:
+        if (r4 != 0) goto L_0x04f8;
+    L_0x04e8:
         r0 = r150;
         r4 = r0.hasInvoicePreview;
-        if (r4 != 0) goto L_0x04e9;
-    L_0x04df:
+        if (r4 != 0) goto L_0x04f8;
+    L_0x04ee:
         r0 = r151;
         r4 = r0.lastLineWidth;
         r4 = r26 - r4;
         r0 = r135;
-        if (r4 >= r0) goto L_0x0a4f;
-    L_0x04e9:
+        if (r4 >= r0) goto L_0x0a5e;
+    L_0x04f8:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r0 = r151;
@@ -2778,7 +2774,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.max(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x0517:
+    L_0x0526:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1106771968; // 0x41f80000 float:31.0 double:5.46818007E-315;
@@ -2787,8 +2783,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r0.availableTimeWidth = r4;
         r4 = r151.isRoundVideo();
-        if (r4 == 0) goto L_0x0551;
-    L_0x052c:
+        if (r4 == 0) goto L_0x0560;
+    L_0x053b:
         r0 = r150;
         r4 = r0.availableTimeWidth;
         r8 = (double) r4;
@@ -2798,10 +2794,10 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r10 = (double) r4;
         r10 = java.lang.Math.ceil(r10);
         r4 = r151.isOutOwner();
-        if (r4 == 0) goto L_0x0a91;
-    L_0x0545:
+        if (r4 == 0) goto L_0x0aa0;
+    L_0x0554:
         r4 = 0;
-    L_0x0546:
+    L_0x0555:
         r0 = (double) r4;
         r18 = r0;
         r10 = r10 + r18;
@@ -2809,21 +2805,21 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = (int) r8;
         r0 = r150;
         r0.availableTimeWidth = r4;
-    L_0x0551:
+    L_0x0560:
         r150.setMessageObjectInternal(r151);
         r0 = r151;
         r6 = r0.textWidth;
         r0 = r150;
         r4 = r0.hasGamePreview;
-        if (r4 != 0) goto L_0x0564;
-    L_0x055e:
+        if (r4 != 0) goto L_0x0573;
+    L_0x056d:
         r0 = r150;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x0a99;
-    L_0x0564:
+        if (r4 == 0) goto L_0x0aa8;
+    L_0x0573:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x056a:
+    L_0x0579:
         r4 = r4 + r6;
         r0 = r150;
         r0.backgroundWidth = r4;
@@ -2839,8 +2835,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.totalHeight = r4;
         r0 = r150;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x0598;
-    L_0x0589:
+        if (r4 == 0) goto L_0x05a7;
+    L_0x0598:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -2848,7 +2844,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.namesOffset = r4;
-    L_0x0598:
+    L_0x05a7:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r0 = r150;
@@ -2869,48 +2865,48 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r100 = 0;
         r0 = r150;
         r4 = r0.hasLinkPreview;
-        if (r4 != 0) goto L_0x05d6;
-    L_0x05ca:
+        if (r4 != 0) goto L_0x05e5;
+    L_0x05d9:
         r0 = r150;
         r4 = r0.hasGamePreview;
-        if (r4 != 0) goto L_0x05d6;
-    L_0x05d0:
+        if (r4 != 0) goto L_0x05e5;
+    L_0x05df:
         r0 = r150;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x1c71;
-    L_0x05d6:
+        if (r4 == 0) goto L_0x1c80;
+    L_0x05e5:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x0aaa;
-    L_0x05dc:
+        if (r4 == 0) goto L_0x0ab9;
+    L_0x05eb:
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x0a9c;
-    L_0x05e2:
+        if (r4 == 0) goto L_0x0aab;
+    L_0x05f1:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x0a9c;
-    L_0x05e8:
+        if (r4 == 0) goto L_0x0aab;
+    L_0x05f7:
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.isOut();
-        if (r4 != 0) goto L_0x0a9c;
-    L_0x05f2:
+        if (r4 != 0) goto L_0x0aab;
+    L_0x0601:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r6 = 1124335616; // 0x43040000 float:132.0 double:5.554956023E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r88 = r4 - r6;
-    L_0x05fe:
+    L_0x060d:
         r0 = r150;
         r4 = r0.drawShareButton;
-        if (r4 == 0) goto L_0x060c;
-    L_0x0604:
+        if (r4 == 0) goto L_0x061b;
+    L_0x0613:
         r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r88 = r88 - r4;
-    L_0x060c:
+    L_0x061b:
         r0 = r150;
         r4 = r0.hasLinkPreview;
-        if (r4 == 0) goto L_0x0af3;
-    L_0x0612:
+        if (r4 == 0) goto L_0x0b02;
+    L_0x0621:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -2941,15 +2937,15 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r144;
         r0 = r0.duration;
         r68 = r0;
-        if (r7 == 0) goto L_0x066e;
-    L_0x064f:
-        if (r112 == 0) goto L_0x066e;
-    L_0x0651:
+        if (r7 == 0) goto L_0x067d;
+    L_0x065e:
+        if (r112 == 0) goto L_0x067d;
+    L_0x0660:
         r4 = r7.toLowerCase();
         r6 = "instagram";
         r4 = r4.equals(r6);
-        if (r4 == 0) goto L_0x066e;
-    L_0x065e:
+        if (r4 == 0) goto L_0x067d;
+    L_0x066d:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.y;
         r4 = r4 / 3;
@@ -2957,284 +2953,284 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = r0.currentMessageObject;
         r6 = r6.textWidth;
         r88 = java.lang.Math.max(r4, r6);
-    L_0x066e:
-        if (r129 != 0) goto L_0x0aec;
-    L_0x0670:
+    L_0x067d:
+        if (r129 != 0) goto L_0x0afb;
+    L_0x067f:
         r0 = r150;
         r4 = r0.drawInstantView;
-        if (r4 != 0) goto L_0x0aec;
-    L_0x0676:
-        if (r67 != 0) goto L_0x0aec;
-    L_0x0678:
-        if (r139 == 0) goto L_0x0aec;
-    L_0x067a:
-        r4 = "app";
-        r0 = r139;
-        r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x069b;
+        if (r4 != 0) goto L_0x0afb;
     L_0x0685:
-        r4 = "profile";
-        r0 = r139;
-        r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x069b;
-    L_0x0690:
-        r4 = "article";
-        r0 = r139;
-        r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x0aec;
-    L_0x069b:
-        r130 = 1;
-    L_0x069d:
-        if (r129 != 0) goto L_0x0af0;
-    L_0x069f:
-        r0 = r150;
-        r4 = r0.drawInstantView;
-        if (r4 != 0) goto L_0x0af0;
-    L_0x06a5:
-        if (r67 != 0) goto L_0x0af0;
-    L_0x06a7:
-        if (r65 == 0) goto L_0x0af0;
-    L_0x06a9:
-        if (r139 == 0) goto L_0x0af0;
-    L_0x06ab:
+        if (r67 != 0) goto L_0x0afb;
+    L_0x0687:
+        if (r139 == 0) goto L_0x0afb;
+    L_0x0689:
         r4 = "app";
         r0 = r139;
         r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x06cc;
-    L_0x06b6:
+        if (r4 != 0) goto L_0x06aa;
+    L_0x0694:
         r4 = "profile";
         r0 = r139;
         r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x06cc;
-    L_0x06c1:
+        if (r4 != 0) goto L_0x06aa;
+    L_0x069f:
         r4 = "article";
         r0 = r139;
         r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x0af0;
-    L_0x06cc:
+        if (r4 == 0) goto L_0x0afb;
+    L_0x06aa:
+        r130 = 1;
+    L_0x06ac:
+        if (r129 != 0) goto L_0x0aff;
+    L_0x06ae:
+        r0 = r150;
+        r4 = r0.drawInstantView;
+        if (r4 != 0) goto L_0x0aff;
+    L_0x06b4:
+        if (r67 != 0) goto L_0x0aff;
+    L_0x06b6:
+        if (r65 == 0) goto L_0x0aff;
+    L_0x06b8:
+        if (r139 == 0) goto L_0x0aff;
+    L_0x06ba:
+        r4 = "app";
+        r0 = r139;
+        r4 = r0.equals(r4);
+        if (r4 != 0) goto L_0x06db;
+    L_0x06c5:
+        r4 = "profile";
+        r0 = r139;
+        r4 = r0.equals(r4);
+        if (r4 != 0) goto L_0x06db;
+    L_0x06d0:
+        r4 = "article";
+        r0 = r139;
+        r4 = r0.equals(r4);
+        if (r4 == 0) goto L_0x0aff;
+    L_0x06db:
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.photoThumbs;
-        if (r4 == 0) goto L_0x0af0;
-    L_0x06d4:
+        if (r4 == 0) goto L_0x0aff;
+    L_0x06e3:
         r4 = 1;
-    L_0x06d5:
+    L_0x06e4:
         r0 = r150;
         r0.isSmallImage = r4;
         r143 = r14;
-    L_0x06db:
+    L_0x06ea:
         r0 = r150;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x0b67;
-    L_0x06e1:
+        if (r4 == 0) goto L_0x0b76;
+    L_0x06f0:
         r42 = 0;
-    L_0x06e3:
+    L_0x06f2:
         r121 = 3;
         r44 = 0;
         r88 = r88 - r42;
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.photoThumbs;
-        if (r4 != 0) goto L_0x06fb;
-    L_0x06f1:
-        if (r112 == 0) goto L_0x06fb;
-    L_0x06f3:
+        if (r4 != 0) goto L_0x070a;
+    L_0x0700:
+        if (r112 == 0) goto L_0x070a;
+    L_0x0702:
         r0 = r150;
         r4 = r0.currentMessageObject;
         r6 = 1;
         r4.generateThumbs(r6);
-    L_0x06fb:
-        if (r7 == 0) goto L_0x0764;
-    L_0x06fd:
-        r4 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0b6f }
-        r4 = r4.measureText(r7);	 Catch:{ Exception -> 0x0b6f }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0b6f }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0b6f }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x0b6f }
-        r146 = r0;	 Catch:{ Exception -> 0x0b6f }
-        r6 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x0b6f }
-        r8 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0b6f }
-        r0 = r146;	 Catch:{ Exception -> 0x0b6f }
-        r1 = r88;	 Catch:{ Exception -> 0x0b6f }
-        r9 = java.lang.Math.min(r0, r1);	 Catch:{ Exception -> 0x0b6f }
-        r10 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0b6f }
-        r11 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x0b6f }
-        r12 = 0;	 Catch:{ Exception -> 0x0b6f }
-        r13 = 0;	 Catch:{ Exception -> 0x0b6f }
-        r6.<init>(r7, r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0b6f }
-        r0 = r150;	 Catch:{ Exception -> 0x0b6f }
-        r0.siteNameLayout = r6;	 Catch:{ Exception -> 0x0b6f }
-        r0 = r150;	 Catch:{ Exception -> 0x0b6f }
-        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0b6f }
-        r0 = r150;	 Catch:{ Exception -> 0x0b6f }
-        r6 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0b6f }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0b6f }
-        r6 = r6 + -1;	 Catch:{ Exception -> 0x0b6f }
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0b6f }
-        r0 = r150;	 Catch:{ Exception -> 0x0b6f }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0b6f }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x0b6f }
-        r0 = r150;	 Catch:{ Exception -> 0x0b6f }
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0b6f }
-        r0 = r150;	 Catch:{ Exception -> 0x0b6f }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0b6f }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x0b6f }
-        r0 = r150;	 Catch:{ Exception -> 0x0b6f }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0b6f }
-        r44 = r44 + r79;	 Catch:{ Exception -> 0x0b6f }
-        r0 = r150;	 Catch:{ Exception -> 0x0b6f }
-        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0b6f }
-        r146 = r4.getWidth();	 Catch:{ Exception -> 0x0b6f }
-        r4 = r146 + r42;	 Catch:{ Exception -> 0x0b6f }
-        r0 = r97;	 Catch:{ Exception -> 0x0b6f }
-        r97 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b6f }
-        r4 = r146 + r42;	 Catch:{ Exception -> 0x0b6f }
-        r0 = r100;	 Catch:{ Exception -> 0x0b6f }
-        r100 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b6f }
-    L_0x0764:
+    L_0x070a:
+        if (r7 == 0) goto L_0x0773;
+    L_0x070c:
+        r4 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0b7e }
+        r4 = r4.measureText(r7);	 Catch:{ Exception -> 0x0b7e }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0b7e }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0b7e }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x0b7e }
+        r146 = r0;
+        r6 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x0b7e }
+        r8 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0b7e }
+        r0 = r146;
+        r1 = r88;
+        r9 = java.lang.Math.min(r0, r1);	 Catch:{ Exception -> 0x0b7e }
+        r10 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0b7e }
+        r11 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r12 = 0;
+        r13 = 0;
+        r6.<init>(r7, r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0b7e }
+        r0 = r150;
+        r0.siteNameLayout = r6;	 Catch:{ Exception -> 0x0b7e }
+        r0 = r150;
+        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0b7e }
+        r0 = r150;
+        r6 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0b7e }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0b7e }
+        r6 = r6 + -1;
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0b7e }
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0b7e }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0b7e }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0b7e }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0b7e }
+        r44 = r44 + r79;
+        r0 = r150;
+        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x0b7e }
+        r146 = r4.getWidth();	 Catch:{ Exception -> 0x0b7e }
+        r4 = r146 + r42;
+        r0 = r97;
+        r97 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b7e }
+        r4 = r146 + r42;
+        r0 = r100;
+        r100 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0b7e }
+    L_0x0773:
         r138 = 0;
-        if (r137 == 0) goto L_0x0bb3;
-    L_0x0768:
+        if (r137 == 0) goto L_0x0bc2;
+    L_0x0777:
         r4 = 2147483647; // 0x7fffffff float:NaN double:1.060997895E-314;
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r0.titleX = r4;	 Catch:{ Exception -> 0x3a8a }
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3a8a }
-        if (r4 == 0) goto L_0x0793;	 Catch:{ Exception -> 0x3a8a }
-    L_0x0775:
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3a8a }
-        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;	 Catch:{ Exception -> 0x3a8a }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3a8a }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x3a8a }
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x3a8a }
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3a8a }
-        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;	 Catch:{ Exception -> 0x3a8a }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3a8a }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x3a8a }
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3a8a }
-    L_0x0793:
-        r120 = 0;	 Catch:{ Exception -> 0x3a8a }
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x3a8a }
-        if (r4 == 0) goto L_0x079d;	 Catch:{ Exception -> 0x3a8a }
-    L_0x079b:
-        if (r65 != 0) goto L_0x0b75;	 Catch:{ Exception -> 0x3a8a }
-    L_0x079d:
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x3a8a }
-        r11 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3a8a }
-        r12 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x3a8a }
-        r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x3a8a }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3a8a }
-        r13 = (float) r4;	 Catch:{ Exception -> 0x3a8a }
-        r14 = 0;	 Catch:{ Exception -> 0x3a8a }
-        r15 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x3a8a }
-        r17 = 4;	 Catch:{ Exception -> 0x3a8a }
-        r8 = r137;	 Catch:{ Exception -> 0x3a8a }
-        r10 = r88;	 Catch:{ Exception -> 0x3a8a }
-        r16 = r88;	 Catch:{ Exception -> 0x3a8a }
-        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r8, r9, r10, r11, r12, r13, r14, r15, r16, r17);	 Catch:{ Exception -> 0x3a8a }
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r0.titleLayout = r4;	 Catch:{ Exception -> 0x3a8a }
+        r0 = r150;
+        r0.titleX = r4;	 Catch:{ Exception -> 0x3a99 }
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3a99 }
+        if (r4 == 0) goto L_0x07a2;
+    L_0x0784:
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3a99 }
+        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3a99 }
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x3a99 }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3a99 }
+        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3a99 }
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3a99 }
+    L_0x07a2:
+        r120 = 0;
+        r0 = r150;
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x3a99 }
+        if (r4 == 0) goto L_0x07ac;
+    L_0x07aa:
+        if (r65 != 0) goto L_0x0b84;
+    L_0x07ac:
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x3a99 }
+        r11 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3a99 }
+        r12 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3a99 }
+        r13 = (float) r4;	 Catch:{ Exception -> 0x3a99 }
+        r14 = 0;
+        r15 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x3a99 }
+        r17 = 4;
+        r8 = r137;
+        r10 = r88;
+        r16 = r88;
+        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r8, r9, r10, r11, r12, r13, r14, r15, r16, r17);	 Catch:{ Exception -> 0x3a99 }
+        r0 = r150;
+        r0.titleLayout = r4;	 Catch:{ Exception -> 0x3a99 }
         r12 = r121;
-    L_0x07bf:
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bad }
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r6 = r0.titleLayout;	 Catch:{ Exception -> 0x0bad }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0bad }
-        r6 = r6 + -1;	 Catch:{ Exception -> 0x0bad }
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0bad }
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0bad }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x0bad }
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0bad }
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0bad }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x0bad }
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0bad }
-        r58 = 1;	 Catch:{ Exception -> 0x0bad }
-        r41 = 0;	 Catch:{ Exception -> 0x0bad }
-    L_0x07e9:
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bad }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0bad }
-        r0 = r41;	 Catch:{ Exception -> 0x0bad }
-        if (r0 >= r4) goto L_0x0d27;	 Catch:{ Exception -> 0x0bad }
-    L_0x07f5:
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bad }
-        r0 = r41;	 Catch:{ Exception -> 0x0bad }
-        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0bad }
-        r0 = (int) r4;	 Catch:{ Exception -> 0x0bad }
-        r87 = r0;	 Catch:{ Exception -> 0x0bad }
-        if (r87 == 0) goto L_0x0806;	 Catch:{ Exception -> 0x0bad }
+    L_0x07ce:
+        r0 = r150;
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bbc }
+        r0 = r150;
+        r6 = r0.titleLayout;	 Catch:{ Exception -> 0x0bbc }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0bbc }
+        r6 = r6 + -1;
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0bbc }
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0bbc }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0bbc }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0bbc }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0bbc }
+        r58 = 1;
+        r41 = 0;
+    L_0x07f8:
+        r0 = r150;
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bbc }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0bbc }
+        r0 = r41;
+        if (r0 >= r4) goto L_0x0d36;
     L_0x0804:
-        r138 = 1;	 Catch:{ Exception -> 0x0bad }
-    L_0x0806:
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.titleX;	 Catch:{ Exception -> 0x0bad }
-        r6 = 2147483647; // 0x7fffffff float:NaN double:1.060997895E-314;	 Catch:{ Exception -> 0x0bad }
-        if (r4 != r6) goto L_0x0b9c;	 Catch:{ Exception -> 0x0bad }
-    L_0x080f:
-        r0 = r87;	 Catch:{ Exception -> 0x0bad }
-        r4 = -r0;	 Catch:{ Exception -> 0x0bad }
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r0.titleX = r4;	 Catch:{ Exception -> 0x0bad }
-    L_0x0816:
-        if (r87 == 0) goto L_0x0d13;	 Catch:{ Exception -> 0x0bad }
-    L_0x0818:
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bad }
-        r4 = r4.getWidth();	 Catch:{ Exception -> 0x0bad }
-        r146 = r4 - r87;	 Catch:{ Exception -> 0x0bad }
-    L_0x0822:
-        r0 = r41;	 Catch:{ Exception -> 0x0bad }
-        r1 = r120;	 Catch:{ Exception -> 0x0bad }
-        if (r0 < r1) goto L_0x0830;	 Catch:{ Exception -> 0x0bad }
-    L_0x0828:
-        if (r87 == 0) goto L_0x0838;	 Catch:{ Exception -> 0x0bad }
-    L_0x082a:
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0bad }
-        if (r4 == 0) goto L_0x0838;	 Catch:{ Exception -> 0x0bad }
-    L_0x0830:
-        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;	 Catch:{ Exception -> 0x0bad }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0bad }
-        r146 = r146 + r4;	 Catch:{ Exception -> 0x0bad }
-    L_0x0838:
-        r4 = r146 + r42;	 Catch:{ Exception -> 0x0bad }
-        r0 = r97;	 Catch:{ Exception -> 0x0bad }
-        r97 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0bad }
-        r4 = r146 + r42;	 Catch:{ Exception -> 0x0bad }
-        r0 = r100;	 Catch:{ Exception -> 0x0bad }
-        r100 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0bad }
+        r0 = r150;
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bbc }
+        r0 = r41;
+        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0bbc }
+        r0 = (int) r4;	 Catch:{ Exception -> 0x0bbc }
+        r87 = r0;
+        if (r87 == 0) goto L_0x0815;
+    L_0x0813:
+        r138 = 1;
+    L_0x0815:
+        r0 = r150;
+        r4 = r0.titleX;	 Catch:{ Exception -> 0x0bbc }
+        r6 = 2147483647; // 0x7fffffff float:NaN double:1.060997895E-314;
+        if (r4 != r6) goto L_0x0bab;
+    L_0x081e:
+        r0 = r87;
+        r4 = -r0;
+        r0 = r150;
+        r0.titleX = r4;	 Catch:{ Exception -> 0x0bbc }
+    L_0x0825:
+        if (r87 == 0) goto L_0x0d22;
+    L_0x0827:
+        r0 = r150;
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bbc }
+        r4 = r4.getWidth();	 Catch:{ Exception -> 0x0bbc }
+        r146 = r4 - r87;
+    L_0x0831:
+        r0 = r41;
+        r1 = r120;
+        if (r0 < r1) goto L_0x083f;
+    L_0x0837:
+        if (r87 == 0) goto L_0x0847;
+    L_0x0839:
+        r0 = r150;
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0bbc }
+        if (r4 == 0) goto L_0x0847;
+    L_0x083f:
+        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0bbc }
+        r146 = r146 + r4;
+    L_0x0847:
+        r4 = r146 + r42;
+        r0 = r97;
+        r97 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0bbc }
+        r4 = r146 + r42;
+        r0 = r100;
+        r100 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0bbc }
         r41 = r41 + 1;
-        goto L_0x07e9;
-    L_0x084b:
+        goto L_0x07f8;
+    L_0x085a:
         r103 = 0;
         goto L_0x0031;
-    L_0x084f:
+    L_0x085e:
         r102 = 0;
         goto L_0x0041;
-    L_0x0853:
+    L_0x0862:
         r64 = 0;
         goto L_0x0057;
-    L_0x0857:
+    L_0x0866:
         r75 = 0;
         goto L_0x0061;
-    L_0x085b:
+    L_0x086a:
         r105 = 0;
         goto L_0x0080;
-    L_0x085f:
+    L_0x086e:
         r75 = 0;
         goto L_0x008a;
-    L_0x0863:
+    L_0x0872:
         r4 = 0;
         r0 = r150;
         r0.currentMessagesGroup = r4;
@@ -3242,48 +3238,48 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r0.currentPosition = r4;
         goto L_0x00ff;
-    L_0x086f:
+    L_0x087e:
         r4 = 0;
         goto L_0x0116;
-    L_0x0872:
+    L_0x0881:
         r4 = 0;
         goto L_0x0131;
-    L_0x0875:
+    L_0x0884:
         r4 = 0;
         goto L_0x0190;
-    L_0x0878:
+    L_0x0887:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.to_id;
         r4 = r4.channel_id;
-        if (r4 == 0) goto L_0x089b;
-    L_0x0882:
+        if (r4 == 0) goto L_0x08aa;
+    L_0x0891:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x089b;
-    L_0x0888:
+        if (r4 != 0) goto L_0x08aa;
+    L_0x0897:
         r4 = 1;
-    L_0x0889:
+    L_0x0898:
         r0 = r150;
         r0.drawName = r4;
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r6 = 1117782016; // 0x42a00000 float:80.0 double:5.522576936E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r26 = r4 - r6;
-        goto L_0x036a;
-    L_0x089b:
+        goto L_0x0379;
+    L_0x08aa:
         r4 = 0;
-        goto L_0x0889;
-    L_0x089d:
+        goto L_0x0898;
+    L_0x08ac:
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x08ca;
-    L_0x08a3:
+        if (r4 == 0) goto L_0x08d9;
+    L_0x08b2:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x08ca;
-    L_0x08a9:
+        if (r4 != 0) goto L_0x08d9;
+    L_0x08b8:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x08ca;
-    L_0x08af:
+        if (r4 == 0) goto L_0x08d9;
+    L_0x08be:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -3295,8 +3291,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = 1;
         r0 = r150;
         r0.drawName = r4;
-        goto L_0x036a;
-    L_0x08ca:
+        goto L_0x0379;
+    L_0x08d9:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -3309,107 +3305,107 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.messageOwner;
         r4 = r4.to_id;
         r4 = r4.channel_id;
-        if (r4 == 0) goto L_0x08f5;
-    L_0x08e8:
+        if (r4 == 0) goto L_0x0904;
+    L_0x08f7:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x08f5;
-    L_0x08ee:
+        if (r4 != 0) goto L_0x0904;
+    L_0x08fd:
         r4 = 1;
-    L_0x08ef:
+    L_0x08fe:
         r0 = r150;
         r0.drawName = r4;
-        goto L_0x036a;
-    L_0x08f5:
+        goto L_0x0379;
+    L_0x0904:
         r4 = 0;
-        goto L_0x08ef;
-    L_0x08f7:
+        goto L_0x08fe;
+    L_0x0906:
         r4 = 1115684864; // 0x42800000 float:64.0 double:5.51221563E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-        goto L_0x0390;
-    L_0x08ff:
+        goto L_0x039f;
+    L_0x090e:
         r4 = 0;
-        goto L_0x03cf;
-    L_0x0902:
+        goto L_0x03de;
+    L_0x0911:
         r4 = 0;
-        goto L_0x03f6;
-    L_0x0905:
+        goto L_0x0405;
+    L_0x0914:
         r4 = 0;
-        goto L_0x040d;
-    L_0x0908:
+        goto L_0x041c;
+    L_0x0917:
         r128 = 0;
-        goto L_0x0425;
-    L_0x090c:
+        goto L_0x0434;
+    L_0x091b:
         r145 = 0;
-        goto L_0x0437;
-    L_0x0910:
+        goto L_0x0446;
+    L_0x091f:
         r4 = "telegram_megagroup";
         r0 = r145;
         r4 = r4.equals(r0);
-        if (r4 == 0) goto L_0x0927;
-    L_0x091b:
+        if (r4 == 0) goto L_0x0936;
+    L_0x092a:
         r4 = 1;
         r0 = r150;
         r0.drawInstantView = r4;
         r4 = 2;
         r0 = r150;
         r0.drawInstantViewType = r4;
-        goto L_0x0452;
-    L_0x0927:
+        goto L_0x0461;
+    L_0x0936:
         r4 = "telegram_message";
         r0 = r145;
         r4 = r4.equals(r0);
-        if (r4 == 0) goto L_0x0452;
-    L_0x0932:
+        if (r4 == 0) goto L_0x0461;
+    L_0x0941:
         r4 = 1;
         r0 = r150;
         r0.drawInstantView = r4;
         r4 = 3;
         r0 = r150;
         r0.drawInstantViewType = r4;
-        goto L_0x0452;
-    L_0x093e:
-        if (r128 == 0) goto L_0x0452;
-    L_0x0940:
+        goto L_0x0461;
+    L_0x094d:
+        if (r128 == 0) goto L_0x0461;
+    L_0x094f:
         r128 = r128.toLowerCase();
         r4 = "instagram";
         r0 = r128;
         r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x0965;
-    L_0x094f:
+        if (r4 != 0) goto L_0x0974;
+    L_0x095e:
         r4 = "twitter";
         r0 = r128;
         r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x0965;
-    L_0x095a:
+        if (r4 != 0) goto L_0x0974;
+    L_0x0969:
         r4 = "telegram_album";
         r0 = r145;
         r4 = r4.equals(r0);
-        if (r4 == 0) goto L_0x0452;
-    L_0x0965:
+        if (r4 == 0) goto L_0x0461;
+    L_0x0974:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
         r4 = r4.cached_page;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_pageFull;
-        if (r4 == 0) goto L_0x0452;
-    L_0x0973:
+        if (r4 == 0) goto L_0x0461;
+    L_0x0982:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
         r4 = r4.photo;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_photo;
-        if (r4 != 0) goto L_0x0991;
-    L_0x0981:
+        if (r4 != 0) goto L_0x09a0;
+    L_0x0990:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
         r4 = r4.document;
         r4 = org.telegram.messenger.MessageObject.isVideoDocument(r4);
-        if (r4 == 0) goto L_0x0452;
-    L_0x0991:
+        if (r4 == 0) goto L_0x0461;
+    L_0x09a0:
         r4 = 0;
         r0 = r150;
         r0.drawInstantView = r4;
@@ -3423,41 +3419,41 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r52 = r0;
         r60 = 1;
         r41 = 0;
-    L_0x09aa:
+    L_0x09b9:
         r4 = r52.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x09e4;
-    L_0x09b2:
+        if (r0 >= r4) goto L_0x09f3;
+    L_0x09c1:
         r0 = r52;
         r1 = r41;
         r51 = r0.get(r1);
         r51 = (org.telegram.tgnet.TLRPC.PageBlock) r51;
         r0 = r51;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_pageBlockSlideshow;
-        if (r4 == 0) goto L_0x09d1;
-    L_0x09c2:
+        if (r4 == 0) goto L_0x09e0;
+    L_0x09d1:
         r50 = r51;
         r50 = (org.telegram.tgnet.TLRPC.TL_pageBlockSlideshow) r50;
         r0 = r50;
         r4 = r0.items;
         r60 = r4.size();
-    L_0x09ce:
+    L_0x09dd:
         r41 = r41 + 1;
-        goto L_0x09aa;
-    L_0x09d1:
+        goto L_0x09b9;
+    L_0x09e0:
         r0 = r51;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_pageBlockCollage;
-        if (r4 == 0) goto L_0x09ce;
-    L_0x09d7:
+        if (r4 == 0) goto L_0x09dd;
+    L_0x09e6:
         r50 = r51;
         r50 = (org.telegram.tgnet.TLRPC.TL_pageBlockCollage) r50;
         r0 = r50;
         r4 = r0.items;
         r60 = r4.size();
-        goto L_0x09ce;
-    L_0x09e4:
+        goto L_0x09dd;
+    L_0x09f3:
         r4 = "Of";
-        r6 = 2131493989; // 0x7f0c0465 float:1.8611474E38 double:1.0530979543E-314;
+        r6 = 2131493992; // 0x7f0c0468 float:1.861148E38 double:1.053097956E-314;
         r8 = 2;
         r8 = new java.lang.Object[r8];
         r9 = 0;
@@ -3486,41 +3482,41 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4.<init>(r5, r6, r7, r8, r9, r10, r11);
         r0 = r150;
         r0.photosCountLayout = r4;
-        goto L_0x0452;
-    L_0x0a27:
+        goto L_0x0461;
+    L_0x0a36:
         r4 = "chat_inPreviewInstantText";
-        goto L_0x0498;
-    L_0x0a2c:
+        goto L_0x04a7;
+    L_0x0a3b:
         r0 = r150;
         r6 = r0.instantViewSelectorDrawable;
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.isOutOwner();
-        if (r4 == 0) goto L_0x0a4b;
-    L_0x0a3a:
+        if (r4 == 0) goto L_0x0a5a;
+    L_0x0a49:
         r4 = "chat_outPreviewInstantText";
-    L_0x0a3d:
+    L_0x0a4c:
         r4 = org.telegram.ui.ActionBar.Theme.getColor(r4);
         r8 = 1610612735; // 0x5fffffff float:3.6893486E19 double:7.95748421E-315;
         r4 = r4 & r8;
         r8 = 1;
         org.telegram.ui.ActionBar.Theme.setSelectorDrawableColor(r6, r4, r8);
-        goto L_0x04be;
-    L_0x0a4b:
+        goto L_0x04cd;
+    L_0x0a5a:
         r4 = "chat_inPreviewInstantText";
-        goto L_0x0a3d;
-    L_0x0a4f:
+        goto L_0x0a4c;
+    L_0x0a5e:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r0 = r151;
         r6 = r0.lastLineWidth;
         r66 = r4 - r6;
-        if (r66 < 0) goto L_0x0a76;
-    L_0x0a5b:
+        if (r66 < 0) goto L_0x0a85;
+    L_0x0a6a:
         r0 = r66;
         r1 = r135;
-        if (r0 > r1) goto L_0x0a76;
-    L_0x0a61:
+        if (r0 > r1) goto L_0x0a85;
+    L_0x0a70:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r4 = r4 + r135;
@@ -3530,8 +3526,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x0517;
-    L_0x0a76:
+        goto L_0x0526;
+    L_0x0a85:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r0 = r151;
@@ -3543,33 +3539,33 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x0517;
-    L_0x0a91:
+        goto L_0x0526;
+    L_0x0aa0:
         r4 = 1115684864; // 0x42800000 float:64.0 double:5.51221563E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-        goto L_0x0546;
-    L_0x0a99:
+        goto L_0x0555;
+    L_0x0aa8:
         r4 = 0;
-        goto L_0x056a;
-    L_0x0a9c:
+        goto L_0x0579;
+    L_0x0aab:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r6 = 1117782016; // 0x42a00000 float:80.0 double:5.522576936E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r88 = r4 - r6;
-        goto L_0x05fe;
-    L_0x0aaa:
+        goto L_0x060d;
+    L_0x0ab9:
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x0ad6;
-    L_0x0ab0:
+        if (r4 == 0) goto L_0x0ae5;
+    L_0x0abf:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x0ad6;
-    L_0x0ab6:
+        if (r4 == 0) goto L_0x0ae5;
+    L_0x0ac5:
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.isOutOwner();
-        if (r4 != 0) goto L_0x0ad6;
-    L_0x0ac0:
+        if (r4 != 0) goto L_0x0ae5;
+    L_0x0acf:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -3578,8 +3574,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = 1124335616; // 0x43040000 float:132.0 double:5.554956023E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r88 = r4 - r6;
-        goto L_0x05fe;
-    L_0x0ad6:
+        goto L_0x060d;
+    L_0x0ae5:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -3588,18 +3584,18 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = 1117782016; // 0x42a00000 float:80.0 double:5.522576936E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r88 = r4 - r6;
-        goto L_0x05fe;
-    L_0x0aec:
+        goto L_0x060d;
+    L_0x0afb:
         r130 = 0;
-        goto L_0x069d;
-    L_0x0af0:
+        goto L_0x06ac;
+    L_0x0aff:
         r4 = 0;
-        goto L_0x06d5;
-    L_0x0af3:
+        goto L_0x06e4;
+    L_0x0b02:
         r0 = r150;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x0b25;
-    L_0x0af9:
+        if (r4 == 0) goto L_0x0b34;
+    L_0x0b08:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -3621,8 +3617,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.isSmallImage = r4;
         r130 = 0;
         r143 = r14;
-        goto L_0x06db;
-    L_0x0b25:
+        goto L_0x06ea;
+    L_0x0b34:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -3635,12 +3631,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r151;
         r4 = r0.messageText;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 == 0) goto L_0x0b64;
-    L_0x0b40:
+        if (r4 == 0) goto L_0x0b73;
+    L_0x0b4f:
         r0 = r74;
         r0 = r0.description;
         r65 = r0;
-    L_0x0b46:
+    L_0x0b55:
         r0 = r74;
         r0 = r0.photo;
         r112 = r0;
@@ -3655,352 +3651,352 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.isSmallImage = r4;
         r130 = 0;
         r143 = r14;
-        goto L_0x06db;
-    L_0x0b64:
+        goto L_0x06ea;
+    L_0x0b73:
         r65 = 0;
-        goto L_0x0b46;
-    L_0x0b67:
+        goto L_0x0b55;
+    L_0x0b76:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r42 = org.telegram.messenger.AndroidUtilities.dp(r4);
-        goto L_0x06e3;
-    L_0x0b6f:
+        goto L_0x06f2;
+    L_0x0b7e:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-        goto L_0x0764;
-    L_0x0b75:
+        goto L_0x0773;
+    L_0x0b84:
         r120 = r121;
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x3a8a }
-        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;	 Catch:{ Exception -> 0x3a8a }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3a8a }
-        r11 = r88 - r4;	 Catch:{ Exception -> 0x3a8a }
-        r13 = 4;	 Catch:{ Exception -> 0x3a8a }
-        r8 = r137;	 Catch:{ Exception -> 0x3a8a }
-        r10 = r88;	 Catch:{ Exception -> 0x3a8a }
-        r12 = r121;	 Catch:{ Exception -> 0x3a8a }
-        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x3a8a }
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r0.titleLayout = r4;	 Catch:{ Exception -> 0x3a8a }
-        r0 = r150;	 Catch:{ Exception -> 0x3a8a }
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x3a8a }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x3a8a }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x3a99 }
+        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3a99 }
+        r11 = r88 - r4;
+        r13 = 4;
+        r8 = r137;
+        r10 = r88;
+        r12 = r121;
+        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x3a99 }
+        r0 = r150;
+        r0.titleLayout = r4;	 Catch:{ Exception -> 0x3a99 }
+        r0 = r150;
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x3a99 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x3a99 }
         r12 = r121 - r4;
-        goto L_0x07bf;
-    L_0x0b9c:
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.titleX;	 Catch:{ Exception -> 0x0bad }
-        r0 = r87;	 Catch:{ Exception -> 0x0bad }
-        r6 = -r0;	 Catch:{ Exception -> 0x0bad }
-        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x0bad }
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r0.titleX = r4;	 Catch:{ Exception -> 0x0bad }
-        goto L_0x0816;
-    L_0x0bad:
+        goto L_0x07ce;
+    L_0x0bab:
+        r0 = r150;
+        r4 = r0.titleX;	 Catch:{ Exception -> 0x0bbc }
+        r0 = r87;
+        r6 = -r0;
+        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x0bbc }
+        r0 = r150;
+        r0.titleX = r4;	 Catch:{ Exception -> 0x0bbc }
+        goto L_0x0825;
+    L_0x0bbc:
         r70 = move-exception;
-    L_0x0bae:
+    L_0x0bbd:
         org.telegram.messenger.FileLog.e(r70);
         r121 = r12;
-    L_0x0bb3:
+    L_0x0bc2:
         r48 = 0;
-        if (r47 == 0) goto L_0x3a9f;
-    L_0x0bb7:
-        if (r137 != 0) goto L_0x3a9f;
-    L_0x0bb9:
-        r0 = r150;	 Catch:{ Exception -> 0x0d63 }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d63 }
-        if (r4 == 0) goto L_0x0bdd;	 Catch:{ Exception -> 0x0d63 }
-    L_0x0bbf:
-        r0 = r150;	 Catch:{ Exception -> 0x0d63 }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d63 }
-        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;	 Catch:{ Exception -> 0x0d63 }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d63 }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x0d63 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d63 }
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0d63 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d63 }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0d63 }
-        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;	 Catch:{ Exception -> 0x0d63 }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d63 }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x0d63 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d63 }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0d63 }
-    L_0x0bdd:
-        r4 = 3;	 Catch:{ Exception -> 0x0d63 }
-        r0 = r121;	 Catch:{ Exception -> 0x0d63 }
-        if (r0 != r4) goto L_0x0d2b;	 Catch:{ Exception -> 0x0d63 }
-    L_0x0be2:
-        r0 = r150;	 Catch:{ Exception -> 0x0d63 }
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0d63 }
-        if (r4 == 0) goto L_0x0bea;	 Catch:{ Exception -> 0x0d63 }
-    L_0x0be8:
-        if (r65 != 0) goto L_0x0d2b;	 Catch:{ Exception -> 0x0d63 }
-    L_0x0bea:
-        r8 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x0d63 }
-        r10 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0d63 }
-        r12 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0d63 }
-        r13 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x0d63 }
-        r14 = 0;	 Catch:{ Exception -> 0x0d63 }
-        r15 = 0;	 Catch:{ Exception -> 0x0d63 }
-        r9 = r47;	 Catch:{ Exception -> 0x0d63 }
-        r11 = r88;	 Catch:{ Exception -> 0x0d63 }
-        r8.<init>(r9, r10, r11, r12, r13, r14, r15);	 Catch:{ Exception -> 0x0d63 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d63 }
-        r0.authorLayout = r8;	 Catch:{ Exception -> 0x0d63 }
+        if (r47 == 0) goto L_0x3aae;
+    L_0x0bc6:
+        if (r137 != 0) goto L_0x3aae;
+    L_0x0bc8:
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d72 }
+        if (r4 == 0) goto L_0x0bec;
+    L_0x0bce:
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d72 }
+        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d72 }
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0d72 }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0d72 }
+        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d72 }
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0d72 }
+    L_0x0bec:
+        r4 = 3;
+        r0 = r121;
+        if (r0 != r4) goto L_0x0d3a;
+    L_0x0bf1:
+        r0 = r150;
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0d72 }
+        if (r4 == 0) goto L_0x0bf9;
+    L_0x0bf7:
+        if (r65 != 0) goto L_0x0d3a;
+    L_0x0bf9:
+        r8 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x0d72 }
+        r10 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0d72 }
+        r12 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0d72 }
+        r13 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r14 = 0;
+        r15 = 0;
+        r9 = r47;
+        r11 = r88;
+        r8.<init>(r9, r10, r11, r12, r13, r14, r15);	 Catch:{ Exception -> 0x0d72 }
+        r0 = r150;
+        r0.authorLayout = r8;	 Catch:{ Exception -> 0x0d72 }
         r12 = r121;
-    L_0x0c01:
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3a87 }
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r6 = r0.authorLayout;	 Catch:{ Exception -> 0x3a87 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x3a87 }
-        r6 = r6 + -1;	 Catch:{ Exception -> 0x3a87 }
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x3a87 }
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x3a87 }
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x3a87 }
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x3a87 }
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3a87 }
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3a87 }
-        r6 = 0;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r4.getLineLeft(r6);	 Catch:{ Exception -> 0x3a87 }
-        r0 = (int) r4;	 Catch:{ Exception -> 0x3a87 }
-        r87 = r0;	 Catch:{ Exception -> 0x3a87 }
-        r0 = r87;	 Catch:{ Exception -> 0x3a87 }
-        r4 = -r0;	 Catch:{ Exception -> 0x3a87 }
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r0.authorX = r4;	 Catch:{ Exception -> 0x3a87 }
-        if (r87 == 0) goto L_0x0d50;	 Catch:{ Exception -> 0x3a87 }
-    L_0x0c3c:
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r4.getWidth();	 Catch:{ Exception -> 0x3a87 }
-        r146 = r4 - r87;	 Catch:{ Exception -> 0x3a87 }
-        r48 = 1;	 Catch:{ Exception -> 0x3a87 }
-    L_0x0c48:
-        r4 = r146 + r42;	 Catch:{ Exception -> 0x3a87 }
-        r0 = r97;	 Catch:{ Exception -> 0x3a87 }
-        r97 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x3a87 }
-        r4 = r146 + r42;	 Catch:{ Exception -> 0x3a87 }
-        r0 = r100;	 Catch:{ Exception -> 0x3a87 }
-        r100 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x3a87 }
-    L_0x0c58:
-        if (r65 == 0) goto L_0x0d8c;
-    L_0x0c5a:
+    L_0x0c10:
+        r0 = r150;
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3a96 }
+        r0 = r150;
+        r6 = r0.authorLayout;	 Catch:{ Exception -> 0x3a96 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x3a96 }
+        r6 = r6 + -1;
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x3a96 }
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3a96 }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x3a96 }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3a96 }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3a96 }
+        r0 = r150;
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3a96 }
+        r6 = 0;
+        r4 = r4.getLineLeft(r6);	 Catch:{ Exception -> 0x3a96 }
+        r0 = (int) r4;	 Catch:{ Exception -> 0x3a96 }
+        r87 = r0;
+        r0 = r87;
+        r4 = -r0;
+        r0 = r150;
+        r0.authorX = r4;	 Catch:{ Exception -> 0x3a96 }
+        if (r87 == 0) goto L_0x0d5f;
+    L_0x0c4b:
+        r0 = r150;
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3a96 }
+        r4 = r4.getWidth();	 Catch:{ Exception -> 0x3a96 }
+        r146 = r4 - r87;
+        r48 = 1;
+    L_0x0c57:
+        r4 = r146 + r42;
+        r0 = r97;
+        r97 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x3a96 }
+        r4 = r146 + r42;
+        r0 = r100;
+        r100 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x3a96 }
+    L_0x0c67:
+        if (r65 == 0) goto L_0x0d9b;
+    L_0x0c69:
         r4 = 0;
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.currentMessageObject;	 Catch:{ Exception -> 0x0d88 }
-        r4.generateLinkDescription();	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d88 }
-        if (r4 == 0) goto L_0x0c8a;	 Catch:{ Exception -> 0x0d88 }
-    L_0x0c6c:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d88 }
-        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;	 Catch:{ Exception -> 0x0d88 }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0d88 }
-        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;	 Catch:{ Exception -> 0x0d88 }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0d88 }
-    L_0x0c8a:
-        r120 = 0;	 Catch:{ Exception -> 0x0d88 }
-        r4 = 3;	 Catch:{ Exception -> 0x0d88 }
-        if (r12 != r4) goto L_0x0d6b;	 Catch:{ Exception -> 0x0d88 }
-    L_0x0c8f:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0d88 }
-        if (r4 != 0) goto L_0x0d6b;	 Catch:{ Exception -> 0x0d88 }
-    L_0x0c95:
-        r0 = r151;	 Catch:{ Exception -> 0x0d88 }
-        r8 = r0.linkDescription;	 Catch:{ Exception -> 0x0d88 }
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x0d88 }
-        r11 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0d88 }
-        r12 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x0d88 }
-        r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x0d88 }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d88 }
-        r13 = (float) r4;	 Catch:{ Exception -> 0x0d88 }
-        r14 = 0;	 Catch:{ Exception -> 0x0d88 }
-        r15 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x0d88 }
-        r17 = 6;	 Catch:{ Exception -> 0x0d88 }
-        r10 = r88;	 Catch:{ Exception -> 0x0d88 }
-        r16 = r88;	 Catch:{ Exception -> 0x0d88 }
-        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r8, r9, r10, r11, r12, r13, r14, r15, r16, r17);	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x0d88 }
-    L_0x0cb7:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r6 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d88 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0d88 }
-        r6 = r6 + -1;	 Catch:{ Exception -> 0x0d88 }
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0d88 }
-        r78 = 0;	 Catch:{ Exception -> 0x0d88 }
-        r41 = 0;	 Catch:{ Exception -> 0x0d88 }
-    L_0x0ce1:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0d88 }
-        r0 = r41;	 Catch:{ Exception -> 0x0d88 }
-        if (r0 >= r4) goto L_0x1462;	 Catch:{ Exception -> 0x0d88 }
-    L_0x0ced:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r41;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0d88 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0d88 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0d88 }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x0d88 }
-        r87 = r0;	 Catch:{ Exception -> 0x0d88 }
-        if (r87 == 0) goto L_0x0d10;	 Catch:{ Exception -> 0x0d88 }
-    L_0x0d01:
-        r78 = 1;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0d88 }
-        if (r4 != 0) goto L_0x1451;	 Catch:{ Exception -> 0x0d88 }
-    L_0x0d09:
-        r0 = r87;	 Catch:{ Exception -> 0x0d88 }
-        r4 = -r0;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d88 }
+        r0 = r150;
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d97 }
+        r0 = r150;
+        r4 = r0.currentMessageObject;	 Catch:{ Exception -> 0x0d97 }
+        r4.generateLinkDescription();	 Catch:{ Exception -> 0x0d97 }
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d97 }
+        if (r4 == 0) goto L_0x0c99;
+    L_0x0c7b:
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d97 }
+        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d97 }
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0d97 }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0d97 }
+        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x0d97 }
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0d97 }
+    L_0x0c99:
+        r120 = 0;
+        r4 = 3;
+        if (r12 != r4) goto L_0x0d7a;
+    L_0x0c9e:
+        r0 = r150;
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0d97 }
+        if (r4 != 0) goto L_0x0d7a;
+    L_0x0ca4:
+        r0 = r151;
+        r8 = r0.linkDescription;	 Catch:{ Exception -> 0x0d97 }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x0d97 }
+        r11 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x0d97 }
+        r12 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d97 }
+        r13 = (float) r4;	 Catch:{ Exception -> 0x0d97 }
+        r14 = 0;
+        r15 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x0d97 }
+        r17 = 6;
+        r10 = r88;
+        r16 = r88;
+        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r8, r9, r10, r11, r12, r13, r14, r15, r16, r17);	 Catch:{ Exception -> 0x0d97 }
+        r0 = r150;
+        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x0d97 }
+    L_0x0cc6:
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d97 }
+        r0 = r150;
+        r6 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d97 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x0d97 }
+        r6 = r6 + -1;
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x0d97 }
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x0d97 }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x0d97 }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x0d97 }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x0d97 }
+        r78 = 0;
+        r41 = 0;
+    L_0x0cf0:
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d97 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0d97 }
+        r0 = r41;
+        if (r0 >= r4) goto L_0x1471;
+    L_0x0cfc:
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d97 }
+        r0 = r41;
+        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0d97 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0d97 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0d97 }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x0d97 }
+        r87 = r0;
+        if (r87 == 0) goto L_0x0d1f;
     L_0x0d10:
+        r78 = 1;
+        r0 = r150;
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0d97 }
+        if (r4 != 0) goto L_0x1460;
+    L_0x0d18:
+        r0 = r87;
+        r4 = -r0;
+        r0 = r150;
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d97 }
+    L_0x0d1f:
         r41 = r41 + 1;
-        goto L_0x0ce1;
-    L_0x0d13:
-        r0 = r150;	 Catch:{ Exception -> 0x0bad }
-        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bad }
-        r0 = r41;	 Catch:{ Exception -> 0x0bad }
-        r4 = r4.getLineWidth(r0);	 Catch:{ Exception -> 0x0bad }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0bad }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0bad }
+        goto L_0x0cf0;
+    L_0x0d22:
+        r0 = r150;
+        r4 = r0.titleLayout;	 Catch:{ Exception -> 0x0bbc }
+        r0 = r41;
+        r4 = r4.getLineWidth(r0);	 Catch:{ Exception -> 0x0bbc }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0bbc }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0bbc }
         r0 = (int) r8;
         r146 = r0;
-        goto L_0x0822;
-    L_0x0d27:
+        goto L_0x0831;
+    L_0x0d36:
         r121 = r12;
-        goto L_0x0bb3;
-    L_0x0d2b:
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0d63 }
-        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;	 Catch:{ Exception -> 0x0d63 }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d63 }
-        r11 = r88 - r4;	 Catch:{ Exception -> 0x0d63 }
-        r13 = 1;	 Catch:{ Exception -> 0x0d63 }
-        r8 = r47;	 Catch:{ Exception -> 0x0d63 }
-        r10 = r88;	 Catch:{ Exception -> 0x0d63 }
-        r12 = r121;	 Catch:{ Exception -> 0x0d63 }
-        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0d63 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d63 }
-        r0.authorLayout = r4;	 Catch:{ Exception -> 0x0d63 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d63 }
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x0d63 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0d63 }
+        goto L_0x0bc2;
+    L_0x0d3a:
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x0d72 }
+        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d72 }
+        r11 = r88 - r4;
+        r13 = 1;
+        r8 = r47;
+        r10 = r88;
+        r12 = r121;
+        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0d72 }
+        r0 = r150;
+        r0.authorLayout = r4;	 Catch:{ Exception -> 0x0d72 }
+        r0 = r150;
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x0d72 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0d72 }
         r12 = r121 - r4;
-        goto L_0x0c01;
-    L_0x0d50:
-        r0 = r150;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3a87 }
-        r6 = 0;	 Catch:{ Exception -> 0x3a87 }
-        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x3a87 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x3a87 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x3a87 }
+        goto L_0x0c10;
+    L_0x0d5f:
+        r0 = r150;
+        r4 = r0.authorLayout;	 Catch:{ Exception -> 0x3a96 }
+        r6 = 0;
+        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x3a96 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x3a96 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x3a96 }
         r0 = (int) r8;
         r146 = r0;
-        goto L_0x0c48;
-    L_0x0d63:
+        goto L_0x0c57;
+    L_0x0d72:
         r70 = move-exception;
         r12 = r121;
-    L_0x0d66:
+    L_0x0d75:
         org.telegram.messenger.FileLog.e(r70);
-        goto L_0x0c58;
-    L_0x0d6b:
+        goto L_0x0c67;
+    L_0x0d7a:
         r120 = r12;
-        r0 = r151;	 Catch:{ Exception -> 0x0d88 }
-        r8 = r0.linkDescription;	 Catch:{ Exception -> 0x0d88 }
-        r9 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x0d88 }
-        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;	 Catch:{ Exception -> 0x0d88 }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d88 }
-        r11 = r88 - r4;	 Catch:{ Exception -> 0x0d88 }
-        r13 = 6;	 Catch:{ Exception -> 0x0d88 }
-        r10 = r88;	 Catch:{ Exception -> 0x0d88 }
-        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x0d88 }
-        goto L_0x0cb7;
-    L_0x0d88:
+        r0 = r151;
+        r8 = r0.linkDescription;	 Catch:{ Exception -> 0x0d97 }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x0d97 }
+        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d97 }
+        r11 = r88 - r4;
+        r13 = 6;
+        r10 = r88;
+        r4 = generateStaticLayout(r8, r9, r10, r11, r12, r13);	 Catch:{ Exception -> 0x0d97 }
+        r0 = r150;
+        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x0d97 }
+        goto L_0x0cc6;
+    L_0x0d97:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-    L_0x0d8c:
-        if (r130 == 0) goto L_0x0dac;
-    L_0x0d8e:
+    L_0x0d9b:
+        if (r130 == 0) goto L_0x0dbb;
+    L_0x0d9d:
         r0 = r150;
         r4 = r0.descriptionLayout;
-        if (r4 == 0) goto L_0x0da5;
-    L_0x0d94:
+        if (r4 == 0) goto L_0x0db4;
+    L_0x0da3:
         r0 = r150;
         r4 = r0.descriptionLayout;
-        if (r4 == 0) goto L_0x0dac;
-    L_0x0d9a:
+        if (r4 == 0) goto L_0x0dbb;
+    L_0x0da9:
         r0 = r150;
         r4 = r0.descriptionLayout;
         r4 = r4.getLineCount();
         r6 = 1;
-        if (r4 != r6) goto L_0x0dac;
-    L_0x0da5:
+        if (r4 != r6) goto L_0x0dbb;
+    L_0x0db4:
         r130 = 0;
         r4 = 0;
         r0 = r150;
         r0.isSmallImage = r4;
-    L_0x0dac:
-        if (r130 == 0) goto L_0x1500;
-    L_0x0dae:
+    L_0x0dbb:
+        if (r130 == 0) goto L_0x150f;
+    L_0x0dbd:
         r4 = 1111490560; // 0x42400000 float:48.0 double:5.491493014E-315;
         r99 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x0db4:
-        if (r67 == 0) goto L_0x184c;
-    L_0x0db6:
+    L_0x0dc3:
+        if (r67 == 0) goto L_0x185b;
+    L_0x0dc5:
         r4 = org.telegram.messenger.MessageObject.isGifDocument(r67);
-        if (r4 == 0) goto L_0x150b;
-    L_0x0dbc:
+        if (r4 == 0) goto L_0x151a;
+    L_0x0dcb:
         r4 = org.telegram.messenger.SharedConfig.autoplayGifs;
-        if (r4 != 0) goto L_0x0dc6;
-    L_0x0dc0:
+        if (r4 != 0) goto L_0x0dd5;
+    L_0x0dcf:
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r0 = r151;
         r0.gifState = r4;
-    L_0x0dc6:
+    L_0x0dd5:
         r0 = r150;
         r6 = r0.photoImage;
         r0 = r151;
         r4 = r0.gifState;
         r8 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r4 = (r4 > r8 ? 1 : (r4 == r8 ? 0 : -1));
-        if (r4 == 0) goto L_0x1504;
-    L_0x0dd4:
+        if (r4 == 0) goto L_0x1513;
+    L_0x0de3:
         r4 = 1;
-    L_0x0dd5:
+    L_0x0de4:
         r6.setAllowStartAnimation(r4);
         r0 = r67;
         r4 = r0.thumb;
@@ -4008,26 +4004,26 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.currentPhotoObject = r4;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x0e52;
-    L_0x0de6:
+        if (r4 == 0) goto L_0x0e61;
+    L_0x0df5:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x0df6;
-    L_0x0dee:
+        if (r4 == 0) goto L_0x0e05;
+    L_0x0dfd:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x0e52;
-    L_0x0df6:
+        if (r4 != 0) goto L_0x0e61;
+    L_0x0e05:
         r41 = 0;
-    L_0x0df8:
+    L_0x0e07:
         r0 = r67;
         r4 = r0.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x0e30;
-    L_0x0e04:
+        if (r0 >= r4) goto L_0x0e3f;
+    L_0x0e13:
         r0 = r67;
         r4 = r0.attributes;
         r0 = r41;
@@ -4035,12 +4031,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeImageSize;
-        if (r4 != 0) goto L_0x0e1c;
-    L_0x0e16:
+        if (r4 != 0) goto L_0x0e2b;
+    L_0x0e25:
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeVideo;
-        if (r4 == 0) goto L_0x1507;
-    L_0x0e1c:
+        if (r4 == 0) goto L_0x1516;
+    L_0x0e2b:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r46;
@@ -4051,17 +4047,17 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r46;
         r6 = r0.h;
         r4.h = r6;
-    L_0x0e30:
+    L_0x0e3f:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x0e40;
-    L_0x0e38:
+        if (r4 == 0) goto L_0x0e4f;
+    L_0x0e47:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x0e52;
-    L_0x0e40:
+        if (r4 != 0) goto L_0x0e61;
+    L_0x0e4f:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r150;
@@ -4070,7 +4066,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r8 = org.telegram.messenger.AndroidUtilities.dp(r8);
         r6.h = r8;
         r4.w = r8;
-    L_0x0e52:
+    L_0x0e61:
         r0 = r67;
         r1 = r150;
         r1.documentAttach = r0;
@@ -4078,63 +4074,63 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r0.documentAttachType = r4;
         r14 = r143;
-    L_0x0e5f:
+    L_0x0e6e:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 5;
-        if (r4 == r6) goto L_0x115f;
-    L_0x0e66:
+        if (r4 == r6) goto L_0x116e;
+    L_0x0e75:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 3;
-        if (r4 == r6) goto L_0x115f;
-    L_0x0e6d:
+        if (r4 == r6) goto L_0x116e;
+    L_0x0e7c:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 1;
-        if (r4 == r6) goto L_0x115f;
-    L_0x0e74:
+        if (r4 == r6) goto L_0x116e;
+    L_0x0e83:
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 != 0) goto L_0x0e7c;
-    L_0x0e7a:
-        if (r14 == 0) goto L_0x1bd0;
-    L_0x0e7c:
-        if (r139 == 0) goto L_0x18bc;
-    L_0x0e7e:
+        if (r4 != 0) goto L_0x0e8b;
+    L_0x0e89:
+        if (r14 == 0) goto L_0x1bdf;
+    L_0x0e8b:
+        if (r139 == 0) goto L_0x18cb;
+    L_0x0e8d:
         r4 = "photo";
         r0 = r139;
         r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x0ead;
-    L_0x0e89:
+        if (r4 != 0) goto L_0x0ebc;
+    L_0x0e98:
         r4 = "document";
         r0 = r139;
         r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x0e9b;
-    L_0x0e94:
+        if (r4 == 0) goto L_0x0eaa;
+    L_0x0ea3:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 6;
-        if (r4 != r6) goto L_0x0ead;
-    L_0x0e9b:
+        if (r4 != r6) goto L_0x0ebc;
+    L_0x0eaa:
         r4 = "gif";
         r0 = r139;
         r4 = r0.equals(r4);
-        if (r4 != 0) goto L_0x0ead;
-    L_0x0ea6:
+        if (r4 != 0) goto L_0x0ebc;
+    L_0x0eb5:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 4;
-        if (r4 != r6) goto L_0x18bc;
-    L_0x0ead:
+        if (r4 != r6) goto L_0x18cb;
+    L_0x0ebc:
         r4 = 1;
-    L_0x0eae:
+    L_0x0ebd:
         r0 = r150;
         r0.drawImageButton = r4;
         r0 = r150;
         r4 = r0.linkPreviewHeight;
-        if (r4 == 0) goto L_0x0ed6;
-    L_0x0eb8:
+        if (r4 == 0) goto L_0x0ee5;
+    L_0x0ec7:
         r0 = r150;
         r4 = r0.linkPreviewHeight;
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
@@ -4149,71 +4145,71 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.totalHeight = r4;
-    L_0x0ed6:
+    L_0x0ee5:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 6;
-        if (r4 != r6) goto L_0x18cc;
-    L_0x0edd:
+        if (r4 != r6) goto L_0x18db;
+    L_0x0eec:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x18bf;
-    L_0x0ee3:
+        if (r4 == 0) goto L_0x18ce;
+    L_0x0ef2:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r4 = (float) r4;
         r6 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
         r4 = r4 * r6;
         r0 = (int) r4;
         r99 = r0;
-    L_0x0eee:
+    L_0x0efd:
         r0 = r150;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x18df;
-    L_0x0ef4:
+        if (r4 == 0) goto L_0x18ee;
+    L_0x0f03:
         r4 = 1094713344; // 0x41400000 float:12.0 double:5.408602553E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x0efa:
+    L_0x0f09:
         r4 = r99 - r4;
         r4 = r4 + r42;
         r0 = r97;
         r97 = java.lang.Math.max(r0, r4);
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x18e2;
-    L_0x0f0a:
+        if (r4 == 0) goto L_0x18f1;
+    L_0x0f19:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r6 = -1;
         r4.size = r6;
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x0f1e;
-    L_0x0f17:
+        if (r4 == 0) goto L_0x0f2d;
+    L_0x0f26:
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
         r6 = -1;
         r4.size = r6;
-    L_0x0f1e:
-        if (r130 != 0) goto L_0x0f27;
-    L_0x0f20:
+    L_0x0f2d:
+        if (r130 != 0) goto L_0x0f36;
+    L_0x0f2f:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 7;
-        if (r4 != r6) goto L_0x18e7;
-    L_0x0f27:
+        if (r4 != r6) goto L_0x18f6;
+    L_0x0f36:
         r79 = r99;
         r146 = r99;
-    L_0x0f2b:
+    L_0x0f3a:
         r0 = r150;
         r4 = r0.isSmallImage;
-        if (r4 == 0) goto L_0x1980;
-    L_0x0f31:
+        if (r4 == 0) goto L_0x198f;
+    L_0x0f40:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r4 + r44;
         r0 = r150;
         r6 = r0.linkPreviewHeight;
-        if (r4 <= r6) goto L_0x0f68;
-    L_0x0f3f:
+        if (r4 <= r6) goto L_0x0f77;
+    L_0x0f4e:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
@@ -4233,7 +4229,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r44;
         r0 = r150;
         r0.linkPreviewHeight = r4;
-    L_0x0f68:
+    L_0x0f77:
         r0 = r150;
         r4 = r0.linkPreviewHeight;
         r6 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
@@ -4241,7 +4237,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.linkPreviewHeight = r4;
-    L_0x0f77:
+    L_0x0f86:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = 0;
@@ -4275,8 +4271,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.String.format(r4, r6, r8);
         r0 = r150;
         r0.currentPhotoFilterThumb = r4;
-        if (r14 == 0) goto L_0x199d;
-    L_0x0fc2:
+        if (r14 == 0) goto L_0x19ac;
+    L_0x0fd1:
         r0 = r150;
         r13 = r0.photoImage;
         r15 = 0;
@@ -4291,19 +4287,19 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r21 = 0;
         r22 = 1;
         r13.setImage(r14, r15, r16, r17, r18, r19, r20, r21, r22);
-    L_0x0fdf:
+    L_0x0fee:
         r4 = 1;
         r0 = r150;
         r0.drawPhotoImage = r4;
-        if (r139 == 0) goto L_0x1b8f;
-    L_0x0fe6:
+        if (r139 == 0) goto L_0x1b9e;
+    L_0x0ff5:
         r4 = "video";
         r0 = r139;
         r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x1b8f;
-    L_0x0ff1:
-        if (r68 == 0) goto L_0x1b8f;
-    L_0x0ff3:
+        if (r4 == 0) goto L_0x1b9e;
+    L_0x1000:
+        if (r68 == 0) goto L_0x1b9e;
+    L_0x1002:
         r104 = r68 / 60;
         r4 = r104 * 60;
         r127 = r68 - r4;
@@ -4337,23 +4333,23 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r15.<init>(r16, r17, r18, r19, r20, r21, r22);
         r0 = r150;
         r0.videoInfoLayout = r15;
-    L_0x103c:
+    L_0x104b:
         r0 = r150;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x1125;
-    L_0x1042:
+        if (r4 == 0) goto L_0x1134;
+    L_0x1051:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.flags;
         r4 = r4 & 4;
-        if (r4 == 0) goto L_0x1bfa;
-    L_0x104e:
+        if (r4 == 0) goto L_0x1c09;
+    L_0x105d:
         r4 = "PaymentReceipt";
-        r6 = 2131494074; // 0x7f0c04ba float:1.8611646E38 double:1.0530979963E-314;
+        r6 = 2131494077; // 0x7f0c04bd float:1.8611652E38 double:1.053097998E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
-    L_0x105c:
+    L_0x106b:
         r4 = org.telegram.messenger.LocaleController.getInstance();
         r0 = r151;
         r6 = r0.messageOwner;
@@ -4410,8 +4406,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.videoInfoLayout = r15;
         r0 = r150;
         r4 = r0.drawPhotoImage;
-        if (r4 != 0) goto L_0x1125;
-    L_0x10e9:
+        if (r4 != 0) goto L_0x1134;
+    L_0x10f8:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1086324736; // 0x40c00000 float:6.0 double:5.367157323E-315;
@@ -4428,8 +4424,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r4 = r4 + r6;
         r0 = r26;
-        if (r4 <= r0) goto L_0x1c24;
-    L_0x110c:
+        if (r4 <= r0) goto L_0x1c33;
+    L_0x111b:
         r0 = r150;
         r4 = r0.durationWidth;
         r0 = r97;
@@ -4441,15 +4437,15 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.totalHeight = r4;
-    L_0x1125:
+    L_0x1134:
         r0 = r150;
         r4 = r0.hasGamePreview;
-        if (r4 == 0) goto L_0x1154;
-    L_0x112b:
+        if (r4 == 0) goto L_0x1163;
+    L_0x113a:
         r0 = r151;
         r4 = r0.textHeight;
-        if (r4 == 0) goto L_0x1154;
-    L_0x1131:
+        if (r4 == 0) goto L_0x1163;
+    L_0x1140:
         r0 = r150;
         r4 = r0.linkPreviewHeight;
         r0 = r151;
@@ -4467,17 +4463,17 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.totalHeight = r4;
-    L_0x1154:
+    L_0x1163:
         r0 = r150;
         r1 = r26;
         r2 = r135;
         r3 = r97;
         r0.calcBackgroundWidth(r1, r2, r3);
-    L_0x115f:
+    L_0x116e:
         r0 = r150;
         r4 = r0.drawInstantView;
-        if (r4 == 0) goto L_0x1216;
-    L_0x1165:
+        if (r4 == 0) goto L_0x1225;
+    L_0x1174:
         r4 = 1107558400; // 0x42040000 float:33.0 double:5.47206556E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r150;
@@ -4485,12 +4481,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.drawInstantViewType;
         r6 = 1;
-        if (r4 != r6) goto L_0x1c3c;
-    L_0x1176:
+        if (r4 != r6) goto L_0x1c4b;
+    L_0x1185:
         r4 = "OpenChannel";
-        r6 = 2131494001; // 0x7f0c0471 float:1.8611498E38 double:1.05309796E-314;
+        r6 = 2131494004; // 0x7f0c0474 float:1.8611504E38 double:1.0530979617E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
-    L_0x1180:
+    L_0x118f:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1117126656; // 0x42960000 float:75.0 double:5.51933903E-315;
@@ -4527,13 +4523,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.totalHeight = r4;
         r0 = r150;
         r4 = r0.instantViewLayout;
-        if (r4 == 0) goto L_0x1216;
-    L_0x11d0:
+        if (r4 == 0) goto L_0x1225;
+    L_0x11df:
         r0 = r150;
         r4 = r0.instantViewLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x1216;
-    L_0x11da:
+        if (r4 <= 0) goto L_0x1225;
+    L_0x11e9:
         r0 = r150;
         r4 = r0.instantWidth;
         r8 = (double) r4;
@@ -4548,11 +4544,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = r4 / 2;
         r0 = r150;
         r4 = r0.drawInstantViewType;
-        if (r4 != 0) goto L_0x1c6e;
-    L_0x11f7:
+        if (r4 != 0) goto L_0x1c7d;
+    L_0x1206:
         r4 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x11fd:
+    L_0x120c:
         r4 = r4 + r6;
         r0 = r150;
         r0.instantTextX = r4;
@@ -4567,151 +4563,151 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.instantTextX = r4;
-    L_0x1216:
+    L_0x1225:
         r0 = r150;
         r4 = r0.currentPosition;
-        if (r4 != 0) goto L_0x36bc;
-    L_0x121c:
+        if (r4 != 0) goto L_0x36cb;
+    L_0x122b:
         r0 = r150;
         r4 = r0.captionLayout;
-        if (r4 != 0) goto L_0x36bc;
-    L_0x1222:
+        if (r4 != 0) goto L_0x36cb;
+    L_0x1231:
         r0 = r151;
         r4 = r0.caption;
-        if (r4 == 0) goto L_0x36bc;
-    L_0x1228:
+        if (r4 == 0) goto L_0x36cb;
+    L_0x1237:
         r0 = r151;
         r4 = r0.type;
         r6 = 13;
-        if (r4 == r6) goto L_0x36bc;
-    L_0x1230:
-        r0 = r151;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r0.caption;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r0.currentCaption = r4;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r0.backgroundWidth;	 Catch:{ Exception -> 0x36b3 }
-        r6 = 1106771968; // 0x41f80000 float:31.0 double:5.46818007E-315;	 Catch:{ Exception -> 0x36b3 }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x36b3 }
-        r146 = r4 - r6;	 Catch:{ Exception -> 0x36b3 }
-        r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;	 Catch:{ Exception -> 0x36b3 }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x36b3 }
-        r30 = r146 - r4;	 Catch:{ Exception -> 0x36b3 }
-        r4 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x36b3 }
-        r6 = 24;	 Catch:{ Exception -> 0x36b3 }
-        if (r4 < r6) goto L_0x3696;	 Catch:{ Exception -> 0x36b3 }
-    L_0x1252:
-        r0 = r151;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r0.caption;	 Catch:{ Exception -> 0x36b3 }
-        r6 = 0;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r151;	 Catch:{ Exception -> 0x36b3 }
-        r8 = r0.caption;	 Catch:{ Exception -> 0x36b3 }
-        r8 = r8.length();	 Catch:{ Exception -> 0x36b3 }
-        r9 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r30;	 Catch:{ Exception -> 0x36b3 }
-        r4 = android.text.StaticLayout.Builder.obtain(r4, r6, r8, r9, r0);	 Catch:{ Exception -> 0x36b3 }
-        r6 = 1;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4.setBreakStrategy(r6);	 Catch:{ Exception -> 0x36b3 }
-        r6 = 0;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4.setHyphenationFrequency(r6);	 Catch:{ Exception -> 0x36b3 }
-        r6 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4.setAlignment(r6);	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4.build();	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r0.captionLayout = r4;	 Catch:{ Exception -> 0x36b3 }
-    L_0x127f:
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x36b3 }
-        if (r4 <= 0) goto L_0x1319;	 Catch:{ Exception -> 0x36b3 }
-    L_0x1289:
-        r0 = r30;	 Catch:{ Exception -> 0x36b3 }
-        r1 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r1.captionWidth = r0;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r6 = r0.timeWidth;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r151.isOutOwner();	 Catch:{ Exception -> 0x36b3 }
-        if (r4 == 0) goto L_0x36b9;	 Catch:{ Exception -> 0x36b3 }
-    L_0x1299:
-        r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;	 Catch:{ Exception -> 0x36b3 }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x36b3 }
-    L_0x129f:
-        r136 = r6 + r4;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4.getHeight();	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r0.captionHeight = r4;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r6 = r0.captionHeight;	 Catch:{ Exception -> 0x36b3 }
-        r8 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;	 Catch:{ Exception -> 0x36b3 }
-        r8 = org.telegram.messenger.AndroidUtilities.dp(r8);	 Catch:{ Exception -> 0x36b3 }
-        r6 = r6 + r8;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x36b3 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x36b3 }
-        r6 = r6 + -1;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r8 = r0.captionLayout;	 Catch:{ Exception -> 0x36b3 }
-        r8 = r8.getLineCount();	 Catch:{ Exception -> 0x36b3 }
-        r8 = r8 + -1;	 Catch:{ Exception -> 0x36b3 }
-        r6 = r6.getLineLeft(r8);	 Catch:{ Exception -> 0x36b3 }
-        r83 = r4 + r6;	 Catch:{ Exception -> 0x36b3 }
-        r4 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;	 Catch:{ Exception -> 0x36b3 }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x36b3 }
-        r4 = r146 - r4;	 Catch:{ Exception -> 0x36b3 }
-        r4 = (float) r4;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4 - r83;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r136;	 Catch:{ Exception -> 0x36b3 }
-        r6 = (float) r0;	 Catch:{ Exception -> 0x36b3 }
-        r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));	 Catch:{ Exception -> 0x36b3 }
-        if (r4 >= 0) goto L_0x1319;	 Catch:{ Exception -> 0x36b3 }
-    L_0x12f9:
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x36b3 }
-        r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;	 Catch:{ Exception -> 0x36b3 }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r4 = r0.captionHeight;	 Catch:{ Exception -> 0x36b3 }
-        r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;	 Catch:{ Exception -> 0x36b3 }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x36b3 }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r0.captionHeight = r4;	 Catch:{ Exception -> 0x36b3 }
+        if (r4 == r6) goto L_0x36cb;
+    L_0x123f:
+        r0 = r151;
+        r4 = r0.caption;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r0.currentCaption = r4;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r4 = r0.backgroundWidth;	 Catch:{ Exception -> 0x36c2 }
+        r6 = 1106771968; // 0x41f80000 float:31.0 double:5.46818007E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x36c2 }
+        r146 = r4 - r6;
+        r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x36c2 }
+        r30 = r146 - r4;
+        r4 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x36c2 }
+        r6 = 24;
+        if (r4 < r6) goto L_0x36a5;
+    L_0x1261:
+        r0 = r151;
+        r4 = r0.caption;	 Catch:{ Exception -> 0x36c2 }
+        r6 = 0;
+        r0 = r151;
+        r8 = r0.caption;	 Catch:{ Exception -> 0x36c2 }
+        r8 = r8.length();	 Catch:{ Exception -> 0x36c2 }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r30;
+        r4 = android.text.StaticLayout.Builder.obtain(r4, r6, r8, r9, r0);	 Catch:{ Exception -> 0x36c2 }
+        r6 = 1;
+        r4 = r4.setBreakStrategy(r6);	 Catch:{ Exception -> 0x36c2 }
+        r6 = 0;
+        r4 = r4.setHyphenationFrequency(r6);	 Catch:{ Exception -> 0x36c2 }
+        r6 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x36c2 }
+        r4 = r4.setAlignment(r6);	 Catch:{ Exception -> 0x36c2 }
+        r4 = r4.build();	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r0.captionLayout = r4;	 Catch:{ Exception -> 0x36c2 }
+    L_0x128e:
+        r0 = r150;
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x36c2 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x36c2 }
+        if (r4 <= 0) goto L_0x1328;
+    L_0x1298:
+        r0 = r30;
+        r1 = r150;
+        r1.captionWidth = r0;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r6 = r0.timeWidth;	 Catch:{ Exception -> 0x36c2 }
+        r4 = r151.isOutOwner();	 Catch:{ Exception -> 0x36c2 }
+        if (r4 == 0) goto L_0x36c8;
+    L_0x12a8:
+        r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x36c2 }
+    L_0x12ae:
+        r136 = r6 + r4;
+        r0 = r150;
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x36c2 }
+        r4 = r4.getHeight();	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r0.captionHeight = r4;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r6 = r0.captionHeight;	 Catch:{ Exception -> 0x36c2 }
+        r8 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
+        r8 = org.telegram.messenger.AndroidUtilities.dp(r8);	 Catch:{ Exception -> 0x36c2 }
+        r6 = r6 + r8;
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x36c2 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x36c2 }
+        r6 = r6 + -1;
+        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r8 = r0.captionLayout;	 Catch:{ Exception -> 0x36c2 }
+        r8 = r8.getLineCount();	 Catch:{ Exception -> 0x36c2 }
+        r8 = r8 + -1;
+        r6 = r6.getLineLeft(r8);	 Catch:{ Exception -> 0x36c2 }
+        r83 = r4 + r6;
+        r4 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x36c2 }
+        r4 = r146 - r4;
+        r4 = (float) r4;	 Catch:{ Exception -> 0x36c2 }
+        r4 = r4 - r83;
+        r0 = r136;
+        r6 = (float) r0;	 Catch:{ Exception -> 0x36c2 }
+        r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
+        if (r4 >= 0) goto L_0x1328;
+    L_0x1308:
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x36c2 }
+        r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x36c2 }
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r150;
+        r4 = r0.captionHeight;	 Catch:{ Exception -> 0x36c2 }
+        r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x36c2 }
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.captionHeight = r4;	 Catch:{ Exception -> 0x36c2 }
         r57 = 2;
-    L_0x1319:
+    L_0x1328:
         r0 = r150;
         r4 = r0.currentMessageObject;
         r8 = r4.eventId;
         r10 = 0;
         r4 = (r8 > r10 ? 1 : (r8 == r10 ? 0 : -1));
-        if (r4 == 0) goto L_0x3732;
-    L_0x1325:
+        if (r4 == 0) goto L_0x3741;
+    L_0x1334:
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.isMediaEmpty();
-        if (r4 != 0) goto L_0x3732;
-    L_0x132f:
+        if (r4 != 0) goto L_0x3741;
+    L_0x133e:
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.messageOwner;
         r4 = r4.media;
         r4 = r4.webpage;
-        if (r4 == 0) goto L_0x3732;
-    L_0x133b:
+        if (r4 == 0) goto L_0x3741;
+    L_0x134a:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1109655552; // 0x42240000 float:41.0 double:5.48242687E-315;
@@ -4729,272 +4725,272 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4.media;
         r0 = r4.webpage;
         r144 = r0;
-        r4 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x36e3 }
-        r0 = r144;	 Catch:{ Exception -> 0x36e3 }
-        r6 = r0.site_name;	 Catch:{ Exception -> 0x36e3 }
-        r4 = r4.measureText(r6);	 Catch:{ Exception -> 0x36e3 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x36e3 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x36e3 }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x36e3 }
-        r146 = r0;	 Catch:{ Exception -> 0x36e3 }
-        r31 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x36e3 }
-        r0 = r144;	 Catch:{ Exception -> 0x36e3 }
-        r0 = r0.site_name;	 Catch:{ Exception -> 0x36e3 }
-        r32 = r0;	 Catch:{ Exception -> 0x36e3 }
-        r33 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x36e3 }
-        r0 = r146;	 Catch:{ Exception -> 0x36e3 }
-        r1 = r88;	 Catch:{ Exception -> 0x36e3 }
-        r34 = java.lang.Math.min(r0, r1);	 Catch:{ Exception -> 0x36e3 }
-        r35 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x36e3 }
-        r36 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x36e3 }
-        r37 = 0;	 Catch:{ Exception -> 0x36e3 }
-        r38 = 0;	 Catch:{ Exception -> 0x36e3 }
-        r31.<init>(r32, r33, r34, r35, r36, r37, r38);	 Catch:{ Exception -> 0x36e3 }
-        r0 = r31;	 Catch:{ Exception -> 0x36e3 }
-        r1 = r150;	 Catch:{ Exception -> 0x36e3 }
-        r1.siteNameLayout = r0;	 Catch:{ Exception -> 0x36e3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36e3 }
-        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x36e3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36e3 }
-        r6 = r0.siteNameLayout;	 Catch:{ Exception -> 0x36e3 }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x36e3 }
-        r6 = r6 + -1;	 Catch:{ Exception -> 0x36e3 }
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x36e3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36e3 }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x36e3 }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x36e3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36e3 }
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x36e3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36e3 }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x36e3 }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x36e3 }
-        r0 = r150;	 Catch:{ Exception -> 0x36e3 }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x36e3 }
-    L_0x13b8:
+        r4 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x36f2 }
+        r0 = r144;
+        r6 = r0.site_name;	 Catch:{ Exception -> 0x36f2 }
+        r4 = r4.measureText(r6);	 Catch:{ Exception -> 0x36f2 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x36f2 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x36f2 }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x36f2 }
+        r146 = r0;
+        r31 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x36f2 }
+        r0 = r144;
+        r0 = r0.site_name;	 Catch:{ Exception -> 0x36f2 }
+        r32 = r0;
+        r33 = org.telegram.ui.ActionBar.Theme.chat_replyNamePaint;	 Catch:{ Exception -> 0x36f2 }
+        r0 = r146;
+        r1 = r88;
+        r34 = java.lang.Math.min(r0, r1);	 Catch:{ Exception -> 0x36f2 }
+        r35 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x36f2 }
+        r36 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r37 = 0;
+        r38 = 0;
+        r31.<init>(r32, r33, r34, r35, r36, r37, r38);	 Catch:{ Exception -> 0x36f2 }
+        r0 = r31;
+        r1 = r150;
+        r1.siteNameLayout = r0;	 Catch:{ Exception -> 0x36f2 }
+        r0 = r150;
+        r4 = r0.siteNameLayout;	 Catch:{ Exception -> 0x36f2 }
+        r0 = r150;
+        r6 = r0.siteNameLayout;	 Catch:{ Exception -> 0x36f2 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x36f2 }
+        r6 = r6 + -1;
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x36f2 }
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x36f2 }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x36f2 }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x36f2 }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x36f2 }
+    L_0x13c7:
         r4 = 0;
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x36fa }
-        if (r4 == 0) goto L_0x13d2;	 Catch:{ Exception -> 0x36fa }
-    L_0x13c3:
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x36fa }
-        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;	 Catch:{ Exception -> 0x36fa }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x36fa }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x36fa }
+        r0 = r150;
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x3709 }
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3709 }
+        if (r4 == 0) goto L_0x13e1;
     L_0x13d2:
-        r0 = r144;	 Catch:{ Exception -> 0x36fa }
-        r0 = r0.description;	 Catch:{ Exception -> 0x36fa }
-        r31 = r0;	 Catch:{ Exception -> 0x36fa }
-        r32 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x36fa }
-        r34 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x36fa }
-        r35 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x36fa }
-        r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x36fa }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x36fa }
-        r0 = (float) r4;	 Catch:{ Exception -> 0x36fa }
-        r36 = r0;	 Catch:{ Exception -> 0x36fa }
-        r37 = 0;	 Catch:{ Exception -> 0x36fa }
-        r38 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x36fa }
-        r40 = 6;	 Catch:{ Exception -> 0x36fa }
-        r33 = r88;	 Catch:{ Exception -> 0x36fa }
-        r39 = r88;	 Catch:{ Exception -> 0x36fa }
-        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r31, r32, r33, r34, r35, r36, r37, r38, r39, r40);	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r6 = r0.descriptionLayout;	 Catch:{ Exception -> 0x36fa }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x36fa }
-        r6 = r6 + -1;	 Catch:{ Exception -> 0x36fa }
-        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x36fa }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x36fa }
-        r4 = r4 + r79;	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r0.totalHeight = r4;	 Catch:{ Exception -> 0x36fa }
-        r41 = 0;	 Catch:{ Exception -> 0x36fa }
-    L_0x1421:
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x36fa }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x36fa }
-        r0 = r41;	 Catch:{ Exception -> 0x36fa }
-        if (r0 >= r4) goto L_0x36fe;	 Catch:{ Exception -> 0x36fa }
-    L_0x142d:
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x36fa }
-        r0 = r41;	 Catch:{ Exception -> 0x36fa }
-        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x36fa }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x36fa }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x36fa }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x36fa }
-        r87 = r0;	 Catch:{ Exception -> 0x36fa }
-        if (r87 == 0) goto L_0x144e;	 Catch:{ Exception -> 0x36fa }
-    L_0x1441:
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x36fa }
-        if (r4 != 0) goto L_0x36e9;	 Catch:{ Exception -> 0x36fa }
-    L_0x1447:
-        r0 = r87;	 Catch:{ Exception -> 0x36fa }
-        r4 = -r0;	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x36fa }
-    L_0x144e:
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3709 }
+        r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x3709 }
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3709 }
+    L_0x13e1:
+        r0 = r144;
+        r0 = r0.description;	 Catch:{ Exception -> 0x3709 }
+        r31 = r0;
+        r32 = org.telegram.ui.ActionBar.Theme.chat_replyTextPaint;	 Catch:{ Exception -> 0x3709 }
+        r34 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x3709 }
+        r35 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x3709 }
+        r0 = (float) r4;	 Catch:{ Exception -> 0x3709 }
+        r36 = r0;
+        r37 = 0;
+        r38 = android.text.TextUtils.TruncateAt.END;	 Catch:{ Exception -> 0x3709 }
+        r40 = 6;
+        r33 = r88;
+        r39 = r88;
+        r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r31, r32, r33, r34, r35, r36, r37, r38, r39, r40);	 Catch:{ Exception -> 0x3709 }
+        r0 = r150;
+        r0.descriptionLayout = r4;	 Catch:{ Exception -> 0x3709 }
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x3709 }
+        r0 = r150;
+        r6 = r0.descriptionLayout;	 Catch:{ Exception -> 0x3709 }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x3709 }
+        r6 = r6 + -1;
+        r79 = r4.getLineBottom(r6);	 Catch:{ Exception -> 0x3709 }
+        r0 = r150;
+        r4 = r0.linkPreviewHeight;	 Catch:{ Exception -> 0x3709 }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.linkPreviewHeight = r4;	 Catch:{ Exception -> 0x3709 }
+        r0 = r150;
+        r4 = r0.totalHeight;	 Catch:{ Exception -> 0x3709 }
+        r4 = r4 + r79;
+        r0 = r150;
+        r0.totalHeight = r4;	 Catch:{ Exception -> 0x3709 }
+        r41 = 0;
+    L_0x1430:
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x3709 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x3709 }
+        r0 = r41;
+        if (r0 >= r4) goto L_0x370d;
+    L_0x143c:
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x3709 }
+        r0 = r41;
+        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x3709 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x3709 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x3709 }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x3709 }
+        r87 = r0;
+        if (r87 == 0) goto L_0x145d;
+    L_0x1450:
+        r0 = r150;
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x3709 }
+        if (r4 != 0) goto L_0x36f8;
+    L_0x1456:
+        r0 = r87;
+        r4 = -r0;
+        r0 = r150;
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x3709 }
+    L_0x145d:
         r41 = r41 + 1;
-        goto L_0x1421;
-    L_0x1451:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r87;	 Catch:{ Exception -> 0x0d88 }
-        r6 = -r0;	 Catch:{ Exception -> 0x0d88 }
-        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d88 }
-        goto L_0x0d10;	 Catch:{ Exception -> 0x0d88 }
-    L_0x1462:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d88 }
-        r132 = r4.getWidth();	 Catch:{ Exception -> 0x0d88 }
-        r41 = 0;	 Catch:{ Exception -> 0x0d88 }
-    L_0x146c:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0d88 }
-        r0 = r41;	 Catch:{ Exception -> 0x0d88 }
-        if (r0 >= r4) goto L_0x0d8c;	 Catch:{ Exception -> 0x0d88 }
-    L_0x1478:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r41;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0d88 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0d88 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0d88 }
-        r0 = (int) r8;	 Catch:{ Exception -> 0x0d88 }
-        r87 = r0;	 Catch:{ Exception -> 0x0d88 }
-        if (r87 != 0) goto L_0x1497;	 Catch:{ Exception -> 0x0d88 }
-    L_0x148c:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0d88 }
-        if (r4 == 0) goto L_0x1497;	 Catch:{ Exception -> 0x0d88 }
-    L_0x1492:
-        r4 = 0;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d88 }
-    L_0x1497:
-        if (r87 == 0) goto L_0x14e4;	 Catch:{ Exception -> 0x0d88 }
-    L_0x1499:
-        r146 = r132 - r87;	 Catch:{ Exception -> 0x0d88 }
+        goto L_0x1430;
+    L_0x1460:
+        r0 = r150;
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0d97 }
+        r0 = r87;
+        r6 = -r0;
+        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x0d97 }
+        r0 = r150;
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d97 }
+        goto L_0x0d1f;
+    L_0x1471:
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d97 }
+        r132 = r4.getWidth();	 Catch:{ Exception -> 0x0d97 }
+        r41 = 0;
+    L_0x147b:
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d97 }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x0d97 }
+        r0 = r41;
+        if (r0 >= r4) goto L_0x0d9b;
+    L_0x1487:
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d97 }
+        r0 = r41;
+        r4 = r4.getLineLeft(r0);	 Catch:{ Exception -> 0x0d97 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0d97 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0d97 }
+        r0 = (int) r8;	 Catch:{ Exception -> 0x0d97 }
+        r87 = r0;
+        if (r87 != 0) goto L_0x14a6;
     L_0x149b:
-        r0 = r41;	 Catch:{ Exception -> 0x0d88 }
-        r1 = r120;	 Catch:{ Exception -> 0x0d88 }
-        if (r0 < r1) goto L_0x14ab;	 Catch:{ Exception -> 0x0d88 }
+        r0 = r150;
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x0d97 }
+        if (r4 == 0) goto L_0x14a6;
     L_0x14a1:
-        if (r120 == 0) goto L_0x14b3;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14a3:
-        if (r87 == 0) goto L_0x14b3;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14a5:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0d88 }
-        if (r4 == 0) goto L_0x14b3;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14ab:
-        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;	 Catch:{ Exception -> 0x0d88 }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d88 }
-        r146 = r146 + r4;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14b3:
-        r4 = r146 + r42;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r100;	 Catch:{ Exception -> 0x0d88 }
-        if (r0 >= r4) goto L_0x14d9;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14b9:
-        if (r138 == 0) goto L_0x14c8;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14bb:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.titleX;	 Catch:{ Exception -> 0x0d88 }
-        r6 = r146 + r42;	 Catch:{ Exception -> 0x0d88 }
-        r6 = r6 - r100;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.titleX = r4;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14c8:
-        if (r48 == 0) goto L_0x14d7;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14ca:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.authorX;	 Catch:{ Exception -> 0x0d88 }
-        r6 = r146 + r42;	 Catch:{ Exception -> 0x0d88 }
-        r6 = r6 - r100;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r0.authorX = r4;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14d7:
-        r100 = r146 + r42;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14d9:
-        r4 = r146 + r42;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r97;	 Catch:{ Exception -> 0x0d88 }
-        r97 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0d88 }
-        r41 = r41 + 1;	 Catch:{ Exception -> 0x0d88 }
-        goto L_0x146c;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14e4:
-        if (r78 == 0) goto L_0x14e9;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14e6:
-        r146 = r132;	 Catch:{ Exception -> 0x0d88 }
-        goto L_0x149b;	 Catch:{ Exception -> 0x0d88 }
-    L_0x14e9:
-        r0 = r150;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r41;	 Catch:{ Exception -> 0x0d88 }
-        r4 = r4.getLineWidth(r0);	 Catch:{ Exception -> 0x0d88 }
-        r8 = (double) r4;	 Catch:{ Exception -> 0x0d88 }
-        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0d88 }
-        r4 = (int) r8;	 Catch:{ Exception -> 0x0d88 }
-        r0 = r132;	 Catch:{ Exception -> 0x0d88 }
-        r146 = java.lang.Math.min(r4, r0);	 Catch:{ Exception -> 0x0d88 }
-        goto L_0x149b;
-    L_0x1500:
-        r99 = r88;
-        goto L_0x0db4;
-    L_0x1504:
         r4 = 0;
-        goto L_0x0dd5;
-    L_0x1507:
+        r0 = r150;
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x0d97 }
+    L_0x14a6:
+        if (r87 == 0) goto L_0x14f3;
+    L_0x14a8:
+        r146 = r132 - r87;
+    L_0x14aa:
+        r0 = r41;
+        r1 = r120;
+        if (r0 < r1) goto L_0x14ba;
+    L_0x14b0:
+        if (r120 == 0) goto L_0x14c2;
+    L_0x14b2:
+        if (r87 == 0) goto L_0x14c2;
+    L_0x14b4:
+        r0 = r150;
+        r4 = r0.isSmallImage;	 Catch:{ Exception -> 0x0d97 }
+        if (r4 == 0) goto L_0x14c2;
+    L_0x14ba:
+        r4 = 1112539136; // 0x42500000 float:52.0 double:5.496673668E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x0d97 }
+        r146 = r146 + r4;
+    L_0x14c2:
+        r4 = r146 + r42;
+        r0 = r100;
+        if (r0 >= r4) goto L_0x14e8;
+    L_0x14c8:
+        if (r138 == 0) goto L_0x14d7;
+    L_0x14ca:
+        r0 = r150;
+        r4 = r0.titleX;	 Catch:{ Exception -> 0x0d97 }
+        r6 = r146 + r42;
+        r6 = r6 - r100;
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.titleX = r4;	 Catch:{ Exception -> 0x0d97 }
+    L_0x14d7:
+        if (r48 == 0) goto L_0x14e6;
+    L_0x14d9:
+        r0 = r150;
+        r4 = r0.authorX;	 Catch:{ Exception -> 0x0d97 }
+        r6 = r146 + r42;
+        r6 = r6 - r100;
+        r4 = r4 + r6;
+        r0 = r150;
+        r0.authorX = r4;	 Catch:{ Exception -> 0x0d97 }
+    L_0x14e6:
+        r100 = r146 + r42;
+    L_0x14e8:
+        r4 = r146 + r42;
+        r0 = r97;
+        r97 = java.lang.Math.max(r0, r4);	 Catch:{ Exception -> 0x0d97 }
         r41 = r41 + 1;
-        goto L_0x0df8;
-    L_0x150b:
+        goto L_0x147b;
+    L_0x14f3:
+        if (r78 == 0) goto L_0x14f8;
+    L_0x14f5:
+        r146 = r132;
+        goto L_0x14aa;
+    L_0x14f8:
+        r0 = r150;
+        r4 = r0.descriptionLayout;	 Catch:{ Exception -> 0x0d97 }
+        r0 = r41;
+        r4 = r4.getLineWidth(r0);	 Catch:{ Exception -> 0x0d97 }
+        r8 = (double) r4;	 Catch:{ Exception -> 0x0d97 }
+        r8 = java.lang.Math.ceil(r8);	 Catch:{ Exception -> 0x0d97 }
+        r4 = (int) r8;	 Catch:{ Exception -> 0x0d97 }
+        r0 = r132;
+        r146 = java.lang.Math.min(r4, r0);	 Catch:{ Exception -> 0x0d97 }
+        goto L_0x14aa;
+    L_0x150f:
+        r99 = r88;
+        goto L_0x0dc3;
+    L_0x1513:
+        r4 = 0;
+        goto L_0x0de4;
+    L_0x1516:
+        r41 = r41 + 1;
+        goto L_0x0e07;
+    L_0x151a:
         r4 = org.telegram.messenger.MessageObject.isVideoDocument(r67);
-        if (r4 == 0) goto L_0x1594;
-    L_0x1511:
+        if (r4 == 0) goto L_0x15a3;
+    L_0x1520:
         r0 = r67;
         r4 = r0.thumb;
         r0 = r150;
         r0.currentPhotoObject = r4;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x1585;
-    L_0x151f:
+        if (r4 == 0) goto L_0x1594;
+    L_0x152e:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x152f;
-    L_0x1527:
+        if (r4 == 0) goto L_0x153e;
+    L_0x1536:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x1585;
-    L_0x152f:
+        if (r4 != 0) goto L_0x1594;
+    L_0x153e:
         r41 = 0;
-    L_0x1531:
+    L_0x1540:
         r0 = r67;
         r4 = r0.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x1563;
-    L_0x153d:
+        if (r0 >= r4) goto L_0x1572;
+    L_0x154c:
         r0 = r67;
         r4 = r0.attributes;
         r0 = r41;
@@ -5002,8 +4998,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeVideo;
-        if (r4 == 0) goto L_0x1591;
-    L_0x154f:
+        if (r4 == 0) goto L_0x15a0;
+    L_0x155e:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r46;
@@ -5014,17 +5010,17 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r46;
         r6 = r0.h;
         r4.h = r6;
-    L_0x1563:
+    L_0x1572:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x1573;
-    L_0x156b:
+        if (r4 == 0) goto L_0x1582;
+    L_0x157a:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x1585;
-    L_0x1573:
+        if (r4 != 0) goto L_0x1594;
+    L_0x1582:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r150;
@@ -5033,46 +5029,46 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r8 = org.telegram.messenger.AndroidUtilities.dp(r8);
         r6.h = r8;
         r4.w = r8;
-    L_0x1585:
+    L_0x1594:
         r4 = 0;
         r0 = r150;
         r1 = r151;
         r0.createDocumentLayout(r4, r1);
         r14 = r143;
-        goto L_0x0e5f;
-    L_0x1591:
+        goto L_0x0e6e;
+    L_0x15a0:
         r41 = r41 + 1;
-        goto L_0x1531;
-    L_0x1594:
+        goto L_0x1540;
+    L_0x15a3:
         r4 = org.telegram.messenger.MessageObject.isStickerDocument(r67);
-        if (r4 == 0) goto L_0x1620;
-    L_0x159a:
+        if (r4 == 0) goto L_0x162f;
+    L_0x15a9:
         r0 = r67;
         r4 = r0.thumb;
         r0 = r150;
         r0.currentPhotoObject = r4;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x160e;
-    L_0x15a8:
+        if (r4 == 0) goto L_0x161d;
+    L_0x15b7:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x15b8;
-    L_0x15b0:
+        if (r4 == 0) goto L_0x15c7;
+    L_0x15bf:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x160e;
-    L_0x15b8:
+        if (r4 != 0) goto L_0x161d;
+    L_0x15c7:
         r41 = 0;
-    L_0x15ba:
+    L_0x15c9:
         r0 = r67;
         r4 = r0.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x15ec;
-    L_0x15c6:
+        if (r0 >= r4) goto L_0x15fb;
+    L_0x15d5:
         r0 = r67;
         r4 = r0.attributes;
         r0 = r41;
@@ -5080,8 +5076,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeImageSize;
-        if (r4 == 0) goto L_0x161d;
-    L_0x15d8:
+        if (r4 == 0) goto L_0x162c;
+    L_0x15e7:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r46;
@@ -5092,17 +5088,17 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r46;
         r6 = r0.h;
         r4.h = r6;
-    L_0x15ec:
+    L_0x15fb:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
-        if (r4 == 0) goto L_0x15fc;
-    L_0x15f4:
+        if (r4 == 0) goto L_0x160b;
+    L_0x1603:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.h;
-        if (r4 != 0) goto L_0x160e;
-    L_0x15fc:
+        if (r4 != 0) goto L_0x161d;
+    L_0x160b:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r150;
@@ -5111,7 +5107,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r8 = org.telegram.messenger.AndroidUtilities.dp(r8);
         r6.h = r8;
         r4.w = r8;
-    L_0x160e:
+    L_0x161d:
         r0 = r67;
         r1 = r150;
         r1.documentAttach = r0;
@@ -5119,14 +5115,14 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r0.documentAttachType = r4;
         r14 = r143;
-        goto L_0x0e5f;
-    L_0x161d:
+        goto L_0x0e6e;
+    L_0x162c:
         r41 = r41 + 1;
-        goto L_0x15ba;
-    L_0x1620:
+        goto L_0x15c9;
+    L_0x162f:
         r4 = org.telegram.messenger.MessageObject.isRoundVideoDocument(r67);
-        if (r4 == 0) goto L_0x163d;
-    L_0x1626:
+        if (r4 == 0) goto L_0x164c;
+    L_0x1635:
         r0 = r67;
         r4 = r0.thumb;
         r0 = r150;
@@ -5138,32 +5134,32 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r0.documentAttachType = r4;
         r14 = r143;
-        goto L_0x0e5f;
-    L_0x163d:
+        goto L_0x0e6e;
+    L_0x164c:
         r0 = r150;
         r1 = r26;
         r2 = r135;
         r3 = r97;
         r0.calcBackgroundWidth(r1, r2, r3);
         r4 = org.telegram.messenger.MessageObject.isStickerDocument(r67);
-        if (r4 != 0) goto L_0x3a9b;
-    L_0x164e:
+        if (r4 != 0) goto L_0x3aaa;
+    L_0x165d:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r6 = r6 + r26;
-        if (r4 >= r6) goto L_0x1668;
-    L_0x165c:
+        if (r4 >= r6) goto L_0x1677;
+    L_0x166b:
         r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r4 + r26;
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x1668:
+    L_0x1677:
         r4 = org.telegram.messenger.MessageObject.isVoiceDocument(r67);
-        if (r4 == 0) goto L_0x16c3;
-    L_0x166e:
+        if (r4 == 0) goto L_0x16d2;
+    L_0x167d:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
@@ -5203,11 +5199,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r3 = r97;
         r0.calcBackgroundWidth(r1, r2, r3);
         r14 = r143;
-        goto L_0x0e5f;
-    L_0x16c3:
+        goto L_0x0e6e;
+    L_0x16d2:
         r4 = org.telegram.messenger.MessageObject.isMusicDocument(r67);
-        if (r4 == 0) goto L_0x1794;
-    L_0x16c9:
+        if (r4 == 0) goto L_0x17a3;
+    L_0x16d8:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
@@ -5252,13 +5248,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r97 = java.lang.Math.max(r0, r4);
         r0 = r150;
         r4 = r0.songLayout;
-        if (r4 == 0) goto L_0x1756;
-    L_0x172d:
+        if (r4 == 0) goto L_0x1765;
+    L_0x173c:
         r0 = r150;
         r4 = r0.songLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x1756;
-    L_0x1737:
+        if (r4 <= 0) goto L_0x1765;
+    L_0x1746:
         r0 = r97;
         r4 = (float) r0;
         r0 = r150;
@@ -5275,16 +5271,16 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.max(r4, r6);
         r0 = (int) r4;
         r97 = r0;
-    L_0x1756:
+    L_0x1765:
         r0 = r150;
         r4 = r0.performerLayout;
-        if (r4 == 0) goto L_0x1785;
-    L_0x175c:
+        if (r4 == 0) goto L_0x1794;
+    L_0x176b:
         r0 = r150;
         r4 = r0.performerLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x1785;
-    L_0x1766:
+        if (r4 <= 0) goto L_0x1794;
+    L_0x1775:
         r0 = r97;
         r4 = (float) r0;
         r0 = r150;
@@ -5301,15 +5297,15 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.max(r4, r6);
         r0 = (int) r4;
         r97 = r0;
-    L_0x1785:
+    L_0x1794:
         r0 = r150;
         r1 = r26;
         r2 = r135;
         r3 = r97;
         r0.calcBackgroundWidth(r1, r2, r3);
         r14 = r143;
-        goto L_0x0e5f;
-    L_0x1794:
+        goto L_0x0e6e;
+    L_0x17a3:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1126694912; // 0x43280000 float:168.0 double:5.566612494E-315;
@@ -5323,8 +5319,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.drawImageButton = r4;
         r0 = r150;
         r4 = r0.drawPhotoImage;
-        if (r4 == 0) goto L_0x17f0;
-    L_0x17b1:
+        if (r4 == 0) goto L_0x17ff;
+    L_0x17c0:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
@@ -5353,8 +5349,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r10 = org.telegram.messenger.AndroidUtilities.dp(r10);
         r4.setImageCoords(r6, r8, r9, r10);
         r14 = r143;
-        goto L_0x0e5f;
-    L_0x17f0:
+        goto L_0x0e6e;
+    L_0x17ff:
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.textHeight;
@@ -5397,35 +5393,35 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r0.linkPreviewHeight = r4;
         r14 = r143;
-        goto L_0x0e5f;
-    L_0x184c:
-        if (r112 == 0) goto L_0x18a5;
-    L_0x184e:
-        if (r139 == 0) goto L_0x189e;
-    L_0x1850:
+        goto L_0x0e6e;
+    L_0x185b:
+        if (r112 == 0) goto L_0x18b4;
+    L_0x185d:
+        if (r139 == 0) goto L_0x18ad;
+    L_0x185f:
         r4 = "photo";
         r0 = r139;
         r4 = r0.equals(r4);
-        if (r4 == 0) goto L_0x189e;
-    L_0x185b:
+        if (r4 == 0) goto L_0x18ad;
+    L_0x186a:
         r4 = 1;
-    L_0x185c:
+    L_0x186b:
         r0 = r150;
         r0.drawImageButton = r4;
         r0 = r151;
         r8 = r0.photoThumbs;
         r0 = r150;
         r4 = r0.drawImageButton;
-        if (r4 == 0) goto L_0x18a0;
-    L_0x186a:
+        if (r4 == 0) goto L_0x18af;
+    L_0x1879:
         r4 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
-    L_0x186e:
+    L_0x187d:
         r0 = r150;
         r6 = r0.drawImageButton;
-        if (r6 != 0) goto L_0x18a3;
-    L_0x1874:
+        if (r6 != 0) goto L_0x18b2;
+    L_0x1883:
         r6 = 1;
-    L_0x1875:
+    L_0x1884:
         r4 = org.telegram.messenger.FileLoader.getClosestPhotoSizeWithSize(r8, r4, r6);
         r0 = r150;
         r0.currentPhotoObject = r4;
@@ -5439,41 +5435,41 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.currentPhotoObjectThumb;
         r0 = r150;
         r6 = r0.currentPhotoObject;
-        if (r4 != r6) goto L_0x3a9b;
-    L_0x1895:
+        if (r4 != r6) goto L_0x3aaa;
+    L_0x18a4:
         r4 = 0;
         r0 = r150;
         r0.currentPhotoObjectThumb = r4;
         r14 = r143;
-        goto L_0x0e5f;
-    L_0x189e:
+        goto L_0x0e6e;
+    L_0x18ad:
         r4 = 0;
-        goto L_0x185c;
-    L_0x18a0:
+        goto L_0x186b;
+    L_0x18af:
         r4 = r99;
-        goto L_0x186e;
-    L_0x18a3:
+        goto L_0x187d;
+    L_0x18b2:
         r6 = 0;
-        goto L_0x1875;
-    L_0x18a5:
-        if (r143 == 0) goto L_0x3a9b;
-    L_0x18a7:
+        goto L_0x1884;
+    L_0x18b4:
+        if (r143 == 0) goto L_0x3aaa;
+    L_0x18b6:
         r0 = r143;
         r4 = r0.mime_type;
         r6 = "image/";
         r4 = r4.startsWith(r6);
-        if (r4 != 0) goto L_0x3a97;
-    L_0x18b4:
+        if (r4 != 0) goto L_0x3aa6;
+    L_0x18c3:
         r14 = 0;
-    L_0x18b5:
+    L_0x18c4:
         r4 = 0;
         r0 = r150;
         r0.drawImageButton = r4;
-        goto L_0x0e5f;
-    L_0x18bc:
+        goto L_0x0e6e;
+    L_0x18cb:
         r4 = 0;
-        goto L_0x0eae;
-    L_0x18bf:
+        goto L_0x0ebd;
+    L_0x18ce:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r4 = (float) r4;
@@ -5481,35 +5477,35 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 * r6;
         r0 = (int) r4;
         r99 = r0;
-        goto L_0x0eee;
-    L_0x18cc:
+        goto L_0x0efd;
+    L_0x18db:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 7;
-        if (r4 != r6) goto L_0x0eee;
-    L_0x18d3:
+        if (r4 != r6) goto L_0x0efd;
+    L_0x18e2:
         r99 = org.telegram.messenger.AndroidUtilities.roundMessageSize;
         r0 = r150;
         r4 = r0.photoImage;
         r6 = 1;
         r4.setAllowDecodeSingleFrame(r6);
-        goto L_0x0eee;
-    L_0x18df:
+        goto L_0x0efd;
+    L_0x18ee:
         r4 = 0;
-        goto L_0x0efa;
-    L_0x18e2:
+        goto L_0x0f09;
+    L_0x18f1:
         r4 = -1;
         r14.size = r4;
-        goto L_0x0f1e;
-    L_0x18e7:
+        goto L_0x0f2d;
+    L_0x18f6:
         r0 = r150;
         r4 = r0.hasGamePreview;
-        if (r4 != 0) goto L_0x18f3;
-    L_0x18ed:
+        if (r4 != 0) goto L_0x1902;
+    L_0x18fc:
         r0 = r150;
         r4 = r0.hasInvoicePreview;
-        if (r4 == 0) goto L_0x1917;
-    L_0x18f3:
+        if (r4 == 0) goto L_0x1926;
+    L_0x1902:
         r146 = 640; // 0x280 float:8.97E-43 double:3.16E-321;
         r79 = 360; // 0x168 float:5.04E-43 double:1.78E-321;
         r0 = r146;
@@ -5529,8 +5525,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 / r125;
         r0 = (int) r4;
         r79 = r0;
-        goto L_0x0f2b;
-    L_0x1917:
+        goto L_0x0f3a;
+    L_0x1926:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r4.w;
@@ -5556,41 +5552,41 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 / r125;
         r0 = (int) r4;
         r79 = r0;
-        if (r7 == 0) goto L_0x195c;
-    L_0x1947:
-        if (r7 == 0) goto L_0x196e;
-    L_0x1949:
+        if (r7 == 0) goto L_0x196b;
+    L_0x1956:
+        if (r7 == 0) goto L_0x197d;
+    L_0x1958:
         r4 = r7.toLowerCase();
         r6 = "instagram";
         r4 = r4.equals(r6);
-        if (r4 != 0) goto L_0x196e;
-    L_0x1956:
+        if (r4 != 0) goto L_0x197d;
+    L_0x1965:
         r0 = r150;
         r4 = r0.documentAttachType;
-        if (r4 != 0) goto L_0x196e;
-    L_0x195c:
+        if (r4 != 0) goto L_0x197d;
+    L_0x196b:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.y;
         r4 = r4 / 3;
         r0 = r79;
-        if (r0 <= r4) goto L_0x0f2b;
-    L_0x1966:
+        if (r0 <= r4) goto L_0x0f3a;
+    L_0x1975:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.y;
         r79 = r4 / 3;
-        goto L_0x0f2b;
-    L_0x196e:
+        goto L_0x0f3a;
+    L_0x197d:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.y;
         r4 = r4 / 2;
         r0 = r79;
-        if (r0 <= r4) goto L_0x0f2b;
-    L_0x1978:
+        if (r0 <= r4) goto L_0x0f3a;
+    L_0x1987:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.y;
         r79 = r4 / 2;
-        goto L_0x0f2b;
-    L_0x1980:
+        goto L_0x0f3a;
+    L_0x198f:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1094713344; // 0x41400000 float:12.0 double:5.408602553E-315;
@@ -5604,13 +5600,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r79;
         r0 = r150;
         r0.linkPreviewHeight = r4;
-        goto L_0x0f77;
-    L_0x199d:
+        goto L_0x0f86;
+    L_0x19ac:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 6;
-        if (r4 != r6) goto L_0x19de;
-    L_0x19a4:
+        if (r4 != r6) goto L_0x19ed;
+    L_0x19b3:
         r0 = r150;
         r15 = r0.photoImage;
         r0 = r150;
@@ -5623,13 +5619,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r19 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x19db;
-    L_0x19be:
+        if (r4 == 0) goto L_0x19ea;
+    L_0x19cd:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r20 = r0;
-    L_0x19c6:
+    L_0x19d5:
         r21 = "b1";
         r0 = r150;
         r4 = r0.documentAttach;
@@ -5638,16 +5634,16 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r23 = "webp";
         r24 = 1;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22, r23, r24);
-        goto L_0x0fdf;
-    L_0x19db:
+        goto L_0x0fee;
+    L_0x19ea:
         r20 = 0;
-        goto L_0x19c6;
-    L_0x19de:
+        goto L_0x19d5;
+    L_0x19ed:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 4;
-        if (r4 != r6) goto L_0x1a06;
-    L_0x19e5:
+        if (r4 != r6) goto L_0x1a15;
+    L_0x19f4:
         r0 = r150;
         r15 = r0.photoImage;
         r16 = 0;
@@ -5663,46 +5659,46 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r21 = 0;
         r22 = 0;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0fdf;
-    L_0x1a06:
+        goto L_0x0fee;
+    L_0x1a15:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 2;
-        if (r4 == r6) goto L_0x1a14;
-    L_0x1a0d:
+        if (r4 == r6) goto L_0x1a23;
+    L_0x1a1c:
         r0 = r150;
         r4 = r0.documentAttachType;
         r6 = 7;
-        if (r4 != r6) goto L_0x1ad2;
-    L_0x1a14:
+        if (r4 != r6) goto L_0x1ae1;
+    L_0x1a23:
         r71 = org.telegram.messenger.FileLoader.getAttachFileName(r67);
         r49 = 0;
         r4 = org.telegram.messenger.MessageObject.isNewGifDocument(r67);
-        if (r4 == 0) goto L_0x1a7e;
-    L_0x1a20:
+        if (r4 == 0) goto L_0x1a8d;
+    L_0x1a2f:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.DownloadController.getInstance(r4);
         r0 = r150;
         r6 = r0.currentMessageObject;
         r49 = r4.canDownloadMedia(r6);
-    L_0x1a30:
+    L_0x1a3f:
         r4 = r151.isSending();
-        if (r4 != 0) goto L_0x1aa3;
-    L_0x1a36:
+        if (r4 != 0) goto L_0x1ab2;
+    L_0x1a45:
         r0 = r151;
         r4 = r0.mediaExists;
-        if (r4 != 0) goto L_0x1a4e;
-    L_0x1a3c:
+        if (r4 != 0) goto L_0x1a5d;
+    L_0x1a4b:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.FileLoader.getInstance(r4);
         r0 = r71;
         r4 = r4.isLoadingFile(r0);
-        if (r4 != 0) goto L_0x1a4e;
-    L_0x1a4c:
-        if (r49 == 0) goto L_0x1aa3;
-    L_0x1a4e:
+        if (r4 != 0) goto L_0x1a5d;
+    L_0x1a5b:
+        if (r49 == 0) goto L_0x1ab2;
+    L_0x1a5d:
         r4 = 0;
         r0 = r150;
         r0.photoNotSet = r4;
@@ -5711,13 +5707,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r17 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x1aa0;
-    L_0x1a5f:
+        if (r4 == 0) goto L_0x1aaf;
+    L_0x1a6e:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r18 = r0;
-    L_0x1a67:
+    L_0x1a76:
         r0 = r150;
         r0 = r0.currentPhotoFilterThumb;
         r19 = r0;
@@ -5728,11 +5724,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r22 = 0;
         r16 = r67;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0fdf;
-    L_0x1a7e:
+        goto L_0x0fee;
+    L_0x1a8d:
         r4 = org.telegram.messenger.MessageObject.isRoundVideoDocument(r67);
-        if (r4 == 0) goto L_0x1a30;
-    L_0x1a84:
+        if (r4 == 0) goto L_0x1a3f;
+    L_0x1a93:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = org.telegram.messenger.AndroidUtilities.roundMessageSize;
@@ -5744,11 +5740,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r6 = r0.currentMessageObject;
         r49 = r4.canDownloadMedia(r6);
-        goto L_0x1a30;
-    L_0x1aa0:
+        goto L_0x1a3f;
+    L_0x1aaf:
         r18 = 0;
-        goto L_0x1a67;
-    L_0x1aa3:
+        goto L_0x1a76;
+    L_0x1ab2:
         r4 = 1;
         r0 = r150;
         r0.photoNotSet = r4;
@@ -5758,13 +5754,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r17 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x1acf;
-    L_0x1ab6:
+        if (r4 == 0) goto L_0x1ade;
+    L_0x1ac5:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r18 = r0;
-    L_0x1abe:
+    L_0x1acd:
         r0 = r150;
         r0 = r0.currentPhotoFilterThumb;
         r19 = r0;
@@ -5772,11 +5768,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r21 = 0;
         r22 = 0;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0fdf;
-    L_0x1acf:
+        goto L_0x0fee;
+    L_0x1ade:
         r18 = 0;
-        goto L_0x1abe;
-    L_0x1ad2:
+        goto L_0x1acd;
+    L_0x1ae1:
         r0 = r151;
         r0 = r0.mediaExists;
         r113 = r0;
@@ -5785,25 +5781,25 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r71 = org.telegram.messenger.FileLoader.getAttachFileName(r4);
         r0 = r150;
         r4 = r0.hasGamePreview;
-        if (r4 != 0) goto L_0x1b0a;
-    L_0x1ae6:
-        if (r113 != 0) goto L_0x1b0a;
-    L_0x1ae8:
+        if (r4 != 0) goto L_0x1b19;
+    L_0x1af5:
+        if (r113 != 0) goto L_0x1b19;
+    L_0x1af7:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.DownloadController.getInstance(r4);
         r0 = r150;
         r6 = r0.currentMessageObject;
         r4 = r4.canDownloadMedia(r6);
-        if (r4 != 0) goto L_0x1b0a;
-    L_0x1afa:
+        if (r4 != 0) goto L_0x1b19;
+    L_0x1b09:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.FileLoader.getInstance(r4);
         r0 = r71;
         r4 = r4.isLoadingFile(r0);
-        if (r4 == 0) goto L_0x1b43;
-    L_0x1b0a:
+        if (r4 == 0) goto L_0x1b52;
+    L_0x1b19:
         r4 = 0;
         r0 = r150;
         r0.photoNotSet = r4;
@@ -5818,13 +5814,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r17 = r0;
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x1b40;
-    L_0x1b27:
+        if (r4 == 0) goto L_0x1b4f;
+    L_0x1b36:
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
         r0 = r4.location;
         r18 = r0;
-    L_0x1b2f:
+    L_0x1b3e:
         r0 = r150;
         r0 = r0.currentPhotoFilterThumb;
         r19 = r0;
@@ -5832,18 +5828,18 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r21 = 0;
         r22 = 0;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0fdf;
-    L_0x1b40:
+        goto L_0x0fee;
+    L_0x1b4f:
         r18 = 0;
-        goto L_0x1b2f;
-    L_0x1b43:
+        goto L_0x1b3e;
+    L_0x1b52:
         r4 = 1;
         r0 = r150;
         r0.photoNotSet = r4;
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x1b83;
-    L_0x1b4e:
+        if (r4 == 0) goto L_0x1b92;
+    L_0x1b5d:
         r0 = r150;
         r15 = r0.photoImage;
         r16 = 0;
@@ -5867,19 +5863,19 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r21 = 0;
         r22 = 0;
         r15.setImage(r16, r17, r18, r19, r20, r21, r22);
-        goto L_0x0fdf;
-    L_0x1b83:
+        goto L_0x0fee;
+    L_0x1b92:
         r0 = r150;
         r6 = r0.photoImage;
         r4 = 0;
         r4 = (android.graphics.drawable.Drawable) r4;
         r6.setImageBitmap(r4);
-        goto L_0x0fdf;
-    L_0x1b8f:
+        goto L_0x0fee;
+    L_0x1b9e:
         r0 = r150;
         r4 = r0.hasGamePreview;
-        if (r4 == 0) goto L_0x103c;
-    L_0x1b95:
+        if (r4 == 0) goto L_0x104b;
+    L_0x1ba4:
         r4 = "AttachGame";
         r6 = 2131493024; // 0x7f0c00a0 float:1.8609516E38 double:1.0530974775E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
@@ -5904,8 +5900,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r15.<init>(r16, r17, r18, r19, r20, r21, r22);
         r0 = r150;
         r0.videoInfoLayout = r15;
-        goto L_0x103c;
-    L_0x1bd0:
+        goto L_0x104b;
+    L_0x1bdf:
         r0 = r150;
         r6 = r0.photoImage;
         r4 = 0;
@@ -5925,26 +5921,26 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.totalHeight = r4;
-        goto L_0x103c;
-    L_0x1bfa:
+        goto L_0x104b;
+    L_0x1c09:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.test;
-        if (r4 == 0) goto L_0x1c14;
-    L_0x1c04:
+        if (r4 == 0) goto L_0x1c23;
+    L_0x1c13:
         r4 = "PaymentTestInvoice";
-        r6 = 2131494092; // 0x7f0c04cc float:1.8611683E38 double:1.053098005E-314;
+        r6 = 2131494095; // 0x7f0c04cf float:1.8611689E38 double:1.0530980067E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
-        goto L_0x105c;
-    L_0x1c14:
+        goto L_0x106b;
+    L_0x1c23:
         r4 = "PaymentInvoice";
-        r6 = 2131494061; // 0x7f0c04ad float:1.861162E38 double:1.05309799E-314;
+        r6 = 2131494064; // 0x7f0c04b0 float:1.8611626E38 double:1.0530979913E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
-        goto L_0x105c;
-    L_0x1c24:
+        goto L_0x106b;
+    L_0x1c33:
         r0 = r150;
         r4 = r0.durationWidth;
         r0 = r150;
@@ -5955,36 +5951,36 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r97;
         r97 = java.lang.Math.max(r4, r0);
-        goto L_0x1125;
-    L_0x1c3c:
+        goto L_0x1134;
+    L_0x1c4b:
         r0 = r150;
         r4 = r0.drawInstantViewType;
         r6 = 2;
-        if (r4 != r6) goto L_0x1c4f;
-    L_0x1c43:
+        if (r4 != r6) goto L_0x1c5e;
+    L_0x1c52:
         r4 = "OpenGroup";
-        r6 = 2131494002; // 0x7f0c0472 float:1.86115E38 double:1.0530979607E-314;
+        r6 = 2131494005; // 0x7f0c0475 float:1.8611506E38 double:1.053097962E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1180;
-    L_0x1c4f:
+        goto L_0x118f;
+    L_0x1c5e:
         r0 = r150;
         r4 = r0.drawInstantViewType;
         r6 = 3;
-        if (r4 != r6) goto L_0x1c62;
-    L_0x1c56:
+        if (r4 != r6) goto L_0x1c71;
+    L_0x1c65:
         r4 = "OpenMessage";
-        r6 = 2131494005; // 0x7f0c0475 float:1.8611506E38 double:1.053097962E-314;
+        r6 = 2131494008; // 0x7f0c0478 float:1.8611512E38 double:1.0530979637E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1180;
-    L_0x1c62:
-        r4 = "InstantView";
-        r6 = 2131493654; // 0x7f0c0316 float:1.8610794E38 double:1.053097789E-314;
-        r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1180;
-    L_0x1c6e:
-        r4 = 0;
-        goto L_0x11fd;
+        goto L_0x118f;
     L_0x1c71:
+        r4 = "InstantView";
+        r6 = 2131493657; // 0x7f0c0319 float:1.86108E38 double:1.0530977903E-314;
+        r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
+        goto L_0x118f;
+    L_0x1c7d:
+        r4 = 0;
+        goto L_0x120c;
+    L_0x1c80:
         r0 = r150;
         r6 = r0.photoImage;
         r4 = 0;
@@ -5995,13 +5991,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r2 = r135;
         r3 = r97;
         r0.calcBackgroundWidth(r1, r2, r3);
-        goto L_0x1216;
-    L_0x1c88:
+        goto L_0x1225;
+    L_0x1c97:
         r0 = r151;
         r4 = r0.type;
         r6 = 16;
-        if (r4 != r6) goto L_0x1e42;
-    L_0x1c90:
+        if (r4 != r6) goto L_0x1e51;
+    L_0x1c9f:
         r4 = 0;
         r0 = r150;
         r0.drawName = r4;
@@ -6012,21 +6008,21 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r0.drawPhotoImage = r4;
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x1dd7;
-    L_0x1ca5:
+        if (r4 == 0) goto L_0x1de6;
+    L_0x1cb4:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x1dd3;
-    L_0x1caf:
+        if (r4 == 0) goto L_0x1de2;
+    L_0x1cbe:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x1dd3;
-    L_0x1cb5:
+        if (r4 == 0) goto L_0x1de2;
+    L_0x1cc4:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x1dd3;
-    L_0x1cbb:
+        if (r4 != 0) goto L_0x1de2;
+    L_0x1cca:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x1cbd:
+    L_0x1ccc:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6034,7 +6030,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x1cd1:
+    L_0x1ce0:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1106771968; // 0x41f80000 float:31.0 double:5.46818007E-315;
@@ -6046,12 +6042,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r26 = r4 - r6;
-        if (r26 >= 0) goto L_0x3a93;
-    L_0x1cee:
+        if (r26 >= 0) goto L_0x3aa2;
+    L_0x1cfd:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r26 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r101 = r26;
-    L_0x1cf6:
+    L_0x1d05:
         r4 = org.telegram.messenger.LocaleController.getInstance();
         r4 = r4.formatterDay;
         r0 = r151;
@@ -6071,18 +6067,18 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r4 instanceof org.telegram.tgnet.TLRPC.TL_phoneCallDiscardReasonMissed;
         r81 = r0;
         r4 = r151.isOutOwner();
-        if (r4 == 0) goto L_0x1e14;
-    L_0x1d22:
-        if (r81 == 0) goto L_0x1e08;
-    L_0x1d24:
+        if (r4 == 0) goto L_0x1e23;
+    L_0x1d31:
+        if (r81 == 0) goto L_0x1e17;
+    L_0x1d33:
         r4 = "CallMessageOutgoingMissed";
-        r6 = 2131493097; // 0x7f0c00e9 float:1.8609665E38 double:1.0530975136E-314;
+        r6 = 2131493098; // 0x7f0c00ea float:1.8609667E38 double:1.053097514E-314;
         r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
-    L_0x1d2e:
+    L_0x1d3d:
         r0 = r56;
         r4 = r0.duration;
-        if (r4 <= 0) goto L_0x1d56;
-    L_0x1d34:
+        if (r4 <= 0) goto L_0x1d65;
+    L_0x1d43:
         r4 = new java.lang.StringBuilder;
         r4.<init>();
         r0 = r133;
@@ -6094,7 +6090,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = org.telegram.messenger.LocaleController.formatCallDuration(r6);
         r4 = r4.append(r6);
         r133 = r4.toString();
-    L_0x1d56:
+    L_0x1d65:
         r21 = new android.text.StaticLayout;
         r4 = org.telegram.ui.ActionBar.Theme.chat_audioTitlePaint;
         r0 = r101;
@@ -6143,8 +6139,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.totalHeight = r4;
         r0 = r150;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x1216;
-    L_0x1dc2:
+        if (r4 == 0) goto L_0x1225;
+    L_0x1dd1:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -6152,25 +6148,25 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.namesOffset = r4;
-        goto L_0x1216;
-    L_0x1dd3:
+        goto L_0x1225;
+    L_0x1de2:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x1cbd;
-    L_0x1dd7:
+        goto L_0x1ccc;
+    L_0x1de6:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x1e05;
-    L_0x1de1:
+        if (r4 == 0) goto L_0x1e14;
+    L_0x1df0:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x1e05;
-    L_0x1de7:
+        if (r4 == 0) goto L_0x1e14;
+    L_0x1df6:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x1e05;
-    L_0x1ded:
+        if (r4 != 0) goto L_0x1e14;
+    L_0x1dfc:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x1def:
+    L_0x1dfe:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6178,43 +6174,43 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x1cd1;
-    L_0x1e05:
+        goto L_0x1ce0;
+    L_0x1e14:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x1def;
-    L_0x1e08:
+        goto L_0x1dfe;
+    L_0x1e17:
         r4 = "CallMessageOutgoing";
+        r6 = 2131493097; // 0x7f0c00e9 float:1.8609665E38 double:1.0530975136E-314;
+        r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
+        goto L_0x1d3d;
+    L_0x1e23:
+        if (r81 == 0) goto L_0x1e31;
+    L_0x1e25:
+        r4 = "CallMessageIncomingMissed";
         r6 = 2131493096; // 0x7f0c00e8 float:1.8609662E38 double:1.053097513E-314;
         r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1d2e;
-    L_0x1e14:
-        if (r81 == 0) goto L_0x1e22;
-    L_0x1e16:
-        r4 = "CallMessageIncomingMissed";
-        r6 = 2131493095; // 0x7f0c00e7 float:1.860966E38 double:1.0530975126E-314;
-        r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1d2e;
-    L_0x1e22:
+        goto L_0x1d3d;
+    L_0x1e31:
         r0 = r56;
         r4 = r0.reason;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_phoneCallDiscardReasonBusy;
-        if (r4 == 0) goto L_0x1e36;
-    L_0x1e2a:
+        if (r4 == 0) goto L_0x1e45;
+    L_0x1e39:
         r4 = "CallMessageIncomingDeclined";
+        r6 = 2131493095; // 0x7f0c00e7 float:1.860966E38 double:1.0530975126E-314;
+        r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
+        goto L_0x1d3d;
+    L_0x1e45:
+        r4 = "CallMessageIncoming";
         r6 = 2131493094; // 0x7f0c00e6 float:1.8609658E38 double:1.053097512E-314;
         r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1d2e;
-    L_0x1e36:
-        r4 = "CallMessageIncoming";
-        r6 = 2131493093; // 0x7f0c00e5 float:1.8609656E38 double:1.0530975116E-314;
-        r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1d2e;
-    L_0x1e42:
+        goto L_0x1d3d;
+    L_0x1e51:
         r0 = r151;
         r4 = r0.type;
         r6 = 12;
-        if (r4 != r6) goto L_0x20a4;
-    L_0x1e4a:
+        if (r4 != r6) goto L_0x20b3;
+    L_0x1e59:
         r4 = 0;
         r0 = r150;
         r0.drawName = r4;
@@ -6230,21 +6226,21 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r4.setRoundRadius(r6);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2039;
-    L_0x1e6c:
+        if (r4 == 0) goto L_0x2048;
+    L_0x1e7b:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2035;
-    L_0x1e76:
+        if (r4 == 0) goto L_0x2044;
+    L_0x1e85:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x2035;
-    L_0x1e7c:
+        if (r4 == 0) goto L_0x2044;
+    L_0x1e8b:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x2035;
-    L_0x1e82:
+        if (r4 != 0) goto L_0x2044;
+    L_0x1e91:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x1e84:
+    L_0x1e93:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6252,7 +6248,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x1e98:
+    L_0x1ea7:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1106771968; // 0x41f80000 float:31.0 double:5.46818007E-315;
@@ -6274,39 +6270,39 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = 1121714176; // 0x42dc0000 float:110.0 double:5.54200439E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r26 = r4 - r6;
-        if (r26 >= 0) goto L_0x3a8f;
-    L_0x1ecf:
+        if (r26 >= 0) goto L_0x3a9e;
+    L_0x1ede:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r26 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r101 = r26;
-    L_0x1ed7:
+    L_0x1ee6:
         r22 = 0;
-        if (r141 == 0) goto L_0x1ef2;
-    L_0x1edb:
+        if (r141 == 0) goto L_0x1f01;
+    L_0x1eea:
         r0 = r141;
         r4 = r0.photo;
-        if (r4 == 0) goto L_0x1ee9;
-    L_0x1ee1:
+        if (r4 == 0) goto L_0x1ef8;
+    L_0x1ef0:
         r0 = r141;
         r4 = r0.photo;
         r0 = r4.photo_small;
         r22 = r0;
-    L_0x1ee9:
+    L_0x1ef8:
         r0 = r150;
         r4 = r0.contactAvatarDrawable;
         r0 = r141;
         r4.setInfo(r0);
-    L_0x1ef2:
+    L_0x1f01:
         r0 = r150;
         r0 = r0.photoImage;
         r21 = r0;
         r23 = "50_50";
-        if (r141 == 0) goto L_0x206a;
-    L_0x1efd:
+        if (r141 == 0) goto L_0x2079;
+    L_0x1f0c:
         r0 = r150;
         r0 = r0.contactAvatarDrawable;
         r24 = r0;
-    L_0x1f03:
+    L_0x1f12:
         r25 = 0;
         r26 = 0;
         r21.setImage(r22, r23, r24, r25, r26);
@@ -6315,15 +6311,15 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4.media;
         r0 = r4.phone_number;
         r111 = r0;
-        if (r111 == 0) goto L_0x2079;
-    L_0x1f16:
+        if (r111 == 0) goto L_0x2088;
+    L_0x1f25:
         r4 = r111.length();
-        if (r4 == 0) goto L_0x2079;
-    L_0x1f1c:
+        if (r4 == 0) goto L_0x2088;
+    L_0x1f2b:
         r4 = org.telegram.PhoneFormat.PhoneFormat.getInstance();
         r0 = r111;
         r111 = r4.format(r0);
-    L_0x1f26:
+    L_0x1f35:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -6337,10 +6333,10 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r8 = 32;
         r62 = r4.replace(r6, r8);
         r4 = r62.length();
-        if (r4 != 0) goto L_0x1f4a;
-    L_0x1f48:
+        if (r4 != 0) goto L_0x1f59;
+    L_0x1f57:
         r62 = r111;
-    L_0x1f4a:
+    L_0x1f59:
         r23 = new android.text.StaticLayout;
         r4 = org.telegram.ui.ActionBar.Theme.chat_contactNamePaint;
         r0 = r101;
@@ -6385,20 +6381,20 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r150.setMessageObjectInternal(r151);
         r0 = r150;
         r4 = r0.drawForwardedName;
-        if (r4 == 0) goto L_0x2085;
-    L_0x1faf:
+        if (r4 == 0) goto L_0x2094;
+    L_0x1fbe:
         r4 = r151.needDrawForwarded();
-        if (r4 == 0) goto L_0x2085;
-    L_0x1fb5:
+        if (r4 == 0) goto L_0x2094;
+    L_0x1fc4:
         r0 = r150;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x1fc3;
-    L_0x1fbb:
+        if (r4 == 0) goto L_0x1fd2;
+    L_0x1fca:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.minY;
-        if (r4 != 0) goto L_0x2085;
-    L_0x1fc3:
+        if (r4 != 0) goto L_0x2094;
+    L_0x1fd2:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1084227584; // 0x40a00000 float:5.0 double:5.356796015E-315;
@@ -6406,7 +6402,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.namesOffset = r4;
-    L_0x1fd2:
+    L_0x1fe1:
         r4 = 1116471296; // 0x428c0000 float:70.0 double:5.51610112E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r150;
@@ -6416,8 +6412,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.totalHeight = r4;
         r0 = r150;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x1ff6;
-    L_0x1fe7:
+        if (r4 == 0) goto L_0x2005;
+    L_0x1ff6:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -6425,12 +6421,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.namesOffset = r4;
-    L_0x1ff6:
+    L_0x2005:
         r0 = r150;
         r4 = r0.docTitleLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x1216;
-    L_0x2000:
+        if (r4 <= 0) goto L_0x1225;
+    L_0x200f:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1121714176; // 0x42dc0000 float:110.0 double:5.54200439E-315;
@@ -6447,8 +6443,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.timeWidth;
         r0 = r134;
-        if (r0 >= r4) goto L_0x1216;
-    L_0x2024:
+        if (r0 >= r4) goto L_0x1225;
+    L_0x2033:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
@@ -6456,25 +6452,25 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.totalHeight = r4;
-        goto L_0x1216;
-    L_0x2035:
+        goto L_0x1225;
+    L_0x2044:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x1e84;
-    L_0x2039:
+        goto L_0x1e93;
+    L_0x2048:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2067;
-    L_0x2043:
+        if (r4 == 0) goto L_0x2076;
+    L_0x2052:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x2067;
-    L_0x2049:
+        if (r4 == 0) goto L_0x2076;
+    L_0x2058:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x2067;
-    L_0x204f:
+        if (r4 != 0) goto L_0x2076;
+    L_0x205e:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x2051:
+    L_0x2060:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6482,37 +6478,37 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x1e98;
-    L_0x2067:
+        goto L_0x1ea7;
+    L_0x2076:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x2051;
-    L_0x206a:
+        goto L_0x2060;
+    L_0x2079:
         r6 = org.telegram.ui.ActionBar.Theme.chat_contactDrawable;
         r4 = r151.isOutOwner();
-        if (r4 == 0) goto L_0x2077;
-    L_0x2072:
+        if (r4 == 0) goto L_0x2086;
+    L_0x2081:
         r4 = 1;
-    L_0x2073:
+    L_0x2082:
         r24 = r6[r4];
-        goto L_0x1f03;
-    L_0x2077:
+        goto L_0x1f12;
+    L_0x2086:
         r4 = 0;
-        goto L_0x2073;
-    L_0x2079:
+        goto L_0x2082;
+    L_0x2088:
         r4 = "NumberUnknown";
-        r6 = 2131493987; // 0x7f0c0463 float:1.861147E38 double:1.0530979533E-314;
+        r6 = 2131493990; // 0x7f0c0466 float:1.8611476E38 double:1.053097955E-314;
         r111 = org.telegram.messenger.LocaleController.getString(r4, r6);
-        goto L_0x1f26;
-    L_0x2085:
+        goto L_0x1f35;
+    L_0x2094:
         r0 = r150;
         r4 = r0.drawNameLayout;
-        if (r4 == 0) goto L_0x1fd2;
-    L_0x208b:
+        if (r4 == 0) goto L_0x1fe1;
+    L_0x209a:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.reply_to_msg_id;
-        if (r4 != 0) goto L_0x1fd2;
-    L_0x2093:
+        if (r4 != 0) goto L_0x1fe1;
+    L_0x20a2:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1088421888; // 0x40e00000 float:7.0 double:5.37751863E-315;
@@ -6520,32 +6516,32 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.namesOffset = r4;
-        goto L_0x1fd2;
-    L_0x20a4:
+        goto L_0x1fe1;
+    L_0x20b3:
         r0 = r151;
         r4 = r0.type;
         r6 = 2;
-        if (r4 != r6) goto L_0x2149;
-    L_0x20ab:
+        if (r4 != r6) goto L_0x2158;
+    L_0x20ba:
         r4 = 1;
         r0 = r150;
         r0.drawForwardedName = r4;
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2119;
-    L_0x20b6:
+        if (r4 == 0) goto L_0x2128;
+    L_0x20c5:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2116;
-    L_0x20c0:
+        if (r4 == 0) goto L_0x2125;
+    L_0x20cf:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x2116;
-    L_0x20c6:
+        if (r4 == 0) goto L_0x2125;
+    L_0x20d5:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x2116;
-    L_0x20cc:
+        if (r4 != 0) goto L_0x2125;
+    L_0x20db:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x20ce:
+    L_0x20dd:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6553,7 +6549,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x20e2:
+    L_0x20f1:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r0 = r150;
@@ -6569,8 +6565,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.totalHeight = r4;
         r0 = r150;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x1216;
-    L_0x2105:
+        if (r4 == 0) goto L_0x1225;
+    L_0x2114:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -6578,25 +6574,25 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.namesOffset = r4;
-        goto L_0x1216;
-    L_0x2116:
+        goto L_0x1225;
+    L_0x2125:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x20ce;
-    L_0x2119:
+        goto L_0x20dd;
+    L_0x2128:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2146;
-    L_0x2123:
+        if (r4 == 0) goto L_0x2155;
+    L_0x2132:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x2146;
-    L_0x2129:
+        if (r4 == 0) goto L_0x2155;
+    L_0x2138:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x2146;
-    L_0x212f:
+        if (r4 != 0) goto L_0x2155;
+    L_0x213e:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x2131:
+    L_0x2140:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6604,32 +6600,32 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x20e2;
-    L_0x2146:
+        goto L_0x20f1;
+    L_0x2155:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x2131;
-    L_0x2149:
+        goto L_0x2140;
+    L_0x2158:
         r0 = r151;
         r4 = r0.type;
         r6 = 14;
-        if (r4 != r6) goto L_0x21ea;
-    L_0x2151:
+        if (r4 != r6) goto L_0x21f9;
+    L_0x2160:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x21ba;
-    L_0x2157:
+        if (r4 == 0) goto L_0x21c9;
+    L_0x2166:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x21b7;
-    L_0x2161:
+        if (r4 == 0) goto L_0x21c6;
+    L_0x2170:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x21b7;
-    L_0x2167:
+        if (r4 == 0) goto L_0x21c6;
+    L_0x2176:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x21b7;
-    L_0x216d:
+        if (r4 != 0) goto L_0x21c6;
+    L_0x217c:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x216f:
+    L_0x217e:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6637,7 +6633,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x2183:
+    L_0x2192:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r0 = r150;
@@ -6653,8 +6649,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.totalHeight = r4;
         r0 = r150;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x1216;
-    L_0x21a6:
+        if (r4 == 0) goto L_0x1225;
+    L_0x21b5:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -6662,25 +6658,25 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.namesOffset = r4;
-        goto L_0x1216;
-    L_0x21b7:
+        goto L_0x1225;
+    L_0x21c6:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x216f;
-    L_0x21ba:
+        goto L_0x217e;
+    L_0x21c9:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x21e7;
-    L_0x21c4:
+        if (r4 == 0) goto L_0x21f6;
+    L_0x21d3:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x21e7;
-    L_0x21ca:
+        if (r4 == 0) goto L_0x21f6;
+    L_0x21d9:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x21e7;
-    L_0x21d0:
+        if (r4 != 0) goto L_0x21f6;
+    L_0x21df:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x21d2:
+    L_0x21e1:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6688,32 +6684,32 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x2183;
-    L_0x21e7:
+        goto L_0x2192;
+    L_0x21f6:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x21d2;
-    L_0x21ea:
+        goto L_0x21e1;
+    L_0x21f9:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.fwd_from;
-        if (r4 == 0) goto L_0x2419;
-    L_0x21f2:
+        if (r4 == 0) goto L_0x2428;
+    L_0x2201:
         r0 = r151;
         r4 = r0.type;
         r6 = 13;
-        if (r4 == r6) goto L_0x2419;
-    L_0x21fa:
+        if (r4 == r6) goto L_0x2428;
+    L_0x2209:
         r4 = 1;
-    L_0x21fb:
+    L_0x220a:
         r0 = r150;
         r0.drawForwardedName = r4;
         r0 = r151;
         r4 = r0.type;
         r6 = 9;
-        if (r4 == r6) goto L_0x241c;
-    L_0x2207:
+        if (r4 == r6) goto L_0x242b;
+    L_0x2216:
         r4 = 1;
-    L_0x2208:
+    L_0x2217:
         r0 = r150;
         r0.mediaBackground = r4;
         r4 = 1;
@@ -6729,28 +6725,28 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.gifState;
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 == 0) goto L_0x223f;
-    L_0x2226:
+        if (r4 == 0) goto L_0x224e;
+    L_0x2235:
         r4 = org.telegram.messenger.SharedConfig.autoplayGifs;
-        if (r4 != 0) goto L_0x223f;
-    L_0x222a:
+        if (r4 != 0) goto L_0x224e;
+    L_0x2239:
         r0 = r151;
         r4 = r0.type;
         r6 = 8;
-        if (r4 == r6) goto L_0x2239;
-    L_0x2232:
+        if (r4 == r6) goto L_0x2248;
+    L_0x2241:
         r0 = r151;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x223f;
-    L_0x2239:
+        if (r4 != r6) goto L_0x224e;
+    L_0x2248:
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r0 = r151;
         r0.gifState = r4;
-    L_0x223f:
+    L_0x224e:
         r4 = r151.isRoundVideo();
-        if (r4 == 0) goto L_0x2422;
-    L_0x2245:
+        if (r4 == 0) goto L_0x2431;
+    L_0x2254:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = 1;
@@ -6759,12 +6755,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = r0.photoImage;
         r4 = org.telegram.messenger.MediaController.getInstance();
         r4 = r4.getPlayingMessageObject();
-        if (r4 != 0) goto L_0x241f;
-    L_0x225b:
+        if (r4 != 0) goto L_0x242e;
+    L_0x226a:
         r4 = 1;
-    L_0x225c:
+    L_0x226b:
         r6.setAllowStartAnimation(r4);
-    L_0x225f:
+    L_0x226e:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = r151.isSecretPhoto();
@@ -6772,24 +6768,24 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r151;
         r4 = r0.type;
         r6 = 9;
-        if (r4 != r6) goto L_0x248f;
-    L_0x2272:
+        if (r4 != r6) goto L_0x249e;
+    L_0x2281:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x243b;
-    L_0x2278:
+        if (r4 == 0) goto L_0x244a;
+    L_0x2287:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2437;
-    L_0x2282:
+        if (r4 == 0) goto L_0x2446;
+    L_0x2291:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x2437;
-    L_0x2288:
+        if (r4 == 0) goto L_0x2446;
+    L_0x2297:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x2437;
-    L_0x228e:
+        if (r4 != 0) goto L_0x2446;
+    L_0x229d:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x2290:
+    L_0x229f:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -6797,10 +6793,10 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x22a4:
+    L_0x22b3:
         r4 = r150.checkNeedDrawShareButton(r151);
-        if (r4 == 0) goto L_0x22b9;
-    L_0x22aa:
+        if (r4 == 0) goto L_0x22c8;
+    L_0x22b9:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
@@ -6808,7 +6804,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x22b9:
+    L_0x22c8:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1124728832; // 0x430a0000 float:138.0 double:5.55689877E-315;
@@ -6821,38 +6817,38 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r151;
         r4 = r0.caption;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 != 0) goto L_0x22e0;
-    L_0x22d8:
+        if (r4 != 0) goto L_0x22ef;
+    L_0x22e7:
         r4 = 1118568448; // 0x42ac0000 float:86.0 double:5.526462427E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r26 = r26 + r4;
-    L_0x22e0:
+    L_0x22ef:
         r0 = r150;
         r4 = r0.drawPhotoImage;
-        if (r4 == 0) goto L_0x246c;
-    L_0x22e6:
+        if (r4 == 0) goto L_0x247b;
+    L_0x22f5:
         r4 = 1118568448; // 0x42ac0000 float:86.0 double:5.526462427E-315;
         r115 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = 1118568448; // 0x42ac0000 float:86.0 double:5.526462427E-315;
         r114 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x22f2:
+    L_0x2301:
         r0 = r26;
         r1 = r150;
         r1.availableTimeWidth = r0;
         r0 = r150;
         r4 = r0.drawPhotoImage;
-        if (r4 != 0) goto L_0x2341;
-    L_0x22fe:
+        if (r4 != 0) goto L_0x2350;
+    L_0x230d:
         r0 = r151;
         r4 = r0.caption;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 == 0) goto L_0x2341;
-    L_0x2308:
+        if (r4 == 0) goto L_0x2350;
+    L_0x2317:
         r0 = r150;
         r4 = r0.infoLayout;
         r4 = r4.getLineCount();
-        if (r4 <= 0) goto L_0x2341;
-    L_0x2312:
+        if (r4 <= 0) goto L_0x2350;
+    L_0x2321:
         r150.measureTime(r151);
         r0 = r150;
         r4 = r0.backgroundWidth;
@@ -6870,34 +6866,34 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.timeWidth;
         r0 = r134;
-        if (r0 >= r4) goto L_0x2341;
-    L_0x2339:
+        if (r0 >= r4) goto L_0x2350;
+    L_0x2348:
         r4 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r114 = r114 + r4;
-    L_0x2341:
+    L_0x2350:
         r150.setMessageObjectInternal(r151);
         r0 = r150;
         r4 = r0.drawForwardedName;
-        if (r4 == 0) goto L_0x3677;
-    L_0x234a:
+        if (r4 == 0) goto L_0x3686;
+    L_0x2359:
         r4 = r151.needDrawForwarded();
-        if (r4 == 0) goto L_0x3677;
-    L_0x2350:
+        if (r4 == 0) goto L_0x3686;
+    L_0x235f:
         r0 = r150;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x235e;
-    L_0x2356:
+        if (r4 == 0) goto L_0x236d;
+    L_0x2365:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.minY;
-        if (r4 != 0) goto L_0x3677;
-    L_0x235e:
+        if (r4 != 0) goto L_0x3686;
+    L_0x236d:
         r0 = r151;
         r4 = r0.type;
         r6 = 5;
-        if (r4 == r6) goto L_0x2374;
-    L_0x2365:
+        if (r4 == r6) goto L_0x2383;
+    L_0x2374:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1084227584; // 0x40a00000 float:5.0 double:5.356796015E-315;
@@ -6905,7 +6901,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.namesOffset = r4;
-    L_0x2374:
+    L_0x2383:
         r4 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r4 + r114;
@@ -6917,14 +6913,14 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.totalHeight = r4;
         r0 = r150;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x23a6;
-    L_0x238d:
+        if (r4 == 0) goto L_0x23b5;
+    L_0x239c:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 8;
-        if (r4 != 0) goto L_0x23a6;
-    L_0x2397:
+        if (r4 != 0) goto L_0x23b5;
+    L_0x23a6:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
@@ -6932,12 +6928,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.totalHeight = r4;
-    L_0x23a6:
+    L_0x23b5:
         r45 = 0;
         r0 = r150;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x23e6;
-    L_0x23ae:
+        if (r4 == 0) goto L_0x23f5;
+    L_0x23bd:
         r0 = r150;
         r4 = r0.currentPosition;
         r0 = r150;
@@ -6947,29 +6943,29 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 4;
-        if (r4 != 0) goto L_0x23d4;
-    L_0x23c4:
+        if (r4 != 0) goto L_0x23e3;
+    L_0x23d3:
         r4 = 1082130432; // 0x40800000 float:4.0 double:5.34643471E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r114 = r114 + r4;
         r4 = 1082130432; // 0x40800000 float:4.0 double:5.34643471E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r45 = r45 - r4;
-    L_0x23d4:
+    L_0x23e3:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 8;
-        if (r4 != 0) goto L_0x23e6;
-    L_0x23de:
+        if (r4 != 0) goto L_0x23f5;
+    L_0x23ed:
         r4 = 1082130432; // 0x40800000 float:4.0 double:5.34643471E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r114 = r114 + r4;
-    L_0x23e6:
+    L_0x23f5:
         r0 = r150;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x23fb;
-    L_0x23ec:
+        if (r4 == 0) goto L_0x240a;
+    L_0x23fb:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -6977,7 +6973,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.namesOffset = r4;
-    L_0x23fb:
+    L_0x240a:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = 0;
@@ -6991,50 +6987,50 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r1 = r114;
         r4.setImageCoords(r6, r8, r0, r1);
         r150.invalidate();
-        goto L_0x1216;
-    L_0x2419:
+        goto L_0x1225;
+    L_0x2428:
         r4 = 0;
-        goto L_0x21fb;
-    L_0x241c:
+        goto L_0x220a;
+    L_0x242b:
         r4 = 0;
-        goto L_0x2208;
-    L_0x241f:
+        goto L_0x2217;
+    L_0x242e:
         r4 = 0;
-        goto L_0x225c;
-    L_0x2422:
+        goto L_0x226b;
+    L_0x2431:
         r0 = r150;
         r6 = r0.photoImage;
         r0 = r151;
         r4 = r0.gifState;
         r8 = 0;
         r4 = (r4 > r8 ? 1 : (r4 == r8 ? 0 : -1));
-        if (r4 != 0) goto L_0x2435;
-    L_0x242f:
+        if (r4 != 0) goto L_0x2444;
+    L_0x243e:
         r4 = 1;
-    L_0x2430:
+    L_0x243f:
         r6.setAllowStartAnimation(r4);
-        goto L_0x225f;
-    L_0x2435:
+        goto L_0x226e;
+    L_0x2444:
         r4 = 0;
-        goto L_0x2430;
-    L_0x2437:
+        goto L_0x243f;
+    L_0x2446:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x2290;
-    L_0x243b:
+        goto L_0x229f;
+    L_0x244a:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2469;
-    L_0x2445:
+        if (r4 == 0) goto L_0x2478;
+    L_0x2454:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x2469;
-    L_0x244b:
+        if (r4 == 0) goto L_0x2478;
+    L_0x245a:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x2469;
-    L_0x2451:
+        if (r4 != 0) goto L_0x2478;
+    L_0x2460:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x2453:
+    L_0x2462:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -7042,11 +7038,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x22a4;
-    L_0x2469:
+        goto L_0x22b3;
+    L_0x2478:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x2453;
-    L_0x246c:
+        goto L_0x2462;
+    L_0x247b:
         r4 = 1113587712; // 0x42600000 float:56.0 double:5.50185432E-315;
         r115 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = 1113587712; // 0x42600000 float:56.0 double:5.50185432E-315;
@@ -7054,22 +7050,22 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r151;
         r4 = r0.caption;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 == 0) goto L_0x248c;
-    L_0x2482:
+        if (r4 == 0) goto L_0x249b;
+    L_0x2491:
         r4 = 1112276992; // 0x424c0000 float:51.0 double:5.495378504E-315;
-    L_0x2484:
+    L_0x2493:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r26 = r26 + r4;
-        goto L_0x22f2;
-    L_0x248c:
+        goto L_0x2301;
+    L_0x249b:
         r4 = 1101529088; // 0x41a80000 float:21.0 double:5.442276803E-315;
-        goto L_0x2484;
-    L_0x248f:
+        goto L_0x2493;
+    L_0x249e:
         r0 = r151;
         r4 = r0.type;
         r6 = 4;
-        if (r4 != r6) goto L_0x291d;
-    L_0x2496:
+        if (r4 != r6) goto L_0x292c;
+    L_0x24a5:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7086,24 +7082,24 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaGeoLive;
-        if (r4 == 0) goto L_0x274f;
-    L_0x24b8:
+        if (r4 == 0) goto L_0x275e;
+    L_0x24c7:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x26de;
-    L_0x24be:
+        if (r4 == 0) goto L_0x26ed;
+    L_0x24cd:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x26da;
-    L_0x24c8:
+        if (r4 == 0) goto L_0x26e9;
+    L_0x24d7:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x26da;
-    L_0x24ce:
+        if (r4 == 0) goto L_0x26e9;
+    L_0x24dd:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x26da;
-    L_0x24d4:
+        if (r4 != 0) goto L_0x26e9;
+    L_0x24e3:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x24d6:
+    L_0x24e5:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1133543424; // 0x43908000 float:289.0 double:5.60044864E-315;
@@ -7111,10 +7107,10 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x24eb:
+    L_0x24fa:
         r4 = r150.checkNeedDrawShareButton(r151);
-        if (r4 == 0) goto L_0x2500;
-    L_0x24f1:
+        if (r4 == 0) goto L_0x250f;
+    L_0x2500:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
@@ -7122,7 +7118,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x2500:
+    L_0x250f:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1108606976; // 0x42140000 float:37.0 double:5.477246216E-315;
@@ -7234,8 +7230,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r150.isCurrentLocationTimeExpired(r151);
         r0 = r150;
         r0.locationExpired = r4;
-        if (r4 != 0) goto L_0x2710;
-    L_0x260a:
+        if (r4 != 0) goto L_0x271f;
+    L_0x2619:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = 1;
@@ -7252,7 +7248,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = 1;
         r0 = r150;
         r0.scheduledInvalidate = r4;
-    L_0x262b:
+    L_0x263a:
         r23 = new android.text.StaticLayout;
         r4 = "AttachLiveLocation";
         r6 = 2131493028; // 0x7f0c00a4 float:1.8609525E38 double:1.0530974795E-314;
@@ -7270,25 +7266,25 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r150.updateCurrentUserAndChat();
         r0 = r150;
         r4 = r0.currentUser;
-        if (r4 == 0) goto L_0x2721;
-    L_0x2655:
+        if (r4 == 0) goto L_0x2730;
+    L_0x2664:
         r0 = r150;
         r4 = r0.currentUser;
         r4 = r4.photo;
-        if (r4 == 0) goto L_0x2667;
-    L_0x265d:
+        if (r4 == 0) goto L_0x2676;
+    L_0x266c:
         r0 = r150;
         r4 = r0.currentUser;
         r4 = r4.photo;
         r0 = r4.photo_small;
         r22 = r0;
-    L_0x2667:
+    L_0x2676:
         r0 = r150;
         r4 = r0.contactAvatarDrawable;
         r0 = r150;
         r6 = r0.currentUser;
         r4.setInfo(r6);
-    L_0x2672:
+    L_0x2681:
         r0 = r150;
         r0 = r0.locationImageReceiver;
         r27 = r0;
@@ -7304,13 +7300,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.edit_date;
-        if (r4 == 0) goto L_0x2746;
-    L_0x2694:
+        if (r4 == 0) goto L_0x2755;
+    L_0x26a3:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.edit_date;
         r8 = (long) r4;
-    L_0x269b:
+    L_0x26aa:
         r24 = org.telegram.messenger.LocaleController.formatLocationUpdateDate(r8);
         r25 = org.telegram.ui.ActionBar.Theme.chat_locationAddressPaint;
         r27 = android.text.Layout.Alignment.ALIGN_NORMAL;
@@ -7321,11 +7317,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r23;
         r1 = r150;
         r1.infoLayout = r0;
-    L_0x26b2:
+    L_0x26c1:
         r0 = r150;
         r4 = r0.currentUrl;
-        if (r4 == 0) goto L_0x2341;
-    L_0x26b8:
+        if (r4 == 0) goto L_0x2350;
+    L_0x26c7:
         r0 = r150;
         r0 = r0.photoImage;
         r27 = r0;
@@ -7335,33 +7331,33 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r29 = 0;
         r6 = org.telegram.ui.ActionBar.Theme.chat_locationDrawable;
         r4 = r151.isOutOwner();
-        if (r4 == 0) goto L_0x291a;
-    L_0x26ce:
+        if (r4 == 0) goto L_0x2929;
+    L_0x26dd:
         r4 = 1;
-    L_0x26cf:
+    L_0x26de:
         r30 = r6[r4];
         r31 = 0;
         r32 = 0;
         r27.setImage(r28, r29, r30, r31, r32);
-        goto L_0x2341;
-    L_0x26da:
+        goto L_0x2350;
+    L_0x26e9:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x24d6;
-    L_0x26de:
+        goto L_0x24e5;
+    L_0x26ed:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x270d;
-    L_0x26e8:
+        if (r4 == 0) goto L_0x271c;
+    L_0x26f7:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x270d;
-    L_0x26ee:
+        if (r4 == 0) goto L_0x271c;
+    L_0x26fd:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x270d;
-    L_0x26f4:
+        if (r4 != 0) goto L_0x271c;
+    L_0x2703:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x26f6:
+    L_0x2705:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1133543424; // 0x43908000 float:289.0 double:5.60044864E-315;
@@ -7369,11 +7365,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x24eb;
-    L_0x270d:
+        goto L_0x24fa;
+    L_0x271c:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x26f6;
-    L_0x2710:
+        goto L_0x2705;
+    L_0x271f:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
@@ -7381,59 +7377,59 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x262b;
-    L_0x2721:
+        goto L_0x263a;
+    L_0x2730:
         r0 = r150;
         r4 = r0.currentChat;
-        if (r4 == 0) goto L_0x2672;
-    L_0x2727:
+        if (r4 == 0) goto L_0x2681;
+    L_0x2736:
         r0 = r150;
         r4 = r0.currentChat;
         r4 = r4.photo;
-        if (r4 == 0) goto L_0x2739;
-    L_0x272f:
+        if (r4 == 0) goto L_0x2748;
+    L_0x273e:
         r0 = r150;
         r4 = r0.currentChat;
         r4 = r4.photo;
         r0 = r4.photo_small;
         r22 = r0;
-    L_0x2739:
+    L_0x2748:
         r0 = r150;
         r4 = r0.contactAvatarDrawable;
         r0 = r150;
         r6 = r0.currentChat;
         r4.setInfo(r6);
-        goto L_0x2672;
-    L_0x2746:
+        goto L_0x2681;
+    L_0x2755:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.date;
         r8 = (long) r4;
-        goto L_0x269b;
-    L_0x274f:
+        goto L_0x26aa;
+    L_0x275e:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.title;
         r4 = android.text.TextUtils.isEmpty(r4);
-        if (r4 != 0) goto L_0x28b2;
-    L_0x275d:
+        if (r4 != 0) goto L_0x28c1;
+    L_0x276c:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x287a;
-    L_0x2763:
+        if (r4 == 0) goto L_0x2889;
+    L_0x2772:
         r6 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x2876;
-    L_0x276d:
+        if (r4 == 0) goto L_0x2885;
+    L_0x277c:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x2876;
-    L_0x2773:
+        if (r4 == 0) goto L_0x2885;
+    L_0x2782:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x2876;
-    L_0x2779:
+        if (r4 != 0) goto L_0x2885;
+    L_0x2788:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x277b:
+    L_0x278a:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -7441,10 +7437,10 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x278f:
+    L_0x279e:
         r4 = r150.checkNeedDrawShareButton(r151);
-        if (r4 == 0) goto L_0x27a4;
-    L_0x2795:
+        if (r4 == 0) goto L_0x27b3;
+    L_0x27a4:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
@@ -7452,7 +7448,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x27a4:
+    L_0x27b3:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1123418112; // 0x42f60000 float:123.0 double:5.55042295E-315;
@@ -7481,15 +7477,15 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.address;
-        if (r4 == 0) goto L_0x28ab;
-    L_0x27e4:
+        if (r4 == 0) goto L_0x28ba;
+    L_0x27f3:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.address;
         r4 = r4.length();
-        if (r4 <= 0) goto L_0x28ab;
-    L_0x27f2:
+        if (r4 <= 0) goto L_0x28ba;
+    L_0x2801:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7508,7 +7504,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = org.telegram.ui.Components.StaticLayoutEx.createStaticLayout(r24, r25, r26, r27, r28, r29, r30, r31, r32, r33);
         r0 = r150;
         r0.infoLayout = r4;
-    L_0x2819:
+    L_0x2828:
         r4 = 0;
         r0 = r150;
         r0.mediaBackground = r4;
@@ -7549,25 +7545,25 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.String.format(r4, r6, r8);
         r0 = r150;
         r0.currentUrl = r4;
-        goto L_0x26b2;
-    L_0x2876:
+        goto L_0x26c1;
+    L_0x2885:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x277b;
-    L_0x287a:
+        goto L_0x278a;
+    L_0x2889:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r4.x;
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x28a8;
-    L_0x2884:
+        if (r4 == 0) goto L_0x28b7;
+    L_0x2893:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x28a8;
-    L_0x288a:
+        if (r4 == 0) goto L_0x28b7;
+    L_0x2899:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x28a8;
-    L_0x2890:
+        if (r4 != 0) goto L_0x28b7;
+    L_0x289f:
         r4 = 1120665600; // 0x42cc0000 float:102.0 double:5.536823734E-315;
-    L_0x2892:
+    L_0x28a1:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
@@ -7575,16 +7571,16 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.Math.min(r4, r6);
         r0 = r150;
         r0.backgroundWidth = r4;
-        goto L_0x278f;
-    L_0x28a8:
+        goto L_0x279e;
+    L_0x28b7:
         r4 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        goto L_0x2892;
-    L_0x28ab:
+        goto L_0x28a1;
+    L_0x28ba:
         r4 = 0;
         r0 = r150;
         r0.infoLayout = r4;
-        goto L_0x2819;
-    L_0x28b2:
+        goto L_0x2828;
+    L_0x28c1:
         r4 = 1127874560; // 0x433a0000 float:186.0 double:5.57244073E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r150;
@@ -7628,21 +7624,21 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = java.lang.String.format(r4, r6, r8);
         r0 = r150;
         r0.currentUrl = r4;
-        goto L_0x26b2;
-    L_0x291a:
+        goto L_0x26c1;
+    L_0x2929:
         r4 = 0;
-        goto L_0x26cf;
-    L_0x291d:
+        goto L_0x26de;
+    L_0x292c:
         r0 = r151;
         r4 = r0.type;
         r6 = 13;
-        if (r4 != r6) goto L_0x2ab4;
-    L_0x2925:
+        if (r4 != r6) goto L_0x2ac3;
+    L_0x2934:
         r4 = 0;
         r0 = r150;
         r0.drawBackground = r4;
         r41 = 0;
-    L_0x292c:
+    L_0x293b:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7650,8 +7646,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x2962;
-    L_0x293e:
+        if (r0 >= r4) goto L_0x2971;
+    L_0x294d:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7662,33 +7658,33 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeImageSize;
-        if (r4 == 0) goto L_0x2a30;
-    L_0x2956:
+        if (r4 == 0) goto L_0x2a3f;
+    L_0x2965:
         r0 = r46;
         r0 = r0.w;
         r115 = r0;
         r0 = r46;
         r0 = r0.h;
         r114 = r0;
-    L_0x2962:
+    L_0x2971:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2a34;
-    L_0x2968:
+        if (r4 == 0) goto L_0x2a43;
+    L_0x2977:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r4 = (float) r4;
         r6 = 1053609165; // 0x3ecccccd float:0.4 double:5.205520926E-315;
         r26 = r4 * r6;
         r98 = r26;
-    L_0x2974:
-        if (r115 != 0) goto L_0x2983;
-    L_0x2976:
+    L_0x2983:
+        if (r115 != 0) goto L_0x2992;
+    L_0x2985:
         r0 = r98;
         r0 = (int) r0;
         r114 = r0;
         r4 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r115 = r114 + r4;
-    L_0x2983:
+    L_0x2992:
         r0 = r114;
         r4 = (float) r0;
         r0 = r115;
@@ -7703,8 +7699,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r114;
         r4 = (float) r0;
         r4 = (r4 > r98 ? 1 : (r4 == r98 ? 0 : -1));
-        if (r4 <= 0) goto L_0x29ac;
-    L_0x299b:
+        if (r4 <= 0) goto L_0x29bb;
+    L_0x29aa:
         r0 = r115;
         r4 = (float) r0;
         r0 = r114;
@@ -7716,7 +7712,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r98;
         r0 = (int) r0;
         r114 = r0;
-    L_0x29ac:
+    L_0x29bb:
         r4 = 6;
         r0 = r150;
         r0.documentAttachType = r4;
@@ -7738,8 +7734,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.currentPhotoObjectThumb = r4;
         r0 = r151;
         r4 = r0.attachPathExists;
-        if (r4 == 0) goto L_0x2a4c;
-    L_0x29dd:
+        if (r4 == 0) goto L_0x2a5b;
+    L_0x29ec:
         r0 = r150;
         r0 = r0.photoImage;
         r27 = r0;
@@ -7762,13 +7758,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r31 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x2a49;
-    L_0x2a0f:
+        if (r4 == 0) goto L_0x2a58;
+    L_0x2a1e:
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
         r0 = r4.location;
         r32 = r0;
-    L_0x2a17:
+    L_0x2a26:
         r33 = "b1";
         r0 = r151;
         r4 = r0.messageOwner;
@@ -7779,11 +7775,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r35 = "webp";
         r36 = 1;
         r27.setImage(r28, r29, r30, r31, r32, r33, r34, r35, r36);
-        goto L_0x2341;
-    L_0x2a30:
+        goto L_0x2350;
+    L_0x2a3f:
         r41 = r41 + 1;
-        goto L_0x292c;
-    L_0x2a34:
+        goto L_0x293b;
+    L_0x2a43:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -7793,11 +7789,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
         r26 = r4 * r6;
         r98 = r26;
-        goto L_0x2974;
-    L_0x2a49:
+        goto L_0x2983;
+    L_0x2a58:
         r32 = 0;
-        goto L_0x2a17;
-    L_0x2a4c:
+        goto L_0x2a26;
+    L_0x2a5b:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -7805,8 +7801,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r8 = r4.id;
         r10 = 0;
         r4 = (r8 > r10 ? 1 : (r8 == r10 ? 0 : -1));
-        if (r4 == 0) goto L_0x2341;
-    L_0x2a5c:
+        if (r4 == 0) goto L_0x2350;
+    L_0x2a6b:
         r0 = r150;
         r0 = r0.photoImage;
         r27 = r0;
@@ -7830,13 +7826,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r31 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x2ab1;
-    L_0x2a90:
+        if (r4 == 0) goto L_0x2ac0;
+    L_0x2a9f:
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
         r0 = r4.location;
         r32 = r0;
-    L_0x2a98:
+    L_0x2aa7:
         r33 = "b1";
         r0 = r151;
         r4 = r0.messageOwner;
@@ -7847,54 +7843,54 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r35 = "webp";
         r36 = 1;
         r27.setImage(r28, r29, r30, r31, r32, r33, r34, r35, r36);
-        goto L_0x2341;
-    L_0x2ab1:
+        goto L_0x2350;
+    L_0x2ac0:
         r32 = 0;
-        goto L_0x2a98;
-    L_0x2ab4:
+        goto L_0x2aa7;
+    L_0x2ac3:
         r0 = r151;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x2ca1;
-    L_0x2abb:
+        if (r4 != r6) goto L_0x2cb0;
+    L_0x2aca:
         r115 = org.telegram.messenger.AndroidUtilities.roundMessageSize;
         r99 = r115;
-    L_0x2abf:
+    L_0x2ace:
         r4 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r114 = r115 + r4;
         r0 = r151;
         r4 = r0.type;
         r6 = 5;
-        if (r4 == r6) goto L_0x2ae4;
-    L_0x2ace:
+        if (r4 == r6) goto L_0x2af3;
+    L_0x2add:
         r4 = r150.checkNeedDrawShareButton(r151);
-        if (r4 == 0) goto L_0x2ae4;
-    L_0x2ad4:
+        if (r4 == 0) goto L_0x2af3;
+    L_0x2ae3:
         r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r99 = r99 - r4;
         r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r115 = r115 - r4;
-    L_0x2ae4:
+    L_0x2af3:
         r4 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
         r0 = r115;
-        if (r0 <= r4) goto L_0x2af0;
-    L_0x2aec:
+        if (r0 <= r4) goto L_0x2aff;
+    L_0x2afb:
         r115 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
-    L_0x2af0:
+    L_0x2aff:
         r4 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
         r0 = r114;
-        if (r0 <= r4) goto L_0x2afc;
-    L_0x2af8:
+        if (r0 <= r4) goto L_0x2b0b;
+    L_0x2b07:
         r114 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
-    L_0x2afc:
+    L_0x2b0b:
         r0 = r151;
         r4 = r0.type;
         r6 = 1;
-        if (r4 != r6) goto L_0x2ccf;
-    L_0x2b03:
+        if (r4 != r6) goto L_0x2cde;
+    L_0x2b12:
         r150.updateSecretTimeText(r151);
         r0 = r151;
         r4 = r0.photoThumbs;
@@ -7902,19 +7898,19 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = org.telegram.messenger.FileLoader.getClosestPhotoSizeWithSize(r4, r6);
         r0 = r150;
         r0.currentPhotoObjectThumb = r4;
-    L_0x2b14:
+    L_0x2b23:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
-        if (r4 != 0) goto L_0x2b25;
-    L_0x2b1a:
+        if (r4 != 0) goto L_0x2b34;
+    L_0x2b29:
         r0 = r151;
         r4 = r0.caption;
-        if (r4 == 0) goto L_0x2b25;
-    L_0x2b20:
+        if (r4 == 0) goto L_0x2b34;
+    L_0x2b2f:
         r4 = 0;
         r0 = r150;
         r0.mediaBackground = r4;
-    L_0x2b25:
+    L_0x2b34:
         r0 = r151;
         r4 = r0.photoThumbs;
         r6 = org.telegram.messenger.AndroidUtilities.getPhotoSize();
@@ -7925,22 +7921,22 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r76 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x2b4e;
-    L_0x2b3f:
+        if (r4 == 0) goto L_0x2b5d;
+    L_0x2b4e:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r150;
         r6 = r0.currentPhotoObjectThumb;
-        if (r4 != r6) goto L_0x2b4e;
-    L_0x2b49:
+        if (r4 != r6) goto L_0x2b5d;
+    L_0x2b58:
         r4 = 0;
         r0 = r150;
         r0.currentPhotoObjectThumb = r4;
-    L_0x2b4e:
+    L_0x2b5d:
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x2ba2;
-    L_0x2b54:
+        if (r4 == 0) goto L_0x2bb1;
+    L_0x2b63:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
@@ -7962,20 +7958,20 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 / r125;
         r0 = (int) r4;
         r76 = r0;
-        if (r142 != 0) goto L_0x2b80;
-    L_0x2b7a:
+        if (r142 != 0) goto L_0x2b8f;
+    L_0x2b89:
         r4 = 1125515264; // 0x43160000 float:150.0 double:5.56078426E-315;
         r142 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x2b80:
-        if (r76 != 0) goto L_0x2b88;
-    L_0x2b82:
+    L_0x2b8f:
+        if (r76 != 0) goto L_0x2b97;
+    L_0x2b91:
         r4 = 1125515264; // 0x43160000 float:150.0 double:5.56078426E-315;
         r76 = org.telegram.messenger.AndroidUtilities.dp(r4);
-    L_0x2b88:
+    L_0x2b97:
         r0 = r76;
         r1 = r114;
-        if (r0 <= r1) goto L_0x2d8f;
-    L_0x2b8e:
+        if (r0 <= r1) goto L_0x2d9e;
+    L_0x2b9d:
         r0 = r76;
         r0 = (float) r0;
         r126 = r0;
@@ -7988,26 +7984,26 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 / r126;
         r0 = (int) r4;
         r142 = r0;
-    L_0x2ba2:
-        r0 = r151;
-        r4 = r0.type;
-        r6 = 5;
-        if (r4 != r6) goto L_0x2bad;
-    L_0x2ba9:
-        r76 = org.telegram.messenger.AndroidUtilities.roundMessageSize;
-        r142 = r76;
-    L_0x2bad:
-        if (r142 == 0) goto L_0x2bb1;
-    L_0x2baf:
-        if (r76 != 0) goto L_0x2c23;
     L_0x2bb1:
         r0 = r151;
         r4 = r0.type;
+        r6 = 5;
+        if (r4 != r6) goto L_0x2bbc;
+    L_0x2bb8:
+        r76 = org.telegram.messenger.AndroidUtilities.roundMessageSize;
+        r142 = r76;
+    L_0x2bbc:
+        if (r142 == 0) goto L_0x2bc0;
+    L_0x2bbe:
+        if (r76 != 0) goto L_0x2c32;
+    L_0x2bc0:
+        r0 = r151;
+        r4 = r0.type;
         r6 = 8;
-        if (r4 != r6) goto L_0x2c23;
-    L_0x2bb9:
+        if (r4 != r6) goto L_0x2c32;
+    L_0x2bc8:
         r41 = 0;
-    L_0x2bbb:
+    L_0x2bca:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -8015,8 +8011,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4.attributes;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x2c23;
-    L_0x2bcd:
+        if (r0 >= r4) goto L_0x2c32;
+    L_0x2bdc:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -8027,12 +8023,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r46 = (org.telegram.tgnet.TLRPC.DocumentAttribute) r46;
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeImageSize;
-        if (r4 != 0) goto L_0x2beb;
-    L_0x2be5:
+        if (r4 != 0) goto L_0x2bfa;
+    L_0x2bf4:
         r0 = r46;
         r4 = r0 instanceof org.telegram.tgnet.TLRPC.TL_documentAttributeVideo;
-        if (r4 == 0) goto L_0x2dfd;
-    L_0x2beb:
+        if (r4 == 0) goto L_0x2e0c;
+    L_0x2bfa:
         r0 = r46;
         r4 = r0.w;
         r4 = (float) r4;
@@ -8053,8 +8049,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r76 = r0;
         r0 = r76;
         r1 = r114;
-        if (r0 <= r1) goto L_0x2dc9;
-    L_0x2c0f:
+        if (r0 <= r1) goto L_0x2dd8;
+    L_0x2c1e:
         r0 = r76;
         r0 = (float) r0;
         r126 = r0;
@@ -8067,49 +8063,49 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 / r126;
         r0 = (int) r4;
         r142 = r0;
-    L_0x2c23:
-        if (r142 == 0) goto L_0x2c27;
-    L_0x2c25:
-        if (r76 != 0) goto L_0x2c2f;
-    L_0x2c27:
+    L_0x2c32:
+        if (r142 == 0) goto L_0x2c36;
+    L_0x2c34:
+        if (r76 != 0) goto L_0x2c3e;
+    L_0x2c36:
         r4 = 1125515264; // 0x43160000 float:150.0 double:5.56078426E-315;
         r76 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r142 = r76;
-    L_0x2c2f:
+    L_0x2c3e:
         r0 = r151;
         r4 = r0.type;
         r6 = 3;
-        if (r4 != r6) goto L_0x2c51;
-    L_0x2c36:
+        if (r4 != r6) goto L_0x2c60;
+    L_0x2c45:
         r0 = r150;
         r4 = r0.infoWidth;
         r6 = 1109393408; // 0x42200000 float:40.0 double:5.481131706E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r4 = r4 + r6;
         r0 = r142;
-        if (r0 >= r4) goto L_0x2c51;
-    L_0x2c45:
+        if (r0 >= r4) goto L_0x2c60;
+    L_0x2c54:
         r0 = r150;
         r4 = r0.infoWidth;
         r6 = 1109393408; // 0x42200000 float:40.0 double:5.481131706E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r142 = r4 + r6;
-    L_0x2c51:
+    L_0x2c60:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
-        if (r4 == 0) goto L_0x2f2d;
-    L_0x2c57:
+        if (r4 == 0) goto L_0x2f3c;
+    L_0x2c66:
         r72 = 0;
         r63 = r150.getGroupPhotosWidth();
         r41 = 0;
-    L_0x2c5f:
+    L_0x2c6e:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x2e01;
-    L_0x2c6d:
+        if (r0 >= r4) goto L_0x2e10;
+    L_0x2c7c:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
@@ -8118,8 +8114,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r116 = (org.telegram.messenger.MessageObject.GroupedMessagePosition) r116;
         r0 = r116;
         r4 = r0.minY;
-        if (r4 != 0) goto L_0x2e01;
-    L_0x2c81:
+        if (r4 != 0) goto L_0x2e10;
+    L_0x2c90:
         r0 = r72;
         r8 = (double) r0;
         r0 = r116;
@@ -8139,11 +8135,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = (int) r8;
         r72 = r0;
         r41 = r41 + 1;
-        goto L_0x2c5f;
-    L_0x2ca1:
+        goto L_0x2c6e;
+    L_0x2cb0:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2cb7;
-    L_0x2ca7:
+        if (r4 == 0) goto L_0x2cc6;
+    L_0x2cb6:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r4 = (float) r4;
         r6 = 1060320051; // 0x3f333333 float:0.7 double:5.23867711E-315;
@@ -8151,8 +8147,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = (int) r4;
         r115 = r0;
         r99 = r115;
-        goto L_0x2abf;
-    L_0x2cb7:
+        goto L_0x2ace;
+    L_0x2cc6:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -8164,21 +8160,21 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = (int) r4;
         r115 = r0;
         r99 = r115;
-        goto L_0x2abf;
-    L_0x2ccf:
+        goto L_0x2ace;
+    L_0x2cde:
         r0 = r151;
         r4 = r0.type;
         r6 = 3;
-        if (r4 != r6) goto L_0x2d02;
-    L_0x2cd6:
+        if (r4 != r6) goto L_0x2d11;
+    L_0x2ce5:
         r4 = 0;
         r0 = r150;
         r1 = r151;
         r0.createDocumentLayout(r4, r1);
         r150.updateSecretTimeText(r151);
         r4 = r151.isSecretPhoto();
-        if (r4 != 0) goto L_0x2cf7;
-    L_0x2ce7:
+        if (r4 != 0) goto L_0x2d06;
+    L_0x2cf6:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = 1;
@@ -8187,21 +8183,21 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.photoImage;
         r6 = 1;
         r4.setShouldGenerateQualityThumb(r6);
-    L_0x2cf7:
+    L_0x2d06:
         r0 = r150;
         r4 = r0.photoImage;
         r0 = r151;
         r4.setParentMessageObject(r0);
-        goto L_0x2b14;
-    L_0x2d02:
+        goto L_0x2b23;
+    L_0x2d11:
         r0 = r151;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x2d2a;
-    L_0x2d09:
+        if (r4 != r6) goto L_0x2d39;
+    L_0x2d18:
         r4 = r151.isSecretPhoto();
-        if (r4 != 0) goto L_0x2d1f;
-    L_0x2d0f:
+        if (r4 != 0) goto L_0x2d2e;
+    L_0x2d1e:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = 1;
@@ -8210,18 +8206,18 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.photoImage;
         r6 = 1;
         r4.setShouldGenerateQualityThumb(r6);
-    L_0x2d1f:
+    L_0x2d2e:
         r0 = r150;
         r4 = r0.photoImage;
         r0 = r151;
         r4.setParentMessageObject(r0);
-        goto L_0x2b14;
-    L_0x2d2a:
+        goto L_0x2b23;
+    L_0x2d39:
         r0 = r151;
         r4 = r0.type;
         r6 = 8;
-        if (r4 != r6) goto L_0x2b14;
-    L_0x2d32:
+        if (r4 != r6) goto L_0x2b23;
+    L_0x2d41:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -8251,8 +8247,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r1 = r150;
         r1.infoLayout = r0;
         r4 = r151.isSecretPhoto();
-        if (r4 != 0) goto L_0x2d84;
-    L_0x2d74:
+        if (r4 != 0) goto L_0x2d93;
+    L_0x2d83:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = 1;
@@ -8261,18 +8257,18 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.photoImage;
         r6 = 1;
         r4.setShouldGenerateQualityThumb(r6);
-    L_0x2d84:
+    L_0x2d93:
         r0 = r150;
         r4 = r0.photoImage;
         r0 = r151;
         r4.setParentMessageObject(r0);
-        goto L_0x2b14;
-    L_0x2d8f:
+        goto L_0x2b23;
+    L_0x2d9e:
         r4 = 1123024896; // 0x42f00000 float:120.0 double:5.548480205E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r76;
-        if (r0 >= r4) goto L_0x2ba2;
-    L_0x2d99:
+        if (r0 >= r4) goto L_0x2bb1;
+    L_0x2da8:
         r4 = 1123024896; // 0x42f00000 float:120.0 double:5.548480205E-315;
         r76 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r150;
@@ -8290,8 +8286,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r115;
         r6 = (float) r0;
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 >= 0) goto L_0x2ba2;
-    L_0x2dbb:
+        if (r4 >= 0) goto L_0x2bb1;
+    L_0x2dca:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.w;
@@ -8299,13 +8295,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 / r77;
         r0 = (int) r4;
         r142 = r0;
-        goto L_0x2ba2;
-    L_0x2dc9:
+        goto L_0x2bb1;
+    L_0x2dd8:
         r4 = 1123024896; // 0x42f00000 float:120.0 double:5.548480205E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r76;
-        if (r0 >= r4) goto L_0x2c23;
-    L_0x2dd3:
+        if (r0 >= r4) goto L_0x2c32;
+    L_0x2de2:
         r4 = 1123024896; // 0x42f00000 float:120.0 double:5.548480205E-315;
         r76 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r46;
@@ -8321,30 +8317,30 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r115;
         r6 = (float) r0;
         r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r4 >= 0) goto L_0x2c23;
-    L_0x2df1:
+        if (r4 >= 0) goto L_0x2c32;
+    L_0x2e00:
         r0 = r46;
         r4 = r0.w;
         r4 = (float) r4;
         r4 = r4 / r77;
         r0 = (int) r4;
         r142 = r0;
-        goto L_0x2c23;
-    L_0x2dfd:
+        goto L_0x2c32;
+    L_0x2e0c:
         r41 = r41 + 1;
-        goto L_0x2bbb;
-    L_0x2e01:
+        goto L_0x2bca;
+    L_0x2e10:
         r4 = 1108082688; // 0x420c0000 float:35.0 double:5.47465589E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r72 - r4;
         r0 = r150;
         r0.availableTimeWidth = r4;
-    L_0x2e0d:
+    L_0x2e1c:
         r0 = r151;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x2e38;
-    L_0x2e14:
+        if (r4 != r6) goto L_0x2e47;
+    L_0x2e23:
         r0 = r150;
         r4 = r0.availableTimeWidth;
         r8 = (double) r4;
@@ -8362,28 +8358,28 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = (int) r8;
         r0 = r150;
         r0.availableTimeWidth = r4;
-    L_0x2e38:
+    L_0x2e47:
         r150.measureTime(r151);
         r0 = r150;
         r6 = r0.timeWidth;
         r4 = r151.isOutOwner();
-        if (r4 == 0) goto L_0x2f3b;
-    L_0x2e45:
+        if (r4 == 0) goto L_0x2f4a;
+    L_0x2e54:
         r4 = 20;
-    L_0x2e47:
+    L_0x2e56:
         r4 = r4 + 14;
         r4 = (float) r4;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r136 = r6 + r4;
         r0 = r142;
         r1 = r136;
-        if (r0 >= r1) goto L_0x2e58;
-    L_0x2e56:
+        if (r0 >= r1) goto L_0x2e67;
+    L_0x2e65:
         r142 = r136;
-    L_0x2e58:
+    L_0x2e67:
         r4 = r151.isRoundVideo();
-        if (r4 == 0) goto L_0x2f3e;
-    L_0x2e5e:
+        if (r4 == 0) goto L_0x2f4d;
+    L_0x2e6d:
         r0 = r142;
         r1 = r76;
         r76 = java.lang.Math.min(r0, r1);
@@ -8395,12 +8391,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.photoImage;
         r6 = r142 / 2;
         r4.setRoundRadius(r6);
-    L_0x2e76:
+    L_0x2e85:
         r30 = 0;
         r0 = r150;
         r4 = r0.currentMessagesGroup;
-        if (r4 == 0) goto L_0x339b;
-    L_0x2e7e:
+        if (r4 == 0) goto L_0x33aa;
+    L_0x2e8d:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -8426,37 +8422,37 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.minY;
-        if (r4 == 0) goto L_0x2fc5;
-    L_0x2eb1:
+        if (r4 == 0) goto L_0x2fd4;
+    L_0x2ec0:
         r4 = r151.isOutOwner();
-        if (r4 == 0) goto L_0x2ec1;
-    L_0x2eb7:
+        if (r4 == 0) goto L_0x2ed0;
+    L_0x2ec6:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 1;
-        if (r4 != 0) goto L_0x2ed1;
-    L_0x2ec1:
+        if (r4 != 0) goto L_0x2ee0;
+    L_0x2ed0:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x2fc5;
-    L_0x2ec7:
+        if (r4 != 0) goto L_0x2fd4;
+    L_0x2ed6:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 2;
-        if (r4 == 0) goto L_0x2fc5;
-    L_0x2ed1:
+        if (r4 == 0) goto L_0x2fd4;
+    L_0x2ee0:
         r72 = 0;
         r61 = 0;
         r41 = 0;
-    L_0x2ed7:
+    L_0x2ee6:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x2fc1;
-    L_0x2ee5:
+        if (r0 >= r4) goto L_0x2fd0;
+    L_0x2ef4:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
@@ -8465,8 +8461,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r116 = (org.telegram.messenger.MessageObject.GroupedMessagePosition) r116;
         r0 = r116;
         r4 = r0.minY;
-        if (r4 != 0) goto L_0x2f73;
-    L_0x2ef9:
+        if (r4 != 0) goto L_0x2f82;
+    L_0x2f08:
         r0 = r72;
         r10 = (double) r0;
         r0 = r116;
@@ -8481,8 +8477,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r18 = java.lang.Math.ceil(r8);
         r0 = r116;
         r4 = r0.leftSpanOffset;
-        if (r4 == 0) goto L_0x2f70;
-    L_0x2f13:
+        if (r4 == 0) goto L_0x2f7f;
+    L_0x2f22:
         r0 = r116;
         r4 = r0.leftSpanOffset;
         r4 = (float) r4;
@@ -8493,31 +8489,31 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 * r6;
         r8 = (double) r4;
         r8 = java.lang.Math.ceil(r8);
-    L_0x2f24:
+    L_0x2f33:
         r8 = r8 + r18;
         r8 = r8 + r10;
         r0 = (int) r8;
         r72 = r0;
-    L_0x2f2a:
+    L_0x2f39:
         r41 = r41 + 1;
-        goto L_0x2ed7;
-    L_0x2f2d:
+        goto L_0x2ee6;
+    L_0x2f3c:
         r4 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r99 - r4;
         r0 = r150;
         r0.availableTimeWidth = r4;
-        goto L_0x2e0d;
-    L_0x2f3b:
-        r4 = 0;
-        goto L_0x2e47;
-    L_0x2f3e:
-        r4 = r151.isSecretPhoto();
-        if (r4 == 0) goto L_0x2e76;
-    L_0x2f44:
-        r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x2f59;
+        goto L_0x2e1c;
     L_0x2f4a:
+        r4 = 0;
+        goto L_0x2e56;
+    L_0x2f4d:
+        r4 = r151.isSecretPhoto();
+        if (r4 == 0) goto L_0x2e85;
+    L_0x2f53:
+        r4 = org.telegram.messenger.AndroidUtilities.isTablet();
+        if (r4 == 0) goto L_0x2f68;
+    L_0x2f59:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r4 = (float) r4;
         r6 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
@@ -8525,8 +8521,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = (int) r4;
         r76 = r0;
         r142 = r76;
-        goto L_0x2e76;
-    L_0x2f59:
+        goto L_0x2e85;
+    L_0x2f68:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
@@ -8538,18 +8534,18 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = (int) r4;
         r76 = r0;
         r142 = r76;
-        goto L_0x2e76;
-    L_0x2f70:
+        goto L_0x2e85;
+    L_0x2f7f:
         r8 = 0;
-        goto L_0x2f24;
-    L_0x2f73:
+        goto L_0x2f33;
+    L_0x2f82:
         r0 = r116;
         r4 = r0.minY;
         r0 = r150;
         r6 = r0.currentPosition;
         r6 = r6.minY;
-        if (r4 != r6) goto L_0x2fb5;
-    L_0x2f7f:
+        if (r4 != r6) goto L_0x2fc4;
+    L_0x2f8e:
         r0 = r61;
         r10 = (double) r0;
         r0 = r116;
@@ -8564,8 +8560,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r18 = java.lang.Math.ceil(r8);
         r0 = r116;
         r4 = r0.leftSpanOffset;
-        if (r4 == 0) goto L_0x2fb2;
-    L_0x2f99:
+        if (r4 == 0) goto L_0x2fc1;
+    L_0x2fa8:
         r0 = r116;
         r4 = r0.leftSpanOffset;
         r4 = (float) r4;
@@ -8576,52 +8572,52 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 * r6;
         r8 = (double) r4;
         r8 = java.lang.Math.ceil(r8);
-    L_0x2faa:
+    L_0x2fb9:
         r8 = r8 + r18;
         r8 = r8 + r10;
         r0 = (int) r8;
         r61 = r0;
-        goto L_0x2f2a;
-    L_0x2fb2:
+        goto L_0x2f39;
+    L_0x2fc1:
         r8 = 0;
-        goto L_0x2faa;
-    L_0x2fb5:
+        goto L_0x2fb9;
+    L_0x2fc4:
         r0 = r116;
         r4 = r0.minY;
         r0 = r150;
         r6 = r0.currentPosition;
         r6 = r6.minY;
-        if (r4 <= r6) goto L_0x2f2a;
-    L_0x2fc1:
+        if (r4 <= r6) goto L_0x2f39;
+    L_0x2fd0:
         r4 = r72 - r61;
         r142 = r142 + r4;
-    L_0x2fc5:
+    L_0x2fd4:
         r4 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r142 = r142 - r4;
         r0 = r150;
         r4 = r0.isAvatarVisible;
-        if (r4 == 0) goto L_0x2fdb;
-    L_0x2fd3:
+        if (r4 == 0) goto L_0x2fea;
+    L_0x2fe2:
         r4 = 1111490560; // 0x42400000 float:48.0 double:5.491493014E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r142 = r142 - r4;
-    L_0x2fdb:
+    L_0x2fea:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.siblingHeights;
-        if (r4 == 0) goto L_0x3137;
-    L_0x2fe3:
+        if (r4 == 0) goto L_0x3146;
+    L_0x2ff2:
         r76 = 0;
         r41 = 0;
-    L_0x2fe7:
+    L_0x2ff6:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.siblingHeights;
         r4 = r4.length;
         r0 = r41;
-        if (r0 >= r4) goto L_0x3007;
-    L_0x2ff2:
+        if (r0 >= r4) goto L_0x3016;
+    L_0x3001:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.siblingHeights;
@@ -8632,8 +8628,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = (int) r8;
         r76 = r76 + r4;
         r41 = r41 + 1;
-        goto L_0x2fe7;
-    L_0x3007:
+        goto L_0x2ff6;
+    L_0x3016:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.maxY;
@@ -8645,7 +8641,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
         r4 = r4 * r6;
         r76 = r76 + r4;
-    L_0x301d:
+    L_0x302c:
         r0 = r142;
         r1 = r150;
         r1.backgroundWidth = r0;
@@ -8656,12 +8652,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.edge;
-        if (r4 != 0) goto L_0x303d;
-    L_0x3035:
+        if (r4 != 0) goto L_0x304c;
+    L_0x3044:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r115 = r115 + r4;
-    L_0x303d:
+    L_0x304c:
         r114 = r76;
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
@@ -8670,14 +8666,14 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r4 = r4.hasSibling;
-        if (r4 != 0) goto L_0x3204;
-    L_0x3051:
+        if (r4 != 0) goto L_0x3213;
+    L_0x3060:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.flags;
         r4 = r4 & 8;
-        if (r4 == 0) goto L_0x3204;
-    L_0x305b:
+        if (r4 == 0) goto L_0x3213;
+    L_0x306a:
         r0 = r150;
         r4 = r0.currentPosition;
         r0 = r150;
@@ -8688,11 +8684,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4.messages;
         r60 = r4.size();
         r80 = 0;
-    L_0x3073:
+    L_0x3082:
         r0 = r80;
         r1 = r60;
-        if (r0 >= r1) goto L_0x3204;
-    L_0x3079:
+        if (r0 >= r1) goto L_0x3213;
+    L_0x3088:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r4 = r4.messages;
@@ -8708,13 +8704,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.currentPosition;
         r0 = r123;
-        if (r0 == r4) goto L_0x31f3;
-    L_0x309d:
+        if (r0 == r4) goto L_0x3202;
+    L_0x30ac:
         r0 = r123;
         r4 = r0.flags;
         r4 = r4 & 8;
-        if (r4 == 0) goto L_0x31f3;
-    L_0x30a5:
+        if (r4 == 0) goto L_0x3202;
+    L_0x30b4:
         r0 = r123;
         r4 = r0.pw;
         r4 = (float) r4;
@@ -8729,35 +8725,35 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r142 = r0;
         r0 = r123;
         r4 = r0.minY;
-        if (r4 == 0) goto L_0x3199;
-    L_0x30bf:
+        if (r4 == 0) goto L_0x31a8;
+    L_0x30ce:
         r4 = r151.isOutOwner();
-        if (r4 == 0) goto L_0x30cd;
-    L_0x30c5:
+        if (r4 == 0) goto L_0x30dc;
+    L_0x30d4:
         r0 = r123;
         r4 = r0.flags;
         r4 = r4 & 1;
-        if (r4 != 0) goto L_0x30db;
-    L_0x30cd:
+        if (r4 != 0) goto L_0x30ea;
+    L_0x30dc:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x3199;
-    L_0x30d3:
+        if (r4 != 0) goto L_0x31a8;
+    L_0x30e2:
         r0 = r123;
         r4 = r0.flags;
         r4 = r4 & 2;
-        if (r4 == 0) goto L_0x3199;
-    L_0x30db:
+        if (r4 == 0) goto L_0x31a8;
+    L_0x30ea:
         r72 = 0;
         r61 = 0;
         r41 = 0;
-    L_0x30e1:
+    L_0x30f0:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
         r4 = r4.size();
         r0 = r41;
-        if (r0 >= r4) goto L_0x3195;
-    L_0x30ef:
+        if (r0 >= r4) goto L_0x31a4;
+    L_0x30fe:
         r0 = r150;
         r4 = r0.currentMessagesGroup;
         r4 = r4.posArray;
@@ -8766,8 +8762,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r116 = (org.telegram.messenger.MessageObject.GroupedMessagePosition) r116;
         r0 = r116;
         r4 = r0.minY;
-        if (r4 != 0) goto L_0x314c;
-    L_0x3103:
+        if (r4 != 0) goto L_0x315b;
+    L_0x3112:
         r0 = r72;
         r10 = (double) r0;
         r0 = r116;
@@ -8782,8 +8778,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r18 = java.lang.Math.ceil(r8);
         r0 = r116;
         r4 = r0.leftSpanOffset;
-        if (r4 == 0) goto L_0x3149;
-    L_0x311d:
+        if (r4 == 0) goto L_0x3158;
+    L_0x312c:
         r0 = r116;
         r4 = r0.leftSpanOffset;
         r4 = (float) r4;
@@ -8794,15 +8790,15 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 * r6;
         r8 = (double) r4;
         r8 = java.lang.Math.ceil(r8);
-    L_0x312e:
+    L_0x313d:
         r8 = r8 + r18;
         r8 = r8 + r10;
         r0 = (int) r8;
         r72 = r0;
-    L_0x3134:
+    L_0x3143:
         r41 = r41 + 1;
-        goto L_0x30e1;
-    L_0x3137:
+        goto L_0x30f0;
+    L_0x3146:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.ph;
@@ -8811,17 +8807,17 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r8 = java.lang.Math.ceil(r8);
         r0 = (int) r8;
         r76 = r0;
-        goto L_0x301d;
-    L_0x3149:
+        goto L_0x302c;
+    L_0x3158:
         r8 = 0;
-        goto L_0x312e;
-    L_0x314c:
+        goto L_0x313d;
+    L_0x315b:
         r0 = r116;
         r4 = r0.minY;
         r0 = r123;
         r6 = r0.minY;
-        if (r4 != r6) goto L_0x318b;
-    L_0x3156:
+        if (r4 != r6) goto L_0x319a;
+    L_0x3165:
         r0 = r61;
         r10 = (double) r0;
         r0 = r116;
@@ -8836,8 +8832,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r18 = java.lang.Math.ceil(r8);
         r0 = r116;
         r4 = r0.leftSpanOffset;
-        if (r4 == 0) goto L_0x3188;
-    L_0x3170:
+        if (r4 == 0) goto L_0x3197;
+    L_0x317f:
         r0 = r116;
         r4 = r0.leftSpanOffset;
         r4 = (float) r4;
@@ -8848,162 +8844,162 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 * r6;
         r8 = (double) r4;
         r8 = java.lang.Math.ceil(r8);
-    L_0x3181:
+    L_0x3190:
         r8 = r8 + r18;
         r8 = r8 + r10;
         r0 = (int) r8;
         r61 = r0;
-        goto L_0x3134;
-    L_0x3188:
+        goto L_0x3143;
+    L_0x3197:
         r8 = 0;
-        goto L_0x3181;
-    L_0x318b:
+        goto L_0x3190;
+    L_0x319a:
         r0 = r116;
         r4 = r0.minY;
         r0 = r123;
         r6 = r0.minY;
-        if (r4 <= r6) goto L_0x3134;
-    L_0x3195:
+        if (r4 <= r6) goto L_0x3143;
+    L_0x31a4:
         r4 = r72 - r61;
         r142 = r142 + r4;
-    L_0x3199:
+    L_0x31a8:
         r4 = 1099956224; // 0x41900000 float:18.0 double:5.43450582E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r142 = r142 - r4;
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x31c3;
-    L_0x31a7:
+        if (r4 == 0) goto L_0x31d2;
+    L_0x31b6:
         r4 = r92.isOutOwner();
-        if (r4 != 0) goto L_0x31c3;
-    L_0x31ad:
+        if (r4 != 0) goto L_0x31d2;
+    L_0x31bc:
         r4 = r92.needDrawAvatar();
-        if (r4 == 0) goto L_0x31c3;
-    L_0x31b3:
-        if (r123 == 0) goto L_0x31bb;
-    L_0x31b5:
+        if (r4 == 0) goto L_0x31d2;
+    L_0x31c2:
+        if (r123 == 0) goto L_0x31ca;
+    L_0x31c4:
         r0 = r123;
         r4 = r0.edge;
-        if (r4 == 0) goto L_0x31c3;
-    L_0x31bb:
+        if (r4 == 0) goto L_0x31d2;
+    L_0x31ca:
         r4 = 1111490560; // 0x42400000 float:48.0 double:5.491493014E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r142 = r142 - r4;
-    L_0x31c3:
+    L_0x31d2:
         r0 = r150;
         r1 = r123;
         r4 = r0.getAdditionalWidthForPosition(r1);
         r142 = r142 + r4;
         r0 = r123;
         r4 = r0.edge;
-        if (r4 != 0) goto L_0x31db;
-    L_0x31d3:
+        if (r4 != 0) goto L_0x31ea;
+    L_0x31e2:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r142 = r142 + r4;
-    L_0x31db:
+    L_0x31ea:
         r30 = r30 + r142;
         r0 = r123;
         r4 = r0.minX;
         r0 = r150;
         r6 = r0.currentPosition;
         r6 = r6.minX;
-        if (r4 >= r6) goto L_0x31f3;
-    L_0x31e9:
+        if (r4 >= r6) goto L_0x3202;
+    L_0x31f8:
         r0 = r150;
         r4 = r0.captionOffsetX;
         r4 = r4 - r142;
         r0 = r150;
         r0.captionOffsetX = r4;
-    L_0x31f3:
+    L_0x3202:
         r0 = r92;
         r4 = r0.caption;
-        if (r4 == 0) goto L_0x3397;
-    L_0x31f9:
+        if (r4 == 0) goto L_0x33a6;
+    L_0x3208:
         r0 = r150;
         r4 = r0.currentCaption;
-        if (r4 == 0) goto L_0x338f;
-    L_0x31ff:
+        if (r4 == 0) goto L_0x339e;
+    L_0x320e:
         r4 = 0;
         r0 = r150;
         r0.currentCaption = r4;
-    L_0x3204:
+    L_0x3213:
         r0 = r150;
         r4 = r0.currentCaption;
-        if (r4 == 0) goto L_0x32a8;
-    L_0x320a:
-        r4 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x33ef }
-        r6 = 24;	 Catch:{ Exception -> 0x33ef }
-        if (r4 < r6) goto L_0x33d2;	 Catch:{ Exception -> 0x33ef }
-    L_0x3210:
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r4 = r0.currentCaption;	 Catch:{ Exception -> 0x33ef }
-        r6 = 0;	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r8 = r0.currentCaption;	 Catch:{ Exception -> 0x33ef }
-        r8 = r8.length();	 Catch:{ Exception -> 0x33ef }
-        r9 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x33ef }
-        r0 = r30;	 Catch:{ Exception -> 0x33ef }
-        r4 = android.text.StaticLayout.Builder.obtain(r4, r6, r8, r9, r0);	 Catch:{ Exception -> 0x33ef }
-        r6 = 1;	 Catch:{ Exception -> 0x33ef }
-        r4 = r4.setBreakStrategy(r6);	 Catch:{ Exception -> 0x33ef }
-        r6 = 0;	 Catch:{ Exception -> 0x33ef }
-        r4 = r4.setHyphenationFrequency(r6);	 Catch:{ Exception -> 0x33ef }
-        r6 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x33ef }
-        r4 = r4.setAlignment(r6);	 Catch:{ Exception -> 0x33ef }
-        r4 = r4.build();	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r0.captionLayout = r4;	 Catch:{ Exception -> 0x33ef }
-    L_0x323d:
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x33ef }
-        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x33ef }
-        if (r4 <= 0) goto L_0x32a8;	 Catch:{ Exception -> 0x33ef }
-    L_0x3247:
-        r0 = r30;	 Catch:{ Exception -> 0x33ef }
-        r1 = r150;	 Catch:{ Exception -> 0x33ef }
-        r1.captionWidth = r0;	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x33ef }
-        r4 = r4.getHeight();	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r0.captionHeight = r4;	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r4 = r0.captionHeight;	 Catch:{ Exception -> 0x33ef }
-        r6 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;	 Catch:{ Exception -> 0x33ef }
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x33ef }
-        r4 = r4 + r6;	 Catch:{ Exception -> 0x33ef }
-        r43 = r43 + r4;	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x33ef }
-        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x33ef }
-        r6 = r6 + -1;	 Catch:{ Exception -> 0x33ef }
-        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r8 = r0.captionLayout;	 Catch:{ Exception -> 0x33ef }
-        r8 = r8.getLineCount();	 Catch:{ Exception -> 0x33ef }
-        r8 = r8 + -1;	 Catch:{ Exception -> 0x33ef }
-        r6 = r6.getLineLeft(r8);	 Catch:{ Exception -> 0x33ef }
-        r83 = r4 + r6;	 Catch:{ Exception -> 0x33ef }
-        r4 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;	 Catch:{ Exception -> 0x33ef }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x33ef }
-        r4 = r4 + r30;	 Catch:{ Exception -> 0x33ef }
-        r4 = (float) r4;	 Catch:{ Exception -> 0x33ef }
-        r4 = r4 - r83;	 Catch:{ Exception -> 0x33ef }
-        r0 = r136;	 Catch:{ Exception -> 0x33ef }
-        r6 = (float) r0;	 Catch:{ Exception -> 0x33ef }
-        r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));	 Catch:{ Exception -> 0x33ef }
-        if (r4 >= 0) goto L_0x32a8;	 Catch:{ Exception -> 0x33ef }
-    L_0x329e:
-        r4 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;	 Catch:{ Exception -> 0x33ef }
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x33ef }
+        if (r4 == 0) goto L_0x32b7;
+    L_0x3219:
+        r4 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x33fe }
+        r6 = 24;
+        if (r4 < r6) goto L_0x33e1;
+    L_0x321f:
+        r0 = r150;
+        r4 = r0.currentCaption;	 Catch:{ Exception -> 0x33fe }
+        r6 = 0;
+        r0 = r150;
+        r8 = r0.currentCaption;	 Catch:{ Exception -> 0x33fe }
+        r8 = r8.length();	 Catch:{ Exception -> 0x33fe }
+        r9 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x33fe }
+        r0 = r30;
+        r4 = android.text.StaticLayout.Builder.obtain(r4, r6, r8, r9, r0);	 Catch:{ Exception -> 0x33fe }
+        r6 = 1;
+        r4 = r4.setBreakStrategy(r6);	 Catch:{ Exception -> 0x33fe }
+        r6 = 0;
+        r4 = r4.setHyphenationFrequency(r6);	 Catch:{ Exception -> 0x33fe }
+        r6 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x33fe }
+        r4 = r4.setAlignment(r6);	 Catch:{ Exception -> 0x33fe }
+        r4 = r4.build();	 Catch:{ Exception -> 0x33fe }
+        r0 = r150;
+        r0.captionLayout = r4;	 Catch:{ Exception -> 0x33fe }
+    L_0x324c:
+        r0 = r150;
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x33fe }
+        r4 = r4.getLineCount();	 Catch:{ Exception -> 0x33fe }
+        if (r4 <= 0) goto L_0x32b7;
+    L_0x3256:
+        r0 = r30;
+        r1 = r150;
+        r1.captionWidth = r0;	 Catch:{ Exception -> 0x33fe }
+        r0 = r150;
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x33fe }
+        r4 = r4.getHeight();	 Catch:{ Exception -> 0x33fe }
+        r0 = r150;
+        r0.captionHeight = r4;	 Catch:{ Exception -> 0x33fe }
+        r0 = r150;
+        r4 = r0.captionHeight;	 Catch:{ Exception -> 0x33fe }
+        r6 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);	 Catch:{ Exception -> 0x33fe }
+        r4 = r4 + r6;
+        r43 = r43 + r4;
+        r0 = r150;
+        r4 = r0.captionLayout;	 Catch:{ Exception -> 0x33fe }
+        r0 = r150;
+        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x33fe }
+        r6 = r6.getLineCount();	 Catch:{ Exception -> 0x33fe }
+        r6 = r6 + -1;
+        r4 = r4.getLineWidth(r6);	 Catch:{ Exception -> 0x33fe }
+        r0 = r150;
+        r6 = r0.captionLayout;	 Catch:{ Exception -> 0x33fe }
+        r0 = r150;
+        r8 = r0.captionLayout;	 Catch:{ Exception -> 0x33fe }
+        r8 = r8.getLineCount();	 Catch:{ Exception -> 0x33fe }
+        r8 = r8 + -1;
+        r6 = r6.getLineLeft(r8);	 Catch:{ Exception -> 0x33fe }
+        r83 = r4 + r6;
+        r4 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x33fe }
+        r4 = r4 + r30;
+        r4 = (float) r4;	 Catch:{ Exception -> 0x33fe }
+        r4 = r4 - r83;
+        r0 = r136;
+        r6 = (float) r0;	 Catch:{ Exception -> 0x33fe }
+        r4 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
+        if (r4 >= 0) goto L_0x32b7;
+    L_0x32ad:
+        r4 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);	 Catch:{ Exception -> 0x33fe }
         r43 = r43 + r4;
         r57 = 1;
-    L_0x32a8:
+    L_0x32b7:
         r4 = java.util.Locale.US;
         r6 = "%d_%d";
         r8 = 2;
@@ -9031,32 +9027,32 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.currentPhotoFilter = r4;
         r0 = r151;
         r4 = r0.photoThumbs;
-        if (r4 == 0) goto L_0x32e9;
-    L_0x32de:
+        if (r4 == 0) goto L_0x32f8;
+    L_0x32ed:
         r0 = r151;
         r4 = r0.photoThumbs;
         r4 = r4.size();
         r6 = 1;
-        if (r4 > r6) goto L_0x32ff;
-    L_0x32e9:
-        r0 = r151;
-        r4 = r0.type;
-        r6 = 3;
-        if (r4 == r6) goto L_0x32ff;
-    L_0x32f0:
-        r0 = r151;
-        r4 = r0.type;
-        r6 = 8;
-        if (r4 == r6) goto L_0x32ff;
+        if (r4 > r6) goto L_0x330e;
     L_0x32f8:
         r0 = r151;
         r4 = r0.type;
-        r6 = 5;
-        if (r4 != r6) goto L_0x333d;
+        r6 = 3;
+        if (r4 == r6) goto L_0x330e;
     L_0x32ff:
+        r0 = r151;
+        r4 = r0.type;
+        r6 = 8;
+        if (r4 == r6) goto L_0x330e;
+    L_0x3307:
+        r0 = r151;
+        r4 = r0.type;
+        r6 = 5;
+        if (r4 != r6) goto L_0x334c;
+    L_0x330e:
         r4 = r151.isSecretPhoto();
-        if (r4 == 0) goto L_0x33f5;
-    L_0x3305:
+        if (r4 == 0) goto L_0x3404;
+    L_0x3314:
         r4 = new java.lang.StringBuilder;
         r4.<init>();
         r0 = r150;
@@ -9077,66 +9073,66 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4.toString();
         r0 = r150;
         r0.currentPhotoFilterThumb = r4;
-    L_0x333d:
+    L_0x334c:
         r106 = 0;
         r0 = r151;
         r4 = r0.type;
         r6 = 3;
-        if (r4 == r6) goto L_0x3355;
-    L_0x3346:
+        if (r4 == r6) goto L_0x3364;
+    L_0x3355:
         r0 = r151;
         r4 = r0.type;
         r6 = 8;
-        if (r4 == r6) goto L_0x3355;
-    L_0x334e:
+        if (r4 == r6) goto L_0x3364;
+    L_0x335d:
         r0 = r151;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x3357;
-    L_0x3355:
+        if (r4 != r6) goto L_0x3366;
+    L_0x3364:
         r106 = 1;
-    L_0x3357:
+    L_0x3366:
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x336e;
-    L_0x335d:
-        if (r106 != 0) goto L_0x336e;
-    L_0x335f:
+        if (r4 == 0) goto L_0x337d;
+    L_0x336c:
+        if (r106 != 0) goto L_0x337d;
+    L_0x336e:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r4 = r4.size;
-        if (r4 != 0) goto L_0x336e;
-    L_0x3367:
+        if (r4 != 0) goto L_0x337d;
+    L_0x3376:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r6 = -1;
         r4.size = r6;
-    L_0x336e:
+    L_0x337d:
         r0 = r151;
         r4 = r0.type;
         r6 = 1;
-        if (r4 != r6) goto L_0x34fe;
-    L_0x3375:
+        if (r4 != r6) goto L_0x350d;
+    L_0x3384:
         r0 = r151;
         r4 = r0.useCustomPhoto;
-        if (r4 == 0) goto L_0x3413;
-    L_0x337b:
+        if (r4 == 0) goto L_0x3422;
+    L_0x338a:
         r0 = r150;
         r4 = r0.photoImage;
         r6 = r150.getResources();
-        r8 = 2131165651; // 0x7f0701d3 float:1.7945525E38 double:1.052935734E-314;
+        r8 = 2131165654; // 0x7f0701d6 float:1.7945531E38 double:1.052935735E-314;
         r6 = r6.getDrawable(r8);
         r4.setImageBitmap(r6);
-        goto L_0x2341;
-    L_0x338f:
+        goto L_0x2350;
+    L_0x339e:
         r0 = r92;
         r4 = r0.caption;
         r0 = r150;
         r0.currentCaption = r4;
-    L_0x3397:
+    L_0x33a6:
         r80 = r80 + 1;
-        goto L_0x3073;
-    L_0x339b:
+        goto L_0x3082;
+    L_0x33aa:
         r115 = r142;
         r114 = r76;
         r4 = 1094713344; // 0x41400000 float:12.0 double:5.408602553E-315;
@@ -9146,8 +9142,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.backgroundWidth = r4;
         r0 = r150;
         r4 = r0.mediaBackground;
-        if (r4 != 0) goto L_0x33c0;
-    L_0x33b1:
+        if (r4 != 0) goto L_0x33cf;
+    L_0x33c0:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r6 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
@@ -9155,7 +9151,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.backgroundWidth = r4;
-    L_0x33c0:
+    L_0x33cf:
         r0 = r151;
         r4 = r0.caption;
         r0 = r150;
@@ -9163,27 +9159,27 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r30 = r115 - r4;
-        goto L_0x3204;
-    L_0x33d2:
-        r27 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x33ef }
-        r0 = r150;	 Catch:{ Exception -> 0x33ef }
-        r0 = r0.currentCaption;	 Catch:{ Exception -> 0x33ef }
-        r28 = r0;	 Catch:{ Exception -> 0x33ef }
-        r29 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x33ef }
-        r31 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x33ef }
-        r32 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x33ef }
-        r33 = 0;	 Catch:{ Exception -> 0x33ef }
-        r34 = 0;	 Catch:{ Exception -> 0x33ef }
-        r27.<init>(r28, r29, r30, r31, r32, r33, r34);	 Catch:{ Exception -> 0x33ef }
-        r0 = r27;	 Catch:{ Exception -> 0x33ef }
-        r1 = r150;	 Catch:{ Exception -> 0x33ef }
-        r1.captionLayout = r0;	 Catch:{ Exception -> 0x33ef }
-        goto L_0x323d;
-    L_0x33ef:
+        goto L_0x3213;
+    L_0x33e1:
+        r27 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x33fe }
+        r0 = r150;
+        r0 = r0.currentCaption;	 Catch:{ Exception -> 0x33fe }
+        r28 = r0;
+        r29 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x33fe }
+        r31 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x33fe }
+        r32 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r33 = 0;
+        r34 = 0;
+        r27.<init>(r28, r29, r30, r31, r32, r33, r34);	 Catch:{ Exception -> 0x33fe }
+        r0 = r27;
+        r1 = r150;
+        r1.captionLayout = r0;	 Catch:{ Exception -> 0x33fe }
+        goto L_0x324c;
+    L_0x33fe:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-        goto L_0x32a8;
-    L_0x33f5:
+        goto L_0x32b7;
+    L_0x3404:
         r4 = new java.lang.StringBuilder;
         r4.<init>();
         r0 = r150;
@@ -9194,43 +9190,43 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4.toString();
         r0 = r150;
         r0.currentPhotoFilterThumb = r4;
-        goto L_0x333d;
-    L_0x3413:
+        goto L_0x334c;
+    L_0x3422:
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x34f2;
-    L_0x3419:
+        if (r4 == 0) goto L_0x3501;
+    L_0x3428:
         r113 = 1;
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r71 = org.telegram.messenger.FileLoader.getAttachFileName(r4);
         r0 = r151;
         r4 = r0.mediaExists;
-        if (r4 == 0) goto L_0x3499;
-    L_0x3429:
+        if (r4 == 0) goto L_0x34a8;
+    L_0x3438:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.DownloadController.getInstance(r4);
         r0 = r150;
         r4.removeLoadingFileObserver(r0);
-    L_0x3436:
-        if (r113 != 0) goto L_0x345a;
-    L_0x3438:
+    L_0x3445:
+        if (r113 != 0) goto L_0x3469;
+    L_0x3447:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.DownloadController.getInstance(r4);
         r0 = r150;
         r6 = r0.currentMessageObject;
         r4 = r4.canDownloadMedia(r6);
-        if (r4 != 0) goto L_0x345a;
-    L_0x344a:
+        if (r4 != 0) goto L_0x3469;
+    L_0x3459:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.FileLoader.getInstance(r4);
         r0 = r71;
         r4 = r4.isLoadingFile(r0);
-        if (r4 == 0) goto L_0x34ab;
-    L_0x345a:
+        if (r4 == 0) goto L_0x34ba;
+    L_0x3469:
         r0 = r150;
         r0 = r0.photoImage;
         r31 = r0;
@@ -9243,53 +9239,53 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r33 = r0;
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x349c;
-    L_0x3474:
+        if (r4 == 0) goto L_0x34ab;
+    L_0x3483:
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
         r0 = r4.location;
         r34 = r0;
-    L_0x347c:
+    L_0x348b:
         r0 = r150;
         r0 = r0.currentPhotoFilterThumb;
         r35 = r0;
-        if (r106 == 0) goto L_0x349f;
-    L_0x3484:
+        if (r106 == 0) goto L_0x34ae;
+    L_0x3493:
         r36 = 0;
-    L_0x3486:
+    L_0x3495:
         r37 = 0;
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.shouldEncryptPhotoOrVideo();
-        if (r4 == 0) goto L_0x34a8;
-    L_0x3492:
+        if (r4 == 0) goto L_0x34b7;
+    L_0x34a1:
         r38 = 2;
-    L_0x3494:
+    L_0x34a3:
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2341;
-    L_0x3499:
+        goto L_0x2350;
+    L_0x34a8:
         r113 = 0;
-        goto L_0x3436;
-    L_0x349c:
+        goto L_0x3445;
+    L_0x34ab:
         r34 = 0;
-        goto L_0x347c;
-    L_0x349f:
+        goto L_0x348b;
+    L_0x34ae:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r4.size;
         r36 = r0;
-        goto L_0x3486;
-    L_0x34a8:
+        goto L_0x3495;
+    L_0x34b7:
         r38 = 0;
-        goto L_0x3494;
-    L_0x34ab:
+        goto L_0x34a3;
+    L_0x34ba:
         r4 = 1;
         r0 = r150;
         r0.photoNotSet = r4;
         r0 = r150;
         r4 = r0.currentPhotoObjectThumb;
-        if (r4 == 0) goto L_0x34e6;
-    L_0x34b6:
+        if (r4 == 0) goto L_0x34f5;
+    L_0x34c5:
         r0 = r150;
         r0 = r0.photoImage;
         r31 = r0;
@@ -9307,40 +9303,40 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.shouldEncryptPhotoOrVideo();
-        if (r4 == 0) goto L_0x34e3;
-    L_0x34dc:
+        if (r4 == 0) goto L_0x34f2;
+    L_0x34eb:
         r38 = 2;
-    L_0x34de:
+    L_0x34ed:
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2341;
-    L_0x34e3:
+        goto L_0x2350;
+    L_0x34f2:
         r38 = 0;
-        goto L_0x34de;
-    L_0x34e6:
+        goto L_0x34ed;
+    L_0x34f5:
         r0 = r150;
         r6 = r0.photoImage;
         r4 = 0;
         r4 = (android.graphics.drawable.Drawable) r4;
         r6.setImageBitmap(r4);
-        goto L_0x2341;
-    L_0x34f2:
+        goto L_0x2350;
+    L_0x3501:
         r0 = r150;
         r6 = r0.photoImage;
         r4 = 0;
         r4 = (android.graphics.drawable.BitmapDrawable) r4;
         r6.setImageBitmap(r4);
-        goto L_0x2341;
-    L_0x34fe:
+        goto L_0x2350;
+    L_0x350d:
         r0 = r151;
         r4 = r0.type;
         r6 = 8;
-        if (r4 == r6) goto L_0x350d;
-    L_0x3506:
+        if (r4 == r6) goto L_0x351c;
+    L_0x3515:
         r0 = r151;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x363e;
-    L_0x350d:
+        if (r4 != r6) goto L_0x364d;
+    L_0x351c:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
@@ -9349,68 +9345,68 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r89 = 0;
         r0 = r151;
         r4 = r0.attachPathExists;
-        if (r4 == 0) goto L_0x35a2;
-    L_0x3521:
+        if (r4 == 0) goto L_0x35b1;
+    L_0x3530:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.DownloadController.getInstance(r4);
         r0 = r150;
         r4.removeLoadingFileObserver(r0);
         r89 = 1;
-    L_0x3530:
+    L_0x353f:
         r49 = 0;
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.document;
         r4 = org.telegram.messenger.MessageObject.isNewGifDocument(r4);
-        if (r4 == 0) goto L_0x35ab;
-    L_0x3540:
+        if (r4 == 0) goto L_0x35ba;
+    L_0x354f:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.DownloadController.getInstance(r4);
         r0 = r150;
         r6 = r0.currentMessageObject;
         r49 = r4.canDownloadMedia(r6);
-    L_0x3550:
+    L_0x355f:
         r4 = r151.isSending();
-        if (r4 != 0) goto L_0x360d;
-    L_0x3556:
-        if (r89 != 0) goto L_0x356a;
-    L_0x3558:
+        if (r4 != 0) goto L_0x361c;
+    L_0x3565:
+        if (r89 != 0) goto L_0x3579;
+    L_0x3567:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.FileLoader.getInstance(r4);
         r0 = r71;
         r4 = r4.isLoadingFile(r0);
-        if (r4 != 0) goto L_0x356a;
-    L_0x3568:
-        if (r49 == 0) goto L_0x360d;
-    L_0x356a:
+        if (r4 != 0) goto L_0x3579;
+    L_0x3577:
+        if (r49 == 0) goto L_0x361c;
+    L_0x3579:
         r4 = 1;
         r0 = r89;
-        if (r0 != r4) goto L_0x35cf;
-    L_0x356f:
+        if (r0 != r4) goto L_0x35de;
+    L_0x357e:
         r0 = r150;
         r0 = r0.photoImage;
         r31 = r0;
         r32 = 0;
         r4 = r151.isSendError();
-        if (r4 == 0) goto L_0x35c3;
-    L_0x357d:
+        if (r4 == 0) goto L_0x35d2;
+    L_0x358c:
         r33 = 0;
-    L_0x357f:
+    L_0x358e:
         r34 = 0;
         r35 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x35cc;
-    L_0x3589:
+        if (r4 == 0) goto L_0x35db;
+    L_0x3598:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r36 = r0;
-    L_0x3591:
+    L_0x35a0:
         r0 = r150;
         r0 = r0.currentPhotoFilterThumb;
         r37 = r0;
@@ -9418,37 +9414,37 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r39 = 0;
         r40 = 0;
         r31.setImage(r32, r33, r34, r35, r36, r37, r38, r39, r40);
-        goto L_0x2341;
-    L_0x35a2:
+        goto L_0x2350;
+    L_0x35b1:
         r0 = r151;
         r4 = r0.mediaExists;
-        if (r4 == 0) goto L_0x3530;
-    L_0x35a8:
+        if (r4 == 0) goto L_0x353f;
+    L_0x35b7:
         r89 = 2;
-        goto L_0x3530;
-    L_0x35ab:
+        goto L_0x353f;
+    L_0x35ba:
         r0 = r151;
         r4 = r0.type;
         r6 = 5;
-        if (r4 != r6) goto L_0x3550;
-    L_0x35b2:
+        if (r4 != r6) goto L_0x355f;
+    L_0x35c1:
         r0 = r150;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.DownloadController.getInstance(r4);
         r0 = r150;
         r6 = r0.currentMessageObject;
         r49 = r4.canDownloadMedia(r6);
-        goto L_0x3550;
-    L_0x35c3:
+        goto L_0x355f;
+    L_0x35d2:
         r0 = r151;
         r4 = r0.messageOwner;
         r0 = r4.attachPath;
         r33 = r0;
-        goto L_0x357f;
-    L_0x35cc:
+        goto L_0x358e;
+    L_0x35db:
         r36 = 0;
-        goto L_0x3591;
-    L_0x35cf:
+        goto L_0x35a0;
+    L_0x35de:
         r0 = r150;
         r0 = r0.photoImage;
         r31 = r0;
@@ -9460,13 +9456,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r33 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x360a;
-    L_0x35e7:
+        if (r4 == 0) goto L_0x3619;
+    L_0x35f6:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r34 = r0;
-    L_0x35ef:
+    L_0x35fe:
         r0 = r150;
         r0 = r0.currentPhotoFilterThumb;
         r35 = r0;
@@ -9479,11 +9475,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r37 = 0;
         r38 = 0;
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2341;
-    L_0x360a:
+        goto L_0x2350;
+    L_0x3619:
         r34 = 0;
-        goto L_0x35ef;
-    L_0x360d:
+        goto L_0x35fe;
+    L_0x361c:
         r4 = 1;
         r0 = r150;
         r0.photoNotSet = r4;
@@ -9494,13 +9490,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r33 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x363b;
-    L_0x3622:
+        if (r4 == 0) goto L_0x364a;
+    L_0x3631:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r34 = r0;
-    L_0x362a:
+    L_0x3639:
         r0 = r150;
         r0 = r0.currentPhotoFilterThumb;
         r35 = r0;
@@ -9508,11 +9504,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r37 = 0;
         r38 = 0;
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2341;
-    L_0x363b:
+        goto L_0x2350;
+    L_0x364a:
         r34 = 0;
-        goto L_0x362a;
-    L_0x363e:
+        goto L_0x3639;
+    L_0x364d:
         r0 = r150;
         r0 = r0.photoImage;
         r31 = r0;
@@ -9520,13 +9516,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r33 = 0;
         r0 = r150;
         r4 = r0.currentPhotoObject;
-        if (r4 == 0) goto L_0x3671;
-    L_0x364e:
+        if (r4 == 0) goto L_0x3680;
+    L_0x365d:
         r0 = r150;
         r4 = r0.currentPhotoObject;
         r0 = r4.location;
         r34 = r0;
-    L_0x3656:
+    L_0x3665:
         r0 = r150;
         r0 = r0.currentPhotoFilterThumb;
         r35 = r0;
@@ -9535,28 +9531,28 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r4 = r0.currentMessageObject;
         r4 = r4.shouldEncryptPhotoOrVideo();
-        if (r4 == 0) goto L_0x3674;
-    L_0x366a:
+        if (r4 == 0) goto L_0x3683;
+    L_0x3679:
         r38 = 2;
-    L_0x366c:
+    L_0x367b:
         r31.setImage(r32, r33, r34, r35, r36, r37, r38);
-        goto L_0x2341;
-    L_0x3671:
+        goto L_0x2350;
+    L_0x3680:
         r34 = 0;
-        goto L_0x3656;
-    L_0x3674:
+        goto L_0x3665;
+    L_0x3683:
         r38 = 0;
-        goto L_0x366c;
-    L_0x3677:
+        goto L_0x367b;
+    L_0x3686:
         r0 = r150;
         r4 = r0.drawNameLayout;
-        if (r4 == 0) goto L_0x2374;
-    L_0x367d:
+        if (r4 == 0) goto L_0x2383;
+    L_0x368c:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.reply_to_msg_id;
-        if (r4 != 0) goto L_0x2374;
-    L_0x3685:
+        if (r4 != 0) goto L_0x2383;
+    L_0x3694:
         r0 = r150;
         r4 = r0.namesOffset;
         r6 = 1088421888; // 0x40e00000 float:7.0 double:5.37751863E-315;
@@ -9564,35 +9560,35 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.namesOffset = r4;
-        goto L_0x2374;
-    L_0x3696:
-        r27 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r151;	 Catch:{ Exception -> 0x36b3 }
-        r0 = r0.caption;	 Catch:{ Exception -> 0x36b3 }
-        r28 = r0;	 Catch:{ Exception -> 0x36b3 }
-        r29 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x36b3 }
-        r31 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x36b3 }
-        r32 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;	 Catch:{ Exception -> 0x36b3 }
-        r33 = 0;	 Catch:{ Exception -> 0x36b3 }
-        r34 = 0;	 Catch:{ Exception -> 0x36b3 }
-        r27.<init>(r28, r29, r30, r31, r32, r33, r34);	 Catch:{ Exception -> 0x36b3 }
-        r0 = r27;	 Catch:{ Exception -> 0x36b3 }
-        r1 = r150;	 Catch:{ Exception -> 0x36b3 }
-        r1.captionLayout = r0;	 Catch:{ Exception -> 0x36b3 }
-        goto L_0x127f;
-    L_0x36b3:
+        goto L_0x2383;
+    L_0x36a5:
+        r27 = new android.text.StaticLayout;	 Catch:{ Exception -> 0x36c2 }
+        r0 = r151;
+        r0 = r0.caption;	 Catch:{ Exception -> 0x36c2 }
+        r28 = r0;
+        r29 = org.telegram.ui.ActionBar.Theme.chat_msgTextPaint;	 Catch:{ Exception -> 0x36c2 }
+        r31 = android.text.Layout.Alignment.ALIGN_NORMAL;	 Catch:{ Exception -> 0x36c2 }
+        r32 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r33 = 0;
+        r34 = 0;
+        r27.<init>(r28, r29, r30, r31, r32, r33, r34);	 Catch:{ Exception -> 0x36c2 }
+        r0 = r27;
+        r1 = r150;
+        r1.captionLayout = r0;	 Catch:{ Exception -> 0x36c2 }
+        goto L_0x128e;
+    L_0x36c2:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-        goto L_0x1319;
-    L_0x36b9:
+        goto L_0x1328;
+    L_0x36c8:
         r4 = 0;
-        goto L_0x129f;
-    L_0x36bc:
+        goto L_0x12ae;
+    L_0x36cb:
         r0 = r150;
         r4 = r0.widthBeforeNewTimeLine;
         r6 = -1;
-        if (r4 == r6) goto L_0x1319;
-    L_0x36c3:
+        if (r4 == r6) goto L_0x1328;
+    L_0x36d2:
         r0 = r150;
         r4 = r0.availableTimeWidth;
         r0 = r150;
@@ -9600,8 +9596,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r6 = r0.timeWidth;
-        if (r4 >= r6) goto L_0x1319;
-    L_0x36d2:
+        if (r4 >= r6) goto L_0x1328;
+    L_0x36e1:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
@@ -9609,24 +9605,24 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.totalHeight = r4;
-        goto L_0x1319;
-    L_0x36e3:
+        goto L_0x1328;
+    L_0x36f2:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-        goto L_0x13b8;
-    L_0x36e9:
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x36fa }
-        r0 = r87;	 Catch:{ Exception -> 0x36fa }
-        r6 = -r0;	 Catch:{ Exception -> 0x36fa }
-        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x36fa }
-        r0 = r150;	 Catch:{ Exception -> 0x36fa }
-        r0.descriptionX = r4;	 Catch:{ Exception -> 0x36fa }
-        goto L_0x144e;
-    L_0x36fa:
+        goto L_0x13c7;
+    L_0x36f8:
+        r0 = r150;
+        r4 = r0.descriptionX;	 Catch:{ Exception -> 0x3709 }
+        r0 = r87;
+        r6 = -r0;
+        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x3709 }
+        r0 = r150;
+        r0.descriptionX = r4;	 Catch:{ Exception -> 0x3709 }
+        goto L_0x145d;
+    L_0x3709:
         r70 = move-exception;
         org.telegram.messenger.FileLog.e(r70);
-    L_0x36fe:
+    L_0x370d:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1099431936; // 0x41880000 float:17.0 double:5.431915495E-315;
@@ -9634,8 +9630,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 + r6;
         r0 = r150;
         r0.totalHeight = r4;
-        if (r57 == 0) goto L_0x3732;
-    L_0x370f:
+        if (r57 == 0) goto L_0x3741;
+    L_0x371e:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
@@ -9645,8 +9641,8 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.totalHeight = r4;
         r4 = 2;
         r0 = r57;
-        if (r0 != r4) goto L_0x3732;
-    L_0x3723:
+        if (r0 != r4) goto L_0x3741;
+    L_0x3732:
         r0 = r150;
         r4 = r0.captionHeight;
         r6 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
@@ -9654,12 +9650,12 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.captionHeight = r4;
-    L_0x3732:
+    L_0x3741:
         r0 = r150;
         r4 = r0.botButtons;
         r4.clear();
-        if (r103 == 0) goto L_0x374e;
-    L_0x373b:
+        if (r103 == 0) goto L_0x375d;
+    L_0x374a:
         r0 = r150;
         r4 = r0.botButtonsByData;
         r4.clear();
@@ -9669,17 +9665,17 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = 0;
         r0 = r150;
         r0.botButtonsLayout = r4;
-    L_0x374e:
+    L_0x375d:
         r0 = r150;
         r4 = r0.currentPosition;
-        if (r4 != 0) goto L_0x3a3c;
-    L_0x3754:
+        if (r4 != 0) goto L_0x3a4b;
+    L_0x3763:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.reply_markup;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_replyInlineMarkup;
-        if (r4 == 0) goto L_0x3a3c;
-    L_0x375e:
+        if (r4 == 0) goto L_0x3a4b;
+    L_0x376d:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.reply_markup;
@@ -9704,29 +9700,29 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r0.wantedBotKeyboardWidth;
         r0 = r150;
         r6 = r0.widthForButtons;
-        if (r4 <= r6) goto L_0x37d4;
-    L_0x3795:
+        if (r4 <= r6) goto L_0x37e3;
+    L_0x37a4:
         r0 = r150;
         r4 = r0.isChat;
-        if (r4 == 0) goto L_0x3836;
-    L_0x379b:
+        if (r4 == 0) goto L_0x3845;
+    L_0x37aa:
         r4 = r151.needDrawAvatar();
-        if (r4 == 0) goto L_0x3836;
-    L_0x37a1:
+        if (r4 == 0) goto L_0x3845;
+    L_0x37b0:
         r4 = r151.isOutOwner();
-        if (r4 != 0) goto L_0x3836;
-    L_0x37a7:
+        if (r4 != 0) goto L_0x3845;
+    L_0x37b6:
         r4 = 1115160576; // 0x42780000 float:62.0 double:5.5096253E-315;
-    L_0x37a9:
+    L_0x37b8:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = -r4;
         r95 = r0;
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x383a;
-    L_0x37b6:
+        if (r4 == 0) goto L_0x3849;
+    L_0x37c5:
         r4 = org.telegram.messenger.AndroidUtilities.getMinTabletSide();
         r95 = r95 + r4;
-    L_0x37bc:
+    L_0x37cb:
         r0 = r150;
         r4 = r0.backgroundWidth;
         r0 = r151;
@@ -9737,7 +9733,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r150;
         r0.widthForButtons = r4;
         r73 = 1;
-    L_0x37d4:
+    L_0x37e3:
         r96 = 0;
         r109 = new java.util.HashMap;
         r0 = r150;
@@ -9746,35 +9742,35 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.<init>(r4);
         r0 = r151;
         r4 = r0.botButtonsLayout;
-        if (r4 == 0) goto L_0x384a;
-    L_0x37e7:
+        if (r4 == 0) goto L_0x3859;
+    L_0x37f6:
         r0 = r150;
         r4 = r0.botButtonsLayout;
-        if (r4 == 0) goto L_0x384a;
-    L_0x37ed:
+        if (r4 == 0) goto L_0x3859;
+    L_0x37fc:
         r0 = r150;
         r4 = r0.botButtonsLayout;
         r0 = r151;
         r6 = r0.botButtonsLayout;
         r6 = r6.toString();
         r4 = r4.equals(r6);
-        if (r4 == 0) goto L_0x384a;
-    L_0x37ff:
+        if (r4 == 0) goto L_0x3859;
+    L_0x380e:
         r110 = new java.util.HashMap;
         r0 = r150;
         r4 = r0.botButtonsByPosition;
         r0 = r110;
         r0.<init>(r4);
-    L_0x380a:
+    L_0x3819:
         r0 = r150;
         r4 = r0.botButtonsByData;
         r4.clear();
         r41 = 0;
-    L_0x3813:
+    L_0x3822:
         r0 = r41;
         r1 = r124;
-        if (r0 >= r1) goto L_0x39f2;
-    L_0x3819:
+        if (r0 >= r1) goto L_0x3a01;
+    L_0x3828:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.reply_markup;
@@ -9785,35 +9781,35 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r122;
         r4 = r0.buttons;
         r55 = r4.size();
-        if (r55 != 0) goto L_0x385f;
-    L_0x3833:
+        if (r55 != 0) goto L_0x386e;
+    L_0x3842:
         r41 = r41 + 1;
-        goto L_0x3813;
-    L_0x3836:
+        goto L_0x3822;
+    L_0x3845:
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        goto L_0x37a9;
-    L_0x383a:
+        goto L_0x37b8;
+    L_0x3849:
         r4 = org.telegram.messenger.AndroidUtilities.displaySize;
         r4 = r4.x;
         r6 = org.telegram.messenger.AndroidUtilities.displaySize;
         r6 = r6.y;
         r4 = java.lang.Math.min(r4, r6);
         r95 = r95 + r4;
-        goto L_0x37bc;
-    L_0x384a:
+        goto L_0x37cb;
+    L_0x3859:
         r0 = r151;
         r4 = r0.botButtonsLayout;
-        if (r4 == 0) goto L_0x385c;
-    L_0x3850:
+        if (r4 == 0) goto L_0x386b;
+    L_0x385f:
         r0 = r151;
         r4 = r0.botButtonsLayout;
         r4 = r4.toString();
         r0 = r150;
         r0.botButtonsLayout = r4;
-    L_0x385c:
+    L_0x386b:
         r110 = 0;
-        goto L_0x380a;
-    L_0x385f:
+        goto L_0x3819;
+    L_0x386e:
         r0 = r150;
         r4 = r0.widthForButtons;
         r6 = 1084227584; // 0x40a00000 float:5.0 double:5.356796015E-315;
@@ -9821,14 +9817,14 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r8 = r55 + -1;
         r6 = r6 * r8;
         r6 = r4 - r6;
-        if (r73 != 0) goto L_0x39ab;
-    L_0x3870:
+        if (r73 != 0) goto L_0x39ba;
+    L_0x387f:
         r0 = r150;
         r4 = r0.mediaBackground;
-        if (r4 == 0) goto L_0x39ab;
-    L_0x3876:
+        if (r4 == 0) goto L_0x39ba;
+    L_0x3885:
         r4 = 0;
-    L_0x3877:
+    L_0x3886:
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = r6 - r4;
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
@@ -9836,13 +9832,13 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r54 = r4 / r55;
         r50 = 0;
-    L_0x3888:
+    L_0x3897:
         r0 = r122;
         r4 = r0.buttons;
         r4 = r4.size();
         r0 = r50;
-        if (r0 >= r4) goto L_0x3833;
-    L_0x3894:
+        if (r0 >= r4) goto L_0x3842;
+    L_0x38a3:
         r53 = new org.telegram.ui.Cells.ChatMessageCell$BotButton;
         r4 = 0;
         r0 = r53;
@@ -9867,15 +9863,15 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0 = r50;
         r4 = r4.append(r0);
         r116 = r4.toString();
-        if (r110 == 0) goto L_0x39af;
-    L_0x38d7:
+        if (r110 == 0) goto L_0x39be;
+    L_0x38e6:
         r0 = r110;
         r1 = r116;
         r108 = r0.get(r1);
         r108 = (org.telegram.ui.Cells.ChatMessageCell.BotButton) r108;
-    L_0x38e1:
-        if (r108 == 0) goto L_0x39bb;
-    L_0x38e3:
+    L_0x38f0:
+        if (r108 == 0) goto L_0x39ca;
+    L_0x38f2:
         r4 = r108.progressAlpha;
         r0 = r53;
         r0.progressAlpha = r4;
@@ -9885,7 +9881,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r8 = r108.lastUpdateTime;
         r0 = r53;
         r0.lastUpdateTime = r8;
-    L_0x38fe:
+    L_0x390d:
         r0 = r150;
         r4 = r0.botButtonsByData;
         r0 = r82;
@@ -9917,19 +9913,19 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r0.height = r4;
         r4 = r53.button;
         r4 = r4 instanceof org.telegram.tgnet.TLRPC.TL_keyboardButtonBuy;
-        if (r4 == 0) goto L_0x39c6;
-    L_0x394d:
+        if (r4 == 0) goto L_0x39d5;
+    L_0x395c:
         r0 = r151;
         r4 = r0.messageOwner;
         r4 = r4.media;
         r4 = r4.flags;
         r4 = r4 & 4;
-        if (r4 == 0) goto L_0x39c6;
-    L_0x3959:
+        if (r4 == 0) goto L_0x39d5;
+    L_0x3968:
         r4 = "PaymentReceipt";
-        r6 = 2131494074; // 0x7f0c04ba float:1.8611646E38 double:1.0530979963E-314;
+        r6 = 2131494077; // 0x7f0c04bd float:1.8611652E38 double:1.053097998E-314;
         r32 = org.telegram.messenger.LocaleController.getString(r4, r6);
-    L_0x3963:
+    L_0x3972:
         r31 = new android.text.StaticLayout;
         r33 = org.telegram.ui.ActionBar.Theme.chat_botButtonPaint;
         r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
@@ -9952,31 +9948,31 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4.size();
         r4 = r4 + -1;
         r0 = r50;
-        if (r0 != r4) goto L_0x39a7;
-    L_0x3998:
+        if (r0 != r4) goto L_0x39b6;
+    L_0x39a7:
         r4 = r53.x;
         r6 = r53.width;
         r4 = r4 + r6;
         r0 = r96;
         r96 = java.lang.Math.max(r0, r4);
-    L_0x39a7:
+    L_0x39b6:
         r50 = r50 + 1;
-        goto L_0x3888;
-    L_0x39ab:
+        goto L_0x3897;
+    L_0x39ba:
         r4 = 1091567616; // 0x41100000 float:9.0 double:5.39306059E-315;
-        goto L_0x3877;
-    L_0x39af:
+        goto L_0x3886;
+    L_0x39be:
         r0 = r109;
         r1 = r82;
         r108 = r0.get(r1);
         r108 = (org.telegram.ui.Cells.ChatMessageCell.BotButton) r108;
-        goto L_0x38e1;
-    L_0x39bb:
+        goto L_0x38f0;
+    L_0x39ca:
         r8 = java.lang.System.currentTimeMillis();
         r0 = r53;
         r0.lastUpdateTime = r8;
-        goto L_0x38fe;
-    L_0x39c6:
+        goto L_0x390d;
+    L_0x39d5:
         r4 = r53.button;
         r4 = r4.text;
         r6 = org.telegram.ui.ActionBar.Theme.chat_botButtonPaint;
@@ -9993,20 +9989,20 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r8 = android.text.TextUtils.TruncateAt.END;
         r0 = r32;
         r32 = android.text.TextUtils.ellipsize(r0, r4, r6, r8);
-        goto L_0x3963;
-    L_0x39f2:
+        goto L_0x3972;
+    L_0x3a01:
         r0 = r96;
         r1 = r150;
         r1.widthForButtons = r0;
-    L_0x39f8:
+    L_0x3a07:
         r0 = r150;
         r4 = r0.drawPinnedBottom;
-        if (r4 == 0) goto L_0x3a47;
-    L_0x39fe:
+        if (r4 == 0) goto L_0x3a56;
+    L_0x3a0d:
         r0 = r150;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x3a47;
-    L_0x3a04:
+        if (r4 == 0) goto L_0x3a56;
+    L_0x3a13:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
@@ -10014,41 +10010,41 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.totalHeight = r4;
-    L_0x3a13:
+    L_0x3a22:
         r0 = r151;
         r4 = r0.type;
         r6 = 13;
-        if (r4 != r6) goto L_0x3a31;
-    L_0x3a1b:
+        if (r4 != r6) goto L_0x3a40;
+    L_0x3a2a:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1116471296; // 0x428c0000 float:70.0 double:5.51610112E-315;
         r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
-        if (r4 >= r6) goto L_0x3a31;
-    L_0x3a27:
+        if (r4 >= r6) goto L_0x3a40;
+    L_0x3a36:
         r4 = 1116471296; // 0x428c0000 float:70.0 double:5.51610112E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r0 = r150;
         r0.totalHeight = r4;
-    L_0x3a31:
+    L_0x3a40:
         r150.updateWaveform();
         r0 = r150;
         r1 = r64;
         r0.updateButtonState(r1);
         return;
-    L_0x3a3c:
+    L_0x3a4b:
         r4 = 0;
         r0 = r150;
         r0.substractBackgroundHeight = r4;
         r4 = 0;
         r0 = r150;
         r0.keyboardHeight = r4;
-        goto L_0x39f8;
-    L_0x3a47:
+        goto L_0x3a07;
+    L_0x3a56:
         r0 = r150;
         r4 = r0.drawPinnedBottom;
-        if (r4 == 0) goto L_0x3a5d;
-    L_0x3a4d:
+        if (r4 == 0) goto L_0x3a6c;
+    L_0x3a5c:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -10056,25 +10052,25 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.totalHeight = r4;
-        goto L_0x3a13;
-    L_0x3a5d:
+        goto L_0x3a22;
+    L_0x3a6c:
         r0 = r150;
         r4 = r0.drawPinnedTop;
-        if (r4 == 0) goto L_0x3a13;
-    L_0x3a63:
+        if (r4 == 0) goto L_0x3a22;
+    L_0x3a72:
         r0 = r150;
         r4 = r0.pinnedBottom;
-        if (r4 == 0) goto L_0x3a13;
-    L_0x3a69:
+        if (r4 == 0) goto L_0x3a22;
+    L_0x3a78:
         r0 = r150;
         r4 = r0.currentPosition;
-        if (r4 == 0) goto L_0x3a13;
-    L_0x3a6f:
+        if (r4 == 0) goto L_0x3a22;
+    L_0x3a7e:
         r0 = r150;
         r4 = r0.currentPosition;
         r4 = r4.siblingHeights;
-        if (r4 != 0) goto L_0x3a13;
-    L_0x3a77:
+        if (r4 != 0) goto L_0x3a22;
+    L_0x3a86:
         r0 = r150;
         r4 = r0.totalHeight;
         r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
@@ -10082,29 +10078,29 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         r4 = r4 - r6;
         r0 = r150;
         r0.totalHeight = r4;
-        goto L_0x3a13;
-    L_0x3a87:
+        goto L_0x3a22;
+    L_0x3a96:
         r70 = move-exception;
-        goto L_0x0d66;
-    L_0x3a8a:
+        goto L_0x0d75;
+    L_0x3a99:
         r70 = move-exception;
         r12 = r121;
-        goto L_0x0bae;
-    L_0x3a8f:
+        goto L_0x0bbd;
+    L_0x3a9e:
         r101 = r26;
-        goto L_0x1ed7;
-    L_0x3a93:
+        goto L_0x1ee6;
+    L_0x3aa2:
         r101 = r26;
-        goto L_0x1cf6;
-    L_0x3a97:
+        goto L_0x1d05;
+    L_0x3aa6:
         r14 = r143;
-        goto L_0x18b5;
-    L_0x3a9b:
+        goto L_0x18c4;
+    L_0x3aaa:
         r14 = r143;
-        goto L_0x0e5f;
-    L_0x3a9f:
+        goto L_0x0e6e;
+    L_0x3aae:
         r12 = r121;
-        goto L_0x0c58;
+        goto L_0x0c67;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.setMessageObject(org.telegram.messenger.MessageObject, org.telegram.messenger.MessageObject$GroupedMessages, boolean, boolean):void");
     }
@@ -10333,7 +10329,6 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         int linkPreviewY;
         int x;
         int y;
-        float progress;
         int x1;
         int y1;
         RadialProgress radialProgress;
@@ -10348,7 +10343,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         int i = isDrawSelectedBackground() ? this.currentPosition != null ? 2 : 1 : 0;
         imageReceiver.setPressed(i);
         imageReceiver = this.photoImage;
-        boolean z = (PhotoViewer.getInstance().isShowingImage(this.currentMessageObject) || SecretMediaViewer.getInstance().isShowingImage(this.currentMessageObject)) ? false : true;
+        boolean z = (PhotoViewer.isShowingImage(this.currentMessageObject) || SecretMediaViewer.getInstance().isShowingImage(this.currentMessageObject)) ? false : true;
         imageReceiver.setVisible(z, false);
         if (!this.photoImage.getVisible()) {
             this.mediaWasInvisible = true;
@@ -10692,6 +10687,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
             Theme.chat_photoStatesDrawables[drawable][this.buttonPressed].draw(canvas);
             if (this.currentMessageObject.messageOwner.destroyTime != 0) {
                 if (!this.currentMessageObject.isOutOwner()) {
+                    float progress;
                     progress = ((float) Math.max(0, (((long) this.currentMessageObject.messageOwner.destroyTime) * 1000) - (System.currentTimeMillis() + ((long) (ConnectionsManager.getInstance(this.currentAccount).getTimeDifference() * 1000))))) / (((float) this.currentMessageObject.messageOwner.ttl) * 1000.0f);
                     Theme.chat_deleteProgressPaint.setAlpha((int) (255.0f * this.controlsAlpha));
                     canvas.drawArc(this.deleteProgressRect, -90.0f, -360.0f * progress, true, Theme.chat_deleteProgressPaint);
@@ -11227,6 +11223,19 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         }
     }
 
+    private Drawable getMiniDrawableForCurrentState() {
+        if (this.miniButtonState < 0) {
+            return null;
+        }
+        if (this.documentAttachType != 3 && this.documentAttachType != 5) {
+            return null;
+        }
+        this.radialProgress.setAlphaForPrevious(false);
+        Drawable[] drawableArr = Theme.chat_fileMiniStatesDrawable[this.currentMessageObject.isOutOwner() ? this.miniButtonState : this.miniButtonState + 2];
+        int i = (isDrawSelectedBackground() || this.miniButtonPressed != 0) ? 1 : 0;
+        return drawableArr[i];
+    }
+
     private Drawable getDrawableForCurrentState() {
         int i = 3;
         int i2 = 0;
@@ -11288,6 +11297,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
             return null;
         } else {
             this.radialProgress.setAlphaForPrevious(false);
+            this.radialProgress.setAlphaForMiniPrevious(true);
             Drawable[] drawableArr3 = Theme.chat_fileStatesDrawable[this.currentMessageObject.isOutOwner() ? this.buttonState : this.buttonState + 5];
             i = (isDrawSelectedBackground() || this.buttonPressed != 0) ? 1 : 0;
             return drawableArr3[i];
@@ -11360,6 +11370,10 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
             fileName = FileLoader.getAttachFileName(this.currentPhotoObject);
             fileExists = this.currentMessageObject.mediaExists;
         }
+        if (SharedConfig.streamMedia && ((int) this.currentMessageObject.getDialogId()) != 0 && (this.documentAttachType == 5 || this.documentAttachType == 4)) {
+            this.hasMiniProgress = fileExists ? 1 : 2;
+            fileExists = true;
+        }
         if (TextUtils.isEmpty(fileName)) {
             this.radialProgress.setBackground(null, false, false);
             return;
@@ -11367,6 +11381,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
         boolean fromBot = this.currentMessageObject.messageOwner.params != null && this.currentMessageObject.messageOwner.params.containsKey("query_id");
         Float progress;
         if (this.documentAttachType == 3 || this.documentAttachType == 5) {
+            RadialProgress radialProgress;
             if ((this.currentMessageObject.isOut() && this.currentMessageObject.isSending()) || (this.currentMessageObject.isSendError() && fromBot)) {
                 DownloadController.getInstance(this.currentAccount).addLoadingFileObserver(this.currentMessageObject.messageOwner.attachPath, this.currentMessageObject, this);
                 this.buttonState = 4;
@@ -11379,7 +11394,7 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
                     if (progress == null && SendMessagesHelper.getInstance(this.currentAccount).isSendingMessage(this.currentMessageObject.getId())) {
                         progress = Float.valueOf(1.0f);
                     }
-                    RadialProgress radialProgress = this.radialProgress;
+                    radialProgress = this.radialProgress;
                     if (progress != null) {
                         floatValue = progress.floatValue();
                     } else {
@@ -11387,9 +11402,45 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
                     }
                     radialProgress.setProgress(floatValue, false);
                 }
+            } else if (this.hasMiniProgress != 0) {
+                boolean z;
+                this.radialProgress.setMiniProgressBackgroundColor(Theme.getColor(this.currentMessageObject.isOutOwner() ? Theme.key_chat_outLoader : Theme.key_chat_inLoader));
+                playing = MediaController.getInstance().isPlayingMessage(this.currentMessageObject);
+                if (!playing || (playing && MediaController.getInstance().isMessagePaused())) {
+                    this.buttonState = 0;
+                } else {
+                    this.buttonState = 1;
+                }
+                this.radialProgress.setBackground(getDrawableForCurrentState(), false, animated);
+                if (this.hasMiniProgress == 1) {
+                    DownloadController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
+                    this.miniButtonState = -1;
+                } else {
+                    DownloadController.getInstance(this.currentAccount).addLoadingFileObserver(fileName, this.currentMessageObject, this);
+                    if (FileLoader.getInstance(this.currentAccount).isLoadingFile(fileName)) {
+                        this.miniButtonState = 1;
+                        progress = ImageLoader.getInstance().getFileProgress(fileName);
+                        if (progress != null) {
+                            this.radialProgress.setProgress(progress.floatValue(), animated);
+                        } else {
+                            this.radialProgress.setProgress(0.0f, animated);
+                        }
+                    } else {
+                        this.radialProgress.setProgress(0.0f, animated);
+                        this.miniButtonState = 0;
+                    }
+                }
+                radialProgress = this.radialProgress;
+                Drawable miniDrawableForCurrentState = getMiniDrawableForCurrentState();
+                if (this.miniButtonState == 1) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                radialProgress.setMiniBackground(miniDrawableForCurrentState, z, animated);
             } else if (fileExists) {
                 DownloadController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
-                boolean playing = MediaController.getInstance().isPlayingMessage(this.currentMessageObject);
+                playing = MediaController.getInstance().isPlayingMessage(this.currentMessageObject);
                 if (!playing || (playing && MediaController.getInstance().isMessagePaused())) {
                     this.buttonState = 0;
                 } else {
@@ -11435,35 +11486,35 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
                         setMessageObject(this.currentMessageObject, this.currentMessagesGroup, this.pinnedBottom, this.pinnedTop);
                     }
                     invalidate();
-                    return;
-                }
-                DownloadController.getInstance(this.currentAccount).addLoadingFileObserver(fileName, this.currentMessageObject, this);
-                setProgress = 0.0f;
-                progressVisible = false;
-                if (FileLoader.getInstance(this.currentAccount).isLoadingFile(fileName)) {
-                    progressVisible = true;
-                    this.buttonState = 1;
-                    progress = ImageLoader.getInstance().getFileProgress(fileName);
-                    setProgress = progress != null ? progress.floatValue() : 0.0f;
                 } else {
-                    boolean autoDownload = false;
-                    if (this.currentMessageObject.type == 1) {
-                        autoDownload = DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject);
-                    } else if (this.currentMessageObject.type == 8 && MessageObject.isNewGifDocument(this.currentMessageObject.messageOwner.media.document)) {
-                        autoDownload = DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject);
-                    } else if (this.currentMessageObject.type == 5) {
-                        autoDownload = DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject);
-                    }
-                    if (this.cancelLoading || !autoDownload) {
-                        this.buttonState = 0;
-                    } else {
+                    DownloadController.getInstance(this.currentAccount).addLoadingFileObserver(fileName, this.currentMessageObject, this);
+                    setProgress = 0.0f;
+                    progressVisible = false;
+                    if (FileLoader.getInstance(this.currentAccount).isLoadingFile(fileName)) {
                         progressVisible = true;
                         this.buttonState = 1;
+                        progress = ImageLoader.getInstance().getFileProgress(fileName);
+                        setProgress = progress != null ? progress.floatValue() : 0.0f;
+                    } else {
+                        boolean autoDownload = false;
+                        if (this.currentMessageObject.type == 1) {
+                            autoDownload = DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject);
+                        } else if (this.currentMessageObject.type == 8 && MessageObject.isNewGifDocument(this.currentMessageObject.messageOwner.media.document)) {
+                            autoDownload = DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject);
+                        } else if (this.currentMessageObject.type == 5) {
+                            autoDownload = DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject);
+                        }
+                        if (this.cancelLoading || !autoDownload) {
+                            this.buttonState = 0;
+                        } else {
+                            progressVisible = true;
+                            this.buttonState = 1;
+                        }
                     }
+                    this.radialProgress.setBackground(getDrawableForCurrentState(), progressVisible, animated);
+                    this.radialProgress.setProgress(setProgress, false);
+                    invalidate();
                 }
-                this.radialProgress.setBackground(getDrawableForCurrentState(), progressVisible, animated);
-                this.radialProgress.setProgress(setProgress, false);
-                invalidate();
             } else if (this.currentMessageObject.messageOwner.attachPath != null && this.currentMessageObject.messageOwner.attachPath.length() > 0) {
                 DownloadController.getInstance(this.currentAccount).addLoadingFileObserver(this.currentMessageObject.messageOwner.attachPath, this.currentMessageObject, this);
                 boolean needProgress = this.currentMessageObject.messageOwner.attachPath == null || !this.currentMessageObject.messageOwner.attachPath.startsWith("http");
@@ -11502,25 +11553,53 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
                 }
                 this.radialProgress.setBackground(getDrawableForCurrentState(), false, animated);
                 invalidate();
-                return;
-            }
-            DownloadController.getInstance(this.currentAccount).addLoadingFileObserver(fileName, this.currentMessageObject, this);
-            setProgress = 0.0f;
-            progressVisible = false;
-            if (FileLoader.getInstance(this.currentAccount).isLoadingFile(fileName)) {
-                progressVisible = true;
-                this.buttonState = 1;
-                progress = ImageLoader.getInstance().getFileProgress(fileName);
-                setProgress = progress != null ? progress.floatValue() : 0.0f;
-            } else if (this.cancelLoading || !((this.documentAttachType == 0 && DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject)) || (this.documentAttachType == 2 && MessageObject.isNewGifDocument(this.documentAttach) && DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject)))) {
-                this.buttonState = 0;
             } else {
-                progressVisible = true;
-                this.buttonState = 1;
+                DownloadController.getInstance(this.currentAccount).addLoadingFileObserver(fileName, this.currentMessageObject, this);
+                setProgress = 0.0f;
+                progressVisible = false;
+                if (FileLoader.getInstance(this.currentAccount).isLoadingFile(fileName)) {
+                    progressVisible = true;
+                    this.buttonState = 1;
+                    progress = ImageLoader.getInstance().getFileProgress(fileName);
+                    setProgress = progress != null ? progress.floatValue() : 0.0f;
+                } else if (this.cancelLoading || !((this.documentAttachType == 0 && DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject)) || (this.documentAttachType == 2 && MessageObject.isNewGifDocument(this.documentAttach) && DownloadController.getInstance(this.currentAccount).canDownloadMedia(this.currentMessageObject)))) {
+                    this.buttonState = 0;
+                } else {
+                    progressVisible = true;
+                    this.buttonState = 1;
+                }
+                this.radialProgress.setProgress(setProgress, false);
+                this.radialProgress.setBackground(getDrawableForCurrentState(), progressVisible, animated);
+                invalidate();
             }
-            this.radialProgress.setProgress(setProgress, false);
-            this.radialProgress.setBackground(getDrawableForCurrentState(), progressVisible, animated);
-            invalidate();
+        } else {
+            return;
+        }
+        if (this.hasMiniProgress == 0) {
+            this.radialProgress.setMiniBackground(null, false, animated);
+        }
+    }
+
+    private void didPressedMiniButton(boolean animated) {
+        if (this.miniButtonState == 0) {
+            if (this.documentAttachType == 3 || this.documentAttachType == 5) {
+                this.miniButtonState = 1;
+                this.radialProgress.setProgress(0.0f, false);
+                FileLoader.getInstance(this.currentAccount).loadFile(this.documentAttach, true, 0);
+                this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false);
+                invalidate();
+            }
+        } else if (this.miniButtonState != 1) {
+        } else {
+            if (this.documentAttachType == 3 || this.documentAttachType == 5) {
+                if (MediaController.getInstance().isPlayingMessage(this.currentMessageObject)) {
+                    MediaController.getInstance().cleanupPlayer(true, true);
+                }
+                this.miniButtonState = 0;
+                FileLoader.getInstance(this.currentAccount).cancelLoadFile(this.documentAttach);
+                this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false);
+                invalidate();
+            }
         }
     }
 
@@ -11580,6 +11659,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
                 this.radialProgress.setBackground(getDrawableForCurrentState(), true, animated);
                 invalidate();
             } else if (this.delegate.needPlayMessage(this.currentMessageObject)) {
+                if (this.hasMiniProgress == 2 && this.miniButtonState != 1) {
+                    this.miniButtonState = 1;
+                    this.radialProgress.setProgress(0.0f, false);
+                    this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false);
+                }
                 this.buttonState = 1;
                 this.radialProgress.setBackground(getDrawableForCurrentState(), false, false);
                 invalidate();
@@ -11684,7 +11768,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
     public void onProgressDownload(String fileName, float progress) {
         this.radialProgress.setProgress(progress, true);
         if (this.documentAttachType == 3 || this.documentAttachType == 5) {
-            if (this.buttonState != 4) {
+            if (this.hasMiniProgress != 0) {
+                if (this.miniButtonState != 1) {
+                    updateButtonState(false);
+                }
+            } else if (this.buttonState != 4) {
                 updateButtonState(false);
             }
         } else if (this.buttonState != 1) {
@@ -12178,17 +12266,17 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
                     if (this.documentAttachType == 3) {
                         if (this.currentMessageObject.isOutOwner()) {
                             this.seekBarWaveform.setColors(Theme.getColor(Theme.key_chat_outVoiceSeekbar), Theme.getColor(Theme.key_chat_outVoiceSeekbarFill), Theme.getColor(Theme.key_chat_outVoiceSeekbarSelected));
-                            this.seekBar.setColors(Theme.getColor(Theme.key_chat_outAudioSeekbar), Theme.getColor(Theme.key_chat_outAudioSeekbarFill), Theme.getColor(Theme.key_chat_outAudioSeekbarSelected));
+                            this.seekBar.setColors(Theme.getColor(Theme.key_chat_outAudioSeekbar), Theme.getColor(Theme.key_chat_outAudioCacheSeekbar), Theme.getColor(Theme.key_chat_outAudioSeekbarFill), Theme.getColor(Theme.key_chat_outAudioSeekbarFill), Theme.getColor(Theme.key_chat_outAudioSeekbarSelected));
                         } else {
                             this.seekBarWaveform.setColors(Theme.getColor(Theme.key_chat_inVoiceSeekbar), Theme.getColor(Theme.key_chat_inVoiceSeekbarFill), Theme.getColor(Theme.key_chat_inVoiceSeekbarSelected));
-                            this.seekBar.setColors(Theme.getColor(Theme.key_chat_inAudioSeekbar), Theme.getColor(Theme.key_chat_inAudioSeekbarFill), Theme.getColor(Theme.key_chat_inAudioSeekbarSelected));
+                            this.seekBar.setColors(Theme.getColor(Theme.key_chat_inAudioSeekbar), Theme.getColor(Theme.key_chat_inAudioCacheSeekbar), Theme.getColor(Theme.key_chat_inAudioSeekbarFill), Theme.getColor(Theme.key_chat_inAudioSeekbarFill), Theme.getColor(Theme.key_chat_inAudioSeekbarSelected));
                         }
                     } else if (this.documentAttachType == 5) {
                         this.documentAttachType = 5;
                         if (this.currentMessageObject.isOutOwner()) {
-                            this.seekBar.setColors(Theme.getColor(Theme.key_chat_outAudioSeekbar), Theme.getColor(Theme.key_chat_outAudioSeekbarFill), Theme.getColor(Theme.key_chat_outAudioSeekbarSelected));
+                            this.seekBar.setColors(Theme.getColor(Theme.key_chat_outAudioSeekbar), Theme.getColor(Theme.key_chat_outAudioCacheSeekbar), Theme.getColor(Theme.key_chat_outAudioSeekbarFill), Theme.getColor(Theme.key_chat_outAudioSeekbarFill), Theme.getColor(Theme.key_chat_outAudioSeekbarSelected));
                         } else {
-                            this.seekBar.setColors(Theme.getColor(Theme.key_chat_inAudioSeekbar), Theme.getColor(Theme.key_chat_inAudioSeekbarFill), Theme.getColor(Theme.key_chat_inAudioSeekbarSelected));
+                            this.seekBar.setColors(Theme.getColor(Theme.key_chat_inAudioSeekbar), Theme.getColor(Theme.key_chat_inAudioCacheSeekbar), Theme.getColor(Theme.key_chat_inAudioSeekbarFill), Theme.getColor(Theme.key_chat_inAudioSeekbarFill), Theme.getColor(Theme.key_chat_inAudioSeekbarSelected));
                         }
                     }
                 }

@@ -45,6 +45,7 @@ public class VideoPlayer implements EventListener, VideoListener {
     private boolean audioPlayerReady;
     private boolean autoplay;
     private VideoPlayerDelegate delegate;
+    private boolean isStreaming;
     private boolean lastReportedPlayWhenReady;
     private int lastReportedPlaybackState = 1;
     private Handler mainHandler = new Handler();
@@ -185,90 +186,103 @@ public class VideoPlayer implements EventListener, VideoListener {
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public void preparePlayer(android.net.Uri r8, java.lang.String r9) {
+    public void preparePlayer(android.net.Uri r9, java.lang.String r10) {
         /*
-        r7 = this;
-        r6 = 1;
-        r1 = 0;
+        r8 = this;
         r5 = 0;
-        r7.videoPlayerReady = r1;
-        r7.mixedAudio = r1;
-        r7.ensurePleyaerCreated();
-        r2 = -1;
-        r3 = r9.hashCode();
-        switch(r3) {
-            case 3680: goto L_0x0040;
-            case 103407: goto L_0x0035;
-            case 3075986: goto L_0x002b;
-            default: goto L_0x0012;
-        };
-    L_0x0012:
-        r1 = r2;
-    L_0x0013:
-        switch(r1) {
-            case 0: goto L_0x004b;
-            case 1: goto L_0x005d;
-            case 2: goto L_0x0067;
-            default: goto L_0x0016;
-        };
+        r7 = 1;
+        r2 = 0;
+        r8.videoPlayerReady = r2;
+        r8.mixedAudio = r2;
+        r6 = r9.getScheme();
+        if (r6 == 0) goto L_0x003d;
+    L_0x000d:
+        r1 = "file";
+        r1 = r6.startsWith(r1);
+        if (r1 != 0) goto L_0x003d;
     L_0x0016:
+        r1 = r7;
+    L_0x0017:
+        r8.isStreaming = r1;
+        r8.ensurePleyaerCreated();
+        r1 = -1;
+        r3 = r10.hashCode();
+        switch(r3) {
+            case 3680: goto L_0x0054;
+            case 103407: goto L_0x0049;
+            case 3075986: goto L_0x003f;
+            default: goto L_0x0024;
+        };
+    L_0x0024:
+        r2 = r1;
+    L_0x0025:
+        switch(r2) {
+            case 0: goto L_0x005f;
+            case 1: goto L_0x0071;
+            case 2: goto L_0x007b;
+            default: goto L_0x0028;
+        };
+    L_0x0028:
         r0 = new org.telegram.messenger.exoplayer2.source.ExtractorMediaSource;
-        r2 = r7.mediaDataSourceFactory;
+        r2 = r8.mediaDataSourceFactory;
         r3 = new org.telegram.messenger.exoplayer2.extractor.DefaultExtractorsFactory;
         r3.<init>();
-        r4 = r7.mainHandler;
-        r1 = r8;
+        r4 = r8.mainHandler;
+        r1 = r9;
         r0.<init>(r1, r2, r3, r4, r5);
-    L_0x0025:
-        r1 = r7.player;
-        r1.prepare(r0, r6, r6);
+    L_0x0037:
+        r1 = r8.player;
+        r1.prepare(r0, r7, r7);
         return;
-    L_0x002b:
+    L_0x003d:
+        r1 = r2;
+        goto L_0x0017;
+    L_0x003f:
         r3 = "dash";
-        r3 = r9.equals(r3);
-        if (r3 == 0) goto L_0x0012;
-    L_0x0034:
-        goto L_0x0013;
-    L_0x0035:
-        r1 = "hls";
-        r1 = r9.equals(r1);
-        if (r1 == 0) goto L_0x0012;
-    L_0x003e:
-        r1 = r6;
-        goto L_0x0013;
-    L_0x0040:
-        r1 = "ss";
-        r1 = r9.equals(r1);
-        if (r1 == 0) goto L_0x0012;
+        r3 = r10.equals(r3);
+        if (r3 == 0) goto L_0x0024;
+    L_0x0048:
+        goto L_0x0025;
     L_0x0049:
-        r1 = 2;
-        goto L_0x0013;
-    L_0x004b:
-        r0 = new org.telegram.messenger.exoplayer2.source.dash.DashMediaSource;
-        r2 = r7.mediaDataSourceFactory;
-        r3 = new org.telegram.messenger.exoplayer2.source.dash.DefaultDashChunkSource$Factory;
-        r1 = r7.mediaDataSourceFactory;
-        r3.<init>(r1);
-        r4 = r7.mainHandler;
-        r1 = r8;
-        r0.<init>(r1, r2, r3, r4, r5);
+        r2 = "hls";
+        r2 = r10.equals(r2);
+        if (r2 == 0) goto L_0x0024;
+    L_0x0052:
+        r2 = r7;
         goto L_0x0025;
+    L_0x0054:
+        r2 = "ss";
+        r2 = r10.equals(r2);
+        if (r2 == 0) goto L_0x0024;
     L_0x005d:
-        r0 = new org.telegram.messenger.exoplayer2.source.hls.HlsMediaSource;
-        r1 = r7.mediaDataSourceFactory;
-        r2 = r7.mainHandler;
-        r0.<init>(r8, r1, r2, r5);
+        r2 = 2;
         goto L_0x0025;
-    L_0x0067:
-        r0 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.SsMediaSource;
-        r2 = r7.mediaDataSourceFactory;
-        r3 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.DefaultSsChunkSource$Factory;
-        r1 = r7.mediaDataSourceFactory;
+    L_0x005f:
+        r0 = new org.telegram.messenger.exoplayer2.source.dash.DashMediaSource;
+        r2 = r8.mediaDataSourceFactory;
+        r3 = new org.telegram.messenger.exoplayer2.source.dash.DefaultDashChunkSource$Factory;
+        r1 = r8.mediaDataSourceFactory;
         r3.<init>(r1);
-        r4 = r7.mainHandler;
-        r1 = r8;
+        r4 = r8.mainHandler;
+        r1 = r9;
         r0.<init>(r1, r2, r3, r4, r5);
-        goto L_0x0025;
+        goto L_0x0037;
+    L_0x0071:
+        r0 = new org.telegram.messenger.exoplayer2.source.hls.HlsMediaSource;
+        r1 = r8.mediaDataSourceFactory;
+        r2 = r8.mainHandler;
+        r0.<init>(r9, r1, r2, r5);
+        goto L_0x0037;
+    L_0x007b:
+        r0 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.SsMediaSource;
+        r2 = r8.mediaDataSourceFactory;
+        r3 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.DefaultSsChunkSource$Factory;
+        r1 = r8.mediaDataSourceFactory;
+        r3.<init>(r1);
+        r4 = r8.mainHandler;
+        r1 = r9;
+        r0.<init>(r1, r2, r3, r4, r5);
+        goto L_0x0037;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.VideoPlayer.preparePlayer(android.net.Uri, java.lang.String):void");
     }
@@ -397,11 +411,19 @@ public class VideoPlayer implements EventListener, VideoListener {
     }
 
     public int getBufferedPercentage() {
-        return this.player != null ? this.player.getBufferedPercentage() : 0;
+        if (this.isStreaming) {
+            return this.player != null ? this.player.getBufferedPercentage() : 0;
+        } else {
+            return 100;
+        }
     }
 
     public long getBufferedPosition() {
-        return this.player != null ? this.player.getBufferedPosition() : 0;
+        if (this.isStreaming) {
+            return this.player != null ? this.player.getBufferedPosition() : 0;
+        } else {
+            return this.player.getDuration();
+        }
     }
 
     public boolean isPlaying() {

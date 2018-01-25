@@ -271,7 +271,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0.setTaskDescription(r1);	 Catch:{ Exception -> 0x08cf }
     L_0x0114:
         r32 = r37.getWindow();
-        r33 = 2131165660; // 0x7f0701dc float:1.7945543E38 double:1.052935738E-314;
+        r33 = 2131165663; // 0x7f0701df float:1.794555E38 double:1.0529357397E-314;
         r32.setBackgroundDrawableResource(r33);
         r32 = org.telegram.messenger.SharedConfig.passcodeHash;
         r32 = r32.length();
@@ -380,7 +380,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r1 = r37;
         r1.backgroundTablet = r0;
         r32 = r37.getResources();
-        r33 = 2131165258; // 0x7f07004a float:1.7944728E38 double:1.0529355396E-314;
+        r33 = 2131165259; // 0x7f07004b float:1.794473E38 double:1.05293554E-314;
         r13 = r32.getDrawable(r33);
         r13 = (android.graphics.drawable.BitmapDrawable) r13;
         r32 = android.graphics.Shader.TileMode.REPEAT;
@@ -524,7 +524,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r37;
         r0 = r0.layersActionBarLayout;
         r32 = r0;
-        r33 = 2131165249; // 0x7f070041 float:1.794471E38 double:1.052935535E-314;
+        r33 = 2131165250; // 0x7f070042 float:1.7944712E38 double:1.0529355356E-314;
         r32.setBackgroundResource(r33);
         r0 = r37;
         r0 = r0.layersActionBarLayout;
@@ -1408,11 +1408,11 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     private void showPasscodeActivity() {
         if (this.passcodeView != null) {
             SharedConfig.appLocked = true;
-            if (SecretMediaViewer.getInstance().isVisible()) {
+            if (SecretMediaViewer.hasInstance() && SecretMediaViewer.getInstance().isVisible()) {
                 SecretMediaViewer.getInstance().closePhoto(false, false);
-            } else if (PhotoViewer.getInstance().isVisible()) {
+            } else if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
                 PhotoViewer.getInstance().closePhoto(false, true);
-            } else if (ArticleViewer.getInstance().isVisible()) {
+            } else if (ArticleViewer.hasInstance() && ArticleViewer.getInstance().isVisible()) {
                 ArticleViewer.getInstance().close(false, true);
             }
             this.passcodeView.onShow();
@@ -1841,13 +1841,13 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         if (r87 != 0) goto L_0x0359;
     L_0x0306:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x110d;
+        if (r4 == 0) goto L_0x111f;
     L_0x030c:
         r0 = r85;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.UserConfig.getInstance(r4);
         r4 = r4.isClientActivated();
-        if (r4 != 0) goto L_0x10d9;
+        if (r4 != 0) goto L_0x10eb;
     L_0x031a:
         r0 = r85;
         r4 = r0.layersActionBarLayout;
@@ -2858,19 +2858,19 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r49 = r0.getQueryParameter(r4);
         if (r81 == 0) goto L_0x0b78;
     L_0x0b64:
-        r4 = java.lang.Integer.parseInt(r81);	 Catch:{ NumberFormatException -> 0x116f }
-        r65 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x116f }
+        r4 = java.lang.Integer.parseInt(r81);	 Catch:{ NumberFormatException -> 0x1181 }
+        r65 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x1181 }
     L_0x0b6c:
         if (r49 == 0) goto L_0x07ad;
     L_0x0b6e:
-        r4 = java.lang.Integer.parseInt(r49);	 Catch:{ NumberFormatException -> 0x1169 }
-        r64 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x1169 }
+        r4 = java.lang.Integer.parseInt(r49);	 Catch:{ NumberFormatException -> 0x117b }
+        r64 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x117b }
         goto L_0x07ad;
     L_0x0b78:
         if (r29 == 0) goto L_0x0b6c;
     L_0x0b7a:
-        r4 = java.lang.Integer.parseInt(r29);	 Catch:{ NumberFormatException -> 0x116c }
-        r62 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x116c }
+        r4 = java.lang.Integer.parseInt(r29);	 Catch:{ NumberFormatException -> 0x117e }
+        r62 = java.lang.Integer.valueOf(r4);	 Catch:{ NumberFormatException -> 0x117e }
         goto L_0x0b6c;
     L_0x0b83:
         if (r6 != 0) goto L_0x0b8f;
@@ -3256,7 +3256,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0e77:
         r0 = r85;
         r4 = r0.documentsUrisArray;
-        if (r4 == 0) goto L_0x102b;
+        if (r4 == 0) goto L_0x103d;
     L_0x0e7d:
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
         if (r4 != 0) goto L_0x0e99;
@@ -3274,7 +3274,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0e99:
         r4 = 0;
         r4 = (r36 > r4 ? 1 : (r36 == r4 ? 0 : -1));
-        if (r4 != 0) goto L_0x100e;
+        if (r4 != 0) goto L_0x1020;
     L_0x0e9f:
         r24 = new android.os.Bundle;
         r24.<init>();
@@ -3292,18 +3292,18 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0.putBoolean(r4, r5);
         r0 = r85;
         r4 = r0.contactsToSend;
-        if (r4 == 0) goto L_0x0f75;
+        if (r4 == 0) goto L_0x0f7b;
     L_0x0ec5:
         r4 = "selectAlertString";
         r5 = "SendContactTo";
-        r16 = 2131494292; // 0x7f0c0594 float:1.8612088E38 double:1.053098104E-314;
+        r16 = 2131494295; // 0x7f0c0597 float:1.8612094E38 double:1.0530981055E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendContactToGroup";
-        r16 = 2131494279; // 0x7f0c0587 float:1.8612062E38 double:1.0530980976E-314;
+        r16 = 2131494282; // 0x7f0c058a float:1.8612068E38 double:1.053098099E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -3317,13 +3317,13 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r1 = r85;
         r0.setDelegate(r1);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x0fa2;
+        if (r4 == 0) goto L_0x0fa8;
     L_0x0f03:
         r0 = r85;
         r4 = r0.layersActionBarLayout;
         r4 = r4.fragmentsStack;
         r4 = r4.size();
-        if (r4 <= 0) goto L_0x0f9f;
+        if (r4 <= 0) goto L_0x0fa5;
     L_0x0f0f:
         r0 = r85;
         r4 = r0.layersActionBarLayout;
@@ -3335,7 +3335,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r5 = r5 + -1;
         r4 = r4.get(r5);
         r4 = r4 instanceof org.telegram.ui.DialogsActivity;
-        if (r4 == 0) goto L_0x0f9f;
+        if (r4 == 0) goto L_0x0fa5;
     L_0x0f29:
         r66 = 1;
     L_0x0f2b:
@@ -3348,16 +3348,19 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r2 = r16;
         r4.presentFragment(r0, r1, r5, r2);
         r61 = 1;
+        r4 = org.telegram.ui.SecretMediaViewer.hasInstance();
+        if (r4 == 0) goto L_0x0fd6;
+    L_0x0f43:
         r4 = org.telegram.ui.SecretMediaViewer.getInstance();
         r4 = r4.isVisible();
-        if (r4 == 0) goto L_0x0fd0;
-    L_0x0f47:
+        if (r4 == 0) goto L_0x0fd6;
+    L_0x0f4d:
         r4 = org.telegram.ui.SecretMediaViewer.getInstance();
         r5 = 0;
         r16 = 0;
         r0 = r16;
         r4.closePhoto(r5, r0);
-    L_0x0f53:
+    L_0x0f59:
         r0 = r85;
         r4 = r0.drawerLayoutContainer;
         r5 = 0;
@@ -3365,8 +3368,8 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x1000;
-    L_0x0f65:
+        if (r4 == 0) goto L_0x1012;
+    L_0x0f6b:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4.showLastFragment();
@@ -3374,33 +3377,33 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r4 = r0.rightActionBarLayout;
         r4.showLastFragment();
         goto L_0x0302;
-    L_0x0f75:
+    L_0x0f7b:
         r4 = "selectAlertString";
         r5 = "SendMessagesTo";
-        r16 = 2131494292; // 0x7f0c0594 float:1.8612088E38 double:1.053098104E-314;
+        r16 = 2131494295; // 0x7f0c0597 float:1.8612094E38 double:1.0530981055E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendMessagesToGroup";
-        r16 = 2131494293; // 0x7f0c0595 float:1.861209E38 double:1.0530981045E-314;
+        r16 = 2131494296; // 0x7f0c0598 float:1.8612096E38 double:1.053098106E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         goto L_0x0eed;
-    L_0x0f9f:
+    L_0x0fa5:
         r66 = 0;
         goto L_0x0f2b;
-    L_0x0fa2:
+    L_0x0fa8:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4 = r4.fragmentsStack;
         r4 = r4.size();
         r5 = 1;
-        if (r4 <= r5) goto L_0x0fcd;
-    L_0x0faf:
+        if (r4 <= r5) goto L_0x0fd3;
+    L_0x0fb5:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4 = r4.fragmentsStack;
@@ -3411,37 +3414,43 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r5 = r5 + -1;
         r4 = r4.get(r5);
         r4 = r4 instanceof org.telegram.ui.DialogsActivity;
-        if (r4 == 0) goto L_0x0fcd;
-    L_0x0fc9:
+        if (r4 == 0) goto L_0x0fd3;
+    L_0x0fcf:
         r66 = 1;
-    L_0x0fcb:
+    L_0x0fd1:
         goto L_0x0f2b;
-    L_0x0fcd:
+    L_0x0fd3:
         r66 = 0;
-        goto L_0x0fcb;
-    L_0x0fd0:
+        goto L_0x0fd1;
+    L_0x0fd6:
+        r4 = org.telegram.ui.PhotoViewer.hasInstance();
+        if (r4 == 0) goto L_0x0ff4;
+    L_0x0fdc:
         r4 = org.telegram.ui.PhotoViewer.getInstance();
         r4 = r4.isVisible();
-        if (r4 == 0) goto L_0x0fe8;
-    L_0x0fda:
+        if (r4 == 0) goto L_0x0ff4;
+    L_0x0fe6:
         r4 = org.telegram.ui.PhotoViewer.getInstance();
         r5 = 0;
         r16 = 1;
         r0 = r16;
         r4.closePhoto(r5, r0);
-        goto L_0x0f53;
-    L_0x0fe8:
+        goto L_0x0f59;
+    L_0x0ff4:
+        r4 = org.telegram.ui.ArticleViewer.hasInstance();
+        if (r4 == 0) goto L_0x0f59;
+    L_0x0ffa:
         r4 = org.telegram.ui.ArticleViewer.getInstance();
         r4 = r4.isVisible();
-        if (r4 == 0) goto L_0x0f53;
-    L_0x0ff2:
+        if (r4 == 0) goto L_0x0f59;
+    L_0x1004:
         r4 = org.telegram.ui.ArticleViewer.getInstance();
         r5 = 0;
         r16 = 1;
         r0 = r16;
         r4.close(r5, r0);
-        goto L_0x0f53;
-    L_0x1000:
+        goto L_0x0f59;
+    L_0x1012:
         r0 = r85;
         r4 = r0.drawerLayoutContainer;
         r5 = 1;
@@ -3449,7 +3458,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         goto L_0x0302;
-    L_0x100e:
+    L_0x1020:
         r39 = new java.util.ArrayList;
         r39.<init>();
         r4 = java.lang.Long.valueOf(r36);
@@ -3463,10 +3472,10 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r2 = r16;
         r0.didSelectDialogs(r4, r1, r5, r2);
         goto L_0x0302;
-    L_0x102b:
+    L_0x103d:
         r4 = r53.intValue();
-        if (r4 == 0) goto L_0x107a;
-    L_0x1031:
+        if (r4 == 0) goto L_0x108c;
+    L_0x1043:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r5 = new org.telegram.ui.SettingsActivity;
@@ -3479,8 +3488,8 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r2 = r18;
         r4.presentFragment(r5, r0, r1, r2);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x106d;
-    L_0x104f:
+        if (r4 == 0) goto L_0x107f;
+    L_0x1061:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4.showLastFragment();
@@ -3493,21 +3502,21 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r16 = 0;
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
-    L_0x1069:
+    L_0x107b:
         r61 = 1;
         goto L_0x0302;
-    L_0x106d:
+    L_0x107f:
         r0 = r85;
         r4 = r0.drawerLayoutContainer;
         r5 = 1;
         r16 = 0;
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
-        goto L_0x1069;
-    L_0x107a:
+        goto L_0x107b;
+    L_0x108c:
         r4 = r52.intValue();
         if (r4 == 0) goto L_0x0302;
-    L_0x1080:
+    L_0x1092:
         r24 = new android.os.Bundle;
         r24.<init>();
         r4 = "destroyAfterSelect";
@@ -3527,8 +3536,8 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r2 = r18;
         r4.presentFragment(r5, r0, r1, r2);
         r4 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r4 == 0) goto L_0x10cc;
-    L_0x10ae:
+        if (r4 == 0) goto L_0x10de;
+    L_0x10c0:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4.showLastFragment();
@@ -3541,24 +3550,24 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r16 = 0;
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
-    L_0x10c8:
+    L_0x10da:
         r61 = 1;
         goto L_0x0302;
-    L_0x10cc:
+    L_0x10de:
         r0 = r85;
         r4 = r0.drawerLayoutContainer;
         r5 = 1;
         r16 = 0;
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
-        goto L_0x10c8;
-    L_0x10d9:
+        goto L_0x10da;
+    L_0x10eb:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4 = r4.fragmentsStack;
         r4 = r4.isEmpty();
         if (r4 == 0) goto L_0x033e;
-    L_0x10e5:
+    L_0x10f7:
         r38 = new org.telegram.ui.DialogsActivity;
         r4 = 0;
         r0 = r38;
@@ -3578,19 +3587,19 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         goto L_0x033e;
-    L_0x110d:
+    L_0x111f:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r4 = r4.fragmentsStack;
         r4 = r4.isEmpty();
         if (r4 == 0) goto L_0x033e;
-    L_0x1119:
+    L_0x112b:
         r0 = r85;
         r4 = r0.currentAccount;
         r4 = org.telegram.messenger.UserConfig.getInstance(r4);
         r4 = r4.isClientActivated();
-        if (r4 != 0) goto L_0x1141;
-    L_0x1127:
+        if (r4 != 0) goto L_0x1153;
+    L_0x1139:
         r0 = r85;
         r4 = r0.actionBarLayout;
         r5 = new org.telegram.ui.LoginActivity;
@@ -3603,7 +3612,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         goto L_0x033e;
-    L_0x1141:
+    L_0x1153:
         r38 = new org.telegram.ui.DialogsActivity;
         r4 = 0;
         r0 = r38;
@@ -3623,13 +3632,13 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r16;
         r4.setAllowOpenDrawer(r5, r0);
         goto L_0x033e;
-    L_0x1169:
+    L_0x117b:
         r4 = move-exception;
         goto L_0x07ad;
-    L_0x116c:
+    L_0x117e:
         r4 = move-exception;
         goto L_0x0b6c;
-    L_0x116f:
+    L_0x1181:
         r4 = move-exception;
         goto L_0x0b6c;
         */
@@ -3715,11 +3724,11 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
                                     });
                                     boolean removeLast = AndroidUtilities.isTablet() ? LaunchActivity.this.layersActionBarLayout.fragmentsStack.size() > 0 && (LaunchActivity.this.layersActionBarLayout.fragmentsStack.get(LaunchActivity.this.layersActionBarLayout.fragmentsStack.size() - 1) instanceof DialogsActivity) : LaunchActivity.this.actionBarLayout.fragmentsStack.size() > 1 && (LaunchActivity.this.actionBarLayout.fragmentsStack.get(LaunchActivity.this.actionBarLayout.fragmentsStack.size() - 1) instanceof DialogsActivity);
                                     LaunchActivity.this.actionBarLayout.presentFragment(fragment, removeLast, true, true);
-                                    if (SecretMediaViewer.getInstance().isVisible()) {
+                                    if (SecretMediaViewer.hasInstance() && SecretMediaViewer.getInstance().isVisible()) {
                                         SecretMediaViewer.getInstance().closePhoto(false, false);
-                                    } else if (PhotoViewer.getInstance().isVisible()) {
+                                    } else if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
                                         PhotoViewer.getInstance().closePhoto(false, true);
-                                    } else if (ArticleViewer.getInstance().isVisible()) {
+                                    } else if (ArticleViewer.hasInstance() && ArticleViewer.getInstance().isVisible()) {
                                         ArticleViewer.getInstance().close(false, true);
                                     }
                                     LaunchActivity.this.drawerLayoutContainer.setAllowOpenDrawer(false, false);
@@ -4243,7 +4252,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         }
         ConnectionsManager.getInstance(this.currentAccount).setAppPaused(true, false);
         AndroidUtilities.unregisterUpdates();
-        if (PhotoViewer.getInstance().isVisible()) {
+        if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().onPause();
         }
     }
@@ -4259,10 +4268,21 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     }
 
     protected void onDestroy() {
-        PhotoViewer.getInstance().destroyPhotoViewer();
-        SecretMediaViewer.getInstance().destroyPhotoViewer();
-        ArticleViewer.getInstance().destroyArticleViewer();
-        StickerPreviewViewer.getInstance().destroy();
+        if (PhotoViewer.getPipInstance() != null) {
+            PhotoViewer.getPipInstance().destroyPhotoViewer();
+        }
+        if (PhotoViewer.hasInstance()) {
+            PhotoViewer.getInstance().destroyPhotoViewer();
+        }
+        if (SecretMediaViewer.hasInstance()) {
+            SecretMediaViewer.getInstance().destroyPhotoViewer();
+        }
+        if (ArticleViewer.hasInstance()) {
+            ArticleViewer.getInstance().destroyArticleViewer();
+        }
+        if (StickerPreviewViewer.hasInstance()) {
+            StickerPreviewViewer.getInstance().destroy();
+        }
         PipRoundVideoView pipRoundVideoView = PipRoundVideoView.getInstance();
         MediaController.getInstance().setBaseActivity(this, false);
         MediaController.getInstance().setFeedbackView(this.actionBarLayout, false);
@@ -4329,7 +4349,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         AndroidUtilities.checkForUpdates(this);
         ConnectionsManager.getInstance(this.currentAccount).setAppPaused(false, false);
         updateCurrentConnectionState(this.currentAccount);
-        if (PhotoViewer.getInstance().isVisible()) {
+        if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().onResume();
         }
         if (PipRoundVideoView.getInstance() != null && MediaController.getInstance().isMessagePaused()) {
@@ -4903,11 +4923,11 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     public void onBackPressed() {
         if (this.passcodeView.getVisibility() == 0) {
             finish();
-        } else if (SecretMediaViewer.getInstance().isVisible()) {
+        } else if (SecretMediaViewer.hasInstance() && SecretMediaViewer.getInstance().isVisible()) {
             SecretMediaViewer.getInstance().closePhoto(true, false);
-        } else if (PhotoViewer.getInstance().isVisible()) {
+        } else if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().closePhoto(true, false);
-        } else if (ArticleViewer.getInstance().isVisible()) {
+        } else if (ArticleViewer.hasInstance() && ArticleViewer.getInstance().isVisible()) {
             ArticleViewer.getInstance().close(true, false);
         } else if (this.drawerLayoutContainer.isDrawerOpened()) {
             this.drawerLayoutContainer.closeDrawer(false);
@@ -4966,13 +4986,13 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     }
 
     public boolean onPreIme() {
-        if (SecretMediaViewer.getInstance().isVisible()) {
+        if (SecretMediaViewer.hasInstance() && SecretMediaViewer.getInstance().isVisible()) {
             SecretMediaViewer.getInstance().closePhoto(true, false);
             return true;
-        } else if (PhotoViewer.getInstance().isVisible()) {
+        } else if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().closePhoto(true, false);
             return true;
-        } else if (!ArticleViewer.getInstance().isVisible()) {
+        } else if (!ArticleViewer.hasInstance() || !ArticleViewer.getInstance().isVisible()) {
             return false;
         } else {
             ArticleViewer.getInstance().close(true, false);
@@ -4982,10 +5002,10 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
 
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == 82 && !SharedConfig.isWaitingForPasscodeEnter) {
-            if (PhotoViewer.getInstance().isVisible()) {
+            if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
                 return super.onKeyUp(keyCode, event);
             }
-            if (ArticleViewer.getInstance().isVisible()) {
+            if (ArticleViewer.hasInstance() && ArticleViewer.getInstance().isVisible()) {
                 return super.onKeyUp(keyCode, event);
             }
             if (AndroidUtilities.isTablet()) {
@@ -5012,7 +5032,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
 
     public boolean needPresentFragment(BaseFragment fragment, boolean removeLast, boolean forceWithoutAnimation, ActionBarLayout layout) {
         boolean z = true;
-        if (ArticleViewer.getInstance().isVisible()) {
+        if (ArticleViewer.hasInstance() && ArticleViewer.getInstance().isVisible()) {
             ArticleViewer.getInstance().close(false, true);
         }
         if (AndroidUtilities.isTablet()) {

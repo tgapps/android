@@ -56,10 +56,10 @@ public class AlertsCreator {
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public static android.app.Dialog processError(int r7, org.telegram.tgnet.TLRPC.TL_error r8, org.telegram.ui.ActionBar.BaseFragment r9, org.telegram.tgnet.TLObject r10, java.lang.Object... r11) {
         /*
-        r6 = 2131493249; // 0x7f0c0181 float:1.8609973E38 double:1.0530975887E-314;
-        r5 = 2131493431; // 0x7f0c0237 float:1.8610342E38 double:1.0530976786E-314;
+        r6 = 2131493251; // 0x7f0c0183 float:1.8609977E38 double:1.0530975897E-314;
+        r5 = 2131493434; // 0x7f0c023a float:1.8610348E38 double:1.05309768E-314;
         r2 = 1;
-        r4 = 2131493521; // 0x7f0c0291 float:1.8610524E38 double:1.053097723E-314;
+        r4 = 2131493524; // 0x7f0c0294 float:1.861053E38 double:1.0530977245E-314;
         r1 = 0;
         r0 = r8.code;
         r3 = 406; // 0x196 float:5.69E-43 double:2.006E-321;
@@ -151,37 +151,31 @@ public class AlertsCreator {
         if (r0 != 0) goto L_0x003e;
     L_0x009c:
         r0 = "EditMessageError";
-        r1 = 2131493395; // 0x7f0c0213 float:1.8610269E38 double:1.053097661E-314;
+        r1 = 2131493397; // 0x7f0c0215 float:1.8610273E38 double:1.053097662E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x00aa:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendMessage;
-        if (r0 != 0) goto L_0x00c6;
+        if (r0 != 0) goto L_0x00be;
     L_0x00ae:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendMedia;
-        if (r0 != 0) goto L_0x00c6;
+        if (r0 != 0) goto L_0x00be;
     L_0x00b2:
-        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_geochats_sendMessage;
-        if (r0 != 0) goto L_0x00c6;
-    L_0x00b6:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendBroadcast;
-        if (r0 != 0) goto L_0x00c6;
-    L_0x00ba:
+        if (r0 != 0) goto L_0x00be;
+    L_0x00b6:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_sendInlineBotResult;
-        if (r0 != 0) goto L_0x00c6;
-    L_0x00be:
-        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_geochats_sendMedia;
-        if (r0 != 0) goto L_0x00c6;
-    L_0x00c2:
+        if (r0 != 0) goto L_0x00be;
+    L_0x00ba:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_forwardMessages;
-        if (r0 == 0) goto L_0x00e4;
-    L_0x00c6:
+        if (r0 == 0) goto L_0x00dc;
+    L_0x00be:
         r0 = r8.text;
         r3 = "PEER_FLOOD";
         r0 = r0.equals(r3);
         if (r0 == 0) goto L_0x003e;
-    L_0x00d1:
+    L_0x00c9:
         r0 = org.telegram.messenger.NotificationCenter.getInstance(r7);
         r3 = org.telegram.messenger.NotificationCenter.needShowAlert;
         r2 = new java.lang.Object[r2];
@@ -189,45 +183,45 @@ public class AlertsCreator {
         r2[r1] = r4;
         r0.postNotificationName(r3, r2);
         goto L_0x003e;
-    L_0x00e4:
+    L_0x00dc:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_importChatInvite;
-        if (r0 == 0) goto L_0x0128;
-    L_0x00e8:
+        if (r0 == 0) goto L_0x0120;
+    L_0x00e0:
         r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
-        if (r0 == 0) goto L_0x00ff;
-    L_0x00f3:
+        if (r0 == 0) goto L_0x00f7;
+    L_0x00eb:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x00ff:
+    L_0x00f7:
         r0 = r8.text;
         r1 = "USERS_TOO_MUCH";
         r0 = r0.equals(r1);
-        if (r0 == 0) goto L_0x0119;
-    L_0x010a:
+        if (r0 == 0) goto L_0x0111;
+    L_0x0102:
         r0 = "JoinToGroupErrorFull";
-        r1 = 2131493689; // 0x7f0c0339 float:1.8610865E38 double:1.053097806E-314;
+        r1 = 2131493692; // 0x7f0c033c float:1.8610871E38 double:1.0530978075E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x0119:
+    L_0x0111:
         r0 = "JoinToGroupErrorNotExist";
-        r1 = 2131493690; // 0x7f0c033a float:1.8610867E38 double:1.0530978066E-314;
+        r1 = 2131493693; // 0x7f0c033d float:1.8610873E38 double:1.053097808E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x0128:
+    L_0x0120:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_messages_getAttachedStickers;
-        if (r0 == 0) goto L_0x0162;
-    L_0x012c:
+        if (r0 == 0) goto L_0x015a;
+    L_0x0124:
         if (r9 == 0) goto L_0x003e;
-    L_0x012e:
+    L_0x0126:
         r0 = r9.getParentActivity();
         if (r0 == 0) goto L_0x003e;
-    L_0x0134:
+    L_0x012c:
         r0 = r9.getParentActivity();
         r2 = new java.lang.StringBuilder;
         r2.<init>();
@@ -242,104 +236,104 @@ public class AlertsCreator {
         r0 = android.widget.Toast.makeText(r0, r2, r1);
         r0.show();
         goto L_0x003e;
-    L_0x0162:
+    L_0x015a:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_confirmPhone;
-        if (r0 == 0) goto L_0x01c0;
-    L_0x0166:
+        if (r0 == 0) goto L_0x01b8;
+    L_0x015e:
         r0 = r8.text;
         r1 = "PHONE_CODE_EMPTY";
         r0 = r0.contains(r1);
-        if (r0 != 0) goto L_0x017c;
-    L_0x0171:
+        if (r0 != 0) goto L_0x0174;
+    L_0x0169:
         r0 = r8.text;
         r1 = "PHONE_CODE_INVALID";
         r0 = r0.contains(r1);
-        if (r0 == 0) goto L_0x018b;
-    L_0x017c:
+        if (r0 == 0) goto L_0x0183;
+    L_0x0174:
         r0 = "InvalidCode";
-        r1 = 2131493657; // 0x7f0c0319 float:1.86108E38 double:1.0530977903E-314;
-        r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x018b:
-        r0 = r8.text;
-        r1 = "PHONE_CODE_EXPIRED";
-        r0 = r0.contains(r1);
-        if (r0 == 0) goto L_0x01a2;
-    L_0x0196:
-        r0 = "CodeExpired";
-        r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x01a2:
-        r0 = r8.text;
-        r1 = "FLOOD_WAIT";
-        r0 = r0.startsWith(r1);
-        if (r0 == 0) goto L_0x01b9;
-    L_0x01ad:
-        r0 = "FloodWait";
-        r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x01b9:
-        r0 = r8.text;
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x01c0:
-        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_auth_resendCode;
-        if (r0 == 0) goto L_0x025d;
-    L_0x01c4:
-        r0 = r8.text;
-        r1 = "PHONE_NUMBER_INVALID";
-        r0 = r0.contains(r1);
-        if (r0 == 0) goto L_0x01de;
-    L_0x01cf:
-        r0 = "InvalidPhoneNumber";
         r1 = 2131493660; // 0x7f0c031c float:1.8610806E38 double:1.0530977917E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x01de:
-        r0 = r8.text;
-        r1 = "PHONE_CODE_EMPTY";
-        r0 = r0.contains(r1);
-        if (r0 != 0) goto L_0x01f4;
-    L_0x01e9:
-        r0 = r8.text;
-        r1 = "PHONE_CODE_INVALID";
-        r0 = r0.contains(r1);
-        if (r0 == 0) goto L_0x0203;
-    L_0x01f4:
-        r0 = "InvalidCode";
-        r1 = 2131493657; // 0x7f0c0319 float:1.86108E38 double:1.0530977903E-314;
-        r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x0203:
+    L_0x0183:
         r0 = r8.text;
         r1 = "PHONE_CODE_EXPIRED";
         r0 = r0.contains(r1);
-        if (r0 == 0) goto L_0x021a;
-    L_0x020e:
+        if (r0 == 0) goto L_0x019a;
+    L_0x018e:
         r0 = "CodeExpired";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x021a:
+    L_0x019a:
         r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
-        if (r0 == 0) goto L_0x0231;
-    L_0x0225:
+        if (r0 == 0) goto L_0x01b1;
+    L_0x01a5:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x0231:
+    L_0x01b1:
+        r0 = r8.text;
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x01b8:
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_auth_resendCode;
+        if (r0 == 0) goto L_0x0255;
+    L_0x01bc:
+        r0 = r8.text;
+        r1 = "PHONE_NUMBER_INVALID";
+        r0 = r0.contains(r1);
+        if (r0 == 0) goto L_0x01d6;
+    L_0x01c7:
+        r0 = "InvalidPhoneNumber";
+        r1 = 2131493663; // 0x7f0c031f float:1.8610813E38 double:1.053097793E-314;
+        r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x01d6:
+        r0 = r8.text;
+        r1 = "PHONE_CODE_EMPTY";
+        r0 = r0.contains(r1);
+        if (r0 != 0) goto L_0x01ec;
+    L_0x01e1:
+        r0 = r8.text;
+        r1 = "PHONE_CODE_INVALID";
+        r0 = r0.contains(r1);
+        if (r0 == 0) goto L_0x01fb;
+    L_0x01ec:
+        r0 = "InvalidCode";
+        r1 = 2131493660; // 0x7f0c031c float:1.8610806E38 double:1.0530977917E-314;
+        r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x01fb:
+        r0 = r8.text;
+        r1 = "PHONE_CODE_EXPIRED";
+        r0 = r0.contains(r1);
+        if (r0 == 0) goto L_0x0212;
+    L_0x0206:
+        r0 = "CodeExpired";
+        r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x0212:
+        r0 = r8.text;
+        r1 = "FLOOD_WAIT";
+        r0 = r0.startsWith(r1);
+        if (r0 == 0) goto L_0x0229;
+    L_0x021d:
+        r0 = "FloodWait";
+        r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x0229:
         r0 = r8.code;
         r1 = -1000; // 0xfffffffffffffc18 float:NaN double:NaN;
         if (r0 == r1) goto L_0x003e;
-    L_0x0237:
+    L_0x022f:
         r0 = new java.lang.StringBuilder;
         r0.<init>();
         r1 = "ErrorOccurred";
@@ -352,149 +346,149 @@ public class AlertsCreator {
         r0 = r0.toString();
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x025d:
+    L_0x0255:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_sendConfirmPhoneCode;
-        if (r0 == 0) goto L_0x02a0;
-    L_0x0261:
+        if (r0 == 0) goto L_0x0298;
+    L_0x0259:
         r0 = r8.code;
         r1 = 400; // 0x190 float:5.6E-43 double:1.976E-321;
-        if (r0 != r1) goto L_0x0277;
-    L_0x0267:
+        if (r0 != r1) goto L_0x026f;
+    L_0x025f:
         r0 = "CancelLinkExpired";
-        r1 = 2131493114; // 0x7f0c00fa float:1.86097E38 double:1.053097522E-314;
+        r1 = 2131493115; // 0x7f0c00fb float:1.8609701E38 double:1.0530975225E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         r0 = showSimpleAlert(r9, r0);
         goto L_0x0016;
-    L_0x0277:
+    L_0x026f:
         r0 = r8.text;
         if (r0 == 0) goto L_0x003e;
-    L_0x027b:
+    L_0x0273:
         r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
-        if (r0 == 0) goto L_0x0293;
-    L_0x0286:
+        if (r0 == 0) goto L_0x028b;
+    L_0x027e:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
         r0 = showSimpleAlert(r9, r0);
         goto L_0x0016;
-    L_0x0293:
+    L_0x028b:
         r0 = "ErrorOccurred";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r5);
         r0 = showSimpleAlert(r9, r0);
         goto L_0x0016;
-    L_0x02a0:
+    L_0x0298:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_changePhone;
-        if (r0 == 0) goto L_0x0318;
-    L_0x02a4:
+        if (r0 == 0) goto L_0x0310;
+    L_0x029c:
         r0 = r8.text;
         r1 = "PHONE_NUMBER_INVALID";
         r0 = r0.contains(r1);
-        if (r0 == 0) goto L_0x02be;
-    L_0x02af:
+        if (r0 == 0) goto L_0x02b6;
+    L_0x02a7:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131493660; // 0x7f0c031c float:1.8610806E38 double:1.0530977917E-314;
+        r1 = 2131493663; // 0x7f0c031f float:1.8610813E38 double:1.053097793E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x02be:
+    L_0x02b6:
         r0 = r8.text;
         r1 = "PHONE_CODE_EMPTY";
         r0 = r0.contains(r1);
-        if (r0 != 0) goto L_0x02d4;
-    L_0x02c9:
+        if (r0 != 0) goto L_0x02cc;
+    L_0x02c1:
         r0 = r8.text;
         r1 = "PHONE_CODE_INVALID";
         r0 = r0.contains(r1);
-        if (r0 == 0) goto L_0x02e3;
-    L_0x02d4:
+        if (r0 == 0) goto L_0x02db;
+    L_0x02cc:
         r0 = "InvalidCode";
-        r1 = 2131493657; // 0x7f0c0319 float:1.86108E38 double:1.0530977903E-314;
-        r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x02e3:
-        r0 = r8.text;
-        r1 = "PHONE_CODE_EXPIRED";
-        r0 = r0.contains(r1);
-        if (r0 == 0) goto L_0x02fa;
-    L_0x02ee:
-        r0 = "CodeExpired";
-        r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x02fa:
-        r0 = r8.text;
-        r1 = "FLOOD_WAIT";
-        r0 = r0.startsWith(r1);
-        if (r0 == 0) goto L_0x0311;
-    L_0x0305:
-        r0 = "FloodWait";
-        r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x0311:
-        r0 = r8.text;
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x0318:
-        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_sendChangePhoneCode;
-        if (r0 == 0) goto L_0x03b7;
-    L_0x031c:
-        r0 = r8.text;
-        r3 = "PHONE_NUMBER_INVALID";
-        r0 = r0.contains(r3);
-        if (r0 == 0) goto L_0x0336;
-    L_0x0327:
-        r0 = "InvalidPhoneNumber";
         r1 = 2131493660; // 0x7f0c031c float:1.8610806E38 double:1.0530977917E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x0336:
+    L_0x02db:
         r0 = r8.text;
-        r3 = "PHONE_CODE_EMPTY";
-        r0 = r0.contains(r3);
-        if (r0 != 0) goto L_0x034c;
-    L_0x0341:
-        r0 = r8.text;
-        r3 = "PHONE_CODE_INVALID";
-        r0 = r0.contains(r3);
-        if (r0 == 0) goto L_0x035b;
-    L_0x034c:
-        r0 = "InvalidCode";
-        r1 = 2131493657; // 0x7f0c0319 float:1.86108E38 double:1.0530977903E-314;
-        r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
-        showSimpleAlert(r9, r0);
-        goto L_0x003e;
-    L_0x035b:
-        r0 = r8.text;
-        r3 = "PHONE_CODE_EXPIRED";
-        r0 = r0.contains(r3);
-        if (r0 == 0) goto L_0x0372;
-    L_0x0366:
+        r1 = "PHONE_CODE_EXPIRED";
+        r0 = r0.contains(r1);
+        if (r0 == 0) goto L_0x02f2;
+    L_0x02e6:
         r0 = "CodeExpired";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x0372:
+    L_0x02f2:
         r0 = r8.text;
-        r3 = "FLOOD_WAIT";
-        r0 = r0.startsWith(r3);
-        if (r0 == 0) goto L_0x0389;
-    L_0x037d:
+        r1 = "FLOOD_WAIT";
+        r0 = r0.startsWith(r1);
+        if (r0 == 0) goto L_0x0309;
+    L_0x02fd:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x0389:
+    L_0x0309:
+        r0 = r8.text;
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x0310:
+        r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_sendChangePhoneCode;
+        if (r0 == 0) goto L_0x03af;
+    L_0x0314:
+        r0 = r8.text;
+        r3 = "PHONE_NUMBER_INVALID";
+        r0 = r0.contains(r3);
+        if (r0 == 0) goto L_0x032e;
+    L_0x031f:
+        r0 = "InvalidPhoneNumber";
+        r1 = 2131493663; // 0x7f0c031f float:1.8610813E38 double:1.053097793E-314;
+        r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x032e:
+        r0 = r8.text;
+        r3 = "PHONE_CODE_EMPTY";
+        r0 = r0.contains(r3);
+        if (r0 != 0) goto L_0x0344;
+    L_0x0339:
+        r0 = r8.text;
+        r3 = "PHONE_CODE_INVALID";
+        r0 = r0.contains(r3);
+        if (r0 == 0) goto L_0x0353;
+    L_0x0344:
+        r0 = "InvalidCode";
+        r1 = 2131493660; // 0x7f0c031c float:1.8610806E38 double:1.0530977917E-314;
+        r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x0353:
+        r0 = r8.text;
+        r3 = "PHONE_CODE_EXPIRED";
+        r0 = r0.contains(r3);
+        if (r0 == 0) goto L_0x036a;
+    L_0x035e:
+        r0 = "CodeExpired";
+        r0 = org.telegram.messenger.LocaleController.getString(r0, r6);
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x036a:
+        r0 = r8.text;
+        r3 = "FLOOD_WAIT";
+        r0 = r0.startsWith(r3);
+        if (r0 == 0) goto L_0x0381;
+    L_0x0375:
+        r0 = "FloodWait";
+        r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
+        showSimpleAlert(r9, r0);
+        goto L_0x003e;
+    L_0x0381:
         r0 = r8.text;
         r3 = "PHONE_NUMBER_OCCUPIED";
         r0 = r0.startsWith(r3);
-        if (r0 == 0) goto L_0x03ab;
-    L_0x0394:
+        if (r0 == 0) goto L_0x03a3;
+    L_0x038c:
         r3 = "ChangePhoneNumberOccupied";
-        r4 = 2131493124; // 0x7f0c0104 float:1.860972E38 double:1.053097527E-314;
+        r4 = 2131493126; // 0x7f0c0106 float:1.8609723E38 double:1.053097528E-314;
         r2 = new java.lang.Object[r2];
         r0 = r11[r1];
         r0 = (java.lang.String) r0;
@@ -502,77 +496,77 @@ public class AlertsCreator {
         r0 = org.telegram.messenger.LocaleController.formatString(r3, r4, r2);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x03ab:
+    L_0x03a3:
         r0 = "ErrorOccurred";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r5);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x03b7:
+    L_0x03af:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_updateUserName;
-        if (r0 == 0) goto L_0x0408;
-    L_0x03bb:
+        if (r0 == 0) goto L_0x0400;
+    L_0x03b3:
         r3 = r8.text;
         r0 = -1;
         r4 = r3.hashCode();
         switch(r4) {
-            case 288843630: goto L_0x03d5;
-            case 533175271: goto L_0x03df;
-            default: goto L_0x03c5;
+            case 288843630: goto L_0x03cd;
+            case 533175271: goto L_0x03d7;
+            default: goto L_0x03bd;
         };
-    L_0x03c5:
+    L_0x03bd:
         r1 = r0;
-    L_0x03c6:
+    L_0x03be:
         switch(r1) {
-            case 0: goto L_0x03ea;
-            case 1: goto L_0x03f9;
-            default: goto L_0x03c9;
+            case 0: goto L_0x03e2;
+            case 1: goto L_0x03f1;
+            default: goto L_0x03c1;
         };
-    L_0x03c9:
+    L_0x03c1:
         r0 = "ErrorOccurred";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r5);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x03d5:
+    L_0x03cd:
         r2 = "USERNAME_INVALID";
         r2 = r3.equals(r2);
-        if (r2 == 0) goto L_0x03c5;
-    L_0x03de:
-        goto L_0x03c6;
-    L_0x03df:
+        if (r2 == 0) goto L_0x03bd;
+    L_0x03d6:
+        goto L_0x03be;
+    L_0x03d7:
         r1 = "USERNAME_OCCUPIED";
         r1 = r3.equals(r1);
-        if (r1 == 0) goto L_0x03c5;
-    L_0x03e8:
+        if (r1 == 0) goto L_0x03bd;
+    L_0x03e0:
         r1 = r2;
-        goto L_0x03c6;
-    L_0x03ea:
+        goto L_0x03be;
+    L_0x03e2:
         r0 = "UsernameInvalid";
-        r1 = 2131494495; // 0x7f0c065f float:1.86125E38 double:1.0530982043E-314;
+        r1 = 2131494499; // 0x7f0c0663 float:1.8612508E38 double:1.0530982063E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x03f9:
+    L_0x03f1:
         r0 = "UsernameInUse";
-        r1 = 2131494494; // 0x7f0c065e float:1.8612498E38 double:1.053098204E-314;
+        r1 = 2131494498; // 0x7f0c0662 float:1.8612506E38 double:1.053098206E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x0408:
+    L_0x0400:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_contacts_importContacts;
-        if (r0 == 0) goto L_0x044b;
-    L_0x040c:
-        if (r8 == 0) goto L_0x0419;
-    L_0x040e:
+        if (r0 == 0) goto L_0x0443;
+    L_0x0404:
+        if (r8 == 0) goto L_0x0411;
+    L_0x0406:
         r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
-        if (r0 == 0) goto L_0x0425;
-    L_0x0419:
+        if (r0 == 0) goto L_0x041d;
+    L_0x0411:
         r0 = "FloodWait";
         r0 = org.telegram.messenger.LocaleController.getString(r0, r4);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x0425:
+    L_0x041d:
         r0 = new java.lang.StringBuilder;
         r0.<init>();
         r1 = "ErrorOccurred";
@@ -585,105 +579,105 @@ public class AlertsCreator {
         r0 = r0.toString();
         showSimpleAlert(r9, r0);
         goto L_0x003e;
-    L_0x044b:
+    L_0x0443:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_getPassword;
-        if (r0 != 0) goto L_0x0453;
-    L_0x044f:
+        if (r0 != 0) goto L_0x044b;
+    L_0x0447:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_account_getTmpPassword;
-        if (r0 == 0) goto L_0x0470;
-    L_0x0453:
+        if (r0 == 0) goto L_0x0468;
+    L_0x044b:
         r0 = r8.text;
         r1 = "FLOOD_WAIT";
         r0 = r0.startsWith(r1);
-        if (r0 == 0) goto L_0x0469;
-    L_0x045e:
+        if (r0 == 0) goto L_0x0461;
+    L_0x0456:
         r0 = r8.text;
         r0 = getFloodWaitString(r0);
         showSimpleToast(r9, r0);
         goto L_0x003e;
-    L_0x0469:
+    L_0x0461:
         r0 = r8.text;
         showSimpleToast(r9, r0);
         goto L_0x003e;
-    L_0x0470:
+    L_0x0468:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_payments_sendPaymentForm;
-        if (r0 == 0) goto L_0x04bc;
-    L_0x0474:
+        if (r0 == 0) goto L_0x04b4;
+    L_0x046c:
         r3 = r8.text;
         r0 = -1;
         r4 = r3.hashCode();
         switch(r4) {
-            case -1144062453: goto L_0x0489;
-            case -784238410: goto L_0x0493;
-            default: goto L_0x047e;
+            case -1144062453: goto L_0x0481;
+            case -784238410: goto L_0x048b;
+            default: goto L_0x0476;
         };
-    L_0x047e:
+    L_0x0476:
         r1 = r0;
-    L_0x047f:
+    L_0x0477:
         switch(r1) {
-            case 0: goto L_0x049e;
-            case 1: goto L_0x04ad;
-            default: goto L_0x0482;
+            case 0: goto L_0x0496;
+            case 1: goto L_0x04a5;
+            default: goto L_0x047a;
         };
-    L_0x0482:
+    L_0x047a:
         r0 = r8.text;
         showSimpleToast(r9, r0);
         goto L_0x003e;
-    L_0x0489:
+    L_0x0481:
         r2 = "BOT_PRECHECKOUT_FAILED";
         r2 = r3.equals(r2);
-        if (r2 == 0) goto L_0x047e;
-    L_0x0492:
-        goto L_0x047f;
-    L_0x0493:
+        if (r2 == 0) goto L_0x0476;
+    L_0x048a:
+        goto L_0x0477;
+    L_0x048b:
         r1 = "PAYMENT_FAILED";
         r1 = r3.equals(r1);
-        if (r1 == 0) goto L_0x047e;
-    L_0x049c:
+        if (r1 == 0) goto L_0x0476;
+    L_0x0494:
         r1 = r2;
-        goto L_0x047f;
-    L_0x049e:
+        goto L_0x0477;
+    L_0x0496:
         r0 = "PaymentPrecheckoutFailed";
-        r1 = 2131494073; // 0x7f0c04b9 float:1.8611644E38 double:1.053097996E-314;
+        r1 = 2131494076; // 0x7f0c04bc float:1.861165E38 double:1.0530979973E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleToast(r9, r0);
         goto L_0x003e;
-    L_0x04ad:
+    L_0x04a5:
         r0 = "PaymentFailed";
-        r1 = 2131494060; // 0x7f0c04ac float:1.8611618E38 double:1.0530979894E-314;
+        r1 = 2131494063; // 0x7f0c04af float:1.8611624E38 double:1.053097991E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleToast(r9, r0);
         goto L_0x003e;
-    L_0x04bc:
+    L_0x04b4:
         r0 = r10 instanceof org.telegram.tgnet.TLRPC.TL_payments_validateRequestedInfo;
         if (r0 == 0) goto L_0x003e;
-    L_0x04c0:
+    L_0x04b8:
         r2 = r8.text;
         r0 = -1;
         r3 = r2.hashCode();
         switch(r3) {
-            case 1758025548: goto L_0x04d4;
-            default: goto L_0x04ca;
+            case 1758025548: goto L_0x04cc;
+            default: goto L_0x04c2;
         };
-    L_0x04ca:
+    L_0x04c2:
         switch(r0) {
-            case 0: goto L_0x04df;
-            default: goto L_0x04cd;
+            case 0: goto L_0x04d7;
+            default: goto L_0x04c5;
         };
-    L_0x04cd:
+    L_0x04c5:
         r0 = r8.text;
         showSimpleToast(r9, r0);
         goto L_0x003e;
-    L_0x04d4:
+    L_0x04cc:
         r3 = "SHIPPING_NOT_AVAILABLE";
         r2 = r2.equals(r3);
-        if (r2 == 0) goto L_0x04ca;
-    L_0x04dd:
+        if (r2 == 0) goto L_0x04c2;
+    L_0x04d5:
         r0 = r1;
-        goto L_0x04ca;
-    L_0x04df:
+        goto L_0x04c2;
+    L_0x04d7:
         r0 = "PaymentNoShippingMethod";
-        r1 = 2131494062; // 0x7f0c04ae float:1.8611622E38 double:1.0530979903E-314;
+        r1 = 2131494065; // 0x7f0c04b1 float:1.8611628E38 double:1.053097992E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleToast(r9, r0);
         goto L_0x003e;
