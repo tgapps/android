@@ -4944,7 +4944,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                 L_0x0176:
                     r0 = r31;
                     r1 = r38;
-                    if (r0 >= r1) goto L_0x0aa8;
+                    if (r0 >= r1) goto L_0x0aa4;
                 L_0x017c:
                     r0 = r79;
                     r4 = r1;
@@ -5413,26 +5413,26 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     goto L_0x03c9;
                 L_0x0532:
                     r4 = r8.isVideo;
-                    if (r4 == 0) goto L_0x0844;
+                    if (r4 == 0) goto L_0x0840;
                 L_0x0536:
                     r74 = 0;
                     r76 = 0;
                     r0 = r79;
                     r4 = r5;
-                    if (r4 == 0) goto L_0x078a;
+                    if (r4 == 0) goto L_0x0786;
                 L_0x0540:
                     r19 = 0;
                 L_0x0542:
                     r0 = r79;
                     r4 = r5;
-                    if (r4 != 0) goto L_0x0819;
+                    if (r4 != 0) goto L_0x0815;
                 L_0x0548:
                     if (r19 != 0) goto L_0x0555;
                 L_0x054a:
                     r4 = r8.path;
                     r5 = "mp4";
                     r4 = r4.endsWith(r5);
-                    if (r4 == 0) goto L_0x0819;
+                    if (r4 == 0) goto L_0x0815;
                 L_0x0555:
                     r0 = r8.path;
                     r60 = r0;
@@ -5479,7 +5479,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r5 = r4.append(r10);
                     r0 = r19;
                     r4 = r0.muted;
-                    if (r4 == 0) goto L_0x079b;
+                    if (r4 == 0) goto L_0x0797;
                 L_0x05cf:
                     r4 = "_m";
                 L_0x05d2:
@@ -5506,7 +5506,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r4 = r0.startTime;
                     r10 = 0;
                     r4 = (r4 > r10 ? 1 : (r4 == r10 ? 0 : -1));
-                    if (r4 < 0) goto L_0x07a0;
+                    if (r4 < 0) goto L_0x079c;
                 L_0x060c:
                     r0 = r19;
                     r0 = r0.startTime;
@@ -5521,7 +5521,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0 = r79;
                     r4 = r4;
                     r5 = org.telegram.messenger.MessagesStorage.getInstance(r4);
-                    if (r50 != 0) goto L_0x07a4;
+                    if (r50 != 0) goto L_0x07a0;
                 L_0x0624:
                     r4 = 2;
                 L_0x0625:
@@ -5529,7 +5529,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r40 = r5.getSentFile(r0, r4);
                     r40 = (org.telegram.tgnet.TLRPC.TL_document) r40;
                 L_0x062d:
-                    if (r40 != 0) goto L_0x0724;
+                    if (r40 != 0) goto L_0x0720;
                 L_0x062f:
                     r4 = r8.path;
                     r0 = r70;
@@ -5559,7 +5559,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r1.thumb = r0;
                     r0 = r40;
                     r4 = r0.thumb;
-                    if (r4 != 0) goto L_0x07a7;
+                    if (r4 != 0) goto L_0x07a3;
                 L_0x0665:
                     r4 = new org.telegram.tgnet.TLRPC$TL_photoSizeEmpty;
                     r4.<init>();
@@ -5578,11 +5578,11 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r4 = org.telegram.messenger.UserConfig.getInstance(r4);
                     r5 = 0;
                     r4.saveConfig(r5);
-                    if (r50 == 0) goto L_0x07b9;
+                    if (r50 == 0) goto L_0x07b5;
                 L_0x068c:
                     r4 = 66;
                     r0 = r43;
-                    if (r0 < r4) goto L_0x07b2;
+                    if (r0 < r4) goto L_0x07ae;
                 L_0x0692:
                     r32 = new org.telegram.tgnet.TLRPC$TL_documentAttributeVideo;
                     r32.<init>();
@@ -5591,14 +5591,14 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r4 = r0.attributes;
                     r0 = r32;
                     r4.add(r0);
-                    if (r19 == 0) goto L_0x0800;
+                    if (r19 == 0) goto L_0x07fc;
                 L_0x06a2:
                     r4 = r19.needConvert();
-                    if (r4 == 0) goto L_0x0800;
+                    if (r4 == 0) goto L_0x07fc;
                 L_0x06a8:
                     r0 = r19;
                     r4 = r0.muted;
-                    if (r4 == 0) goto L_0x07c0;
+                    if (r4 == 0) goto L_0x07bc;
                 L_0x06ae:
                     r0 = r40;
                     r4 = r0.attributes;
@@ -5635,14 +5635,11 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r4.<init>();
                     r5 = "-2147483648_";
                     r4 = r4.append(r5);
-                    r5 = org.telegram.messenger.SharedConfig.lastLocalId;
+                    r5 = org.telegram.messenger.SharedConfig.getLastLocalId();
                     r4 = r4.append(r5);
                     r5 = ".mp4";
                     r4 = r4.append(r5);
                     r45 = r4.toString();
-                    r4 = org.telegram.messenger.SharedConfig.lastLocalId;
-                    r4 = r4 + -1;
-                    org.telegram.messenger.SharedConfig.lastLocalId = r4;
                     r37 = new java.io.File;
                     r4 = 4;
                     r4 = org.telegram.messenger.FileLoader.getDirectory(r4);
@@ -5651,7 +5648,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0.<init>(r4, r1);
                     org.telegram.messenger.SharedConfig.saveConfig();
                     r60 = r37.getAbsolutePath();
-                L_0x0724:
+                L_0x0720:
                     r18 = r40;
                     r59 = r58;
                     r20 = r60;
@@ -5659,18 +5656,18 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r9.<init>();
                     r16 = r74;
                     r17 = r76;
-                    if (r58 == 0) goto L_0x073d;
-                L_0x0735:
+                    if (r58 == 0) goto L_0x0739;
+                L_0x0731:
                     r4 = "originalPath";
                     r0 = r58;
                     r9.put(r4, r0);
-                L_0x073d:
-                    if (r56 != 0) goto L_0x077a;
-                L_0x073f:
+                L_0x0739:
+                    if (r56 != 0) goto L_0x0776;
+                L_0x073b:
                     r0 = r79;
                     r4 = r6;
-                    if (r4 == 0) goto L_0x077a;
-                L_0x0745:
+                    if (r4 == 0) goto L_0x0776;
+                L_0x0741:
                     r63 = r63 + 1;
                     r4 = "groupId";
                     r5 = new java.lang.StringBuilder;
@@ -5683,17 +5680,17 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r9.put(r4, r5);
                     r4 = 10;
                     r0 = r63;
-                    if (r0 == r4) goto L_0x076f;
-                L_0x0769:
+                    if (r0 == r4) goto L_0x076b;
+                L_0x0765:
                     r4 = r38 + -1;
                     r0 = r31;
-                    if (r0 != r4) goto L_0x077a;
-                L_0x076f:
+                    if (r0 != r4) goto L_0x0776;
+                L_0x076b:
                     r4 = "final";
                     r5 = "1";
                     r9.put(r4, r5);
                     r52 = 0;
-                L_0x077a:
+                L_0x0776:
                     r14 = new org.telegram.messenger.SendMessagesHelper$19$4;
                     r15 = r79;
                     r21 = r8;
@@ -5701,42 +5698,42 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r14.<init>(r16, r17, r18, r19, r20, r21, r22);
                     org.telegram.messenger.AndroidUtilities.runOnUIThread(r14);
                     goto L_0x0325;
-                L_0x078a:
+                L_0x0786:
                     r4 = r8.videoEditedInfo;
-                    if (r4 == 0) goto L_0x0794;
-                L_0x078e:
+                    if (r4 == 0) goto L_0x0790;
+                L_0x078a:
                     r0 = r8.videoEditedInfo;
                     r19 = r0;
-                L_0x0792:
+                L_0x078e:
                     goto L_0x0542;
-                L_0x0794:
+                L_0x0790:
                     r4 = r8.path;
                     r19 = org.telegram.messenger.SendMessagesHelper.createCompressionSettings(r4);
-                    goto L_0x0792;
-                L_0x079b:
+                    goto L_0x078e;
+                L_0x0797:
                     r4 = "";
                     goto L_0x05d2;
-                L_0x07a0:
+                L_0x079c:
                     r70 = 0;
                     goto L_0x0612;
-                L_0x07a4:
+                L_0x07a0:
                     r4 = 5;
                     goto L_0x0625;
-                L_0x07a7:
+                L_0x07a3:
                     r0 = r40;
                     r4 = r0.thumb;
                     r5 = "s";
                     r4.type = r5;
                     goto L_0x0677;
-                L_0x07b2:
+                L_0x07ae:
                     r32 = new org.telegram.tgnet.TLRPC$TL_documentAttributeVideo_layer65;
                     r32.<init>();
                     goto L_0x0697;
-                L_0x07b9:
+                L_0x07b5:
                     r32 = new org.telegram.tgnet.TLRPC$TL_documentAttributeVideo;
                     r32.<init>();
                     goto L_0x0697;
-                L_0x07c0:
+                L_0x07bc:
                     r0 = r19;
                     r4 = r0.estimatedDuration;
                     r10 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
@@ -5747,13 +5744,13 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0 = r19;
                     r4 = r0.rotationValue;
                     r5 = 90;
-                    if (r4 == r5) goto L_0x07dc;
-                L_0x07d4:
+                    if (r4 == r5) goto L_0x07d8;
+                L_0x07d0:
                     r0 = r19;
                     r4 = r0.rotationValue;
                     r5 = 270; // 0x10e float:3.78E-43 double:1.334E-321;
-                    if (r4 != r5) goto L_0x07ee;
-                L_0x07dc:
+                    if (r4 != r5) goto L_0x07ea;
+                L_0x07d8:
                     r0 = r19;
                     r4 = r0.resultHeight;
                     r0 = r32;
@@ -5763,7 +5760,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0 = r32;
                     r0.h = r4;
                     goto L_0x06e3;
-                L_0x07ee:
+                L_0x07ea:
                     r0 = r19;
                     r4 = r0.resultWidth;
                     r0 = r32;
@@ -5773,21 +5770,21 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0 = r32;
                     r0.h = r4;
                     goto L_0x06e3;
-                L_0x0800:
+                L_0x07fc:
                     r4 = r72.exists();
-                    if (r4 == 0) goto L_0x080f;
-                L_0x0806:
+                    if (r4 == 0) goto L_0x080b;
+                L_0x0802:
                     r4 = r72.length();
                     r4 = (int) r4;
                     r0 = r40;
                     r0.size = r4;
-                L_0x080f:
+                L_0x080b:
                     r4 = r8.path;
                     r5 = 0;
                     r0 = r32;
                     org.telegram.messenger.SendMessagesHelper.fillVideoAttribute(r4, r0, r5);
-                    goto L_0x0724;
-                L_0x0819:
+                    goto L_0x0720;
+                L_0x0815:
                     r0 = r79;
                     r0 = r4;
                     r21 = r0;
@@ -5809,36 +5806,36 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r30 = r0;
                     org.telegram.messenger.SendMessagesHelper.prepareSendingDocumentInternal(r21, r22, r23, r24, r25, r26, r28, r29, r30);
                     goto L_0x0325;
-                L_0x0844:
+                L_0x0840:
                     r0 = r8.path;
                     r58 = r0;
                     r0 = r8.path;
                     r73 = r0;
-                    if (r73 != 0) goto L_0x085e;
-                L_0x084e:
+                    if (r73 != 0) goto L_0x085a;
+                L_0x084a:
                     r4 = r8.uri;
-                    if (r4 == 0) goto L_0x085e;
-                L_0x0852:
+                    if (r4 == 0) goto L_0x085a;
+                L_0x084e:
                     r4 = r8.uri;
                     r73 = org.telegram.messenger.AndroidUtilities.getPath(r4);
                     r4 = r8.uri;
                     r58 = r4.toString();
-                L_0x085e:
+                L_0x085a:
                     r49 = 0;
                     r0 = r79;
                     r4 = r5;
-                    if (r4 == 0) goto L_0x08a9;
-                L_0x0866:
+                    if (r4 == 0) goto L_0x08a5;
+                L_0x0862:
                     r49 = 1;
                     r4 = new java.io.File;
                     r0 = r73;
                     r4.<init>(r0);
                     r44 = org.telegram.messenger.FileLoader.getFileExtension(r4);
+                L_0x086f:
+                    if (r49 == 0) goto L_0x0914;
+                L_0x0871:
+                    if (r64 != 0) goto L_0x0887;
                 L_0x0873:
-                    if (r49 == 0) goto L_0x0918;
-                L_0x0875:
-                    if (r64 != 0) goto L_0x088b;
-                L_0x0877:
                     r64 = new java.util.ArrayList;
                     r64.<init>();
                     r67 = new java.util.ArrayList;
@@ -5847,7 +5844,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r65.<init>();
                     r66 = new java.util.ArrayList;
                     r66.<init>();
-                L_0x088b:
+                L_0x0887:
                     r0 = r64;
                     r1 = r73;
                     r0.add(r1);
@@ -5861,41 +5858,41 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0 = r66;
                     r0.add(r4);
                     goto L_0x0325;
-                L_0x08a9:
-                    if (r73 == 0) goto L_0x08d6;
-                L_0x08ab:
+                L_0x08a5:
+                    if (r73 == 0) goto L_0x08d2;
+                L_0x08a7:
                     r4 = ".gif";
                     r0 = r73;
                     r4 = r0.endsWith(r4);
-                    if (r4 != 0) goto L_0x08c1;
-                L_0x08b6:
+                    if (r4 != 0) goto L_0x08bd;
+                L_0x08b2:
                     r4 = ".webp";
                     r0 = r73;
                     r4 = r0.endsWith(r4);
-                    if (r4 == 0) goto L_0x08d6;
-                L_0x08c1:
+                    if (r4 == 0) goto L_0x08d2;
+                L_0x08bd:
                     r4 = ".gif";
                     r0 = r73;
                     r4 = r0.endsWith(r4);
-                    if (r4 == 0) goto L_0x08d2;
-                L_0x08cc:
+                    if (r4 == 0) goto L_0x08ce;
+                L_0x08c8:
                     r44 = "gif";
-                L_0x08cf:
+                L_0x08cb:
                     r49 = 1;
-                    goto L_0x0873;
-                L_0x08d2:
+                    goto L_0x086f;
+                L_0x08ce:
                     r44 = "webp";
-                    goto L_0x08cf;
-                L_0x08d6:
-                    if (r73 != 0) goto L_0x0873;
+                    goto L_0x08cb;
+                L_0x08d2:
+                    if (r73 != 0) goto L_0x086f;
+                L_0x08d4:
+                    r4 = r8.uri;
+                    if (r4 == 0) goto L_0x086f;
                 L_0x08d8:
                     r4 = r8.uri;
-                    if (r4 == 0) goto L_0x0873;
-                L_0x08dc:
-                    r4 = r8.uri;
                     r4 = org.telegram.messenger.MediaController.isGif(r4);
-                    if (r4 == 0) goto L_0x08fa;
-                L_0x08e4:
+                    if (r4 == 0) goto L_0x08f6;
+                L_0x08e0:
                     r49 = 1;
                     r4 = r8.uri;
                     r58 = r4.toString();
@@ -5903,12 +5900,12 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r5 = "gif";
                     r73 = org.telegram.messenger.MediaController.copyFileToCache(r4, r5);
                     r44 = "gif";
-                    goto L_0x0873;
-                L_0x08fa:
+                    goto L_0x086f;
+                L_0x08f6:
                     r4 = r8.uri;
                     r4 = org.telegram.messenger.MediaController.isWebp(r4);
-                    if (r4 == 0) goto L_0x0873;
-                L_0x0902:
+                    if (r4 == 0) goto L_0x086f;
+                L_0x08fe:
                     r49 = 1;
                     r4 = r8.uri;
                     r58 = r4.toString();
@@ -5916,10 +5913,10 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r5 = "webp";
                     r73 = org.telegram.messenger.MediaController.copyFileToCache(r4, r5);
                     r44 = "webp";
-                    goto L_0x0873;
-                L_0x0918:
-                    if (r73 == 0) goto L_0x09bc;
-                L_0x091a:
+                    goto L_0x086f;
+                L_0x0914:
+                    if (r73 == 0) goto L_0x09b8;
+                L_0x0916:
                     r72 = new java.io.File;
                     r72.<init>(r73);
                     r4 = new java.lang.StringBuilder;
@@ -5933,44 +5930,44 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r10 = r72.lastModified();
                     r4 = r4.append(r10);
                     r58 = r4.toString();
-                L_0x0945:
+                L_0x0941:
                     r61 = 0;
-                    if (r78 == 0) goto L_0x09c4;
-                L_0x0949:
+                    if (r78 == 0) goto L_0x09c0;
+                L_0x0945:
                     r0 = r78;
                     r77 = r0.get(r8);
                     r77 = (org.telegram.messenger.SendMessagesHelper.MediaSendPrepareWorker) r77;
                     r0 = r77;
                     r0 = r0.photo;
                     r61 = r0;
-                    if (r61 != 0) goto L_0x0966;
-                L_0x0959:
+                    if (r61 != 0) goto L_0x0962;
+                L_0x0955:
                     r0 = r77;
-                    r4 = r0.sync;	 Catch:{ Exception -> 0x09bf }
-                    r4.await();	 Catch:{ Exception -> 0x09bf }
-                L_0x0960:
+                    r4 = r0.sync;	 Catch:{ Exception -> 0x09bb }
+                    r4.await();	 Catch:{ Exception -> 0x09bb }
+                L_0x095c:
                     r0 = r77;
                     r0 = r0.photo;
                     r61 = r0;
-                L_0x0966:
-                    if (r61 == 0) goto L_0x0a74;
-                L_0x0968:
+                L_0x0962:
+                    if (r61 == 0) goto L_0x0a70;
+                L_0x0964:
                     r12 = r61;
                     r9 = new java.util.HashMap;
                     r9.<init>();
                     r4 = r8.masks;
-                    if (r4 == 0) goto L_0x0a12;
-                L_0x0973:
+                    if (r4 == 0) goto L_0x0a0e;
+                L_0x096f:
                     r4 = r8.masks;
                     r4 = r4.isEmpty();
-                    if (r4 != 0) goto L_0x0a12;
-                L_0x097b:
+                    if (r4 != 0) goto L_0x0a0e;
+                L_0x0977:
                     r4 = 1;
-                L_0x097c:
+                L_0x0978:
                     r0 = r61;
                     r0.has_stickers = r4;
-                    if (r4 == 0) goto L_0x0a23;
-                L_0x0982:
+                    if (r4 == 0) goto L_0x0a1f;
+                L_0x097e:
                     r68 = new org.telegram.tgnet.SerializedData;
                     r4 = r8.masks;
                     r4 = r4.size();
@@ -5983,12 +5980,12 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0 = r68;
                     r0.writeInt32(r4);
                     r33 = 0;
-                L_0x09a0:
+                L_0x099c:
                     r4 = r8.masks;
                     r4 = r4.size();
                     r0 = r33;
-                    if (r0 >= r4) goto L_0x0a15;
-                L_0x09aa:
+                    if (r0 >= r4) goto L_0x0a11;
+                L_0x09a6:
                     r4 = r8.masks;
                     r0 = r33;
                     r4 = r4.get(r0);
@@ -5996,81 +5993,81 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0 = r68;
                     r4.serializeToStream(r0);
                     r33 = r33 + 1;
-                    goto L_0x09a0;
-                L_0x09bc:
+                    goto L_0x099c;
+                L_0x09b8:
                     r58 = 0;
-                    goto L_0x0945;
-                L_0x09bf:
+                    goto L_0x0941;
+                L_0x09bb:
                     r41 = move-exception;
                     org.telegram.messenger.FileLog.e(r41);
-                    goto L_0x0960;
-                L_0x09c4:
-                    if (r50 != 0) goto L_0x09fa;
-                L_0x09c6:
+                    goto L_0x095c;
+                L_0x09c0:
+                    if (r50 != 0) goto L_0x09f6;
+                L_0x09c2:
                     r4 = r8.ttl;
-                    if (r4 != 0) goto L_0x09fa;
-                L_0x09ca:
+                    if (r4 != 0) goto L_0x09f6;
+                L_0x09c6:
                     r0 = r79;
                     r4 = r4;
                     r5 = org.telegram.messenger.MessagesStorage.getInstance(r4);
-                    if (r50 != 0) goto L_0x0a0e;
-                L_0x09d4:
+                    if (r50 != 0) goto L_0x0a0a;
+                L_0x09d0:
                     r4 = 0;
-                L_0x09d5:
+                L_0x09d1:
                     r0 = r58;
                     r61 = r5.getSentFile(r0, r4);
                     r61 = (org.telegram.tgnet.TLRPC.TL_photo) r61;
-                    if (r61 != 0) goto L_0x09fa;
-                L_0x09df:
+                    if (r61 != 0) goto L_0x09f6;
+                L_0x09db:
                     r4 = r8.uri;
-                    if (r4 == 0) goto L_0x09fa;
-                L_0x09e3:
+                    if (r4 == 0) goto L_0x09f6;
+                L_0x09df:
                     r0 = r79;
                     r4 = r4;
                     r5 = org.telegram.messenger.MessagesStorage.getInstance(r4);
                     r4 = r8.uri;
                     r10 = org.telegram.messenger.AndroidUtilities.getPath(r4);
-                    if (r50 != 0) goto L_0x0a10;
-                L_0x09f3:
+                    if (r50 != 0) goto L_0x0a0c;
+                L_0x09ef:
                     r4 = 0;
-                L_0x09f4:
+                L_0x09f0:
                     r61 = r5.getSentFile(r10, r4);
                     r61 = (org.telegram.tgnet.TLRPC.TL_photo) r61;
-                L_0x09fa:
-                    if (r61 != 0) goto L_0x0966;
-                L_0x09fc:
+                L_0x09f6:
+                    if (r61 != 0) goto L_0x0962;
+                L_0x09f8:
                     r0 = r79;
                     r4 = r4;
                     r4 = org.telegram.messenger.SendMessagesHelper.getInstance(r4);
                     r5 = r8.path;
                     r10 = r8.uri;
                     r61 = r4.generatePhotoSizes(r5, r10);
-                    goto L_0x0966;
+                    goto L_0x0962;
+                L_0x0a0a:
+                    r4 = 3;
+                    goto L_0x09d1;
+                L_0x0a0c:
+                    r4 = 3;
+                    goto L_0x09f0;
                 L_0x0a0e:
-                    r4 = 3;
-                    goto L_0x09d5;
-                L_0x0a10:
-                    r4 = 3;
-                    goto L_0x09f4;
-                L_0x0a12:
                     r4 = 0;
-                    goto L_0x097c;
-                L_0x0a15:
+                    goto L_0x0978;
+                L_0x0a11:
                     r4 = "masks";
                     r5 = r68.toByteArray();
                     r5 = org.telegram.messenger.Utilities.bytesToHex(r5);
                     r9.put(r4, r5);
-                L_0x0a23:
-                    if (r58 == 0) goto L_0x0a2d;
-                L_0x0a25:
+                L_0x0a1f:
+                    if (r58 == 0) goto L_0x0a29;
+                L_0x0a21:
                     r4 = "originalPath";
                     r0 = r58;
                     r9.put(r4, r0);
-                L_0x0a2d:
+                L_0x0a29:
                     r0 = r79;
                     r4 = r6;
-                    if (r4 == 0) goto L_0x0a68;
-                L_0x0a33:
+                    if (r4 == 0) goto L_0x0a64;
+                L_0x0a2f:
                     r63 = r63 + 1;
                     r4 = "groupId";
                     r5 = new java.lang.StringBuilder;
@@ -6083,25 +6080,25 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r9.put(r4, r5);
                     r4 = 10;
                     r0 = r63;
-                    if (r0 == r4) goto L_0x0a5d;
-                L_0x0a57:
+                    if (r0 == r4) goto L_0x0a59;
+                L_0x0a53:
                     r4 = r38 + -1;
                     r0 = r31;
-                    if (r0 != r4) goto L_0x0a68;
-                L_0x0a5d:
+                    if (r0 != r4) goto L_0x0a64;
+                L_0x0a59:
                     r4 = "final";
                     r5 = "1";
                     r9.put(r4, r5);
                     r52 = 0;
-                L_0x0a68:
+                L_0x0a64:
                     r4 = new org.telegram.messenger.SendMessagesHelper$19$5;
                     r0 = r79;
                     r4.<init>(r12, r8, r9);
                     org.telegram.messenger.AndroidUtilities.runOnUIThread(r4);
                     goto L_0x0325;
-                L_0x0a74:
-                    if (r64 != 0) goto L_0x0a8a;
-                L_0x0a76:
+                L_0x0a70:
+                    if (r64 != 0) goto L_0x0a86;
+                L_0x0a72:
                     r64 = new java.util.ArrayList;
                     r64.<init>();
                     r67 = new java.util.ArrayList;
@@ -6110,7 +6107,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r65.<init>();
                     r66 = new java.util.ArrayList;
                     r66.<init>();
-                L_0x0a8a:
+                L_0x0a86:
                     r0 = r64;
                     r1 = r73;
                     r0.add(r1);
@@ -6124,37 +6121,37 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0 = r66;
                     r0.add(r4);
                     goto L_0x0325;
-                L_0x0aa8:
+                L_0x0aa4:
                     r4 = 0;
                     r4 = (r52 > r4 ? 1 : (r52 == r4 ? 0 : -1));
-                    if (r4 == 0) goto L_0x0abc;
-                L_0x0aae:
+                    if (r4 == 0) goto L_0x0ab8;
+                L_0x0aaa:
                     r54 = r52;
                     r4 = new org.telegram.messenger.SendMessagesHelper$19$6;
                     r0 = r79;
                     r1 = r54;
                     r4.<init>(r1);
                     org.telegram.messenger.AndroidUtilities.runOnUIThread(r4);
-                L_0x0abc:
+                L_0x0ab8:
                     r0 = r79;
                     r4 = r8;
-                    if (r4 == 0) goto L_0x0ac9;
-                L_0x0ac2:
+                    if (r4 == 0) goto L_0x0ac5;
+                L_0x0abe:
                     r0 = r79;
                     r4 = r8;
                     r4.releasePermission();
-                L_0x0ac9:
-                    if (r64 == 0) goto L_0x0b1f;
-                L_0x0acb:
+                L_0x0ac5:
+                    if (r64 == 0) goto L_0x0b1b;
+                L_0x0ac7:
                     r4 = r64.isEmpty();
-                    if (r4 != 0) goto L_0x0b1f;
-                L_0x0ad1:
+                    if (r4 != 0) goto L_0x0b1b;
+                L_0x0acd:
                     r31 = 0;
-                L_0x0ad3:
+                L_0x0acf:
                     r4 = r64.size();
                     r0 = r31;
-                    if (r0 >= r4) goto L_0x0b1f;
-                L_0x0adb:
+                    if (r0 >= r4) goto L_0x0b1b;
+                L_0x0ad7:
                     r0 = r79;
                     r0 = r4;
                     r21 = r0;
@@ -6184,11 +6181,11 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r25 = r44;
                     org.telegram.messenger.SendMessagesHelper.prepareSendingDocumentInternal(r21, r22, r23, r24, r25, r26, r28, r29, r30);
                     r31 = r31 + 1;
-                    goto L_0x0ad3;
-                L_0x0b1f:
+                    goto L_0x0acf;
+                L_0x0b1b:
                     r4 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
-                    if (r4 == 0) goto L_0x0b40;
-                L_0x0b23:
+                    if (r4 == 0) goto L_0x0b3c;
+                L_0x0b1f:
                     r4 = new java.lang.StringBuilder;
                     r4.<init>();
                     r5 = "total send time = ";
@@ -6198,7 +6195,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r4 = r4.append(r10);
                     r4 = r4.toString();
                     org.telegram.messenger.FileLog.d(r4);
-                L_0x0b40:
+                L_0x0b3c:
                     return;
                     */
                     throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.SendMessagesHelper.19.run():void");
@@ -6665,9 +6662,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                                     }
                                 }
                                 tL_document.size = (int) j3;
-                                String fileName = "-2147483648_" + SharedConfig.lastLocalId + ".mp4";
-                                SharedConfig.lastLocalId--;
-                                file = new File(FileLoader.getDirectory(4), fileName);
+                                file = new File(FileLoader.getDirectory(4), "-2147483648_" + SharedConfig.getLastLocalId() + ".mp4");
                                 SharedConfig.saveConfig();
                                 path = file.getAbsolutePath();
                             }

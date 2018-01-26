@@ -578,7 +578,10 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                     float left = this.captionLayout.getLineLeft(line);
                     if (left <= ((float) x) && this.captionLayout.getLineWidth(line) + left >= ((float) x)) {
                         Spannable buffer = this.currentCaption;
-                        ClickableSpan[] link = (ClickableSpan[]) buffer.getSpans(off, off, ClickableSpan.class);
+                        CharacterStyle[] link = (CharacterStyle[]) buffer.getSpans(off, off, ClickableSpan.class);
+                        if (link == null || link.length == 0) {
+                            link = (CharacterStyle[]) buffer.getSpans(off, off, URLSpanMono.class);
+                        }
                         boolean ignore = false;
                         if (link.length == 0 || !(link.length == 0 || !(link[0] instanceof URLSpanBotCommand) || URLSpanBotCommand.enabled)) {
                             ignore = true;
