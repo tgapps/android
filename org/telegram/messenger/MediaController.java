@@ -2562,7 +2562,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                     this.audioPlayer.preparePlayer(Uri.fromFile(cacheFile), "other");
                 } else {
                     Document document = messageObject.getDocument();
-                    this.audioPlayer.preparePlayer(Uri.parse("tg://" + messageObject.getFileName() + ("?id=" + document.id + "&hash=" + document.access_hash + "&dc=" + document.dc_id + "&size=" + document.size + "&mime=" + URLEncoder.encode(document.mime_type, C.UTF8_NAME) + "&name=" + URLEncoder.encode(FileLoader.getDocumentFileName(document), C.UTF8_NAME))), "other");
+                    this.audioPlayer.preparePlayer(Uri.parse("tg://" + messageObject.getFileName() + ("?account=" + messageObject.currentAccount + "&id=" + document.id + "&hash=" + document.access_hash + "&dc=" + document.dc_id + "&size=" + document.size + "&mime=" + URLEncoder.encode(document.mime_type, C.UTF8_NAME) + "&name=" + URLEncoder.encode(FileLoader.getDocumentFileName(document), C.UTF8_NAME))), "other");
                 }
                 this.audioPlayer.play();
                 if (messageObject.isVoice()) {
@@ -3372,16 +3372,35 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
         InputStream inputStream = null;
         FileOutputStream fileOutputStream = null;
         try {
-            String name = getFileName(uri);
+            String name = FileLoader.fixFileName(getFileName(uri));
             if (name == null) {
                 int id = SharedConfig.getLastLocalId();
                 SharedConfig.saveConfig();
                 name = String.format(Locale.US, "%d.%s", new Object[]{Integer.valueOf(id), ext});
             }
-            inputStream = ApplicationLoader.applicationContext.getContentResolver().openInputStream(uri);
             File f = new File(FileLoader.getDirectory(4), "sharing/");
             f.mkdirs();
             File f2 = new File(f, name);
+            if (AndroidUtilities.isInternalUri(Uri.fromFile(f2))) {
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (Throwable e2) {
+                        FileLog.e(e2);
+                    }
+                }
+                if (fileOutputStream == null) {
+                    return null;
+                }
+                try {
+                    fileOutputStream.close();
+                    return null;
+                } catch (Throwable e22) {
+                    FileLog.e(e22);
+                    return null;
+                }
+            }
+            inputStream = ApplicationLoader.applicationContext.getContentResolver().openInputStream(uri);
             FileOutputStream output = new FileOutputStream(f2);
             try {
                 byte[] buffer = new byte[CacheDataSink.DEFAULT_BUFFER_SIZE];
@@ -3396,15 +3415,15 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 if (inputStream != null) {
                     try {
                         inputStream.close();
-                    } catch (Throwable e2) {
-                        FileLog.e(e2);
+                    } catch (Throwable e222) {
+                        FileLog.e(e222);
                     }
                 }
                 if (output != null) {
                     try {
                         output.close();
-                    } catch (Throwable e22) {
-                        FileLog.e(e22);
+                    } catch (Throwable e2222) {
+                        FileLog.e(e2222);
                     }
                 }
                 fileOutputStream = output;
@@ -3417,23 +3436,6 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                     if (inputStream != null) {
                         try {
                             inputStream.close();
-                        } catch (Throwable e222) {
-                            FileLog.e(e222);
-                        }
-                    }
-                    if (fileOutputStream != null) {
-                        try {
-                            fileOutputStream.close();
-                        } catch (Throwable e2222) {
-                            FileLog.e(e2222);
-                        }
-                    }
-                    return null;
-                } catch (Throwable th2) {
-                    th = th2;
-                    if (inputStream != null) {
-                        try {
-                            inputStream.close();
                         } catch (Throwable e22222) {
                             FileLog.e(e22222);
                         }
@@ -3443,6 +3445,23 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                             fileOutputStream.close();
                         } catch (Throwable e222222) {
                             FileLog.e(e222222);
+                        }
+                    }
+                    return null;
+                } catch (Throwable th2) {
+                    th = th2;
+                    if (inputStream != null) {
+                        try {
+                            inputStream.close();
+                        } catch (Throwable e2222222) {
+                            FileLog.e(e2222222);
+                        }
+                    }
+                    if (fileOutputStream != null) {
+                        try {
+                            fileOutputStream.close();
+                        } catch (Throwable e22222222) {
+                            FileLog.e(e22222222);
                         }
                     }
                     throw th;
@@ -3474,7 +3493,6 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     public static void loadGalleryPhotosAlbums(final int guid) {
         Thread thread = new Thread(new Runnable() {
             public void run() {
-                Throwable e;
                 int imageIdColumn;
                 int bucketIdColumn;
                 int bucketNameColumn;
@@ -3503,7 +3521,8 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 String cameraFolder = null;
                 try {
                     cameraFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/Camera/";
-                } catch (Throwable e2) {
+                } catch (Throwable e) {
+                    Throwable e2;
                     FileLog.e(e2);
                 }
                 Integer num = null;

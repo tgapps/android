@@ -994,7 +994,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
                             args2 = args[a].split("=");
                             if (args2.length == 2) {
                                 try {
-                                    String[] args3 = URLDecoder.decode(args2[1], C.UTF8_NAME).split("&");
+                                    String[] args3 = URLDecoder.decode(args2[1], C.UTF8_NAME).split("[&,]");
                                     String currentUrl = null;
                                     boolean isMp4 = false;
                                     for (String split : args3) {
@@ -1171,6 +1171,9 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
 
         protected void onPostExecute(String[] result) {
             if (result[0] != null) {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("start play youtube video " + result[1] + " " + result[0]);
+                }
                 WebPlayerView.this.initied = true;
                 WebPlayerView.this.playVideoUrl = result[0];
                 WebPlayerView.this.playVideoType = result[1];

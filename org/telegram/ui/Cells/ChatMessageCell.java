@@ -58,7 +58,6 @@ import org.telegram.messenger.beta.R;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
-import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.TLRPC.Chat;
 import org.telegram.tgnet.TLRPC.Document;
 import org.telegram.tgnet.TLRPC.DocumentAttribute;
@@ -10332,6 +10331,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         int linkPreviewY;
         int x;
         int y;
+        float progress;
         int x1;
         int y1;
         RadialProgress radialProgress;
@@ -10690,7 +10690,6 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
             Theme.chat_photoStatesDrawables[drawable][this.buttonPressed].draw(canvas);
             if (this.currentMessageObject.messageOwner.destroyTime != 0) {
                 if (!this.currentMessageObject.isOutOwner()) {
-                    float progress;
                     progress = ((float) Math.max(0, (((long) this.currentMessageObject.messageOwner.destroyTime) * 1000) - (System.currentTimeMillis() + ((long) (ConnectionsManager.getInstance(this.currentAccount).getTimeDifference() * 1000))))) / (((float) this.currentMessageObject.messageOwner.ttl) * 1000.0f);
                     Theme.chat_deleteProgressPaint.setAlpha((int) (255.0f * this.controlsAlpha));
                     canvas.drawArc(this.deleteProgressRect, -90.0f, -360.0f * progress, true, Theme.chat_deleteProgressPaint);
@@ -11831,7 +11830,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (this.currentMessageObject.isFromUser()) {
             author = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.messageOwner.from_id));
         }
-        if (messageObject.isLiveLocation() || messageObject.messageOwner.via_bot_id != 0 || messageObject.messageOwner.via_bot_name != null || ((author != null && author.bot) || (messageObject.messageOwner.flags & TLRPC.MESSAGE_FLAG_EDITED) == 0 || this.currentPosition != null)) {
+        if (messageObject.isLiveLocation() || messageObject.messageOwner.via_bot_id != 0 || messageObject.messageOwner.via_bot_name != null || ((author != null && author.bot) || (messageObject.messageOwner.flags & 32768) == 0 || this.currentPosition != null)) {
             timeString = LocaleController.getInstance().formatterDay.format(((long) messageObject.messageOwner.date) * 1000);
         } else {
             timeString = LocaleController.getString("EditedMessage", R.string.EditedMessage) + " " + LocaleController.getInstance().formatterDay.format(((long) messageObject.messageOwner.date) * 1000);
