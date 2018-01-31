@@ -878,7 +878,21 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         int y = (int) event.getY();
         boolean result = false;
         if (event.getAction() == 0) {
-            if (this.buttonState != -1 && x >= this.buttonX && x <= this.buttonX + AndroidUtilities.dp(48.0f) && y >= this.buttonY && y <= this.buttonY + AndroidUtilities.dp(48.0f)) {
+            boolean area2 = false;
+            int side = AndroidUtilities.dp(48.0f);
+            if (this.miniButtonState >= 0) {
+                int offset = AndroidUtilities.dp(27.0f);
+                if (x < this.buttonX + offset || x > (this.buttonX + offset) + side || y < this.buttonY + offset || y > (this.buttonY + offset) + side) {
+                    area2 = false;
+                } else {
+                    area2 = true;
+                }
+            }
+            if (area2) {
+                this.miniButtonPressed = 1;
+                invalidate();
+                result = true;
+            } else if (this.buttonState != -1 && x >= this.buttonX && x <= this.buttonX + side && y >= this.buttonY && y <= this.buttonY + side) {
                 this.buttonPressed = 1;
                 invalidate();
                 result = true;
@@ -897,34 +911,31 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                     result = false;
                 }
             }
-            if (!this.imagePressed) {
-                return result;
+            if (this.imagePressed) {
+                if (this.currentMessageObject.isSendError()) {
+                    this.imagePressed = false;
+                    result = false;
+                } else if (this.currentMessageObject.type == 8 && this.buttonState == -1 && SharedConfig.autoplayGifs && this.photoImage.getAnimation() == null) {
+                    this.imagePressed = false;
+                    result = false;
+                } else if (this.currentMessageObject.type == 5 && this.buttonState != -1) {
+                    this.imagePressed = false;
+                    result = false;
+                }
             }
-            if (this.currentMessageObject.isSendError()) {
-                this.imagePressed = false;
-                return false;
-            } else if (this.currentMessageObject.type == 8 && this.buttonState == -1 && SharedConfig.autoplayGifs && this.photoImage.getAnimation() == null) {
-                this.imagePressed = false;
-                return false;
-            } else if (this.currentMessageObject.type != 5 || this.buttonState == -1) {
-                return result;
-            } else {
-                this.imagePressed = false;
-                return false;
-            }
-        } else if (event.getAction() != 1) {
-            return false;
-        } else {
+        } else if (event.getAction() == 1) {
             if (this.buttonPressed == 1) {
                 this.buttonPressed = 0;
                 playSoundEffect(0);
                 didPressedButton(false);
                 updateRadialProgressBackground();
                 invalidate();
-                return false;
-            } else if (!this.imagePressed) {
-                return false;
-            } else {
+            } else if (this.miniButtonPressed == 1) {
+                this.miniButtonPressed = 0;
+                playSoundEffect(0);
+                didPressedMiniButton(false);
+                invalidate();
+            } else if (this.imagePressed) {
                 this.imagePressed = false;
                 if (this.buttonState == -1 || this.buttonState == 2 || this.buttonState == 3) {
                     playSoundEffect(0);
@@ -934,9 +945,9 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                     didPressedButton(false);
                 }
                 invalidate();
-                return false;
             }
         }
+        return result;
     }
 
     private boolean checkAudioMotionEvent(MotionEvent event) {
@@ -1645,6 +1656,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
 
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        setTranslationX(0.0f);
         this.avatarImage.onAttachedToWindow();
         this.avatarImage.setParentView((View) getParent());
         this.replyImageReceiver.onAttachedToWindow();
@@ -3455,7 +3467,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         goto L_0x09dd;
     L_0x09f3:
         r4 = "Of";
-        r6 = 2131493992; // 0x7f0c0468 float:1.861148E38 double:1.053097956E-314;
+        r6 = 2131493991; // 0x7f0c0467 float:1.8611478E38 double:1.0530979553E-314;
         r8 = 2;
         r8 = new java.lang.Object[r8];
         r9 = 0;
@@ -4348,7 +4360,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x1c09;
     L_0x105d:
         r4 = "PaymentReceipt";
-        r6 = 2131494077; // 0x7f0c04bd float:1.8611652E38 double:1.053097998E-314;
+        r6 = 2131494076; // 0x7f0c04bc float:1.861165E38 double:1.0530979973E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
     L_0x106b:
@@ -4486,7 +4498,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 != r6) goto L_0x1c4b;
     L_0x1185:
         r4 = "OpenChannel";
-        r6 = 2131494004; // 0x7f0c0474 float:1.8611504E38 double:1.0530979617E-314;
+        r6 = 2131494003; // 0x7f0c0473 float:1.8611502E38 double:1.053097961E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
     L_0x118f:
         r0 = r150;
@@ -5932,13 +5944,13 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x1c23;
     L_0x1c13:
         r4 = "PaymentTestInvoice";
-        r6 = 2131494095; // 0x7f0c04cf float:1.8611689E38 double:1.0530980067E-314;
+        r6 = 2131494094; // 0x7f0c04ce float:1.8611687E38 double:1.053098006E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
         goto L_0x106b;
     L_0x1c23:
         r4 = "PaymentInvoice";
-        r6 = 2131494064; // 0x7f0c04b0 float:1.8611626E38 double:1.0530979913E-314;
+        r6 = 2131494063; // 0x7f0c04af float:1.8611624E38 double:1.053097991E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
         goto L_0x106b;
@@ -5961,7 +5973,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 != r6) goto L_0x1c5e;
     L_0x1c52:
         r4 = "OpenGroup";
-        r6 = 2131494005; // 0x7f0c0475 float:1.8611506E38 double:1.053097962E-314;
+        r6 = 2131494004; // 0x7f0c0474 float:1.8611504E38 double:1.0530979617E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x118f;
     L_0x1c5e:
@@ -5971,12 +5983,12 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 != r6) goto L_0x1c71;
     L_0x1c65:
         r4 = "OpenMessage";
-        r6 = 2131494008; // 0x7f0c0478 float:1.8611512E38 double:1.0530979637E-314;
+        r6 = 2131494007; // 0x7f0c0477 float:1.861151E38 double:1.053097963E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x118f;
     L_0x1c71:
         r4 = "InstantView";
-        r6 = 2131493657; // 0x7f0c0319 float:1.86108E38 double:1.0530977903E-314;
+        r6 = 2131493656; // 0x7f0c0318 float:1.8610798E38 double:1.05309779E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x118f;
     L_0x1c7d:
@@ -6074,7 +6086,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r81 == 0) goto L_0x1e17;
     L_0x1d33:
         r4 = "CallMessageOutgoingMissed";
-        r6 = 2131493098; // 0x7f0c00ea float:1.8609667E38 double:1.053097514E-314;
+        r6 = 2131493097; // 0x7f0c00e9 float:1.8609665E38 double:1.0530975136E-314;
         r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
     L_0x1d3d:
         r0 = r56;
@@ -6182,14 +6194,14 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         goto L_0x1dfe;
     L_0x1e17:
         r4 = "CallMessageOutgoing";
-        r6 = 2131493097; // 0x7f0c00e9 float:1.8609665E38 double:1.0530975136E-314;
+        r6 = 2131493096; // 0x7f0c00e8 float:1.8609662E38 double:1.053097513E-314;
         r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1d3d;
     L_0x1e23:
         if (r81 == 0) goto L_0x1e31;
     L_0x1e25:
         r4 = "CallMessageIncomingMissed";
-        r6 = 2131493096; // 0x7f0c00e8 float:1.8609662E38 double:1.053097513E-314;
+        r6 = 2131493095; // 0x7f0c00e7 float:1.860966E38 double:1.0530975126E-314;
         r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1d3d;
     L_0x1e31:
@@ -6199,12 +6211,12 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x1e45;
     L_0x1e39:
         r4 = "CallMessageIncomingDeclined";
-        r6 = 2131493095; // 0x7f0c00e7 float:1.860966E38 double:1.0530975126E-314;
+        r6 = 2131493094; // 0x7f0c00e6 float:1.8609658E38 double:1.053097512E-314;
         r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1d3d;
     L_0x1e45:
         r4 = "CallMessageIncoming";
-        r6 = 2131493094; // 0x7f0c00e6 float:1.8609658E38 double:1.053097512E-314;
+        r6 = 2131493093; // 0x7f0c00e5 float:1.8609656E38 double:1.0530975116E-314;
         r131 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1d3d;
     L_0x1e51:
@@ -6498,7 +6510,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         goto L_0x2082;
     L_0x2088:
         r4 = "NumberUnknown";
-        r6 = 2131493990; // 0x7f0c0466 float:1.8611476E38 double:1.053097955E-314;
+        r6 = 2131493989; // 0x7f0c0465 float:1.8611474E38 double:1.0530979543E-314;
         r111 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1f35;
     L_0x2094:
@@ -9925,7 +9937,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x39d5;
     L_0x3968:
         r4 = "PaymentReceipt";
-        r6 = 2131494077; // 0x7f0c04bd float:1.8611652E38 double:1.053097998E-314;
+        r6 = 2131494076; // 0x7f0c04bc float:1.861165E38 double:1.0530979973E-314;
         r32 = org.telegram.messenger.LocaleController.getString(r4, r6);
     L_0x3972:
         r31 = new android.text.StaticLayout;
@@ -11226,16 +11238,24 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
     }
 
     private Drawable getMiniDrawableForCurrentState() {
+        int i = 1;
         if (this.miniButtonState < 0) {
             return null;
         }
-        if (this.documentAttachType != 3 && this.documentAttachType != 5) {
+        if (this.documentAttachType == 3 || this.documentAttachType == 5) {
+            this.radialProgress.setAlphaForPrevious(false);
+            Drawable[] drawableArr = Theme.chat_fileMiniStatesDrawable[this.currentMessageObject.isOutOwner() ? this.miniButtonState : this.miniButtonState + 2];
+            int i2 = (isDrawSelectedBackground() || this.miniButtonPressed != 0) ? 1 : 0;
+            return drawableArr[i2];
+        } else if (this.documentAttachType != 4) {
             return null;
+        } else {
+            Drawable[] drawableArr2 = Theme.chat_fileMiniStatesDrawable[this.miniButtonState + 4];
+            if (this.miniButtonPressed == 0) {
+                i = 0;
+            }
+            return drawableArr2[i];
         }
-        this.radialProgress.setAlphaForPrevious(false);
-        Drawable[] drawableArr = Theme.chat_fileMiniStatesDrawable[this.currentMessageObject.isOutOwner() ? this.miniButtonState : this.miniButtonState + 2];
-        int i = (isDrawSelectedBackground() || this.miniButtonPressed != 0) ? 1 : 0;
-        return drawableArr[i];
     }
 
     private Drawable getDrawableForCurrentState() {
@@ -11382,8 +11402,10 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         }
         boolean fromBot = this.currentMessageObject.messageOwner.params != null && this.currentMessageObject.messageOwner.params.containsKey("query_id");
         Float progress;
+        RadialProgress radialProgress;
+        Drawable miniDrawableForCurrentState;
+        boolean z;
         if (this.documentAttachType == 3 || this.documentAttachType == 5) {
-            RadialProgress radialProgress;
             if ((this.currentMessageObject.isOut() && this.currentMessageObject.isSending()) || (this.currentMessageObject.isSendError() && fromBot)) {
                 DownloadController.getInstance(this.currentAccount).addLoadingFileObserver(this.currentMessageObject.messageOwner.attachPath, this.currentMessageObject, this);
                 this.buttonState = 4;
@@ -11405,7 +11427,6 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                     radialProgress.setProgress(floatValue, false);
                 }
             } else if (this.hasMiniProgress != 0) {
-                boolean z;
                 this.radialProgress.setMiniProgressBackgroundColor(Theme.getColor(this.currentMessageObject.isOutOwner() ? Theme.key_chat_outLoader : Theme.key_chat_inLoader));
                 playing = MediaController.getInstance().isPlayingMessage(this.currentMessageObject);
                 if (!playing || (playing && MediaController.getInstance().isMessagePaused())) {
@@ -11433,13 +11454,13 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                     }
                 }
                 radialProgress = this.radialProgress;
-                Drawable miniDrawableForCurrentState = getMiniDrawableForCurrentState();
+                miniDrawableForCurrentState = getMiniDrawableForCurrentState();
                 if (this.miniButtonState == 1) {
                     z = true;
                 } else {
                     z = false;
                 }
-                radialProgress.setMiniBackground(miniDrawableForCurrentState, z, animated);
+                radialProgress.setMiniBackground(miniDrawableForCurrentState, z, animated, AndroidUtilities.dp(44.0f));
             } else if (fileExists) {
                 DownloadController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
                 playing = MediaController.getInstance().isPlayingMessage(this.currentMessageObject);
@@ -11472,7 +11493,37 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                 if (!(this.currentMessageObject.messageOwner.attachPath == null || this.currentMessageObject.messageOwner.attachPath.length() == 0)) {
                     DownloadController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
                 }
-                if (fileExists) {
+                if (this.hasMiniProgress != 0) {
+                    this.radialProgress.setMiniProgressBackgroundColor(Theme.getColor(Theme.key_chat_inLoaderPhoto));
+                    this.buttonState = 3;
+                    this.radialProgress.setBackground(getDrawableForCurrentState(), false, animated);
+                    if (this.hasMiniProgress == 1) {
+                        DownloadController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
+                        this.miniButtonState = -1;
+                    } else {
+                        DownloadController.getInstance(this.currentAccount).addLoadingFileObserver(fileName, this.currentMessageObject, this);
+                        if (FileLoader.getInstance(this.currentAccount).isLoadingFile(fileName)) {
+                            this.miniButtonState = 1;
+                            progress = ImageLoader.getInstance().getFileProgress(fileName);
+                            if (progress != null) {
+                                this.radialProgress.setProgress(progress.floatValue(), animated);
+                            } else {
+                                this.radialProgress.setProgress(0.0f, animated);
+                            }
+                        } else {
+                            this.radialProgress.setProgress(0.0f, animated);
+                            this.miniButtonState = 0;
+                        }
+                    }
+                    radialProgress = this.radialProgress;
+                    miniDrawableForCurrentState = getMiniDrawableForCurrentState();
+                    if (this.miniButtonState == 1) {
+                        z = true;
+                    } else {
+                        z = false;
+                    }
+                    radialProgress.setMiniBackground(miniDrawableForCurrentState, z, animated, AndroidUtilities.dp(48.0f));
+                } else if (fileExists) {
                     DownloadController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
                     if (this.currentMessageObject.isSecretPhoto()) {
                         this.buttonState = -1;
@@ -11578,30 +11629,29 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
             return;
         }
         if (this.hasMiniProgress == 0) {
-            this.radialProgress.setMiniBackground(null, false, animated);
+            this.radialProgress.setMiniBackground(null, false, animated, 0);
         }
     }
 
     private void didPressedMiniButton(boolean animated) {
         if (this.miniButtonState == 0) {
+            this.miniButtonState = 1;
+            this.radialProgress.setProgress(0.0f, false);
             if (this.documentAttachType == 3 || this.documentAttachType == 5) {
-                this.miniButtonState = 1;
-                this.radialProgress.setProgress(0.0f, false);
                 FileLoader.getInstance(this.currentAccount).loadFile(this.documentAttach, true, 0);
-                this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false);
-                invalidate();
+            } else if (this.documentAttachType == 4) {
+                FileLoader.getInstance(this.currentAccount).loadFile(this.documentAttach, true, this.currentMessageObject.shouldEncryptPhotoOrVideo() ? 2 : 0);
             }
-        } else if (this.miniButtonState != 1) {
-        } else {
-            if (this.documentAttachType == 3 || this.documentAttachType == 5) {
-                if (MediaController.getInstance().isPlayingMessage(this.currentMessageObject)) {
-                    MediaController.getInstance().cleanupPlayer(true, true);
-                }
-                this.miniButtonState = 0;
-                FileLoader.getInstance(this.currentAccount).cancelLoadFile(this.documentAttach);
-                this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false);
-                invalidate();
+            this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false, AndroidUtilities.dp(44.0f));
+            invalidate();
+        } else if (this.miniButtonState == 1) {
+            if ((this.documentAttachType == 3 || this.documentAttachType == 5) && MediaController.getInstance().isPlayingMessage(this.currentMessageObject)) {
+                MediaController.getInstance().cleanupPlayer(true, true);
             }
+            this.miniButtonState = 0;
+            FileLoader.getInstance(this.currentAccount).cancelLoadFile(this.documentAttach);
+            this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false, AndroidUtilities.dp(44.0f));
+            invalidate();
         }
     }
 
@@ -11664,7 +11714,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                 if (this.hasMiniProgress == 2 && this.miniButtonState != 1) {
                     this.miniButtonState = 1;
                     this.radialProgress.setProgress(0.0f, false);
-                    this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false);
+                    this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false, AndroidUtilities.dp(44.0f));
                 }
                 this.buttonState = 1;
                 this.radialProgress.setBackground(getDrawableForCurrentState(), false, false);
@@ -11708,6 +11758,11 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
             this.buttonState = -1;
             this.radialProgress.setBackground(getDrawableForCurrentState(), false, animated);
         } else if (this.buttonState == 3) {
+            if (this.hasMiniProgress == 2 && this.miniButtonState != 1) {
+                this.miniButtonState = 1;
+                this.radialProgress.setProgress(0.0f, false);
+                this.radialProgress.setMiniBackground(getMiniDrawableForCurrentState(), true, false, AndroidUtilities.dp(48.0f));
+            }
             this.delegate.didPressedImage(this);
         } else if (this.buttonState != 4) {
         } else {
@@ -11775,6 +11830,10 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                     updateButtonState(false);
                 }
             } else if (this.buttonState != 4) {
+                updateButtonState(false);
+            }
+        } else if (this.hasMiniProgress != 0) {
+            if (this.miniButtonState != 1) {
                 updateButtonState(false);
             }
         } else if (this.buttonState != 1) {
@@ -12734,7 +12793,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
     }
 
     public void drawTimeLayout(Canvas canvas) {
-        if ((this.drawTime && !this.groupPhotoInvisible) || !this.mediaBackground) {
+        if (((this.drawTime && !this.groupPhotoInvisible) || !this.mediaBackground) && this.timeLayout != null) {
             int x;
             int y;
             if (this.currentMessageObject.type == 5) {

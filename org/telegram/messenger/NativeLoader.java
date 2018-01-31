@@ -11,10 +11,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class NativeLoader {
-    private static final String LIB_NAME = "tmessages.27";
-    private static final String LIB_SO_NAME = "libtmessages.27.so";
-    private static final int LIB_VERSION = 27;
-    private static final String LOCALE_LIB_SO_NAME = "libtmessages.27loc.so";
+    private static final String LIB_NAME = "tmessages.28";
+    private static final String LIB_SO_NAME = "libtmessages.28.so";
+    private static final int LIB_VERSION = 28;
+    private static final String LOCALE_LIB_SO_NAME = "libtmessages.28loc.so";
     private static volatile boolean nativeLoaded = false;
     private String crashPath = TtmlNode.ANONYMOUS_REGION_ID;
 
@@ -190,7 +190,7 @@ public class NativeLoader {
         if (r1 == 0) goto L_0x005e;
     L_0x0037:
         r2 = new java.io.File;	 Catch:{ Throwable -> 0x0148 }
-        r8 = "libtmessages.27.so";
+        r8 = "libtmessages.28.so";
         r2.<init>(r1, r8);	 Catch:{ Throwable -> 0x0148 }
         r8 = r2.exists();	 Catch:{ Throwable -> 0x0148 }
         if (r8 == 0) goto L_0x005d;
@@ -201,7 +201,7 @@ public class NativeLoader {
         r8 = "load normal lib";
         org.telegram.messenger.FileLog.d(r8);	 Catch:{ Throwable -> 0x0148 }
     L_0x004f:
-        r8 = "tmessages.27";
+        r8 = "tmessages.28";
         java.lang.System.loadLibrary(r8);	 Catch:{ Error -> 0x0059 }
         r8 = 1;
         nativeLoaded = r8;	 Catch:{ Error -> 0x0059 }
@@ -218,7 +218,7 @@ public class NativeLoader {
         r0.<init>(r8, r10);	 Catch:{ Throwable -> 0x0148 }
         r0.mkdirs();	 Catch:{ Throwable -> 0x0148 }
         r3 = new java.io.File;	 Catch:{ Throwable -> 0x0148 }
-        r8 = "libtmessages.27loc.so";
+        r8 = "libtmessages.28loc.so";
         r3.<init>(r0, r8);	 Catch:{ Throwable -> 0x0148 }
         r8 = r3.exists();	 Catch:{ Throwable -> 0x0148 }
         if (r8 == 0) goto L_0x0098;
@@ -253,7 +253,7 @@ public class NativeLoader {
         r8 = loadFromZip(r11, r0, r3, r5);	 Catch:{ Throwable -> 0x0148 }
         if (r8 != 0) goto L_0x0007;
     L_0x00b9:
-        r8 = "tmessages.27";
+        r8 = "tmessages.28";
         java.lang.System.loadLibrary(r8);	 Catch:{ Error -> 0x00c4 }
         r8 = 1;
         nativeLoaded = r8;	 Catch:{ Error -> 0x00c4 }

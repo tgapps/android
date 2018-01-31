@@ -2137,7 +2137,7 @@ public class NotificationsController {
         r5.<init>(r13);	 Catch:{ Exception -> 0x0052 }
         r0 = r44;
         r5 = r5.setContentTitle(r0);	 Catch:{ Exception -> 0x0052 }
-        r13 = 2131165529; // 0x7f070159 float:1.7945278E38 double:1.0529356735E-314;
+        r13 = 2131165531; // 0x7f07015b float:1.7945282E38 double:1.0529356745E-314;
         r5 = r5.setSmallIcon(r13);	 Catch:{ Exception -> 0x0052 }
         r13 = 1;
         r5 = r5.setAutoCancel(r13);	 Catch:{ Exception -> 0x0052 }
@@ -2398,7 +2398,7 @@ public class NotificationsController {
     L_0x05fb:
         r5 = 2131165347; // 0x7f0700a3 float:1.7944909E38 double:1.0529355836E-314;
         r13 = "Reply";
-        r66 = 2131494184; // 0x7f0c0528 float:1.861187E38 double:1.0530980506E-314;
+        r66 = 2131494183; // 0x7f0c0527 float:1.8611867E38 double:1.05309805E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
@@ -2684,7 +2684,7 @@ public class NotificationsController {
         r0 = r21;
         r5 = r5.append(r0);	 Catch:{ Exception -> 0x0052 }
         r13 = "NotificationMessagesPeopleDisplayOrder";
-        r66 = 2131493966; // 0x7f0c044e float:1.8611427E38 double:1.053097943E-314;
+        r66 = 2131493965; // 0x7f0c044d float:1.8611425E38 double:1.0530979424E-314;
         r67 = 2;
         r0 = r67;
         r0 = new java.lang.Object[r0];	 Catch:{ Exception -> 0x0052 }
@@ -3003,7 +3003,7 @@ public class NotificationsController {
     L_0x0a79:
         r5 = 2131165346; // 0x7f0700a2 float:1.7944907E38 double:1.052935583E-314;
         r13 = "Reply";
-        r66 = 2131494184; // 0x7f0c0528 float:1.861187E38 double:1.0530980506E-314;
+        r66 = 2131494183; // 0x7f0c0527 float:1.8611867E38 double:1.05309805E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }

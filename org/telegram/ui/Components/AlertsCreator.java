@@ -56,10 +56,10 @@ public class AlertsCreator {
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public static android.app.Dialog processError(int r7, org.telegram.tgnet.TLRPC.TL_error r8, org.telegram.ui.ActionBar.BaseFragment r9, org.telegram.tgnet.TLObject r10, java.lang.Object... r11) {
         /*
-        r6 = 2131493251; // 0x7f0c0183 float:1.8609977E38 double:1.0530975897E-314;
-        r5 = 2131493434; // 0x7f0c023a float:1.8610348E38 double:1.05309768E-314;
+        r6 = 2131493250; // 0x7f0c0182 float:1.8609975E38 double:1.053097589E-314;
+        r5 = 2131493433; // 0x7f0c0239 float:1.8610346E38 double:1.0530976796E-314;
         r2 = 1;
-        r4 = 2131493524; // 0x7f0c0294 float:1.861053E38 double:1.0530977245E-314;
+        r4 = 2131493523; // 0x7f0c0293 float:1.8610529E38 double:1.053097724E-314;
         r1 = 0;
         r0 = r8.code;
         r3 = 406; // 0x196 float:5.69E-43 double:2.006E-321;
@@ -155,7 +155,7 @@ public class AlertsCreator {
         if (r0 != 0) goto L_0x003e;
     L_0x00a2:
         r0 = "EditMessageError";
-        r1 = 2131493397; // 0x7f0c0215 float:1.8610273E38 double:1.053097662E-314;
+        r1 = 2131493396; // 0x7f0c0214 float:1.861027E38 double:1.0530976613E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -207,13 +207,13 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0117;
     L_0x0108:
         r0 = "JoinToGroupErrorFull";
-        r1 = 2131493692; // 0x7f0c033c float:1.8610871E38 double:1.0530978075E-314;
+        r1 = 2131493691; // 0x7f0c033b float:1.861087E38 double:1.053097807E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0117:
         r0 = "JoinToGroupErrorNotExist";
-        r1 = 2131493693; // 0x7f0c033d float:1.8610873E38 double:1.053097808E-314;
+        r1 = 2131493692; // 0x7f0c033c float:1.8610871E38 double:1.0530978075E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -255,7 +255,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0189;
     L_0x017a:
         r0 = "InvalidCode";
-        r1 = 2131493660; // 0x7f0c031c float:1.8610806E38 double:1.0530977917E-314;
+        r1 = 2131493659; // 0x7f0c031b float:1.8610804E38 double:1.053097791E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -293,7 +293,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x01dc;
     L_0x01cd:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131493663; // 0x7f0c031f float:1.8610813E38 double:1.053097793E-314;
+        r1 = 2131493662; // 0x7f0c031e float:1.861081E38 double:1.0530977927E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -309,7 +309,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0201;
     L_0x01f2:
         r0 = "InvalidCode";
-        r1 = 2131493660; // 0x7f0c031c float:1.8610806E38 double:1.0530977917E-314;
+        r1 = 2131493659; // 0x7f0c031b float:1.8610804E38 double:1.053097791E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -359,7 +359,7 @@ public class AlertsCreator {
         if (r0 != r1) goto L_0x0275;
     L_0x0265:
         r0 = "CancelLinkExpired";
-        r1 = 2131493115; // 0x7f0c00fb float:1.8609701E38 double:1.0530975225E-314;
+        r1 = 2131493114; // 0x7f0c00fa float:1.86097E38 double:1.053097522E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         r0 = showSimpleAlert(r9, r0);
         goto L_0x0016;
@@ -391,7 +391,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x02bc;
     L_0x02ad:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131493663; // 0x7f0c031f float:1.8610813E38 double:1.053097793E-314;
+        r1 = 2131493662; // 0x7f0c031e float:1.861081E38 double:1.0530977927E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -407,7 +407,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x02e1;
     L_0x02d2:
         r0 = "InvalidCode";
-        r1 = 2131493660; // 0x7f0c031c float:1.8610806E38 double:1.0530977917E-314;
+        r1 = 2131493659; // 0x7f0c031b float:1.8610804E38 double:1.053097791E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -445,7 +445,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0334;
     L_0x0325:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131493663; // 0x7f0c031f float:1.8610813E38 double:1.053097793E-314;
+        r1 = 2131493662; // 0x7f0c031e float:1.861081E38 double:1.0530977927E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -461,7 +461,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0359;
     L_0x034a:
         r0 = "InvalidCode";
-        r1 = 2131493660; // 0x7f0c031c float:1.8610806E38 double:1.0530977917E-314;
+        r1 = 2131493659; // 0x7f0c031b float:1.8610804E38 double:1.053097791E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -492,7 +492,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x03a9;
     L_0x0392:
         r3 = "ChangePhoneNumberOccupied";
-        r4 = 2131493126; // 0x7f0c0106 float:1.8609723E38 double:1.053097528E-314;
+        r4 = 2131493125; // 0x7f0c0105 float:1.8609721E38 double:1.0530975274E-314;
         r2 = new java.lang.Object[r2];
         r0 = r11[r1];
         r0 = (java.lang.String) r0;
@@ -642,13 +642,13 @@ public class AlertsCreator {
         goto L_0x047d;
     L_0x049c:
         r0 = "PaymentPrecheckoutFailed";
-        r1 = 2131494076; // 0x7f0c04bc float:1.861165E38 double:1.0530979973E-314;
+        r1 = 2131494075; // 0x7f0c04bb float:1.8611648E38 double:1.053097997E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleToast(r9, r0);
         goto L_0x003e;
     L_0x04ab:
         r0 = "PaymentFailed";
-        r1 = 2131494063; // 0x7f0c04af float:1.8611624E38 double:1.053097991E-314;
+        r1 = 2131494062; // 0x7f0c04ae float:1.8611622E38 double:1.0530979903E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleToast(r9, r0);
         goto L_0x003e;
@@ -681,7 +681,7 @@ public class AlertsCreator {
         goto L_0x04c8;
     L_0x04dd:
         r0 = "PaymentNoShippingMethod";
-        r1 = 2131494065; // 0x7f0c04b1 float:1.8611628E38 double:1.053097992E-314;
+        r1 = 2131494064; // 0x7f0c04b0 float:1.8611626E38 double:1.0530979913E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleToast(r9, r0);
         goto L_0x003e;

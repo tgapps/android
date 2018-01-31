@@ -3085,10 +3085,10 @@ public class zzcim {
 
     public final void zzbah() {
         String zzayf;
+        String str;
         zzawx().zzve();
         zzxf();
         this.zzjgf = true;
-        String str;
         try {
             Boolean zzbas = zzawp().zzbas();
             if (zzbas == null) {
@@ -3349,8 +3349,6 @@ public class zzcim {
     }
 
     public final void zzf(zzcgi com_google_android_gms_internal_zzcgi) {
-        zzcjk zzaws;
-        String appId;
         zzawx().zzve();
         zzxf();
         zzbq.checkNotNull(com_google_android_gms_internal_zzcgi);
@@ -3377,6 +3375,8 @@ public class zzcim {
                     i = 0;
                 }
                 zzaws().beginTransaction();
+                zzcjk zzaws;
+                String appId;
                 try {
                     zzjb = zzaws().zzjb(com_google_android_gms_internal_zzcgi.packageName);
                     if (!(zzjb == null || zzjb.getGmpAppId() == null || zzjb.getGmpAppId().equals(com_google_android_gms_internal_zzcgi.zzixs))) {

@@ -492,8 +492,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
     private int newUnreadMessageCount;
     OnItemClickListenerExtended onItemClickListener = new OnItemClickListenerExtended() {
         public void onItemClick(View view, int position, float x, float y) {
+            ChatActivity.this.wasManualScroll = true;
             if (ChatActivity.this.actionBar.isActionModeShowed()) {
-                ChatActivity.this.wasManualScroll = true;
                 boolean outside = false;
                 if (view instanceof ChatMessageCell) {
                     if (((ChatMessageCell) view).isInsideBackground(x, y)) {
@@ -510,6 +510,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
     };
     OnItemLongClickListenerExtended onItemLongClickListener = new OnItemLongClickListenerExtended() {
         public boolean onItemClick(View view, int position, float x, float y) {
+            ChatActivity.this.wasManualScroll = true;
             if (ChatActivity.this.actionBar.isActionModeShowed()) {
                 boolean outside = false;
                 if (view instanceof ChatMessageCell) {
@@ -521,7 +522,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                 }
                 ChatActivity.this.processRowSelect(view, outside);
             } else {
-                ChatActivity.this.wasManualScroll = true;
                 ChatActivity.this.createMenu(view, false, true);
             }
             return true;
@@ -3263,7 +3263,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
             private float totalDy = 0.0f;
 
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (newState == 1) {
+                if (newState == 2) {
+                    ChatActivity.this.wasManualScroll = true;
+                } else if (newState == 1) {
                     ChatActivity.this.wasManualScroll = true;
                     ChatActivity.this.scrollingFloatingDate = true;
                     ChatActivity.this.checkTextureViewPosition = true;
@@ -9769,13 +9771,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         r0 = r34;
         r0.setTitle(r5);
         r5 = "OK";
-        r6 = 2131493991; // 0x7f0c0467 float:1.8611478E38 double:1.0530979553E-314;
+        r6 = 2131493990; // 0x7f0c0466 float:1.8611476E38 double:1.053097955E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r6);
         r6 = 0;
         r0 = r34;
         r0.setPositiveButton(r5, r6);
         r5 = "CompatibilityChat";
-        r6 = 2131493263; // 0x7f0c018f float:1.8610001E38 double:1.0530975956E-314;
+        r6 = 2131493262; // 0x7f0c018e float:1.861E38 double:1.053097595E-314;
         r7 = 2;
         r7 = new java.lang.Object[r7];
         r8 = 0;
@@ -13189,13 +13191,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         if (r138 != 0) goto L_0x27c8;
     L_0x277a:
         r5 = "ChannelCantOpenPrivate";
-        r6 = 2131493145; // 0x7f0c0119 float:1.8609762E38 double:1.0530975373E-314;
+        r6 = 2131493144; // 0x7f0c0118 float:1.860976E38 double:1.053097537E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r6);
         r0 = r34;
         r0.setMessage(r5);
     L_0x2789:
         r5 = "OK";
-        r6 = 2131493991; // 0x7f0c0467 float:1.8611478E38 double:1.0530979553E-314;
+        r6 = 2131493990; // 0x7f0c0466 float:1.8611476E38 double:1.053097955E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r6);
         r6 = 0;
         r0 = r34;
@@ -13231,7 +13233,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         if (r0 != r5) goto L_0x27dd;
     L_0x27cd:
         r5 = "ChannelCantOpenNa";
-        r6 = 2131493144; // 0x7f0c0118 float:1.860976E38 double:1.053097537E-314;
+        r6 = 2131493143; // 0x7f0c0117 float:1.8609758E38 double:1.0530975363E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r6);
         r0 = r34;
         r0.setMessage(r5);
@@ -13242,7 +13244,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         if (r0 != r5) goto L_0x2789;
     L_0x27e2:
         r5 = "ChannelCantOpenBanned";
-        r6 = 2131493143; // 0x7f0c0117 float:1.8609758E38 double:1.0530975363E-314;
+        r6 = 2131493142; // 0x7f0c0116 float:1.8609756E38 double:1.053097536E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r6);
         r0 = r34;
         r0.setMessage(r5);
@@ -17486,6 +17488,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                 case 0:
                     if (this.selectedObjectGroup == null) {
                         if (SendMessagesHelper.getInstance(this.currentAccount).retrySendMessage(this.selectedObject, false)) {
+                            updateVisibleRows();
                             moveScrollToLastMessage();
                             break;
                         }
@@ -17537,7 +17540,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                     this.selectedObject = null;
                     this.selectedObjectGroup = null;
                     return;
-                    break;
                 case 5:
                     File locFile = null;
                     if (!TextUtils.isEmpty(this.selectedObject.messageOwner.attachPath)) {
