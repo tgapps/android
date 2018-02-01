@@ -2398,7 +2398,7 @@ public class NotificationsController {
     L_0x05fb:
         r5 = 2131165347; // 0x7f0700a3 float:1.7944909E38 double:1.0529355836E-314;
         r13 = "Reply";
-        r66 = 2131494183; // 0x7f0c0527 float:1.8611867E38 double:1.05309805E-314;
+        r66 = 2131494184; // 0x7f0c0528 float:1.861187E38 double:1.0530980506E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
@@ -3003,7 +3003,7 @@ public class NotificationsController {
     L_0x0a79:
         r5 = 2131165346; // 0x7f0700a2 float:1.7944907E38 double:1.052935583E-314;
         r13 = "Reply";
-        r66 = 2131494183; // 0x7f0c0527 float:1.8611867E38 double:1.05309805E-314;
+        r66 = 2131494184; // 0x7f0c0528 float:1.861187E38 double:1.0530980506E-314;
         r0 = r66;
         r13 = org.telegram.messenger.LocaleController.getString(r13, r0);	 Catch:{ Exception -> 0x0052 }
         r66 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0052 }
@@ -3036,15 +3036,13 @@ public class NotificationsController {
             for (a = 0; a < this.pushMessages.size(); a++) {
                 messageObject = (MessageObject) this.pushMessages.get(a);
                 dialog_id = messageObject.getDialogId();
-                if (((int) dialog_id) != 0) {
-                    ArrayList<MessageObject> arrayList = (ArrayList) messagesByDialogs.get(dialog_id);
-                    if (arrayList == null) {
-                        arrayList = new ArrayList();
-                        messagesByDialogs.put(dialog_id, arrayList);
-                        sortedDialogs.add(0, Long.valueOf(dialog_id));
-                    }
-                    arrayList.add(messageObject);
+                ArrayList<MessageObject> arrayList = (ArrayList) messagesByDialogs.get(dialog_id);
+                if (arrayList == null) {
+                    arrayList = new ArrayList();
+                    messagesByDialogs.put(dialog_id, arrayList);
+                    sortedDialogs.add(0, Long.valueOf(dialog_id));
                 }
+                arrayList.add(messageObject);
             }
             LongSparseArray<Integer> oldIdsWear = this.wearNotificationsIds.clone();
             this.wearNotificationsIds.clear();
@@ -3055,6 +3053,7 @@ public class NotificationsController {
                 int max_date = ((MessageObject) messageObjects.get(0)).messageOwner.date;
                 Chat chat = null;
                 User user = null;
+                int lowerId = (int) dialog_id;
                 TLObject photoPath;
                 String chatName;
                 String name;
@@ -3082,17 +3081,150 @@ public class NotificationsController {
                 Options options;
                 int i;
                 Bitmap bitmap;
-                if (dialog_id > 0) {
-                    user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf((int) dialog_id));
+                if (lowerId == 0) {
+                    EncryptedChat encryptedChat = MessagesController.getInstance(this.currentAccount).getEncryptedChat(Integer.valueOf((int) (dialog_id >> 32)));
+                    if (encryptedChat != null) {
+                        user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(encryptedChat.user_id));
+                        if (user == null) {
+                        }
+                        photoPath = null;
+                        if (chat != null) {
+                            chatName = chat.title;
+                        } else {
+                            chatName = UserObject.getUserName(user);
+                        }
+                        if (!AndroidUtilities.needShowPasscode(false)) {
+                        }
+                        name = LocaleController.getString("AppName", R.string.AppName);
+                        notificationId = (Integer) oldIdsWear.get(dialog_id);
+                        if (notificationId == null) {
+                            notificationId = Integer.valueOf((int) dialog_id);
+                        } else {
+                            oldIdsWear.remove(dialog_id);
+                        }
+                        unreadConvBuilder = new UnreadConversation.Builder(name).setLatestTimestamp(((long) max_date) * 1000);
+                        intent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
+                        intent.addFlags(32);
+                        intent.setAction("org.telegram.messenger.ACTION_MESSAGE_HEARD");
+                        intent.putExtra("dialog_id", dialog_id);
+                        intent.putExtra("max_id", max_id);
+                        intent.putExtra("currentAccount", this.currentAccount);
+                        unreadConvBuilder.setReadPendingIntent(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, notificationId.intValue(), intent, 134217728));
+                        wearReplyAction = null;
+                        intent = new Intent(ApplicationLoader.applicationContext, AutoMessageReplyReceiver.class);
+                        intent.addFlags(32);
+                        intent.setAction("org.telegram.messenger.ACTION_MESSAGE_REPLY");
+                        intent.putExtra("dialog_id", dialog_id);
+                        intent.putExtra("max_id", max_id);
+                        intent.putExtra("currentAccount", this.currentAccount);
+                        unreadConvBuilder.setReplyAction(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, notificationId.intValue(), intent, 134217728), new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build());
+                        intent = new Intent(ApplicationLoader.applicationContext, WearReplyReceiver.class);
+                        intent.putExtra("dialog_id", dialog_id);
+                        intent.putExtra("max_id", max_id);
+                        intent.putExtra("currentAccount", this.currentAccount);
+                        replyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, notificationId.intValue(), intent, 134217728);
+                        remoteInputWear = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
+                        if (chat != null) {
+                            replyToString = LocaleController.formatString("ReplyToGroup", R.string.ReplyToGroup, name);
+                        } else {
+                            replyToString = LocaleController.formatString("ReplyToUser", R.string.ReplyToUser, name);
+                        }
+                        wearReplyAction = new Action.Builder(R.drawable.ic_reply_icon, replyToString, replyPendingIntent).setAllowGeneratedReplies(true).addRemoteInput(remoteInputWear).build();
+                        count = (Integer) this.pushDialogs.get(dialog_id);
+                        if (count == null) {
+                            count = Integer.valueOf(0);
+                        }
+                        messagingStyle = new MessagingStyle(TtmlNode.ANONYMOUS_REGION_ID).setConversationTitle(String.format("%1$s (%2$s)", new Object[]{name, LocaleController.formatPluralString("NewMessages", Math.max(count.intValue(), messageObjects.size()))}));
+                        text = new StringBuilder();
+                        isText = new boolean[1];
+                        for (a = messageObjects.size() - 1; a >= 0; a--) {
+                            messageObject = (MessageObject) messageObjects.get(a);
+                            message = getStringForMessage(messageObject, false, isText);
+                            if (message != null) {
+                                if (chat == null) {
+                                    message = message.replace(" @ " + name, TtmlNode.ANONYMOUS_REGION_ID);
+                                } else if (isText[0]) {
+                                    message = message.replace(name + ": ", TtmlNode.ANONYMOUS_REGION_ID);
+                                } else {
+                                    message = message.replace(name + " ", TtmlNode.ANONYMOUS_REGION_ID);
+                                }
+                                if (text.length() > 0) {
+                                    text.append("\n\n");
+                                }
+                                text.append(message);
+                                unreadConvBuilder.addMessage(message);
+                                messagingStyle.addMessage(message, ((long) messageObject.messageOwner.date) * 1000, null);
+                            }
+                        }
+                        intent = new Intent(ApplicationLoader.applicationContext, LaunchActivity.class);
+                        intent.setAction("com.tmessages.openchat" + Math.random() + ConnectionsManager.DEFAULT_DATACENTER_ID);
+                        intent.setFlags(32768);
+                        if (chat == null) {
+                            intent.putExtra("chatId", chat.id);
+                        } else if (user != null) {
+                            intent.putExtra("userId", user.id);
+                        }
+                        intent.putExtra("currentAccount", this.currentAccount);
+                        contentIntent = PendingIntent.getActivity(ApplicationLoader.applicationContext, 0, intent, 1073741824);
+                        wearableExtender = new WearableExtender();
+                        if (wearReplyAction != null) {
+                            wearableExtender.addAction(wearReplyAction);
+                        }
+                        dismissalID = null;
+                        if (chat == null) {
+                            dismissalID = "tgchat" + chat.id + "_" + max_id;
+                        } else if (user != null) {
+                            dismissalID = "tguser" + user.id + "_" + max_id;
+                        }
+                        wearableExtender.setDismissalId(dismissalID);
+                        summaryExtender = new WearableExtender();
+                        summaryExtender.setDismissalId("summary_" + dismissalID);
+                        notificationBuilder.extend(summaryExtender);
+                        date = ((long) ((MessageObject) messageObjects.get(0)).messageOwner.date) * 1000;
+                        builder = new Builder(ApplicationLoader.applicationContext).setContentTitle(name).setSmallIcon(R.drawable.notification).setGroup(this.notificationGroup).setContentText(text.toString()).setAutoCancel(true).setNumber(messageObjects.size()).setColor(-13851168).setGroupSummary(false).setWhen(date).setStyle(messagingStyle).setContentIntent(contentIntent).extend(wearableExtender).setSortKey(TtmlNode.ANONYMOUS_REGION_ID + (Long.MAX_VALUE - date)).extend(new CarExtender().setUnreadConversation(unreadConvBuilder.build())).setCategory("msg");
+                        if (this.pushDialogs.size() == 1) {
+                            builder.setSubText(summary);
+                        }
+                        if (photoPath != null) {
+                            img = ImageLoader.getInstance().getImageFromMemory(photoPath, null, "50_50");
+                            if (img != null) {
+                                builder.setLargeIcon(img.getBitmap());
+                            } else {
+                                file = FileLoader.getPathToAttach(photoPath, true);
+                                if (file.exists()) {
+                                    scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
+                                    options = new Options();
+                                    if (scaleFactor < 1.0f) {
+                                        i = 1;
+                                    } else {
+                                        i = (int) scaleFactor;
+                                    }
+                                    options.inSampleSize = i;
+                                    bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+                                    if (bitmap != null) {
+                                        builder.setLargeIcon(bitmap);
+                                    }
+                                }
+                            }
+                        }
+                        builder.addPerson("tel:+" + user.phone);
+                        if (VERSION.SDK_INT >= 26) {
+                            builder.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
+                        }
+                        notificationManager.notify(notificationId.intValue(), builder.build());
+                        this.wearNotificationsIds.put(dialog_id, notificationId);
+                    }
+                } else if (lowerId > 0) {
+                    user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(lowerId));
                     if (user == null) {
                     }
                     photoPath = null;
-                    if (chat == null) {
+                    if (chat != null) {
                         chatName = chat.title;
                     } else {
                         chatName = UserObject.getUserName(user);
                     }
-                    if (!AndroidUtilities.needShowPasscode(false) || SharedConfig.isWaitingForPasscodeEnter) {
+                    if (AndroidUtilities.needShowPasscode(false) || SharedConfig.isWaitingForPasscodeEnter) {
                         name = LocaleController.getString("AppName", R.string.AppName);
                     } else {
                         name = chatName;
@@ -3105,7 +3237,7 @@ public class NotificationsController {
                         }
                     }
                     notificationId = (Integer) oldIdsWear.get(dialog_id);
-                    if (notificationId != null) {
+                    if (notificationId == null) {
                         notificationId = Integer.valueOf((int) dialog_id);
                     } else {
                         oldIdsWear.remove(dialog_id);
@@ -3133,7 +3265,7 @@ public class NotificationsController {
                         intent.putExtra("currentAccount", this.currentAccount);
                         replyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, notificationId.intValue(), intent, 134217728);
                         remoteInputWear = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
-                        if (chat == null) {
+                        if (chat != null) {
                             replyToString = LocaleController.formatString("ReplyToGroup", R.string.ReplyToGroup, name);
                         } else {
                             replyToString = LocaleController.formatString("ReplyToUser", R.string.ReplyToUser, name);
@@ -3151,12 +3283,12 @@ public class NotificationsController {
                         messageObject = (MessageObject) messageObjects.get(a);
                         message = getStringForMessage(messageObject, false, isText);
                         if (message != null) {
-                            if (chat != null) {
+                            if (chat == null) {
                                 message = message.replace(" @ " + name, TtmlNode.ANONYMOUS_REGION_ID);
                             } else if (isText[0]) {
-                                message = message.replace(name + " ", TtmlNode.ANONYMOUS_REGION_ID);
-                            } else {
                                 message = message.replace(name + ": ", TtmlNode.ANONYMOUS_REGION_ID);
+                            } else {
+                                message = message.replace(name + " ", TtmlNode.ANONYMOUS_REGION_ID);
                             }
                             if (text.length() > 0) {
                                 text.append("\n\n");
@@ -3169,7 +3301,7 @@ public class NotificationsController {
                     intent = new Intent(ApplicationLoader.applicationContext, LaunchActivity.class);
                     intent.setAction("com.tmessages.openchat" + Math.random() + ConnectionsManager.DEFAULT_DATACENTER_ID);
                     intent.setFlags(32768);
-                    if (chat != null) {
+                    if (chat == null) {
                         intent.putExtra("chatId", chat.id);
                     } else if (user != null) {
                         intent.putExtra("userId", user.id);
@@ -3181,7 +3313,7 @@ public class NotificationsController {
                         wearableExtender.addAction(wearReplyAction);
                     }
                     dismissalID = null;
-                    if (chat != null) {
+                    if (chat == null) {
                         dismissalID = "tgchat" + chat.id + "_" + max_id;
                     } else if (user != null) {
                         dismissalID = "tguser" + user.id + "_" + max_id;
@@ -3197,7 +3329,7 @@ public class NotificationsController {
                     }
                     if (photoPath != null) {
                         img = ImageLoader.getInstance().getImageFromMemory(photoPath, null, "50_50");
-                        if (img == null) {
+                        if (img != null) {
                             builder.setLargeIcon(img.getBitmap());
                         } else {
                             try {
@@ -3205,7 +3337,7 @@ public class NotificationsController {
                                 if (file.exists()) {
                                     scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
                                     options = new Options();
-                                    if (scaleFactor >= 1.0f) {
+                                    if (scaleFactor < 1.0f) {
                                         i = 1;
                                     } else {
                                         i = (int) scaleFactor;
@@ -3229,11 +3361,11 @@ public class NotificationsController {
                     notificationManager.notify(notificationId.intValue(), builder.build());
                     this.wearNotificationsIds.put(dialog_id, notificationId);
                 } else {
-                    chat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(-((int) dialog_id)));
+                    chat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(-lowerId));
                     if (chat == null) {
                     }
                     photoPath = null;
-                    if (chat == null) {
+                    if (chat != null) {
                         chatName = UserObject.getUserName(user);
                     } else {
                         chatName = chat.title;
@@ -3242,7 +3374,7 @@ public class NotificationsController {
                     }
                     name = LocaleController.getString("AppName", R.string.AppName);
                     notificationId = (Integer) oldIdsWear.get(dialog_id);
-                    if (notificationId != null) {
+                    if (notificationId == null) {
                         oldIdsWear.remove(dialog_id);
                     } else {
                         notificationId = Integer.valueOf((int) dialog_id);
@@ -3269,7 +3401,7 @@ public class NotificationsController {
                     intent.putExtra("currentAccount", this.currentAccount);
                     replyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, notificationId.intValue(), intent, 134217728);
                     remoteInputWear = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
-                    if (chat == null) {
+                    if (chat != null) {
                         replyToString = LocaleController.formatString("ReplyToUser", R.string.ReplyToUser, name);
                     } else {
                         replyToString = LocaleController.formatString("ReplyToGroup", R.string.ReplyToGroup, name);
@@ -3286,7 +3418,7 @@ public class NotificationsController {
                         messageObject = (MessageObject) messageObjects.get(a);
                         message = getStringForMessage(messageObject, false, isText);
                         if (message != null) {
-                            if (chat != null) {
+                            if (chat == null) {
                                 message = message.replace(" @ " + name, TtmlNode.ANONYMOUS_REGION_ID);
                             } else if (isText[0]) {
                                 message = message.replace(name + " ", TtmlNode.ANONYMOUS_REGION_ID);
@@ -3304,7 +3436,7 @@ public class NotificationsController {
                     intent = new Intent(ApplicationLoader.applicationContext, LaunchActivity.class);
                     intent.setAction("com.tmessages.openchat" + Math.random() + ConnectionsManager.DEFAULT_DATACENTER_ID);
                     intent.setFlags(32768);
-                    if (chat != null) {
+                    if (chat == null) {
                         intent.putExtra("chatId", chat.id);
                     } else if (user != null) {
                         intent.putExtra("userId", user.id);
@@ -3316,7 +3448,7 @@ public class NotificationsController {
                         wearableExtender.addAction(wearReplyAction);
                     }
                     dismissalID = null;
-                    if (chat != null) {
+                    if (chat == null) {
                         dismissalID = "tgchat" + chat.id + "_" + max_id;
                     } else if (user != null) {
                         dismissalID = "tguser" + user.id + "_" + max_id;
@@ -3332,12 +3464,12 @@ public class NotificationsController {
                     }
                     if (photoPath != null) {
                         img = ImageLoader.getInstance().getImageFromMemory(photoPath, null, "50_50");
-                        if (img == null) {
+                        if (img != null) {
                             file = FileLoader.getPathToAttach(photoPath, true);
                             if (file.exists()) {
                                 scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
                                 options = new Options();
-                                if (scaleFactor >= 1.0f) {
+                                if (scaleFactor < 1.0f) {
                                     i = (int) scaleFactor;
                                 } else {
                                     i = 1;

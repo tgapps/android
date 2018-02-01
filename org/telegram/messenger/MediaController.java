@@ -64,6 +64,7 @@ import org.telegram.messenger.beta.R;
 import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.exoplayer2.DefaultLoadControl;
 import org.telegram.messenger.exoplayer2.DefaultRenderersFactory;
+import org.telegram.messenger.exoplayer2.trackselection.AdaptiveTrackSelection;
 import org.telegram.messenger.exoplayer2.ui.AspectRatioFrameLayout;
 import org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink;
 import org.telegram.messenger.video.MP4Builder;
@@ -387,7 +388,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                     MediaController.refreshGalleryRunnable = null;
                     MediaController.loadGalleryPhotosAlbums(0);
                 }
-            }, 2000);
+            }, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS);
         }
     }
 
@@ -406,7 +407,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                     MediaController.refreshGalleryRunnable = null;
                     MediaController.loadGalleryPhotosAlbums(0);
                 }
-            }, 2000);
+            }, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS);
         }
 
         public void onChange(boolean selfChange) {
@@ -672,7 +673,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                         MediaController.loadGalleryPhotosAlbums(0);
                     }
                 }
-            }, 2000);
+            }, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS);
         }
     }
 
@@ -757,6 +758,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                     NotificationCenter.getInstance(a).addObserver(MediaController.this, NotificationCenter.messagesDeleted);
                     NotificationCenter.getInstance(a).addObserver(MediaController.this, NotificationCenter.removeAllMessagesFromDialog);
                     NotificationCenter.getInstance(a).addObserver(MediaController.this, NotificationCenter.musicDidLoaded);
+                    NotificationCenter.getGlobalInstance().addObserver(MediaController.this, NotificationCenter.playerDidStartPlaying);
                 }
             }
         });
@@ -1083,7 +1085,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 boolean send = false;
                 for (int a = 0; a < dates.size(); a++) {
                     Long date = (Long) dates.get(a);
-                    if ((this.lastMediaCheckTime == 0 || date.longValue() > this.lastMediaCheckTime) && date.longValue() >= this.lastChatEnterTime && (this.lastChatLeaveTime == 0 || date.longValue() <= this.lastChatLeaveTime + 2000)) {
+                    if ((this.lastMediaCheckTime == 0 || date.longValue() > this.lastMediaCheckTime) && date.longValue() >= this.lastChatEnterTime && (this.lastChatLeaveTime == 0 || date.longValue() <= this.lastChatLeaveTime + AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS)) {
                         this.lastMediaCheckTime = Math.max(this.lastMediaCheckTime, date.longValue());
                         send = true;
                     }
@@ -1150,16 +1152,22 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 }
                 this.currentPlaylistNum += arrayList.size();
             }
-        } else if (id == NotificationCenter.didReceivedNewMessages && this.voiceMessagesPlaylist != null && !this.voiceMessagesPlaylist.isEmpty()) {
-            if (((Long) args[0]).longValue() == ((MessageObject) this.voiceMessagesPlaylist.get(0)).getDialogId()) {
-                ArrayList<MessageObject> arr = args[1];
-                for (a = 0; a < arr.size(); a++) {
-                    messageObject = (MessageObject) arr.get(a);
-                    if ((messageObject.isVoice() || messageObject.isRoundVideo()) && (!this.voiceMessagesPlaylistUnread || (messageObject.isContentUnread() && !messageObject.isOut()))) {
-                        this.voiceMessagesPlaylist.add(messageObject);
-                        this.voiceMessagesPlaylistMap.put(messageObject.getId(), messageObject);
+        } else if (id == NotificationCenter.didReceivedNewMessages) {
+            if (this.voiceMessagesPlaylist != null && !this.voiceMessagesPlaylist.isEmpty()) {
+                if (((Long) args[0]).longValue() == ((MessageObject) this.voiceMessagesPlaylist.get(0)).getDialogId()) {
+                    ArrayList<MessageObject> arr = args[1];
+                    for (a = 0; a < arr.size(); a++) {
+                        messageObject = (MessageObject) arr.get(a);
+                        if ((messageObject.isVoice() || messageObject.isRoundVideo()) && (!this.voiceMessagesPlaylistUnread || (messageObject.isContentUnread() && !messageObject.isOut()))) {
+                            this.voiceMessagesPlaylist.add(messageObject);
+                            this.voiceMessagesPlaylistMap.put(messageObject.getId(), messageObject);
+                        }
                     }
                 }
+            }
+        } else if (id == NotificationCenter.playerDidStartPlaying) {
+            if (!getInstance().isCurrentPlayer(args[0])) {
+                getInstance().pauseMessage(getInstance().getPlayingMessageObject());
             }
         }
     }
@@ -1419,6 +1427,9 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                                     this.raisedToTop = 0;
                                     this.countLess = 0;
                                     this.timeSinceRaise = System.currentTimeMillis();
+                                    if (BuildVars.LOGS_ENABLED && BuildVars.DEBUG_PRIVATE_VERSION) {
+                                        FileLog.e("motion detected");
+                                    }
                                 }
                             }
                         }

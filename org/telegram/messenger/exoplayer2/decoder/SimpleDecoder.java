@@ -22,6 +22,8 @@ public abstract class SimpleDecoder<I extends DecoderInputBuffer, O extends Outp
 
     protected abstract O createOutputBuffer();
 
+    protected abstract E createUnexpectedDecodeException(Throwable th);
+
     protected abstract E decode(I i, O o, boolean z);
 
     protected SimpleDecoder(I[] inputBuffers, O[] outputBuffers) {
@@ -165,101 +167,112 @@ public abstract class SimpleDecoder<I extends DecoderInputBuffer, O extends Outp
     /* Code decompiled incorrectly, please refer to instructions dump. */
     private boolean decode() throws java.lang.InterruptedException {
         /*
-        r7 = this;
-        r3 = 0;
-        r4 = r7.lock;
-        monitor-enter(r4);
+        r8 = this;
+        r4 = 0;
+        r5 = r8.lock;
+        monitor-enter(r5);
     L_0x0004:
-        r5 = r7.released;	 Catch:{ all -> 0x0014 }
-        if (r5 != 0) goto L_0x0017;
+        r6 = r8.released;	 Catch:{ all -> 0x0014 }
+        if (r6 != 0) goto L_0x0017;
     L_0x0008:
-        r5 = r7.canDecodeBuffer();	 Catch:{ all -> 0x0014 }
-        if (r5 != 0) goto L_0x0017;
+        r6 = r8.canDecodeBuffer();	 Catch:{ all -> 0x0014 }
+        if (r6 != 0) goto L_0x0017;
     L_0x000e:
-        r5 = r7.lock;	 Catch:{ all -> 0x0014 }
-        r5.wait();	 Catch:{ all -> 0x0014 }
+        r6 = r8.lock;	 Catch:{ all -> 0x0014 }
+        r6.wait();	 Catch:{ all -> 0x0014 }
         goto L_0x0004;
     L_0x0014:
-        r3 = move-exception;
-        monitor-exit(r4);	 Catch:{ all -> 0x0014 }
-        throw r3;
+        r4 = move-exception;
+        monitor-exit(r5);	 Catch:{ all -> 0x0014 }
+        throw r4;
     L_0x0017:
-        r5 = r7.released;	 Catch:{ all -> 0x0014 }
-        if (r5 == 0) goto L_0x001d;
+        r6 = r8.released;	 Catch:{ all -> 0x0014 }
+        if (r6 == 0) goto L_0x001d;
     L_0x001b:
-        monitor-exit(r4);	 Catch:{ all -> 0x0014 }
+        monitor-exit(r5);	 Catch:{ all -> 0x0014 }
     L_0x001c:
-        return r3;
+        return r4;
     L_0x001d:
-        r5 = r7.queuedInputBuffers;	 Catch:{ all -> 0x0014 }
-        r0 = r5.removeFirst();	 Catch:{ all -> 0x0014 }
-        r0 = (org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer) r0;	 Catch:{ all -> 0x0014 }
-        r5 = r7.availableOutputBuffers;	 Catch:{ all -> 0x0014 }
-        r6 = r7.availableOutputBufferCount;	 Catch:{ all -> 0x0014 }
-        r6 = r6 + -1;
-        r7.availableOutputBufferCount = r6;	 Catch:{ all -> 0x0014 }
-        r1 = r5[r6];	 Catch:{ all -> 0x0014 }
-        r2 = r7.flushed;	 Catch:{ all -> 0x0014 }
-        r5 = 0;
-        r7.flushed = r5;	 Catch:{ all -> 0x0014 }
-        monitor-exit(r4);	 Catch:{ all -> 0x0014 }
-        r4 = r0.isEndOfStream();
-        if (r4 == 0) goto L_0x004f;
+        r6 = r8.queuedInputBuffers;	 Catch:{ all -> 0x0014 }
+        r1 = r6.removeFirst();	 Catch:{ all -> 0x0014 }
+        r1 = (org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer) r1;	 Catch:{ all -> 0x0014 }
+        r6 = r8.availableOutputBuffers;	 Catch:{ all -> 0x0014 }
+        r7 = r8.availableOutputBufferCount;	 Catch:{ all -> 0x0014 }
+        r7 = r7 + -1;
+        r8.availableOutputBufferCount = r7;	 Catch:{ all -> 0x0014 }
+        r2 = r6[r7];	 Catch:{ all -> 0x0014 }
+        r3 = r8.flushed;	 Catch:{ all -> 0x0014 }
+        r6 = 0;
+        r8.flushed = r6;	 Catch:{ all -> 0x0014 }
+        monitor-exit(r5);	 Catch:{ all -> 0x0014 }
+        r5 = r1.isEndOfStream();
+        if (r5 == 0) goto L_0x004f;
     L_0x003b:
-        r3 = 4;
-        r1.addFlag(r3);
+        r4 = 4;
+        r2.addFlag(r4);
     L_0x003f:
-        r4 = r7.lock;
-        monitor-enter(r4);
-        r3 = r7.flushed;	 Catch:{ all -> 0x007c }
-        if (r3 == 0) goto L_0x006c;
+        r5 = r8.lock;
+        monitor-enter(r5);
+        r4 = r8.flushed;	 Catch:{ all -> 0x008c }
+        if (r4 == 0) goto L_0x007c;
     L_0x0046:
-        r7.releaseOutputBufferInternal(r1);	 Catch:{ all -> 0x007c }
+        r8.releaseOutputBufferInternal(r2);	 Catch:{ all -> 0x008c }
     L_0x0049:
-        r7.releaseInputBufferInternal(r0);	 Catch:{ all -> 0x007c }
-        monitor-exit(r4);	 Catch:{ all -> 0x007c }
-        r3 = 1;
+        r8.releaseInputBufferInternal(r1);	 Catch:{ all -> 0x008c }
+        monitor-exit(r5);	 Catch:{ all -> 0x008c }
+        r4 = 1;
         goto L_0x001c;
     L_0x004f:
-        r4 = r0.isDecodeOnly();
-        if (r4 == 0) goto L_0x005a;
+        r5 = r1.isDecodeOnly();
+        if (r5 == 0) goto L_0x005a;
     L_0x0055:
-        r4 = -2147483648; // 0xffffffff80000000 float:-0.0 double:NaN;
-        r1.addFlag(r4);
+        r5 = -2147483648; // 0xffffffff80000000 float:-0.0 double:NaN;
+        r2.addFlag(r5);
     L_0x005a:
-        r4 = r7.decode(r0, r1, r2);
-        r7.exception = r4;
-        r4 = r7.exception;
-        if (r4 == 0) goto L_0x003f;
+        r5 = r8.decode(r1, r2, r3);	 Catch:{ RuntimeException -> 0x006c, OutOfMemoryError -> 0x0074 }
+        r8.exception = r5;	 Catch:{ RuntimeException -> 0x006c, OutOfMemoryError -> 0x0074 }
+    L_0x0060:
+        r5 = r8.exception;
+        if (r5 == 0) goto L_0x003f;
     L_0x0064:
-        r4 = r7.lock;
-        monitor-enter(r4);
-        monitor-exit(r4);	 Catch:{ all -> 0x0069 }
+        r5 = r8.lock;
+        monitor-enter(r5);
+        monitor-exit(r5);	 Catch:{ all -> 0x0069 }
         goto L_0x001c;
     L_0x0069:
-        r3 = move-exception;
-        monitor-exit(r4);	 Catch:{ all -> 0x0069 }
-        throw r3;
+        r4 = move-exception;
+        monitor-exit(r5);	 Catch:{ all -> 0x0069 }
+        throw r4;
     L_0x006c:
-        r3 = r1.isDecodeOnly();	 Catch:{ all -> 0x007c }
-        if (r3 == 0) goto L_0x007f;
-    L_0x0072:
-        r3 = r7.skippedOutputBufferCount;	 Catch:{ all -> 0x007c }
-        r3 = r3 + 1;
-        r7.skippedOutputBufferCount = r3;	 Catch:{ all -> 0x007c }
-        r7.releaseOutputBufferInternal(r1);	 Catch:{ all -> 0x007c }
-        goto L_0x0049;
+        r0 = move-exception;
+        r5 = r8.createUnexpectedDecodeException(r0);
+        r8.exception = r5;
+        goto L_0x0060;
+    L_0x0074:
+        r0 = move-exception;
+        r5 = r8.createUnexpectedDecodeException(r0);
+        r8.exception = r5;
+        goto L_0x0060;
     L_0x007c:
-        r3 = move-exception;
-        monitor-exit(r4);	 Catch:{ all -> 0x007c }
-        throw r3;
-    L_0x007f:
-        r3 = r7.skippedOutputBufferCount;	 Catch:{ all -> 0x007c }
-        r1.skippedOutputBufferCount = r3;	 Catch:{ all -> 0x007c }
-        r3 = 0;
-        r7.skippedOutputBufferCount = r3;	 Catch:{ all -> 0x007c }
-        r3 = r7.queuedOutputBuffers;	 Catch:{ all -> 0x007c }
-        r3.addLast(r1);	 Catch:{ all -> 0x007c }
+        r4 = r2.isDecodeOnly();	 Catch:{ all -> 0x008c }
+        if (r4 == 0) goto L_0x008f;
+    L_0x0082:
+        r4 = r8.skippedOutputBufferCount;	 Catch:{ all -> 0x008c }
+        r4 = r4 + 1;
+        r8.skippedOutputBufferCount = r4;	 Catch:{ all -> 0x008c }
+        r8.releaseOutputBufferInternal(r2);	 Catch:{ all -> 0x008c }
+        goto L_0x0049;
+    L_0x008c:
+        r4 = move-exception;
+        monitor-exit(r5);	 Catch:{ all -> 0x008c }
+        throw r4;
+    L_0x008f:
+        r4 = r8.skippedOutputBufferCount;	 Catch:{ all -> 0x008c }
+        r2.skippedOutputBufferCount = r4;	 Catch:{ all -> 0x008c }
+        r4 = 0;
+        r8.skippedOutputBufferCount = r4;	 Catch:{ all -> 0x008c }
+        r4 = r8.queuedOutputBuffers;	 Catch:{ all -> 0x008c }
+        r4.addLast(r2);	 Catch:{ all -> 0x008c }
         goto L_0x0049;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.decoder.SimpleDecoder.decode():boolean");

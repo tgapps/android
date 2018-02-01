@@ -324,9 +324,9 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                     r8 = r8.sendWhenDone;
                     if (r8 != 0) goto L_0x0054;
                 L_0x002e:
-                    r8 = org.telegram.ui.Components.InstantCameraView.VideoRecorder.this;	 Catch:{ Exception -> 0x0121 }
-                    r8 = r8.audioRecorder;	 Catch:{ Exception -> 0x0121 }
-                    r8.release();	 Catch:{ Exception -> 0x0121 }
+                    r8 = org.telegram.ui.Components.InstantCameraView.VideoRecorder.this;	 Catch:{ Exception -> 0x0105 }
+                    r8 = r8.audioRecorder;	 Catch:{ Exception -> 0x0105 }
+                    r8.release();	 Catch:{ Exception -> 0x0105 }
                 L_0x0037:
                     r8 = org.telegram.ui.Components.InstantCameraView.VideoRecorder.this;
                     r8 = r8.handler;
@@ -386,7 +386,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                     if (r8 >= 0) goto L_0x00a5;
                 L_0x00a1:
                     r8 = r1.last;
-                    if (r8 == 0) goto L_0x0108;
+                    if (r8 == 0) goto L_0x00ec;
                 L_0x00a5:
                     r8 = org.telegram.ui.Components.InstantCameraView.VideoRecorder.this;
                     r8 = r8.running;
@@ -416,17 +416,6 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                     r8[r0] = r2;
                     r8 = r1.read;
                     r8[r0] = r7;
-                    r8 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
-                    if (r8 == 0) goto L_0x00f8;
-                L_0x00e1:
-                    r8 = new java.lang.StringBuilder;
-                    r8.<init>();
-                    r9 = "audio frame time ";
-                    r8 = r8.append(r9);
-                    r8 = r8.append(r2);
-                    r8 = r8.toString();
-                    org.telegram.messenger.FileLog.d(r8);
-                L_0x00f8:
                     r8 = 1000000; // 0xf4240 float:1.401298E-39 double:4.940656E-318;
                     r8 = r8 * r7;
                     r9 = 44100; // 0xac44 float:6.1797E-41 double:2.17883E-319;
@@ -436,22 +425,22 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                     r2 = r2 + r8;
                     r0 = r0 + 1;
                     goto L_0x006f;
-                L_0x0108:
+                L_0x00ec:
                     r8 = org.telegram.ui.Components.InstantCameraView.VideoRecorder.this;
                     r8 = r8.running;
-                    if (r8 != 0) goto L_0x0113;
-                L_0x0110:
+                    if (r8 != 0) goto L_0x00f7;
+                L_0x00f4:
                     r5 = 1;
                     goto L_0x0007;
-                L_0x0113:
-                    r8 = org.telegram.ui.Components.InstantCameraView.VideoRecorder.this;	 Catch:{ Exception -> 0x011e }
-                    r8 = r8.buffers;	 Catch:{ Exception -> 0x011e }
-                    r8.put(r1);	 Catch:{ Exception -> 0x011e }
+                L_0x00f7:
+                    r8 = org.telegram.ui.Components.InstantCameraView.VideoRecorder.this;	 Catch:{ Exception -> 0x0102 }
+                    r8 = r8.buffers;	 Catch:{ Exception -> 0x0102 }
+                    r8.put(r1);	 Catch:{ Exception -> 0x0102 }
                     goto L_0x0007;
-                L_0x011e:
+                L_0x0102:
                     r8 = move-exception;
                     goto L_0x0007;
-                L_0x0121:
+                L_0x0105:
                     r6 = move-exception;
                     org.telegram.messenger.FileLog.e(r6);
                     goto L_0x0037;
@@ -759,9 +748,6 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             GLES20.glDisableVertexAttribArray(this.textureHandle);
             GLES20.glBindTexture(36197, 0);
             GLES20.glUseProgram(0);
-            if (BuildVars.LOGS_ENABLED) {
-                FileLog.d("video frame time " + this.currentTimestamp);
-            }
             EGLExt.eglPresentationTimeANDROID(this.eglDisplay, this.eglSurface, this.currentTimestamp);
             EGL14.eglSwapBuffers(this.eglDisplay, this.eglSurface);
             if (InstantCameraView.this.oldCameraTexture[0] != 0 && InstantCameraView.this.cameraTextureAlpha < 1.0f) {
@@ -1045,20 +1031,35 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         }
 
         private void didWriteData(File file, boolean last) {
+            long j = 0;
             if (this.videoConvertFirstWrite) {
-                FileLoader.getInstance(InstantCameraView.this.currentAccount).uploadFile(file.toString(), false, false, 1, ConnectionsManager.FileTypeVideo);
+                FileLoader.getInstance(InstantCameraView.this.currentAccount).uploadFile(file.toString(), InstantCameraView.this.isSecretChat, false, 1, ConnectionsManager.FileTypeVideo);
                 this.videoConvertFirstWrite = false;
                 if (last) {
-                    FileLoader.getInstance(InstantCameraView.this.currentAccount).checkUploadNewDataAvailable(file.toString(), false, file.length(), last ? file.length() : 0);
+                    FileLoader instance = FileLoader.getInstance(InstantCameraView.this.currentAccount);
+                    String file2 = file.toString();
+                    boolean access$5500 = InstantCameraView.this.isSecretChat;
+                    long length = file.length();
+                    if (last) {
+                        j = file.length();
+                    }
+                    instance.checkUploadNewDataAvailable(file2, access$5500, length, j);
                     return;
                 }
                 return;
             }
-            FileLoader.getInstance(InstantCameraView.this.currentAccount).checkUploadNewDataAvailable(file.toString(), false, file.length(), last ? file.length() : 0);
+            instance = FileLoader.getInstance(InstantCameraView.this.currentAccount);
+            file2 = file.toString();
+            access$5500 = InstantCameraView.this.isSecretChat;
+            length = file.length();
+            if (last) {
+                j = file.length();
+            }
+            instance.checkUploadNewDataAvailable(file2, access$5500, length, j);
         }
 
         public void drainEncoder(boolean endOfStream) throws Exception {
-            ByteBuffer encodedData;
+            MediaFormat newFormat;
             if (endOfStream) {
                 this.videoEncoder.signalEndOfInputStream();
             }
@@ -1067,7 +1068,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                 encoderOutputBuffers = this.videoEncoder.getOutputBuffers();
             }
             while (true) {
-                MediaFormat newFormat;
+                ByteBuffer encodedData;
                 int encoderStatus = this.videoEncoder.dequeueOutputBuffer(this.videoBufferInfo, 10000);
                 if (encoderStatus == -1) {
                     if (!endOfStream) {

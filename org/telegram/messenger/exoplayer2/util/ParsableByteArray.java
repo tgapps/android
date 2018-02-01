@@ -161,6 +161,21 @@ public final class ParsableByteArray {
         return i2 | (bArr2[i3] & 255);
     }
 
+    public int readInt24() {
+        byte[] bArr = this.data;
+        int i = this.position;
+        this.position = i + 1;
+        int i2 = ((bArr[i] & 255) << 24) >> 8;
+        byte[] bArr2 = this.data;
+        int i3 = this.position;
+        this.position = i3 + 1;
+        i2 |= (bArr2[i3] & 255) << 8;
+        bArr2 = this.data;
+        i3 = this.position;
+        this.position = i3 + 1;
+        return i2 | (bArr2[i3] & 255);
+    }
+
     public int readLittleEndianInt24() {
         byte[] bArr = this.data;
         int i = this.position;
@@ -457,11 +472,10 @@ public final class ParsableByteArray {
     }
 
     public long readUtf8EncodedLong() {
-        int i;
+        int x;
         int length = 0;
         long value = (long) this.data[this.position];
         for (int j = 7; j >= 0; j--) {
-            int x;
             if ((((long) (1 << j)) & value) == 0) {
                 if (j < 6) {
                     value &= (long) ((1 << j) - 1);
@@ -472,6 +486,7 @@ public final class ParsableByteArray {
                 if (length != 0) {
                     throw new NumberFormatException("Invalid UTF-8 sequence first byte: " + value);
                 }
+                int i;
                 for (i = 1; i < length; i++) {
                     x = this.data[this.position + i];
                     if ((x & PsExtractor.AUDIO_STREAM) == 128) {

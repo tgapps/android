@@ -545,13 +545,13 @@ public class AlertsCreator {
         goto L_0x03c4;
     L_0x03e8:
         r0 = "UsernameInvalid";
-        r1 = 2131494499; // 0x7f0c0663 float:1.8612508E38 double:1.0530982063E-314;
+        r1 = 2131494500; // 0x7f0c0664 float:1.861251E38 double:1.0530982067E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x03f7:
         r0 = "UsernameInUse";
-        r1 = 2131494498; // 0x7f0c0662 float:1.8612506E38 double:1.053098206E-314;
+        r1 = 2131494499; // 0x7f0c0663 float:1.8612508E38 double:1.0530982063E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;

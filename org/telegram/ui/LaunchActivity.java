@@ -54,6 +54,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.messenger.camera.CameraController;
+import org.telegram.messenger.exoplayer2.trackselection.AdaptiveTrackSelection;
 import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
@@ -3300,14 +3301,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0ecb:
         r4 = "selectAlertString";
         r5 = "SendContactTo";
-        r16 = 2131494294; // 0x7f0c0596 float:1.8612092E38 double:1.053098105E-314;
+        r16 = 2131494295; // 0x7f0c0597 float:1.8612094E38 double:1.0530981055E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendContactToGroup";
-        r16 = 2131494281; // 0x7f0c0589 float:1.8612066E38 double:1.0530980985E-314;
+        r16 = 2131494282; // 0x7f0c058a float:1.8612068E38 double:1.053098099E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -3384,14 +3385,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0f81:
         r4 = "selectAlertString";
         r5 = "SendMessagesTo";
-        r16 = 2131494294; // 0x7f0c0596 float:1.8612092E38 double:1.053098105E-314;
+        r16 = 2131494295; // 0x7f0c0597 float:1.8612094E38 double:1.0530981055E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendMessagesToGroup";
-        r16 = 2131494295; // 0x7f0c0597 float:1.8612094E38 double:1.0530981055E-314;
+        r16 = 2131494296; // 0x7f0c0598 float:1.8612096E38 double:1.053098106E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -4592,7 +4593,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
                         }
                     }
                 }
-            }, 2000);
+            }, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS);
         }
     }
 
