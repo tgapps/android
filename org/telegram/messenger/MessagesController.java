@@ -336,6 +336,7 @@ import org.telegram.tgnet.TLRPC.updates_Difference;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.AlertDialog.Builder;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AlertsCreator;
 import org.telegram.ui.DialogsActivity;
@@ -360,6 +361,7 @@ public class MessagesController implements NotificationCenterDelegate {
     public static final int UPDATE_MASK_STATUS = 4;
     public static final int UPDATE_MASK_USER_PHONE = 128;
     public static final int UPDATE_MASK_USER_PRINT = 64;
+    private static volatile long lastThemeCheckTime;
     public ArrayList<Integer> blockedUsers = new ArrayList();
     public int callConnectTimeout = DefaultLoadControl.DEFAULT_MAX_BUFFER_MS;
     public int callPacketTimeout = 10000;
@@ -483,6 +485,11 @@ public class MessagesController implements NotificationCenterDelegate {
     private SparseIntArray shortPollChannels = new SparseIntArray();
     private int statusRequest;
     private int statusSettingState;
+    private Runnable themeCheckRunnable = new Runnable() {
+        public void run() {
+            Theme.checkAutoNightThemeConditions();
+        }
+    };
     private final Comparator<Update> updatesComparator = new Comparator<Update>() {
         public int compare(Update lhs, Update rhs) {
             int ltype = MessagesController.this.getUpdateType(lhs);
@@ -2362,9 +2369,9 @@ public class MessagesController implements NotificationCenterDelegate {
     }
 
     public void deleteMessages(ArrayList<Integer> messages, ArrayList<Long> randoms, EncryptedChat encryptedChat, int channelId, boolean forAll, long taskId, TLObject taskRequest) {
+        long newTaskId;
         NativeByteBuffer data;
         Throwable e;
-        final int i;
         TL_messages_deleteMessages req;
         if ((messages != null && !messages.isEmpty()) || taskRequest != null) {
             ArrayList<Integer> toSend = null;
@@ -2391,10 +2398,10 @@ public class MessagesController implements NotificationCenterDelegate {
                 MessagesStorage.getInstance(this.currentAccount).updateDialogsWithDeletedMessages(messages, null, true, channelId);
                 NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.messagesDeleted, messages, Integer.valueOf(channelId));
             }
-            long newTaskId;
             NativeByteBuffer data2;
             if (channelId != 0) {
                 TL_channels_deleteMessages req2;
+                final int i;
                 if (taskRequest != null) {
                     req2 = (TL_channels_deleteMessages) taskRequest;
                     newTaskId = taskId;
@@ -2929,6 +2936,10 @@ public class MessagesController implements NotificationCenterDelegate {
                     }
                 });
             }
+        }
+        if (Theme.selectedAutoNightType == 1 && Math.abs(currentTime - lastThemeCheckTime) >= 60) {
+            AndroidUtilities.runOnUIThread(this.themeCheckRunnable);
+            lastThemeCheckTime = currentTime;
         }
         LocationController.getInstance(this.currentAccount).update();
     }
@@ -4030,7 +4041,6 @@ public class MessagesController implements NotificationCenterDelegate {
                 int a;
                 Chat chat;
                 User user;
-                Integer value;
                 final LongSparseArray<TL_dialog> new_dialogs_dict = new LongSparseArray();
                 final LongSparseArray<MessageObject> new_dialogMessage = new LongSparseArray();
                 SparseArray usersDict = new SparseArray();
@@ -4119,6 +4129,7 @@ public class MessagesController implements NotificationCenterDelegate {
                 }
                 final ArrayList<TL_dialog> dialogsToReload = new ArrayList();
                 for (a = 0; a < org_telegram_tgnet_TLRPC_messages_Dialogs.dialogs.size(); a++) {
+                    Integer value;
                     TL_dialog d = (TL_dialog) org_telegram_tgnet_TLRPC_messages_Dialogs.dialogs.get(a);
                     if (d.id == 0 && d.peer != null) {
                         if (d.peer.user_id != 0) {
@@ -4480,6 +4491,8 @@ public class MessagesController implements NotificationCenterDelegate {
 
     protected void checkLastDialogMessage(TL_dialog dialog, InputPeer peer, long taskId) {
         Throwable e;
+        long newTaskId;
+        final TL_dialog tL_dialog;
         final int lower_id = (int) dialog.id;
         if (lower_id != 0 && this.checkingLastMessagesDialogs.indexOfKey(lower_id) < 0) {
             InputPeer inputPeer;
@@ -4491,8 +4504,6 @@ public class MessagesController implements NotificationCenterDelegate {
             }
             req.peer = inputPeer;
             if (req.peer != null && !(req.peer instanceof TL_inputPeerChannel)) {
-                long newTaskId;
-                final TL_dialog tL_dialog;
                 req.limit = 1;
                 this.checkingLastMessagesDialogs.put(lower_id, true);
                 if (taskId == 0) {
@@ -6042,13 +6053,13 @@ public class MessagesController implements NotificationCenterDelegate {
     }
 
     protected void getChannelDifference(int channelId, int newDialogType, long taskId, InputChannel inputChannel) {
+        int channelPts;
         Throwable e;
         long newTaskId;
         TL_updates_getChannelDifference req;
         final int i;
         final int i2;
         if (!this.gettingDifferenceChannels.get(channelId)) {
-            int channelPts;
             int limit = 100;
             if (newDialogType != 1) {
                 channelPts = this.channelsPts.get(channelId);
@@ -9425,7 +9436,7 @@ public class MessagesController implements NotificationCenterDelegate {
                 Chat chat;
                 if (DialogObject.isChannel(d)) {
                     chat = getChat(Integer.valueOf(-lower_id));
-                    if (chat != null && ((chat.megagroup && chat.admin_rights != null && chat.admin_rights.post_messages) || chat.creator)) {
+                    if (chat != null && ((chat.megagroup && chat.admin_rights != null && (chat.admin_rights.post_messages || chat.admin_rights.add_admins)) || chat.creator)) {
                         this.dialogsGroupsOnly.add(d);
                     }
                 } else if (lower_id < 0) {

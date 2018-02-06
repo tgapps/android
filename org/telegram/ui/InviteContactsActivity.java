@@ -827,12 +827,14 @@ public class InviteContactsActivity extends BaseFragment implements OnClickListe
 
     public ThemeDescription[] getThemeDescriptions() {
         ThemeDescriptionDelegate сellDelegate = new ThemeDescriptionDelegate() {
-            public void didSetColor(int color) {
-                int count = InviteContactsActivity.this.listView.getChildCount();
-                for (int a = 0; a < count; a++) {
-                    View child = InviteContactsActivity.this.listView.getChildAt(a);
-                    if (child instanceof InviteUserCell) {
-                        ((InviteUserCell) child).update(0);
+            public void didSetColor() {
+                if (InviteContactsActivity.this.listView != null) {
+                    int count = InviteContactsActivity.this.listView.getChildCount();
+                    for (int a = 0; a < count; a++) {
+                        View child = InviteContactsActivity.this.listView.getChildAt(a);
+                        if (child instanceof InviteUserCell) {
+                            ((InviteUserCell) child).update(0);
+                        }
                     }
                 }
             }

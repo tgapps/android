@@ -69,7 +69,7 @@ public class FileLoadOperation {
     private int datacenter_id;
     private ArrayList<RequestInfo> delayedRequestInfos;
     private FileLoadOperationDelegate delegate;
-    private int downloadedBytes;
+    private volatile int downloadedBytes;
     private boolean encryptFile;
     private byte[] encryptIv;
     private byte[] encryptKey;
@@ -85,8 +85,9 @@ public class FileLoadOperation {
     private InputFileLocation location;
     private ArrayList<Range> notCheckedCdnRanges;
     private ArrayList<Range> notLoadedBytesRanges;
-    private ArrayList<Range> notLoadedBytesRangesCopy;
+    private volatile ArrayList<Range> notLoadedBytesRangesCopy;
     private ArrayList<Range> notRequestedBytesRanges;
+    private volatile boolean paused;
     private int renameRetryCount;
     private ArrayList<RequestInfo> requestInfos;
     private int requestedBytesCount;
@@ -459,10 +460,11 @@ public class FileLoadOperation {
     }
 
     protected float getDownloadedLengthFromOffset(float progress) {
-        if (this.totalBytesCount == 0 || this.notLoadedBytesRanges == null) {
+        ArrayList<Range> ranges = this.notLoadedBytesRangesCopy;
+        if (this.totalBytesCount == 0 || ranges == null) {
             return 0.0f;
         }
-        return (((float) getDownloadedLengthFromOffsetInternal(this.notLoadedBytesRanges, (int) (((float) this.totalBytesCount) * progress), this.totalBytesCount)) / ((float) this.totalBytesCount)) + progress;
+        return (((float) getDownloadedLengthFromOffsetInternal(ranges, (int) (((float) this.totalBytesCount) * progress), this.totalBytesCount)) / ((float) this.totalBytesCount)) + progress;
     }
 
     protected int getDownloadedLengthFromOffset(int offset, int length) {
@@ -507,6 +509,16 @@ public class FileLoadOperation {
         }
     }
 
+    public void pause() {
+        if (this.state == 1) {
+            Utilities.stageQueue.postRunnable(new Runnable() {
+                public void run() {
+                    FileLoadOperation.this.paused = true;
+                }
+            });
+        }
+    }
+
     public boolean start() {
         return start(null, 0);
     }
@@ -517,6 +529,8 @@ public class FileLoadOperation {
             this.currentMaxDownloadRequests = this.totalBytesCount >= 1048576 ? 4 : 4;
         }
         final boolean alreadyStarted = this.state != 0;
+        boolean wasPaused = this.paused;
+        this.paused = false;
         if (stream != null) {
             final int i = streamOffset;
             final FileStreamLoadOperation fileStreamLoadOperation = stream;
@@ -532,9 +546,15 @@ public class FileLoadOperation {
                     }
                 }
             });
+        } else if (wasPaused && alreadyStarted) {
+            Utilities.stageQueue.postRunnable(new Runnable() {
+                public void run() {
+                    FileLoadOperation.this.startDownloadRequest();
+                }
+            });
         }
         if (alreadyStarted) {
-            return false;
+            return wasPaused;
         }
         if (this.location == null && this.webLocation == null) {
             onFail(true, 0);
@@ -750,6 +770,10 @@ public class FileLoadOperation {
             });
         }
         return true;
+    }
+
+    public boolean isPaused() {
+        return this.paused;
     }
 
     public void cancel() {
@@ -1194,7 +1218,7 @@ public class FileLoadOperation {
     }
 
     private void startDownloadRequest() {
-        if (this.state == 1 && this.requestInfos.size() + this.delayedRequestInfos.size() < this.currentMaxDownloadRequests) {
+        if (!this.paused && this.state == 1 && this.requestInfos.size() + this.delayedRequestInfos.size() < this.currentMaxDownloadRequests) {
             int count = 1;
             if (this.totalBytesCount > 0) {
                 count = Math.max(0, this.currentMaxDownloadRequests - this.requestInfos.size());
@@ -1264,7 +1288,7 @@ public class FileLoadOperation {
                     requestInfo.offset = downloadOffset;
                     ConnectionsManager instance = ConnectionsManager.getInstance(this.currentAccount);
                     final RequestInfo requestInfo2 = requestInfo;
-                    RequestDelegate anonymousClass10 = new RequestDelegate() {
+                    RequestDelegate anonymousClass12 = new RequestDelegate() {
                         public void run(TLObject response, TL_error error) {
                             if (!FileLoadOperation.this.requestInfos.contains(requestInfo2)) {
                                 return;
@@ -1361,7 +1385,7 @@ public class FileLoadOperation {
                     } else {
                         i = this.datacenter_id;
                     }
-                    requestInfo.requestToken = instance.sendRequest(request, anonymousClass10, null, null, flags, i, connectionType, isLast);
+                    requestInfo.requestToken = instance.sendRequest(request, anonymousClass12, null, null, flags, i, connectionType, isLast);
                     this.requestsCount++;
                     a++;
                 } else {

@@ -639,12 +639,14 @@ public class SetAdminsActivity extends BaseFragment implements NotificationCente
 
     public ThemeDescription[] getThemeDescriptions() {
         ThemeDescriptionDelegate сellDelegate = new ThemeDescriptionDelegate() {
-            public void didSetColor(int color) {
-                int count = SetAdminsActivity.this.listView.getChildCount();
-                for (int a = 0; a < count; a++) {
-                    View child = SetAdminsActivity.this.listView.getChildAt(a);
-                    if (child instanceof UserCell) {
-                        ((UserCell) child).update(0);
+            public void didSetColor() {
+                if (SetAdminsActivity.this.listView != null) {
+                    int count = SetAdminsActivity.this.listView.getChildCount();
+                    for (int a = 0; a < count; a++) {
+                        View child = SetAdminsActivity.this.listView.getChildAt(a);
+                        if (child instanceof UserCell) {
+                            ((UserCell) child).update(0);
+                        }
                     }
                 }
             }

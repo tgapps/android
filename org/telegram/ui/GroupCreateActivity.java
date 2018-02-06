@@ -357,7 +357,6 @@ public class GroupCreateActivity extends BaseFragment implements OnClickListener
         }
 
         public void onBindViewHolder(ViewHolder holder, int position) {
-            User user;
             switch (holder.getItemViewType()) {
                 case 0:
                     GroupCreateSectionCell cell = (GroupCreateSectionCell) holder.itemView;
@@ -367,6 +366,7 @@ public class GroupCreateActivity extends BaseFragment implements OnClickListener
                     }
                     return;
                 default:
+                    User user;
                     GroupCreateUserCell cell2 = holder.itemView;
                     CharSequence username = null;
                     CharSequence name = null;
@@ -1028,12 +1028,14 @@ public class GroupCreateActivity extends BaseFragment implements OnClickListener
 
     public ThemeDescription[] getThemeDescriptions() {
         ThemeDescriptionDelegate сellDelegate = new ThemeDescriptionDelegate() {
-            public void didSetColor(int color) {
-                int count = GroupCreateActivity.this.listView.getChildCount();
-                for (int a = 0; a < count; a++) {
-                    View child = GroupCreateActivity.this.listView.getChildAt(a);
-                    if (child instanceof GroupCreateUserCell) {
-                        ((GroupCreateUserCell) child).update(0);
+            public void didSetColor() {
+                if (GroupCreateActivity.this.listView != null) {
+                    int count = GroupCreateActivity.this.listView.getChildCount();
+                    for (int a = 0; a < count; a++) {
+                        View child = GroupCreateActivity.this.listView.getChildAt(a);
+                        if (child instanceof GroupCreateUserCell) {
+                            ((GroupCreateUserCell) child).update(0);
+                        }
                     }
                 }
             }

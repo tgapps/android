@@ -821,12 +821,14 @@ public class ChannelEditActivity extends BaseFragment implements NotificationCen
 
     public ThemeDescription[] getThemeDescriptions() {
         ThemeDescriptionDelegate сellDelegate = new ThemeDescriptionDelegate() {
-            public void didSetColor(int color) {
-                int count = ChannelEditActivity.this.listView.getChildCount();
-                for (int a = 0; a < count; a++) {
-                    View child = ChannelEditActivity.this.listView.getChildAt(a);
-                    if (child instanceof ManageChatUserCell) {
-                        ((ManageChatUserCell) child).update(0);
+            public void didSetColor() {
+                if (ChannelEditActivity.this.listView != null) {
+                    int count = ChannelEditActivity.this.listView.getChildCount();
+                    for (int a = 0; a < count; a++) {
+                        View child = ChannelEditActivity.this.listView.getChildAt(a);
+                        if (child instanceof ManageChatUserCell) {
+                            ((ManageChatUserCell) child).update(0);
+                        }
                     }
                 }
             }

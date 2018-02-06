@@ -2302,7 +2302,7 @@ public class MessageObject {
     }
 
     public void generateCaption() {
-        if (this.caption == null && !isRoundVideo() && !isMediaEmpty() && !TextUtils.isEmpty(this.messageOwner.message)) {
+        if (this.caption == null && !isRoundVideo() && !isMediaEmpty() && !(this.messageOwner.media instanceof TL_messageMediaGame) && !TextUtils.isEmpty(this.messageOwner.message)) {
             boolean hasEntities;
             boolean useManualParse;
             this.caption = Emoji.replaceEmoji(this.messageOwner.message, Theme.chat_msgTextPaint.getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
@@ -2998,6 +2998,23 @@ public class MessageObject {
 
     public long getDialogId() {
         return getDialogId(this.messageOwner);
+    }
+
+    public boolean canStreamVideo() {
+        Document document = getDocument();
+        if (document == null) {
+            return false;
+        }
+        if (SharedConfig.streamAllVideo) {
+            return true;
+        }
+        for (int a = 0; a < document.attributes.size(); a++) {
+            DocumentAttribute attribute = (DocumentAttribute) document.attributes.get(a);
+            if (attribute instanceof TL_documentAttributeVideo) {
+                return attribute.supports_streaming;
+            }
+        }
+        return false;
     }
 
     public static long getDialogId(Message message) {

@@ -56,10 +56,10 @@ public class AlertsCreator {
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public static android.app.Dialog processError(int r7, org.telegram.tgnet.TLRPC.TL_error r8, org.telegram.ui.ActionBar.BaseFragment r9, org.telegram.tgnet.TLObject r10, java.lang.Object... r11) {
         /*
-        r6 = 2131493250; // 0x7f0c0182 float:1.8609975E38 double:1.053097589E-314;
-        r5 = 2131493433; // 0x7f0c0239 float:1.8610346E38 double:1.0530976796E-314;
+        r6 = 2131493265; // 0x7f0c0191 float:1.8610005E38 double:1.0530975966E-314;
+        r5 = 2131493450; // 0x7f0c024a float:1.861038E38 double:1.053097688E-314;
         r2 = 1;
-        r4 = 2131493523; // 0x7f0c0293 float:1.8610529E38 double:1.053097724E-314;
+        r4 = 2131493540; // 0x7f0c02a4 float:1.8610563E38 double:1.0530977324E-314;
         r1 = 0;
         r0 = r8.code;
         r3 = 406; // 0x196 float:5.69E-43 double:2.006E-321;
@@ -155,7 +155,7 @@ public class AlertsCreator {
         if (r0 != 0) goto L_0x003e;
     L_0x00a2:
         r0 = "EditMessageError";
-        r1 = 2131493396; // 0x7f0c0214 float:1.861027E38 double:1.0530976613E-314;
+        r1 = 2131493411; // 0x7f0c0223 float:1.8610301E38 double:1.0530976687E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -207,13 +207,13 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0117;
     L_0x0108:
         r0 = "JoinToGroupErrorFull";
-        r1 = 2131493691; // 0x7f0c033b float:1.861087E38 double:1.053097807E-314;
+        r1 = 2131493708; // 0x7f0c034c float:1.8610904E38 double:1.0530978154E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x0117:
         r0 = "JoinToGroupErrorNotExist";
-        r1 = 2131493692; // 0x7f0c033c float:1.8610871E38 double:1.0530978075E-314;
+        r1 = 2131493709; // 0x7f0c034d float:1.8610906E38 double:1.053097816E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -255,7 +255,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0189;
     L_0x017a:
         r0 = "InvalidCode";
-        r1 = 2131493659; // 0x7f0c031b float:1.8610804E38 double:1.053097791E-314;
+        r1 = 2131493676; // 0x7f0c032c float:1.8610839E38 double:1.0530977996E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -293,7 +293,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x01dc;
     L_0x01cd:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131493662; // 0x7f0c031e float:1.861081E38 double:1.0530977927E-314;
+        r1 = 2131493679; // 0x7f0c032f float:1.8610845E38 double:1.053097801E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -309,7 +309,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0201;
     L_0x01f2:
         r0 = "InvalidCode";
-        r1 = 2131493659; // 0x7f0c031b float:1.8610804E38 double:1.053097791E-314;
+        r1 = 2131493676; // 0x7f0c032c float:1.8610839E38 double:1.0530977996E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -359,7 +359,7 @@ public class AlertsCreator {
         if (r0 != r1) goto L_0x0275;
     L_0x0265:
         r0 = "CancelLinkExpired";
-        r1 = 2131493114; // 0x7f0c00fa float:1.86097E38 double:1.053097522E-314;
+        r1 = 2131493128; // 0x7f0c0108 float:1.8609727E38 double:1.053097529E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         r0 = showSimpleAlert(r9, r0);
         goto L_0x0016;
@@ -391,7 +391,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x02bc;
     L_0x02ad:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131493662; // 0x7f0c031e float:1.861081E38 double:1.0530977927E-314;
+        r1 = 2131493679; // 0x7f0c032f float:1.8610845E38 double:1.053097801E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -407,7 +407,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x02e1;
     L_0x02d2:
         r0 = "InvalidCode";
-        r1 = 2131493659; // 0x7f0c031b float:1.8610804E38 double:1.053097791E-314;
+        r1 = 2131493676; // 0x7f0c032c float:1.8610839E38 double:1.0530977996E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -445,7 +445,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0334;
     L_0x0325:
         r0 = "InvalidPhoneNumber";
-        r1 = 2131493662; // 0x7f0c031e float:1.861081E38 double:1.0530977927E-314;
+        r1 = 2131493679; // 0x7f0c032f float:1.8610845E38 double:1.053097801E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -461,7 +461,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x0359;
     L_0x034a:
         r0 = "InvalidCode";
-        r1 = 2131493659; // 0x7f0c031b float:1.8610804E38 double:1.053097791E-314;
+        r1 = 2131493676; // 0x7f0c032c float:1.8610839E38 double:1.0530977996E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -492,7 +492,7 @@ public class AlertsCreator {
         if (r0 == 0) goto L_0x03a9;
     L_0x0392:
         r3 = "ChangePhoneNumberOccupied";
-        r4 = 2131493125; // 0x7f0c0105 float:1.8609721E38 double:1.0530975274E-314;
+        r4 = 2131493139; // 0x7f0c0113 float:1.860975E38 double:1.0530975343E-314;
         r2 = new java.lang.Object[r2];
         r0 = r11[r1];
         r0 = (java.lang.String) r0;
@@ -545,13 +545,13 @@ public class AlertsCreator {
         goto L_0x03c4;
     L_0x03e8:
         r0 = "UsernameInvalid";
-        r1 = 2131494500; // 0x7f0c0664 float:1.861251E38 double:1.0530982067E-314;
+        r1 = 2131494528; // 0x7f0c0680 float:1.8612567E38 double:1.0530982206E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x03f7:
         r0 = "UsernameInUse";
-        r1 = 2131494499; // 0x7f0c0663 float:1.8612508E38 double:1.0530982063E-314;
+        r1 = 2131494527; // 0x7f0c067f float:1.8612565E38 double:1.05309822E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -642,13 +642,13 @@ public class AlertsCreator {
         goto L_0x047d;
     L_0x049c:
         r0 = "PaymentPrecheckoutFailed";
-        r1 = 2131494075; // 0x7f0c04bb float:1.8611648E38 double:1.053097997E-314;
+        r1 = 2131494099; // 0x7f0c04d3 float:1.8611697E38 double:1.0530980086E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleToast(r9, r0);
         goto L_0x003e;
     L_0x04ab:
         r0 = "PaymentFailed";
-        r1 = 2131494062; // 0x7f0c04ae float:1.8611622E38 double:1.0530979903E-314;
+        r1 = 2131494086; // 0x7f0c04c6 float:1.861167E38 double:1.053098002E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleToast(r9, r0);
         goto L_0x003e;
@@ -681,7 +681,7 @@ public class AlertsCreator {
         goto L_0x04c8;
     L_0x04dd:
         r0 = "PaymentNoShippingMethod";
-        r1 = 2131494064; // 0x7f0c04b0 float:1.8611626E38 double:1.0530979913E-314;
+        r1 = 2131494088; // 0x7f0c04c8 float:1.8611675E38 double:1.053098003E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleToast(r9, r0);
         goto L_0x003e;
@@ -1368,17 +1368,32 @@ public class AlertsCreator {
             selected[0] = preferences.getInt("priority_" + dialog_id, 3);
             if (selected[0] == 3) {
                 selected[0] = 0;
+            } else if (selected[0] == 4) {
+                selected[0] = 1;
+            } else if (selected[0] == 5) {
+                selected[0] = 2;
+            } else if (selected[0] == 0) {
+                selected[0] = 3;
             } else {
-                selected[0] = selected[0] + 1;
+                selected[0] = 4;
             }
-            descriptions = new String[]{LocaleController.getString("NotificationsPrioritySettings", R.string.NotificationsPrioritySettings), LocaleController.getString("NotificationsPriorityDefault", R.string.NotificationsPriorityDefault), LocaleController.getString("NotificationsPriorityHigh", R.string.NotificationsPriorityHigh), LocaleController.getString("NotificationsPriorityMax", R.string.NotificationsPriorityMax)};
+            descriptions = new String[]{LocaleController.getString("NotificationsPrioritySettings", R.string.NotificationsPrioritySettings), LocaleController.getString("NotificationsPriorityLow", R.string.NotificationsPriorityLow), LocaleController.getString("NotificationsPriorityMedium", R.string.NotificationsPriorityMedium), LocaleController.getString("NotificationsPriorityHigh", R.string.NotificationsPriorityHigh), LocaleController.getString("NotificationsPriorityUrgent", R.string.NotificationsPriorityUrgent)};
         } else {
             if (globalAll) {
                 selected[0] = preferences.getInt("priority_messages", 1);
             } else if (globalGroup) {
                 selected[0] = preferences.getInt("priority_group", 1);
             }
-            descriptions = new String[]{LocaleController.getString("NotificationsPriorityDefault", R.string.NotificationsPriorityDefault), LocaleController.getString("NotificationsPriorityHigh", R.string.NotificationsPriorityHigh), LocaleController.getString("NotificationsPriorityMax", R.string.NotificationsPriorityMax)};
+            if (selected[0] == 4) {
+                selected[0] = 0;
+            } else if (selected[0] == 5) {
+                selected[0] = 1;
+            } else if (selected[0] == 0) {
+                selected[0] = 2;
+            } else {
+                selected[0] = 3;
+            }
+            descriptions = new String[]{LocaleController.getString("NotificationsPriorityLow", R.string.NotificationsPriorityLow), LocaleController.getString("NotificationsPriorityMedium", R.string.NotificationsPriorityMedium), LocaleController.getString("NotificationsPriorityHigh", R.string.NotificationsPriorityHigh), LocaleController.getString("NotificationsPriorityUrgent", R.string.NotificationsPriorityUrgent)};
         }
         LinearLayout linearLayout = new LinearLayout(parentActivity);
         linearLayout.setOrientation(1);
@@ -1398,16 +1413,37 @@ public class AlertsCreator {
                 public void onClick(View v) {
                     selected[0] = ((Integer) v.getTag()).intValue();
                     Editor editor = MessagesController.getNotificationsSettings(UserConfig.selectedAccount).edit();
+                    int option;
                     if (j != 0) {
                         if (selected[0] == 0) {
-                            selected[0] = 3;
+                            option = 3;
+                        } else if (selected[0] == 1) {
+                            option = 4;
+                        } else if (selected[0] == 2) {
+                            option = 5;
+                        } else if (selected[0] == 3) {
+                            option = 0;
                         } else {
-                            int[] iArr = selected;
-                            iArr[0] = iArr[0] - 1;
+                            option = 1;
                         }
-                        editor.putInt("priority_" + j, selected[0]);
+                        editor.putInt("priority_" + j, option);
                     } else {
-                        editor.putInt(z ? "priority_group" : "priority_messages", selected[0]);
+                        String str;
+                        if (selected[0] == 0) {
+                            option = 4;
+                        } else if (selected[0] == 1) {
+                            option = 5;
+                        } else if (selected[0] == 2) {
+                            option = 0;
+                        } else {
+                            option = 1;
+                        }
+                        if (z) {
+                            str = "priority_group";
+                        } else {
+                            str = "priority_messages";
+                        }
+                        editor.putInt(str, option);
                     }
                     editor.commit();
                     if (baseFragment != null) {
@@ -1421,7 +1457,7 @@ public class AlertsCreator {
             a++;
         }
         Builder builder = new Builder(parentActivity);
-        builder.setTitle(LocaleController.getString("NotificationsPriority", R.string.NotificationsPriority));
+        builder.setTitle(LocaleController.getString("NotificationsImportance", R.string.NotificationsImportance));
         builder.setView(linearLayout);
         builder.setPositiveButton(LocaleController.getString("Cancel", R.string.Cancel), null);
         return builder.create();

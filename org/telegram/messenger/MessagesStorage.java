@@ -23,6 +23,7 @@ import org.telegram.SQLite.SQLitePreparedStatement;
 import org.telegram.messenger.ContactsController.Contact;
 import org.telegram.messenger.MediaController.SearchImage;
 import org.telegram.messenger.exoplayer2.C;
+import org.telegram.messenger.exoplayer2.DefaultLoadControl;
 import org.telegram.messenger.support.SparseLongArray;
 import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 import org.telegram.tgnet.AbstractSerializedData;
@@ -246,7 +247,6 @@ public class MessagesStorage {
 
     public MessagesStorage(int instance) {
         this.currentAccount = instance;
-        this.storageQueue.setPriority(10);
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
                 MessagesStorage.this.openDatabase(true);
@@ -3125,60 +3125,75 @@ Error: java.util.NoSuchElementException
     }
 
     public void putCachedPhoneBook(final HashMap<String, Contact> contactHashMap, final boolean migrate) {
-        this.storageQueue.postRunnable(new Runnable() {
-            public void run() {
-                try {
-                    MessagesStorage.this.database.beginTransaction();
-                    SQLitePreparedStatement state = MessagesStorage.this.database.executeFast("REPLACE INTO user_contacts_v7 VALUES(?, ?, ?, ?, ?)");
-                    SQLitePreparedStatement state2 = MessagesStorage.this.database.executeFast("REPLACE INTO user_phones_v7 VALUES(?, ?, ?, ?)");
-                    for (Entry<String, Contact> entry : contactHashMap.entrySet()) {
-                        Contact contact = (Contact) entry.getValue();
-                        if (!(contact.phones.isEmpty() || contact.shortPhones.isEmpty())) {
-                            state.requery();
-                            state.bindString(1, contact.key);
-                            state.bindInteger(2, contact.contact_id);
-                            state.bindString(3, contact.first_name);
-                            state.bindString(4, contact.last_name);
-                            state.bindInteger(5, contact.imported);
-                            state.step();
-                            for (int a = 0; a < contact.phones.size(); a++) {
-                                state2.requery();
-                                state2.bindString(1, contact.key);
-                                state2.bindString(2, (String) contact.phones.get(a));
-                                state2.bindString(3, (String) contact.shortPhones.get(a));
-                                state2.bindInteger(4, ((Integer) contact.phoneDeleted.get(a)).intValue());
-                                state2.step();
+        if (contactHashMap != null && !contactHashMap.isEmpty()) {
+            this.storageQueue.postRunnable(new Runnable() {
+                public void run() {
+                    try {
+                        if (BuildVars.LOGS_ENABLED) {
+                            FileLog.d(MessagesStorage.this.currentAccount + " save contacts to db " + contactHashMap.size());
+                        }
+                        MessagesStorage.this.database.executeFast("DELETE FROM user_contacts_v7 WHERE 1").stepThis().dispose();
+                        MessagesStorage.this.database.executeFast("DELETE FROM user_phones_v7 WHERE 1").stepThis().dispose();
+                        MessagesStorage.this.database.beginTransaction();
+                        SQLitePreparedStatement state = MessagesStorage.this.database.executeFast("REPLACE INTO user_contacts_v7 VALUES(?, ?, ?, ?, ?)");
+                        SQLitePreparedStatement state2 = MessagesStorage.this.database.executeFast("REPLACE INTO user_phones_v7 VALUES(?, ?, ?, ?)");
+                        for (Entry<String, Contact> entry : contactHashMap.entrySet()) {
+                            Contact contact = (Contact) entry.getValue();
+                            if (!(contact.phones.isEmpty() || contact.shortPhones.isEmpty())) {
+                                state.requery();
+                                state.bindString(1, contact.key);
+                                state.bindInteger(2, contact.contact_id);
+                                state.bindString(3, contact.first_name);
+                                state.bindString(4, contact.last_name);
+                                state.bindInteger(5, contact.imported);
+                                state.step();
+                                for (int a = 0; a < contact.phones.size(); a++) {
+                                    state2.requery();
+                                    state2.bindString(1, contact.key);
+                                    state2.bindString(2, (String) contact.phones.get(a));
+                                    state2.bindString(3, (String) contact.shortPhones.get(a));
+                                    state2.bindInteger(4, ((Integer) contact.phoneDeleted.get(a)).intValue());
+                                    state2.step();
+                                }
                             }
                         }
+                        state.dispose();
+                        state2.dispose();
+                        MessagesStorage.this.database.commitTransaction();
+                        if (migrate) {
+                            MessagesStorage.this.database.executeFast("DROP TABLE IF EXISTS user_contacts_v6;").stepThis().dispose();
+                            MessagesStorage.this.database.executeFast("DROP TABLE IF EXISTS user_phones_v6;").stepThis().dispose();
+                            MessagesStorage.this.getCachedPhoneBook(false);
+                        }
+                    } catch (Throwable e) {
+                        FileLog.e(e);
                     }
-                    state.dispose();
-                    state2.dispose();
-                    MessagesStorage.this.database.commitTransaction();
-                    if (migrate) {
-                        MessagesStorage.this.database.executeFast("DROP TABLE IF EXISTS user_contacts_v6;").stepThis().dispose();
-                        MessagesStorage.this.database.executeFast("DROP TABLE IF EXISTS user_phones_v6;").stepThis().dispose();
-                        MessagesStorage.this.getCachedPhoneBook(false);
-                    }
-                } catch (Throwable e) {
-                    FileLog.e(e);
                 }
-            }
-        });
+            });
+        }
     }
 
     public void getCachedPhoneBook(final boolean byError) {
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
-                SQLiteCursor cursor;
-                Contact contact;
-                String phone;
-                String sphone;
+                SQLiteCursor cursor = null;
                 try {
                     cursor = MessagesStorage.this.database.queryFinalized("SELECT name FROM sqlite_master WHERE type='table' AND name='user_contacts_v6'", new Object[0]);
                     boolean migrate = cursor.next();
                     cursor.dispose();
+                    cursor = null;
+                    int count;
+                    Contact contact;
+                    String phone;
+                    String sphone;
                     if (migrate) {
-                        SparseArray<Contact> contactHashMap = new SparseArray();
+                        count = 16;
+                        cursor = MessagesStorage.this.database.queryFinalized("SELECT COUNT(uid) FROM user_contacts_v6 WHERE 1", new Object[0]);
+                        if (cursor.next()) {
+                            count = Math.min(DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS, cursor.intValue(0));
+                        }
+                        cursor.dispose();
+                        SparseArray<Contact> contactHashMap = new SparseArray(count);
                         cursor = MessagesStorage.this.database.queryFinalized("SELECT us.uid, us.fname, us.sname, up.phone, up.sphone, up.deleted, us.imported FROM user_contacts_v6 as us LEFT JOIN user_phones_v6 as up ON us.uid = up.uid WHERE 1", new Object[0]);
                         while (cursor.next()) {
                             int uid = cursor.intValue(0);
@@ -3201,26 +3216,76 @@ Error: java.util.NoSuchElementException
                             if (phone != null) {
                                 contact.phones.add(phone);
                                 sphone = cursor.stringValue(4);
-                                if (sphone != null) {
+                                if (sphone == null) {
+                                    continue;
+                                } else {
                                     if (sphone.length() == 8 && phone.length() != 8) {
                                         sphone = PhoneFormat.stripExceptNumbers(phone);
                                     }
                                     contact.shortPhones.add(sphone);
                                     contact.phoneDeleted.add(Integer.valueOf(cursor.intValue(5)));
                                     contact.phoneTypes.add(TtmlNode.ANONYMOUS_REGION_ID);
+                                    if (contactHashMap.size() == DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS) {
+                                        break;
+                                    }
                                 }
                             }
                         }
                         cursor.dispose();
+                        cursor = null;
                         ContactsController.getInstance(MessagesStorage.this.currentAccount).migratePhoneBookToV7(contactHashMap);
+                        if (cursor != null) {
+                            cursor.dispose();
+                            return;
+                        }
                         return;
                     }
-                } catch (Throwable e) {
-                    FileLog.e(e);
-                }
-                HashMap<String, Contact> contactHashMap2 = new HashMap();
-                try {
-                    cursor = MessagesStorage.this.database.queryFinalized("SELECT us.key, us.uid, us.fname, us.sname, up.phone, up.sphone, up.deleted, us.imported FROM user_contacts_v7 as us LEFT JOIN user_phones_v7 as up ON us.key = up.key WHERE 1", new Object[0]);
+                    boolean z;
+                    if (cursor != null) {
+                        cursor.dispose();
+                    }
+                    count = 16;
+                    int currentContactsCount = 0;
+                    int start = 0;
+                    try {
+                        cursor = MessagesStorage.this.database.queryFinalized("SELECT COUNT(key) FROM user_contacts_v7 WHERE 1", new Object[0]);
+                        if (cursor.next()) {
+                            currentContactsCount = cursor.intValue(0);
+                            count = Math.min(DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS, currentContactsCount);
+                            if (currentContactsCount > DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS) {
+                                start = currentContactsCount - 5000;
+                            }
+                            if (BuildVars.LOGS_ENABLED) {
+                                FileLog.d(MessagesStorage.this.currentAccount + " current cached contacts count = " + currentContactsCount);
+                            }
+                        }
+                        cursor.dispose();
+                        if (cursor != null) {
+                            cursor.dispose();
+                        }
+                    } catch (Throwable th) {
+                        if (cursor != null) {
+                            cursor.dispose();
+                        }
+                    }
+                    HashMap<String, Contact> contactHashMap2 = new HashMap(count);
+                    if (start != 0) {
+                        try {
+                            cursor = MessagesStorage.this.database.queryFinalized("SELECT us.key, us.uid, us.fname, us.sname, up.phone, up.sphone, up.deleted, us.imported FROM user_contacts_v7 as us LEFT JOIN user_phones_v7 as up ON us.key = up.key WHERE 1 LIMIT 0," + currentContactsCount, new Object[0]);
+                        } catch (Throwable e) {
+                            contactHashMap2.clear();
+                            FileLog.e(e);
+                            if (cursor != null) {
+                                cursor.dispose();
+                            }
+                        } catch (Throwable th2) {
+                            if (cursor != null) {
+                                cursor.dispose();
+                            }
+                        }
+                    } else {
+                        cursor = MessagesStorage.this.database.queryFinalized("SELECT us.key, us.uid, us.fname, us.sname, up.phone, up.sphone, up.deleted, us.imported FROM user_contacts_v7 as us LEFT JOIN user_phones_v7 as up ON us.key = up.key WHERE 1", new Object[0]);
+                    }
                     while (cursor.next()) {
                         String key = cursor.stringValue(0);
                         contact = (Contact) contactHashMap2.get(key);
@@ -3242,22 +3307,38 @@ Error: java.util.NoSuchElementException
                         if (phone != null) {
                             contact.phones.add(phone);
                             sphone = cursor.stringValue(5);
-                            if (sphone != null) {
+                            if (sphone == null) {
+                                continue;
+                            } else {
                                 if (sphone.length() == 8 && phone.length() != 8) {
                                     sphone = PhoneFormat.stripExceptNumbers(phone);
                                 }
                                 contact.shortPhones.add(sphone);
                                 contact.phoneDeleted.add(Integer.valueOf(cursor.intValue(6)));
                                 contact.phoneTypes.add(TtmlNode.ANONYMOUS_REGION_ID);
+                                if (contactHashMap2.size() == DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS) {
+                                    break;
+                                }
                             }
                         }
                     }
                     cursor.dispose();
-                } catch (Throwable e2) {
-                    contactHashMap2.clear();
-                    FileLog.e(e2);
+                    cursor = null;
+                    if (cursor != null) {
+                        cursor.dispose();
+                    }
+                    ContactsController instance = ContactsController.getInstance(MessagesStorage.this.currentAccount);
+                    if (byError) {
+                        z = false;
+                    } else {
+                        z = true;
+                    }
+                    instance.performSyncPhoneBook(contactHashMap2, true, true, false, false, z, false);
+                } catch (Throwable th3) {
+                    if (cursor != null) {
+                        cursor.dispose();
+                    }
                 }
-                ContactsController.getInstance(MessagesStorage.this.currentAccount).performSyncPhoneBook(contactHashMap2, true, true, false, false, !byError, false);
             }
         });
     }
@@ -5976,6 +6057,7 @@ Error: java.util.NoSuchElementException
     }
 
     private long[] updateMessageStateAndIdInternal(long random_id, Integer _oldId, int newId, int date, int channelId) {
+        SQLitePreparedStatement state;
         SQLiteCursor cursor = null;
         long newMessageId = (long) newId;
         if (_oldId == null) {
@@ -6028,7 +6110,6 @@ Error: java.util.NoSuchElementException
         if (did == 0) {
             return null;
         }
-        SQLitePreparedStatement state;
         if (oldMessageId != newMessageId || date == 0) {
             state = null;
             try {
@@ -7160,6 +7241,7 @@ Error: java.util.NoSuchElementException
     public void getDialogs(final int offset, final int count) {
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
+                Message message;
                 messages_Dialogs dialogs = new TL_messages_dialogs();
                 ArrayList<EncryptedChat> encryptedChats = new ArrayList();
                 ArrayList<Integer> usersToLoad = new ArrayList();
@@ -7170,7 +7252,6 @@ Error: java.util.NoSuchElementException
                 LongSparseArray<Message> replyMessageOwners = new LongSparseArray();
                 SQLiteCursor cursor = MessagesStorage.this.database.queryFinalized(String.format(Locale.US, "SELECT d.did, d.last_mid, d.unread_count, d.date, m.data, m.read_state, m.mid, m.send_state, s.flags, m.date, d.pts, d.inbox_max, d.outbox_max, m.replydata, d.pinned, d.unread_count_i FROM dialogs as d LEFT JOIN messages as m ON d.last_mid = m.mid LEFT JOIN dialog_settings as s ON d.did = s.did ORDER BY d.pinned DESC, d.date DESC LIMIT %d,%d", new Object[]{Integer.valueOf(offset), Integer.valueOf(count)}), new Object[0]);
                 while (cursor.next()) {
-                    Message message;
                     TL_dialog dialog = new TL_dialog();
                     dialog.id = cursor.longValue(0);
                     dialog.top_message = cursor.intValue(1);

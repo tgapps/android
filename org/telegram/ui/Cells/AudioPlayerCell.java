@@ -24,6 +24,7 @@ import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.CombinedDrawable;
 import org.telegram.ui.Components.RadialProgress;
 
 public class AudioPlayerCell extends View implements FileDownloadProgressListener {
@@ -170,6 +171,9 @@ public class AudioPlayerCell extends View implements FileDownloadProgressListene
 
     public void didPressedButton() {
         if (this.buttonState == 0) {
+            if (this.miniButtonState == 0) {
+                FileLoader.getInstance(this.currentAccount).loadFile(this.currentMessageObject.getDocument(), true, 0);
+            }
             if (MediaController.getInstance().findMessageInPlaylistAndPlay(this.currentMessageObject)) {
                 if (this.hasMiniProgress == 2 && this.miniButtonState != 1) {
                     this.miniButtonState = 1;
@@ -228,11 +232,11 @@ public class AudioPlayerCell extends View implements FileDownloadProgressListene
             return null;
         }
         this.radialProgress.setAlphaForPrevious(false);
-        Drawable[] drawableArr = Theme.chat_fileMiniStatesDrawable[this.miniButtonState + 2];
+        CombinedDrawable[] combinedDrawableArr = Theme.chat_fileMiniStatesDrawable[this.miniButtonState + 2];
         if (this.miniButtonPressed) {
             i = 1;
         }
-        return drawableArr[i];
+        return combinedDrawableArr[i];
     }
 
     private Drawable getDrawableForCurrentState() {

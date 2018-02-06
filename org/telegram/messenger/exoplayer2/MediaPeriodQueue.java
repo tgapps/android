@@ -3,42 +3,25 @@ package org.telegram.messenger.exoplayer2;
 import android.util.Pair;
 import org.telegram.messenger.exoplayer2.Timeline.Period;
 import org.telegram.messenger.exoplayer2.Timeline.Window;
+import org.telegram.messenger.exoplayer2.source.MediaPeriod;
+import org.telegram.messenger.exoplayer2.source.MediaSource;
 import org.telegram.messenger.exoplayer2.source.MediaSource.MediaPeriodId;
+import org.telegram.messenger.exoplayer2.trackselection.TrackSelector;
+import org.telegram.messenger.exoplayer2.trackselection.TrackSelectorResult;
+import org.telegram.messenger.exoplayer2.upstream.Allocator;
+import org.telegram.messenger.exoplayer2.util.Assertions;
 
-final class MediaPeriodInfoSequence {
+final class MediaPeriodQueue {
+    private static final int MAXIMUM_BUFFER_AHEAD_PERIODS = 100;
+    private int length;
+    private MediaPeriodHolder loading;
     private final Period period = new Period();
+    private MediaPeriodHolder playing;
+    private MediaPeriodHolder reading;
     private int repeatMode;
     private boolean shuffleModeEnabled;
     private Timeline timeline;
     private final Window window = new Window();
-
-    public static final class MediaPeriodInfo {
-        public final long contentPositionUs;
-        public final long durationUs;
-        public final long endPositionUs;
-        public final MediaPeriodId id;
-        public final boolean isFinal;
-        public final boolean isLastInTimelinePeriod;
-        public final long startPositionUs;
-
-        private MediaPeriodInfo(MediaPeriodId id, long startPositionUs, long endPositionUs, long contentPositionUs, long durationUs, boolean isLastInTimelinePeriod, boolean isFinal) {
-            this.id = id;
-            this.startPositionUs = startPositionUs;
-            this.endPositionUs = endPositionUs;
-            this.contentPositionUs = contentPositionUs;
-            this.durationUs = durationUs;
-            this.isLastInTimelinePeriod = isLastInTimelinePeriod;
-            this.isFinal = isFinal;
-        }
-
-        public MediaPeriodInfo copyWithPeriodIndex(int periodIndex) {
-            return new MediaPeriodInfo(this.id.copyWithPeriodIndex(periodIndex), this.startPositionUs, this.endPositionUs, this.contentPositionUs, this.durationUs, this.isLastInTimelinePeriod, this.isFinal);
-        }
-
-        public MediaPeriodInfo copyWithStartPositionUs(long startPositionUs) {
-            return new MediaPeriodInfo(this.id, startPositionUs, this.endPositionUs, this.contentPositionUs, this.durationUs, this.isLastInTimelinePeriod, this.isFinal);
-        }
-    }
 
     public void setTimeline(Timeline timeline) {
         this.timeline = timeline;
@@ -52,11 +35,144 @@ final class MediaPeriodInfoSequence {
         this.shuffleModeEnabled = shuffleModeEnabled;
     }
 
-    public MediaPeriodInfo getFirstMediaPeriodInfo(PlaybackInfo playbackInfo) {
+    public boolean isLoading(MediaPeriod mediaPeriod) {
+        return this.loading != null && this.loading.mediaPeriod == mediaPeriod;
+    }
+
+    public void reevaluateBuffer(long rendererPositionUs) {
+        if (this.loading != null) {
+            this.loading.reevaluateBuffer(rendererPositionUs);
+        }
+    }
+
+    public boolean shouldLoadNextMediaPeriod() {
+        return this.loading == null || (!this.loading.info.isFinal && this.loading.isFullyBuffered() && this.loading.info.durationUs != C.TIME_UNSET && this.length < MAXIMUM_BUFFER_AHEAD_PERIODS);
+    }
+
+    public MediaPeriodInfo getNextMediaPeriodInfo(long rendererPositionUs, PlaybackInfo playbackInfo) {
+        if (this.loading == null) {
+            return getFirstMediaPeriodInfo(playbackInfo);
+        }
+        return getFollowingMediaPeriodInfo(this.loading.info, this.loading.getRendererOffset(), rendererPositionUs);
+    }
+
+    public MediaPeriod enqueueNextMediaPeriod(RendererCapabilities[] rendererCapabilities, long rendererTimestampOffsetUs, TrackSelector trackSelector, Allocator allocator, MediaSource mediaSource, Object uid, MediaPeriodInfo info) {
+        long rendererPositionOffsetUs;
+        if (this.loading == null) {
+            rendererPositionOffsetUs = info.startPositionUs + rendererTimestampOffsetUs;
+        } else {
+            rendererPositionOffsetUs = this.loading.getRendererOffset() + this.loading.info.durationUs;
+        }
+        MediaPeriodHolder newPeriodHolder = new MediaPeriodHolder(rendererCapabilities, rendererPositionOffsetUs, trackSelector, allocator, mediaSource, uid, info);
+        if (this.loading != null) {
+            Assertions.checkState(hasPlayingPeriod());
+            this.loading.next = newPeriodHolder;
+        }
+        this.loading = newPeriodHolder;
+        this.length++;
+        return newPeriodHolder.mediaPeriod;
+    }
+
+    public TrackSelectorResult handleLoadingPeriodPrepared(float playbackSpeed) throws ExoPlaybackException {
+        return this.loading.handlePrepared(playbackSpeed);
+    }
+
+    public MediaPeriodHolder getLoadingPeriod() {
+        return this.loading;
+    }
+
+    public MediaPeriodHolder getPlayingPeriod() {
+        return this.playing;
+    }
+
+    public MediaPeriodHolder getReadingPeriod() {
+        return this.reading;
+    }
+
+    public MediaPeriodHolder getFrontPeriod() {
+        return hasPlayingPeriod() ? this.playing : this.loading;
+    }
+
+    public boolean hasPlayingPeriod() {
+        return this.playing != null;
+    }
+
+    public MediaPeriodHolder advanceReadingPeriod() {
+        boolean z = (this.reading == null || this.reading.next == null) ? false : true;
+        Assertions.checkState(z);
+        this.reading = this.reading.next;
+        return this.reading;
+    }
+
+    public MediaPeriodHolder advancePlayingPeriod() {
+        if (this.playing != null) {
+            if (this.playing == this.reading) {
+                this.reading = this.playing.next;
+            }
+            this.playing.release();
+            this.playing = this.playing.next;
+            this.length--;
+            if (this.length == 0) {
+                this.loading = null;
+            }
+        } else {
+            this.playing = this.loading;
+            this.reading = this.loading;
+        }
+        return this.playing;
+    }
+
+    public boolean removeAfter(MediaPeriodHolder mediaPeriodHolder) {
+        Assertions.checkState(mediaPeriodHolder != null);
+        boolean removedReading = false;
+        this.loading = mediaPeriodHolder;
+        while (mediaPeriodHolder.next != null) {
+            mediaPeriodHolder = mediaPeriodHolder.next;
+            if (mediaPeriodHolder == this.reading) {
+                this.reading = this.playing;
+                removedReading = true;
+            }
+            mediaPeriodHolder.release();
+            this.length--;
+        }
+        this.loading.next = null;
+        return removedReading;
+    }
+
+    public void clear() {
+        MediaPeriodHolder front = getFrontPeriod();
+        if (front != null) {
+            front.release();
+            removeAfter(front);
+        }
+        this.playing = null;
+        this.loading = null;
+        this.reading = null;
+        this.length = 0;
+    }
+
+    public MediaPeriodInfo getUpdatedMediaPeriodInfo(MediaPeriodInfo mediaPeriodInfo) {
+        return getUpdatedMediaPeriodInfo(mediaPeriodInfo, mediaPeriodInfo.id);
+    }
+
+    public MediaPeriodInfo getUpdatedMediaPeriodInfo(MediaPeriodInfo mediaPeriodInfo, int newPeriodIndex) {
+        return getUpdatedMediaPeriodInfo(mediaPeriodInfo, mediaPeriodInfo.id.copyWithPeriodIndex(newPeriodIndex));
+    }
+
+    public MediaPeriodId resolveMediaPeriodIdForAds(int periodIndex, long positionUs) {
+        this.timeline.getPeriod(periodIndex, this.period);
+        int adGroupIndex = this.period.getAdGroupIndexForPositionUs(positionUs);
+        if (adGroupIndex == -1) {
+            return new MediaPeriodId(periodIndex);
+        }
+        return new MediaPeriodId(periodIndex, adGroupIndex, this.period.getNextAdIndexToPlay(adGroupIndex));
+    }
+
+    private MediaPeriodInfo getFirstMediaPeriodInfo(PlaybackInfo playbackInfo) {
         return getMediaPeriodInfo(playbackInfo.periodId, playbackInfo.contentPositionUs, playbackInfo.startPositionUs);
     }
 
-    public MediaPeriodInfo getNextMediaPeriodInfo(MediaPeriodInfo currentMediaPeriodInfo, long rendererOffsetUs, long rendererPositionUs) {
+    private MediaPeriodInfo getFollowingMediaPeriodInfo(MediaPeriodInfo currentMediaPeriodInfo, long rendererOffsetUs, long rendererPositionUs) {
         if (currentMediaPeriodInfo.isLastInTimelinePeriod) {
             int nextPeriodIndex = this.timeline.getNextPeriodIndex(currentMediaPeriodInfo.id.periodIndex, this.period, this.window, this.repeatMode, this.shuffleModeEnabled);
             if (nextPeriodIndex == -1) {
@@ -74,7 +190,7 @@ final class MediaPeriodInfoSequence {
             } else {
                 startPositionUs = 0;
             }
-            return getMediaPeriodInfo(resolvePeriodPositionForAds(nextPeriodIndex, startPositionUs), startPositionUs, startPositionUs);
+            return getMediaPeriodInfo(resolveMediaPeriodIdForAds(nextPeriodIndex, startPositionUs), startPositionUs, startPositionUs);
         }
         MediaPeriodId currentPeriodId = currentMediaPeriodInfo.id;
         int nextAdGroupIndex;
@@ -115,23 +231,6 @@ final class MediaPeriodInfoSequence {
         }
     }
 
-    public MediaPeriodId resolvePeriodPositionForAds(int periodIndex, long positionUs) {
-        this.timeline.getPeriod(periodIndex, this.period);
-        int adGroupIndex = this.period.getAdGroupIndexForPositionUs(positionUs);
-        if (adGroupIndex == -1) {
-            return new MediaPeriodId(periodIndex);
-        }
-        return new MediaPeriodId(periodIndex, adGroupIndex, this.period.getPlayedAdCount(adGroupIndex));
-    }
-
-    public MediaPeriodInfo getUpdatedMediaPeriodInfo(MediaPeriodInfo mediaPeriodInfo) {
-        return getUpdatedMediaPeriodInfo(mediaPeriodInfo, mediaPeriodInfo.id);
-    }
-
-    public MediaPeriodInfo getUpdatedMediaPeriodInfo(MediaPeriodInfo mediaPeriodInfo, int newPeriodIndex) {
-        return getUpdatedMediaPeriodInfo(mediaPeriodInfo, mediaPeriodInfo.id.copyWithPeriodIndex(newPeriodIndex));
-    }
-
     private MediaPeriodInfo getUpdatedMediaPeriodInfo(MediaPeriodInfo info, MediaPeriodId newId) {
         long startPositionUs = info.startPositionUs;
         long endPositionUs = info.endPositionUs;
@@ -164,7 +263,7 @@ final class MediaPeriodInfoSequence {
         MediaPeriodId id = new MediaPeriodId(periodIndex, adGroupIndex, adIndexInAdGroup);
         boolean isLastInPeriod = isLastInPeriod(id, Long.MIN_VALUE);
         boolean isLastInTimeline = isLastInTimeline(id, isLastInPeriod);
-        return new MediaPeriodInfo(id, adIndexInAdGroup == this.period.getPlayedAdCount(adGroupIndex) ? this.period.getAdResumePositionUs() : 0, Long.MIN_VALUE, contentPositionUs, this.timeline.getPeriod(id.periodIndex, this.period).getAdDurationUs(id.adGroupIndex, id.adIndexInAdGroup), isLastInPeriod, isLastInTimeline);
+        return new MediaPeriodInfo(id, adIndexInAdGroup == this.period.getNextAdIndexToPlay(adGroupIndex) ? this.period.getAdResumePositionUs() : 0, Long.MIN_VALUE, contentPositionUs, this.timeline.getPeriod(id.periodIndex, this.period).getAdDurationUs(id.adGroupIndex, id.adIndexInAdGroup), isLastInPeriod, isLastInTimeline);
     }
 
     private MediaPeriodInfo getMediaPeriodInfoForContent(int periodIndex, long startPositionUs, long endUs) {
@@ -200,7 +299,7 @@ final class MediaPeriodInfoSequence {
             } else {
                 isLastAd = false;
             }
-            if (isLastAd || (!isAd && this.period.getPlayedAdCount(lastAdGroupIndex) == postrollAdCount)) {
+            if (isLastAd || (!isAd && this.period.getNextAdIndexToPlay(lastAdGroupIndex) == postrollAdCount)) {
                 z = true;
             }
             return z;

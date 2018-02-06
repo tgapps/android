@@ -566,12 +566,14 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
 
     public ThemeDescription[] getThemeDescriptions() {
         ThemeDescriptionDelegate сellDelegate = new ThemeDescriptionDelegate() {
-            public void didSetColor(int color) {
-                int count = ChatUsersActivity.this.listView.getChildCount();
-                for (int a = 0; a < count; a++) {
-                    View child = ChatUsersActivity.this.listView.getChildAt(a);
-                    if (child instanceof ManageChatUserCell) {
-                        ((ManageChatUserCell) child).update(0);
+            public void didSetColor() {
+                if (ChatUsersActivity.this.listView != null) {
+                    int count = ChatUsersActivity.this.listView.getChildCount();
+                    for (int a = 0; a < count; a++) {
+                        View child = ChatUsersActivity.this.listView.getChildAt(a);
+                        if (child instanceof ManageChatUserCell) {
+                            ((ManageChatUserCell) child).update(0);
+                        }
                     }
                 }
             }

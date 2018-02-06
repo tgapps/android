@@ -252,12 +252,14 @@ public class CommonGroupsActivity extends BaseFragment {
 
     public ThemeDescription[] getThemeDescriptions() {
         ThemeDescriptionDelegate сellDelegate = new ThemeDescriptionDelegate() {
-            public void didSetColor(int color) {
-                int count = CommonGroupsActivity.this.listView.getChildCount();
-                for (int a = 0; a < count; a++) {
-                    View child = CommonGroupsActivity.this.listView.getChildAt(a);
-                    if (child instanceof ProfileSearchCell) {
-                        ((ProfileSearchCell) child).update(0);
+            public void didSetColor() {
+                if (CommonGroupsActivity.this.listView != null) {
+                    int count = CommonGroupsActivity.this.listView.getChildCount();
+                    for (int a = 0; a < count; a++) {
+                        View child = CommonGroupsActivity.this.listView.getChildAt(a);
+                        if (child instanceof ProfileSearchCell) {
+                            ((ProfileSearchCell) child).update(0);
+                        }
                     }
                 }
             }
