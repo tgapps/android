@@ -5855,7 +5855,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0.muteVideo = r3;
         r0 = r22;
         r3 = r0.muteItem;
-        r4 = 2131165686; // 0x7f0701f6 float:1.7945596E38 double:1.052935751E-314;
+        r4 = 2131165687; // 0x7f0701f7 float:1.7945598E38 double:1.0529357515E-314;
         r3.setImageResource(r4);
         r0 = r22;
         r3 = r0.editorDoneLayout;

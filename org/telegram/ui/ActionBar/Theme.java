@@ -2125,12 +2125,29 @@ public class Theme {
     }
 
     public static void setCurrentNightTheme(ThemeInfo theme) {
+        boolean apply = currentTheme == currentNightTheme;
         currentNightTheme = theme;
-        checkAutoNightThemeConditions();
+        if (apply) {
+            applyDayNightThemeMaybe(true);
+        }
     }
 
     public static void checkAutoNightThemeConditions() {
+        checkAutoNightThemeConditions(false);
+    }
+
+    public static void checkAutoNightThemeConditions(boolean force) {
         if (previousTheme == null) {
+            if (force) {
+                if (switchNightRunnableScheduled) {
+                    switchNightRunnableScheduled = false;
+                    AndroidUtilities.cancelRunOnUIThread(switchNightBrightnessRunnable);
+                }
+                if (switchDayRunnableScheduled) {
+                    switchDayRunnableScheduled = false;
+                    AndroidUtilities.cancelRunOnUIThread(switchDayBrightnessRunnable);
+                }
+            }
             if (selectedAutoNightType != 2) {
                 if (switchNightRunnableScheduled) {
                     switchNightRunnableScheduled = false;
@@ -2195,13 +2212,10 @@ public class Theme {
                 switchToTheme = 1;
             }
             if (switchToTheme != 0) {
-                boolean z;
-                if (switchToTheme == 2) {
-                    z = true;
-                } else {
-                    z = false;
-                }
-                applyDayNightThemeMaybe(z);
+                applyDayNightThemeMaybe(switchToTheme == 2);
+            }
+            if (force) {
+                lastThemeSwitchTime = 0;
             }
         }
     }
@@ -3269,9 +3283,9 @@ public class Theme {
                     int i;
                     SharedPreferences preferences;
                     int selectedBackground;
+                    File toFile;
                     Throwable th;
                     synchronized (Theme.wallpaperSync) {
-                        File toFile;
                         if (!MessagesController.getGlobalMainSettings().getBoolean("overrideThemeWallpaper", false)) {
                             Integer backgroundColor = (Integer) Theme.currentColors.get(Theme.key_chat_wallpaper);
                             if (backgroundColor != null) {

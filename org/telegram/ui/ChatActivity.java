@@ -9808,7 +9808,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         r0 = r34;
         r0.setTitle(r5);
         r5 = "OK";
-        r6 = 2131494013; // 0x7f0c047d float:1.8611522E38 double:1.053097966E-314;
+        r6 = 2131494009; // 0x7f0c0479 float:1.8611514E38 double:1.053097964E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r6);
         r6 = 0;
         r0 = r34;
@@ -13250,7 +13250,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         r0.setMessage(r5);
     L_0x27d9:
         r5 = "OK";
-        r6 = 2131494013; // 0x7f0c047d float:1.8611522E38 double:1.053097966E-314;
+        r6 = 2131494009; // 0x7f0c0479 float:1.8611514E38 double:1.053097964E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r6);
         r6 = 0;
         r0 = r34;

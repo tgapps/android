@@ -3483,7 +3483,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         goto L_0x09dd;
     L_0x09f3:
         r4 = "Of";
-        r6 = 2131494014; // 0x7f0c047e float:1.8611524E38 double:1.0530979666E-314;
+        r6 = 2131494010; // 0x7f0c047a float:1.8611516E38 double:1.0530979647E-314;
         r8 = 2;
         r8 = new java.lang.Object[r8];
         r9 = 0;
@@ -4293,7 +4293,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x1c21;
     L_0x0fcf:
         r4 = "PaymentReceipt";
-        r6 = 2131494100; // 0x7f0c04d4 float:1.8611699E38 double:1.053098009E-314;
+        r6 = 2131494096; // 0x7f0c04d0 float:1.861169E38 double:1.053098007E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
     L_0x0fdd:
@@ -4431,7 +4431,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 != r6) goto L_0x1c63;
     L_0x10f7:
         r4 = "OpenChannel";
-        r6 = 2131494026; // 0x7f0c048a float:1.8611549E38 double:1.0530979726E-314;
+        r6 = 2131494022; // 0x7f0c0486 float:1.861154E38 double:1.0530979706E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
     L_0x1101:
         r0 = r150;
@@ -5972,13 +5972,13 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x1c3b;
     L_0x1c2b:
         r4 = "PaymentTestInvoice";
-        r6 = 2131494118; // 0x7f0c04e6 float:1.8611735E38 double:1.053098018E-314;
+        r6 = 2131494114; // 0x7f0c04e2 float:1.8611727E38 double:1.053098016E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
         goto L_0x0fdd;
     L_0x1c3b:
         r4 = "PaymentInvoice";
-        r6 = 2131494087; // 0x7f0c04c7 float:1.8611672E38 double:1.0530980027E-314;
+        r6 = 2131494083; // 0x7f0c04c3 float:1.8611664E38 double:1.0530980007E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
         goto L_0x0fdd;
@@ -6001,7 +6001,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 != r6) goto L_0x1c76;
     L_0x1c6a:
         r4 = "OpenGroup";
-        r6 = 2131494027; // 0x7f0c048b float:1.861155E38 double:1.053097973E-314;
+        r6 = 2131494023; // 0x7f0c0487 float:1.8611543E38 double:1.053097971E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1101;
     L_0x1c76:
@@ -6011,12 +6011,12 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 != r6) goto L_0x1c89;
     L_0x1c7d:
         r4 = "OpenMessage";
-        r6 = 2131494030; // 0x7f0c048e float:1.8611557E38 double:1.0530979745E-314;
+        r6 = 2131494026; // 0x7f0c048a float:1.8611549E38 double:1.0530979726E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1101;
     L_0x1c89:
         r4 = "InstantView";
-        r6 = 2131493673; // 0x7f0c0329 float:1.8610833E38 double:1.053097798E-314;
+        r6 = 2131493672; // 0x7f0c0328 float:1.861083E38 double:1.0530977977E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1101;
     L_0x1c95:
@@ -6538,7 +6538,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         goto L_0x209a;
     L_0x20a0:
         r4 = "NumberUnknown";
-        r6 = 2131494012; // 0x7f0c047c float:1.861152E38 double:1.0530979656E-314;
+        r6 = 2131494008; // 0x7f0c0478 float:1.8611512E38 double:1.0530979637E-314;
         r111 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1f4d;
     L_0x20ac:
@@ -9162,7 +9162,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         r0 = r150;
         r4 = r0.photoImage;
         r6 = r150.getResources();
-        r8 = 2131165658; // 0x7f0701da float:1.794554E38 double:1.052935737E-314;
+        r8 = 2131165659; // 0x7f0701db float:1.7945541E38 double:1.0529357377E-314;
         r6 = r6.getDrawable(r8);
         r4.setImageBitmap(r6);
         goto L_0x2368;
@@ -9965,7 +9965,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x39ed;
     L_0x3980:
         r4 = "PaymentReceipt";
-        r6 = 2131494100; // 0x7f0c04d4 float:1.8611699E38 double:1.053098009E-314;
+        r6 = 2131494096; // 0x7f0c04d0 float:1.861169E38 double:1.053098007E-314;
         r32 = org.telegram.messenger.LocaleController.getString(r4, r6);
     L_0x398a:
         r31 = new android.text.StaticLayout;

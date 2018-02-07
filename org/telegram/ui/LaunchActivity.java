@@ -273,7 +273,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0.setTaskDescription(r1);	 Catch:{ Exception -> 0x08de }
     L_0x0114:
         r32 = r37.getWindow();
-        r33 = 2131165667; // 0x7f0701e3 float:1.7945558E38 double:1.0529357417E-314;
+        r33 = 2131165668; // 0x7f0701e4 float:1.794556E38 double:1.052935742E-314;
         r32.setBackgroundDrawableResource(r33);
         r32 = org.telegram.messenger.SharedConfig.passcodeHash;
         r32 = r32.length();
@@ -3308,14 +3308,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0ecb:
         r4 = "selectAlertString";
         r5 = "SendContactTo";
-        r16 = 2131494320; // 0x7f0c05b0 float:1.8612145E38 double:1.053098118E-314;
+        r16 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendContactToGroup";
-        r16 = 2131494307; // 0x7f0c05a3 float:1.8612119E38 double:1.0530981114E-314;
+        r16 = 2131494304; // 0x7f0c05a0 float:1.8612113E38 double:1.05309811E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -3392,14 +3392,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0f81:
         r4 = "selectAlertString";
         r5 = "SendMessagesTo";
-        r16 = 2131494320; // 0x7f0c05b0 float:1.8612145E38 double:1.053098118E-314;
+        r16 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendMessagesToGroup";
-        r16 = 2131494321; // 0x7f0c05b1 float:1.8612147E38 double:1.0530981183E-314;
+        r16 = 2131494318; // 0x7f0c05ae float:1.861214E38 double:1.053098117E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -4494,7 +4494,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
                 FileLog.e(e2);
             }
         } else if (id == NotificationCenter.reloadInterface) {
-            rebuildAllFragments(true);
+            rebuildAllFragments(false);
         } else if (id == NotificationCenter.suggestedLangpack) {
             showLanguageAlert(false);
         } else if (id == NotificationCenter.openArticle) {
@@ -5303,16 +5303,16 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
 
     public void rebuildAllFragments(boolean last) {
         if (this.layersActionBarLayout != null) {
-            this.layersActionBarLayout.rebuildAllFragmentViews(last, true);
+            this.layersActionBarLayout.rebuildAllFragmentViews(last, last);
         } else {
-            this.actionBarLayout.rebuildAllFragmentViews(last, true);
+            this.actionBarLayout.rebuildAllFragmentViews(last, last);
         }
     }
 
-    public void onRebuildAllFragments(ActionBarLayout layout) {
+    public void onRebuildAllFragments(ActionBarLayout layout, boolean last) {
         if (AndroidUtilities.isTablet() && layout == this.layersActionBarLayout) {
-            this.rightActionBarLayout.rebuildAllFragmentViews(true, true);
-            this.actionBarLayout.rebuildAllFragmentViews(true, true);
+            this.rightActionBarLayout.rebuildAllFragmentViews(last, last);
+            this.actionBarLayout.rebuildAllFragmentViews(last, last);
         }
         this.drawerLayoutAdapter.notifyDataSetChanged();
     }

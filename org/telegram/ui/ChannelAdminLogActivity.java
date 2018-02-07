@@ -1646,9 +1646,9 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
     }
 
     private void processSelectedOption(int option) {
-        Intent intent;
+        String path;
         if (this.selectedObject != null) {
-            String path;
+            Intent intent;
             switch (option) {
                 case 3:
                     AndroidUtilities.addToClipboard(getMessageContent(this.selectedObject, 0, true));
