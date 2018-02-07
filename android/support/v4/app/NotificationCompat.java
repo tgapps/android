@@ -220,11 +220,6 @@ public class NotificationCompat {
             return this;
         }
 
-        public Builder setShowWhen(boolean show) {
-            this.mShowWhen = show;
-            return this;
-        }
-
         public Builder setSmallIcon(int icon) {
             this.mNotification.icon = icon;
             return this;

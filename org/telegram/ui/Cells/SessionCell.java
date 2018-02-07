@@ -2,7 +2,6 @@ package org.telegram.ui.Cells;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.view.View.MeasureSpec;
 import android.widget.FrameLayout;
@@ -45,7 +44,7 @@ public class SessionCell extends FrameLayout {
             this.avatarDrawable.setTextSize(AndroidUtilities.dp(10.0f));
             this.imageView = new BackupImageView(context);
             this.imageView.setRoundRadius(AndroidUtilities.dp(10.0f));
-            addView(this.imageView, LayoutHelper.createFrame(20, 20.0f, (LocaleController.isRTL ? 5 : 3) | 48, (float) (LocaleController.isRTL ? 0 : 17), 13.0f, (float) (LocaleController.isRTL ? 17 : 0), 0.0f));
+            addView(this.imageView, LayoutHelper.createFrame(20, 20.0f, (LocaleController.isRTL ? 5 : 3) | 48, (float) (LocaleController.isRTL ? 0 : 17), 12.0f, (float) (LocaleController.isRTL ? 17 : 0), 0.0f));
         } else {
             addView(linearLayout, LayoutHelper.createFrame(-1, 30.0f, (LocaleController.isRTL ? 5 : 3) | 48, (float) (LocaleController.isRTL ? 11 : 17), 11.0f, (float) (LocaleController.isRTL ? 17 : 11), 0.0f));
         }
@@ -148,14 +147,12 @@ public class SessionCell extends FrameLayout {
             }
             this.detailTextView.setText(stringBuilder);
         } else if (object instanceof TL_webAuthorization) {
-            String name;
             TL_webAuthorization session2 = (TL_webAuthorization) object;
             User user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(session2.bot_id));
-            this.nameTextView.setText(session2.domain);
             if (user != null) {
                 TLObject currentPhoto;
                 this.avatarDrawable.setInfo(user);
-                name = UserObject.getFirstName(user);
+                this.nameTextView.setText(UserObject.getFirstName(user));
                 if (user.photo != null) {
                     currentPhoto = user.photo.photo_small;
                 } else {
@@ -163,7 +160,7 @@ public class SessionCell extends FrameLayout {
                 }
                 this.imageView.setImage(currentPhoto, "50_50", this.avatarDrawable);
             } else {
-                name = TtmlNode.ANONYMOUS_REGION_ID;
+                this.nameTextView.setText(TtmlNode.ANONYMOUS_REGION_ID);
             }
             setTag(Theme.key_windowBackgroundWhiteGrayText3);
             this.onlineTextView.setText(LocaleController.stringForMessageListDate((long) session2.date_active));
@@ -181,8 +178,8 @@ public class SessionCell extends FrameLayout {
             }
             this.detailExTextView.setText(stringBuilder);
             stringBuilder = new StringBuilder();
-            if (!TextUtils.isEmpty(name)) {
-                stringBuilder.append(name);
+            if (session2.domain.length() != 0) {
+                stringBuilder.append(session2.domain);
             }
             if (session2.browser.length() != 0) {
                 if (stringBuilder.length() != 0) {

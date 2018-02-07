@@ -3308,14 +3308,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0ecb:
         r4 = "selectAlertString";
         r5 = "SendContactTo";
-        r16 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
+        r16 = 2131494323; // 0x7f0c05b3 float:1.8612151E38 double:1.0530981193E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendContactToGroup";
-        r16 = 2131494304; // 0x7f0c05a0 float:1.8612113E38 double:1.05309811E-314;
+        r16 = 2131494310; // 0x7f0c05a6 float:1.8612125E38 double:1.053098113E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -3392,14 +3392,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0f81:
         r4 = "selectAlertString";
         r5 = "SendMessagesTo";
-        r16 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
+        r16 = 2131494323; // 0x7f0c05b3 float:1.8612151E38 double:1.0530981193E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendMessagesToGroup";
-        r16 = 2131494318; // 0x7f0c05ae float:1.861214E38 double:1.053098117E-314;
+        r16 = 2131494324; // 0x7f0c05b4 float:1.8612153E38 double:1.05309812E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -4494,7 +4494,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
                 FileLog.e(e2);
             }
         } else if (id == NotificationCenter.reloadInterface) {
-            rebuildAllFragments(false);
+            rebuildAllFragments(true);
         } else if (id == NotificationCenter.suggestedLangpack) {
             showLanguageAlert(false);
         } else if (id == NotificationCenter.openArticle) {
@@ -5303,16 +5303,16 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
 
     public void rebuildAllFragments(boolean last) {
         if (this.layersActionBarLayout != null) {
-            this.layersActionBarLayout.rebuildAllFragmentViews(last, last);
+            this.layersActionBarLayout.rebuildAllFragmentViews(last, true);
         } else {
-            this.actionBarLayout.rebuildAllFragmentViews(last, last);
+            this.actionBarLayout.rebuildAllFragmentViews(last, true);
         }
     }
 
-    public void onRebuildAllFragments(ActionBarLayout layout, boolean last) {
+    public void onRebuildAllFragments(ActionBarLayout layout) {
         if (AndroidUtilities.isTablet() && layout == this.layersActionBarLayout) {
-            this.rightActionBarLayout.rebuildAllFragmentViews(last, last);
-            this.actionBarLayout.rebuildAllFragmentViews(last, last);
+            this.rightActionBarLayout.rebuildAllFragmentViews(true, true);
+            this.actionBarLayout.rebuildAllFragmentViews(true, true);
         }
         this.drawerLayoutAdapter.notifyDataSetChanged();
     }

@@ -281,9 +281,9 @@ public class ManageSpaceActivity extends Activity implements ActionBarLayoutDele
         return true;
     }
 
-    public void onRebuildAllFragments(ActionBarLayout layout, boolean last) {
+    public void onRebuildAllFragments(ActionBarLayout layout) {
         if (AndroidUtilities.isTablet() && layout == this.layersActionBarLayout) {
-            this.actionBarLayout.rebuildAllFragmentViews(last, last);
+            this.actionBarLayout.rebuildAllFragmentViews(true, true);
         }
     }
 }

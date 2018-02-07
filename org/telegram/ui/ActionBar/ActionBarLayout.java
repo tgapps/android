@@ -95,7 +95,7 @@ public class ActionBarLayout extends FrameLayout {
 
         boolean onPreIme();
 
-        void onRebuildAllFragments(ActionBarLayout actionBarLayout, boolean z);
+        void onRebuildAllFragments(ActionBarLayout actionBarLayout);
     }
 
     public class LinearLayoutContainer extends LinearLayout {
@@ -1142,7 +1142,7 @@ public class ActionBarLayout extends FrameLayout {
             a++;
         }
         if (this.delegate != null) {
-            this.delegate.onRebuildAllFragments(this, last);
+            this.delegate.onRebuildAllFragments(this);
         }
         if (showLastAfter) {
             showLastFragment();
