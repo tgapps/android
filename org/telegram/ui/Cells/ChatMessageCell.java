@@ -1886,7 +1886,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
             return 0;
         } else {
             int width;
-            boolean z = (this.documentAttach.mime_type != null && this.documentAttach.mime_type.toLowerCase().startsWith("image/")) || !((this.documentAttach.thumb instanceof TL_photoSizeEmpty) || (this.documentAttach.thumb.location instanceof TL_fileLocationUnavailable));
+            boolean z = (this.documentAttach.mime_type != null && this.documentAttach.mime_type.toLowerCase().startsWith("image/")) || !(this.documentAttach.thumb == null || (this.documentAttach.thumb instanceof TL_photoSizeEmpty) || (this.documentAttach.thumb.location instanceof TL_fileLocationUnavailable));
             this.drawPhotoImage = z;
             if (!this.drawPhotoImage) {
                 maxWidth += AndroidUtilities.dp(30.0f);
@@ -3483,7 +3483,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         goto L_0x09dd;
     L_0x09f3:
         r4 = "Of";
-        r6 = 2131494014; // 0x7f0c047e float:1.8611524E38 double:1.0530979666E-314;
+        r6 = 2131494010; // 0x7f0c047a float:1.8611516E38 double:1.0530979647E-314;
         r8 = 2;
         r8 = new java.lang.Object[r8];
         r9 = 0;
@@ -4293,7 +4293,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x1c21;
     L_0x0fcf:
         r4 = "PaymentReceipt";
-        r6 = 2131494100; // 0x7f0c04d4 float:1.8611699E38 double:1.053098009E-314;
+        r6 = 2131494096; // 0x7f0c04d0 float:1.861169E38 double:1.053098007E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
     L_0x0fdd:
@@ -4431,7 +4431,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 != r6) goto L_0x1c63;
     L_0x10f7:
         r4 = "OpenChannel";
-        r6 = 2131494026; // 0x7f0c048a float:1.8611549E38 double:1.0530979726E-314;
+        r6 = 2131494022; // 0x7f0c0486 float:1.861154E38 double:1.0530979706E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
     L_0x1101:
         r0 = r150;
@@ -5972,13 +5972,13 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x1c3b;
     L_0x1c2b:
         r4 = "PaymentTestInvoice";
-        r6 = 2131494118; // 0x7f0c04e6 float:1.8611735E38 double:1.053098018E-314;
+        r6 = 2131494114; // 0x7f0c04e2 float:1.8611727E38 double:1.053098016E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
         goto L_0x0fdd;
     L_0x1c3b:
         r4 = "PaymentInvoice";
-        r6 = 2131494087; // 0x7f0c04c7 float:1.8611672E38 double:1.0530980027E-314;
+        r6 = 2131494083; // 0x7f0c04c3 float:1.8611664E38 double:1.0530980007E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r6);
         r5 = r4.toUpperCase();
         goto L_0x0fdd;
@@ -6001,7 +6001,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 != r6) goto L_0x1c76;
     L_0x1c6a:
         r4 = "OpenGroup";
-        r6 = 2131494027; // 0x7f0c048b float:1.861155E38 double:1.053097973E-314;
+        r6 = 2131494023; // 0x7f0c0487 float:1.8611543E38 double:1.053097971E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1101;
     L_0x1c76:
@@ -6011,12 +6011,12 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 != r6) goto L_0x1c89;
     L_0x1c7d:
         r4 = "OpenMessage";
-        r6 = 2131494030; // 0x7f0c048e float:1.8611557E38 double:1.0530979745E-314;
+        r6 = 2131494026; // 0x7f0c048a float:1.8611549E38 double:1.0530979726E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1101;
     L_0x1c89:
         r4 = "InstantView";
-        r6 = 2131493673; // 0x7f0c0329 float:1.8610833E38 double:1.053097798E-314;
+        r6 = 2131493672; // 0x7f0c0328 float:1.861083E38 double:1.0530977977E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1101;
     L_0x1c95:
@@ -6538,7 +6538,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         goto L_0x209a;
     L_0x20a0:
         r4 = "NumberUnknown";
-        r6 = 2131494012; // 0x7f0c047c float:1.861152E38 double:1.0530979656E-314;
+        r6 = 2131494008; // 0x7f0c0478 float:1.8611512E38 double:1.0530979637E-314;
         r111 = org.telegram.messenger.LocaleController.getString(r4, r6);
         goto L_0x1f4d;
     L_0x20ac:
@@ -9965,7 +9965,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (r4 == 0) goto L_0x39ed;
     L_0x3980:
         r4 = "PaymentReceipt";
-        r6 = 2131494100; // 0x7f0c04d4 float:1.8611699E38 double:1.053098009E-314;
+        r6 = 2131494096; // 0x7f0c04d0 float:1.861169E38 double:1.053098007E-314;
         r32 = org.telegram.messenger.LocaleController.getString(r4, r6);
     L_0x398a:
         r31 = new android.text.StaticLayout;
@@ -10371,7 +10371,6 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         int linkPreviewY;
         int x;
         int y;
-        float progress;
         int x1;
         int y1;
         RadialProgress radialProgress;
@@ -10730,6 +10729,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
             Theme.chat_photoStatesDrawables[drawable][this.buttonPressed].draw(canvas);
             if (this.currentMessageObject.messageOwner.destroyTime != 0) {
                 if (!this.currentMessageObject.isOutOwner()) {
+                    float progress;
                     progress = ((float) Math.max(0, (((long) this.currentMessageObject.messageOwner.destroyTime) * 1000) - (System.currentTimeMillis() + ((long) (ConnectionsManager.getInstance(this.currentAccount).getTimeDifference() * 1000))))) / (((float) this.currentMessageObject.messageOwner.ttl) * 1000.0f);
                     Theme.chat_deleteProgressPaint.setAlpha((int) (255.0f * this.controlsAlpha));
                     canvas.drawArc(this.deleteProgressRect, -90.0f, -360.0f * progress, true, Theme.chat_deleteProgressPaint);
@@ -11925,7 +11925,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
         if (this.currentMessageObject.isFromUser()) {
             author = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.messageOwner.from_id));
         }
-        if (messageObject.isLiveLocation() || messageObject.messageOwner.via_bot_id != 0 || messageObject.messageOwner.via_bot_name != null || ((author != null && author.bot) || (messageObject.messageOwner.flags & 32768) == 0 || this.currentPosition != null)) {
+        if (messageObject.isLiveLocation() || messageObject.getDialogId() == 777000 || messageObject.messageOwner.via_bot_id != 0 || messageObject.messageOwner.via_bot_name != null || ((author != null && author.bot) || (messageObject.messageOwner.flags & 32768) == 0 || this.currentPosition != null)) {
             timeString = LocaleController.getInstance().formatterDay.format(((long) messageObject.messageOwner.date) * 1000);
         } else {
             timeString = LocaleController.getString("EditedMessage", R.string.EditedMessage) + " " + LocaleController.getInstance().formatterDay.format(((long) messageObject.messageOwner.date) * 1000);
@@ -12204,6 +12204,7 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                 this.currentForwardUser = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.messageOwner.fwd_from.from_id));
             }
             if (!(this.currentForwardUser == null && this.currentForwardChannel == null)) {
+                String fromString;
                 if (this.currentForwardChannel != null) {
                     if (this.currentForwardUser != null) {
                         this.currentForwardNameString = String.format("%s (%s)", new Object[]{this.currentForwardChannel.title, UserObject.getUserName(this.currentForwardUser)});
@@ -12217,7 +12218,12 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                 String from = LocaleController.getString("From", R.string.From);
                 String fromFormattedString = LocaleController.getString("FromFormatted", R.string.FromFormatted);
                 int idx = fromFormattedString.indexOf("%1$s");
-                String fromString = String.format(fromFormattedString, new Object[]{TextUtils.ellipsize(this.currentForwardNameString.replace('\n', ' '), Theme.chat_replyNamePaint, (float) ((this.forwardedNameWidth - ((int) Math.ceil((double) Theme.chat_forwardNamePaint.measureText(from + " ")))) - this.viaWidth), TruncateAt.END)});
+                name = TextUtils.ellipsize(this.currentForwardNameString.replace('\n', ' '), Theme.chat_replyNamePaint, (float) ((this.forwardedNameWidth - ((int) Math.ceil((double) Theme.chat_forwardNamePaint.measureText(from + " ")))) - this.viaWidth), TruncateAt.END);
+                try {
+                    fromString = String.format(fromFormattedString, new Object[]{name});
+                } catch (Exception e2) {
+                    fromString = name.toString();
+                }
                 if (viaString != null) {
                     spannableStringBuilder = new SpannableStringBuilder(String.format("%s via %s", new Object[]{fromString, viaUsername}));
                     this.viaNameWidth = (int) Math.ceil((double) Theme.chat_forwardNamePaint.measureText(fromString));
@@ -12237,8 +12243,8 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                     if (messageObject.type != 5) {
                         this.namesOffset += AndroidUtilities.dp(36.0f);
                     }
-                } catch (Throwable e2) {
-                    FileLog.e(e2);
+                } catch (Throwable e3) {
+                    FileLog.e(e3);
                 }
             }
         }
@@ -12315,8 +12321,8 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                         this.replyNameOffset = this.replyNameLayout.getLineLeft(0);
                     }
                 }
-            } catch (Throwable e22) {
-                FileLog.e(e22);
+            } catch (Throwable e32) {
+                FileLog.e(e32);
             }
             try {
                 this.replyTextWidth = AndroidUtilities.dp((float) ((this.needReplyImage ? 44 : 0) + 4));
@@ -12327,8 +12333,8 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                         this.replyTextOffset = this.replyTextLayout.getLineLeft(0);
                     }
                 }
-            } catch (Throwable e222) {
-                FileLog.e(e222);
+            } catch (Throwable e322) {
+                FileLog.e(e322);
             }
         }
         requestLayout();

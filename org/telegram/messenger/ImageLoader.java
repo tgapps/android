@@ -2029,7 +2029,10 @@ public class ImageLoader {
         filter.addAction("android.intent.action.MEDIA_UNMOUNTABLE");
         filter.addAction("android.intent.action.MEDIA_UNMOUNTED");
         filter.addDataScheme("file");
-        ApplicationLoader.applicationContext.registerReceiver(receiver, filter);
+        try {
+            ApplicationLoader.applicationContext.registerReceiver(receiver, filter);
+        } catch (Throwable th) {
+        }
         checkMediaPaths();
     }
 

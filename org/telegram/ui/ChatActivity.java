@@ -3280,6 +3280,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
 
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 ChatActivity.this.chatListView.invalidate();
+                if (!(ChatActivity.this.wasManualScroll || dy == 0)) {
+                    ChatActivity.this.wasManualScroll = true;
+                }
                 if (!(dy == 0 || !ChatActivity.this.scrollingFloatingDate || ChatActivity.this.currentFloatingTopIsNotMessage)) {
                     if (ChatActivity.this.highlightMessageId != ConnectionsManager.DEFAULT_DATACENTER_ID) {
                         ChatActivity.this.highlightMessageId = ConnectionsManager.DEFAULT_DATACENTER_ID;
@@ -9808,7 +9811,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         r0 = r34;
         r0.setTitle(r5);
         r5 = "OK";
-        r6 = 2131494013; // 0x7f0c047d float:1.8611522E38 double:1.053097966E-314;
+        r6 = 2131494009; // 0x7f0c0479 float:1.8611514E38 double:1.053097964E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r6);
         r6 = 0;
         r0 = r34;
@@ -13250,7 +13253,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         r0.setMessage(r5);
     L_0x27d9:
         r5 = "OK";
-        r6 = 2131494013; // 0x7f0c047d float:1.8611522E38 double:1.053097966E-314;
+        r6 = 2131494009; // 0x7f0c0479 float:1.8611514E38 double:1.053097964E-314;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r6);
         r6 = 0;
         r0 = r34;
@@ -16349,7 +16352,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                         } else if (holder.itemView instanceof ChatActionCell) {
                             messageId = ((ChatActionCell) holder.itemView).getMessageObject().getId();
                         }
-                        if (messageId != 0) {
+                        if ((messageId <= 0 || this.currentEncryptedChat != null) && (messageId >= 0 || this.currentEncryptedChat == null)) {
+                            messageId = 0;
+                        } else {
                             offset = holder.itemView.getBottom() - this.chatListView.getMeasuredHeight();
                             if (BuildVars.LOGS_ENABLED) {
                                 FileLog.d("save offset = " + offset + " for mid " + messageId);
@@ -18282,7 +18287,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         ThemeDescriptionDelegate selectedBackgroundDelegate = new ThemeDescriptionDelegate() {
             public void didSetColor() {
                 ChatActivity.this.updateVisibleRows();
-                if (ChatActivity.this.chatActivityEnterView.getEmojiView() != null) {
+                if (ChatActivity.this.chatActivityEnterView != null && ChatActivity.this.chatActivityEnterView.getEmojiView() != null) {
                     ChatActivity.this.chatActivityEnterView.getEmojiView().updateUIColors();
                 }
             }
@@ -18327,9 +18332,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         themeDescriptionArr[36] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, null, null, Theme.key_avatar_nameInMessageCyan);
         themeDescriptionArr[37] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, null, null, Theme.key_avatar_nameInMessageBlue);
         themeDescriptionArr[38] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, null, null, Theme.key_avatar_nameInMessagePink);
-        themeDescriptionArr[39] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, new Drawable[]{Theme.chat_msgInDrawable, Theme.chat_msgInMediaDrawable}, null, Theme.key_chat_inBubble);
+        themeDescriptionArr[39] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class, BotHelpCell.class}, null, new Drawable[]{Theme.chat_msgInDrawable, Theme.chat_msgInMediaDrawable}, null, Theme.key_chat_inBubble);
         themeDescriptionArr[search] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, new Drawable[]{Theme.chat_msgInSelectedDrawable, Theme.chat_msgInMediaSelectedDrawable}, null, Theme.key_chat_inBubbleSelected);
-        themeDescriptionArr[41] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, new Drawable[]{Theme.chat_msgInShadowDrawable, Theme.chat_msgInMediaShadowDrawable}, null, Theme.key_chat_inBubbleShadow);
+        themeDescriptionArr[41] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class, BotHelpCell.class}, null, new Drawable[]{Theme.chat_msgInShadowDrawable, Theme.chat_msgInMediaShadowDrawable}, null, Theme.key_chat_inBubbleShadow);
         themeDescriptionArr[42] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, new Drawable[]{Theme.chat_msgOutDrawable, Theme.chat_msgOutMediaDrawable}, null, Theme.key_chat_outBubble);
         themeDescriptionArr[43] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, new Drawable[]{Theme.chat_msgOutSelectedDrawable, Theme.chat_msgOutMediaSelectedDrawable}, null, Theme.key_chat_outBubbleSelected);
         themeDescriptionArr[44] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, new Drawable[]{Theme.chat_msgOutShadowDrawable, Theme.chat_msgOutMediaShadowDrawable}, null, Theme.key_chat_outBubbleShadow);
@@ -18338,9 +18343,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         themeDescriptionArr[47] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, new Drawable[]{Theme.chat_shareIconDrawable, Theme.chat_replyIconDrawable, Theme.chat_botInlineDrawable, Theme.chat_botLinkDrawalbe, Theme.chat_goIconDrawable}, null, Theme.key_chat_serviceIcon);
         themeDescriptionArr[48] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class, ChatActionCell.class}, null, null, null, Theme.key_chat_serviceBackground);
         themeDescriptionArr[49] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class, ChatActionCell.class}, null, null, null, Theme.key_chat_serviceBackgroundSelected);
-        themeDescriptionArr[50] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, null, null, Theme.key_chat_messageTextIn);
+        themeDescriptionArr[50] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class, BotHelpCell.class}, null, null, null, Theme.key_chat_messageTextIn);
         themeDescriptionArr[51] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, null, null, Theme.key_chat_messageTextOut);
-        themeDescriptionArr[52] = new ThemeDescription(this.chatListView, ThemeDescription.FLAG_LINKCOLOR, new Class[]{ChatMessageCell.class}, null, null, null, Theme.key_chat_messageLinkIn, null);
+        themeDescriptionArr[52] = new ThemeDescription(this.chatListView, ThemeDescription.FLAG_LINKCOLOR, new Class[]{ChatMessageCell.class, BotHelpCell.class}, null, null, null, Theme.key_chat_messageLinkIn, null);
         themeDescriptionArr[53] = new ThemeDescription(this.chatListView, ThemeDescription.FLAG_LINKCOLOR, new Class[]{ChatMessageCell.class}, null, null, null, Theme.key_chat_messageLinkOut, null);
         themeDescriptionArr[54] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, new Drawable[]{Theme.chat_msgOutCheckDrawable, Theme.chat_msgOutHalfCheckDrawable}, null, Theme.key_chat_outSentCheck);
         themeDescriptionArr[55] = new ThemeDescription(this.chatListView, 0, new Class[]{ChatMessageCell.class}, null, new Drawable[]{Theme.chat_msgOutCheckSelectedDrawable, Theme.chat_msgOutHalfCheckSelectedDrawable}, null, Theme.key_chat_outSentCheckSelected);

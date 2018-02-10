@@ -503,15 +503,19 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
 
     public SendMessagesHelper(int instance) {
         this.currentAccount = instance;
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.FileDidUpload);
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.FileDidFailUpload);
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.FilePreparingStarted);
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.FileNewChunkAvailable);
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.FilePreparingFailed);
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.httpFileDidFailedLoad);
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.httpFileDidLoaded);
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.FileDidLoaded);
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.FileDidFailedLoad);
+        AndroidUtilities.runOnUIThread(new Runnable() {
+            public void run() {
+                NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).addObserver(SendMessagesHelper.this, NotificationCenter.FileDidUpload);
+                NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).addObserver(SendMessagesHelper.this, NotificationCenter.FileDidFailUpload);
+                NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).addObserver(SendMessagesHelper.this, NotificationCenter.FilePreparingStarted);
+                NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).addObserver(SendMessagesHelper.this, NotificationCenter.FileNewChunkAvailable);
+                NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).addObserver(SendMessagesHelper.this, NotificationCenter.FilePreparingFailed);
+                NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).addObserver(SendMessagesHelper.this, NotificationCenter.httpFileDidFailedLoad);
+                NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).addObserver(SendMessagesHelper.this, NotificationCenter.httpFileDidLoaded);
+                NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).addObserver(SendMessagesHelper.this, NotificationCenter.FileDidLoaded);
+                NotificationCenter.getInstance(SendMessagesHelper.this.currentAccount).addObserver(SendMessagesHelper.this, NotificationCenter.FileDidFailedLoad);
+            }
+        });
     }
 
     public void cleanup() {
@@ -792,7 +796,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                         cacheFile = new File(FileLoader.getDirectory(4), Utilities.MD5(path) + "." + ImageLoader.getHttpUrlExtension(path, "file"));
                         Utilities.globalQueue.postRunnable(new Runnable() {
                             public void run() {
-                                final TL_photo photo = SendMessagesHelper.getInstance(SendMessagesHelper.this.currentAccount).generatePhotoSizes(cacheFile.toString(), null);
+                                final TL_photo photo = SendMessagesHelper.this.generatePhotoSizes(cacheFile.toString(), null);
                                 AndroidUtilities.runOnUIThread(new Runnable() {
                                     public void run() {
                                         if (photo != null) {
@@ -1158,7 +1162,9 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     return;
                 }
             }
-            getInstance(this.currentAccount).sendMessage((TL_document) document, null, null, peer, replyingMessageObject, null, null, null, null, 0);
+            if (document instanceof TL_document) {
+                sendMessage((TL_document) document, null, null, peer, replyingMessageObject, null, null, null, null, 0);
+            }
         }
     }
 
@@ -1563,7 +1569,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
         mediaGeo.geo._long = location.getLongitude();
         for (Entry<String, MessageObject> entry : this.waitingForLocation.entrySet()) {
             MessageObject messageObject = (MessageObject) entry.getValue();
-            getInstance(this.currentAccount).sendMessage(mediaGeo, messageObject.getDialogId(), messageObject, null, null);
+            sendMessage(mediaGeo, messageObject.getDialogId(), messageObject, null, null);
         }
     }
 
@@ -1769,8 +1775,8 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
 
     public void sendGame(InputPeer peer, TL_inputMediaGame game, long random_id, long taskId) {
         Throwable e;
+        long newTaskId;
         if (peer != null && game != null) {
-            long newTaskId;
             TL_messages_sendMedia request = new TL_messages_sendMedia();
             request.peer = peer;
             if (request.peer instanceof TL_inputPeerChannel) {
@@ -3682,7 +3688,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
         final TLObject tLObject = req;
         final MessageObject messageObject = msgObj;
         final String str = originalPath;
-        RequestDelegate anonymousClass12 = new RequestDelegate() {
+        RequestDelegate anonymousClass13 = new RequestDelegate() {
             public void run(final TLObject response, final TL_error error) {
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     public void run() {
@@ -3862,7 +3868,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                 });
             }
         };
-        QuickAckDelegate anonymousClass13 = new QuickAckDelegate() {
+        QuickAckDelegate anonymousClass14 = new QuickAckDelegate() {
             public void run() {
                 final int msg_id = newMsgObj.id;
                 AndroidUtilities.runOnUIThread(new Runnable() {
@@ -3878,7 +3884,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
         } else {
             i = 0;
         }
-        instance.sendRequest(req, anonymousClass12, anonymousClass13, i | 68);
+        instance.sendRequest(req, anonymousClass13, anonymousClass14, i | 68);
         if (parentMessage != null) {
             parentMessage.sendDelayedRequests();
         }
@@ -4977,7 +4983,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r0 = r77;
                     r0.sync = r4;
                     r4 = org.telegram.messenger.SendMessagesHelper.mediaSendThreadPool;
-                    r5 = new org.telegram.messenger.SendMessagesHelper$20$1;
+                    r5 = new org.telegram.messenger.SendMessagesHelper$21$1;
                     r0 = r79;
                     r1 = r77;
                     r5.<init>(r1, r8);
@@ -5211,7 +5217,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r5 = r5.imageUrl;
                     r9.put(r4, r5);
                 L_0x031b:
-                    r4 = new org.telegram.messenger.SendMessagesHelper$20$2;
+                    r4 = new org.telegram.messenger.SendMessagesHelper$21$2;
                     r5 = r79;
                     r4.<init>(r6, r7, r8, r9);
                     org.telegram.messenger.AndroidUtilities.runOnUIThread(r4);
@@ -5455,7 +5461,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r9.put(r4, r5);
                     r52 = 0;
                 L_0x0521:
-                    r10 = new org.telegram.messenger.SendMessagesHelper$20$3;
+                    r10 = new org.telegram.messenger.SendMessagesHelper$21$3;
                     r11 = r79;
                     r14 = r8;
                     r15 = r9;
@@ -5745,7 +5751,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r9.put(r4, r5);
                     r52 = 0;
                 L_0x0776:
-                    r14 = new org.telegram.messenger.SendMessagesHelper$20$4;
+                    r14 = new org.telegram.messenger.SendMessagesHelper$21$4;
                     r15 = r79;
                     r21 = r8;
                     r22 = r9;
@@ -6148,7 +6154,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     r9.put(r4, r5);
                     r52 = 0;
                 L_0x0a69:
-                    r4 = new org.telegram.messenger.SendMessagesHelper$20$5;
+                    r4 = new org.telegram.messenger.SendMessagesHelper$21$5;
                     r0 = r79;
                     r4.<init>(r12, r8, r9);
                     org.telegram.messenger.AndroidUtilities.runOnUIThread(r4);
@@ -6184,7 +6190,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     if (r4 == 0) goto L_0x0abd;
                 L_0x0aaf:
                     r54 = r52;
-                    r4 = new org.telegram.messenger.SendMessagesHelper$20$6;
+                    r4 = new org.telegram.messenger.SendMessagesHelper$21$6;
                     r0 = r79;
                     r1 = r54;
                     r4.<init>(r1);
@@ -6255,7 +6261,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                 L_0x0b41:
                     return;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.SendMessagesHelper.20.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.SendMessagesHelper.21.run():void");
                 }
             });
         }
