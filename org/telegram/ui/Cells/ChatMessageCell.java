@@ -1371,19 +1371,17 @@ public class ChatMessageCell extends BaseCell implements FileDownloadProgressLis
                     }
                 } else {
                     int currentProgress = 0;
-                    for (a = 0; a < this.documentAttach.attributes.size(); a++) {
-                        attribute = (DocumentAttribute) this.documentAttach.attributes.get(a);
-                        if (attribute instanceof TL_documentAttributeAudio) {
-                            duration = attribute.duration;
-                            break;
-                        }
-                    }
+                    duration = this.currentMessageObject.getDuration();
                     if (MediaController.getInstance().isPlayingMessage(this.currentMessageObject)) {
                         currentProgress = this.currentMessageObject.audioProgressSec;
                     }
                     if (this.lastTime != currentProgress) {
                         this.lastTime = currentProgress;
-                        timeString = String.format("%d:%02d / %d:%02d", new Object[]{Integer.valueOf(currentProgress / 60), Integer.valueOf(currentProgress % 60), Integer.valueOf(duration / 60), Integer.valueOf(duration % 60)});
+                        if (duration == 0) {
+                            timeString = String.format("%d:%02d / -:--", new Object[]{Integer.valueOf(currentProgress / 60), Integer.valueOf(currentProgress % 60)});
+                        } else {
+                            timeString = String.format("%d:%02d / %d:%02d", new Object[]{Integer.valueOf(currentProgress / 60), Integer.valueOf(currentProgress % 60), Integer.valueOf(duration / 60), Integer.valueOf(duration % 60)});
+                        }
                         this.durationLayout = new StaticLayout(timeString, Theme.chat_audioTimePaint, (int) Math.ceil((double) Theme.chat_audioTimePaint.measureText(timeString)), Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
                     }
                 }

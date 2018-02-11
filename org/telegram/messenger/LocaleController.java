@@ -626,6 +626,15 @@ public class LocaleController {
         applyRemoteLanguage(this.currentLocaleInfo, null, true, currentAccount);
     }
 
+    public void checkUpdateForCurrentRemoteLocale(int currentAccount, int version) {
+        if (this.currentLocaleInfo == null) {
+            return;
+        }
+        if ((this.currentLocaleInfo == null || this.currentLocaleInfo.isRemote()) && this.currentLocaleInfo.version < version) {
+            applyRemoteLanguage(this.currentLocaleInfo, null, false, currentAccount);
+        }
+    }
+
     private String getLocaleString(Locale locale) {
         if (locale == null) {
             return "en";
@@ -935,12 +944,12 @@ public class LocaleController {
     }
 
     private HashMap<String, String> getLocaleFileStrings(File file, boolean preserveEscapes) {
-        HashMap<String, String> stringMap;
         Throwable e;
         Throwable th;
         FileInputStream fileInputStream = null;
         this.reloadLastFile = false;
         try {
+            HashMap<String, String> stringMap;
             if (file.exists()) {
                 stringMap = new HashMap();
                 XmlPullParser parser = Xml.newPullParser();

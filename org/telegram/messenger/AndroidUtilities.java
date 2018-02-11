@@ -381,8 +381,8 @@ Error: java.util.NoSuchElementException
         if (pathString == null) {
             return false;
         }
-        String path;
         while (true) {
+            String path;
             String newPath = Utilities.readlink(pathString);
             if (newPath != null && !newPath.equals(pathString)) {
                 pathString = newPath;
@@ -1467,18 +1467,18 @@ Error: java.util.NoSuchElementException
     }
 
     public static boolean copyFile(File sourceFile, File destFile) throws IOException {
-        FileOutputStream destination;
         Throwable e;
         Throwable th;
         if (!destFile.exists()) {
             destFile.createNewFile();
         }
         FileInputStream source = null;
-        FileOutputStream destination2 = null;
+        FileOutputStream destination = null;
         try {
+            FileOutputStream destination2;
             FileInputStream source2 = new FileInputStream(sourceFile);
             try {
-                destination = new FileOutputStream(destFile);
+                destination2 = new FileOutputStream(destFile);
             } catch (Exception e2) {
                 e = e2;
                 source = source2;
@@ -1487,18 +1487,18 @@ Error: java.util.NoSuchElementException
                     if (source != null) {
                         source.close();
                     }
-                    if (destination2 != null) {
+                    if (destination != null) {
                         return false;
                     }
-                    destination2.close();
+                    destination.close();
                     return false;
                 } catch (Throwable th2) {
                     th = th2;
                     if (source != null) {
                         source.close();
                     }
-                    if (destination2 != null) {
-                        destination2.close();
+                    if (destination != null) {
+                        destination.close();
                     }
                     throw th;
                 }
@@ -1508,44 +1508,44 @@ Error: java.util.NoSuchElementException
                 if (source != null) {
                     source.close();
                 }
-                if (destination2 != null) {
-                    destination2.close();
+                if (destination != null) {
+                    destination.close();
                 }
                 throw th;
             }
             try {
-                destination.getChannel().transferFrom(source2.getChannel(), 0, source2.getChannel().size());
+                destination2.getChannel().transferFrom(source2.getChannel(), 0, source2.getChannel().size());
                 if (source2 != null) {
                     source2.close();
                 }
-                if (destination != null) {
-                    destination.close();
+                if (destination2 != null) {
+                    destination2.close();
                 }
-                destination2 = destination;
+                destination = destination2;
                 source = source2;
                 return true;
             } catch (Exception e3) {
                 e = e3;
-                destination2 = destination;
+                destination = destination2;
                 source = source2;
                 FileLog.e(e);
                 if (source != null) {
                     source.close();
                 }
-                if (destination2 != null) {
+                if (destination != null) {
                     return false;
                 }
-                destination2.close();
+                destination.close();
                 return false;
             } catch (Throwable th4) {
                 th = th4;
-                destination2 = destination;
+                destination = destination2;
                 source = source2;
                 if (source != null) {
                     source.close();
                 }
-                if (destination2 != null) {
-                    destination2.close();
+                if (destination != null) {
+                    destination.close();
                 }
                 throw th;
             }
@@ -1555,10 +1555,10 @@ Error: java.util.NoSuchElementException
             if (source != null) {
                 source.close();
             }
-            if (destination2 != null) {
+            if (destination != null) {
                 return false;
             }
-            destination2.close();
+            destination.close();
             return false;
         }
     }
