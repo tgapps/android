@@ -79,27 +79,27 @@ public final class R {
     }
 
     public static final class drawable {
-        public static final int common_full_open_on_phone = 2131165275;
-        public static final int common_google_signin_btn_icon_dark = 2131165276;
-        public static final int common_google_signin_btn_icon_dark_focused = 2131165277;
-        public static final int common_google_signin_btn_icon_dark_normal = 2131165278;
-        public static final int common_google_signin_btn_icon_dark_normal_background = 2131165279;
-        public static final int common_google_signin_btn_icon_disabled = 2131165280;
-        public static final int common_google_signin_btn_icon_light = 2131165281;
-        public static final int common_google_signin_btn_icon_light_focused = 2131165282;
-        public static final int common_google_signin_btn_icon_light_normal = 2131165283;
-        public static final int common_google_signin_btn_icon_light_normal_background = 2131165284;
-        public static final int common_google_signin_btn_text_dark = 2131165285;
-        public static final int common_google_signin_btn_text_dark_focused = 2131165286;
-        public static final int common_google_signin_btn_text_dark_normal = 2131165287;
-        public static final int common_google_signin_btn_text_dark_normal_background = 2131165288;
-        public static final int common_google_signin_btn_text_disabled = 2131165289;
-        public static final int common_google_signin_btn_text_light = 2131165290;
-        public static final int common_google_signin_btn_text_light_focused = 2131165291;
-        public static final int common_google_signin_btn_text_light_normal = 2131165292;
-        public static final int common_google_signin_btn_text_light_normal_background = 2131165293;
-        public static final int googleg_disabled_color_18 = 2131165322;
-        public static final int googleg_standard_color_18 = 2131165323;
+        public static final int common_full_open_on_phone = 2131165279;
+        public static final int common_google_signin_btn_icon_dark = 2131165280;
+        public static final int common_google_signin_btn_icon_dark_focused = 2131165281;
+        public static final int common_google_signin_btn_icon_dark_normal = 2131165282;
+        public static final int common_google_signin_btn_icon_dark_normal_background = 2131165283;
+        public static final int common_google_signin_btn_icon_disabled = 2131165284;
+        public static final int common_google_signin_btn_icon_light = 2131165285;
+        public static final int common_google_signin_btn_icon_light_focused = 2131165286;
+        public static final int common_google_signin_btn_icon_light_normal = 2131165287;
+        public static final int common_google_signin_btn_icon_light_normal_background = 2131165288;
+        public static final int common_google_signin_btn_text_dark = 2131165289;
+        public static final int common_google_signin_btn_text_dark_focused = 2131165290;
+        public static final int common_google_signin_btn_text_dark_normal = 2131165291;
+        public static final int common_google_signin_btn_text_dark_normal_background = 2131165292;
+        public static final int common_google_signin_btn_text_disabled = 2131165293;
+        public static final int common_google_signin_btn_text_light = 2131165294;
+        public static final int common_google_signin_btn_text_light_focused = 2131165295;
+        public static final int common_google_signin_btn_text_light_normal = 2131165296;
+        public static final int common_google_signin_btn_text_light_normal_background = 2131165297;
+        public static final int googleg_disabled_color_18 = 2131165326;
+        public static final int googleg_standard_color_18 = 2131165327;
     }
 
     public static final class id {
@@ -109,43 +109,43 @@ public final class R {
         public static final int android_pay_dark = 2131230728;
         public static final int android_pay_light = 2131230729;
         public static final int android_pay_light_with_border = 2131230730;
-        public static final int auto = 2131230732;
-        public static final int book_now = 2131230734;
-        public static final int buyButton = 2131230741;
-        public static final int buy_now = 2131230742;
-        public static final int buy_with = 2131230743;
-        public static final int buy_with_google = 2131230744;
-        public static final int classic = 2131230746;
-        public static final int dark = 2131230747;
-        public static final int donate_with = 2131230748;
-        public static final int donate_with_google = 2131230749;
-        public static final int google_wallet_classic = 2131230751;
-        public static final int google_wallet_grayscale = 2131230752;
-        public static final int google_wallet_monochrome = 2131230753;
-        public static final int grayscale = 2131230754;
-        public static final int holo_dark = 2131230755;
-        public static final int holo_light = 2131230756;
-        public static final int hybrid = 2131230757;
-        public static final int icon_only = 2131230760;
-        public static final int light = 2131230775;
-        public static final int logo_only = 2131230780;
-        public static final int match_parent = 2131230781;
-        public static final int monochrome = 2131230786;
-        public static final int none = 2131230787;
-        public static final int normal = 2131230788;
-        public static final int production = 2131230802;
-        public static final int sandbox = 2131230805;
-        public static final int satellite = 2131230806;
-        public static final int selectionDetails = 2131230807;
-        public static final int slide = 2131230808;
-        public static final int standard = 2131230809;
-        public static final int strict_sandbox = 2131230810;
-        public static final int terrain = 2131230812;
-        public static final int test = 2131230813;
-        public static final int text = 2131230814;
-        public static final int text2 = 2131230815;
-        public static final int wide = 2131230821;
-        public static final int wrap_content = 2131230822;
+        public static final int auto = 2131230734;
+        public static final int book_now = 2131230736;
+        public static final int buyButton = 2131230744;
+        public static final int buy_now = 2131230745;
+        public static final int buy_with = 2131230746;
+        public static final int buy_with_google = 2131230747;
+        public static final int classic = 2131230749;
+        public static final int dark = 2131230750;
+        public static final int donate_with = 2131230753;
+        public static final int donate_with_google = 2131230754;
+        public static final int google_wallet_classic = 2131230756;
+        public static final int google_wallet_grayscale = 2131230757;
+        public static final int google_wallet_monochrome = 2131230758;
+        public static final int grayscale = 2131230759;
+        public static final int holo_dark = 2131230760;
+        public static final int holo_light = 2131230761;
+        public static final int hybrid = 2131230762;
+        public static final int icon_only = 2131230765;
+        public static final int light = 2131230780;
+        public static final int logo_only = 2131230785;
+        public static final int match_parent = 2131230786;
+        public static final int monochrome = 2131230791;
+        public static final int none = 2131230793;
+        public static final int normal = 2131230794;
+        public static final int production = 2131230809;
+        public static final int sandbox = 2131230812;
+        public static final int satellite = 2131230813;
+        public static final int selectionDetails = 2131230814;
+        public static final int slide = 2131230815;
+        public static final int standard = 2131230816;
+        public static final int strict_sandbox = 2131230817;
+        public static final int terrain = 2131230820;
+        public static final int test = 2131230821;
+        public static final int text = 2131230822;
+        public static final int text2 = 2131230823;
+        public static final int wide = 2131230830;
+        public static final int wrap_content = 2131230831;
     }
 
     public static final class integer {
@@ -153,30 +153,30 @@ public final class R {
     }
 
     public static final class layout {
-        public static final int wallet_test_layout = 2131361805;
+        public static final int wallet_test_layout = 2131361807;
     }
 
     public static final class string {
-        public static final int common_google_play_services_enable_button = 2131494634;
-        public static final int common_google_play_services_enable_text = 2131494635;
-        public static final int common_google_play_services_enable_title = 2131494636;
-        public static final int common_google_play_services_install_button = 2131494637;
-        public static final int common_google_play_services_install_text = 2131494638;
-        public static final int common_google_play_services_install_title = 2131494639;
-        public static final int common_google_play_services_notification_channel_name = 2131494640;
-        public static final int common_google_play_services_notification_ticker = 2131494641;
-        public static final int common_google_play_services_unknown_issue = 2131494642;
-        public static final int common_google_play_services_unsupported_text = 2131494643;
-        public static final int common_google_play_services_update_button = 2131494644;
-        public static final int common_google_play_services_update_text = 2131494645;
-        public static final int common_google_play_services_update_title = 2131494646;
-        public static final int common_google_play_services_updating_text = 2131494647;
-        public static final int common_google_play_services_wear_update_text = 2131494648;
-        public static final int common_open_on_phone = 2131494649;
-        public static final int common_signin_button_text = 2131494650;
-        public static final int common_signin_button_text_long = 2131494651;
-        public static final int gcm_fallback_notification_channel_label = 2131494669;
-        public static final int wallet_buy_button_place_holder = 2131494774;
+        public static final int common_google_play_services_enable_button = 2131494669;
+        public static final int common_google_play_services_enable_text = 2131494670;
+        public static final int common_google_play_services_enable_title = 2131494671;
+        public static final int common_google_play_services_install_button = 2131494672;
+        public static final int common_google_play_services_install_text = 2131494673;
+        public static final int common_google_play_services_install_title = 2131494674;
+        public static final int common_google_play_services_notification_channel_name = 2131494675;
+        public static final int common_google_play_services_notification_ticker = 2131494676;
+        public static final int common_google_play_services_unknown_issue = 2131494677;
+        public static final int common_google_play_services_unsupported_text = 2131494678;
+        public static final int common_google_play_services_update_button = 2131494679;
+        public static final int common_google_play_services_update_text = 2131494680;
+        public static final int common_google_play_services_update_title = 2131494681;
+        public static final int common_google_play_services_updating_text = 2131494682;
+        public static final int common_google_play_services_wear_update_text = 2131494683;
+        public static final int common_open_on_phone = 2131494684;
+        public static final int common_signin_button_text = 2131494685;
+        public static final int common_signin_button_text_long = 2131494686;
+        public static final int gcm_fallback_notification_channel_label = 2131494704;
+        public static final int wallet_buy_button_place_holder = 2131494809;
     }
 
     public static final class style {

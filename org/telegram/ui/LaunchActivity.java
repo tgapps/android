@@ -3,6 +3,7 @@ package org.telegram.ui;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager.TaskDescription;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
@@ -274,7 +275,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0.setTaskDescription(r1);	 Catch:{ Exception -> 0x08de }
     L_0x0114:
         r32 = r37.getWindow();
-        r33 = 2131165668; // 0x7f0701e4 float:1.794556E38 double:1.052935742E-314;
+        r33 = 2131165679; // 0x7f0701ef float:1.7945582E38 double:1.0529357476E-314;
         r32.setBackgroundDrawableResource(r33);
         r32 = org.telegram.messenger.SharedConfig.passcodeHash;
         r32 = r32.length();
@@ -383,7 +384,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r1 = r37;
         r1.backgroundTablet = r0;
         r32 = r37.getResources();
-        r33 = 2131165262; // 0x7f07004e float:1.7944736E38 double:1.0529355416E-314;
+        r33 = 2131165266; // 0x7f070052 float:1.7944744E38 double:1.0529355435E-314;
         r13 = r32.getDrawable(r33);
         r13 = (android.graphics.drawable.BitmapDrawable) r13;
         r32 = android.graphics.Shader.TileMode.REPEAT;
@@ -3323,14 +3324,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0ee7:
         r4 = "selectAlertString";
         r5 = "SendContactTo";
-        r16 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
+        r16 = 2131494348; // 0x7f0c05cc float:1.8612202E38 double:1.0530981317E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendContactToGroup";
-        r16 = 2131494304; // 0x7f0c05a0 float:1.8612113E38 double:1.05309811E-314;
+        r16 = 2131494335; // 0x7f0c05bf float:1.8612175E38 double:1.053098125E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -3407,14 +3408,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0f9d:
         r4 = "selectAlertString";
         r5 = "SendMessagesTo";
-        r16 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
+        r16 = 2131494348; // 0x7f0c05cc float:1.8612202E38 double:1.0530981317E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendMessagesToGroup";
-        r16 = 2131494318; // 0x7f0c05ae float:1.861214E38 double:1.053098117E-314;
+        r16 = 2131494349; // 0x7f0c05cd float:1.8612204E38 double:1.053098132E-314;
         r0 = r16;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r24;
@@ -4216,7 +4217,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
                 }
             }
             if (showAlert) {
-                Builder builder = new Builder(this);
+                Builder builder = new Builder((Context) this);
                 builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                 if (requestCode == 3) {
                     builder.setMessage(LocaleController.getString("PermissionNoAudio", R.string.PermissionNoAudio));
@@ -4437,7 +4438,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
             this.drawerLayoutAdapter.notifyDataSetChanged();
         } else if (id == NotificationCenter.needShowAlert) {
             Integer reason = args[0];
-            builder = new Builder(this);
+            builder = new Builder((Context) this);
             builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
             builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
             if (reason.intValue() != 2) {
@@ -4462,7 +4463,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
             }
         } else if (id == NotificationCenter.wasUnableToFindCurrentLocation) {
             HashMap<String, MessageObject> waitingForLocation = args[0];
-            builder = new Builder(this);
+            builder = new Builder((Context) this);
             builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
             builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
             final HashMap<String, MessageObject> hashMap = waitingForLocation;
@@ -4525,7 +4526,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
                 final boolean first = ((Boolean) args[2]).booleanValue();
                 final boolean schedule = ((Boolean) args[3]).booleanValue();
                 BaseFragment fragment = (BaseFragment) this.actionBarLayout.fragmentsStack.get(this.actionBarLayout.fragmentsStack.size() - 1);
-                builder = new Builder(this);
+                builder = new Builder((Context) this);
                 builder.setTitle(LocaleController.getString("UpdateContactsTitle", R.string.UpdateContactsTitle));
                 builder.setMessage(LocaleController.getString("UpdateContactsMessage", R.string.UpdateContactsMessage));
                 final int i3 = account;
@@ -4635,7 +4636,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
             LocaleInfo localeInfo;
             this.loadingLocaleDialog = false;
             boolean firstSystem = systemInfo.builtIn || LocaleController.getInstance().isCurrentLocalLocale();
-            Builder builder = new Builder(this);
+            Builder builder = new Builder((Context) this);
             builder.setTitle(getStringForLanguageAlert(this.systemLocaleStrings, "ChooseYourLanguage", R.string.ChooseYourLanguage));
             builder.setSubtitle(getStringForLanguageAlert(this.englishLocaleStrings, "ChooseYourLanguage", R.string.ChooseYourLanguage));
             LinearLayout linearLayout = new LinearLayout(this);

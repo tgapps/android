@@ -1873,6 +1873,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
 
     public void onError(Exception e) {
         FileLog.e((Throwable) e);
+        onInitFailed();
     }
 
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {

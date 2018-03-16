@@ -1606,7 +1606,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                 updated = false;
                 for (a = 0; a < arr.size(); a++) {
                     MessageObject obj = (MessageObject) arr.get(a);
-                    if (!(obj.messageOwner.media == null || obj.isSecretPhoto())) {
+                    if (!(obj.messageOwner.media == null || obj.needDrawBluredPreview())) {
                         type = DataQuery.getMediaType(obj.messageOwner);
                         if (type == -1) {
                             return;
@@ -1859,7 +1859,6 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
     }
 
     private void onItemClick(int index, View view, MessageObject message, int a) {
-        Builder builder;
         if (message != null) {
             if (this.actionBar.isActionModeShowed()) {
                 int loadIndex = message.getDialogId() == this.dialog_id ? 0 : 1;
@@ -1914,6 +1913,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                                 f = FileLoader.getPathToMessage(message.messageOwner);
                             }
                             if (f != null && f.exists()) {
+                                Builder builder;
                                 if (f.getName().endsWith("attheme")) {
                                     ThemeInfo themeInfo = Theme.applyThemeFile(f, message.getDocumentName(), true);
                                     if (themeInfo != null) {

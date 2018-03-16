@@ -2557,7 +2557,7 @@ public class ImageLoader {
                                 if (trueExt.equals("mp4") || trueExt.equals("gif")) {
                                     img.animatedFile = true;
                                 }
-                            } else if (((tLObject instanceof TL_webDocument) && ((TL_webDocument) tLObject).mime_type.equals("image/gif")) || ((tLObject instanceof Document) && (MessageObject.isGifDocument((Document) tLObject) || MessageObject.isRoundVideoDocument((Document) tLObject)))) {
+                            } else if (((tLObject instanceof TL_webDocument) && MessageObject.isGifDocument((TL_webDocument) tLObject)) || ((tLObject instanceof Document) && (MessageObject.isGifDocument((Document) tLObject) || MessageObject.isRoundVideoDocument((Document) tLObject)))) {
                                 img.animatedFile = true;
                             }
                             if (cacheFile == null) {
