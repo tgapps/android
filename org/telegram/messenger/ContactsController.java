@@ -717,7 +717,7 @@ public class ContactsController {
         goto L_0x0190;
     L_0x0216:
         r4 = "PhoneMobile";
-        r5 = 2131494151; // 0x7f0c0507 float:1.8611802E38 double:1.0530980343E-314;
+        r5 = 2131494152; // 0x7f0c0508 float:1.8611804E38 double:1.053098035E-314;
         r13 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0133 }
         goto L_0x01ca;
     L_0x0221:
@@ -727,7 +727,7 @@ public class ContactsController {
     L_0x0226:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0133 }
         r4 = "PhoneHome";
-        r5 = 2131494149; // 0x7f0c0505 float:1.8611798E38 double:1.0530980333E-314;
+        r5 = 2131494150; // 0x7f0c0506 float:1.86118E38 double:1.053098034E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0133 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0133 }
         goto L_0x01cd;
@@ -738,7 +738,7 @@ public class ContactsController {
     L_0x023b:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0133 }
         r4 = "PhoneMobile";
-        r5 = 2131494151; // 0x7f0c0507 float:1.8611802E38 double:1.0530980343E-314;
+        r5 = 2131494152; // 0x7f0c0508 float:1.8611804E38 double:1.053098035E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0133 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0133 }
         goto L_0x01cd;
@@ -749,7 +749,7 @@ public class ContactsController {
     L_0x0250:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0133 }
         r4 = "PhoneWork";
-        r5 = 2131494157; // 0x7f0c050d float:1.8611814E38 double:1.0530980373E-314;
+        r5 = 2131494158; // 0x7f0c050e float:1.8611816E38 double:1.053098038E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0133 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0133 }
         goto L_0x01cd;
@@ -760,14 +760,14 @@ public class ContactsController {
     L_0x0267:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0133 }
         r4 = "PhoneMain";
-        r5 = 2131494150; // 0x7f0c0506 float:1.86118E38 double:1.053098034E-314;
+        r5 = 2131494151; // 0x7f0c0507 float:1.8611802E38 double:1.0530980343E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0133 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0133 }
         goto L_0x01cd;
     L_0x0278:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0133 }
         r4 = "PhoneOther";
-        r5 = 2131494156; // 0x7f0c050c float:1.8611812E38 double:1.053098037E-314;
+        r5 = 2131494157; // 0x7f0c050d float:1.8611814E38 double:1.0530980373E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0133 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0133 }
         goto L_0x01cd;
@@ -1945,16 +1945,16 @@ public class ContactsController {
     private void applyContactsUpdates(ArrayList<Integer> ids, ConcurrentHashMap<Integer, User> userDict, ArrayList<TL_contact> newC, ArrayList<Integer> contactsTD) {
         int a;
         Integer uid;
-        Contact contact;
+        int index;
         if (newC == null || contactsTD == null) {
             newC = new ArrayList();
             contactsTD = new ArrayList();
             for (a = 0; a < ids.size(); a++) {
                 uid = (Integer) ids.get(a);
                 if (uid.intValue() > 0) {
-                    TL_contact contact2 = new TL_contact();
-                    contact2.user_id = uid.intValue();
-                    newC.add(contact2);
+                    TL_contact contact = new TL_contact();
+                    contact.user_id = uid.intValue();
+                    newC.add(contact);
                 } else if (uid.intValue() < 0) {
                     contactsTD.add(Integer.valueOf(-uid.intValue()));
                 }
@@ -1967,7 +1967,7 @@ public class ContactsController {
         StringBuilder toDelete = new StringBuilder();
         boolean reloadContacts = false;
         for (a = 0; a < newC.size(); a++) {
-            int index;
+            Contact contact2;
             TL_contact newContact = (TL_contact) newC.get(a);
             User user = null;
             if (userDict != null) {
@@ -1981,11 +1981,11 @@ public class ContactsController {
             if (user == null || TextUtils.isEmpty(user.phone)) {
                 reloadContacts = true;
             } else {
-                contact = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact != null) {
-                    index = contact.shortPhones.indexOf(user.phone);
+                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact2 != null) {
+                    index = contact2.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact.phoneDeleted.set(index, Integer.valueOf(0));
+                        contact2.phoneDeleted.set(index, Integer.valueOf(0));
                     }
                 }
                 if (toAdd.length() != 0) {
@@ -2013,11 +2013,11 @@ public class ContactsController {
             if (user == null) {
                 reloadContacts = true;
             } else if (!TextUtils.isEmpty(user.phone)) {
-                contact = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact != null) {
-                    index = contact.shortPhones.indexOf(user.phone);
+                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact2 != null) {
+                    index = contact2.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact.phoneDeleted.set(index, Integer.valueOf(1));
+                        contact2.phoneDeleted.set(index, Integer.valueOf(1));
                     }
                 }
                 if (toDelete.length() != 0) {

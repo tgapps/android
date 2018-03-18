@@ -268,10 +268,7 @@ public class MessagesStorage {
             size = 0 + this.cacheFile.length();
         }
         if (this.shmCacheFile != null) {
-            size += this.shmCacheFile.length();
-        }
-        if (this.walCacheFile != null) {
-            return size + this.walCacheFile.length();
+            return size + this.shmCacheFile.length();
         }
         return size;
     }
@@ -5434,7 +5431,7 @@ Error: java.util.NoSuchElementException
 
     private int getMessageMediaType(Message message) {
         if (message instanceof TL_message_secret) {
-            if (((message.media instanceof TL_messageMediaPhoto) && message.ttl > 0 && message.ttl <= 60) || MessageObject.isVoiceMessage(message) || MessageObject.isVideoMessage(message) || MessageObject.isRoundVideoMessage(message)) {
+            if ((((message.media instanceof TL_messageMediaPhoto) || MessageObject.isGifMessage(message)) && message.ttl > 0 && message.ttl <= 60) || MessageObject.isVoiceMessage(message) || MessageObject.isVideoMessage(message) || MessageObject.isRoundVideoMessage(message)) {
                 return 1;
             }
             if ((message.media instanceof TL_messageMediaPhoto) || MessageObject.isVideoMessage(message)) {
