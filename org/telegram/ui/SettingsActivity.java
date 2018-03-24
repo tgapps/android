@@ -907,6 +907,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                         builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                         builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                SharedConfig.pushAuthKey = null;
+                                SharedConfig.pushAuthKeyId = null;
+                                SharedConfig.saveConfig();
                                 ConnectionsManager.getInstance(SettingsActivity.this.currentAccount).switchBackend();
                             }
                         });

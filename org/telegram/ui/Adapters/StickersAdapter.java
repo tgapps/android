@@ -1,23 +1,15 @@
 package org.telegram.ui.Adapters;
 
 import android.content.Context;
-import android.text.TextUtils;
-import android.util.LongSparseArray;
 import android.view.ViewGroup;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.DataQuery;
-import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLoader;
-import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.NotificationCenter.NotificationCenterDelegate;
-import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
-import org.telegram.messenger.Utilities;
 import org.telegram.messenger.support.widget.RecyclerView.ViewHolder;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
@@ -40,7 +32,7 @@ public class StickersAdapter extends SelectionAdapter implements NotificationCen
     private String lastSticker;
     private Context mContext;
     private ArrayList<Document> stickers;
-    private LongSparseArray<Document> stickersMap;
+    private HashMap<String, Document> stickersMap;
     private ArrayList<String> stickersToLoad = new ArrayList();
     private boolean visible;
 
@@ -108,200 +100,373 @@ public class StickersAdapter extends SelectionAdapter implements NotificationCen
 
     private void addStickerToResult(Document document) {
         if (document != null) {
-            if (this.stickersMap == null || this.stickersMap.indexOfKey(document.id) < 0) {
+            String key = document.dc_id + "_" + document.id;
+            if (this.stickersMap == null || !this.stickersMap.containsKey(key)) {
                 if (this.stickers == null) {
                     this.stickers = new ArrayList();
-                    this.stickersMap = new LongSparseArray();
+                    this.stickersMap = new HashMap();
                 }
                 this.stickers.add(document);
-                this.stickersMap.put(document.id, document);
+                this.stickersMap.put(key, document);
             }
         }
     }
 
     private void addStickersToResult(ArrayList<Document> documents) {
         if (documents != null && !documents.isEmpty()) {
-            int a = 0;
             int size = documents.size();
-            while (a < size) {
+            for (int a = 0; a < size; a++) {
                 Document document = (Document) documents.get(a);
-                if (this.stickersMap == null || this.stickersMap.indexOfKey(document.id) < 0) {
+                String key = document.dc_id + "_" + document.id;
+                if (this.stickersMap == null || !this.stickersMap.containsKey(key)) {
                     if (this.stickers == null) {
                         this.stickers = new ArrayList();
-                        this.stickersMap = new LongSparseArray();
+                        this.stickersMap = new HashMap();
                     }
                     this.stickers.add(document);
-                    this.stickersMap.put(document.id, document);
-                    a++;
-                } else {
-                    return;
+                    this.stickersMap.put(key, document);
                 }
             }
         }
     }
 
-    public void loadStikersForEmoji(CharSequence emoji) {
-        if (SharedConfig.suggestStickers != 2) {
-            boolean search = emoji != null && emoji.length() > 0 && emoji.length() <= 14;
-            if (search) {
-                this.stickers = null;
-                this.stickersMap = null;
-                int length = emoji.length();
-                int a = 0;
-                while (a < length) {
-                    CharSequence[] charSequenceArr;
-                    if (a < length - 1 && ((emoji.charAt(a) == '?' && emoji.charAt(a + 1) >= '?' && emoji.charAt(a + 1) <= '?') || (emoji.charAt(a) == '‍' && (emoji.charAt(a + 1) == '♀' || emoji.charAt(a + 1) == '♂')))) {
-                        charSequenceArr = new CharSequence[2];
-                        charSequenceArr[0] = emoji.subSequence(0, a);
-                        charSequenceArr[1] = emoji.subSequence(a + 2, emoji.length());
-                        emoji = TextUtils.concat(charSequenceArr);
-                        length -= 2;
-                        a--;
-                    } else if (emoji.charAt(a) == '️') {
-                        charSequenceArr = new CharSequence[2];
-                        charSequenceArr[0] = emoji.subSequence(0, a);
-                        charSequenceArr[1] = emoji.subSequence(a + 1, emoji.length());
-                        emoji = TextUtils.concat(charSequenceArr);
-                        length--;
-                        a--;
-                    }
-                    a++;
-                }
-                this.lastSticker = emoji.toString();
-                if (Emoji.isValidEmoji(this.lastSticker)) {
-                    Document document;
-                    this.delayLocalResults = false;
-                    final ArrayList<Document> recentStickers = DataQuery.getInstance(this.currentAccount).getRecentStickersNoCopy(0);
-                    final ArrayList<Document> favsStickers = DataQuery.getInstance(this.currentAccount).getRecentStickersNoCopy(2);
-                    int recentsAdded = 0;
-                    int size = recentStickers.size();
-                    for (a = 0; a < size; a++) {
-                        document = (Document) recentStickers.get(a);
-                        if (isValidSticker(document, this.lastSticker)) {
-                            addStickerToResult(document);
-                            recentsAdded++;
-                            if (recentsAdded >= 5) {
-                                break;
-                            }
-                        }
-                    }
-                    size = favsStickers.size();
-                    for (a = 0; a < size; a++) {
-                        document = (Document) favsStickers.get(a);
-                        if (isValidSticker(document, this.lastSticker)) {
-                            addStickerToResult(document);
-                        }
-                    }
-                    if (SharedConfig.suggestStickers == 0) {
-                        HashMap<String, ArrayList<Document>> allStickersFeatured = DataQuery.getInstance(this.currentAccount).getAllStickersFeatured();
-                        ArrayList<Document> newStickersFeatured = allStickersFeatured != null ? (ArrayList) allStickersFeatured.get(this.lastSticker) : null;
-                        if (!(newStickersFeatured == null || newStickersFeatured.isEmpty())) {
-                            final LongSparseArray<Integer> indices = new LongSparseArray(newStickersFeatured.size());
-                            for (a = 0; a < newStickersFeatured.size(); a++) {
-                                indices.put(((Document) newStickersFeatured.get(a)).id, Integer.valueOf(Utilities.random.nextInt()));
-                            }
-                            Collections.sort(newStickersFeatured, new Comparator<Document>() {
-                                public int compare(Document o1, Document o2) {
-                                    Integer idx1 = (Integer) indices.get(o1.id);
-                                    Integer idx2 = (Integer) indices.get(o2.id);
-                                    if (idx1 == null) {
-                                        idx1 = Integer.valueOf(0);
-                                    }
-                                    if (idx2 == null) {
-                                        idx2 = Integer.valueOf(0);
-                                    }
-                                    return idx1.compareTo(idx2);
-                                }
-                            });
-                            addStickersToResult(newStickersFeatured);
-                        }
-                    }
-                    HashMap<String, ArrayList<Document>> allStickers = DataQuery.getInstance(this.currentAccount).getAllStickers();
-                    ArrayList<Document> newStickers = allStickers != null ? (ArrayList) allStickers.get(this.lastSticker) : null;
-                    if (!(newStickers == null || newStickers.isEmpty())) {
-                        ArrayList<Document> arrayList = new ArrayList(newStickers);
-                        if (!recentStickers.isEmpty()) {
-                            Collections.sort(arrayList, new Comparator<Document>() {
-                                private int getIndex(long id) {
-                                    int a;
-                                    for (a = 0; a < favsStickers.size(); a++) {
-                                        if (((Document) favsStickers.get(a)).id == id) {
-                                            return a + 1000;
-                                        }
-                                    }
-                                    for (a = 0; a < recentStickers.size(); a++) {
-                                        if (((Document) recentStickers.get(a)).id == id) {
-                                            return a;
-                                        }
-                                    }
-                                    return -1;
-                                }
-
-                                public int compare(Document lhs, Document rhs) {
-                                    int idx1 = getIndex(lhs.id);
-                                    int idx2 = getIndex(rhs.id);
-                                    if (idx1 > idx2) {
-                                        return -1;
-                                    }
-                                    if (idx1 < idx2) {
-                                        return 1;
-                                    }
-                                    return 0;
-                                }
-                            });
-                        }
-                        addStickersToResult(arrayList);
-                    }
-                    if (SharedConfig.suggestStickers == 0) {
-                        searchServerStickers(this.lastSticker);
-                    }
-                    if (this.stickers != null && !this.stickers.isEmpty()) {
-                        if (SharedConfig.suggestStickers != 0 || this.stickers.size() >= 5) {
-                            checkStickerFilesExistAndDownload();
-                            StickersAdapterDelegate stickersAdapterDelegate = this.delegate;
-                            boolean z = (this.stickers == null || this.stickers.isEmpty() || !this.stickersToLoad.isEmpty()) ? false : true;
-                            stickersAdapterDelegate.needChangePanelVisibility(z);
-                            this.visible = true;
-                        } else {
-                            this.delayLocalResults = true;
-                            this.delegate.needChangePanelVisibility(false);
-                            this.visible = false;
-                        }
-                        notifyDataSetChanged();
-                        return;
-                    } else if (this.visible) {
-                        this.delegate.needChangePanelVisibility(false);
-                        this.visible = false;
-                        return;
-                    } else {
-                        return;
-                    }
-                }
-                this.visible = false;
-                this.delegate.needChangePanelVisibility(false);
-                notifyDataSetChanged();
-                return;
-            }
-            this.lastSticker = TtmlNode.ANONYMOUS_REGION_ID;
-            if (this.visible && this.stickers != null) {
-                this.visible = false;
-                this.delegate.needChangePanelVisibility(false);
-            }
-        }
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public void loadStikersForEmoji(java.lang.CharSequence r17) {
+        /*
+        r16 = this;
+        r12 = org.telegram.messenger.SharedConfig.suggestStickers;
+        r13 = 2;
+        if (r12 != r13) goto L_0x0006;
+    L_0x0005:
+        return;
+    L_0x0006:
+        if (r17 == 0) goto L_0x009c;
+    L_0x0008:
+        r12 = r17.length();
+        if (r12 <= 0) goto L_0x009c;
+    L_0x000e:
+        r12 = r17.length();
+        r13 = 14;
+        if (r12 > r13) goto L_0x009c;
+    L_0x0016:
+        r10 = 1;
+    L_0x0017:
+        if (r10 == 0) goto L_0x0220;
+    L_0x0019:
+        r12 = 0;
+        r0 = r16;
+        r0.stickers = r12;
+        r12 = 0;
+        r0 = r16;
+        r0.stickersMap = r12;
+        r6 = r17.length();
+        r1 = 0;
+    L_0x0028:
+        if (r1 >= r6) goto L_0x00cf;
+    L_0x002a:
+        r12 = r6 + -1;
+        if (r1 >= r12) goto L_0x009f;
+    L_0x002e:
+        r0 = r17;
+        r12 = r0.charAt(r1);
+        r13 = 55356; // 0xd83c float:7.757E-41 double:2.73495E-319;
+        if (r12 != r13) goto L_0x0053;
+    L_0x0039:
+        r12 = r1 + 1;
+        r0 = r17;
+        r12 = r0.charAt(r12);
+        r13 = 57339; // 0xdffb float:8.0349E-41 double:2.8329E-319;
+        if (r12 < r13) goto L_0x0053;
+    L_0x0046:
+        r12 = r1 + 1;
+        r0 = r17;
+        r12 = r0.charAt(r12);
+        r13 = 57343; // 0xdfff float:8.0355E-41 double:2.8331E-319;
+        if (r12 <= r13) goto L_0x0075;
+    L_0x0053:
+        r0 = r17;
+        r12 = r0.charAt(r1);
+        r13 = 8205; // 0x200d float:1.1498E-41 double:4.054E-320;
+        if (r12 != r13) goto L_0x009f;
+    L_0x005d:
+        r12 = r1 + 1;
+        r0 = r17;
+        r12 = r0.charAt(r12);
+        r13 = 9792; // 0x2640 float:1.3722E-41 double:4.838E-320;
+        if (r12 == r13) goto L_0x0075;
+    L_0x0069:
+        r12 = r1 + 1;
+        r0 = r17;
+        r12 = r0.charAt(r12);
+        r13 = 9794; // 0x2642 float:1.3724E-41 double:4.839E-320;
+        if (r12 != r13) goto L_0x009f;
+    L_0x0075:
+        r12 = 2;
+        r12 = new java.lang.CharSequence[r12];
+        r13 = 0;
+        r14 = 0;
+        r0 = r17;
+        r14 = r0.subSequence(r14, r1);
+        r12[r13] = r14;
+        r13 = 1;
+        r14 = r1 + 2;
+        r15 = r17.length();
+        r0 = r17;
+        r14 = r0.subSequence(r14, r15);
+        r12[r13] = r14;
+        r17 = android.text.TextUtils.concat(r12);
+        r6 = r6 + -2;
+        r1 = r1 + -1;
+    L_0x0099:
+        r1 = r1 + 1;
+        goto L_0x0028;
+    L_0x009c:
+        r10 = 0;
+        goto L_0x0017;
+    L_0x009f:
+        r0 = r17;
+        r12 = r0.charAt(r1);
+        r13 = 65039; // 0xfe0f float:9.1139E-41 double:3.21335E-319;
+        if (r12 != r13) goto L_0x0099;
+    L_0x00aa:
+        r12 = 2;
+        r12 = new java.lang.CharSequence[r12];
+        r13 = 0;
+        r14 = 0;
+        r0 = r17;
+        r14 = r0.subSequence(r14, r1);
+        r12[r13] = r14;
+        r13 = 1;
+        r14 = r1 + 1;
+        r15 = r17.length();
+        r0 = r17;
+        r14 = r0.subSequence(r14, r15);
+        r12[r13] = r14;
+        r17 = android.text.TextUtils.concat(r12);
+        r6 = r6 + -1;
+        r1 = r1 + -1;
+        goto L_0x0099;
+    L_0x00cf:
+        r12 = r17.toString();
+        r12 = r12.trim();
+        r0 = r16;
+        r0.lastSticker = r12;
+        r0 = r16;
+        r12 = r0.lastSticker;
+        r12 = org.telegram.messenger.Emoji.isValidEmoji(r12);
+        if (r12 != 0) goto L_0x00f7;
+    L_0x00e5:
+        r12 = 0;
+        r0 = r16;
+        r0.visible = r12;
+        r0 = r16;
+        r12 = r0.delegate;
+        r13 = 0;
+        r12.needChangePanelVisibility(r13);
+        r16.notifyDataSetChanged();
+        goto L_0x0005;
+    L_0x00f7:
+        r12 = 0;
+        r0 = r16;
+        r0.delayLocalResults = r12;
+        r0 = r16;
+        r12 = r0.currentAccount;
+        r12 = org.telegram.messenger.DataQuery.getInstance(r12);
+        r13 = 0;
+        r8 = r12.getRecentStickersNoCopy(r13);
+        r0 = r16;
+        r12 = r0.currentAccount;
+        r12 = org.telegram.messenger.DataQuery.getInstance(r12);
+        r13 = 2;
+        r5 = r12.getRecentStickersNoCopy(r13);
+        r9 = 0;
+        r1 = 0;
+        r11 = r8.size();
+    L_0x011c:
+        if (r1 >= r11) goto L_0x013a;
+    L_0x011e:
+        r4 = r8.get(r1);
+        r4 = (org.telegram.tgnet.TLRPC.Document) r4;
+        r0 = r16;
+        r12 = r0.lastSticker;
+        r0 = r16;
+        r12 = r0.isValidSticker(r4, r12);
+        if (r12 == 0) goto L_0x015b;
+    L_0x0130:
+        r0 = r16;
+        r0.addStickerToResult(r4);
+        r9 = r9 + 1;
+        r12 = 5;
+        if (r9 < r12) goto L_0x015b;
+    L_0x013a:
+        r1 = 0;
+        r11 = r5.size();
+    L_0x013f:
+        if (r1 >= r11) goto L_0x015e;
+    L_0x0141:
+        r4 = r5.get(r1);
+        r4 = (org.telegram.tgnet.TLRPC.Document) r4;
+        r0 = r16;
+        r12 = r0.lastSticker;
+        r0 = r16;
+        r12 = r0.isValidSticker(r4, r12);
+        if (r12 == 0) goto L_0x0158;
+    L_0x0153:
+        r0 = r16;
+        r0.addStickerToResult(r4);
+    L_0x0158:
+        r1 = r1 + 1;
+        goto L_0x013f;
+    L_0x015b:
+        r1 = r1 + 1;
+        goto L_0x011c;
+    L_0x015e:
+        r0 = r16;
+        r12 = r0.currentAccount;
+        r12 = org.telegram.messenger.DataQuery.getInstance(r12);
+        r2 = r12.getAllStickers();
+        if (r2 == 0) goto L_0x01dc;
+    L_0x016c:
+        r0 = r16;
+        r12 = r0.lastSticker;
+        r12 = r2.get(r12);
+        r12 = (java.util.ArrayList) r12;
+        r7 = r12;
+    L_0x0177:
+        if (r7 == 0) goto L_0x0199;
+    L_0x0179:
+        r12 = r7.isEmpty();
+        if (r12 != 0) goto L_0x0199;
+    L_0x017f:
+        r3 = new java.util.ArrayList;
+        r3.<init>(r7);
+        r12 = r8.isEmpty();
+        if (r12 != 0) goto L_0x0194;
+    L_0x018a:
+        r12 = new org.telegram.ui.Adapters.StickersAdapter$1;
+        r0 = r16;
+        r12.<init>(r5, r8);
+        java.util.Collections.sort(r3, r12);
+    L_0x0194:
+        r0 = r16;
+        r0.addStickersToResult(r3);
+    L_0x0199:
+        r12 = org.telegram.messenger.SharedConfig.suggestStickers;
+        if (r12 != 0) goto L_0x01a6;
+    L_0x019d:
+        r0 = r16;
+        r12 = r0.lastSticker;
+        r0 = r16;
+        r0.searchServerStickers(r12);
+    L_0x01a6:
+        r0 = r16;
+        r12 = r0.stickers;
+        if (r12 == 0) goto L_0x020b;
+    L_0x01ac:
+        r0 = r16;
+        r12 = r0.stickers;
+        r12 = r12.isEmpty();
+        if (r12 != 0) goto L_0x020b;
+    L_0x01b6:
+        r12 = org.telegram.messenger.SharedConfig.suggestStickers;
+        if (r12 != 0) goto L_0x01de;
+    L_0x01ba:
+        r0 = r16;
+        r12 = r0.stickers;
+        r12 = r12.size();
+        r13 = 5;
+        if (r12 >= r13) goto L_0x01de;
+    L_0x01c5:
+        r12 = 1;
+        r0 = r16;
+        r0.delayLocalResults = r12;
+        r0 = r16;
+        r12 = r0.delegate;
+        r13 = 0;
+        r12.needChangePanelVisibility(r13);
+        r12 = 0;
+        r0 = r16;
+        r0.visible = r12;
+    L_0x01d7:
+        r16.notifyDataSetChanged();
+        goto L_0x0005;
+    L_0x01dc:
+        r7 = 0;
+        goto L_0x0177;
+    L_0x01de:
+        r16.checkStickerFilesExistAndDownload();
+        r0 = r16;
+        r13 = r0.delegate;
+        r0 = r16;
+        r12 = r0.stickers;
+        if (r12 == 0) goto L_0x0209;
+    L_0x01eb:
+        r0 = r16;
+        r12 = r0.stickers;
+        r12 = r12.isEmpty();
+        if (r12 != 0) goto L_0x0209;
+    L_0x01f5:
+        r0 = r16;
+        r12 = r0.stickersToLoad;
+        r12 = r12.isEmpty();
+        if (r12 == 0) goto L_0x0209;
+    L_0x01ff:
+        r12 = 1;
+    L_0x0200:
+        r13.needChangePanelVisibility(r12);
+        r12 = 1;
+        r0 = r16;
+        r0.visible = r12;
+        goto L_0x01d7;
+    L_0x0209:
+        r12 = 0;
+        goto L_0x0200;
+    L_0x020b:
+        r0 = r16;
+        r12 = r0.visible;
+        if (r12 == 0) goto L_0x0005;
+    L_0x0211:
+        r0 = r16;
+        r12 = r0.delegate;
+        r13 = 0;
+        r12.needChangePanelVisibility(r13);
+        r12 = 0;
+        r0 = r16;
+        r0.visible = r12;
+        goto L_0x0005;
+    L_0x0220:
+        r12 = "";
+        r0 = r16;
+        r0.lastSticker = r12;
+        r0 = r16;
+        r12 = r0.visible;
+        if (r12 == 0) goto L_0x0005;
+    L_0x022d:
+        r0 = r16;
+        r12 = r0.stickers;
+        if (r12 == 0) goto L_0x0005;
+    L_0x0233:
+        r12 = 0;
+        r0 = r16;
+        r0.visible = r12;
+        r0 = r16;
+        r12 = r0.delegate;
+        r13 = 0;
+        r12.needChangePanelVisibility(r13);
+        goto L_0x0005;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.StickersAdapter.loadStikersForEmoji(java.lang.CharSequence):void");
     }
 
     private void searchServerStickers(final String emoji) {
-        boolean z = true;
         if (this.lastReqId != 0) {
             ConnectionsManager.getInstance(this.currentAccount).cancelRequest(this.lastReqId, true);
         }
         TL_messages_getStickers req = new TL_messages_getStickers();
         req.emoticon = emoji;
         req.hash = TtmlNode.ANONYMOUS_REGION_ID;
-        if (MessagesController.getInstance(this.currentAccount).preloadFeaturedStickers) {
-            z = false;
-        }
-        req.exclude_featured = z;
+        req.exclude_featured = false;
         this.lastReqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
             public void run(final TLObject response, TL_error error) {
                 AndroidUtilities.runOnUIThread(new Runnable() {

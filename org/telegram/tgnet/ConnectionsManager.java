@@ -99,8 +99,9 @@ public class ConnectionsManager {
         }
 
         protected NativeByteBuffer doInBackground(Void... voids) {
+            Throwable e;
             Throwable th;
-            ByteArrayOutputStream outbuf = null;
+            ByteArrayOutputStream byteArrayOutputStream = null;
             InputStream httpConnectionStream = null;
             try {
                 URL downloadUrl;
@@ -116,7 +117,7 @@ public class ConnectionsManager {
                 httpConnection.setReadTimeout(DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS);
                 httpConnection.connect();
                 httpConnectionStream = httpConnection.getInputStream();
-                ByteArrayOutputStream outbuf2 = new ByteArrayOutputStream();
+                ByteArrayOutputStream outbuf = new ByteArrayOutputStream();
                 try {
                     byte[] bytes;
                     NativeByteBuffer buffer;
@@ -124,61 +125,80 @@ public class ConnectionsManager {
                     while (!isCancelled()) {
                         int read = httpConnectionStream.read(data);
                         if (read > 0) {
-                            outbuf2.write(data, 0, read);
+                            outbuf.write(data, 0, read);
                         } else {
                             if (read == -1) {
                             }
-                            bytes = Base64.decode(outbuf2.toByteArray(), 0);
+                            bytes = Base64.decode(outbuf.toByteArray(), 0);
                             buffer = new NativeByteBuffer(bytes.length);
                             buffer.writeBytes(bytes);
                             if (httpConnectionStream != null) {
                                 try {
                                     httpConnectionStream.close();
-                                } catch (Throwable e) {
-                                    FileLog.e(e);
+                                } catch (Throwable e2) {
+                                    FileLog.e(e2);
                                 }
                             }
-                            if (outbuf2 != null) {
+                            if (outbuf != null) {
                                 try {
-                                    outbuf2.close();
-                                } catch (Exception e2) {
+                                    outbuf.close();
+                                } catch (Exception e3) {
                                 }
                             }
-                            outbuf = outbuf2;
+                            byteArrayOutputStream = outbuf;
                             return buffer;
                         }
                     }
-                    bytes = Base64.decode(outbuf2.toByteArray(), 0);
+                    bytes = Base64.decode(outbuf.toByteArray(), 0);
                     buffer = new NativeByteBuffer(bytes.length);
                     buffer.writeBytes(bytes);
                     if (httpConnectionStream != null) {
                         httpConnectionStream.close();
                     }
-                    if (outbuf2 != null) {
-                        outbuf2.close();
+                    if (outbuf != null) {
+                        outbuf.close();
                     }
-                    outbuf = outbuf2;
+                    byteArrayOutputStream = outbuf;
                     return buffer;
                 } catch (Throwable th2) {
                     th = th2;
-                    outbuf = outbuf2;
+                    byteArrayOutputStream = outbuf;
                 }
             } catch (Throwable th3) {
-                th = th3;
-                if (httpConnectionStream != null) {
-                    try {
-                        httpConnectionStream.close();
-                    } catch (Throwable e3) {
-                        FileLog.e(e3);
+                e2 = th3;
+                try {
+                    FileLog.e(e2);
+                    if (httpConnectionStream != null) {
+                        try {
+                            httpConnectionStream.close();
+                        } catch (Throwable e22) {
+                            FileLog.e(e22);
+                        }
                     }
-                }
-                if (outbuf != null) {
-                    try {
-                        outbuf.close();
-                    } catch (Exception e4) {
+                    if (byteArrayOutputStream != null) {
+                        try {
+                            byteArrayOutputStream.close();
+                        } catch (Exception e4) {
+                        }
                     }
+                    return null;
+                } catch (Throwable th4) {
+                    th = th4;
+                    if (httpConnectionStream != null) {
+                        try {
+                            httpConnectionStream.close();
+                        } catch (Throwable e222) {
+                            FileLog.e(e222);
+                        }
+                    }
+                    if (byteArrayOutputStream != null) {
+                        try {
+                            byteArrayOutputStream.close();
+                        } catch (Exception e5) {
+                        }
+                    }
+                    throw th;
                 }
-                throw th;
             }
         }
 
@@ -187,6 +207,10 @@ public class ConnectionsManager {
                 ConnectionsManager.currentTask = null;
                 ConnectionsManager.native_applyDnsConfig(this.currentAccount, result.address);
                 return;
+            }
+            if (BuildVars.LOGS_ENABLED) {
+                FileLog.d("failed to get azure result");
+                FileLog.d("start dns txt task");
             }
             DnsTxtLoadTask task = new DnsTxtLoadTask(this.currentAccount);
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[]{null, null, null});
@@ -202,8 +226,9 @@ public class ConnectionsManager {
         }
 
         protected NativeByteBuffer doInBackground(Void... voids) {
+            Throwable e;
             Throwable th;
-            ByteArrayOutputStream outbuf = null;
+            ByteArrayOutputStream byteArrayOutputStream = null;
             InputStream httpConnectionStream = null;
             try {
                 URLConnection httpConnection = new URL("https://google.com/resolve?name=" + String.format(Locale.US, ConnectionsManager.native_isTestBackend(this.currentAccount) != 0 ? "tap%1$s.stel.com" : "ap%1$s.stel.com", new Object[]{TtmlNode.ANONYMOUS_REGION_ID}) + "&type=16").openConnection();
@@ -213,7 +238,7 @@ public class ConnectionsManager {
                 httpConnection.setReadTimeout(DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS);
                 httpConnection.connect();
                 httpConnectionStream = httpConnection.getInputStream();
-                ByteArrayOutputStream outbuf2 = new ByteArrayOutputStream();
+                ByteArrayOutputStream outbuf = new ByteArrayOutputStream();
                 try {
                     JSONArray array;
                     int len;
@@ -226,11 +251,11 @@ public class ConnectionsManager {
                     while (!isCancelled()) {
                         int read = httpConnectionStream.read(data);
                         if (read > 0) {
-                            outbuf2.write(data, 0, read);
+                            outbuf.write(data, 0, read);
                         } else {
                             if (read == -1) {
                             }
-                            array = new JSONObject(new String(outbuf2.toByteArray(), C.UTF8_NAME)).getJSONArray("Answer");
+                            array = new JSONObject(new String(outbuf.toByteArray(), C.UTF8_NAME)).getJSONArray("Answer");
                             len = array.length();
                             arrayList = new ArrayList(len);
                             for (a = 0; a < len; a++) {
@@ -259,21 +284,21 @@ public class ConnectionsManager {
                             if (httpConnectionStream != null) {
                                 try {
                                     httpConnectionStream.close();
-                                } catch (Throwable e) {
-                                    FileLog.e(e);
+                                } catch (Throwable e2) {
+                                    FileLog.e(e2);
                                 }
                             }
-                            if (outbuf2 != null) {
+                            if (outbuf != null) {
                                 try {
-                                    outbuf2.close();
-                                } catch (Exception e2) {
+                                    outbuf.close();
+                                } catch (Exception e3) {
                                 }
                             }
-                            outbuf = outbuf2;
+                            byteArrayOutputStream = outbuf;
                             return buffer;
                         }
                     }
-                    array = new JSONObject(new String(outbuf2.toByteArray(), C.UTF8_NAME)).getJSONArray("Answer");
+                    array = new JSONObject(new String(outbuf.toByteArray(), C.UTF8_NAME)).getJSONArray("Answer");
                     len = array.length();
                     arrayList = new ArrayList(len);
                     for (a = 0; a < len; a++) {
@@ -290,37 +315,58 @@ public class ConnectionsManager {
                     if (httpConnectionStream != null) {
                         httpConnectionStream.close();
                     }
-                    if (outbuf2 != null) {
-                        outbuf2.close();
+                    if (outbuf != null) {
+                        outbuf.close();
                     }
-                    outbuf = outbuf2;
+                    byteArrayOutputStream = outbuf;
                     return buffer;
                 } catch (Throwable th2) {
                     th = th2;
-                    outbuf = outbuf2;
+                    byteArrayOutputStream = outbuf;
                 }
             } catch (Throwable th3) {
-                th = th3;
-                if (httpConnectionStream != null) {
-                    try {
-                        httpConnectionStream.close();
-                    } catch (Throwable e3) {
-                        FileLog.e(e3);
+                e2 = th3;
+                try {
+                    FileLog.e(e2);
+                    if (httpConnectionStream != null) {
+                        try {
+                            httpConnectionStream.close();
+                        } catch (Throwable e22) {
+                            FileLog.e(e22);
+                        }
                     }
-                }
-                if (outbuf != null) {
-                    try {
-                        outbuf.close();
-                    } catch (Exception e4) {
+                    if (byteArrayOutputStream != null) {
+                        try {
+                            byteArrayOutputStream.close();
+                        } catch (Exception e4) {
+                        }
                     }
+                    return null;
+                } catch (Throwable th4) {
+                    th = th4;
+                    if (httpConnectionStream != null) {
+                        try {
+                            httpConnectionStream.close();
+                        } catch (Throwable e222) {
+                            FileLog.e(e222);
+                        }
+                    }
+                    if (byteArrayOutputStream != null) {
+                        try {
+                            byteArrayOutputStream.close();
+                        } catch (Exception e5) {
+                        }
+                    }
+                    throw th;
                 }
-                throw th;
             }
         }
 
         protected void onPostExecute(NativeByteBuffer result) {
             if (result != null) {
                 ConnectionsManager.native_applyDnsConfig(this.currentAccount, result.address);
+            } else if (BuildVars.LOGS_ENABLED) {
+                FileLog.d("failed to get dns txt result");
             }
             ConnectionsManager.currentTask = null;
         }
@@ -747,20 +793,25 @@ public class ConnectionsManager {
     }
 
     public static void onRequestNewServerIpAndPort(int second, int currentAccount) {
-        if (currentTask != null) {
-            return;
-        }
-        if ((second == 1 || Math.abs(lastDnsRequestTime - System.currentTimeMillis()) >= 10000) && isNetworkOnline()) {
+        if (currentTask == null && ((second == 1 || Math.abs(lastDnsRequestTime - System.currentTimeMillis()) >= 10000) && isNetworkOnline())) {
             lastDnsRequestTime = System.currentTimeMillis();
             if (second == 1) {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("start dns txt task");
+                }
                 DnsTxtLoadTask task = new DnsTxtLoadTask(currentAccount);
                 task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[]{null, null, null});
                 currentTask = task;
                 return;
             }
+            if (BuildVars.LOGS_ENABLED) {
+                FileLog.d("start azure dns task");
+            }
             AzureLoadTask task2 = new AzureLoadTask(currentAccount);
             task2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[]{null, null, null});
             currentTask = task2;
+        } else if (BuildVars.LOGS_ENABLED) {
+            FileLog.d("don't start task, current task = " + currentTask + " second = " + second + " time diff = " + Math.abs(lastDnsRequestTime - System.currentTimeMillis()) + " network = " + isNetworkOnline());
         }
     }
 

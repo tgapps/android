@@ -1854,6 +1854,7 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
             Chat chat;
             Document document2;
             MessageObject newMsgObj;
+            MessageMedia messageMedia;
             int a;
             DocumentAttribute attribute;
             if (message == null && caption == null) {
@@ -2004,16 +2005,16 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     newMsg = new TL_message();
                 }
                 newMsg.media = new TL_messageMediaPhoto();
-                r4 = newMsg.media;
-                r4.flags |= 3;
+                messageMedia = newMsg.media;
+                messageMedia.flags |= 3;
                 if (entities != null) {
                     newMsg.entities = entities;
                 }
                 if (ttl != 0) {
                     newMsg.media.ttl_seconds = ttl;
                     newMsg.ttl = ttl;
-                    r4 = newMsg.media;
-                    r4.flags |= 4;
+                    messageMedia = newMsg.media;
+                    messageMedia.flags |= 4;
                 }
                 newMsg.media.photo = photo;
                 if (params != null) {
@@ -2069,15 +2070,15 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                 newMsg.media.last_name = user.last_name;
                 newMsg.media.user_id = user.id;
                 if (newMsg.media.first_name == null) {
-                    r4 = newMsg.media;
+                    messageMedia = newMsg.media;
                     str = TtmlNode.ANONYMOUS_REGION_ID;
-                    r4.first_name = str;
+                    messageMedia.first_name = str;
                     user.first_name = str;
                 }
                 if (newMsg.media.last_name == null) {
-                    r4 = newMsg.media;
+                    messageMedia = newMsg.media;
                     str = TtmlNode.ANONYMOUS_REGION_ID;
-                    r4.last_name = str;
+                    messageMedia.last_name = str;
                     user.last_name = str;
                 }
                 if (params != null) {
@@ -2096,13 +2097,13 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     newMsg = new TL_message();
                 }
                 newMsg.media = new TL_messageMediaDocument();
-                r4 = newMsg.media;
-                r4.flags |= 3;
+                messageMedia = newMsg.media;
+                messageMedia.flags |= 3;
                 if (ttl != 0) {
                     newMsg.media.ttl_seconds = ttl;
                     newMsg.ttl = ttl;
-                    r4 = newMsg.media;
-                    r4.flags |= 4;
+                    messageMedia = newMsg.media;
+                    messageMedia.flags |= 4;
                 }
                 newMsg.media.document = document;
                 if (params != null) {
@@ -2324,6 +2325,11 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                     newMsg.ttl = ttl;
                 } else {
                     newMsg.ttl = encryptedChat.ttl;
+                    if (!(newMsg.ttl == 0 || newMsg.media == null)) {
+                        newMsg.media.ttl_seconds = newMsg.ttl;
+                        messageMedia = newMsg.media;
+                        messageMedia.flags |= 4;
+                    }
                 }
                 if (!(newMsg.ttl == 0 || newMsg.media.document == null)) {
                     int duration;

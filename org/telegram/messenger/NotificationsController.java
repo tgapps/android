@@ -1640,7 +1640,7 @@ public class NotificationsController {
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.chat_id;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x07ba;
+        if (r5 == 0) goto L_0x07c4;
     L_0x0082:
         r0 = r44;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
@@ -1653,7 +1653,7 @@ public class NotificationsController {
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0058 }
         r0 = r5.user_id;	 Catch:{ Exception -> 0x0058 }
         r74 = r0;
-        if (r74 != 0) goto L_0x07c6;
+        if (r74 != 0) goto L_0x07d0;
     L_0x0098:
         r0 = r44;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
@@ -1729,7 +1729,7 @@ public class NotificationsController {
         r0 = r61;
         r1 = r77;
         r5 = r0.getBoolean(r5, r1);	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x07e0;
+        if (r5 == 0) goto L_0x07ea;
     L_0x0132:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
@@ -1760,7 +1760,7 @@ public class NotificationsController {
         r5 = r0.smartNotificationsDialogs;	 Catch:{ Exception -> 0x0058 }
         r28 = r5.get(r6);	 Catch:{ Exception -> 0x0058 }
         r28 = (android.graphics.Point) r28;	 Catch:{ Exception -> 0x0058 }
-        if (r28 != 0) goto L_0x07e6;
+        if (r28 != 0) goto L_0x07f0;
     L_0x0180:
         r28 = new android.graphics.Point;	 Catch:{ Exception -> 0x0058 }
         r5 = 1;
@@ -1811,7 +1811,7 @@ public class NotificationsController {
         r0 = r61;
         r1 = r77;
         r25 = r0.getBoolean(r5, r1);	 Catch:{ Exception -> 0x0058 }
-        if (r25 == 0) goto L_0x083c;
+        if (r25 == 0) goto L_0x0846;
     L_0x01fc:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
@@ -1848,14 +1848,14 @@ public class NotificationsController {
         r22 = r0.getString(r5, r1);	 Catch:{ Exception -> 0x0058 }
     L_0x025c:
         r75 = 0;
-        if (r21 == 0) goto L_0x0853;
+        if (r21 == 0) goto L_0x085d;
     L_0x0260:
-        if (r22 == 0) goto L_0x0844;
+        if (r22 == 0) goto L_0x084e;
     L_0x0262:
         r0 = r22;
         r1 = r26;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0844;
+        if (r5 == 0) goto L_0x084e;
     L_0x026c:
         r22 = 0;
     L_0x026e:
@@ -1952,7 +1952,7 @@ public class NotificationsController {
     L_0x0312:
         r52 = 2;
     L_0x0314:
-        if (r38 != 0) goto L_0x089b;
+        if (r38 != 0) goto L_0x08a5;
     L_0x0316:
         r62 = 0;
     L_0x0318:
@@ -1962,8 +1962,8 @@ public class NotificationsController {
         r0 = r52;
         if (r0 == r5) goto L_0x032e;
     L_0x031f:
-        r5 = audioManager;	 Catch:{ Exception -> 0x08a4 }
-        r50 = r5.getRingerMode();	 Catch:{ Exception -> 0x08a4 }
+        r5 = audioManager;	 Catch:{ Exception -> 0x08ae }
+        r50 = r5.getRingerMode();	 Catch:{ Exception -> 0x08ae }
         if (r50 == 0) goto L_0x032e;
     L_0x0327:
         r5 = 1;
@@ -1982,7 +1982,7 @@ public class NotificationsController {
     L_0x0339:
         r5 = 2;
         r0 = r52;
-        if (r0 != r5) goto L_0x08aa;
+        if (r0 != r5) goto L_0x08b4;
     L_0x033e:
         r5 = 2;
         r13 = new long[r5];	 Catch:{ Exception -> 0x0058 }
@@ -1998,11 +1998,11 @@ public class NotificationsController {
         r0 = r22;
         r1 = r26;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x08d0;
+        if (r5 == 0) goto L_0x08da;
     L_0x035b:
         r14 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0058 }
     L_0x035d:
-        if (r62 != 0) goto L_0x08d6;
+        if (r62 != 0) goto L_0x08e0;
     L_0x035f:
         r15 = 3;
     L_0x0360:
@@ -2037,7 +2037,7 @@ public class NotificationsController {
         r0 = r42;
         r0.setFlags(r5);	 Catch:{ Exception -> 0x0058 }
         r5 = (int) r6;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0977;
+        if (r5 == 0) goto L_0x0981;
     L_0x03ab:
         r0 = r84;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0058 }
@@ -2046,7 +2046,7 @@ public class NotificationsController {
         r0 = r77;
         if (r5 != r0) goto L_0x03c5;
     L_0x03b9:
-        if (r21 == 0) goto L_0x08f3;
+        if (r21 == 0) goto L_0x08fd;
     L_0x03bb:
         r5 = "chatId";
         r0 = r42;
@@ -2058,7 +2058,7 @@ public class NotificationsController {
         if (r5 != 0) goto L_0x03d0;
     L_0x03cc:
         r5 = org.telegram.messenger.SharedConfig.isWaitingForPasscodeEnter;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0901;
+        if (r5 == 0) goto L_0x090b;
     L_0x03d0:
         r60 = 0;
     L_0x03d2:
@@ -2077,71 +2077,78 @@ public class NotificationsController {
         r2 = r78;
         r23 = android.app.PendingIntent.getActivity(r5, r0, r1, r2);	 Catch:{ Exception -> 0x0058 }
         r64 = 1;
-        if (r20 == 0) goto L_0x099a;
+        if (r21 == 0) goto L_0x03f8;
     L_0x03f6:
-        r0 = r20;
-        r8 = r0.title;	 Catch:{ Exception -> 0x0058 }
+        if (r20 == 0) goto L_0x03fa;
+    L_0x03f8:
+        if (r73 != 0) goto L_0x09a4;
     L_0x03fa:
+        r5 = r44.isFcmMessage();	 Catch:{ Exception -> 0x0058 }
+        if (r5 == 0) goto L_0x09a4;
+    L_0x0400:
+        r0 = r44;
+        r8 = r0.localName;	 Catch:{ Exception -> 0x0058 }
+    L_0x0404:
         r5 = (int) r6;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0416;
-    L_0x03fd:
+        if (r5 == 0) goto L_0x0420;
+    L_0x0407:
         r0 = r84;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0058 }
         r77 = 1;
         r0 = r77;
-        if (r5 > r0) goto L_0x0416;
-    L_0x040b:
+        if (r5 > r0) goto L_0x0420;
+    L_0x0415:
         r5 = 0;
         r5 = org.telegram.messenger.AndroidUtilities.needShowPasscode(r5);	 Catch:{ Exception -> 0x0058 }
-        if (r5 != 0) goto L_0x0416;
-    L_0x0412:
+        if (r5 != 0) goto L_0x0420;
+    L_0x041c:
         r5 = org.telegram.messenger.SharedConfig.isWaitingForPasscodeEnter;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x09a0;
-    L_0x0416:
+        if (r5 == 0) goto L_0x09b2;
+    L_0x0420:
         r5 = "AppName";
         r77 = 2131492981; // 0x7f0c0075 float:1.860943E38 double:1.0530974563E-314;
         r0 = r77;
         r51 = org.telegram.messenger.LocaleController.getString(r5, r0);	 Catch:{ Exception -> 0x0058 }
         r64 = 0;
-    L_0x0424:
+    L_0x042e:
         r5 = org.telegram.messenger.UserConfig.getActivatedAccountsCount();	 Catch:{ Exception -> 0x0058 }
         r77 = 1;
         r0 = r77;
-        if (r5 <= r0) goto L_0x09d0;
-    L_0x042e:
+        if (r5 <= r0) goto L_0x09e2;
+    L_0x0438:
         r0 = r84;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0058 }
         r77 = 1;
         r0 = r77;
-        if (r5 != r0) goto L_0x09a4;
-    L_0x043c:
+        if (r5 != r0) goto L_0x09b6;
+    L_0x0446:
         r0 = r84;
         r5 = r0.currentAccount;	 Catch:{ Exception -> 0x0058 }
         r5 = org.telegram.messenger.UserConfig.getInstance(r5);	 Catch:{ Exception -> 0x0058 }
         r5 = r5.getCurrentUser();	 Catch:{ Exception -> 0x0058 }
         r27 = org.telegram.messenger.UserObject.getFirstName(r5);	 Catch:{ Exception -> 0x0058 }
-    L_0x044c:
+    L_0x0456:
         r0 = r84;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0058 }
         r77 = 1;
         r0 = r77;
-        if (r5 != r0) goto L_0x0462;
-    L_0x045a:
+        if (r5 != r0) goto L_0x046c;
+    L_0x0464:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 23;
         r0 = r77;
-        if (r5 >= r0) goto L_0x0492;
-    L_0x0462:
+        if (r5 >= r0) goto L_0x049c;
+    L_0x046c:
         r0 = r84;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0058 }
         r77 = 1;
         r0 = r77;
-        if (r5 != r0) goto L_0x09d5;
-    L_0x0470:
+        if (r5 != r0) goto L_0x09e7;
+    L_0x047a:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r0 = r27;
@@ -2154,7 +2161,7 @@ public class NotificationsController {
         r0 = r77;
         r5 = r5.append(r0);	 Catch:{ Exception -> 0x0058 }
         r27 = r5.toString();	 Catch:{ Exception -> 0x0058 }
-    L_0x0492:
+    L_0x049c:
         r5 = new android.support.v4.app.NotificationCompat$Builder;	 Catch:{ Exception -> 0x0058 }
         r77 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0058 }
         r0 = r77;
@@ -2207,19 +2214,19 @@ public class NotificationsController {
         r5 = "msg";
         r0 = r46;
         r0.setCategory(r5);	 Catch:{ Exception -> 0x0058 }
-        if (r20 != 0) goto L_0x0546;
-    L_0x0511:
-        if (r73 == 0) goto L_0x0546;
-    L_0x0513:
+        if (r20 != 0) goto L_0x0550;
+    L_0x051b:
+        if (r73 == 0) goto L_0x0550;
+    L_0x051d:
         r0 = r73;
         r5 = r0.phone;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0546;
-    L_0x0519:
+        if (r5 == 0) goto L_0x0550;
+    L_0x0523:
         r0 = r73;
         r5 = r0.phone;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.length();	 Catch:{ Exception -> 0x0058 }
-        if (r5 <= 0) goto L_0x0546;
-    L_0x0523:
+        if (r5 <= 0) goto L_0x0550;
+    L_0x052d:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r77 = "tel:+";
@@ -2233,7 +2240,7 @@ public class NotificationsController {
         r5 = r5.toString();	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r0.addPerson(r5);	 Catch:{ Exception -> 0x0058 }
-    L_0x0546:
+    L_0x0550:
         r69 = 2;
         r43 = 0;
         r34 = 0;
@@ -2242,8 +2249,8 @@ public class NotificationsController {
         r5 = r5.size();	 Catch:{ Exception -> 0x0058 }
         r77 = 1;
         r0 = r77;
-        if (r5 != r0) goto L_0x0a77;
-    L_0x055a:
+        if (r5 != r0) goto L_0x0a89;
+    L_0x0564:
         r0 = r84;
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0058 }
         r77 = 0;
@@ -2262,16 +2269,16 @@ public class NotificationsController {
         r0 = r48;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.silent;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0a24;
-    L_0x0582:
+        if (r5 == 0) goto L_0x0a36;
+    L_0x058c:
         r69 = 1;
-    L_0x0584:
+    L_0x058e:
         if (r47 == 0) goto L_0x001b;
-    L_0x0586:
-        if (r64 == 0) goto L_0x05ad;
-    L_0x0588:
-        if (r20 == 0) goto L_0x0a28;
-    L_0x058a:
+    L_0x0590:
+        if (r64 == 0) goto L_0x05b7;
+    L_0x0592:
+        if (r20 == 0) goto L_0x0a3a;
+    L_0x0594:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r77 = " @ ";
@@ -2284,7 +2291,7 @@ public class NotificationsController {
         r0 = r47;
         r1 = r77;
         r47 = r0.replace(r5, r1);	 Catch:{ Exception -> 0x0058 }
-    L_0x05ad:
+    L_0x05b7:
         r46.setContentText(r47);	 Catch:{ Exception -> 0x0058 }
         r5 = new android.support.v4.app.NotificationCompat$BigTextStyle;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
@@ -2292,7 +2299,7 @@ public class NotificationsController {
         r5 = r5.bigText(r0);	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r0.setStyle(r5);	 Catch:{ Exception -> 0x0058 }
-    L_0x05c0:
+    L_0x05ca:
         r30 = new android.content.Intent;	 Catch:{ Exception -> 0x0058 }
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0058 }
         r77 = org.telegram.messenger.NotificationDismissReceiver.class;
@@ -2325,8 +2332,8 @@ public class NotificationsController {
         r5 = android.app.PendingIntent.getBroadcast(r5, r0, r1, r2);	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r0.setDeleteIntent(r5);	 Catch:{ Exception -> 0x0058 }
-        if (r60 == 0) goto L_0x0628;
-    L_0x060a:
+        if (r60 == 0) goto L_0x0632;
+    L_0x0614:
         r5 = org.telegram.messenger.ImageLoader.getInstance();	 Catch:{ Exception -> 0x0058 }
         r77 = 0;
         r78 = "50_50";
@@ -2334,44 +2341,44 @@ public class NotificationsController {
         r1 = r77;
         r2 = r78;
         r36 = r5.getImageFromMemory(r0, r1, r2);	 Catch:{ Exception -> 0x0058 }
-        if (r36 == 0) goto L_0x0b7d;
-    L_0x061f:
+        if (r36 == 0) goto L_0x0b8f;
+    L_0x0629:
         r5 = r36.getBitmap();	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r0.setLargeIcon(r5);	 Catch:{ Exception -> 0x0058 }
-    L_0x0628:
-        if (r85 == 0) goto L_0x062f;
-    L_0x062a:
+    L_0x0632:
+        if (r85 == 0) goto L_0x0639;
+    L_0x0634:
         r5 = 1;
         r0 = r69;
-        if (r0 != r5) goto L_0x0bc5;
-    L_0x062f:
+        if (r0 != r5) goto L_0x0bd7;
+    L_0x0639:
         r5 = -1;
         r0 = r46;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0058 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 26;
         r0 = r77;
-        if (r5 < r0) goto L_0x063e;
-    L_0x063d:
+        if (r5 < r0) goto L_0x0648;
+    L_0x0647:
         r12 = 2;
-    L_0x063e:
+    L_0x0648:
         r5 = 1;
         r0 = r69;
-        if (r0 == r5) goto L_0x0c81;
-    L_0x0643:
-        if (r54 != 0) goto L_0x0c81;
-    L_0x0645:
+        if (r0 == r5) goto L_0x0c93;
+    L_0x064d:
+        if (r54 != 0) goto L_0x0c93;
+    L_0x064f:
         r5 = org.telegram.messenger.ApplicationLoader.mainInterfacePaused;	 Catch:{ Exception -> 0x0058 }
-        if (r5 != 0) goto L_0x064b;
-    L_0x0649:
-        if (r37 == 0) goto L_0x068e;
-    L_0x064b:
+        if (r5 != 0) goto L_0x0655;
+    L_0x0653:
+        if (r37 == 0) goto L_0x0698;
+    L_0x0655:
         r5 = r43.length();	 Catch:{ Exception -> 0x0058 }
         r77 = 100;
         r0 = r77;
-        if (r5 <= r0) goto L_0x0687;
-    L_0x0655:
+        if (r5 <= r0) goto L_0x0691;
+    L_0x065f:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r77 = 0;
@@ -2390,74 +2397,74 @@ public class NotificationsController {
         r0 = r77;
         r5 = r5.append(r0);	 Catch:{ Exception -> 0x0058 }
         r43 = r5.toString();	 Catch:{ Exception -> 0x0058 }
-    L_0x0687:
+    L_0x0691:
         r0 = r46;
         r1 = r43;
         r0.setTicker(r1);	 Catch:{ Exception -> 0x0058 }
-    L_0x068e:
+    L_0x0698:
         r5 = org.telegram.messenger.MediaController.getInstance();	 Catch:{ Exception -> 0x0058 }
         r5 = r5.isRecordingAudio();	 Catch:{ Exception -> 0x0058 }
-        if (r5 != 0) goto L_0x06b9;
-    L_0x0698:
-        if (r22 == 0) goto L_0x06b9;
-    L_0x069a:
+        if (r5 != 0) goto L_0x06c3;
+    L_0x06a2:
+        if (r22 == 0) goto L_0x06c3;
+    L_0x06a4:
         r5 = "NoSound";
         r0 = r22;
         r5 = r0.equals(r5);	 Catch:{ Exception -> 0x0058 }
-        if (r5 != 0) goto L_0x06b9;
-    L_0x06a5:
+        if (r5 != 0) goto L_0x06c3;
+    L_0x06af:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 26;
         r0 = r77;
-        if (r5 < r0) goto L_0x0c25;
-    L_0x06ad:
+        if (r5 < r0) goto L_0x0c37;
+    L_0x06b7:
         r0 = r22;
         r1 = r26;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0c1f;
-    L_0x06b7:
+        if (r5 == 0) goto L_0x0c31;
+    L_0x06c1:
         r11 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0058 }
-    L_0x06b9:
-        if (r10 == 0) goto L_0x06c6;
-    L_0x06bb:
+    L_0x06c3:
+        if (r10 == 0) goto L_0x06d0;
+    L_0x06c5:
         r5 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r77 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r0 = r46;
         r1 = r77;
         r0.setLights(r10, r5, r1);	 Catch:{ Exception -> 0x0058 }
-    L_0x06c6:
+    L_0x06d0:
         r5 = 2;
         r0 = r52;
-        if (r0 == r5) goto L_0x06d5;
-    L_0x06cb:
+        if (r0 == r5) goto L_0x06df;
+    L_0x06d5:
         r5 = org.telegram.messenger.MediaController.getInstance();	 Catch:{ Exception -> 0x0058 }
         r5 = r5.isRecordingAudio();	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0c4b;
-    L_0x06d5:
+        if (r5 == 0) goto L_0x0c5d;
+    L_0x06df:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0058 }
         r9 = {0, 0};	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0058 }
-    L_0x06e0:
+    L_0x06ea:
         r33 = 0;
         r5 = 0;
         r5 = org.telegram.messenger.AndroidUtilities.needShowPasscode(r5);	 Catch:{ Exception -> 0x0058 }
-        if (r5 != 0) goto L_0x0c92;
-    L_0x06e9:
+        if (r5 != 0) goto L_0x0ca4;
+    L_0x06f3:
         r5 = org.telegram.messenger.SharedConfig.isWaitingForPasscodeEnter;	 Catch:{ Exception -> 0x0058 }
-        if (r5 != 0) goto L_0x0c92;
-    L_0x06ed:
+        if (r5 != 0) goto L_0x0ca4;
+    L_0x06f7:
         r78 = r44.getDialogId();	 Catch:{ Exception -> 0x0058 }
         r80 = 777000; // 0xbdb28 float:1.088809E-39 double:3.83889E-318;
         r5 = (r78 > r80 ? 1 : (r78 == r80 ? 0 : -1));
-        if (r5 != 0) goto L_0x0c92;
-    L_0x06f8:
+        if (r5 != 0) goto L_0x0ca4;
+    L_0x0702:
         r0 = r44;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.reply_markup;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0c92;
-    L_0x0700:
+        if (r5 == 0) goto L_0x0ca4;
+    L_0x070a:
         r0 = r44;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.reply_markup;	 Catch:{ Exception -> 0x0058 }
@@ -2465,10 +2472,10 @@ public class NotificationsController {
         r67 = r0;
         r4 = 0;
         r70 = r67.size();	 Catch:{ Exception -> 0x0058 }
-    L_0x070f:
+    L_0x0719:
         r0 = r70;
-        if (r4 >= r0) goto L_0x0c92;
-    L_0x0713:
+        if (r4 >= r0) goto L_0x0ca4;
+    L_0x071d:
         r0 = r67;
         r66 = r0.get(r4);	 Catch:{ Exception -> 0x0058 }
         r66 = (org.telegram.tgnet.TLRPC.TL_keyboardButtonRow) r66;	 Catch:{ Exception -> 0x0058 }
@@ -2476,11 +2483,11 @@ public class NotificationsController {
         r0 = r66;
         r5 = r0.buttons;	 Catch:{ Exception -> 0x0058 }
         r71 = r5.size();	 Catch:{ Exception -> 0x0058 }
-    L_0x0725:
+    L_0x072f:
         r0 = r16;
         r1 = r71;
-        if (r0 >= r1) goto L_0x0c8e;
-    L_0x072b:
+        if (r0 >= r1) goto L_0x0ca0;
+    L_0x0735:
         r0 = r66;
         r5 = r0.buttons;	 Catch:{ Exception -> 0x0058 }
         r0 = r16;
@@ -2488,8 +2495,8 @@ public class NotificationsController {
         r18 = (org.telegram.tgnet.TLRPC.KeyboardButton) r18;	 Catch:{ Exception -> 0x0058 }
         r0 = r18;
         r5 = r0 instanceof org.telegram.tgnet.TLRPC.TL_keyboardButtonCallback;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x07b6;
-    L_0x073d:
+        if (r5 == 0) goto L_0x07c0;
+    L_0x0747:
         r19 = new android.content.Intent;	 Catch:{ Exception -> 0x0058 }
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0058 }
         r77 = org.telegram.messenger.NotificationCallbackReceiver.class;
@@ -2508,8 +2515,8 @@ public class NotificationsController {
         r0.putExtra(r5, r6);	 Catch:{ Exception -> 0x0058 }
         r0 = r18;
         r5 = r0.data;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0778;
-    L_0x0768:
+        if (r5 == 0) goto L_0x0782;
+    L_0x0772:
         r5 = "data";
         r0 = r18;
         r0 = r0.data;	 Catch:{ Exception -> 0x0058 }
@@ -2517,7 +2524,7 @@ public class NotificationsController {
         r0 = r19;
         r1 = r77;
         r0.putExtra(r5, r1);	 Catch:{ Exception -> 0x0058 }
-    L_0x0778:
+    L_0x0782:
         r5 = "mid";
         r77 = r44.getId();	 Catch:{ Exception -> 0x0058 }
         r0 = r19;
@@ -2546,34 +2553,34 @@ public class NotificationsController {
         r2 = r78;
         r0.addAction(r5, r1, r2);	 Catch:{ Exception -> 0x0058 }
         r33 = 1;
-    L_0x07b6:
+    L_0x07c0:
         r16 = r16 + 1;
-        goto L_0x0725;
-    L_0x07ba:
+        goto L_0x072f;
+    L_0x07c4:
         r0 = r44;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.to_id;	 Catch:{ Exception -> 0x0058 }
         r0 = r5.channel_id;	 Catch:{ Exception -> 0x0058 }
         r21 = r0;
         goto L_0x008c;
-    L_0x07c6:
+    L_0x07d0:
         r0 = r84;
         r5 = r0.currentAccount;	 Catch:{ Exception -> 0x0058 }
         r5 = org.telegram.messenger.UserConfig.getInstance(r5);	 Catch:{ Exception -> 0x0058 }
         r5 = r5.getClientUserId();	 Catch:{ Exception -> 0x0058 }
         r0 = r74;
         if (r0 != r5) goto L_0x00a0;
-    L_0x07d6:
+    L_0x07e0:
         r0 = r44;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
         r0 = r5.from_id;	 Catch:{ Exception -> 0x0058 }
         r74 = r0;
         goto L_0x00a0;
-    L_0x07e0:
+    L_0x07ea:
         r55 = 2;
         r53 = 180; // 0xb4 float:2.52E-43 double:8.9E-322;
         goto L_0x0172;
-    L_0x07e6:
+    L_0x07f0:
         r0 = r28;
         r0 = r0.y;	 Catch:{ Exception -> 0x0058 }
         r45 = r0;
@@ -2584,8 +2591,8 @@ public class NotificationsController {
         r82 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
         r80 = r80 / r82;
         r5 = (r78 > r80 ? 1 : (r78 == r80 ? 0 : -1));
-        if (r5 >= 0) goto L_0x0814;
-    L_0x07fd:
+        if (r5 >= 0) goto L_0x081e;
+    L_0x0807:
         r5 = 1;
         r78 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0058 }
         r80 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
@@ -2597,14 +2604,14 @@ public class NotificationsController {
         r1 = r77;
         r0.set(r5, r1);	 Catch:{ Exception -> 0x0058 }
         goto L_0x01a0;
-    L_0x0814:
+    L_0x081e:
         r0 = r28;
         r0 = r0.x;	 Catch:{ Exception -> 0x0058 }
         r24 = r0;
         r0 = r24;
         r1 = r55;
-        if (r0 >= r1) goto L_0x0838;
-    L_0x0820:
+        if (r0 >= r1) goto L_0x0842;
+    L_0x082a:
         r5 = r24 + 1;
         r78 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0058 }
         r80 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
@@ -2616,34 +2623,34 @@ public class NotificationsController {
         r1 = r77;
         r0.set(r5, r1);	 Catch:{ Exception -> 0x0058 }
         goto L_0x01a0;
-    L_0x0838:
+    L_0x0842:
         r54 = 1;
         goto L_0x01a0;
-    L_0x083c:
+    L_0x0846:
         r76 = 0;
         r63 = 3;
         r22 = 0;
         goto L_0x025c;
-    L_0x0844:
+    L_0x084e:
         if (r22 != 0) goto L_0x026e;
-    L_0x0846:
+    L_0x0850:
         r5 = "GroupSoundPath";
         r0 = r61;
         r1 = r26;
         r22 = r0.getString(r5, r1);	 Catch:{ Exception -> 0x0058 }
         goto L_0x026e;
-    L_0x0853:
+    L_0x085d:
         if (r74 == 0) goto L_0x0296;
-    L_0x0855:
-        if (r22 == 0) goto L_0x088d;
-    L_0x0857:
+    L_0x085f:
+        if (r22 == 0) goto L_0x0897;
+    L_0x0861:
         r0 = r22;
         r1 = r26;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x088d;
-    L_0x0861:
+        if (r5 == 0) goto L_0x0897;
+    L_0x086b:
         r22 = 0;
-    L_0x0863:
+    L_0x086d:
         r5 = "vibrate_messages";
         r77 = 0;
         r0 = r61;
@@ -2660,108 +2667,108 @@ public class NotificationsController {
         r1 = r77;
         r10 = r0.getInt(r5, r1);	 Catch:{ Exception -> 0x0058 }
         goto L_0x0296;
-    L_0x088d:
-        if (r22 != 0) goto L_0x0863;
-    L_0x088f:
+    L_0x0897:
+        if (r22 != 0) goto L_0x086d;
+    L_0x0899:
         r5 = "GlobalSoundPath";
         r0 = r61;
         r1 = r26;
         r22 = r0.getString(r5, r1);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x0863;
-    L_0x089b:
+        goto L_0x086d;
+    L_0x08a5:
         r5 = 2;
         r0 = r62;
         if (r0 != r5) goto L_0x0318;
-    L_0x08a0:
+    L_0x08aa:
         r62 = 1;
         goto L_0x0318;
-    L_0x08a4:
+    L_0x08ae:
         r31 = move-exception;
         org.telegram.messenger.FileLog.e(r31);	 Catch:{ Exception -> 0x0058 }
         goto L_0x032e;
-    L_0x08aa:
+    L_0x08b4:
         r5 = 1;
         r0 = r52;
-        if (r0 != r5) goto L_0x08b7;
-    L_0x08af:
+        if (r0 != r5) goto L_0x08c1;
+    L_0x08b9:
         r5 = 4;
         r13 = new long[r5];	 Catch:{ Exception -> 0x0058 }
         r13 = {0, 100, 0, 100};	 Catch:{ Exception -> 0x0058 }
         goto L_0x0344;
-    L_0x08b7:
-        if (r52 == 0) goto L_0x08be;
-    L_0x08b9:
+    L_0x08c1:
+        if (r52 == 0) goto L_0x08c8;
+    L_0x08c3:
         r5 = 4;
         r0 = r52;
-        if (r0 != r5) goto L_0x08c3;
-    L_0x08be:
+        if (r0 != r5) goto L_0x08cd;
+    L_0x08c8:
         r5 = 0;
         r13 = new long[r5];	 Catch:{ Exception -> 0x0058 }
         goto L_0x0344;
-    L_0x08c3:
+    L_0x08cd:
         r5 = 3;
         r0 = r52;
         if (r0 != r5) goto L_0x0344;
-    L_0x08c8:
+    L_0x08d2:
         r5 = 2;
         r13 = new long[r5];	 Catch:{ Exception -> 0x0058 }
         r13 = {0, 1000};	 Catch:{ Exception -> 0x0058 }
         goto L_0x0344;
-    L_0x08d0:
+    L_0x08da:
         r14 = android.net.Uri.parse(r22);	 Catch:{ Exception -> 0x0058 }
         goto L_0x035d;
-    L_0x08d6:
+    L_0x08e0:
         r5 = 1;
         r0 = r62;
-        if (r0 == r5) goto L_0x08e0;
-    L_0x08db:
+        if (r0 == r5) goto L_0x08ea;
+    L_0x08e5:
         r5 = 2;
         r0 = r62;
-        if (r0 != r5) goto L_0x08e3;
-    L_0x08e0:
+        if (r0 != r5) goto L_0x08ed;
+    L_0x08ea:
         r15 = 4;
         goto L_0x0360;
-    L_0x08e3:
+    L_0x08ed:
         r5 = 4;
         r0 = r62;
-        if (r0 != r5) goto L_0x08eb;
-    L_0x08e8:
+        if (r0 != r5) goto L_0x08f5;
+    L_0x08f2:
         r15 = 1;
         goto L_0x0360;
-    L_0x08eb:
+    L_0x08f5:
         r5 = 5;
         r0 = r62;
         if (r0 != r5) goto L_0x0360;
-    L_0x08f0:
+    L_0x08fa:
         r15 = 2;
         goto L_0x0360;
-    L_0x08f3:
+    L_0x08fd:
         if (r74 == 0) goto L_0x03c5;
-    L_0x08f5:
+    L_0x08ff:
         r5 = "userId";
         r0 = r42;
         r1 = r74;
         r0.putExtra(r5, r1);	 Catch:{ Exception -> 0x0058 }
         goto L_0x03c5;
-    L_0x0901:
+    L_0x090b:
         r0 = r84;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0058 }
         r77 = 1;
         r0 = r77;
         if (r5 != r0) goto L_0x03d2;
-    L_0x090f:
-        if (r20 == 0) goto L_0x0943;
-    L_0x0911:
+    L_0x0919:
+        if (r20 == 0) goto L_0x094d;
+    L_0x091b:
         r0 = r20;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
         if (r5 == 0) goto L_0x03d2;
-    L_0x0917:
+    L_0x0921:
         r0 = r20;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0058 }
         if (r5 == 0) goto L_0x03d2;
-    L_0x091f:
+    L_0x0929:
         r0 = r20;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0058 }
@@ -2769,31 +2776,31 @@ public class NotificationsController {
         r78 = r0;
         r80 = 0;
         r5 = (r78 > r80 ? 1 : (r78 == r80 ? 0 : -1));
-        if (r5 == 0) goto L_0x03d2;
-    L_0x092f:
-        r0 = r20;
-        r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
-        r5 = r5.photo_small;	 Catch:{ Exception -> 0x0058 }
-        r5 = r5.local_id;	 Catch:{ Exception -> 0x0058 }
         if (r5 == 0) goto L_0x03d2;
     L_0x0939:
         r0 = r20;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
+        r5 = r5.photo_small;	 Catch:{ Exception -> 0x0058 }
+        r5 = r5.local_id;	 Catch:{ Exception -> 0x0058 }
+        if (r5 == 0) goto L_0x03d2;
+    L_0x0943:
+        r0 = r20;
+        r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
         r0 = r5.photo_small;	 Catch:{ Exception -> 0x0058 }
         r60 = r0;
         goto L_0x03d2;
-    L_0x0943:
+    L_0x094d:
         if (r73 == 0) goto L_0x03d2;
-    L_0x0945:
+    L_0x094f:
         r0 = r73;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
         if (r5 == 0) goto L_0x03d2;
-    L_0x094b:
+    L_0x0955:
         r0 = r73;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0058 }
         if (r5 == 0) goto L_0x03d2;
-    L_0x0953:
+    L_0x095d:
         r0 = r73;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0058 }
@@ -2802,26 +2809,26 @@ public class NotificationsController {
         r80 = 0;
         r5 = (r78 > r80 ? 1 : (r78 == r80 ? 0 : -1));
         if (r5 == 0) goto L_0x03d2;
-    L_0x0963:
+    L_0x096d:
         r0 = r73;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.photo_small;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.local_id;	 Catch:{ Exception -> 0x0058 }
         if (r5 == 0) goto L_0x03d2;
-    L_0x096d:
+    L_0x0977:
         r0 = r73;
         r5 = r0.photo;	 Catch:{ Exception -> 0x0058 }
         r0 = r5.photo_small;	 Catch:{ Exception -> 0x0058 }
         r60 = r0;
         goto L_0x03d2;
-    L_0x0977:
+    L_0x0981:
         r0 = r84;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0058 }
         r77 = 1;
         r0 = r77;
         if (r5 != r0) goto L_0x03d2;
-    L_0x0985:
+    L_0x098f:
         r5 = "encId";
         r77 = 32;
         r78 = r6 >> r77;
@@ -2832,13 +2839,19 @@ public class NotificationsController {
         r1 = r77;
         r0.putExtra(r5, r1);	 Catch:{ Exception -> 0x0058 }
         goto L_0x03d2;
-    L_0x099a:
-        r8 = org.telegram.messenger.UserObject.getUserName(r73);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x03fa;
-    L_0x09a0:
-        r51 = r8;
-        goto L_0x0424;
     L_0x09a4:
+        if (r20 == 0) goto L_0x09ac;
+    L_0x09a6:
+        r0 = r20;
+        r8 = r0.title;	 Catch:{ Exception -> 0x0058 }
+        goto L_0x0404;
+    L_0x09ac:
+        r8 = org.telegram.messenger.UserObject.getUserName(r73);	 Catch:{ Exception -> 0x0058 }
+        goto L_0x0404;
+    L_0x09b2:
+        r51 = r8;
+        goto L_0x042e;
+    L_0x09b6:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r0 = r84;
@@ -2853,11 +2866,11 @@ public class NotificationsController {
         r0 = r77;
         r5 = r5.append(r0);	 Catch:{ Exception -> 0x0058 }
         r27 = r5.toString();	 Catch:{ Exception -> 0x0058 }
-        goto L_0x044c;
-    L_0x09d0:
+        goto L_0x0456;
+    L_0x09e2:
         r27 = "";
-        goto L_0x044c;
-    L_0x09d5:
+        goto L_0x0456;
+    L_0x09e7:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r0 = r27;
@@ -2887,15 +2900,15 @@ public class NotificationsController {
         r0 = r77;
         r5 = r5.append(r0);	 Catch:{ Exception -> 0x0058 }
         r27 = r5.toString();	 Catch:{ Exception -> 0x0058 }
-        goto L_0x0492;
-    L_0x0a24:
+        goto L_0x049c;
+    L_0x0a36:
         r69 = 0;
-        goto L_0x0584;
-    L_0x0a28:
+        goto L_0x058e;
+    L_0x0a3a:
         r5 = 0;
         r5 = r72[r5];	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0a52;
-    L_0x0a2d:
+        if (r5 == 0) goto L_0x0a64;
+    L_0x0a3f:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r0 = r51;
@@ -2908,8 +2921,8 @@ public class NotificationsController {
         r0 = r47;
         r1 = r77;
         r47 = r0.replace(r5, r1);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x05ad;
-    L_0x0a52:
+        goto L_0x05b7;
+    L_0x0a64:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r0 = r51;
@@ -2922,8 +2935,8 @@ public class NotificationsController {
         r0 = r47;
         r1 = r77;
         r47 = r0.replace(r5, r1);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x05ad;
-    L_0x0a77:
+        goto L_0x05b7;
+    L_0x0a89:
         r0 = r46;
         r1 = r27;
         r0.setContentText(r1);	 Catch:{ Exception -> 0x0058 }
@@ -2943,11 +2956,11 @@ public class NotificationsController {
         r0 = new boolean[r5];	 Catch:{ Exception -> 0x0058 }
         r72 = r0;
         r35 = 0;
-    L_0x0aa3:
+    L_0x0ab5:
         r0 = r35;
         r1 = r24;
-        if (r0 >= r1) goto L_0x0b6d;
-    L_0x0aa9:
+        if (r0 >= r1) goto L_0x0b7f;
+    L_0x0abb:
         r0 = r84;
         r5 = r0.pushMessages;	 Catch:{ Exception -> 0x0058 }
         r0 = r35;
@@ -2958,40 +2971,40 @@ public class NotificationsController {
         r1 = r48;
         r2 = r72;
         r47 = r0.getStringForMessage(r1, r5, r2);	 Catch:{ Exception -> 0x0058 }
-        if (r47 == 0) goto L_0x0acc;
-    L_0x0ac2:
+        if (r47 == 0) goto L_0x0ade;
+    L_0x0ad4:
         r0 = r48;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.date;	 Catch:{ Exception -> 0x0058 }
         r0 = r29;
-        if (r5 > r0) goto L_0x0acf;
-    L_0x0acc:
+        if (r5 > r0) goto L_0x0ae1;
+    L_0x0ade:
         r35 = r35 + 1;
-        goto L_0x0aa3;
-    L_0x0acf:
+        goto L_0x0ab5;
+    L_0x0ae1:
         r5 = 2;
         r0 = r69;
-        if (r0 != r5) goto L_0x0ae0;
-    L_0x0ad4:
+        if (r0 != r5) goto L_0x0af2;
+    L_0x0ae6:
         r43 = r47;
         r0 = r48;
         r5 = r0.messageOwner;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.silent;	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0b1d;
-    L_0x0ade:
+        if (r5 == 0) goto L_0x0b2f;
+    L_0x0af0:
         r69 = 1;
-    L_0x0ae0:
+    L_0x0af2:
         r0 = r84;
         r5 = r0.pushDialogs;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.size();	 Catch:{ Exception -> 0x0058 }
         r77 = 1;
         r0 = r77;
-        if (r5 != r0) goto L_0x0b15;
-    L_0x0aee:
-        if (r64 == 0) goto L_0x0b15;
-    L_0x0af0:
-        if (r20 == 0) goto L_0x0b20;
-    L_0x0af2:
+        if (r5 != r0) goto L_0x0b27;
+    L_0x0b00:
+        if (r64 == 0) goto L_0x0b27;
+    L_0x0b02:
+        if (r20 == 0) goto L_0x0b32;
+    L_0x0b04:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r77 = " @ ";
@@ -3004,19 +3017,19 @@ public class NotificationsController {
         r0 = r47;
         r1 = r77;
         r47 = r0.replace(r5, r1);	 Catch:{ Exception -> 0x0058 }
-    L_0x0b15:
+    L_0x0b27:
         r0 = r41;
         r1 = r47;
         r0.addLine(r1);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x0acc;
-    L_0x0b1d:
+        goto L_0x0ade;
+    L_0x0b2f:
         r69 = 0;
-        goto L_0x0ae0;
-    L_0x0b20:
+        goto L_0x0af2;
+    L_0x0b32:
         r5 = 0;
         r5 = r72[r5];	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0b49;
-    L_0x0b25:
+        if (r5 == 0) goto L_0x0b5b;
+    L_0x0b37:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r0 = r51;
@@ -3029,8 +3042,8 @@ public class NotificationsController {
         r0 = r47;
         r1 = r77;
         r47 = r0.replace(r5, r1);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x0b15;
-    L_0x0b49:
+        goto L_0x0b27;
+    L_0x0b5b:
         r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0058 }
         r5.<init>();	 Catch:{ Exception -> 0x0058 }
         r0 = r51;
@@ -3043,199 +3056,199 @@ public class NotificationsController {
         r0 = r47;
         r1 = r77;
         r47 = r0.replace(r5, r1);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x0b15;
-    L_0x0b6d:
+        goto L_0x0b27;
+    L_0x0b7f:
         r0 = r41;
         r1 = r27;
         r0.setSummaryText(r1);	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r1 = r41;
         r0.setStyle(r1);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x05c0;
-    L_0x0b7d:
+        goto L_0x05ca;
+    L_0x0b8f:
         r5 = 1;
         r0 = r60;
-        r32 = org.telegram.messenger.FileLoader.getPathToAttach(r0, r5);	 Catch:{ Throwable -> 0x0bbe }
-        r5 = r32.exists();	 Catch:{ Throwable -> 0x0bbe }
-        if (r5 == 0) goto L_0x0628;
-    L_0x0b8a:
+        r32 = org.telegram.messenger.FileLoader.getPathToAttach(r0, r5);	 Catch:{ Throwable -> 0x0bd0 }
+        r5 = r32.exists();	 Catch:{ Throwable -> 0x0bd0 }
+        if (r5 == 0) goto L_0x0632;
+    L_0x0b9c:
         r5 = 1126170624; // 0x43200000 float:160.0 double:5.564022167E-315;
         r77 = 1112014848; // 0x42480000 float:50.0 double:5.49408334E-315;
-        r77 = org.telegram.messenger.AndroidUtilities.dp(r77);	 Catch:{ Throwable -> 0x0bbe }
+        r77 = org.telegram.messenger.AndroidUtilities.dp(r77);	 Catch:{ Throwable -> 0x0bd0 }
         r0 = r77;
-        r0 = (float) r0;	 Catch:{ Throwable -> 0x0bbe }
+        r0 = (float) r0;	 Catch:{ Throwable -> 0x0bd0 }
         r77 = r0;
         r68 = r5 / r77;
-        r57 = new android.graphics.BitmapFactory$Options;	 Catch:{ Throwable -> 0x0bbe }
-        r57.<init>();	 Catch:{ Throwable -> 0x0bbe }
+        r57 = new android.graphics.BitmapFactory$Options;	 Catch:{ Throwable -> 0x0bd0 }
+        r57.<init>();	 Catch:{ Throwable -> 0x0bd0 }
         r5 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r5 = (r68 > r5 ? 1 : (r68 == r5 ? 0 : -1));
-        if (r5 >= 0) goto L_0x0bc1;
-    L_0x0ba4:
+        if (r5 >= 0) goto L_0x0bd3;
+    L_0x0bb6:
         r5 = 1;
-    L_0x0ba5:
+    L_0x0bb7:
         r0 = r57;
-        r0.inSampleSize = r5;	 Catch:{ Throwable -> 0x0bbe }
-        r5 = r32.getAbsolutePath();	 Catch:{ Throwable -> 0x0bbe }
+        r0.inSampleSize = r5;	 Catch:{ Throwable -> 0x0bd0 }
+        r5 = r32.getAbsolutePath();	 Catch:{ Throwable -> 0x0bd0 }
         r0 = r57;
-        r17 = android.graphics.BitmapFactory.decodeFile(r5, r0);	 Catch:{ Throwable -> 0x0bbe }
-        if (r17 == 0) goto L_0x0628;
-    L_0x0bb5:
+        r17 = android.graphics.BitmapFactory.decodeFile(r5, r0);	 Catch:{ Throwable -> 0x0bd0 }
+        if (r17 == 0) goto L_0x0632;
+    L_0x0bc7:
         r0 = r46;
         r1 = r17;
-        r0.setLargeIcon(r1);	 Catch:{ Throwable -> 0x0bbe }
-        goto L_0x0628;
-    L_0x0bbe:
+        r0.setLargeIcon(r1);	 Catch:{ Throwable -> 0x0bd0 }
+        goto L_0x0632;
+    L_0x0bd0:
         r5 = move-exception;
-        goto L_0x0628;
-    L_0x0bc1:
+        goto L_0x0632;
+    L_0x0bd3:
         r0 = r68;
         r5 = (int) r0;
-        goto L_0x0ba5;
-    L_0x0bc5:
-        if (r62 != 0) goto L_0x0bd8;
-    L_0x0bc7:
+        goto L_0x0bb7;
+    L_0x0bd7:
+        if (r62 != 0) goto L_0x0bea;
+    L_0x0bd9:
         r5 = 0;
         r0 = r46;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0058 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 26;
         r0 = r77;
-        if (r5 < r0) goto L_0x063e;
-    L_0x0bd5:
+        if (r5 < r0) goto L_0x0648;
+    L_0x0be7:
         r12 = 3;
-        goto L_0x063e;
-    L_0x0bd8:
+        goto L_0x0648;
+    L_0x0bea:
         r5 = 1;
         r0 = r62;
-        if (r0 == r5) goto L_0x0be2;
-    L_0x0bdd:
+        if (r0 == r5) goto L_0x0bf4;
+    L_0x0bef:
         r5 = 2;
         r0 = r62;
-        if (r0 != r5) goto L_0x0bf3;
-    L_0x0be2:
+        if (r0 != r5) goto L_0x0c05;
+    L_0x0bf4:
         r5 = 1;
         r0 = r46;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0058 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 26;
         r0 = r77;
-        if (r5 < r0) goto L_0x063e;
-    L_0x0bf0:
+        if (r5 < r0) goto L_0x0648;
+    L_0x0c02:
         r12 = 4;
-        goto L_0x063e;
-    L_0x0bf3:
+        goto L_0x0648;
+    L_0x0c05:
         r5 = 4;
         r0 = r62;
-        if (r0 != r5) goto L_0x0c09;
-    L_0x0bf8:
+        if (r0 != r5) goto L_0x0c1b;
+    L_0x0c0a:
         r5 = -2;
         r0 = r46;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0058 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 26;
         r0 = r77;
-        if (r5 < r0) goto L_0x063e;
-    L_0x0c06:
+        if (r5 < r0) goto L_0x0648;
+    L_0x0c18:
         r12 = 1;
-        goto L_0x063e;
-    L_0x0c09:
+        goto L_0x0648;
+    L_0x0c1b:
         r5 = 5;
         r0 = r62;
-        if (r0 != r5) goto L_0x063e;
-    L_0x0c0e:
+        if (r0 != r5) goto L_0x0648;
+    L_0x0c20:
         r5 = -1;
         r0 = r46;
         r0.setPriority(r5);	 Catch:{ Exception -> 0x0058 }
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 26;
         r0 = r77;
-        if (r5 < r0) goto L_0x063e;
-    L_0x0c1c:
+        if (r5 < r0) goto L_0x0648;
+    L_0x0c2e:
         r12 = 2;
-        goto L_0x063e;
-    L_0x0c1f:
+        goto L_0x0648;
+    L_0x0c31:
         r11 = android.net.Uri.parse(r22);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x06b9;
-    L_0x0c25:
+        goto L_0x06c3;
+    L_0x0c37:
         r0 = r22;
         r1 = r26;
         r5 = r0.equals(r1);	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0c3c;
-    L_0x0c2f:
+        if (r5 == 0) goto L_0x0c4e;
+    L_0x0c41:
         r5 = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;	 Catch:{ Exception -> 0x0058 }
         r77 = 5;
         r0 = r46;
         r1 = r77;
         r0.setSound(r5, r1);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x06b9;
-    L_0x0c3c:
+        goto L_0x06c3;
+    L_0x0c4e:
         r5 = android.net.Uri.parse(r22);	 Catch:{ Exception -> 0x0058 }
         r77 = 5;
         r0 = r46;
         r1 = r77;
         r0.setSound(r5, r1);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x06b9;
-    L_0x0c4b:
+        goto L_0x06c3;
+    L_0x0c5d:
         r5 = 1;
         r0 = r52;
-        if (r0 != r5) goto L_0x0c5d;
-    L_0x0c50:
+        if (r0 != r5) goto L_0x0c6f;
+    L_0x0c62:
         r5 = 4;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0058 }
         r9 = {0, 100, 0, 100};	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x06e0;
-    L_0x0c5d:
-        if (r52 == 0) goto L_0x0c64;
-    L_0x0c5f:
+        goto L_0x06ea;
+    L_0x0c6f:
+        if (r52 == 0) goto L_0x0c76;
+    L_0x0c71:
         r5 = 4;
         r0 = r52;
-        if (r0 != r5) goto L_0x0c6f;
-    L_0x0c64:
+        if (r0 != r5) goto L_0x0c81;
+    L_0x0c76:
         r5 = 2;
         r0 = r46;
         r0.setDefaults(r5);	 Catch:{ Exception -> 0x0058 }
         r5 = 0;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0058 }
-        goto L_0x06e0;
-    L_0x0c6f:
+        goto L_0x06ea;
+    L_0x0c81:
         r5 = 3;
         r0 = r52;
-        if (r0 != r5) goto L_0x06e0;
-    L_0x0c74:
+        if (r0 != r5) goto L_0x06ea;
+    L_0x0c86:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0058 }
         r9 = {0, 1000};	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x06e0;
-    L_0x0c81:
+        goto L_0x06ea;
+    L_0x0c93:
         r5 = 2;
         r9 = new long[r5];	 Catch:{ Exception -> 0x0058 }
         r9 = {0, 0};	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r0.setVibrate(r9);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x06e0;
-    L_0x0c8e:
+        goto L_0x06ea;
+    L_0x0ca0:
         r4 = r4 + 1;
-        goto L_0x070f;
-    L_0x0c92:
-        if (r33 != 0) goto L_0x0cf7;
-    L_0x0c94:
+        goto L_0x0719;
+    L_0x0ca4:
+        if (r33 != 0) goto L_0x0d09;
+    L_0x0ca6:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 24;
         r0 = r77;
-        if (r5 >= r0) goto L_0x0cf7;
-    L_0x0c9c:
+        if (r5 >= r0) goto L_0x0d09;
+    L_0x0cae:
         r5 = org.telegram.messenger.SharedConfig.passcodeHash;	 Catch:{ Exception -> 0x0058 }
         r5 = r5.length();	 Catch:{ Exception -> 0x0058 }
-        if (r5 != 0) goto L_0x0cf7;
-    L_0x0ca4:
+        if (r5 != 0) goto L_0x0d09;
+    L_0x0cb6:
         r5 = r84.hasMessagesToReply();	 Catch:{ Exception -> 0x0058 }
-        if (r5 == 0) goto L_0x0cf7;
-    L_0x0caa:
+        if (r5 == 0) goto L_0x0d09;
+    L_0x0cbc:
         r65 = new android.content.Intent;	 Catch:{ Exception -> 0x0058 }
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0058 }
         r77 = org.telegram.messenger.PopupReplyReceiver.class;
@@ -3252,8 +3265,8 @@ public class NotificationsController {
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 19;
         r0 = r77;
-        if (r5 > r0) goto L_0x0d1f;
-    L_0x0ccf:
+        if (r5 > r0) goto L_0x0d31;
+    L_0x0ce1:
         r5 = 2131165354; // 0x7f0700aa float:1.7944923E38 double:1.052935587E-314;
         r77 = "Reply";
         r78 = 2131494235; // 0x7f0c055b float:1.8611973E38 double:1.053098076E-314;
@@ -3270,17 +3283,17 @@ public class NotificationsController {
         r1 = r77;
         r2 = r78;
         r0.addAction(r5, r1, r2);	 Catch:{ Exception -> 0x0058 }
-    L_0x0cf7:
+    L_0x0d09:
         r5 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0058 }
         r77 = 26;
         r0 = r77;
-        if (r5 < r0) goto L_0x0d0a;
-    L_0x0cff:
+        if (r5 < r0) goto L_0x0d1c;
+    L_0x0d11:
         r5 = r84;
         r5 = r5.validateChannelId(r6, r8, r9, r10, r11, r12, r13, r14, r15);	 Catch:{ Exception -> 0x0058 }
         r0 = r46;
         r0.setChannelId(r5);	 Catch:{ Exception -> 0x0058 }
-    L_0x0d0a:
+    L_0x0d1c:
         r0 = r84;
         r1 = r46;
         r2 = r85;
@@ -3291,7 +3304,7 @@ public class NotificationsController {
         r0.lastNotificationIsNoData = r5;	 Catch:{ Exception -> 0x0058 }
         r84.scheduleNotificationRepeat();	 Catch:{ Exception -> 0x0058 }
         goto L_0x001b;
-    L_0x0d1f:
+    L_0x0d31:
         r5 = 2131165353; // 0x7f0700a9 float:1.794492E38 double:1.0529355865E-314;
         r77 = "Reply";
         r78 = 2131494235; // 0x7f0c055b float:1.8611973E38 double:1.053098076E-314;
@@ -3308,7 +3321,7 @@ public class NotificationsController {
         r1 = r77;
         r2 = r78;
         r0.addAction(r5, r1, r2);	 Catch:{ Exception -> 0x0058 }
-        goto L_0x0cf7;
+        goto L_0x0d09;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.NotificationsController.showOrUpdateNotification(boolean):void");
     }
@@ -3343,6 +3356,9 @@ public class NotificationsController {
         }
         int size = sortedDialogs.size();
         for (int b = 0; b < size; b++) {
+            boolean canReply;
+            String name;
+            String dismissalID;
             dialog_id = ((Long) sortedDialogs.get(b)).longValue();
             ArrayList<MessageObject> messageObjects = (ArrayList) messagesByDialogs.get(dialog_id);
             int max_id = ((MessageObject) messageObjects.get(0)).getId();
@@ -3360,51 +3376,13 @@ public class NotificationsController {
             if (serializedNotifications != null) {
                 jSONObject = new JSONObject();
             }
-            int max_date = ((MessageObject) messageObjects.get(0)).messageOwner.date;
+            MessageObject lastMessageObject = (MessageObject) messageObjects.get(0);
+            int max_date = lastMessageObject.messageOwner.date;
             Chat chat = null;
             User user = null;
+            boolean isChannel = false;
+            boolean isSupergroup = false;
             TLObject photoPath = null;
-            boolean canReply;
-            String name;
-            UnreadConversation.Builder unreadConvBuilder;
-            Intent intent;
-            Action wearReplyAction;
-            PendingIntent replyPendingIntent;
-            RemoteInput remoteInputWear;
-            String replyToString;
-            Integer count;
-            Style messagingStyle;
-            StringBuilder text;
-            boolean[] isText;
-            ArrayList<TL_keyboardButtonRow> rows;
-            int rowsMid;
-            JSONArray serializedMsgs;
-            String message;
-            String nameToReplace;
-            JSONObject jmsg;
-            User sender;
-            PendingIntent contentIntent;
-            WearableExtender wearableExtender;
-            String dismissalID;
-            WearableExtender summaryExtender;
-            long date;
-            NotificationCompat.Builder builder;
-            BitmapDrawable img;
-            File file;
-            float scaleFactor;
-            Options options;
-            int i;
-            Bitmap bitmap;
-            int rc;
-            int r;
-            TL_keyboardButtonRow row;
-            int cc;
-            int c;
-            KeyboardButton button;
-            Intent callbackIntent;
-            String str;
-            Context context;
-            int i2;
             if (lowerId != 0) {
                 canReply = true;
                 if (lowerId > 0) {
@@ -3414,413 +3392,24 @@ public class NotificationsController {
                         if (!(user.photo == null || user.photo.photo_small == null || user.photo.photo_small.volume_id == 0 || user.photo.photo_small.local_id == 0)) {
                             photoPath = user.photo.photo_small;
                         }
-                        if (AndroidUtilities.needShowPasscode(false) || SharedConfig.isWaitingForPasscodeEnter) {
-                            name = LocaleController.getString("AppName", R.string.AppName);
-                            photoPath = null;
-                            canReply = false;
-                        }
-                        unreadConvBuilder = new UnreadConversation.Builder(name).setLatestTimestamp(((long) max_date) * 1000);
-                        intent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
-                        intent.addFlags(32);
-                        intent.setAction("org.telegram.messenger.ACTION_MESSAGE_HEARD");
-                        intent.putExtra("dialog_id", dialog_id);
-                        intent.putExtra("max_id", max_id);
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        unreadConvBuilder.setReadPendingIntent(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728));
-                        wearReplyAction = null;
-                        if ((!ChatObject.isChannel(chat) || (chat != null && chat.megagroup)) && canReply && !SharedConfig.isWaitingForPasscodeEnter) {
-                            intent = new Intent(ApplicationLoader.applicationContext, AutoMessageReplyReceiver.class);
-                            intent.addFlags(32);
-                            intent.setAction("org.telegram.messenger.ACTION_MESSAGE_REPLY");
-                            intent.putExtra("dialog_id", dialog_id);
-                            intent.putExtra("max_id", max_id);
-                            intent.putExtra("currentAccount", this.currentAccount);
-                            unreadConvBuilder.setReplyAction(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728), new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build());
-                            intent = new Intent(ApplicationLoader.applicationContext, WearReplyReceiver.class);
-                            intent.putExtra("dialog_id", dialog_id);
-                            intent.putExtra("max_id", max_id);
-                            intent.putExtra("currentAccount", this.currentAccount);
-                            replyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728);
-                            remoteInputWear = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
-                            if (chat != null) {
-                                replyToString = LocaleController.formatString("ReplyToGroup", R.string.ReplyToGroup, name);
-                            } else {
-                                replyToString = LocaleController.formatString("ReplyToUser", R.string.ReplyToUser, name);
-                            }
-                            wearReplyAction = new Action.Builder(R.drawable.ic_reply_icon, replyToString, replyPendingIntent).setAllowGeneratedReplies(true).addRemoteInput(remoteInputWear).build();
-                        }
-                        count = (Integer) this.pushDialogs.get(dialog_id);
-                        if (count == null) {
-                            count = Integer.valueOf(0);
-                        }
-                        messagingStyle = new MessagingStyle(TtmlNode.ANONYMOUS_REGION_ID).setConversationTitle(String.format("%1$s (%2$s)", new Object[]{name, LocaleController.formatPluralString("NewMessages", Math.max(count.intValue(), messageObjects.size()))}));
-                        text = new StringBuilder();
-                        isText = new boolean[1];
-                        rows = null;
-                        rowsMid = 0;
-                        serializedMsgs = null;
-                        if (jSONObject != null) {
-                            serializedMsgs = new JSONArray();
-                        }
-                        for (a = messageObjects.size() - 1; a >= 0; a--) {
-                            messageObject = (MessageObject) messageObjects.get(a);
-                            message = getStringForMessage(messageObject, false, isText);
-                            if (messageObject.isFcmMessage()) {
-                                nameToReplace = messageObject.localName;
-                            } else {
-                                nameToReplace = name;
-                            }
-                            if (message != null) {
-                                if (chat == null) {
-                                    message = message.replace(" @ " + nameToReplace, TtmlNode.ANONYMOUS_REGION_ID);
-                                } else if (isText[0]) {
-                                    message = message.replace(nameToReplace + ": ", TtmlNode.ANONYMOUS_REGION_ID);
-                                } else {
-                                    message = message.replace(nameToReplace + " ", TtmlNode.ANONYMOUS_REGION_ID);
-                                }
-                                if (text.length() > 0) {
-                                    text.append("\n\n");
-                                }
-                                text.append(message);
-                                unreadConvBuilder.addMessage(message);
-                                messagingStyle.addMessage(message, ((long) messageObject.messageOwner.date) * 1000, null);
-                                if (serializedMsgs != null) {
-                                    try {
-                                        jmsg = new JSONObject();
-                                        jmsg.put(MimeTypes.BASE_TYPE_TEXT, getShortStringForMessage(messageObject));
-                                        jmsg.put("date", messageObject.messageOwner.date);
-                                        if (messageObject.isFromUser() && chat != null) {
-                                            sender = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.getFromId()));
-                                            if (sender != null) {
-                                                jmsg.put("fname", sender.first_name);
-                                                jmsg.put("lname", sender.last_name);
-                                            }
-                                        }
-                                        serializedMsgs.put(jmsg);
-                                    } catch (JSONException e) {
-                                    }
-                                }
-                                if (dialog_id == 777000 && messageObject.messageOwner.reply_markup != null) {
-                                    rows = messageObject.messageOwner.reply_markup.rows;
-                                    rowsMid = messageObject.getId();
-                                }
-                            }
-                        }
-                        intent = new Intent(ApplicationLoader.applicationContext, LaunchActivity.class);
-                        intent.setAction("com.tmessages.openchat" + Math.random() + ConnectionsManager.DEFAULT_DATACENTER_ID);
-                        intent.setFlags(32768);
-                        if (lowerId != 0) {
-                            intent.putExtra("encId", highId);
-                        } else if (lowerId > 0) {
-                            intent.putExtra("userId", lowerId);
-                        } else {
-                            intent.putExtra("chatId", -lowerId);
-                        }
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        contentIntent = PendingIntent.getActivity(ApplicationLoader.applicationContext, 0, intent, 1073741824);
-                        wearableExtender = new WearableExtender();
-                        if (wearReplyAction != null) {
-                            wearableExtender.addAction(wearReplyAction);
-                        }
-                        if (lowerId != 0) {
-                            dismissalID = "tgenc" + highId + "_" + max_id;
-                        } else if (lowerId > 0) {
-                            dismissalID = "tguser" + lowerId + "_" + max_id;
-                        } else {
-                            dismissalID = "tgchat" + (-lowerId) + "_" + max_id;
-                        }
-                        wearableExtender.setDismissalId(dismissalID);
-                        wearableExtender.setBridgeTag("tgaccount" + UserConfig.getInstance(this.currentAccount).getClientUserId());
-                        summaryExtender = new WearableExtender();
-                        summaryExtender.setDismissalId("summary_" + dismissalID);
-                        notificationBuilder.extend(summaryExtender);
-                        date = ((long) ((MessageObject) messageObjects.get(0)).messageOwner.date) * 1000;
-                        builder = new NotificationCompat.Builder(ApplicationLoader.applicationContext).setContentTitle(name).setSmallIcon(R.drawable.notification).setGroup(this.notificationGroup).setContentText(text.toString()).setAutoCancel(true).setNumber(messageObjects.size()).setColor(-13851168).setGroupSummary(false).setWhen(date).setShowWhen(true).setShortcutId("sdid_" + dialog_id).setGroupAlertBehavior(1).setStyle(messagingStyle).setContentIntent(contentIntent).extend(wearableExtender).setSortKey(TtmlNode.ANONYMOUS_REGION_ID + (Long.MAX_VALUE - date)).extend(new CarExtender().setUnreadConversation(unreadConvBuilder.build())).setCategory("msg");
-                        if (this.pushDialogs.size() == 1 && !TextUtils.isEmpty(summary)) {
-                            builder.setSubText(summary);
-                        }
-                        if (lowerId == 0) {
-                            builder.setLocalOnly(true);
-                        }
-                        if (photoPath != null) {
-                            img = ImageLoader.getInstance().getImageFromMemory(photoPath, null, "50_50");
-                            if (img != null) {
-                                builder.setLargeIcon(img.getBitmap());
-                            } else {
-                                try {
-                                    file = FileLoader.getPathToAttach(photoPath, true);
-                                    if (file.exists()) {
-                                        scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
-                                        options = new Options();
-                                        if (scaleFactor < 1.0f) {
-                                            i = 1;
-                                        } else {
-                                            i = (int) scaleFactor;
-                                        }
-                                        options.inSampleSize = i;
-                                        bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-                                        if (bitmap != null) {
-                                            builder.setLargeIcon(bitmap);
-                                        }
-                                    }
-                                } catch (Throwable th) {
-                                }
-                            }
-                        }
-                        if (!(AndroidUtilities.needShowPasscode(false) || SharedConfig.isWaitingForPasscodeEnter || rows == null)) {
-                            rc = rows.size();
-                            for (r = 0; r < rc; r++) {
-                                row = (TL_keyboardButtonRow) rows.get(r);
-                                cc = row.buttons.size();
-                                for (c = 0; c < cc; c++) {
-                                    button = (KeyboardButton) row.buttons.get(c);
-                                    if (!(button instanceof TL_keyboardButtonCallback)) {
-                                        callbackIntent = new Intent(ApplicationLoader.applicationContext, NotificationCallbackReceiver.class);
-                                        callbackIntent.putExtra("currentAccount", this.currentAccount);
-                                        callbackIntent.putExtra("did", dialog_id);
-                                        if (button.data != null) {
-                                            callbackIntent.putExtra(DataSchemeDataSource.SCHEME_DATA, button.data);
-                                        }
-                                        callbackIntent.putExtra("mid", rowsMid);
-                                        str = button.text;
-                                        context = ApplicationLoader.applicationContext;
-                                        i2 = this.lastButtonId;
-                                        this.lastButtonId = i2 + 1;
-                                        builder.addAction(0, str, PendingIntent.getBroadcast(context, i2, callbackIntent, 134217728));
-                                    }
-                                }
-                            }
-                        }
-                        if (chat == null && user != null && user.phone != null && user.phone.length() > 0) {
-                            builder.addPerson("tel:+" + user.phone);
-                        }
-                        if (VERSION.SDK_INT >= 26) {
-                            builder.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
-                        }
-                        holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), builder.build()));
-                        this.wearNotificationsIds.put(dialog_id, internalId);
-                        if (jSONObject == null) {
-                            try {
-                                jSONObject.put("reply", canReply);
-                                jSONObject.put("name", name);
-                                jSONObject.put("max_id", max_id);
-                                jSONObject.put("max_date", max_date);
-                                jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                                if (photoPath != null) {
-                                    jSONObject.put("photo", photoPath.dc_id + "_" + photoPath.volume_id + "_" + photoPath.secret);
-                                }
-                                if (serializedMsgs != null) {
-                                    jSONObject.put("msgs", serializedMsgs);
-                                }
-                                if (user == null) {
-                                    jSONObject.put("type", "user");
-                                } else if (chat != null) {
-                                    if (ChatObject.isChannel(chat)) {
-                                        jSONObject.put("type", "channel");
-                                    } else {
-                                        jSONObject.put("type", "group");
-                                    }
-                                }
-                                serializedNotifications.put(jSONObject);
-                            } catch (JSONException e2) {
-                            }
-                        }
+                    } else if (lastMessageObject.isFcmMessage()) {
+                        name = lastMessageObject.localName;
+                    } else {
                     }
                 } else {
                     chat = MessagesController.getInstance(this.currentAccount).getChat(Integer.valueOf(-lowerId));
                     if (chat != null) {
+                        isSupergroup = chat.megagroup;
+                        isChannel = ChatObject.isChannel(chat) && !chat.megagroup;
                         name = chat.title;
                         if (!(chat.photo == null || chat.photo.photo_small == null || chat.photo.photo_small.volume_id == 0 || chat.photo.photo_small.local_id == 0)) {
                             photoPath = chat.photo.photo_small;
                         }
-                        name = LocaleController.getString("AppName", R.string.AppName);
-                        photoPath = null;
-                        canReply = false;
-                        unreadConvBuilder = new UnreadConversation.Builder(name).setLatestTimestamp(((long) max_date) * 1000);
-                        intent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
-                        intent.addFlags(32);
-                        intent.setAction("org.telegram.messenger.ACTION_MESSAGE_HEARD");
-                        intent.putExtra("dialog_id", dialog_id);
-                        intent.putExtra("max_id", max_id);
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        unreadConvBuilder.setReadPendingIntent(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728));
-                        wearReplyAction = null;
-                        intent = new Intent(ApplicationLoader.applicationContext, AutoMessageReplyReceiver.class);
-                        intent.addFlags(32);
-                        intent.setAction("org.telegram.messenger.ACTION_MESSAGE_REPLY");
-                        intent.putExtra("dialog_id", dialog_id);
-                        intent.putExtra("max_id", max_id);
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        unreadConvBuilder.setReplyAction(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728), new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build());
-                        intent = new Intent(ApplicationLoader.applicationContext, WearReplyReceiver.class);
-                        intent.putExtra("dialog_id", dialog_id);
-                        intent.putExtra("max_id", max_id);
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        replyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728);
-                        remoteInputWear = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
-                        if (chat != null) {
-                            replyToString = LocaleController.formatString("ReplyToUser", R.string.ReplyToUser, name);
-                        } else {
-                            replyToString = LocaleController.formatString("ReplyToGroup", R.string.ReplyToGroup, name);
-                        }
-                        wearReplyAction = new Action.Builder(R.drawable.ic_reply_icon, replyToString, replyPendingIntent).setAllowGeneratedReplies(true).addRemoteInput(remoteInputWear).build();
-                        count = (Integer) this.pushDialogs.get(dialog_id);
-                        if (count == null) {
-                            count = Integer.valueOf(0);
-                        }
-                        messagingStyle = new MessagingStyle(TtmlNode.ANONYMOUS_REGION_ID).setConversationTitle(String.format("%1$s (%2$s)", new Object[]{name, LocaleController.formatPluralString("NewMessages", Math.max(count.intValue(), messageObjects.size()))}));
-                        text = new StringBuilder();
-                        isText = new boolean[1];
-                        rows = null;
-                        rowsMid = 0;
-                        serializedMsgs = null;
-                        if (jSONObject != null) {
-                            serializedMsgs = new JSONArray();
-                        }
-                        for (a = messageObjects.size() - 1; a >= 0; a--) {
-                            messageObject = (MessageObject) messageObjects.get(a);
-                            message = getStringForMessage(messageObject, false, isText);
-                            if (messageObject.isFcmMessage()) {
-                                nameToReplace = name;
-                            } else {
-                                nameToReplace = messageObject.localName;
-                            }
-                            if (message != null) {
-                                if (chat == null) {
-                                    message = message.replace(" @ " + nameToReplace, TtmlNode.ANONYMOUS_REGION_ID);
-                                } else if (isText[0]) {
-                                    message = message.replace(nameToReplace + " ", TtmlNode.ANONYMOUS_REGION_ID);
-                                } else {
-                                    message = message.replace(nameToReplace + ": ", TtmlNode.ANONYMOUS_REGION_ID);
-                                }
-                                if (text.length() > 0) {
-                                    text.append("\n\n");
-                                }
-                                text.append(message);
-                                unreadConvBuilder.addMessage(message);
-                                messagingStyle.addMessage(message, ((long) messageObject.messageOwner.date) * 1000, null);
-                                if (serializedMsgs != null) {
-                                    jmsg = new JSONObject();
-                                    jmsg.put(MimeTypes.BASE_TYPE_TEXT, getShortStringForMessage(messageObject));
-                                    jmsg.put("date", messageObject.messageOwner.date);
-                                    sender = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.getFromId()));
-                                    if (sender != null) {
-                                        jmsg.put("fname", sender.first_name);
-                                        jmsg.put("lname", sender.last_name);
-                                    }
-                                    serializedMsgs.put(jmsg);
-                                }
-                                rows = messageObject.messageOwner.reply_markup.rows;
-                                rowsMid = messageObject.getId();
-                            }
-                        }
-                        intent = new Intent(ApplicationLoader.applicationContext, LaunchActivity.class);
-                        intent.setAction("com.tmessages.openchat" + Math.random() + ConnectionsManager.DEFAULT_DATACENTER_ID);
-                        intent.setFlags(32768);
-                        if (lowerId != 0) {
-                            intent.putExtra("encId", highId);
-                        } else if (lowerId > 0) {
-                            intent.putExtra("chatId", -lowerId);
-                        } else {
-                            intent.putExtra("userId", lowerId);
-                        }
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        contentIntent = PendingIntent.getActivity(ApplicationLoader.applicationContext, 0, intent, 1073741824);
-                        wearableExtender = new WearableExtender();
-                        if (wearReplyAction != null) {
-                            wearableExtender.addAction(wearReplyAction);
-                        }
-                        if (lowerId != 0) {
-                            dismissalID = "tgenc" + highId + "_" + max_id;
-                        } else if (lowerId > 0) {
-                            dismissalID = "tgchat" + (-lowerId) + "_" + max_id;
-                        } else {
-                            dismissalID = "tguser" + lowerId + "_" + max_id;
-                        }
-                        wearableExtender.setDismissalId(dismissalID);
-                        wearableExtender.setBridgeTag("tgaccount" + UserConfig.getInstance(this.currentAccount).getClientUserId());
-                        summaryExtender = new WearableExtender();
-                        summaryExtender.setDismissalId("summary_" + dismissalID);
-                        notificationBuilder.extend(summaryExtender);
-                        date = ((long) ((MessageObject) messageObjects.get(0)).messageOwner.date) * 1000;
-                        builder = new NotificationCompat.Builder(ApplicationLoader.applicationContext).setContentTitle(name).setSmallIcon(R.drawable.notification).setGroup(this.notificationGroup).setContentText(text.toString()).setAutoCancel(true).setNumber(messageObjects.size()).setColor(-13851168).setGroupSummary(false).setWhen(date).setShowWhen(true).setShortcutId("sdid_" + dialog_id).setGroupAlertBehavior(1).setStyle(messagingStyle).setContentIntent(contentIntent).extend(wearableExtender).setSortKey(TtmlNode.ANONYMOUS_REGION_ID + (Long.MAX_VALUE - date)).extend(new CarExtender().setUnreadConversation(unreadConvBuilder.build())).setCategory("msg");
-                        builder.setSubText(summary);
-                        if (lowerId == 0) {
-                            builder.setLocalOnly(true);
-                        }
-                        if (photoPath != null) {
-                            img = ImageLoader.getInstance().getImageFromMemory(photoPath, null, "50_50");
-                            if (img != null) {
-                                file = FileLoader.getPathToAttach(photoPath, true);
-                                if (file.exists()) {
-                                    scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
-                                    options = new Options();
-                                    if (scaleFactor < 1.0f) {
-                                        i = (int) scaleFactor;
-                                    } else {
-                                        i = 1;
-                                    }
-                                    options.inSampleSize = i;
-                                    bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-                                    if (bitmap != null) {
-                                        builder.setLargeIcon(bitmap);
-                                    }
-                                }
-                            } else {
-                                builder.setLargeIcon(img.getBitmap());
-                            }
-                        }
-                        rc = rows.size();
-                        for (r = 0; r < rc; r++) {
-                            row = (TL_keyboardButtonRow) rows.get(r);
-                            cc = row.buttons.size();
-                            for (c = 0; c < cc; c++) {
-                                button = (KeyboardButton) row.buttons.get(c);
-                                if (!(button instanceof TL_keyboardButtonCallback)) {
-                                    callbackIntent = new Intent(ApplicationLoader.applicationContext, NotificationCallbackReceiver.class);
-                                    callbackIntent.putExtra("currentAccount", this.currentAccount);
-                                    callbackIntent.putExtra("did", dialog_id);
-                                    if (button.data != null) {
-                                        callbackIntent.putExtra(DataSchemeDataSource.SCHEME_DATA, button.data);
-                                    }
-                                    callbackIntent.putExtra("mid", rowsMid);
-                                    str = button.text;
-                                    context = ApplicationLoader.applicationContext;
-                                    i2 = this.lastButtonId;
-                                    this.lastButtonId = i2 + 1;
-                                    builder.addAction(0, str, PendingIntent.getBroadcast(context, i2, callbackIntent, 134217728));
-                                }
-                            }
-                        }
-                        builder.addPerson("tel:+" + user.phone);
-                        if (VERSION.SDK_INT >= 26) {
-                            builder.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
-                        }
-                        holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), builder.build()));
-                        this.wearNotificationsIds.put(dialog_id, internalId);
-                        if (jSONObject == null) {
-                            jSONObject.put("reply", canReply);
-                            jSONObject.put("name", name);
-                            jSONObject.put("max_id", max_id);
-                            jSONObject.put("max_date", max_date);
-                            jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                            if (photoPath != null) {
-                                jSONObject.put("photo", photoPath.dc_id + "_" + photoPath.volume_id + "_" + photoPath.secret);
-                            }
-                            if (serializedMsgs != null) {
-                                jSONObject.put("msgs", serializedMsgs);
-                            }
-                            if (user == null) {
-                                jSONObject.put("type", "user");
-                            } else if (chat != null) {
-                                if (ChatObject.isChannel(chat)) {
-                                    jSONObject.put("type", "group");
-                                } else {
-                                    jSONObject.put("type", "channel");
-                                }
-                            }
-                            serializedNotifications.put(jSONObject);
-                        }
+                    } else if (lastMessageObject.isFcmMessage()) {
+                        isSupergroup = lastMessageObject.isMegagroup();
+                        name = lastMessageObject.localName;
+                        isChannel = lastMessageObject.localChannel;
+                    } else {
                     }
                 }
             } else {
@@ -3832,195 +3421,221 @@ public class NotificationsController {
                         name = LocaleController.getString("SecretChatName", R.string.SecretChatName);
                         photoPath = null;
                         jSONObject = null;
-                        name = LocaleController.getString("AppName", R.string.AppName);
-                        photoPath = null;
-                        canReply = false;
-                        unreadConvBuilder = new UnreadConversation.Builder(name).setLatestTimestamp(((long) max_date) * 1000);
-                        intent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
-                        intent.addFlags(32);
-                        intent.setAction("org.telegram.messenger.ACTION_MESSAGE_HEARD");
-                        intent.putExtra("dialog_id", dialog_id);
-                        intent.putExtra("max_id", max_id);
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        unreadConvBuilder.setReadPendingIntent(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728));
-                        wearReplyAction = null;
-                        intent = new Intent(ApplicationLoader.applicationContext, AutoMessageReplyReceiver.class);
-                        intent.addFlags(32);
-                        intent.setAction("org.telegram.messenger.ACTION_MESSAGE_REPLY");
-                        intent.putExtra("dialog_id", dialog_id);
-                        intent.putExtra("max_id", max_id);
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        unreadConvBuilder.setReplyAction(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728), new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build());
-                        intent = new Intent(ApplicationLoader.applicationContext, WearReplyReceiver.class);
-                        intent.putExtra("dialog_id", dialog_id);
-                        intent.putExtra("max_id", max_id);
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        replyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728);
-                        remoteInputWear = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
-                        if (chat != null) {
-                            replyToString = LocaleController.formatString("ReplyToGroup", R.string.ReplyToGroup, name);
-                        } else {
-                            replyToString = LocaleController.formatString("ReplyToUser", R.string.ReplyToUser, name);
-                        }
-                        wearReplyAction = new Action.Builder(R.drawable.ic_reply_icon, replyToString, replyPendingIntent).setAllowGeneratedReplies(true).addRemoteInput(remoteInputWear).build();
-                        count = (Integer) this.pushDialogs.get(dialog_id);
-                        if (count == null) {
-                            count = Integer.valueOf(0);
-                        }
-                        messagingStyle = new MessagingStyle(TtmlNode.ANONYMOUS_REGION_ID).setConversationTitle(String.format("%1$s (%2$s)", new Object[]{name, LocaleController.formatPluralString("NewMessages", Math.max(count.intValue(), messageObjects.size()))}));
-                        text = new StringBuilder();
-                        isText = new boolean[1];
-                        rows = null;
-                        rowsMid = 0;
-                        serializedMsgs = null;
-                        if (jSONObject != null) {
-                            serializedMsgs = new JSONArray();
-                        }
-                        for (a = messageObjects.size() - 1; a >= 0; a--) {
-                            messageObject = (MessageObject) messageObjects.get(a);
-                            message = getStringForMessage(messageObject, false, isText);
-                            if (messageObject.isFcmMessage()) {
-                                nameToReplace = messageObject.localName;
-                            } else {
-                                nameToReplace = name;
-                            }
-                            if (message != null) {
-                                if (chat == null) {
-                                    message = message.replace(" @ " + nameToReplace, TtmlNode.ANONYMOUS_REGION_ID);
-                                } else if (isText[0]) {
-                                    message = message.replace(nameToReplace + ": ", TtmlNode.ANONYMOUS_REGION_ID);
-                                } else {
-                                    message = message.replace(nameToReplace + " ", TtmlNode.ANONYMOUS_REGION_ID);
-                                }
-                                if (text.length() > 0) {
-                                    text.append("\n\n");
-                                }
-                                text.append(message);
-                                unreadConvBuilder.addMessage(message);
-                                messagingStyle.addMessage(message, ((long) messageObject.messageOwner.date) * 1000, null);
-                                if (serializedMsgs != null) {
-                                    jmsg = new JSONObject();
-                                    jmsg.put(MimeTypes.BASE_TYPE_TEXT, getShortStringForMessage(messageObject));
-                                    jmsg.put("date", messageObject.messageOwner.date);
-                                    sender = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.getFromId()));
-                                    if (sender != null) {
-                                        jmsg.put("fname", sender.first_name);
-                                        jmsg.put("lname", sender.last_name);
-                                    }
-                                    serializedMsgs.put(jmsg);
-                                }
-                                rows = messageObject.messageOwner.reply_markup.rows;
-                                rowsMid = messageObject.getId();
-                            }
-                        }
-                        intent = new Intent(ApplicationLoader.applicationContext, LaunchActivity.class);
-                        intent.setAction("com.tmessages.openchat" + Math.random() + ConnectionsManager.DEFAULT_DATACENTER_ID);
-                        intent.setFlags(32768);
-                        if (lowerId != 0) {
-                            intent.putExtra("encId", highId);
-                        } else if (lowerId > 0) {
-                            intent.putExtra("userId", lowerId);
-                        } else {
-                            intent.putExtra("chatId", -lowerId);
-                        }
-                        intent.putExtra("currentAccount", this.currentAccount);
-                        contentIntent = PendingIntent.getActivity(ApplicationLoader.applicationContext, 0, intent, 1073741824);
-                        wearableExtender = new WearableExtender();
-                        if (wearReplyAction != null) {
-                            wearableExtender.addAction(wearReplyAction);
-                        }
-                        if (lowerId != 0) {
-                            dismissalID = "tgenc" + highId + "_" + max_id;
-                        } else if (lowerId > 0) {
-                            dismissalID = "tguser" + lowerId + "_" + max_id;
-                        } else {
-                            dismissalID = "tgchat" + (-lowerId) + "_" + max_id;
-                        }
-                        wearableExtender.setDismissalId(dismissalID);
-                        wearableExtender.setBridgeTag("tgaccount" + UserConfig.getInstance(this.currentAccount).getClientUserId());
-                        summaryExtender = new WearableExtender();
-                        summaryExtender.setDismissalId("summary_" + dismissalID);
-                        notificationBuilder.extend(summaryExtender);
-                        date = ((long) ((MessageObject) messageObjects.get(0)).messageOwner.date) * 1000;
-                        builder = new NotificationCompat.Builder(ApplicationLoader.applicationContext).setContentTitle(name).setSmallIcon(R.drawable.notification).setGroup(this.notificationGroup).setContentText(text.toString()).setAutoCancel(true).setNumber(messageObjects.size()).setColor(-13851168).setGroupSummary(false).setWhen(date).setShowWhen(true).setShortcutId("sdid_" + dialog_id).setGroupAlertBehavior(1).setStyle(messagingStyle).setContentIntent(contentIntent).extend(wearableExtender).setSortKey(TtmlNode.ANONYMOUS_REGION_ID + (Long.MAX_VALUE - date)).extend(new CarExtender().setUnreadConversation(unreadConvBuilder.build())).setCategory("msg");
-                        builder.setSubText(summary);
-                        if (lowerId == 0) {
-                            builder.setLocalOnly(true);
-                        }
-                        if (photoPath != null) {
-                            img = ImageLoader.getInstance().getImageFromMemory(photoPath, null, "50_50");
-                            if (img != null) {
-                                builder.setLargeIcon(img.getBitmap());
-                            } else {
-                                file = FileLoader.getPathToAttach(photoPath, true);
-                                if (file.exists()) {
-                                    scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
-                                    options = new Options();
-                                    if (scaleFactor < 1.0f) {
-                                        i = 1;
-                                    } else {
-                                        i = (int) scaleFactor;
-                                    }
-                                    options.inSampleSize = i;
-                                    bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-                                    if (bitmap != null) {
-                                        builder.setLargeIcon(bitmap);
-                                    }
+                    }
+                }
+            }
+            if (AndroidUtilities.needShowPasscode(false) || SharedConfig.isWaitingForPasscodeEnter) {
+                name = LocaleController.getString("AppName", R.string.AppName);
+                photoPath = null;
+                canReply = false;
+            }
+            UnreadConversation.Builder unreadConvBuilder = new UnreadConversation.Builder(name).setLatestTimestamp(((long) max_date) * 1000);
+            Intent intent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
+            intent.addFlags(32);
+            intent.setAction("org.telegram.messenger.ACTION_MESSAGE_HEARD");
+            intent.putExtra("dialog_id", dialog_id);
+            intent.putExtra("max_id", max_id);
+            intent.putExtra("currentAccount", this.currentAccount);
+            unreadConvBuilder.setReadPendingIntent(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728));
+            Action wearReplyAction = null;
+            if ((!isChannel || isSupergroup) && canReply && !SharedConfig.isWaitingForPasscodeEnter) {
+                String replyToString;
+                intent = new Intent(ApplicationLoader.applicationContext, AutoMessageReplyReceiver.class);
+                intent.addFlags(32);
+                intent.setAction("org.telegram.messenger.ACTION_MESSAGE_REPLY");
+                intent.putExtra("dialog_id", dialog_id);
+                intent.putExtra("max_id", max_id);
+                intent.putExtra("currentAccount", this.currentAccount);
+                unreadConvBuilder.setReplyAction(PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728), new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build());
+                intent = new Intent(ApplicationLoader.applicationContext, WearReplyReceiver.class);
+                intent.putExtra("dialog_id", dialog_id);
+                intent.putExtra("max_id", max_id);
+                intent.putExtra("currentAccount", this.currentAccount);
+                PendingIntent replyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), intent, 134217728);
+                RemoteInput remoteInputWear = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
+                if (lowerId < 0) {
+                    replyToString = LocaleController.formatString("ReplyToGroup", R.string.ReplyToGroup, name);
+                } else {
+                    replyToString = LocaleController.formatString("ReplyToUser", R.string.ReplyToUser, name);
+                }
+                wearReplyAction = new Action.Builder(R.drawable.ic_reply_icon, replyToString, replyPendingIntent).setAllowGeneratedReplies(true).addRemoteInput(remoteInputWear).build();
+            }
+            Integer count = (Integer) this.pushDialogs.get(dialog_id);
+            if (count == null) {
+                count = Integer.valueOf(0);
+            }
+            Style messagingStyle = new MessagingStyle(TtmlNode.ANONYMOUS_REGION_ID).setConversationTitle(String.format("%1$s (%2$s)", new Object[]{name, LocaleController.formatPluralString("NewMessages", Math.max(count.intValue(), messageObjects.size()))}));
+            StringBuilder text = new StringBuilder();
+            boolean[] isText = new boolean[1];
+            ArrayList<TL_keyboardButtonRow> rows = null;
+            int rowsMid = 0;
+            JSONArray serializedMsgs = null;
+            if (jSONObject != null) {
+                serializedMsgs = new JSONArray();
+            }
+            for (a = messageObjects.size() - 1; a >= 0; a--) {
+                String nameToReplace;
+                messageObject = (MessageObject) messageObjects.get(a);
+                String message = getStringForMessage(messageObject, false, isText);
+                if (messageObject.isFcmMessage()) {
+                    nameToReplace = messageObject.localName;
+                } else {
+                    nameToReplace = name;
+                }
+                if (message != null) {
+                    if (lowerId < 0) {
+                        message = message.replace(" @ " + nameToReplace, TtmlNode.ANONYMOUS_REGION_ID);
+                    } else if (isText[0]) {
+                        message = message.replace(nameToReplace + ": ", TtmlNode.ANONYMOUS_REGION_ID);
+                    } else {
+                        message = message.replace(nameToReplace + " ", TtmlNode.ANONYMOUS_REGION_ID);
+                    }
+                    if (text.length() > 0) {
+                        text.append("\n\n");
+                    }
+                    text.append(message);
+                    unreadConvBuilder.addMessage(message);
+                    messagingStyle.addMessage(message, ((long) messageObject.messageOwner.date) * 1000, null);
+                    if (serializedMsgs != null) {
+                        try {
+                            JSONObject jmsg = new JSONObject();
+                            jmsg.put(MimeTypes.BASE_TYPE_TEXT, getShortStringForMessage(messageObject));
+                            jmsg.put("date", messageObject.messageOwner.date);
+                            if (messageObject.isFromUser() && lowerId < 0) {
+                                User sender = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(messageObject.getFromId()));
+                                if (sender != null) {
+                                    jmsg.put("fname", sender.first_name);
+                                    jmsg.put("lname", sender.last_name);
                                 }
                             }
-                        }
-                        rc = rows.size();
-                        for (r = 0; r < rc; r++) {
-                            row = (TL_keyboardButtonRow) rows.get(r);
-                            cc = row.buttons.size();
-                            for (c = 0; c < cc; c++) {
-                                button = (KeyboardButton) row.buttons.get(c);
-                                if (!(button instanceof TL_keyboardButtonCallback)) {
-                                    callbackIntent = new Intent(ApplicationLoader.applicationContext, NotificationCallbackReceiver.class);
-                                    callbackIntent.putExtra("currentAccount", this.currentAccount);
-                                    callbackIntent.putExtra("did", dialog_id);
-                                    if (button.data != null) {
-                                        callbackIntent.putExtra(DataSchemeDataSource.SCHEME_DATA, button.data);
-                                    }
-                                    callbackIntent.putExtra("mid", rowsMid);
-                                    str = button.text;
-                                    context = ApplicationLoader.applicationContext;
-                                    i2 = this.lastButtonId;
-                                    this.lastButtonId = i2 + 1;
-                                    builder.addAction(0, str, PendingIntent.getBroadcast(context, i2, callbackIntent, 134217728));
-                                }
-                            }
-                        }
-                        builder.addPerson("tel:+" + user.phone);
-                        if (VERSION.SDK_INT >= 26) {
-                            builder.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
-                        }
-                        holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), builder.build()));
-                        this.wearNotificationsIds.put(dialog_id, internalId);
-                        if (jSONObject == null) {
-                            jSONObject.put("reply", canReply);
-                            jSONObject.put("name", name);
-                            jSONObject.put("max_id", max_id);
-                            jSONObject.put("max_date", max_date);
-                            jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                            if (photoPath != null) {
-                                jSONObject.put("photo", photoPath.dc_id + "_" + photoPath.volume_id + "_" + photoPath.secret);
-                            }
-                            if (serializedMsgs != null) {
-                                jSONObject.put("msgs", serializedMsgs);
-                            }
-                            if (user == null) {
-                                jSONObject.put("type", "user");
-                            } else if (chat != null) {
-                                if (ChatObject.isChannel(chat)) {
-                                    jSONObject.put("type", "channel");
-                                } else {
-                                    jSONObject.put("type", "group");
-                                }
-                            }
-                            serializedNotifications.put(jSONObject);
+                            serializedMsgs.put(jmsg);
+                        } catch (JSONException e) {
                         }
                     }
+                    if (dialog_id == 777000 && messageObject.messageOwner.reply_markup != null) {
+                        rows = messageObject.messageOwner.reply_markup.rows;
+                        rowsMid = messageObject.getId();
+                    }
+                }
+            }
+            intent = new Intent(ApplicationLoader.applicationContext, LaunchActivity.class);
+            intent.setAction("com.tmessages.openchat" + Math.random() + ConnectionsManager.DEFAULT_DATACENTER_ID);
+            intent.setFlags(32768);
+            if (lowerId == 0) {
+                intent.putExtra("encId", highId);
+            } else if (lowerId > 0) {
+                intent.putExtra("userId", lowerId);
+            } else {
+                intent.putExtra("chatId", -lowerId);
+            }
+            intent.putExtra("currentAccount", this.currentAccount);
+            PendingIntent contentIntent = PendingIntent.getActivity(ApplicationLoader.applicationContext, 0, intent, 1073741824);
+            WearableExtender wearableExtender = new WearableExtender();
+            if (wearReplyAction != null) {
+                wearableExtender.addAction(wearReplyAction);
+            }
+            if (lowerId == 0) {
+                dismissalID = "tgenc" + highId + "_" + max_id;
+            } else if (lowerId > 0) {
+                dismissalID = "tguser" + lowerId + "_" + max_id;
+            } else {
+                dismissalID = "tgchat" + (-lowerId) + "_" + max_id;
+            }
+            wearableExtender.setDismissalId(dismissalID);
+            wearableExtender.setBridgeTag("tgaccount" + UserConfig.getInstance(this.currentAccount).getClientUserId());
+            WearableExtender summaryExtender = new WearableExtender();
+            summaryExtender.setDismissalId("summary_" + dismissalID);
+            notificationBuilder.extend(summaryExtender);
+            long date = ((long) ((MessageObject) messageObjects.get(0)).messageOwner.date) * 1000;
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(ApplicationLoader.applicationContext).setContentTitle(name).setSmallIcon(R.drawable.notification).setGroup(this.notificationGroup).setContentText(text.toString()).setAutoCancel(true).setNumber(messageObjects.size()).setColor(-13851168).setGroupSummary(false).setWhen(date).setShowWhen(true).setShortcutId("sdid_" + dialog_id).setGroupAlertBehavior(1).setStyle(messagingStyle).setContentIntent(contentIntent).extend(wearableExtender).setSortKey(TtmlNode.ANONYMOUS_REGION_ID + (Long.MAX_VALUE - date)).extend(new CarExtender().setUnreadConversation(unreadConvBuilder.build())).setCategory("msg");
+            if (this.pushDialogs.size() == 1 && !TextUtils.isEmpty(summary)) {
+                builder.setSubText(summary);
+            }
+            if (lowerId == 0) {
+                builder.setLocalOnly(true);
+            }
+            if (photoPath != null) {
+                BitmapDrawable img = ImageLoader.getInstance().getImageFromMemory(photoPath, null, "50_50");
+                if (img != null) {
+                    builder.setLargeIcon(img.getBitmap());
+                } else {
+                    try {
+                        File file = FileLoader.getPathToAttach(photoPath, true);
+                        if (file.exists()) {
+                            int i;
+                            float scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
+                            Options options = new Options();
+                            if (scaleFactor < 1.0f) {
+                                i = 1;
+                            } else {
+                                i = (int) scaleFactor;
+                            }
+                            options.inSampleSize = i;
+                            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+                            if (bitmap != null) {
+                                builder.setLargeIcon(bitmap);
+                            }
+                        }
+                    } catch (Throwable th) {
+                    }
+                }
+            }
+            if (!(AndroidUtilities.needShowPasscode(false) || SharedConfig.isWaitingForPasscodeEnter || rows == null)) {
+                int rc = rows.size();
+                for (int r = 0; r < rc; r++) {
+                    TL_keyboardButtonRow row = (TL_keyboardButtonRow) rows.get(r);
+                    int cc = row.buttons.size();
+                    for (int c = 0; c < cc; c++) {
+                        KeyboardButton button = (KeyboardButton) row.buttons.get(c);
+                        if (button instanceof TL_keyboardButtonCallback) {
+                            Intent callbackIntent = new Intent(ApplicationLoader.applicationContext, NotificationCallbackReceiver.class);
+                            callbackIntent.putExtra("currentAccount", this.currentAccount);
+                            callbackIntent.putExtra("did", dialog_id);
+                            if (button.data != null) {
+                                callbackIntent.putExtra(DataSchemeDataSource.SCHEME_DATA, button.data);
+                            }
+                            callbackIntent.putExtra("mid", rowsMid);
+                            String str = button.text;
+                            Context context = ApplicationLoader.applicationContext;
+                            int i2 = this.lastButtonId;
+                            this.lastButtonId = i2 + 1;
+                            builder.addAction(0, str, PendingIntent.getBroadcast(context, i2, callbackIntent, 134217728));
+                        }
+                    }
+                }
+            }
+            if (chat == null && user != null && user.phone != null && user.phone.length() > 0) {
+                builder.addPerson("tel:+" + user.phone);
+            }
+            if (VERSION.SDK_INT >= 26) {
+                builder.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
+            }
+            holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), builder.build()));
+            this.wearNotificationsIds.put(dialog_id, internalId);
+            if (jSONObject != null) {
+                try {
+                    jSONObject.put("reply", canReply);
+                    jSONObject.put("name", name);
+                    jSONObject.put("max_id", max_id);
+                    jSONObject.put("max_date", max_date);
+                    jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
+                    if (photoPath != null) {
+                        jSONObject.put("photo", photoPath.dc_id + "_" + photoPath.volume_id + "_" + photoPath.secret);
+                    }
+                    if (serializedMsgs != null) {
+                        jSONObject.put("msgs", serializedMsgs);
+                    }
+                    if (lowerId > 0) {
+                        jSONObject.put("type", "user");
+                    } else if (lowerId < 0) {
+                        if (isChannel || isSupergroup) {
+                            jSONObject.put("type", "channel");
+                        } else {
+                            jSONObject.put("type", "group");
+                        }
+                    }
+                    serializedNotifications.put(jSONObject);
+                } catch (JSONException e2) {
                 }
             }
         }
