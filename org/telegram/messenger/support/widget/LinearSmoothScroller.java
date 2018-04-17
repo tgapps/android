@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import org.telegram.messenger.support.widget.RecyclerView.LayoutManager;
-import org.telegram.messenger.support.widget.RecyclerView.LayoutParams;
 import org.telegram.messenger.support.widget.RecyclerView.SmoothScroller;
 import org.telegram.messenger.support.widget.RecyclerView.SmoothScroller.Action;
 import org.telegram.messenger.support.widget.RecyclerView.SmoothScroller.ScrollVectorProvider;
@@ -29,6 +28,106 @@ public class LinearSmoothScroller extends SmoothScroller {
     protected int mInterimTargetDy = 0;
     protected final LinearInterpolator mLinearInterpolator = new LinearInterpolator();
     protected PointF mTargetVector;
+
+    public int calculateDxToMakeVisible(android.view.View r1, int r2) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.LinearSmoothScroller.calculateDxToMakeVisible(android.view.View, int):int
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r12.getLayoutManager();
+        if (r0 == 0) goto L_0x003b;
+    L_0x0006:
+        r1 = r0.canScrollHorizontally();
+        if (r1 != 0) goto L_0x000d;
+    L_0x000c:
+        goto L_0x003b;
+        r1 = r13.getLayoutParams();
+        r1 = (org.telegram.messenger.support.widget.RecyclerView.LayoutParams) r1;
+        r2 = r0.getDecoratedLeft(r13);
+        r3 = r1.leftMargin;
+        r2 = r2 - r3;
+        r3 = r0.getDecoratedRight(r13);
+        r4 = r1.rightMargin;
+        r3 = r3 + r4;
+        r10 = r0.getPaddingLeft();
+        r4 = r0.getWidth();
+        r5 = r0.getPaddingRight();
+        r11 = r4 - r5;
+        r4 = r12;
+        r5 = r2;
+        r6 = r3;
+        r7 = r10;
+        r8 = r11;
+        r9 = r14;
+        r4 = r4.calculateDtToFit(r5, r6, r7, r8, r9);
+        return r4;
+    L_0x003b:
+        r1 = 0;
+        return r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.LinearSmoothScroller.calculateDxToMakeVisible(android.view.View, int):int");
+    }
+
+    public int calculateDyToMakeVisible(android.view.View r1, int r2) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.LinearSmoothScroller.calculateDyToMakeVisible(android.view.View, int):int
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r12.getLayoutManager();
+        if (r0 == 0) goto L_0x003b;
+    L_0x0006:
+        r1 = r0.canScrollVertically();
+        if (r1 != 0) goto L_0x000d;
+    L_0x000c:
+        goto L_0x003b;
+        r1 = r13.getLayoutParams();
+        r1 = (org.telegram.messenger.support.widget.RecyclerView.LayoutParams) r1;
+        r2 = r0.getDecoratedTop(r13);
+        r3 = r1.topMargin;
+        r2 = r2 - r3;
+        r3 = r0.getDecoratedBottom(r13);
+        r4 = r1.bottomMargin;
+        r3 = r3 + r4;
+        r10 = r0.getPaddingTop();
+        r4 = r0.getHeight();
+        r5 = r0.getPaddingBottom();
+        r11 = r4 - r5;
+        r4 = r12;
+        r5 = r2;
+        r6 = r3;
+        r7 = r10;
+        r8 = r11;
+        r9 = r14;
+        r4 = r4.calculateDtToFit(r5, r6, r7, r8, r9);
+        return r4;
+    L_0x003b:
+        r1 = 0;
+        return r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.LinearSmoothScroller.calculateDyToMakeVisible(android.view.View, int):int");
+    }
 
     public LinearSmoothScroller(Context context) {
         this.MILLISECONDS_PER_PX = calculateSpeedPerPixel(context.getResources().getDisplayMetrics());
@@ -77,31 +176,37 @@ public class LinearSmoothScroller extends SmoothScroller {
     }
 
     protected int getHorizontalSnapPreference() {
-        if (this.mTargetVector == null || this.mTargetVector.x == 0.0f) {
-            return 0;
+        if (this.mTargetVector != null) {
+            if (this.mTargetVector.x != 0.0f) {
+                return this.mTargetVector.x > 0.0f ? 1 : -1;
+            }
         }
-        return this.mTargetVector.x > 0.0f ? 1 : -1;
+        return 0;
     }
 
     protected int getVerticalSnapPreference() {
-        if (this.mTargetVector == null || this.mTargetVector.y == 0.0f) {
-            return 0;
+        if (this.mTargetVector != null) {
+            if (this.mTargetVector.y != 0.0f) {
+                return this.mTargetVector.y > 0.0f ? 1 : -1;
+            }
         }
-        return this.mTargetVector.y > 0.0f ? 1 : -1;
+        return 0;
     }
 
     protected void updateActionForInterimTarget(Action action) {
         PointF scrollVector = computeScrollVectorForPosition(getTargetPosition());
-        if (scrollVector == null || (scrollVector.x == 0.0f && scrollVector.y == 0.0f)) {
-            action.jumpTo(getTargetPosition());
-            stop();
-            return;
+        if (scrollVector != null) {
+            if (scrollVector.x != 0.0f || scrollVector.y != 0.0f) {
+                normalize(scrollVector);
+                this.mTargetVector = scrollVector;
+                this.mInterimTargetDx = (int) (scrollVector.x * 10000.0f);
+                this.mInterimTargetDy = (int) (10000.0f * scrollVector.y);
+                action.update((int) (((float) this.mInterimTargetDx) * TARGET_SEEK_EXTRA_SCROLL_RATIO), (int) (((float) this.mInterimTargetDy) * TARGET_SEEK_EXTRA_SCROLL_RATIO), (int) (((float) calculateTimeForScrolling(10000)) * TARGET_SEEK_EXTRA_SCROLL_RATIO), this.mLinearInterpolator);
+                return;
+            }
         }
-        normalize(scrollVector);
-        this.mTargetVector = scrollVector;
-        this.mInterimTargetDx = (int) (scrollVector.x * 10000.0f);
-        this.mInterimTargetDy = (int) (scrollVector.y * 10000.0f);
-        action.update((int) (((float) this.mInterimTargetDx) * TARGET_SEEK_EXTRA_SCROLL_RATIO), (int) (((float) this.mInterimTargetDy) * TARGET_SEEK_EXTRA_SCROLL_RATIO), (int) (((float) calculateTimeForScrolling(10000)) * TARGET_SEEK_EXTRA_SCROLL_RATIO), this.mLinearInterpolator);
+        action.jumpTo(getTargetPosition());
+        stop();
     }
 
     private int clampApplyScroll(int tmpDt, int dt) {
@@ -134,30 +239,16 @@ public class LinearSmoothScroller extends SmoothScroller {
         }
     }
 
-    public int calculateDyToMakeVisible(View view, int snapPreference) {
-        LayoutManager layoutManager = getLayoutManager();
-        if (layoutManager == null || !layoutManager.canScrollVertically()) {
-            return 0;
-        }
-        LayoutParams params = (LayoutParams) view.getLayoutParams();
-        return calculateDtToFit(layoutManager.getDecoratedTop(view) - params.topMargin, layoutManager.getDecoratedBottom(view) + params.bottomMargin, layoutManager.getPaddingTop(), layoutManager.getHeight() - layoutManager.getPaddingBottom(), snapPreference);
-    }
-
-    public int calculateDxToMakeVisible(View view, int snapPreference) {
-        LayoutManager layoutManager = getLayoutManager();
-        if (layoutManager == null || !layoutManager.canScrollHorizontally()) {
-            return 0;
-        }
-        LayoutParams params = (LayoutParams) view.getLayoutParams();
-        return calculateDtToFit(layoutManager.getDecoratedLeft(view) - params.leftMargin, layoutManager.getDecoratedRight(view) + params.rightMargin, layoutManager.getPaddingLeft(), layoutManager.getWidth() - layoutManager.getPaddingRight(), snapPreference);
-    }
-
     public PointF computeScrollVectorForPosition(int targetPosition) {
         LayoutManager layoutManager = getLayoutManager();
         if (layoutManager instanceof ScrollVectorProvider) {
             return ((ScrollVectorProvider) layoutManager).computeScrollVectorForPosition(targetPosition);
         }
-        Log.w(TAG, "You should override computeScrollVectorForPosition when the LayoutManager does not implement " + ScrollVectorProvider.class.getCanonicalName());
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("You should override computeScrollVectorForPosition when the LayoutManager does not implement ");
+        stringBuilder.append(ScrollVectorProvider.class.getCanonicalName());
+        Log.w(str, stringBuilder.toString());
         return null;
     }
 }

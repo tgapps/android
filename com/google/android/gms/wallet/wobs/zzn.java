@@ -2,41 +2,41 @@ package com.google.android.gms.wallet.wobs;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzn implements Creator<WalletObjectMessage> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        UriData uriData = null;
-        int zzd = zzbfn.zzd(parcel);
-        UriData uriData2 = null;
-        TimeInterval timeInterval = null;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
-        String str2 = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        String str2 = str;
+        TimeInterval timeInterval = str2;
+        UriData uriData = timeInterval;
+        UriData uriData2 = uriData;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str2 = zzbfn.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str = zzbfn.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    timeInterval = (TimeInterval) zzbfn.zza(parcel, readInt, TimeInterval.CREATOR);
+                    timeInterval = (TimeInterval) SafeParcelReader.createParcelable(parcel, readHeader, TimeInterval.CREATOR);
                     break;
                 case 5:
-                    uriData2 = (UriData) zzbfn.zza(parcel, readInt, UriData.CREATOR);
+                    uriData = (UriData) SafeParcelReader.createParcelable(parcel, readHeader, UriData.CREATOR);
                     break;
                 case 6:
-                    uriData = (UriData) zzbfn.zza(parcel, readInt, UriData.CREATOR);
+                    uriData2 = (UriData) SafeParcelReader.createParcelable(parcel, readHeader, UriData.CREATOR);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new WalletObjectMessage(str2, str, timeInterval, uriData2, uriData);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new WalletObjectMessage(str, str2, timeInterval, uriData, uriData2);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

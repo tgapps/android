@@ -51,7 +51,7 @@ public class SegmentTypeBox extends AbstractBox {
     }
 
     protected long getContentSize() {
-        return (long) ((this.compatibleBrands.size() * 4) + 8);
+        return (long) (8 + (this.compatibleBrands.size() * 4));
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -105,12 +105,15 @@ public class SegmentTypeBox extends AbstractBox {
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append("SegmentTypeBox[");
-        result.append("majorBrand=").append(getMajorBrand());
+        result.append("majorBrand=");
+        result.append(getMajorBrand());
         result.append(";");
-        result.append("minorVersion=").append(getMinorVersion());
+        result.append("minorVersion=");
+        result.append(getMinorVersion());
         for (String compatibleBrand : this.compatibleBrands) {
             result.append(";");
-            result.append("compatibleBrand=").append(compatibleBrand);
+            result.append("compatibleBrand=");
+            result.append(compatibleBrand);
         }
         result.append("]");
         return result.toString();

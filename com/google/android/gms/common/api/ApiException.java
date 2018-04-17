@@ -6,7 +6,11 @@ public class ApiException extends Exception {
     public ApiException(Status status) {
         int statusCode = status.getStatusCode();
         String statusMessage = status.getStatusMessage() != null ? status.getStatusMessage() : TtmlNode.ANONYMOUS_REGION_ID;
-        super(new StringBuilder(String.valueOf(statusMessage).length() + 13).append(statusCode).append(": ").append(statusMessage).toString());
+        StringBuilder stringBuilder = new StringBuilder(13 + String.valueOf(statusMessage).length());
+        stringBuilder.append(statusCode);
+        stringBuilder.append(": ");
+        stringBuilder.append(statusMessage);
+        super(stringBuilder.toString());
         this.mStatus = status;
     }
 }

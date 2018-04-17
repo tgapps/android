@@ -3,18 +3,18 @@ package com.google.android.gms.flags.impl;
 import android.content.SharedPreferences;
 import java.util.concurrent.Callable;
 
-final class zzc implements Callable<Boolean> {
-    private /* synthetic */ SharedPreferences zzhiy;
-    private /* synthetic */ String zzhiz;
-    private /* synthetic */ Boolean zzhja;
+final class zzc implements Callable<Long> {
+    private final /* synthetic */ SharedPreferences zzacl;
+    private final /* synthetic */ String zzacm;
+    private final /* synthetic */ Long zzacr;
 
-    zzc(SharedPreferences sharedPreferences, String str, Boolean bool) {
-        this.zzhiy = sharedPreferences;
-        this.zzhiz = str;
-        this.zzhja = bool;
+    zzc(SharedPreferences sharedPreferences, String str, Long l) {
+        this.zzacl = sharedPreferences;
+        this.zzacm = str;
+        this.zzacr = l;
     }
 
     public final /* synthetic */ Object call() throws Exception {
-        return Boolean.valueOf(this.zzhiy.getBoolean(this.zzhiz, this.zzhja.booleanValue()));
+        return Long.valueOf(this.zzacl.getLong(this.zzacm, this.zzacr.longValue()));
     }
 }

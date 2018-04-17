@@ -5,5 +5,5 @@ import android.os.RemoteException;
 import com.google.android.gms.dynamic.IObjectWrapper;
 
 public interface zzax extends IInterface {
-    void zzy(IObjectWrapper iObjectWrapper) throws RemoteException;
+    void zza(IObjectWrapper iObjectWrapper) throws RemoteException;
 }

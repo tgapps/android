@@ -5,150 +5,176 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.api.Api.AnyClient;
 import com.google.android.gms.common.api.Api.ApiOptions;
 import com.google.android.gms.common.api.Api.ApiOptions.HasAccountOptions;
 import com.google.android.gms.common.api.Api.ApiOptions.HasGoogleSignInAccountOptions;
-import com.google.android.gms.common.api.Api.zzb;
-import com.google.android.gms.common.api.Api.zze;
-import com.google.android.gms.common.api.internal.zzbm;
+import com.google.android.gms.common.api.Api.Client;
+import com.google.android.gms.common.api.internal.ApiExceptionMapper;
+import com.google.android.gms.common.api.internal.BaseImplementation.ApiMethodImpl;
+import com.google.android.gms.common.api.internal.GoogleApiManager;
+import com.google.android.gms.common.api.internal.GoogleApiManager.zza;
+import com.google.android.gms.common.api.internal.StatusExceptionMapper;
 import com.google.android.gms.common.api.internal.zzbo;
-import com.google.android.gms.common.api.internal.zzbw;
-import com.google.android.gms.common.api.internal.zzcv;
-import com.google.android.gms.common.api.internal.zzcz;
-import com.google.android.gms.common.api.internal.zzg;
+import com.google.android.gms.common.api.internal.zzby;
 import com.google.android.gms.common.api.internal.zzh;
-import com.google.android.gms.common.api.internal.zzm;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.common.internal.zzs;
+import com.google.android.gms.common.internal.ClientSettings.Builder;
+import com.google.android.gms.common.internal.Preconditions;
 import java.util.Collection;
 import java.util.Collections;
 
 public class GoogleApi<O extends ApiOptions> {
+    private final Api<O> mApi;
     private final Context mContext;
     private final int mId;
-    private final Looper zzall;
-    private final Api<O> zzfin;
-    private final O zzfme;
-    private final zzh<O> zzfmf;
-    private final GoogleApiClient zzfmg;
-    private final zzcz zzfmh;
-    protected final zzbm zzfmi;
+    private final O zzcl;
+    private final zzh<O> zzcm;
+    private final Looper zzcn;
+    private final GoogleApiClient zzco;
+    private final StatusExceptionMapper zzcp;
+    protected final GoogleApiManager zzcq;
 
-    public static class zza {
-        public static final zza zzfmj = new zzd().zzagq();
-        public final zzcz zzfmk;
-        public final Looper zzfml;
+    public static class Settings {
+        public static final Settings DEFAULT_SETTINGS = new Builder().build();
+        public final StatusExceptionMapper zzcr;
+        public final Looper zzcs;
 
-        private zza(zzcz com_google_android_gms_common_api_internal_zzcz, Account account, Looper looper) {
-            this.zzfmk = com_google_android_gms_common_api_internal_zzcz;
-            this.zzfml = looper;
+        public static class Builder {
+            private Looper zzcn;
+            private StatusExceptionMapper zzcp;
+
+            public Settings build() {
+                if (this.zzcp == null) {
+                    this.zzcp = new ApiExceptionMapper();
+                }
+                if (this.zzcn == null) {
+                    this.zzcn = Looper.getMainLooper();
+                }
+                return new Settings(this.zzcp, this.zzcn);
+            }
+
+            public Builder setMapper(StatusExceptionMapper statusExceptionMapper) {
+                Preconditions.checkNotNull(statusExceptionMapper, "StatusExceptionMapper must not be null.");
+                this.zzcp = statusExceptionMapper;
+                return this;
+            }
+        }
+
+        private Settings(StatusExceptionMapper statusExceptionMapper, Account account, Looper looper) {
+            this.zzcr = statusExceptionMapper;
+            this.zzcs = looper;
         }
     }
 
     protected GoogleApi(Context context, Api<O> api, Looper looper) {
-        zzbq.checkNotNull(context, "Null context is not permitted.");
-        zzbq.checkNotNull(api, "Api must not be null.");
-        zzbq.checkNotNull(looper, "Looper must not be null.");
+        Preconditions.checkNotNull(context, "Null context is not permitted.");
+        Preconditions.checkNotNull(api, "Api must not be null.");
+        Preconditions.checkNotNull(looper, "Looper must not be null.");
         this.mContext = context.getApplicationContext();
-        this.zzfin = api;
-        this.zzfme = null;
-        this.zzall = looper;
-        this.zzfmf = zzh.zzb(api);
-        this.zzfmg = new zzbw(this);
-        this.zzfmi = zzbm.zzcj(this.mContext);
-        this.mId = this.zzfmi.zzais();
-        this.zzfmh = new zzg();
+        this.mApi = api;
+        this.zzcl = null;
+        this.zzcn = looper;
+        this.zzcm = zzh.zza(api);
+        this.zzco = new zzbo(this);
+        this.zzcq = GoogleApiManager.zzb(this.mContext);
+        this.mId = this.zzcq.zzbg();
+        this.zzcp = new ApiExceptionMapper();
     }
 
-    public GoogleApi(Context context, Api<O> api, O o, zza com_google_android_gms_common_api_GoogleApi_zza) {
-        zzbq.checkNotNull(context, "Null context is not permitted.");
-        zzbq.checkNotNull(api, "Api must not be null.");
-        zzbq.checkNotNull(com_google_android_gms_common_api_GoogleApi_zza, "Settings must not be null; use Settings.DEFAULT_SETTINGS instead.");
+    public GoogleApi(Context context, Api<O> api, O o, Settings settings) {
+        Preconditions.checkNotNull(context, "Null context is not permitted.");
+        Preconditions.checkNotNull(api, "Api must not be null.");
+        Preconditions.checkNotNull(settings, "Settings must not be null; use Settings.DEFAULT_SETTINGS instead.");
         this.mContext = context.getApplicationContext();
-        this.zzfin = api;
-        this.zzfme = o;
-        this.zzall = com_google_android_gms_common_api_GoogleApi_zza.zzfml;
-        this.zzfmf = zzh.zza(this.zzfin, this.zzfme);
-        this.zzfmg = new zzbw(this);
-        this.zzfmi = zzbm.zzcj(this.mContext);
-        this.mId = this.zzfmi.zzais();
-        this.zzfmh = com_google_android_gms_common_api_GoogleApi_zza.zzfmk;
-        this.zzfmi.zza(this);
+        this.mApi = api;
+        this.zzcl = o;
+        this.zzcn = settings.zzcs;
+        this.zzcm = zzh.zza(this.mApi, this.zzcl);
+        this.zzco = new zzbo(this);
+        this.zzcq = GoogleApiManager.zzb(this.mContext);
+        this.mId = this.zzcq.zzbg();
+        this.zzcp = settings.zzcr;
+        this.zzcq.zza(this);
     }
 
-    private final <A extends zzb, T extends zzm<? extends Result, A>> T zza(int i, T t) {
-        t.zzahi();
-        this.zzfmi.zza(this, i, t);
+    @Deprecated
+    public GoogleApi(Context context, Api<O> api, O o, StatusExceptionMapper statusExceptionMapper) {
+        this(context, (Api) api, (ApiOptions) o, new Builder().setMapper(statusExceptionMapper).build());
+    }
+
+    private final <A extends AnyClient, T extends ApiMethodImpl<? extends Result, A>> T zza(int i, T t) {
+        t.zzx();
+        this.zzcq.zza(this, i, t);
         return t;
     }
 
-    private final zzs zzagp() {
+    public GoogleApiClient asGoogleApiClient() {
+        return this.zzco;
+    }
+
+    protected Builder createClientSettingsBuilder() {
         GoogleSignInAccount googleSignInAccount;
         Account account;
-        Collection zzabb;
-        zzs com_google_android_gms_common_internal_zzs = new zzs();
-        if (this.zzfme instanceof HasGoogleSignInAccountOptions) {
-            googleSignInAccount = ((HasGoogleSignInAccountOptions) this.zzfme).getGoogleSignInAccount();
+        Collection requestedScopes;
+        Builder builder = new Builder();
+        if (this.zzcl instanceof HasGoogleSignInAccountOptions) {
+            googleSignInAccount = ((HasGoogleSignInAccountOptions) this.zzcl).getGoogleSignInAccount();
             if (googleSignInAccount != null) {
                 account = googleSignInAccount.getAccount();
-                com_google_android_gms_common_internal_zzs = com_google_android_gms_common_internal_zzs.zze(account);
-                if (this.zzfme instanceof HasGoogleSignInAccountOptions) {
-                    googleSignInAccount = ((HasGoogleSignInAccountOptions) this.zzfme).getGoogleSignInAccount();
+                builder = builder.setAccount(account);
+                if (this.zzcl instanceof HasGoogleSignInAccountOptions) {
+                    googleSignInAccount = ((HasGoogleSignInAccountOptions) this.zzcl).getGoogleSignInAccount();
                     if (googleSignInAccount != null) {
-                        zzabb = googleSignInAccount.zzabb();
-                        return com_google_android_gms_common_internal_zzs.zze(zzabb);
+                        requestedScopes = googleSignInAccount.getRequestedScopes();
+                        return builder.addAllRequiredScopes(requestedScopes).setRealClientClassName(this.mContext.getClass().getName()).setRealClientPackageName(this.mContext.getPackageName());
                     }
                 }
-                zzabb = Collections.emptySet();
-                return com_google_android_gms_common_internal_zzs.zze(zzabb);
+                requestedScopes = Collections.emptySet();
+                return builder.addAllRequiredScopes(requestedScopes).setRealClientClassName(this.mContext.getClass().getName()).setRealClientPackageName(this.mContext.getPackageName());
             }
         }
-        account = this.zzfme instanceof HasAccountOptions ? ((HasAccountOptions) this.zzfme).getAccount() : null;
-        com_google_android_gms_common_internal_zzs = com_google_android_gms_common_internal_zzs.zze(account);
-        if (this.zzfme instanceof HasGoogleSignInAccountOptions) {
-            googleSignInAccount = ((HasGoogleSignInAccountOptions) this.zzfme).getGoogleSignInAccount();
+        account = this.zzcl instanceof HasAccountOptions ? ((HasAccountOptions) this.zzcl).getAccount() : null;
+        builder = builder.setAccount(account);
+        if (this.zzcl instanceof HasGoogleSignInAccountOptions) {
+            googleSignInAccount = ((HasGoogleSignInAccountOptions) this.zzcl).getGoogleSignInAccount();
             if (googleSignInAccount != null) {
-                zzabb = googleSignInAccount.zzabb();
-                return com_google_android_gms_common_internal_zzs.zze(zzabb);
+                requestedScopes = googleSignInAccount.getRequestedScopes();
+                return builder.addAllRequiredScopes(requestedScopes).setRealClientClassName(this.mContext.getClass().getName()).setRealClientPackageName(this.mContext.getPackageName());
             }
         }
-        zzabb = Collections.emptySet();
-        return com_google_android_gms_common_internal_zzs.zze(zzabb);
+        requestedScopes = Collections.emptySet();
+        return builder.addAllRequiredScopes(requestedScopes).setRealClientClassName(this.mContext.getClass().getName()).setRealClientPackageName(this.mContext.getPackageName());
+    }
+
+    public <A extends AnyClient, T extends ApiMethodImpl<? extends Result, A>> T doRead(T t) {
+        return zza(0, (ApiMethodImpl) t);
+    }
+
+    public <A extends AnyClient, T extends ApiMethodImpl<? extends Result, A>> T doWrite(T t) {
+        return zza(1, (ApiMethodImpl) t);
+    }
+
+    public final Api<O> getApi() {
+        return this.mApi;
     }
 
     public final int getInstanceId() {
         return this.mId;
     }
 
-    public final Looper getLooper() {
-        return this.zzall;
+    public Looper getLooper() {
+        return this.zzcn;
     }
 
-    public zze zza(Looper looper, zzbo<O> com_google_android_gms_common_api_internal_zzbo_O) {
-        return this.zzfin.zzage().zza(this.mContext, looper, zzagp().zzgf(this.mContext.getPackageName()).zzgg(this.mContext.getClass().getName()).zzald(), this.zzfme, com_google_android_gms_common_api_internal_zzbo_O, com_google_android_gms_common_api_internal_zzbo_O);
+    public Client zza(Looper looper, zza<O> com_google_android_gms_common_api_internal_GoogleApiManager_zza_O) {
+        return this.mApi.zzk().buildClient(this.mContext, looper, createClientSettingsBuilder().build(), this.zzcl, com_google_android_gms_common_api_internal_GoogleApiManager_zza_O, com_google_android_gms_common_api_internal_GoogleApiManager_zza_O);
     }
 
-    public zzcv zza(Context context, Handler handler) {
-        return new zzcv(context, handler, zzagp().zzald());
+    public zzby zza(Context context, Handler handler) {
+        return new zzby(context, handler, createClientSettingsBuilder().build());
     }
 
-    public final <A extends zzb, T extends zzm<? extends Result, A>> T zza(T t) {
-        return zza(0, (zzm) t);
-    }
-
-    public final Api<O> zzagl() {
-        return this.zzfin;
-    }
-
-    public final zzh<O> zzagn() {
-        return this.zzfmf;
-    }
-
-    public final GoogleApiClient zzago() {
-        return this.zzfmg;
-    }
-
-    public final <A extends zzb, T extends zzm<? extends Result, A>> T zzb(T t) {
-        return zza(1, (zzm) t);
+    public final zzh<O> zzm() {
+        return this.zzcm;
     }
 }

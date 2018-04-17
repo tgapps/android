@@ -68,27 +68,31 @@ public class UpdateFragment extends DialogFragment implements OnClickListener, U
         TextView nameLabel = (TextView) view.findViewById(R.id.label_title);
         nameLabel.setText(Util.getAppName(getActivity()));
         nameLabel.setContentDescription(nameLabel.getText());
-        TextView versionLabel = (TextView) view.findViewById(R.id.label_version);
-        String versionString = String.format(getString(R.string.hockeyapp_update_version), new Object[]{versionHelper.getVersionString()});
+        final TextView versionLabel = (TextView) view.findViewById(R.id.label_version);
+        final String versionString = String.format(getString(R.string.hockeyapp_update_version), new Object[]{versionHelper.getVersionString()});
         final String fileDate = versionHelper.getFileDateString();
         String appSizeString = getString(R.string.hockeyapp_update_unknown_size);
         if (versionHelper.getFileSizeBytes() >= 0) {
-            appSizeString = String.format(Locale.US, "%.2f", new Object[]{Float.valueOf(((float) appSize) / 1048576.0f)}) + " MB";
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(String.format(Locale.US, "%.2f", new Object[]{Float.valueOf(((float) appSize) / 1048576.0f)}));
+            stringBuilder.append(" MB");
+            appSizeString = stringBuilder.toString();
         } else {
-            final TextView textView = versionLabel;
-            final String str = versionString;
-            AsyncTaskUtils.execute(new GetFileSizeTask(getActivity(), this.mUrlString, new DownloadFileListener() {
+            AsyncTaskUtils.execute(new GetFileSizeTask(getActivity(), r0.mUrlString, new DownloadFileListener() {
                 public void downloadSuccessful(DownloadFileTask task) {
                     if (task instanceof GetFileSizeTask) {
                         long appSize = ((GetFileSizeTask) task).getSize();
-                        String appSizeString = String.format(Locale.US, "%.2f", new Object[]{Float.valueOf(((float) appSize) / 1048576.0f)}) + " MB";
-                        textView.setText(UpdateFragment.this.getString(R.string.hockeyapp_update_version_details_label, new Object[]{str, fileDate, appSizeString}));
+                        String appSizeString = new StringBuilder();
+                        appSizeString.append(String.format(Locale.US, "%.2f", new Object[]{Float.valueOf(((float) appSize) / 1048576.0f)}));
+                        appSizeString.append(" MB");
+                        appSizeString = appSizeString.toString();
+                        versionLabel.setText(UpdateFragment.this.getString(R.string.hockeyapp_update_version_details_label, new Object[]{versionString, fileDate, appSizeString}));
                     }
                 }
             }));
         }
         versionLabel.setText(getString(R.string.hockeyapp_update_version_details_label, new Object[]{versionString, fileDate, appSizeString}));
-        ((Button) view.findViewById(R.id.button_update)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.button_update)).setOnClickListener(r0);
         WebView webView = (WebView) view.findViewById(R.id.web_update_details);
         webView.clearCache(true);
         webView.destroyDrawingCache();
@@ -109,13 +113,10 @@ public class UpdateFragment extends DialogFragment implements OnClickListener, U
     }
 
     public int getCurrentVersionCode() {
-        int currentVersionCode = -1;
         try {
             return getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 128).versionCode;
         } catch (NameNotFoundException e) {
-            return currentVersionCode;
-        } catch (NullPointerException e2) {
-            return currentVersionCode;
+            return -1;
         }
     }
 
@@ -142,12 +143,17 @@ public class UpdateFragment extends DialogFragment implements OnClickListener, U
             if (getShowsDialog()) {
                 dismiss();
             }
-        } else if (VERSION.SDK_INT >= 26) {
-            Intent intent = new Intent("android.settings.MANAGE_UNKNOWN_APP_SOURCES");
-            intent.setData(Uri.parse("package:" + context.getPackageName()));
-            context.startActivity(intent);
         } else {
-            showError(R.string.hockeyapp_error_install_form_unknown_sources_disabled);
+            if (VERSION.SDK_INT >= 26) {
+                Intent intent = new Intent("android.settings.MANAGE_UNKNOWN_APP_SOURCES");
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("package:");
+                stringBuilder.append(context.getPackageName());
+                intent.setData(Uri.parse(stringBuilder.toString()));
+                context.startActivity(intent);
+            } else {
+                showError(R.string.hockeyapp_error_install_form_unknown_sources_disabled);
+            }
         }
     }
 

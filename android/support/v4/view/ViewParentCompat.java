@@ -71,7 +71,12 @@ public final class ViewParentCompat {
             try {
                 return parent.onStartNestedScroll(child, target, nestedScrollAxes);
             } catch (AbstractMethodError e) {
-                Log.e("ViewParentCompat", "ViewParent " + parent + " does not implement interface " + "method onStartNestedScroll", e);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("ViewParent ");
+                stringBuilder.append(parent);
+                stringBuilder.append(" does not implement interface ");
+                stringBuilder.append("method onStartNestedScroll");
+                Log.e("ViewParentCompat", stringBuilder.toString(), e);
                 return false;
             }
         }
@@ -80,7 +85,12 @@ public final class ViewParentCompat {
             try {
                 parent.onNestedScrollAccepted(child, target, nestedScrollAxes);
             } catch (AbstractMethodError e) {
-                Log.e("ViewParentCompat", "ViewParent " + parent + " does not implement interface " + "method onNestedScrollAccepted", e);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("ViewParent ");
+                stringBuilder.append(parent);
+                stringBuilder.append(" does not implement interface ");
+                stringBuilder.append("method onNestedScrollAccepted");
+                Log.e("ViewParentCompat", stringBuilder.toString(), e);
             }
         }
 
@@ -88,7 +98,12 @@ public final class ViewParentCompat {
             try {
                 parent.onStopNestedScroll(target);
             } catch (AbstractMethodError e) {
-                Log.e("ViewParentCompat", "ViewParent " + parent + " does not implement interface " + "method onStopNestedScroll", e);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("ViewParent ");
+                stringBuilder.append(parent);
+                stringBuilder.append(" does not implement interface ");
+                stringBuilder.append("method onStopNestedScroll");
+                Log.e("ViewParentCompat", stringBuilder.toString(), e);
             }
         }
 
@@ -96,7 +111,12 @@ public final class ViewParentCompat {
             try {
                 parent.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
             } catch (AbstractMethodError e) {
-                Log.e("ViewParentCompat", "ViewParent " + parent + " does not implement interface " + "method onNestedScroll", e);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("ViewParent ");
+                stringBuilder.append(parent);
+                stringBuilder.append(" does not implement interface ");
+                stringBuilder.append("method onNestedScroll");
+                Log.e("ViewParentCompat", stringBuilder.toString(), e);
             }
         }
 
@@ -104,7 +124,12 @@ public final class ViewParentCompat {
             try {
                 parent.onNestedPreScroll(target, dx, dy, consumed);
             } catch (AbstractMethodError e) {
-                Log.e("ViewParentCompat", "ViewParent " + parent + " does not implement interface " + "method onNestedPreScroll", e);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("ViewParent ");
+                stringBuilder.append(parent);
+                stringBuilder.append(" does not implement interface ");
+                stringBuilder.append("method onNestedPreScroll");
+                Log.e("ViewParentCompat", stringBuilder.toString(), e);
             }
         }
 
@@ -112,7 +137,12 @@ public final class ViewParentCompat {
             try {
                 return parent.onNestedFling(target, velocityX, velocityY, consumed);
             } catch (AbstractMethodError e) {
-                Log.e("ViewParentCompat", "ViewParent " + parent + " does not implement interface " + "method onNestedFling", e);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("ViewParent ");
+                stringBuilder.append(parent);
+                stringBuilder.append(" does not implement interface ");
+                stringBuilder.append("method onNestedFling");
+                Log.e("ViewParentCompat", stringBuilder.toString(), e);
                 return false;
             }
         }
@@ -121,7 +151,12 @@ public final class ViewParentCompat {
             try {
                 return parent.onNestedPreFling(target, velocityX, velocityY);
             } catch (AbstractMethodError e) {
-                Log.e("ViewParentCompat", "ViewParent " + parent + " does not implement interface " + "method onNestedPreFling", e);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("ViewParent ");
+                stringBuilder.append(parent);
+                stringBuilder.append(" does not implement interface ");
+                stringBuilder.append("method onNestedPreFling");
+                Log.e("ViewParentCompat", stringBuilder.toString(), e);
                 return false;
             }
         }

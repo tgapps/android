@@ -248,4 +248,7 @@
         <item>@dimen/notification_action_text_size</item>
         <item>@color/secondary_text_default_material_light</item>
     </style>
+    <style name="Widget.Support.CoordinatorLayout">
+        <item>#000000</item>
+    </style>
 </resources>

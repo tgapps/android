@@ -149,6 +149,9 @@ public final class AvcConfigurationBox extends AbstractBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_29, this, this));
-        return "AvcConfigurationBox{avcDecoderConfigurationRecord=" + this.avcDecoderConfigurationRecord + '}';
+        StringBuilder stringBuilder = new StringBuilder("AvcConfigurationBox{avcDecoderConfigurationRecord=");
+        stringBuilder.append(this.avcDecoderConfigurationRecord);
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 }

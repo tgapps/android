@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.net.Uri.Builder;
+import android.os.Build.VERSION;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
@@ -36,44 +37,57 @@ public class FileProvider extends ContentProvider {
         private final String mAuthority;
         private final HashMap<String, File> mRoots = new HashMap();
 
-        public SimplePathStrategy(String authority) {
+        SimplePathStrategy(String authority) {
             this.mAuthority = authority;
         }
 
-        public void addRoot(String name, File root) {
+        void addRoot(String name, File root) {
             if (TextUtils.isEmpty(name)) {
                 throw new IllegalArgumentException("Name must not be empty");
             }
             try {
                 this.mRoots.put(name, root.getCanonicalFile());
             } catch (IOException e) {
-                throw new IllegalArgumentException("Failed to resolve canonical path for " + root, e);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("Failed to resolve canonical path for ");
+                stringBuilder.append(root);
+                throw new IllegalArgumentException(stringBuilder.toString(), e);
             }
         }
 
         public Uri getUriForFile(File file) {
             try {
-                String rootPath;
                 String path = file.getCanonicalPath();
                 Entry<String, File> mostSpecific = null;
                 for (Entry<String, File> root : this.mRoots.entrySet()) {
-                    rootPath = ((File) root.getValue()).getPath();
+                    String rootPath = ((File) root.getValue()).getPath();
                     if (path.startsWith(rootPath) && (mostSpecific == null || rootPath.length() > ((File) mostSpecific.getValue()).getPath().length())) {
                         mostSpecific = root;
                     }
                 }
+                StringBuilder stringBuilder;
                 if (mostSpecific == null) {
-                    throw new IllegalArgumentException("Failed to find configured root that contains " + path);
+                    stringBuilder = new StringBuilder();
+                    stringBuilder.append("Failed to find configured root that contains ");
+                    stringBuilder.append(path);
+                    throw new IllegalArgumentException(stringBuilder.toString());
                 }
-                rootPath = ((File) mostSpecific.getValue()).getPath();
-                if (rootPath.endsWith("/")) {
-                    path = path.substring(rootPath.length());
+                String rootPath2 = ((File) mostSpecific.getValue()).getPath();
+                if (rootPath2.endsWith("/")) {
+                    path = path.substring(rootPath2.length());
                 } else {
-                    path = path.substring(rootPath.length() + 1);
+                    path = path.substring(rootPath2.length() + 1);
                 }
-                return new Builder().scheme("content").authority(this.mAuthority).encodedPath(Uri.encode((String) mostSpecific.getKey()) + '/' + Uri.encode(path, "/")).build();
+                stringBuilder = new StringBuilder();
+                stringBuilder.append(Uri.encode((String) mostSpecific.getKey()));
+                stringBuilder.append('/');
+                stringBuilder.append(Uri.encode(path, "/"));
+                return new Builder().scheme("content").authority(this.mAuthority).encodedPath(stringBuilder.toString()).build();
             } catch (IOException e) {
-                throw new IllegalArgumentException("Failed to resolve canonical path for " + file);
+                StringBuilder stringBuilder2 = new StringBuilder();
+                stringBuilder2.append("Failed to resolve canonical path for ");
+                stringBuilder2.append(file);
+                throw new IllegalArgumentException(stringBuilder2.toString());
             }
         }
 
@@ -84,7 +98,10 @@ public class FileProvider extends ContentProvider {
             path = Uri.decode(path.substring(splitIndex + 1));
             File root = (File) this.mRoots.get(tag);
             if (root == null) {
-                throw new IllegalArgumentException("Unable to find configured root for " + uri);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("Unable to find configured root for ");
+                stringBuilder.append(uri);
+                throw new IllegalArgumentException(stringBuilder.toString());
             }
             File file = new File(root, path);
             try {
@@ -94,9 +111,70 @@ public class FileProvider extends ContentProvider {
                 }
                 throw new SecurityException("Resolved path jumped beyond configured root");
             } catch (IOException e) {
-                throw new IllegalArgumentException("Failed to resolve canonical path for " + file);
+                StringBuilder stringBuilder2 = new StringBuilder();
+                stringBuilder2.append("Failed to resolve canonical path for ");
+                stringBuilder2.append(file);
+                throw new IllegalArgumentException(stringBuilder2.toString());
             }
         }
+    }
+
+    private static int modeToMode(java.lang.String r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: android.support.v4.content.FileProvider.modeToMode(java.lang.String):int
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = "r";
+        r0 = r0.equals(r3);
+        if (r0 == 0) goto L_0x000b;
+    L_0x0008:
+        r0 = 268435456; // 0x10000000 float:2.5243549E-29 double:1.32624737E-315;
+        goto L_0x0057;
+    L_0x000b:
+        r0 = "w";
+        r0 = r0.equals(r3);
+        if (r0 != 0) goto L_0x0054;
+        r0 = "wt";
+        r0 = r0.equals(r3);
+        if (r0 == 0) goto L_0x001c;
+        goto L_0x0054;
+        r0 = "wa";
+        r0 = r0.equals(r3);
+        if (r0 == 0) goto L_0x0027;
+        r0 = 704643072; // 0x2a000000 float:1.1368684E-13 double:3.481399345E-315;
+        goto L_0x000a;
+        r0 = "rw";
+        r0 = r0.equals(r3);
+        if (r0 == 0) goto L_0x0032;
+        r0 = 939524096; // 0x38000000 float:3.0517578E-5 double:4.641865793E-315;
+        goto L_0x000a;
+        r0 = "rwt";
+        r0 = r0.equals(r3);
+        if (r0 == 0) goto L_0x003d;
+        r0 = 1006632960; // 0x3c000000 float:0.0078125 double:4.973427635E-315;
+        goto L_0x000a;
+        r0 = new java.lang.IllegalArgumentException;
+        r1 = new java.lang.StringBuilder;
+        r1.<init>();
+        r2 = "Invalid mode: ";
+        r1.append(r2);
+        r1.append(r3);
+        r1 = r1.toString();
+        r0.<init>(r1);
+        throw r0;
+        r0 = 738197504; // 0x2c000000 float:1.8189894E-12 double:3.647180266E-315;
+        goto L_0x000a;
+        return r0;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: android.support.v4.content.FileProvider.modeToMode(java.lang.String):int");
     }
 
     public boolean onCreate() {
@@ -125,28 +203,23 @@ public class FileProvider extends ContentProvider {
         }
         String[] cols = new String[projection.length];
         Object[] values = new Object[projection.length];
-        int length = projection.length;
         int i = 0;
-        int i2 = 0;
-        while (i < length) {
-            int i3;
-            String col = projection[i];
+        for (String col : projection) {
+            int i2;
             if ("_display_name".equals(col)) {
-                cols[i2] = "_display_name";
-                i3 = i2 + 1;
-                values[i2] = file.getName();
+                cols[i] = "_display_name";
+                i2 = i + 1;
+                values[i] = file.getName();
             } else if ("_size".equals(col)) {
-                cols[i2] = "_size";
-                i3 = i2 + 1;
-                values[i2] = Long.valueOf(file.length());
+                cols[i] = "_size";
+                i2 = i + 1;
+                values[i] = Long.valueOf(file.length());
             } else {
-                i3 = i2;
             }
-            i++;
-            i2 = i3;
+            i = i2;
         }
-        cols = copyOf(cols, i2);
-        values = copyOf(values, i2);
+        cols = copyOf(cols, i);
+        values = copyOf(values, i);
         MatrixCursor cursor = new MatrixCursor(cols, 1);
         cursor.addRow(values);
         return cursor;
@@ -173,7 +246,7 @@ public class FileProvider extends ContentProvider {
     }
 
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return this.mStrategy.getFileForUri(uri).delete() ? 1 : 0;
+        return this.mStrategy.getFileForUri(uri).delete();
     }
 
     public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
@@ -205,8 +278,9 @@ public class FileProvider extends ContentProvider {
             throw new IllegalArgumentException("Missing android.support.FILE_PROVIDER_PATHS meta-data");
         }
         while (true) {
-            int type = in.next();
-            if (type == 1) {
+            int next = in.next();
+            int type = next;
+            if (next == 1) {
                 return strat;
             }
             if (type == 2) {
@@ -223,14 +297,19 @@ public class FileProvider extends ContentProvider {
                 } else if ("external-path".equals(tag)) {
                     target = Environment.getExternalStorageDirectory();
                 } else if ("external-files-path".equals(tag)) {
-                    File[] externalFilesDirs = ContextCompat.getExternalFilesDirs(context, null);
+                    externalFilesDirs = ContextCompat.getExternalFilesDirs(context, null);
                     if (externalFilesDirs.length > 0) {
                         target = externalFilesDirs[0];
                     }
                 } else if ("external-cache-path".equals(tag)) {
-                    File[] externalCacheDirs = ContextCompat.getExternalCacheDirs(context);
-                    if (externalCacheDirs.length > 0) {
-                        target = externalCacheDirs[0];
+                    externalFilesDirs = ContextCompat.getExternalCacheDirs(context);
+                    if (externalFilesDirs.length > 0) {
+                        target = externalFilesDirs[0];
+                    }
+                } else if (VERSION.SDK_INT >= 21 && "external-media-path".equals(tag)) {
+                    externalFilesDirs = context.getExternalMediaDirs();
+                    if (externalFilesDirs.length > 0) {
+                        target = externalFilesDirs[0];
                     }
                 }
                 if (target != null) {
@@ -240,41 +319,14 @@ public class FileProvider extends ContentProvider {
         }
     }
 
-    private static int modeToMode(String mode) {
-        if ("r".equals(mode)) {
-            return 268435456;
-        }
-        if ("w".equals(mode) || "wt".equals(mode)) {
-            return 738197504;
-        }
-        if ("wa".equals(mode)) {
-            return 704643072;
-        }
-        if ("rw".equals(mode)) {
-            return 939524096;
-        }
-        if ("rwt".equals(mode)) {
-            return 1006632960;
-        }
-        throw new IllegalArgumentException("Invalid mode: " + mode);
-    }
-
     private static File buildPath(File base, String... segments) {
         File cur = base;
-        int length = segments.length;
-        int i = 0;
-        File cur2 = cur;
-        while (i < length) {
-            String segment = segments[i];
+        for (String segment : segments) {
             if (segment != null) {
-                cur = new File(cur2, segment);
-            } else {
-                cur = cur2;
+                cur = new File(cur, segment);
             }
-            i++;
-            cur2 = cur;
         }
-        return cur2;
+        return cur;
     }
 
     private static String[] copyOf(String[] original, int newLength) {

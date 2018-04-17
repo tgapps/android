@@ -2,15 +2,15 @@ package com.google.android.gms.maps.model;
 
 import android.graphics.Bitmap;
 import android.os.RemoteException;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.maps.model.internal.zza;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.internal.maps.zze;
 
 public final class BitmapDescriptorFactory {
-    private static zza zziud;
+    private static zze zzcl;
 
     public static BitmapDescriptor fromBitmap(Bitmap bitmap) {
         try {
-            return new BitmapDescriptor(zzawe().zzd(bitmap));
+            return new BitmapDescriptor(zzf().zza(bitmap));
         } catch (RemoteException e) {
             throw new RuntimeRemoteException(e);
         }
@@ -18,19 +18,19 @@ public final class BitmapDescriptorFactory {
 
     public static BitmapDescriptor fromResource(int i) {
         try {
-            return new BitmapDescriptor(zzawe().zzea(i));
+            return new BitmapDescriptor(zzf().zza(i));
         } catch (RemoteException e) {
             throw new RuntimeRemoteException(e);
         }
     }
 
-    public static void zza(zza com_google_android_gms_maps_model_internal_zza) {
-        if (zziud == null) {
-            zziud = (zza) zzbq.checkNotNull(com_google_android_gms_maps_model_internal_zza);
+    public static void zza(zze com_google_android_gms_internal_maps_zze) {
+        if (zzcl == null) {
+            zzcl = (zze) Preconditions.checkNotNull(com_google_android_gms_internal_maps_zze);
         }
     }
 
-    private static zza zzawe() {
-        return (zza) zzbq.checkNotNull(zziud, "IBitmapDescriptorFactory is not initialized");
+    private static zze zzf() {
+        return (zze) Preconditions.checkNotNull(zzcl, "IBitmapDescriptorFactory is not initialized");
     }
 }

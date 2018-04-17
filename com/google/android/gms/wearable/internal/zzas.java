@@ -5,39 +5,41 @@ import com.google.android.gms.wearable.ChannelApi.ChannelListener;
 import com.google.android.gms.wearable.ChannelClient.ChannelCallback;
 
 public final class zzas implements ChannelListener {
-    private final ChannelCallback zzliz;
+    private final ChannelCallback zzch;
 
     public zzas(ChannelCallback channelCallback) {
-        this.zzliz = channelCallback;
+        this.zzch = channelCallback;
     }
 
     public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
+        if (obj != null) {
+            if (getClass() == obj.getClass()) {
+                return this.zzch.equals(((zzas) obj).zzch);
+            }
         }
-        return this.zzliz.equals(((zzas) obj).zzliz);
+        return false;
     }
 
     public final int hashCode() {
-        return this.zzliz.hashCode();
+        return this.zzch.hashCode();
     }
 
     public final void onChannelClosed(Channel channel, int i, int i2) {
-        this.zzliz.onChannelClosed(zzao.zza(channel), i, i2);
+        this.zzch.onChannelClosed(zzao.zza(channel), i, i2);
     }
 
     public final void onChannelOpened(Channel channel) {
-        this.zzliz.onChannelOpened(zzao.zza(channel));
+        this.zzch.onChannelOpened(zzao.zza(channel));
     }
 
     public final void onInputClosed(Channel channel, int i, int i2) {
-        this.zzliz.onInputClosed(zzao.zza(channel), i, i2);
+        this.zzch.onInputClosed(zzao.zza(channel), i, i2);
     }
 
     public final void onOutputClosed(Channel channel, int i, int i2) {
-        this.zzliz.onOutputClosed(zzao.zza(channel), i, i2);
+        this.zzch.onOutputClosed(zzao.zza(channel), i, i2);
     }
 }

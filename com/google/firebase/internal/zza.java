@@ -1,6 +1,6 @@
 package com.google.firebase.internal;
 
-import com.google.firebase.FirebaseApp.zzb;
+import com.google.firebase.FirebaseApp.IdTokenListenersCountChangedListener;
 
-public final class zza implements zzb {
+public final class zza implements IdTokenListenersCountChangedListener {
 }

@@ -7,6 +7,6 @@ import com.google.android.gms.wearable.MessageApi.SendMessageResult;
 
 public final class zzeu implements MessageApi {
     public final PendingResult<SendMessageResult> sendMessage(GoogleApiClient googleApiClient, String str, String str2, byte[] bArr) {
-        return googleApiClient.zzd(new zzev(this, googleApiClient, str, str2, bArr));
+        return googleApiClient.enqueue(new zzev(this, googleApiClient, str, str2, bArr));
     }
 }

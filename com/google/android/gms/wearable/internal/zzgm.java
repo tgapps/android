@@ -1,19 +1,19 @@
 package com.google.android.gms.wearable.internal;
 
-import com.google.android.gms.common.api.internal.zzn;
+import com.google.android.gms.common.api.internal.BaseImplementation.ResultHolder;
 
 class zzgm<T> extends zza {
-    private zzn<T> zzeay;
+    private ResultHolder<T> zzet;
 
-    public zzgm(zzn<T> com_google_android_gms_common_api_internal_zzn_T) {
-        this.zzeay = com_google_android_gms_common_api_internal_zzn_T;
+    public zzgm(ResultHolder<T> resultHolder) {
+        this.zzet = resultHolder;
     }
 
-    public final void zzav(T t) {
-        zzn com_google_android_gms_common_api_internal_zzn = this.zzeay;
-        if (com_google_android_gms_common_api_internal_zzn != null) {
-            com_google_android_gms_common_api_internal_zzn.setResult(t);
-            this.zzeay = null;
+    public final void zza(T t) {
+        ResultHolder resultHolder = this.zzet;
+        if (resultHolder != null) {
+            resultHolder.setResult(t);
+            this.zzet = null;
         }
     }
 }

@@ -2,41 +2,50 @@ package com.google.android.gms.common.api.internal;
 
 import android.os.Bundle;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.Api;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.internal.zzbq;
 
-public final class zzt implements ConnectionCallbacks, OnConnectionFailedListener {
-    public final Api<?> zzfin;
-    private final boolean zzfpg;
-    private zzu zzfph;
+final class zzt implements zzbq {
+    private final /* synthetic */ zzr zzgc;
 
-    public zzt(Api<?> api, boolean z) {
-        this.zzfin = api;
-        this.zzfpg = z;
+    private zzt(zzr com_google_android_gms_common_api_internal_zzr) {
+        this.zzgc = com_google_android_gms_common_api_internal_zzr;
     }
 
-    private final void zzahj() {
-        zzbq.checkNotNull(this.zzfph, "Callbacks must be attached to a ClientConnectionHelper instance before connecting the client.");
+    public final void zzb(int i, boolean z) {
+        this.zzgc.zzga.lock();
+        try {
+            if (!(this.zzgc.zzfz || this.zzgc.zzfy == null)) {
+                if (this.zzgc.zzfy.isSuccess()) {
+                    this.zzgc.zzfz = true;
+                    this.zzgc.zzfs.onConnectionSuspended(i);
+                    this.zzgc.zzga.unlock();
+                }
+            }
+            this.zzgc.zzfz = false;
+            this.zzgc.zza(i, z);
+            this.zzgc.zzga.unlock();
+        } catch (Throwable th) {
+            this.zzgc.zzga.unlock();
+        }
     }
 
-    public final void onConnected(Bundle bundle) {
-        zzahj();
-        this.zzfph.onConnected(bundle);
+    public final void zzb(Bundle bundle) {
+        this.zzgc.zzga.lock();
+        try {
+            this.zzgc.zza(bundle);
+            this.zzgc.zzfx = ConnectionResult.RESULT_SUCCESS;
+            this.zzgc.zzaa();
+        } finally {
+            this.zzgc.zzga.unlock();
+        }
     }
 
-    public final void onConnectionFailed(ConnectionResult connectionResult) {
-        zzahj();
-        this.zzfph.zza(connectionResult, this.zzfin, this.zzfpg);
-    }
-
-    public final void onConnectionSuspended(int i) {
-        zzahj();
-        this.zzfph.onConnectionSuspended(i);
-    }
-
-    public final void zza(zzu com_google_android_gms_common_api_internal_zzu) {
-        this.zzfph = com_google_android_gms_common_api_internal_zzu;
+    public final void zzc(ConnectionResult connectionResult) {
+        this.zzgc.zzga.lock();
+        try {
+            this.zzgc.zzfx = connectionResult;
+            this.zzgc.zzaa();
+        } finally {
+            this.zzgc.zzga.unlock();
+        }
     }
 }

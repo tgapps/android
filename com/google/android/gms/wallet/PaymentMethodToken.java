@@ -2,30 +2,30 @@ package com.google.android.gms.wallet;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class PaymentMethodToken extends zzbfm {
+public final class PaymentMethodToken extends AbstractSafeParcelable {
     public static final Creator<PaymentMethodToken> CREATOR = new zzaf();
-    private int zzldi;
-    private String zzldj;
+    private int zzeb;
+    private String zzec;
 
     private PaymentMethodToken() {
     }
 
     PaymentMethodToken(int i, String str) {
-        this.zzldi = i;
-        this.zzldj = str;
+        this.zzeb = i;
+        this.zzec = str;
     }
 
     public final String getToken() {
-        return this.zzldj;
+        return this.zzec;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 2, this.zzldi);
-        zzbfp.zza(parcel, 3, this.zzldj, false);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 2, this.zzeb);
+        SafeParcelWriter.writeString(parcel, 3, this.zzec, false);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

@@ -72,33 +72,34 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
         }
 
         public Factory setMinLoadableRetryCount(int minLoadableRetryCount) {
-            Assertions.checkState(!this.isCreateCalled);
+            Assertions.checkState(this.isCreateCalled ^ 1);
             this.minLoadableRetryCount = minLoadableRetryCount;
             return this;
         }
 
         public Factory setLivePresentationDelayMs(long livePresentationDelayMs) {
-            Assertions.checkState(!this.isCreateCalled);
+            Assertions.checkState(this.isCreateCalled ^ 1);
             this.livePresentationDelayMs = livePresentationDelayMs;
             return this;
         }
 
         public Factory setManifestParser(Parser<? extends SsManifest> manifestParser) {
-            Assertions.checkState(!this.isCreateCalled);
+            Assertions.checkState(this.isCreateCalled ^ 1);
             this.manifestParser = (Parser) Assertions.checkNotNull(manifestParser);
             return this;
         }
 
         public Factory setCompositeSequenceableLoaderFactory(CompositeSequenceableLoaderFactory compositeSequenceableLoaderFactory) {
-            Assertions.checkState(!this.isCreateCalled);
+            Assertions.checkState(this.isCreateCalled ^ 1);
             this.compositeSequenceableLoaderFactory = (CompositeSequenceableLoaderFactory) Assertions.checkNotNull(compositeSequenceableLoaderFactory);
             return this;
         }
 
         public SsMediaSource createMediaSource(SsManifest manifest, Handler eventHandler, MediaSourceEventListener eventListener) {
-            Assertions.checkArgument(!manifest.isLive);
+            SsManifest ssManifest = manifest;
+            Assertions.checkArgument(ssManifest.isLive ^ true);
             this.isCreateCalled = true;
-            return new SsMediaSource(manifest, null, null, null, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, eventHandler, eventListener);
+            return new SsMediaSource(ssManifest, null, null, null, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, eventHandler, eventListener);
         }
 
         public SsMediaSource createMediaSource(Uri manifestUri) {
@@ -108,9 +109,9 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
         public SsMediaSource createMediaSource(Uri manifestUri, Handler eventHandler, MediaSourceEventListener eventListener) {
             this.isCreateCalled = true;
             if (this.manifestParser == null) {
-                this.manifestParser = new SsManifestParser();
+                r0.manifestParser = new SsManifestParser();
             }
-            return new SsMediaSource(null, (Uri) Assertions.checkNotNull(manifestUri), this.manifestDataSourceFactory, this.manifestParser, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, eventHandler, eventListener);
+            return new SsMediaSource(null, (Uri) Assertions.checkNotNull(manifestUri), r0.manifestDataSourceFactory, r0.manifestParser, r0.chunkSourceFactory, r0.compositeSequenceableLoaderFactory, r0.minLoadableRetryCount, r0.livePresentationDelayMs, eventHandler, eventListener);
         }
 
         public int[] getSupportedTypes() {
@@ -148,15 +149,33 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
     }
 
     private SsMediaSource(SsManifest manifest, Uri manifestUri, org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory, Parser<? extends SsManifest> manifestParser, org.telegram.messenger.exoplayer2.source.smoothstreaming.SsChunkSource.Factory chunkSourceFactory, CompositeSequenceableLoaderFactory compositeSequenceableLoaderFactory, int minLoadableRetryCount, long livePresentationDelayMs, Handler eventHandler, MediaSourceEventListener eventListener) {
-        boolean z = manifest == null || !manifest.isLive;
+        boolean z;
+        Uri withAppendedPath;
+        if (manifest != null) {
+            if (manifest.isLive) {
+                z = false;
+                Assertions.checkState(z);
+                this.manifest = manifest;
+                withAppendedPath = manifestUri != null ? null : Util.toLowerInvariant(manifestUri.getLastPathSegment()).matches("manifest(\\(.+\\))?") ? manifestUri : Uri.withAppendedPath(manifestUri, "Manifest");
+                this.manifestUri = withAppendedPath;
+                this.manifestDataSourceFactory = manifestDataSourceFactory;
+                this.manifestParser = manifestParser;
+                this.chunkSourceFactory = chunkSourceFactory;
+                this.compositeSequenceableLoaderFactory = compositeSequenceableLoaderFactory;
+                this.minLoadableRetryCount = minLoadableRetryCount;
+                this.livePresentationDelayMs = livePresentationDelayMs;
+                this.eventDispatcher = new EventDispatcher(eventHandler, eventListener);
+                this.mediaPeriods = new ArrayList();
+            }
+        }
+        z = true;
         Assertions.checkState(z);
         this.manifest = manifest;
-        if (manifestUri == null) {
-            manifestUri = null;
-        } else if (!Util.toLowerInvariant(manifestUri.getLastPathSegment()).matches("manifest(\\(.+\\))?")) {
-            manifestUri = Uri.withAppendedPath(manifestUri, "Manifest");
+        if (manifestUri != null) {
+            if (Util.toLowerInvariant(manifestUri.getLastPathSegment()).matches("manifest(\\(.+\\))?")) {
+            }
         }
-        this.manifestUri = manifestUri;
+        this.manifestUri = withAppendedPath;
         this.manifestDataSourceFactory = manifestDataSourceFactory;
         this.manifestParser = manifestParser;
         this.chunkSourceFactory = chunkSourceFactory;
@@ -188,9 +207,9 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
 
     public MediaPeriod createPeriod(MediaPeriodId id, Allocator allocator) {
         Assertions.checkArgument(id.periodIndex == 0);
-        SsMediaPeriod period = new SsMediaPeriod(this.manifest, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.eventDispatcher, this.manifestLoaderErrorThrower, allocator);
-        this.mediaPeriods.add(period);
-        return period;
+        SsMediaPeriod ssMediaPeriod = new SsMediaPeriod(this.manifest, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.eventDispatcher, this.manifestLoaderErrorThrower, allocator);
+        this.mediaPeriods.add(ssMediaPeriod);
+        return ssMediaPeriod;
     }
 
     public void releasePeriod(MediaPeriod period) {
@@ -225,54 +244,61 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
     }
 
     public int onLoadError(ParsingLoadable<SsManifest> loadable, long elapsedRealtimeMs, long loadDurationMs, IOException error) {
-        boolean isFatal = error instanceof ParserException;
-        this.eventDispatcher.loadError(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded(), error, isFatal);
+        ParsingLoadable<SsManifest> parsingLoadable = loadable;
+        IOException iOException = error;
+        boolean isFatal = iOException instanceof ParserException;
+        this.eventDispatcher.loadError(parsingLoadable.dataSpec, parsingLoadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded(), iOException, isFatal);
         return isFatal ? 3 : 0;
     }
 
     private void processManifest() {
+        int i;
         Timeline timeline;
-        for (int i = 0; i < this.mediaPeriods.size(); i++) {
-            ((SsMediaPeriod) this.mediaPeriods.get(i)).updateManifest(this.manifest);
-        }
-        long endTimeUs = Long.MIN_VALUE;
-        StreamElement[] streamElementArr = this.manifest.streamElements;
-        int length = streamElementArr.length;
+        SsMediaSource ssMediaSource = this;
         int i2 = 0;
+        for (i = 0; i < ssMediaSource.mediaPeriods.size(); i++) {
+            ((SsMediaPeriod) ssMediaSource.mediaPeriods.get(i)).updateManifest(ssMediaSource.manifest);
+        }
+        StreamElement[] streamElementArr = ssMediaSource.manifest.streamElements;
+        int length = streamElementArr.length;
+        long endTimeUs = Long.MIN_VALUE;
         long startTimeUs = Long.MAX_VALUE;
-        while (i2 < length) {
-            long startTimeUs2;
-            StreamElement element = streamElementArr[i2];
+        i = 0;
+        while (i < length) {
+            int i3;
+            StreamElement element = streamElementArr[i];
             if (element.chunkCount > 0) {
-                startTimeUs2 = Math.min(startTimeUs, element.getStartTimeUs(0));
+                startTimeUs = Math.min(startTimeUs, element.getStartTimeUs(i2));
+                i3 = i;
                 endTimeUs = Math.max(endTimeUs, element.getStartTimeUs(element.chunkCount - 1) + element.getChunkDurationUs(element.chunkCount - 1));
             } else {
-                startTimeUs2 = startTimeUs;
+                i3 = i;
             }
-            i2++;
-            startTimeUs = startTimeUs2;
+            i = i3 + 1;
+            i2 = 0;
         }
         if (startTimeUs == Long.MAX_VALUE) {
-            timeline = new SinglePeriodTimeline(this.manifest.isLive ? C.TIME_UNSET : 0, 0, 0, 0, true, this.manifest.isLive);
-            startTimeUs2 = startTimeUs;
-        } else if (this.manifest.isLive) {
-            if (this.manifest.dvrWindowLengthUs == C.TIME_UNSET || this.manifest.dvrWindowLengthUs <= 0) {
-                startTimeUs2 = startTimeUs;
-            } else {
-                startTimeUs2 = Math.max(startTimeUs, endTimeUs - this.manifest.dvrWindowLengthUs);
+            Timeline singlePeriodTimeline = new SinglePeriodTimeline(ssMediaSource.manifest.isLive ? C.TIME_UNSET : 0, 0, 0, 0, true, ssMediaSource.manifest.isLive);
+        } else if (ssMediaSource.manifest.isLive) {
+            long defaultStartPositionUs;
+            if (ssMediaSource.manifest.dvrWindowLengthUs != C.TIME_UNSET && ssMediaSource.manifest.dvrWindowLengthUs > 0) {
+                startTimeUs = Math.max(startTimeUs, endTimeUs - ssMediaSource.manifest.dvrWindowLengthUs);
             }
-            durationUs = endTimeUs - startTimeUs2;
-            long defaultStartPositionUs = durationUs - C.msToUs(this.livePresentationDelayMs);
-            if (defaultStartPositionUs < MIN_LIVE_DEFAULT_START_POSITION_US) {
+            durationUs = endTimeUs - startTimeUs;
+            long defaultStartPositionUs2 = durationUs - C.msToUs(ssMediaSource.livePresentationDelayMs);
+            if (defaultStartPositionUs2 < MIN_LIVE_DEFAULT_START_POSITION_US) {
                 defaultStartPositionUs = Math.min(MIN_LIVE_DEFAULT_START_POSITION_US, durationUs / 2);
+            } else {
+                defaultStartPositionUs = defaultStartPositionUs2;
             }
-            Timeline singlePeriodTimeline = new SinglePeriodTimeline(C.TIME_UNSET, durationUs, startTimeUs2, defaultStartPositionUs, true, true);
+            timeline = new SinglePeriodTimeline(C.TIME_UNSET, durationUs, startTimeUs, defaultStartPositionUs, true, true);
         } else {
-            durationUs = this.manifest.durationUs != C.TIME_UNSET ? this.manifest.durationUs : endTimeUs - startTimeUs;
-            Timeline singlePeriodTimeline2 = new SinglePeriodTimeline(startTimeUs + durationUs, durationUs, startTimeUs, 0, true, false);
-            startTimeUs2 = startTimeUs;
+            durationUs = ssMediaSource.manifest.durationUs != C.TIME_UNSET ? ssMediaSource.manifest.durationUs : endTimeUs - startTimeUs;
+            long j = endTimeUs;
+            timeline = new SinglePeriodTimeline(startTimeUs + durationUs, durationUs, startTimeUs, 0, true, false);
+            ssMediaSource.sourceListener.onSourceInfoRefreshed(ssMediaSource, timeline, ssMediaSource.manifest);
         }
-        this.sourceListener.onSourceInfoRefreshed(this, timeline, this.manifest);
+        ssMediaSource.sourceListener.onSourceInfoRefreshed(ssMediaSource, timeline, ssMediaSource.manifest);
     }
 
     private void scheduleManifestRefresh() {

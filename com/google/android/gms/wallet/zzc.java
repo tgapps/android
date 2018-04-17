@@ -2,42 +2,42 @@ package com.google.android.gms.wallet;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.identity.intents.model.UserAddress;
-import com.google.android.gms.internal.zzbfn;
 
 public final class zzc implements Creator<CardInfo> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        UserAddress userAddress = null;
-        int zzd = zzbfn.zzd(parcel);
-        int i = 0;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
-        String str2 = null;
-        String str3 = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        String str2 = str;
+        String str3 = str2;
+        UserAddress userAddress = str3;
+        int i = 0;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    str3 = zzbfn.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 2:
-                    str2 = zzbfn.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str = zzbfn.zzq(parcel, readInt);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    i = zzbfn.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 5:
-                    userAddress = (UserAddress) zzbfn.zza(parcel, readInt, UserAddress.CREATOR);
+                    userAddress = (UserAddress) SafeParcelReader.createParcelable(parcel, readHeader, UserAddress.CREATOR);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new CardInfo(str3, str2, str, i, userAddress);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new CardInfo(str, str2, str3, i, userAddress);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

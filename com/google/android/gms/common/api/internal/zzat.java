@@ -1,17 +1,25 @@
 package com.google.android.gms.common.api.internal;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.internal.zzj;
+abstract class zzat implements Runnable {
+    private final /* synthetic */ zzaj zzhv;
 
-final class zzat extends zzbj {
-    private /* synthetic */ zzj zzfrq;
-
-    zzat(zzar com_google_android_gms_common_api_internal_zzar, zzbh com_google_android_gms_common_api_internal_zzbh, zzj com_google_android_gms_common_internal_zzj) {
-        this.zzfrq = com_google_android_gms_common_internal_zzj;
-        super(com_google_android_gms_common_api_internal_zzbh);
+    private zzat(zzaj com_google_android_gms_common_api_internal_zzaj) {
+        this.zzhv = com_google_android_gms_common_api_internal_zzaj;
     }
 
-    public final void zzaib() {
-        this.zzfrq.zzf(new ConnectionResult(16, null));
+    public void run() {
+        this.zzhv.zzga.lock();
+        try {
+            if (!Thread.interrupted()) {
+                zzaq();
+            }
+        } catch (RuntimeException e) {
+            this.zzhv.zzhf.zzb(e);
+        } catch (Throwable th) {
+            this.zzhv.zzga.unlock();
+        }
+        this.zzhv.zzga.unlock();
     }
+
+    protected abstract void zzaq();
 }

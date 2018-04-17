@@ -2,57 +2,57 @@ package com.google.android.gms.wearable;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzg implements Creator<ConnectionConfiguration> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
-        boolean z = false;
-        int zzd = zzbfn.zzd(parcel);
-        String str2 = null;
-        boolean z2 = false;
-        boolean z3 = false;
+        String str2 = str;
+        String str3 = str2;
+        String str4 = str3;
         int i = 0;
-        int i2 = 0;
-        String str3 = null;
-        String str4 = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        int i2 = i;
+        boolean z = i2;
+        boolean z2 = z;
+        boolean z3 = z2;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str4 = zzbfn.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str3 = zzbfn.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    i2 = zzbfn.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 5:
-                    i = zzbfn.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 6:
-                    z3 = zzbfn.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 7:
-                    z2 = zzbfn.zzc(parcel, readInt);
+                    z2 = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 8:
-                    str2 = zzbfn.zzq(parcel, readInt);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 9:
-                    z = zzbfn.zzc(parcel, readInt);
+                    z3 = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 10:
-                    str = zzbfn.zzq(parcel, readInt);
+                    str4 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new ConnectionConfiguration(str4, str3, i2, i, z3, z2, str2, z, str);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new ConnectionConfiguration(str, str2, i, i2, z, z2, str3, z3, str4);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

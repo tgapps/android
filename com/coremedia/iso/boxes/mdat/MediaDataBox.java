@@ -52,11 +52,14 @@ public final class MediaDataBox implements Box {
     public void parse(DataSource dataSource, ByteBuffer header, long contentSize, BoxParser boxParser) throws IOException {
         this.offset = dataSource.position() - ((long) header.remaining());
         this.dataSource = dataSource;
-        this.size = ((long) header.remaining()) + contentSize;
+        this.size = contentSize + ((long) header.remaining());
         dataSource.position(dataSource.position() + contentSize);
     }
 
     public String toString() {
-        return "MediaDataBox{size=" + this.size + '}';
+        StringBuilder stringBuilder = new StringBuilder("MediaDataBox{size=");
+        stringBuilder.append(this.size);
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 }

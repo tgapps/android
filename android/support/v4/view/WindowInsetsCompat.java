@@ -53,20 +53,22 @@ public class WindowInsetsCompat {
     }
 
     public boolean equals(Object o) {
+        boolean z = true;
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        if (o != null) {
+            if (getClass() == o.getClass()) {
+                WindowInsetsCompat other = (WindowInsetsCompat) o;
+                if (this.mInsets != null) {
+                    z = this.mInsets.equals(other.mInsets);
+                } else if (other.mInsets != null) {
+                    z = false;
+                }
+                return z;
+            }
         }
-        WindowInsetsCompat other = (WindowInsetsCompat) o;
-        if (this.mInsets != null) {
-            return this.mInsets.equals(other.mInsets);
-        }
-        if (other.mInsets != null) {
-            return false;
-        }
-        return true;
+        return false;
     }
 
     public int hashCode() {

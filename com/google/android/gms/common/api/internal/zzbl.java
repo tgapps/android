@@ -1,13 +1,16 @@
 package com.google.android.gms.common.api.internal;
 
-import com.google.android.gms.internal.zzbhb;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.android.gms.common.api.internal.GoogleApiManager.zza;
+import com.google.android.gms.common.internal.BaseGmsClient.SignOutCallbacks;
 
-public final class zzbl {
-    private static final ExecutorService zzfsx = Executors.newFixedThreadPool(2, new zzbhb("GAC_Executor"));
+final class zzbl implements SignOutCallbacks {
+    final /* synthetic */ zza zzkk;
 
-    public static ExecutorService zzaip() {
-        return zzfsx;
+    zzbl(zza com_google_android_gms_common_api_internal_GoogleApiManager_zza) {
+        this.zzkk = com_google_android_gms_common_api_internal_GoogleApiManager_zza;
+    }
+
+    public final void onSignOutComplete() {
+        this.zzkk.zzjy.handler.post(new zzbm(this));
     }
 }

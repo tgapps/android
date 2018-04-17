@@ -4,6 +4,9 @@ import java.nio.ByteBuffer;
 
 public final class IsoTypeReaderVariable {
     public static long read(ByteBuffer bb, int bytes) {
+        if (bytes == 8) {
+            return IsoTypeReader.readUInt64(bb);
+        }
         switch (bytes) {
             case 1:
                 return (long) IsoTypeReader.readUInt8(bb);
@@ -13,10 +16,11 @@ public final class IsoTypeReaderVariable {
                 return (long) IsoTypeReader.readUInt24(bb);
             case 4:
                 return IsoTypeReader.readUInt32(bb);
-            case 8:
-                return IsoTypeReader.readUInt64(bb);
             default:
-                throw new RuntimeException("I don't know how to read " + bytes + " bytes");
+                StringBuilder stringBuilder = new StringBuilder("I don't know how to read ");
+                stringBuilder.append(bytes);
+                stringBuilder.append(" bytes");
+                throw new RuntimeException(stringBuilder.toString());
         }
     }
 }

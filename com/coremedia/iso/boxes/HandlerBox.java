@@ -92,9 +92,9 @@ public class HandlerBox extends AbstractFullBox {
 
     protected long getContentSize() {
         if (this.zeroTerm) {
-            return (long) (Utf8.utf8StringLengthInBytes(this.name) + 25);
+            return (long) (25 + Utf8.utf8StringLengthInBytes(this.name));
         }
-        return (long) (Utf8.utf8StringLengthInBytes(this.name) + 24);
+        return (long) (24 + Utf8.utf8StringLengthInBytes(this.name));
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -134,6 +134,11 @@ public class HandlerBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_5, this, this));
-        return "HandlerBox[handlerType=" + getHandlerType() + ";name=" + getName() + "]";
+        StringBuilder stringBuilder = new StringBuilder("HandlerBox[handlerType=");
+        stringBuilder.append(getHandlerType());
+        stringBuilder.append(";name=");
+        stringBuilder.append(getName());
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 }

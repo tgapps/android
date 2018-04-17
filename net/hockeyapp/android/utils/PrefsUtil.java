@@ -35,11 +35,13 @@ public class PrefsUtil {
             this.mNameEmailSubjectPrefs = context.getSharedPreferences("net.hockeyapp.android.prefs_name_email", 0);
             if (this.mNameEmailSubjectPrefs != null) {
                 Editor editor = this.mNameEmailSubjectPrefs.edit();
-                if (name == null || email == null || subject == null) {
-                    editor.putString("net.hockeyapp.android.prefs_key_name_email", null);
-                } else {
-                    editor.putString("net.hockeyapp.android.prefs_key_name_email", String.format("%s|%s|%s", new Object[]{name, email, subject}));
+                if (!(name == null || email == null)) {
+                    if (subject != null) {
+                        editor.putString("net.hockeyapp.android.prefs_key_name_email", String.format("%s|%s|%s", new Object[]{name, email, subject}));
+                        editor.apply();
+                    }
                 }
+                editor.putString("net.hockeyapp.android.prefs_key_name_email", null);
                 editor.apply();
             }
         }

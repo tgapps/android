@@ -73,19 +73,19 @@ public class PhotoAttachPhotoCell extends FrameLayout {
     }
 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int i = 0;
+        int i = 6;
         if (this.isVertical) {
             int makeMeasureSpec = MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(80.0f), 1073741824);
-            if (!this.isLast) {
-                i = 6;
+            if (this.isLast) {
+                i = 0;
             }
-            super.onMeasure(makeMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.dp((float) (i + 80)), 1073741824));
+            super.onMeasure(makeMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.dp((float) (80 + i)), 1073741824));
             return;
         }
-        if (!this.isLast) {
-            i = 6;
+        if (this.isLast) {
+            i = 0;
         }
-        super.onMeasure(MeasureSpec.makeMeasureSpec(AndroidUtilities.dp((float) (i + 80)), 1073741824), MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(80.0f), 1073741824));
+        super.onMeasure(MeasureSpec.makeMeasureSpec(AndroidUtilities.dp((float) (80 + i)), 1073741824), MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(80.0f), 1073741824));
     }
 
     public PhotoEntry getPhotoEntry() {
@@ -109,8 +109,6 @@ public class PhotoAttachPhotoCell extends FrameLayout {
     }
 
     public void setPhotoEntry(PhotoEntry entry, boolean needCheckShow, boolean last) {
-        boolean showing;
-        float f = 0.0f;
         boolean z = false;
         this.pressed = false;
         this.photoEntry = entry;
@@ -128,25 +126,34 @@ public class PhotoAttachPhotoCell extends FrameLayout {
         } else if (this.photoEntry.path == null) {
             this.imageView.setImageResource(R.drawable.nophotos);
         } else if (this.photoEntry.isVideo) {
-            this.imageView.setImage("vthumb://" + this.photoEntry.imageId + ":" + this.photoEntry.path, null, getResources().getDrawable(R.drawable.nophotos));
+            r1 = this.imageView;
+            r5 = new StringBuilder();
+            r5.append("vthumb://");
+            r5.append(this.photoEntry.imageId);
+            r5.append(":");
+            r5.append(this.photoEntry.path);
+            r1.setImage(r5.toString(), null, getResources().getDrawable(R.drawable.nophotos));
         } else {
             this.imageView.setOrientation(this.photoEntry.orientation, true);
-            this.imageView.setImage("thumb://" + this.photoEntry.imageId + ":" + this.photoEntry.path, null, getResources().getDrawable(R.drawable.nophotos));
+            r1 = this.imageView;
+            r5 = new StringBuilder();
+            r5.append("thumb://");
+            r5.append(this.photoEntry.imageId);
+            r5.append(":");
+            r5.append(this.photoEntry.path);
+            r1.setImage(r5.toString(), null, getResources().getDrawable(R.drawable.nophotos));
         }
-        if (needCheckShow && PhotoViewer.isShowingImage(this.photoEntry.path)) {
-            showing = true;
-        } else {
-            showing = false;
-        }
+        boolean showing = needCheckShow && PhotoViewer.isShowingImage(this.photoEntry.path);
         ImageReceiver imageReceiver = this.imageView.getImageReceiver();
         if (!showing) {
             z = true;
         }
         imageReceiver.setVisible(z, true);
+        float f = 1.0f;
         this.checkBox.setAlpha(showing ? 0.0f : 1.0f);
         FrameLayout frameLayout = this.videoInfoContainer;
-        if (!showing) {
-            f = 1.0f;
+        if (showing) {
+            f = 0.0f;
         }
         frameLayout.setAlpha(f);
         requestLayout();
@@ -178,40 +185,38 @@ public class PhotoAttachPhotoCell extends FrameLayout {
 
     public void showCheck(boolean show) {
         float f = 1.0f;
-        if (!show || this.checkBox.getAlpha() != 1.0f) {
-            if (show || this.checkBox.getAlpha() != 0.0f) {
-                if (this.animatorSet != null) {
-                    this.animatorSet.cancel();
-                    this.animatorSet = null;
-                }
-                this.animatorSet = new AnimatorSet();
-                this.animatorSet.setInterpolator(new DecelerateInterpolator());
-                this.animatorSet.setDuration(180);
-                AnimatorSet animatorSet = this.animatorSet;
-                Animator[] animatorArr = new Animator[2];
-                FrameLayout frameLayout = this.videoInfoContainer;
-                String str = "alpha";
-                float[] fArr = new float[1];
-                fArr[0] = show ? 1.0f : 0.0f;
-                animatorArr[0] = ObjectAnimator.ofFloat(frameLayout, str, fArr);
-                CheckBox checkBox = this.checkBox;
-                String str2 = "alpha";
-                float[] fArr2 = new float[1];
-                if (!show) {
-                    f = 0.0f;
-                }
-                fArr2[0] = f;
-                animatorArr[1] = ObjectAnimator.ofFloat(checkBox, str2, fArr2);
-                animatorSet.playTogether(animatorArr);
-                this.animatorSet.addListener(new AnimatorListenerAdapter() {
-                    public void onAnimationEnd(Animator animation) {
-                        if (animation.equals(PhotoAttachPhotoCell.this.animatorSet)) {
-                            PhotoAttachPhotoCell.this.animatorSet = null;
-                        }
-                    }
-                });
-                this.animatorSet.start();
+        if (!(show && this.checkBox.getAlpha() == 1.0f) && (show || this.checkBox.getAlpha() != 0.0f)) {
+            if (this.animatorSet != null) {
+                this.animatorSet.cancel();
+                this.animatorSet = null;
             }
+            this.animatorSet = new AnimatorSet();
+            this.animatorSet.setInterpolator(new DecelerateInterpolator());
+            this.animatorSet.setDuration(180);
+            AnimatorSet animatorSet = this.animatorSet;
+            Animator[] animatorArr = new Animator[2];
+            FrameLayout frameLayout = this.videoInfoContainer;
+            String str = "alpha";
+            float[] fArr = new float[1];
+            fArr[0] = show ? 1.0f : 0.0f;
+            animatorArr[0] = ObjectAnimator.ofFloat(frameLayout, str, fArr);
+            CheckBox checkBox = this.checkBox;
+            str = "alpha";
+            fArr = new float[1];
+            if (!show) {
+                f = 0.0f;
+            }
+            fArr[0] = f;
+            animatorArr[1] = ObjectAnimator.ofFloat(checkBox, str, fArr);
+            animatorSet.playTogether(animatorArr);
+            this.animatorSet.addListener(new AnimatorListenerAdapter() {
+                public void onAnimationEnd(Animator animation) {
+                    if (animation.equals(PhotoAttachPhotoCell.this.animatorSet)) {
+                        PhotoAttachPhotoCell.this.animatorSet = null;
+                    }
+                }
+            });
+            this.animatorSet.start();
         }
     }
 

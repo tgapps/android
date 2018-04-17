@@ -24,7 +24,10 @@ public class RequiresParseDetailAspect {
 
     public void before(JoinPoint joinPoint) {
         if (!(joinPoint.getTarget() instanceof AbstractBox)) {
-            throw new RuntimeException("Only methods in subclasses of " + AbstractBox.class.getName() + " can  be annotated with ParseDetail");
+            StringBuilder stringBuilder = new StringBuilder("Only methods in subclasses of ");
+            stringBuilder.append(AbstractBox.class.getName());
+            stringBuilder.append(" can  be annotated with ParseDetail");
+            throw new RuntimeException(stringBuilder.toString());
         } else if (!((AbstractBox) joinPoint.getTarget()).isParsed()) {
             ((AbstractBox) joinPoint.getTarget()).parseDetails();
         }

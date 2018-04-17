@@ -2,29 +2,29 @@ package com.google.android.gms.maps.model;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zze implements Creator<LatLngBounds> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzbfn.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         LatLng latLng = null;
         LatLng latLng2 = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    latLng2 = (LatLng) zzbfn.zza(parcel, readInt, LatLng.CREATOR);
+                    latLng = (LatLng) SafeParcelReader.createParcelable(parcel, readHeader, LatLng.CREATOR);
                     break;
                 case 3:
-                    latLng = (LatLng) zzbfn.zza(parcel, readInt, LatLng.CREATOR);
+                    latLng2 = (LatLng) SafeParcelReader.createParcelable(parcel, readHeader, LatLng.CREATOR);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new LatLngBounds(latLng2, latLng);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new LatLngBounds(latLng, latLng2);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

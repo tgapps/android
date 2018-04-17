@@ -20,7 +20,6 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
     String[] param;
 
     public PropertyBoxParserImpl(String... customProperties) {
-        InputStream customIS;
         InputStream is = getClass().getResourceAsStream("/isoparser-default.properties");
         try {
             this.mapping = new Properties();
@@ -31,25 +30,29 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
             }
             Enumeration<URL> enumeration = cl.getResources("isoparser-custom.properties");
             while (enumeration.hasMoreElements()) {
-                customIS = ((URL) enumeration.nextElement()).openStream();
-                this.mapping.load(customIS);
-                customIS.close();
+                InputStream customIS = ((URL) enumeration.nextElement()).openStream();
+                try {
+                    this.mapping.load(customIS);
+                    customIS.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (Throwable th) {
+                    customIS.close();
+                }
             }
             for (String customProperty : customProperties) {
                 this.mapping.load(getClass().getResourceAsStream(customProperty));
             }
             try {
                 is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (ClassLoader cl2) {
+                cl2.printStackTrace();
             }
-        } catch (IOException e2) {
-            throw new RuntimeException(e2);
-        } catch (Throwable th) {
+        } catch (Throwable th2) {
             try {
                 is.close();
-            } catch (IOException e22) {
-                e22.printStackTrace();
+            } catch (IOException e2) {
+                e2.printStackTrace();
             }
         }
     }
@@ -78,7 +81,9 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
                     constructorArgs[i] = parent;
                     constructorArgsClazz[i] = String.class;
                 } else {
-                    throw new InternalError("No such param: " + this.param[i]);
+                    StringBuilder stringBuilder = new StringBuilder("No such param: ");
+                    stringBuilder.append(this.param[i]);
+                    throw new InternalError(stringBuilder.toString());
                 }
             }
             return (Box) clazz.getConstructor(constructorArgsClazz).newInstance(constructorArgs);
@@ -100,14 +105,27 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
         if (userType == null) {
             constructor = this.mapping.getProperty(type);
             if (constructor == null) {
-                String lookup = this.buildLookupStrings.append(parent).append('-').append(type).toString();
+                String lookup = this.buildLookupStrings;
+                lookup.append(parent);
+                lookup.append('-');
+                lookup.append(type);
+                lookup = lookup.toString();
                 this.buildLookupStrings.setLength(0);
                 constructor = this.mapping.getProperty(lookup);
             }
         } else if (UserBox.TYPE.equals(type)) {
-            constructor = this.mapping.getProperty("uuid[" + Hex.encodeHex(userType).toUpperCase() + "]");
+            constructor = this.mapping;
+            StringBuilder stringBuilder = new StringBuilder("uuid[");
+            stringBuilder.append(Hex.encodeHex(userType).toUpperCase());
+            stringBuilder.append("]");
+            constructor = constructor.getProperty(stringBuilder.toString());
             if (constructor == null) {
-                constructor = this.mapping.getProperty(new StringBuilder(String.valueOf(parent)).append("-uuid[").append(Hex.encodeHex(userType).toUpperCase()).append("]").toString());
+                Properties properties = this.mapping;
+                StringBuilder stringBuilder2 = new StringBuilder(String.valueOf(parent));
+                stringBuilder2.append("-uuid[");
+                stringBuilder2.append(Hex.encodeHex(userType).toUpperCase());
+                stringBuilder2.append("]");
+                constructor = properties.getProperty(stringBuilder2.toString());
             }
             if (constructor == null) {
                 constructor = this.mapping.getProperty(UserBox.TYPE);
@@ -119,7 +137,9 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
             constructor = this.mapping.getProperty("default");
         }
         if (constructor == null) {
-            throw new RuntimeException("No box object found for " + type);
+            stringBuilder = new StringBuilder("No box object found for ");
+            stringBuilder.append(type);
+            throw new RuntimeException(stringBuilder.toString());
         } else if (constructor.endsWith(")")) {
             Matcher m = this.constuctorPattern.matcher(constructor);
             if (m.matches()) {
@@ -132,7 +152,9 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
                     return;
                 }
             }
-            throw new RuntimeException("Cannot work with that constructor: " + constructor);
+            StringBuilder stringBuilder3 = new StringBuilder("Cannot work with that constructor: ");
+            stringBuilder3.append(constructor);
+            throw new RuntimeException(stringBuilder3.toString());
         } else {
             this.param = EMPTY_STRING_ARRAY;
             this.clazzName = constructor;

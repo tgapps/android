@@ -146,7 +146,7 @@ public class LocationInformationBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (((Utf8.convert(this.name).length + 22) + Utf8.convert(this.astronomicalBody).length) + Utf8.convert(this.additionalNotes).length);
+        return (long) (((22 + Utf8.convert(this.name).length) + Utf8.convert(this.astronomicalBody).length) + Utf8.convert(this.additionalNotes).length);
     }
 
     public void _parseDetails(ByteBuffer content) {

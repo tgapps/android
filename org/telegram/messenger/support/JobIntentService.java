@@ -38,8 +38,9 @@ public abstract class JobIntentService extends Service {
 
         protected Void doInBackground(Void... params) {
             while (true) {
-                GenericWorkItem work = JobIntentService.this.dequeueWork();
-                if (work == null) {
+                GenericWorkItem dequeueWork = JobIntentService.this.dequeueWork();
+                GenericWorkItem work = dequeueWork;
+                if (dequeueWork == null) {
                     return null;
                 }
                 JobIntentService.this.onHandleWork(work.getIntent());
@@ -84,7 +85,12 @@ public abstract class JobIntentService extends Service {
                 this.mHasJobId = true;
                 this.mJobId = jobId;
             } else if (this.mJobId != jobId) {
-                throw new IllegalArgumentException("Given job ID " + jobId + " is different than previous " + this.mJobId);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("Given job ID ");
+                stringBuilder.append(jobId);
+                stringBuilder.append(" is different than previous ");
+                stringBuilder.append(this.mJobId);
+                throw new IllegalArgumentException(stringBuilder.toString());
             }
         }
 
@@ -109,9 +115,15 @@ public abstract class JobIntentService extends Service {
             super(context, cn);
             this.mContext = context.getApplicationContext();
             PowerManager pm = (PowerManager) context.getSystemService("power");
-            this.mLaunchWakeLock = pm.newWakeLock(1, cn.getClassName() + ":launch");
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(cn.getClassName());
+            stringBuilder.append(":launch");
+            this.mLaunchWakeLock = pm.newWakeLock(1, stringBuilder.toString());
             this.mLaunchWakeLock.setReferenceCounted(false);
-            this.mRunWakeLock = pm.newWakeLock(1, cn.getClassName() + ":run");
+            stringBuilder = new StringBuilder();
+            stringBuilder.append(cn.getClassName());
+            stringBuilder.append(":run");
+            this.mRunWakeLock = pm.newWakeLock(1, stringBuilder.toString());
             this.mRunWakeLock.setReferenceCounted(false);
         }
 
@@ -140,7 +152,7 @@ public abstract class JobIntentService extends Service {
             synchronized (this) {
                 if (!this.mServiceProcessing) {
                     this.mServiceProcessing = true;
-                    this.mRunWakeLock.acquire(600000);
+                    this.mRunWakeLock.acquire(120000);
                     this.mLaunchWakeLock.release();
                 }
             }
@@ -232,37 +244,39 @@ public abstract class JobIntentService extends Service {
         public org.telegram.messenger.support.JobIntentService.GenericWorkItem dequeueWork() {
             /*
             r4 = this;
-            r1 = 0;
             r0 = 0;
-            r2 = r4.mLock;
-            monitor-enter(r2);
-            r3 = r4.mParams;	 Catch:{ all -> 0x0027 }
-            if (r3 != 0) goto L_0x000b;
+            r1 = r4.mLock;
+            monitor-enter(r1);
+            r2 = r4.mParams;	 Catch:{ all -> 0x002b }
+            r3 = 0;
+            if (r2 != 0) goto L_0x000b;
         L_0x0009:
-            monitor-exit(r2);	 Catch:{ all -> 0x0027 }
-        L_0x000a:
-            return r1;
+            monitor-exit(r1);	 Catch:{ all -> 0x002b }
+            return r3;
         L_0x000b:
-            r3 = r4.mParams;	 Catch:{ Throwable -> 0x002a }
-            r0 = r3.dequeueWork();	 Catch:{ Throwable -> 0x002a }
-        L_0x0011:
-            monitor-exit(r2);	 Catch:{ all -> 0x0027 }
-            if (r0 == 0) goto L_0x000a;
+            r2 = r4.mParams;	 Catch:{ Throwable -> 0x0013 }
+            r2 = r2.dequeueWork();	 Catch:{ Throwable -> 0x0013 }
+            r0 = r2;
+            goto L_0x0014;
+        L_0x0013:
+            r2 = move-exception;
         L_0x0014:
+            monitor-exit(r1);	 Catch:{ all -> 0x002b }
+            if (r0 == 0) goto L_0x002a;
+        L_0x0017:
             r1 = r0.getIntent();
             r2 = r4.mService;
             r2 = r2.getClassLoader();
             r1.setExtrasClassLoader(r2);
             r1 = new org.telegram.messenger.support.JobIntentService$JobServiceEngineImpl$WrapperWorkItem;
             r1.<init>(r0);
-            goto L_0x000a;
-        L_0x0027:
-            r1 = move-exception;
-            monitor-exit(r2);	 Catch:{ all -> 0x0027 }
-            throw r1;
+            return r1;
         L_0x002a:
-            r3 = move-exception;
-            goto L_0x0011;
+            return r3;
+        L_0x002b:
+            r2 = move-exception;
+            monitor-exit(r1);	 Catch:{ all -> 0x002b }
+            throw r2;
             */
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.JobIntentService.JobServiceEngineImpl.dequeueWork():org.telegram.messenger.support.JobIntentService$GenericWorkItem");
         }
@@ -311,11 +325,7 @@ public abstract class JobIntentService extends Service {
         }
         this.mCompatWorkEnqueuer.serviceStartReceived();
         synchronized (this.mCompatQueue) {
-            ArrayList arrayList = this.mCompatQueue;
-            if (intent == null) {
-                intent = new Intent();
-            }
-            arrayList.add(new CompatWorkItem(intent, startId));
+            this.mCompatQueue.add(new CompatWorkItem(intent != null ? intent : new Intent(), startId));
             ensureProcessorRunningLocked(true);
         }
         return 3;

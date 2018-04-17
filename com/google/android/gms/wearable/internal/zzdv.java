@@ -2,13 +2,13 @@ package com.google.android.gms.wearable.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class zzdv extends zzbfm {
+public final class zzdv extends AbstractSafeParcelable {
     public static final Creator<zzdv> CREATOR = new zzdu();
-    private boolean enabled;
-    private int statusCode;
+    private final boolean enabled;
+    private final int statusCode;
 
     public zzdv(int i, boolean z) {
         this.statusCode = i;
@@ -16,9 +16,9 @@ public final class zzdv extends zzbfm {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 2, this.statusCode);
-        zzbfp.zza(parcel, 3, this.enabled);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 2, this.statusCode);
+        SafeParcelWriter.writeBoolean(parcel, 3, this.enabled);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

@@ -6,21 +6,19 @@ import java.util.Locale;
 
 public class DateUtils {
     public static boolean hasYearPassed(int year) {
-        if (normalizeYear(year) < Clock.getCalendarInstance().get(1)) {
-            return true;
-        }
-        return false;
+        return normalizeYear(year) < Clock.getCalendarInstance().get(1);
     }
 
     public static boolean hasMonthPassed(int year, int month) {
+        boolean z = true;
         if (hasYearPassed(year)) {
             return true;
         }
         Calendar now = Clock.getCalendarInstance();
         if (normalizeYear(year) != now.get(1) || month >= now.get(2) + 1) {
-            return false;
+            z = false;
         }
-        return true;
+        return z;
     }
 
     private static int normalizeYear(int year) {

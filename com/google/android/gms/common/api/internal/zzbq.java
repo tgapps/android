@@ -1,13 +1,12 @@
 package com.google.android.gms.common.api.internal;
 
-final class zzbq implements Runnable {
-    private /* synthetic */ zzbo zzftr;
+import android.os.Bundle;
+import com.google.android.gms.common.ConnectionResult;
 
-    zzbq(zzbo com_google_android_gms_common_api_internal_zzbo) {
-        this.zzftr = com_google_android_gms_common_api_internal_zzbo;
-    }
+public interface zzbq {
+    void zzb(int i, boolean z);
 
-    public final void run() {
-        this.zzftr.zzaix();
-    }
+    void zzb(Bundle bundle);
+
+    void zzc(ConnectionResult connectionResult);
 }

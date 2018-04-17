@@ -14,7 +14,6 @@ import android.os.StatFs;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.widget.FrameLayout;
 import java.io.BufferedReader;
@@ -52,7 +51,6 @@ import org.telegram.ui.Components.EmptyTextProgressView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.NumberTextView;
 import org.telegram.ui.Components.RecyclerListView;
-import org.telegram.ui.Components.RecyclerListView.Holder;
 import org.telegram.ui.Components.RecyclerListView.OnItemClickListener;
 import org.telegram.ui.Components.RecyclerListView.OnItemLongClickListener;
 import org.telegram.ui.Components.RecyclerListView.SelectionAdapter;
@@ -131,6 +129,47 @@ public class DocumentSelectActivity extends BaseFragment {
     private class ListAdapter extends SelectionAdapter {
         private Context mContext;
 
+        public org.telegram.messenger.support.widget.RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup r1, int r2) {
+            /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.DocumentSelectActivity.ListAdapter.onCreateViewHolder(android.view.ViewGroup, int):org.telegram.messenger.support.widget.RecyclerView$ViewHolder
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+            /*
+            r0 = this;
+            if (r6 == 0) goto L_0x000a;
+        L_0x0002:
+            r0 = new org.telegram.ui.Cells.SharedDocumentCell;
+            r1 = r4.mContext;
+            r0.<init>(r1);
+            goto L_0x0025;
+        L_0x000a:
+            r0 = new org.telegram.ui.Cells.GraySectionCell;
+            r1 = r4.mContext;
+            r0.<init>(r1);
+            r1 = r0;
+            r1 = (org.telegram.ui.Cells.GraySectionCell) r1;
+            r2 = "Recent";
+            r3 = 2131494215; // 0x7f0c0547 float:1.8611932E38 double:1.053098066E-314;
+            r2 = org.telegram.messenger.LocaleController.getString(r2, r3);
+            r2 = r2.toUpperCase();
+            r1.setText(r2);
+            r1 = new org.telegram.ui.Components.RecyclerListView$Holder;
+            r1.<init>(r0);
+            return r1;
+            */
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.DocumentSelectActivity.ListAdapter.onCreateViewHolder(android.view.ViewGroup, int):org.telegram.messenger.support.widget.RecyclerView$ViewHolder");
+        }
+
         public ListAdapter(Context context) {
             this.mContext = context;
         }
@@ -164,22 +203,7 @@ public class DocumentSelectActivity extends BaseFragment {
             return getItem(position) != null ? 1 : 0;
         }
 
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view;
-            switch (viewType) {
-                case 0:
-                    view = new GraySectionCell(this.mContext);
-                    ((GraySectionCell) view).setText(LocaleController.getString("Recent", R.string.Recent).toUpperCase());
-                    break;
-                default:
-                    view = new SharedDocumentCell(this.mContext);
-                    break;
-            }
-            return new Holder(view);
-        }
-
         public void onBindViewHolder(ViewHolder holder, int position) {
-            boolean z = true;
             if (holder.getItemViewType() == 1) {
                 ListItem item = getItem(position);
                 SharedDocumentCell documentCell = holder.itemView;
@@ -189,20 +213,10 @@ public class DocumentSelectActivity extends BaseFragment {
                     documentCell.setTextAndValueAndTypeAndThumb(item.title, item.subtitle, item.ext.toUpperCase().substring(0, Math.min(item.ext.length(), 4)), item.thumb, 0);
                 }
                 if (item.file == null || !DocumentSelectActivity.this.actionBar.isActionModeShowed()) {
-                    if (DocumentSelectActivity.this.scrolling) {
-                        z = false;
-                    }
-                    documentCell.setChecked(false, z);
-                    return;
-                }
-                boolean z2;
-                boolean containsKey = DocumentSelectActivity.this.selectedFiles.containsKey(item.file.toString());
-                if (DocumentSelectActivity.this.scrolling) {
-                    z2 = false;
+                    documentCell.setChecked(false, true ^ DocumentSelectActivity.this.scrolling);
                 } else {
-                    z2 = true;
+                    documentCell.setChecked(DocumentSelectActivity.this.selectedFiles.containsKey(item.file.toString()), true ^ DocumentSelectActivity.this.scrolling);
                 }
-                documentCell.setChecked(containsKey, z2);
             }
         }
     }
@@ -358,16 +372,16 @@ public class DocumentSelectActivity extends BaseFragment {
                                 DocumentSelectActivity.this.delegate.startDocumentSelectActivity();
                             }
                             DocumentSelectActivity.this.finishFragment(false);
-                            return;
-                        }
-                        he = (HistoryEntry) DocumentSelectActivity.this.history.remove(DocumentSelectActivity.this.history.size() - 1);
-                        DocumentSelectActivity.this.actionBar.setTitle(he.title);
-                        if (he.dir != null) {
-                            DocumentSelectActivity.this.listFiles(he.dir);
                         } else {
-                            DocumentSelectActivity.this.listRoots();
+                            he = (HistoryEntry) DocumentSelectActivity.this.history.remove(DocumentSelectActivity.this.history.size() - 1);
+                            DocumentSelectActivity.this.actionBar.setTitle(he.title);
+                            if (he.dir != null) {
+                                DocumentSelectActivity.this.listFiles(he.dir);
+                            } else {
+                                DocumentSelectActivity.this.listRoots();
+                            }
+                            DocumentSelectActivity.this.layoutManager.scrollToPositionWithOffset(he.scrollItem, he.scrollOffset);
                         }
-                        DocumentSelectActivity.this.layoutManager.scrollToPositionWithOffset(he.scrollItem, he.scrollOffset);
                     } else if (file.isDirectory()) {
                         he = new HistoryEntry();
                         he.scrollItem = DocumentSelectActivity.this.layoutManager.findLastVisibleItemPosition();
@@ -390,8 +404,7 @@ public class DocumentSelectActivity extends BaseFragment {
                         }
                         if (DocumentSelectActivity.this.sizeLimit != 0 && file.length() > DocumentSelectActivity.this.sizeLimit) {
                             DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("FileUploadLimit", R.string.FileUploadLimit, AndroidUtilities.formatFileSize(DocumentSelectActivity.this.sizeLimit)));
-                        } else if (file.length() == 0) {
-                        } else {
+                        } else if (file.length() != 0) {
                             if (DocumentSelectActivity.this.actionBar.isActionModeShowed()) {
                                 if (DocumentSelectActivity.this.selectedFiles.containsKey(file.toString())) {
                                     DocumentSelectActivity.this.selectedFiles.remove(file.toString());
@@ -516,21 +529,19 @@ public class DocumentSelectActivity extends BaseFragment {
                     showErrorBox(LocaleController.getString("UnknownError", R.string.UnknownError));
                     return false;
                 }
-                ListItem item;
                 this.currentDir = dir;
                 this.items.clear();
                 Arrays.sort(files, new Comparator<File>() {
                     public int compare(File lhs, File rhs) {
-                        if (lhs.isDirectory() != rhs.isDirectory()) {
-                            return lhs.isDirectory() ? -1 : 1;
-                        } else {
+                        if (lhs.isDirectory() == rhs.isDirectory()) {
                             return lhs.getName().compareToIgnoreCase(rhs.getName());
                         }
+                        return lhs.isDirectory() ? -1 : 1;
                     }
                 });
                 for (File file : files) {
                     if (file.getName().indexOf(46) != 0) {
-                        item = new ListItem();
+                        ListItem item = new ListItem();
                         item.title = file.getName();
                         item.file = file;
                         if (file.isDirectory()) {
@@ -549,21 +560,21 @@ public class DocumentSelectActivity extends BaseFragment {
                         this.items.add(item);
                     }
                 }
-                item = new ListItem();
-                item.title = "..";
+                ListItem item2 = new ListItem();
+                item2.title = "..";
                 if (this.history.size() > 0) {
                     HistoryEntry entry = (HistoryEntry) this.history.get(this.history.size() - 1);
                     if (entry.dir == null) {
-                        item.subtitle = LocaleController.getString("Folder", R.string.Folder);
+                        item2.subtitle = LocaleController.getString("Folder", R.string.Folder);
                     } else {
-                        item.subtitle = entry.dir.toString();
+                        item2.subtitle = entry.dir.toString();
                     }
                 } else {
-                    item.subtitle = LocaleController.getString("Folder", R.string.Folder);
+                    item2.subtitle = LocaleController.getString("Folder", R.string.Folder);
                 }
-                item.icon = R.drawable.ic_directory;
-                item.file = null;
-                this.items.add(0, item);
+                item2.icon = R.drawable.ic_directory;
+                item2.file = null;
+                this.items.add(0, item2);
                 AndroidUtilities.clearDrawableAnimation(this.listView);
                 this.scrolling = true;
                 this.listAdapter.notifyDataSetChanged();
@@ -598,11 +609,6 @@ public class DocumentSelectActivity extends BaseFragment {
 
     @SuppressLint({"NewApi"})
     private void listRoots() {
-        Throwable e;
-        Throwable th;
-        ListItem fs;
-        File file;
-        ListItem fs2;
         this.currentDir = null;
         this.items.clear();
         HashSet<String> paths = new HashSet();
@@ -625,158 +631,91 @@ public class DocumentSelectActivity extends BaseFragment {
         }
         BufferedReader bufferedReader = null;
         try {
-            BufferedReader bufferedReader2 = new BufferedReader(new FileReader("/proc/mounts"));
+            bufferedReader = new BufferedReader(new FileReader("/proc/mounts"));
             while (true) {
-                String line = bufferedReader2.readLine();
-                if (line == null) {
+                String readLine = bufferedReader.readLine();
+                String line = readLine;
+                if (readLine == null) {
                     break;
                 } else if (line.contains("vfat") || line.contains("/mnt")) {
                     if (BuildVars.LOGS_ENABLED) {
                         FileLog.d(line);
                     }
-                    StringTokenizer stringTokenizer = new StringTokenizer(line, " ");
-                    String unused = stringTokenizer.nextToken();
-                    String path = stringTokenizer.nextToken();
-                    if (!(paths.contains(path) || !line.contains("/dev/block/vold") || line.contains("/mnt/secure") || line.contains("/mnt/asec") || line.contains("/mnt/obb") || line.contains("/dev/mapper") || line.contains("tmpfs"))) {
-                        if (!new File(path).isDirectory()) {
-                            int index = path.lastIndexOf(47);
-                            if (index != -1) {
-                                String newPath = "/storage/" + path.substring(index + 1);
-                                if (new File(newPath).isDirectory()) {
-                                    path = newPath;
+                    StringTokenizer tokens = new StringTokenizer(line, " ");
+                    String unused = tokens.nextToken();
+                    String path = tokens.nextToken();
+                    if (!paths.contains(path)) {
+                        if (!(!line.contains("/dev/block/vold") || line.contains("/mnt/secure") || line.contains("/mnt/asec") || line.contains("/mnt/obb") || line.contains("/dev/mapper") || line.contains("tmpfs"))) {
+                            if (!new File(path).isDirectory()) {
+                                int index = path.lastIndexOf(47);
+                                if (index != -1) {
+                                    String newPath = new StringBuilder();
+                                    newPath.append("/storage/");
+                                    newPath.append(path.substring(index + 1));
+                                    newPath = newPath.toString();
+                                    if (new File(newPath).isDirectory()) {
+                                        path = newPath;
+                                    }
                                 }
                             }
-                        }
-                        paths.add(path);
-                        try {
-                            ListItem item = new ListItem();
-                            if (path.toLowerCase().contains("sd")) {
-                                item.title = LocaleController.getString("SdCard", R.string.SdCard);
-                            } else {
-                                item.title = LocaleController.getString("ExternalStorage", R.string.ExternalStorage);
-                            }
-                            item.icon = R.drawable.ic_external_storage;
-                            item.subtitle = getRootSubtitle(path);
-                            item.file = new File(path);
-                            this.items.add(item);
-                        } catch (Throwable e2) {
+                            paths.add(path);
                             try {
-                                FileLog.e(e2);
-                            } catch (Exception e3) {
-                                e2 = e3;
-                                bufferedReader = bufferedReader2;
-                            } catch (Throwable th2) {
-                                th = th2;
-                                bufferedReader = bufferedReader2;
+                                ListItem item = new ListItem();
+                                if (path.toLowerCase().contains("sd")) {
+                                    item.title = LocaleController.getString("SdCard", R.string.SdCard);
+                                } else {
+                                    item.title = LocaleController.getString("ExternalStorage", R.string.ExternalStorage);
+                                }
+                                item.icon = R.drawable.ic_external_storage;
+                                item.subtitle = getRootSubtitle(path);
+                                item.file = new File(path);
+                                this.items.add(item);
+                            } catch (Throwable e) {
+                                FileLog.e(e);
                             }
-                        } catch (Throwable th22) {
-                            th = th22;
-                            bufferedReader = bufferedReader2;
                         }
                     }
                 }
             }
-            if (bufferedReader2 != null) {
+            if (bufferedReader != null) {
                 try {
-                    bufferedReader2.close();
-                    bufferedReader = bufferedReader2;
-                } catch (Throwable e22) {
-                    FileLog.e(e22);
-                    bufferedReader = bufferedReader2;
+                    bufferedReader.close();
+                } catch (Throwable e2) {
+                    FileLog.e(e2);
                 }
             }
-        } catch (Exception e4) {
-            e22 = e4;
-            try {
-                FileLog.e(e22);
-                if (bufferedReader != null) {
-                    try {
-                        bufferedReader.close();
-                    } catch (Throwable e222) {
-                        FileLog.e(e222);
-                    }
+        } catch (Throwable e22) {
+            FileLog.e(e22);
+            if (bufferedReader != null) {
+                bufferedReader.close();
+            }
+        } catch (Throwable th) {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (Throwable e222) {
+                    FileLog.e(e222);
                 }
-                fs = new ListItem();
-                fs.title = "/";
-                fs.subtitle = LocaleController.getString("SystemRoot", R.string.SystemRoot);
-                fs.icon = R.drawable.ic_directory;
-                fs.file = new File("/");
-                this.items.add(fs);
-                file = new File(Environment.getExternalStorageDirectory(), "Telegram");
-                if (file.exists()) {
-                    fs2 = new ListItem();
-                    try {
-                        fs2.title = "Telegram";
-                        fs2.subtitle = file.toString();
-                        fs2.icon = R.drawable.ic_directory;
-                        fs2.file = file;
-                        this.items.add(fs2);
-                        fs = fs2;
-                    } catch (Exception e5) {
-                        e222 = e5;
-                        fs = fs2;
-                        FileLog.e(e222);
-                        fs = new ListItem();
-                        fs.title = LocaleController.getString("Gallery", R.string.Gallery);
-                        fs.subtitle = LocaleController.getString("GalleryInfo", R.string.GalleryInfo);
-                        fs.icon = R.drawable.ic_storage_gallery;
-                        fs.file = null;
-                        this.items.add(fs);
-                        AndroidUtilities.clearDrawableAnimation(this.listView);
-                        this.scrolling = true;
-                        this.listAdapter.notifyDataSetChanged();
-                    }
-                }
-                fs = new ListItem();
-                fs.title = LocaleController.getString("Gallery", R.string.Gallery);
-                fs.subtitle = LocaleController.getString("GalleryInfo", R.string.GalleryInfo);
-                fs.icon = R.drawable.ic_storage_gallery;
-                fs.file = null;
-                this.items.add(fs);
-                AndroidUtilities.clearDrawableAnimation(this.listView);
-                this.scrolling = true;
-                this.listAdapter.notifyDataSetChanged();
-            } catch (Throwable th3) {
-                th = th3;
-                if (bufferedReader != null) {
-                    try {
-                        bufferedReader.close();
-                    } catch (Throwable e2222) {
-                        FileLog.e(e2222);
-                    }
-                }
-                throw th;
             }
         }
-        fs = new ListItem();
+        ListItem fs = new ListItem();
         fs.title = "/";
         fs.subtitle = LocaleController.getString("SystemRoot", R.string.SystemRoot);
         fs.icon = R.drawable.ic_directory;
         fs.file = new File("/");
         this.items.add(fs);
         try {
-            file = new File(Environment.getExternalStorageDirectory(), "Telegram");
-            if (file.exists()) {
-                fs2 = new ListItem();
-                fs2.title = "Telegram";
-                fs2.subtitle = file.toString();
-                fs2.icon = R.drawable.ic_directory;
-                fs2.file = file;
-                this.items.add(fs2);
-                fs = fs2;
+            File telegramPath = new File(Environment.getExternalStorageDirectory(), "Telegram");
+            if (telegramPath.exists()) {
+                fs = new ListItem();
+                fs.title = "Telegram";
+                fs.subtitle = telegramPath.toString();
+                fs.icon = R.drawable.ic_directory;
+                fs.file = telegramPath;
+                this.items.add(fs);
             }
-        } catch (Exception e6) {
-            e2222 = e6;
-            FileLog.e(e2222);
-            fs = new ListItem();
-            fs.title = LocaleController.getString("Gallery", R.string.Gallery);
-            fs.subtitle = LocaleController.getString("GalleryInfo", R.string.GalleryInfo);
-            fs.icon = R.drawable.ic_storage_gallery;
-            fs.file = null;
-            this.items.add(fs);
-            AndroidUtilities.clearDrawableAnimation(this.listView);
-            this.scrolling = true;
-            this.listAdapter.notifyDataSetChanged();
+        } catch (Throwable e3) {
+            FileLog.e(e3);
         }
         fs = new ListItem();
         fs.title = LocaleController.getString("Gallery", R.string.Gallery);

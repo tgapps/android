@@ -72,33 +72,12 @@ public final class SpliceInsertCommand extends SpliceCommand {
     }
 
     private SpliceInsertCommand(Parcel in) {
-        boolean z;
-        boolean z2 = true;
         this.spliceEventId = in.readLong();
-        if (in.readByte() == (byte) 1) {
-            z = true;
-        } else {
-            z = false;
-        }
-        this.spliceEventCancelIndicator = z;
-        if (in.readByte() == (byte) 1) {
-            z = true;
-        } else {
-            z = false;
-        }
-        this.outOfNetworkIndicator = z;
-        if (in.readByte() == (byte) 1) {
-            z = true;
-        } else {
-            z = false;
-        }
-        this.programSpliceFlag = z;
-        if (in.readByte() == (byte) 1) {
-            z = true;
-        } else {
-            z = false;
-        }
-        this.spliceImmediateFlag = z;
+        boolean z = false;
+        this.spliceEventCancelIndicator = in.readByte() == (byte) 1;
+        this.outOfNetworkIndicator = in.readByte() == (byte) 1;
+        this.programSpliceFlag = in.readByte() == (byte) 1;
+        this.spliceImmediateFlag = in.readByte() == (byte) 1;
         this.programSplicePts = in.readLong();
         this.programSplicePlaybackPositionUs = in.readLong();
         int componentSpliceListSize = in.readInt();
@@ -107,10 +86,10 @@ public final class SpliceInsertCommand extends SpliceCommand {
             componentSpliceList.add(ComponentSplice.createFromParcel(in));
         }
         this.componentSpliceList = Collections.unmodifiableList(componentSpliceList);
-        if (in.readByte() != (byte) 1) {
-            z2 = false;
+        if (in.readByte() == (byte) 1) {
+            z = true;
         }
-        this.autoReturn = z2;
+        this.autoReturn = z;
         this.breakDurationUs = in.readLong();
         this.uniqueProgramId = in.readInt();
         this.availNum = in.readInt();
@@ -118,90 +97,93 @@ public final class SpliceInsertCommand extends SpliceCommand {
     }
 
     static SpliceInsertCommand parseFromSection(ParsableByteArray sectionData, long ptsAdjustment, TimestampAdjuster timestampAdjuster) {
+        boolean outOfNetworkIndicator;
+        boolean programSpliceFlag;
+        boolean spliceImmediateFlag;
+        List<ComponentSplice> componentSplices;
+        int uniqueProgramId;
+        int availNum;
+        int availsExpected;
+        TimestampAdjuster timestampAdjuster2 = timestampAdjuster;
         long spliceEventId = sectionData.readUnsignedInt();
         boolean spliceEventCancelIndicator = (sectionData.readUnsignedByte() & 128) != 0;
-        boolean outOfNetworkIndicator = false;
-        boolean programSpliceFlag = false;
-        boolean spliceImmediateFlag = false;
         long programSplicePts = C.TIME_UNSET;
-        List<ComponentSplice> componentSplices = Collections.emptyList();
-        int uniqueProgramId = 0;
-        int availNum = 0;
-        int availsExpected = 0;
+        List<ComponentSplice> componentSplices2 = Collections.emptyList();
         boolean autoReturn = false;
         long breakDurationUs = C.TIME_UNSET;
-        if (!spliceEventCancelIndicator) {
+        if (spliceEventCancelIndicator) {
+            outOfNetworkIndicator = false;
+            programSpliceFlag = false;
+            spliceImmediateFlag = false;
+            componentSplices = componentSplices2;
+            uniqueProgramId = 0;
+            availNum = 0;
+            availsExpected = 0;
+        } else {
             int headerByte = sectionData.readUnsignedByte();
-            outOfNetworkIndicator = (headerByte & 128) != 0;
-            programSpliceFlag = (headerByte & 64) != 0;
-            boolean durationFlag = (headerByte & 32) != 0;
-            spliceImmediateFlag = (headerByte & 16) != 0;
-            if (programSpliceFlag && !spliceImmediateFlag) {
+            boolean outOfNetworkIndicator2 = (headerByte & 128) != 0;
+            boolean programSpliceFlag2 = (headerByte & 64) != 0;
+            boolean programSpliceFlag3 = (headerByte & 32) != 0;
+            boolean spliceImmediateFlag2 = (headerByte & 16) != 0;
+            if (programSpliceFlag2 && !spliceImmediateFlag2) {
                 programSplicePts = TimeSignalCommand.parseSpliceTime(sectionData, ptsAdjustment);
             }
-            if (!programSpliceFlag) {
-                int componentCount = sectionData.readUnsignedByte();
-                List<ComponentSplice> arrayList = new ArrayList(componentCount);
-                for (int i = 0; i < componentCount; i++) {
+            if (programSpliceFlag2) {
+                outOfNetworkIndicator = outOfNetworkIndicator2;
+                programSpliceFlag = programSpliceFlag2;
+                spliceImmediateFlag = spliceImmediateFlag2;
+            } else {
+                boolean componentCount = sectionData.readUnsignedByte();
+                outOfNetworkIndicator = outOfNetworkIndicator2;
+                componentSplices2 = new ArrayList(componentCount);
+                outOfNetworkIndicator2 = false;
+                while (outOfNetworkIndicator2 < componentCount) {
                     int componentTag = sectionData.readUnsignedByte();
                     long componentSplicePts = C.TIME_UNSET;
-                    if (!spliceImmediateFlag) {
+                    if (!spliceImmediateFlag2) {
                         componentSplicePts = TimeSignalCommand.parseSpliceTime(sectionData, ptsAdjustment);
                     }
-                    arrayList.add(new ComponentSplice(componentTag, componentSplicePts, timestampAdjuster.adjustTsTimestamp(componentSplicePts)));
+                    programSpliceFlag = programSpliceFlag2;
+                    boolean componentCount2 = componentCount;
+                    programSpliceFlag2 = componentSplicePts;
+                    spliceImmediateFlag = spliceImmediateFlag2;
+                    componentSplices2.add(new ComponentSplice(componentTag, programSpliceFlag2, timestampAdjuster2.adjustTsTimestamp(programSpliceFlag2)));
+                    outOfNetworkIndicator2++;
+                    programSpliceFlag2 = programSpliceFlag;
+                    componentCount = componentCount2;
+                    spliceImmediateFlag2 = spliceImmediateFlag;
                 }
+                programSpliceFlag = programSpliceFlag2;
+                spliceImmediateFlag = spliceImmediateFlag2;
             }
-            if (durationFlag) {
-                long firstByte = (long) sectionData.readUnsignedByte();
-                autoReturn = (128 & firstByte) != 0;
-                breakDurationUs = (1000 * (((1 & firstByte) << 32) | sectionData.readUnsignedInt())) / 90;
+            if (programSpliceFlag3) {
+                outOfNetworkIndicator2 = (long) sectionData.readUnsignedByte();
+                autoReturn = (outOfNetworkIndicator2 & 128) != 0;
+                breakDurationUs = (1000 * (((outOfNetworkIndicator2 & 1) << 32) | sectionData.readUnsignedInt())) / 90;
             }
             uniqueProgramId = sectionData.readUnsignedShort();
             availNum = sectionData.readUnsignedByte();
             availsExpected = sectionData.readUnsignedByte();
+            componentSplices = componentSplices2;
         }
-        return new SpliceInsertCommand(spliceEventId, spliceEventCancelIndicator, outOfNetworkIndicator, programSpliceFlag, spliceImmediateFlag, programSplicePts, timestampAdjuster.adjustTsTimestamp(programSplicePts), componentSplices, autoReturn, breakDurationUs, uniqueProgramId, availNum, availsExpected);
+        long programSplicePts2 = programSplicePts;
+        return new SpliceInsertCommand(spliceEventId, spliceEventCancelIndicator, outOfNetworkIndicator, programSpliceFlag, spliceImmediateFlag, programSplicePts2, timestampAdjuster2.adjustTsTimestamp(programSplicePts2), componentSplices, autoReturn, breakDurationUs, uniqueProgramId, availNum, availsExpected);
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        int i;
-        int i2 = 1;
         dest.writeLong(this.spliceEventId);
-        if (this.spliceEventCancelIndicator) {
-            i = 1;
-        } else {
-            i = 0;
-        }
-        dest.writeByte((byte) i);
-        if (this.outOfNetworkIndicator) {
-            i = 1;
-        } else {
-            i = 0;
-        }
-        dest.writeByte((byte) i);
-        if (this.programSpliceFlag) {
-            i = 1;
-        } else {
-            i = 0;
-        }
-        dest.writeByte((byte) i);
-        if (this.spliceImmediateFlag) {
-            i = 1;
-        } else {
-            i = 0;
-        }
-        dest.writeByte((byte) i);
+        dest.writeByte((byte) this.spliceEventCancelIndicator);
+        dest.writeByte((byte) this.outOfNetworkIndicator);
+        dest.writeByte((byte) this.programSpliceFlag);
+        dest.writeByte((byte) this.spliceImmediateFlag);
         dest.writeLong(this.programSplicePts);
         dest.writeLong(this.programSplicePlaybackPositionUs);
         int componentSpliceListSize = this.componentSpliceList.size();
         dest.writeInt(componentSpliceListSize);
-        for (int i3 = 0; i3 < componentSpliceListSize; i3++) {
-            ((ComponentSplice) this.componentSpliceList.get(i3)).writeToParcel(dest);
+        for (int i = 0; i < componentSpliceListSize; i++) {
+            ((ComponentSplice) this.componentSpliceList.get(i)).writeToParcel(dest);
         }
-        if (!this.autoReturn) {
-            i2 = 0;
-        }
-        dest.writeByte((byte) i2);
+        dest.writeByte((byte) this.autoReturn);
         dest.writeLong(this.breakDurationUs);
         dest.writeInt(this.uniqueProgramId);
         dest.writeInt(this.availNum);

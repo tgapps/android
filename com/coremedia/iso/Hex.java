@@ -12,23 +12,21 @@ public class Hex {
 
     public static String encodeHex(byte[] data, int group) {
         int l = data.length;
-        char[] out = new char[((group > 0 ? l / group : 0) + (l << 1))];
+        char[] out = new char[((l << 1) + (group > 0 ? l / group : 0))];
         int i = 0;
         int j = 0;
         while (i < l) {
-            int i2;
-            if (group <= 0 || i % group != 0 || j <= 0) {
-                i2 = j;
-            } else {
-                i2 = j + 1;
+            int j2;
+            if (group > 0 && i % group == 0 && j > 0) {
+                j2 = j + 1;
                 out[j] = '-';
+                j = j2;
             }
-            j = i2 + 1;
-            out[i2] = DIGITS[(data[i] & PsExtractor.VIDEO_STREAM_MASK) >>> 4];
-            i2 = j + 1;
-            out[j] = DIGITS[data[i] & 15];
+            j2 = j + 1;
+            out[j] = DIGITS[(PsExtractor.VIDEO_STREAM_MASK & data[i]) >>> 4];
+            j = j2 + 1;
+            out[j2] = DIGITS[15 & data[i]];
             i++;
-            j = i2;
         }
         return new String(out);
     }

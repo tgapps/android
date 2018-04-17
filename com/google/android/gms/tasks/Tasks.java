@@ -1,7 +1,8 @@
 package com.google.android.gms.tasks;
 
-import com.google.android.gms.common.internal.zzbq;
+import com.google.android.gms.common.internal.Preconditions;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -10,88 +11,96 @@ import java.util.concurrent.TimeoutException;
 
 public final class Tasks {
 
-    interface zzb extends OnFailureListener, OnSuccessListener<Object> {
+    interface zzb extends OnCanceledListener, OnFailureListener, OnSuccessListener<Object> {
     }
 
-    static final class zza implements zzb {
-        private final CountDownLatch zzapd;
+    private static final class zza implements zzb {
+        private final CountDownLatch zzfd;
 
         private zza() {
-            this.zzapd = new CountDownLatch(1);
+            this.zzfd = new CountDownLatch(1);
         }
 
         public final void await() throws InterruptedException {
-            this.zzapd.await();
+            this.zzfd.await();
         }
 
         public final boolean await(long j, TimeUnit timeUnit) throws InterruptedException {
-            return this.zzapd.await(j, timeUnit);
+            return this.zzfd.await(j, timeUnit);
+        }
+
+        public final void onCanceled() {
+            this.zzfd.countDown();
         }
 
         public final void onFailure(Exception exception) {
-            this.zzapd.countDown();
+            this.zzfd.countDown();
         }
 
         public final void onSuccess(Object obj) {
-            this.zzapd.countDown();
+            this.zzfd.countDown();
         }
     }
 
     public static <TResult> TResult await(Task<TResult> task) throws ExecutionException, InterruptedException {
-        zzbq.zzgn("Must not be called on the main application thread");
-        zzbq.checkNotNull(task, "Task must not be null");
+        Preconditions.checkNotMainThread();
+        Preconditions.checkNotNull(task, "Task must not be null");
         if (task.isComplete()) {
-            return zzc(task);
+            return zzb(task);
         }
         Object com_google_android_gms_tasks_Tasks_zza = new zza();
         zza(task, com_google_android_gms_tasks_Tasks_zza);
         com_google_android_gms_tasks_Tasks_zza.await();
-        return zzc(task);
+        return zzb(task);
     }
 
     public static <TResult> TResult await(Task<TResult> task, long j, TimeUnit timeUnit) throws ExecutionException, InterruptedException, TimeoutException {
-        zzbq.zzgn("Must not be called on the main application thread");
-        zzbq.checkNotNull(task, "Task must not be null");
-        zzbq.checkNotNull(timeUnit, "TimeUnit must not be null");
+        Preconditions.checkNotMainThread();
+        Preconditions.checkNotNull(task, "Task must not be null");
+        Preconditions.checkNotNull(timeUnit, "TimeUnit must not be null");
         if (task.isComplete()) {
-            return zzc(task);
+            return zzb(task);
         }
         Object com_google_android_gms_tasks_Tasks_zza = new zza();
         zza(task, com_google_android_gms_tasks_Tasks_zza);
         if (com_google_android_gms_tasks_Tasks_zza.await(j, timeUnit)) {
-            return zzc(task);
+            return zzb(task);
         }
         throw new TimeoutException("Timed out waiting for Task");
     }
 
     public static <TResult> Task<TResult> call(Executor executor, Callable<TResult> callable) {
-        zzbq.checkNotNull(executor, "Executor must not be null");
-        zzbq.checkNotNull(callable, "Callback must not be null");
-        Task com_google_android_gms_tasks_zzn = new zzn();
-        executor.execute(new zzo(com_google_android_gms_tasks_zzn, callable));
-        return com_google_android_gms_tasks_zzn;
+        Preconditions.checkNotNull(executor, "Executor must not be null");
+        Preconditions.checkNotNull(callable, "Callback must not be null");
+        Task com_google_android_gms_tasks_zzu = new zzu();
+        executor.execute(new zzv(com_google_android_gms_tasks_zzu, callable));
+        return com_google_android_gms_tasks_zzu;
     }
 
     public static <TResult> Task<TResult> forException(Exception exception) {
-        Task com_google_android_gms_tasks_zzn = new zzn();
-        com_google_android_gms_tasks_zzn.setException(exception);
-        return com_google_android_gms_tasks_zzn;
+        Task com_google_android_gms_tasks_zzu = new zzu();
+        com_google_android_gms_tasks_zzu.setException(exception);
+        return com_google_android_gms_tasks_zzu;
     }
 
     public static <TResult> Task<TResult> forResult(TResult tResult) {
-        Task com_google_android_gms_tasks_zzn = new zzn();
-        com_google_android_gms_tasks_zzn.setResult(tResult);
-        return com_google_android_gms_tasks_zzn;
+        Task com_google_android_gms_tasks_zzu = new zzu();
+        com_google_android_gms_tasks_zzu.setResult(tResult);
+        return com_google_android_gms_tasks_zzu;
     }
 
     private static void zza(Task<?> task, zzb com_google_android_gms_tasks_Tasks_zzb) {
-        task.addOnSuccessListener(TaskExecutors.zzkum, com_google_android_gms_tasks_Tasks_zzb);
-        task.addOnFailureListener(TaskExecutors.zzkum, com_google_android_gms_tasks_Tasks_zzb);
+        task.addOnSuccessListener(TaskExecutors.zzagd, com_google_android_gms_tasks_Tasks_zzb);
+        task.addOnFailureListener(TaskExecutors.zzagd, com_google_android_gms_tasks_Tasks_zzb);
+        task.addOnCanceledListener(TaskExecutors.zzagd, com_google_android_gms_tasks_Tasks_zzb);
     }
 
-    private static <TResult> TResult zzc(Task<TResult> task) throws ExecutionException {
+    private static <TResult> TResult zzb(Task<TResult> task) throws ExecutionException {
         if (task.isSuccessful()) {
             return task.getResult();
+        }
+        if (task.isCanceled()) {
+            throw new CancellationException("Task is already canceled");
         }
         throw new ExecutionException(task.getException());
     }

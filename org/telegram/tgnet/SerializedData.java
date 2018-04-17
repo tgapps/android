@@ -19,6 +19,171 @@ public class SerializedData extends AbstractSerializedData {
     private DataOutputStream out;
     private ByteArrayOutputStream outbuf;
 
+    private void writeInt32(int r1, java.io.DataOutputStream r2) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.tgnet.SerializedData.writeInt32(int, java.io.DataOutputStream):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = 0;
+        r1 = 4;
+        if (r0 >= r1) goto L_0x0019;
+    L_0x0004:
+        r1 = r0 * 8;
+        r1 = r3 >> r1;
+        r4.write(r1);	 Catch:{ Exception -> 0x000e }
+        r0 = r0 + 1;
+        goto L_0x0001;
+    L_0x000e:
+        r0 = move-exception;
+        r1 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
+        if (r1 == 0) goto L_0x001a;
+        r1 = "write int32 error";
+        org.telegram.messenger.FileLog.e(r1);
+        goto L_0x001a;
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.tgnet.SerializedData.writeInt32(int, java.io.DataOutputStream):void");
+    }
+
+    private void writeInt64(long r1, java.io.DataOutputStream r3) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.tgnet.SerializedData.writeInt64(long, java.io.DataOutputStream):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = 0;
+        r1 = 8;
+        if (r0 >= r1) goto L_0x001b;
+    L_0x0005:
+        r1 = r0 * 8;
+        r1 = r4 >> r1;
+        r1 = (int) r1;
+        r6.write(r1);	 Catch:{ Exception -> 0x0010 }
+        r0 = r0 + 1;
+        goto L_0x0001;
+    L_0x0010:
+        r0 = move-exception;
+        r1 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
+        if (r1 == 0) goto L_0x001c;
+        r1 = "write int64 error";
+        org.telegram.messenger.FileLog.e(r1);
+        goto L_0x001c;
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.tgnet.SerializedData.writeInt64(long, java.io.DataOutputStream):void");
+    }
+
+    public void writeByteArray(byte[] r1, int r2, int r3) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.tgnet.SerializedData.writeByteArray(byte[], int, int):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = 253; // 0xfd float:3.55E-43 double:1.25E-321;
+        r1 = 4;
+        r2 = 1;
+        if (r8 > r0) goto L_0x0018;
+    L_0x0006:
+        r3 = r5.justCalc;	 Catch:{ Exception -> 0x0016 }
+        if (r3 != 0) goto L_0x0010;	 Catch:{ Exception -> 0x0016 }
+    L_0x000a:
+        r3 = r5.out;	 Catch:{ Exception -> 0x0016 }
+        r3.write(r8);	 Catch:{ Exception -> 0x0016 }
+        goto L_0x003c;	 Catch:{ Exception -> 0x0016 }
+    L_0x0010:
+        r3 = r5.len;	 Catch:{ Exception -> 0x0016 }
+        r3 = r3 + r2;	 Catch:{ Exception -> 0x0016 }
+        r5.len = r3;	 Catch:{ Exception -> 0x0016 }
+        goto L_0x003c;	 Catch:{ Exception -> 0x0016 }
+    L_0x0016:
+        r0 = move-exception;	 Catch:{ Exception -> 0x0016 }
+        goto L_0x0069;	 Catch:{ Exception -> 0x0016 }
+    L_0x0018:
+        r3 = r5.justCalc;	 Catch:{ Exception -> 0x0016 }
+        if (r3 != 0) goto L_0x0037;	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.out;	 Catch:{ Exception -> 0x0016 }
+        r4 = 254; // 0xfe float:3.56E-43 double:1.255E-321;	 Catch:{ Exception -> 0x0016 }
+        r3.write(r4);	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.out;	 Catch:{ Exception -> 0x0016 }
+        r3.write(r8);	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.out;	 Catch:{ Exception -> 0x0016 }
+        r4 = r8 >> 8;	 Catch:{ Exception -> 0x0016 }
+        r3.write(r4);	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.out;	 Catch:{ Exception -> 0x0016 }
+        r4 = r8 >> 16;	 Catch:{ Exception -> 0x0016 }
+        r3.write(r4);	 Catch:{ Exception -> 0x0016 }
+        goto L_0x003c;	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.len;	 Catch:{ Exception -> 0x0016 }
+        r3 = r3 + r1;	 Catch:{ Exception -> 0x0016 }
+        r5.len = r3;	 Catch:{ Exception -> 0x0016 }
+    L_0x003c:
+        r3 = r5.justCalc;	 Catch:{ Exception -> 0x0016 }
+        if (r3 != 0) goto L_0x0046;	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.out;	 Catch:{ Exception -> 0x0016 }
+        r3.write(r6, r7, r8);	 Catch:{ Exception -> 0x0016 }
+        goto L_0x004b;	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.len;	 Catch:{ Exception -> 0x0016 }
+        r3 = r3 + r8;	 Catch:{ Exception -> 0x0016 }
+        r5.len = r3;	 Catch:{ Exception -> 0x0016 }
+        if (r8 > r0) goto L_0x004f;	 Catch:{ Exception -> 0x0016 }
+        r0 = r2;	 Catch:{ Exception -> 0x0016 }
+        goto L_0x0050;	 Catch:{ Exception -> 0x0016 }
+        r0 = r1;	 Catch:{ Exception -> 0x0016 }
+        r3 = r8 + r0;	 Catch:{ Exception -> 0x0016 }
+        r3 = r3 % r1;	 Catch:{ Exception -> 0x0016 }
+        if (r3 == 0) goto L_0x0068;	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.justCalc;	 Catch:{ Exception -> 0x0016 }
+        if (r3 != 0) goto L_0x0060;	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.out;	 Catch:{ Exception -> 0x0016 }
+        r4 = 0;	 Catch:{ Exception -> 0x0016 }
+        r3.write(r4);	 Catch:{ Exception -> 0x0016 }
+        goto L_0x0065;	 Catch:{ Exception -> 0x0016 }
+        r3 = r5.len;	 Catch:{ Exception -> 0x0016 }
+        r3 = r3 + r2;	 Catch:{ Exception -> 0x0016 }
+        r5.len = r3;	 Catch:{ Exception -> 0x0016 }
+        r0 = r0 + 1;
+        goto L_0x0050;
+        goto L_0x0073;
+        r1 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
+        if (r1 == 0) goto L_0x0073;
+        r1 = "write byte array error";
+        org.telegram.messenger.FileLog.e(r1);
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.tgnet.SerializedData.writeByteArray(byte[], int, int):void");
+    }
+
     public SerializedData() {
         this.isOut = true;
         this.justCalc = false;
@@ -83,8 +248,8 @@ public class SerializedData extends AbstractSerializedData {
                 this.out.close();
                 this.out = null;
             }
-        } catch (Throwable e222) {
-            FileLog.e(e222);
+        } catch (Throwable e3) {
+            FileLog.e(e3);
         }
     }
 
@@ -108,43 +273,11 @@ public class SerializedData extends AbstractSerializedData {
         }
     }
 
-    private void writeInt32(int x, DataOutputStream out) {
-        int i = 0;
-        while (i < 4) {
-            try {
-                out.write(x >> (i * 8));
-                i++;
-            } catch (Exception e) {
-                if (BuildVars.LOGS_ENABLED) {
-                    FileLog.e("write int32 error");
-                    return;
-                }
-                return;
-            }
-        }
-    }
-
     public void writeInt64(long i) {
         if (this.justCalc) {
             this.len += 8;
         } else {
             writeInt64(i, this.out);
-        }
-    }
-
-    private void writeInt64(long x, DataOutputStream out) {
-        int i = 0;
-        while (i < 8) {
-            try {
-                out.write((int) (x >> (i * 8)));
-                i++;
-            } catch (Exception e) {
-                if (BuildVars.LOGS_ENABLED) {
-                    FileLog.e("write int64 error");
-                    return;
-                }
-                return;
-            }
         }
     }
 
@@ -261,45 +394,6 @@ public class SerializedData extends AbstractSerializedData {
         }
     }
 
-    public void writeByteArray(byte[] b, int offset, int count) {
-        if (count <= 253) {
-            try {
-                if (this.justCalc) {
-                    this.len++;
-                } else {
-                    this.out.write(count);
-                }
-            } catch (Exception e) {
-                if (BuildVars.LOGS_ENABLED) {
-                    FileLog.e("write byte array error");
-                    return;
-                }
-                return;
-            }
-        } else if (this.justCalc) {
-            this.len += 4;
-        } else {
-            this.out.write(254);
-            this.out.write(count);
-            this.out.write(count >> 8);
-            this.out.write(count >> 16);
-        }
-        if (this.justCalc) {
-            this.len += count;
-        } else {
-            this.out.write(b, offset, count);
-        }
-        int i = count <= 253 ? 1 : 4;
-        while ((count + i) % 4 != 0) {
-            if (this.justCalc) {
-                this.len++;
-            } else {
-                this.out.write(0);
-            }
-            i++;
-        }
-    }
-
     public void writeDouble(double d) {
         try {
             writeInt64(Double.doubleToRawLongBits(d));
@@ -355,12 +449,11 @@ public class SerializedData extends AbstractSerializedData {
         }
         if (exception) {
             throw new RuntimeException("Not bool value!");
-        } else if (!BuildVars.LOGS_ENABLED) {
-            return false;
-        } else {
-            FileLog.e("Not bool value!");
-            return false;
         }
+        if (BuildVars.LOGS_ENABLED) {
+            FileLog.e("Not bool value!");
+        }
+        return false;
     }
 
     public void readBytes(byte[] b, boolean exception) {
@@ -421,14 +514,14 @@ public class SerializedData extends AbstractSerializedData {
                 this.len += 3;
                 sl = 4;
             }
-            byte[] bArr = new byte[l];
-            this.in.read(bArr);
+            byte[] b = new byte[l];
+            this.in.read(b);
             this.len++;
             for (int i = sl; (l + i) % 4 != 0; i++) {
                 this.in.read();
                 this.len++;
             }
-            return bArr;
+            return b;
         } catch (Exception e) {
             if (exception) {
                 throw new RuntimeException("read byte array error", e);
@@ -480,12 +573,13 @@ public class SerializedData extends AbstractSerializedData {
         int j = 0;
         while (j < 8) {
             try {
-                i |= ((long) this.in.read()) << (j * 8);
+                long i2 = i | (((long) this.in.read()) << (j * 8));
                 this.len++;
                 j++;
-            } catch (Exception e) {
+                i = i2;
+            } catch (long i3) {
                 if (exception) {
-                    throw new RuntimeException("read int64 error", e);
+                    throw new RuntimeException("read int64 error", i3);
                 }
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.e("read int64 error");
@@ -493,7 +587,7 @@ public class SerializedData extends AbstractSerializedData {
                 return 0;
             }
         }
-        return i;
+        return i3;
     }
 
     public void writeByteBuffer(NativeByteBuffer buffer) {

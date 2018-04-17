@@ -3,10 +3,6 @@ package net.hockeyapp.android;
 import android.content.Context;
 import android.os.Process;
 import android.text.TextUtils;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -54,7 +50,11 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
                 crashDetails.setDeviceModel(Constants.PHONE_MODEL);
             }
             if (thread != null && (listener == null || listener.includeThreadDetails())) {
-                crashDetails.setThreadName(thread.getName() + "-" + thread.getId());
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(thread.getName());
+                stringBuilder.append("-");
+                stringBuilder.append(thread.getId());
+                crashDetails.setThreadName(stringBuilder.toString());
             }
             String deviceIdentifier = Constants.DEVICE_IDENTIFIER;
             if (deviceIdentifier != null && (listener == null || listener.includeDeviceIdentifier())) {
@@ -63,9 +63,21 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
             crashDetails.writeCrashReport(context);
             if (listener != null) {
                 try {
-                    writeValueToFile(context, limitedString(listener.getUserID()), filename + ".user");
-                    writeValueToFile(context, limitedString(listener.getContact()), filename + ".contact");
-                    writeValueToFile(context, listener.getDescription(), filename + ".description");
+                    String limitedString = limitedString(listener.getUserID());
+                    StringBuilder stringBuilder2 = new StringBuilder();
+                    stringBuilder2.append(filename);
+                    stringBuilder2.append(".user");
+                    writeValueToFile(context, limitedString, stringBuilder2.toString());
+                    limitedString = limitedString(listener.getContact());
+                    stringBuilder2 = new StringBuilder();
+                    stringBuilder2.append(filename);
+                    stringBuilder2.append(".contact");
+                    writeValueToFile(context, limitedString, stringBuilder2.toString());
+                    limitedString = listener.getDescription();
+                    stringBuilder2 = new StringBuilder();
+                    stringBuilder2.append(filename);
+                    stringBuilder2.append(".description");
+                    writeValueToFile(context, limitedString, stringBuilder2.toString());
                 } catch (Throwable e) {
                     HockeyLog.error("Error saving crash meta data!", e);
                 }
@@ -75,67 +87,77 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 
     public void uncaughtException(Thread thread, Throwable exception) {
         Context context = CrashManager.weakContext != null ? (Context) CrashManager.weakContext.get() : null;
-        if (context == null || context.getFilesDir() == null) {
-            this.mDefaultExceptionHandler.uncaughtException(thread, exception);
-            return;
-        }
-        saveException(exception, thread, this.mCrashManagerListener);
-        if (this.mIgnoreDefaultHandler) {
-            Process.killProcess(Process.myPid());
-            System.exit(10);
-            return;
+        if (context != null) {
+            if (context.getFilesDir() != null) {
+                saveException(exception, thread, this.mCrashManagerListener);
+                if (this.mIgnoreDefaultHandler) {
+                    Process.killProcess(Process.myPid());
+                    System.exit(10);
+                    return;
+                }
+                this.mDefaultExceptionHandler.uncaughtException(thread, exception);
+                return;
+            }
         }
         this.mDefaultExceptionHandler.uncaughtException(thread, exception);
     }
 
-    private static void writeValueToFile(Context context, String value, String filename) throws IOException {
-        Throwable e;
-        Throwable th;
-        if (!TextUtils.isEmpty(value)) {
-            BufferedWriter writer = null;
-            try {
-                File file = new File(context.getFilesDir(), filename);
-                if (!TextUtils.isEmpty(value) && TextUtils.getTrimmedLength(value) > 0) {
-                    BufferedWriter writer2 = new BufferedWriter(new FileWriter(file));
-                    try {
-                        writer2.write(value);
-                        writer2.flush();
-                        writer = writer2;
-                    } catch (IOException e2) {
-                        e = e2;
-                        writer = writer2;
-                        try {
-                            HockeyLog.error("Failed to write value to " + filename, e);
-                            if (writer != null) {
-                                writer.close();
-                            }
-                        } catch (Throwable th2) {
-                            th = th2;
-                            if (writer != null) {
-                                writer.close();
-                            }
-                            throw th;
-                        }
-                    } catch (Throwable th3) {
-                        th = th3;
-                        writer = writer2;
-                        if (writer != null) {
-                            writer.close();
-                        }
-                        throw th;
-                    }
-                }
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e3) {
-                e = e3;
-                HockeyLog.error("Failed to write value to " + filename, e);
-                if (writer != null) {
-                    writer.close();
-                }
-            }
-        }
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private static void writeValueToFile(android.content.Context r4, java.lang.String r5, java.lang.String r6) throws java.io.IOException {
+        /*
+        r0 = android.text.TextUtils.isEmpty(r5);
+        if (r0 == 0) goto L_0x0007;
+    L_0x0006:
+        return;
+    L_0x0007:
+        r0 = 0;
+        r1 = new java.io.File;	 Catch:{ IOException -> 0x0036 }
+        r2 = r4.getFilesDir();	 Catch:{ IOException -> 0x0036 }
+        r1.<init>(r2, r6);	 Catch:{ IOException -> 0x0036 }
+        r2 = android.text.TextUtils.isEmpty(r5);	 Catch:{ IOException -> 0x0036 }
+        if (r2 != 0) goto L_0x002e;
+    L_0x0017:
+        r2 = android.text.TextUtils.getTrimmedLength(r5);	 Catch:{ IOException -> 0x0036 }
+        if (r2 <= 0) goto L_0x002e;
+    L_0x001d:
+        r2 = new java.io.BufferedWriter;	 Catch:{ IOException -> 0x0036 }
+        r3 = new java.io.FileWriter;	 Catch:{ IOException -> 0x0036 }
+        r3.<init>(r1);	 Catch:{ IOException -> 0x0036 }
+        r2.<init>(r3);	 Catch:{ IOException -> 0x0036 }
+        r0 = r2;
+        r0.write(r5);	 Catch:{ IOException -> 0x0036 }
+        r0.flush();	 Catch:{ IOException -> 0x0036 }
+    L_0x002e:
+        if (r0 == 0) goto L_0x004e;
+    L_0x0030:
+        r0.close();
+        goto L_0x004e;
+    L_0x0034:
+        r1 = move-exception;
+        goto L_0x004f;
+    L_0x0036:
+        r1 = move-exception;
+        r2 = new java.lang.StringBuilder;	 Catch:{ all -> 0x0034 }
+        r2.<init>();	 Catch:{ all -> 0x0034 }
+        r3 = "Failed to write value to ";
+        r2.append(r3);	 Catch:{ all -> 0x0034 }
+        r2.append(r6);	 Catch:{ all -> 0x0034 }
+        r2 = r2.toString();	 Catch:{ all -> 0x0034 }
+        net.hockeyapp.android.utils.HockeyLog.error(r2, r1);	 Catch:{ all -> 0x0034 }
+        if (r0 == 0) goto L_0x004e;
+    L_0x004d:
+        goto L_0x0030;
+    L_0x004e:
+        return;
+    L_0x004f:
+        if (r0 == 0) goto L_0x0054;
+    L_0x0051:
+        r0.close();
+    L_0x0054:
+        throw r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.ExceptionHandler.writeValueToFile(android.content.Context, java.lang.String, java.lang.String):void");
     }
 
     private static String limitedString(String string) {

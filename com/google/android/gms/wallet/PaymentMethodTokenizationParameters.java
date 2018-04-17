@@ -3,35 +3,35 @@ package com.google.android.gms.wallet;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class PaymentMethodTokenizationParameters extends zzbfm {
+public final class PaymentMethodTokenizationParameters extends AbstractSafeParcelable {
     public static final Creator<PaymentMethodTokenizationParameters> CREATOR = new zzah();
-    Bundle zzeac = new Bundle();
-    int zzldi;
+    int zzeb;
+    Bundle zzed = new Bundle();
 
     public final class Builder {
-        private /* synthetic */ PaymentMethodTokenizationParameters zzldk;
+        private final /* synthetic */ PaymentMethodTokenizationParameters zzee;
 
         private Builder(PaymentMethodTokenizationParameters paymentMethodTokenizationParameters) {
-            this.zzldk = paymentMethodTokenizationParameters;
+            this.zzee = paymentMethodTokenizationParameters;
         }
 
         public final Builder addParameter(String str, String str2) {
-            zzbq.zzh(str, "Tokenization parameter name must not be empty");
-            zzbq.zzh(str2, "Tokenization parameter value must not be empty");
-            this.zzldk.zzeac.putString(str, str2);
+            Preconditions.checkNotEmpty(str, "Tokenization parameter name must not be empty");
+            Preconditions.checkNotEmpty(str2, "Tokenization parameter value must not be empty");
+            this.zzee.zzed.putString(str, str2);
             return this;
         }
 
         public final PaymentMethodTokenizationParameters build() {
-            return this.zzldk;
+            return this.zzee;
         }
 
         public final Builder setPaymentMethodTokenizationType(int i) {
-            this.zzldk.zzldi = i;
+            this.zzee.zzeb = i;
             return this;
         }
     }
@@ -40,8 +40,8 @@ public final class PaymentMethodTokenizationParameters extends zzbfm {
     }
 
     PaymentMethodTokenizationParameters(int i, Bundle bundle) {
-        this.zzldi = i;
-        this.zzeac = bundle;
+        this.zzeb = i;
+        this.zzed = bundle;
     }
 
     public static Builder newBuilder() {
@@ -49,9 +49,9 @@ public final class PaymentMethodTokenizationParameters extends zzbfm {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 2, this.zzldi);
-        zzbfp.zza(parcel, 3, this.zzeac, false);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 2, this.zzeb);
+        SafeParcelWriter.writeBundle(parcel, 3, this.zzed, false);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

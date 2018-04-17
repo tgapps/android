@@ -1,61 +1,29 @@
 package com.google.android.gms.common.api.internal;
 
-import android.os.DeadObjectException;
-import android.os.RemoteException;
-import com.google.android.gms.common.api.Api;
-import com.google.android.gms.common.api.Api.zzb;
-import com.google.android.gms.common.api.Api.zzc;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Result;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.common.internal.zzbz;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiActivity;
 
-public abstract class zzm<R extends Result, A extends zzb> extends BasePendingResult<R> implements zzn<R> {
-    private final Api<?> zzfin;
-    private final zzc<A> zzfok;
+final class zzm implements Runnable {
+    private final zzl zzev;
+    final /* synthetic */ zzk zzew;
 
-    protected zzm(Api<?> api, GoogleApiClient googleApiClient) {
-        super((GoogleApiClient) zzbq.checkNotNull(googleApiClient, "GoogleApiClient must not be null"));
-        zzbq.checkNotNull(api, "Api must not be null");
-        this.zzfok = api.zzagf();
-        this.zzfin = api;
+    zzm(zzk com_google_android_gms_common_api_internal_zzk, zzl com_google_android_gms_common_api_internal_zzl) {
+        this.zzew = com_google_android_gms_common_api_internal_zzk;
+        this.zzev = com_google_android_gms_common_api_internal_zzl;
     }
 
-    private final void zzc(RemoteException remoteException) {
-        zzu(new Status(8, remoteException.getLocalizedMessage(), null));
-    }
-
-    public /* bridge */ /* synthetic */ void setResult(Object obj) {
-        super.setResult((Result) obj);
-    }
-
-    protected abstract void zza(A a) throws RemoteException;
-
-    public final zzc<A> zzagf() {
-        return this.zzfok;
-    }
-
-    public final Api<?> zzagl() {
-        return this.zzfin;
-    }
-
-    public final void zzb(A a) throws DeadObjectException {
-        if (a instanceof zzbz) {
-            zzb zzals = zzbz.zzals();
+    public final void run() {
+        if (this.zzew.mStarted) {
+            ConnectionResult connectionResult = this.zzev.getConnectionResult();
+            if (connectionResult.hasResolution()) {
+                this.zzew.mLifecycleFragment.startActivityForResult(GoogleApiActivity.zza(this.zzew.getActivity(), connectionResult.getResolution(), this.zzev.zzu(), false), 1);
+            } else if (this.zzew.zzdg.isUserResolvableError(connectionResult.getErrorCode())) {
+                this.zzew.zzdg.showErrorDialogFragment(this.zzew.getActivity(), this.zzew.mLifecycleFragment, connectionResult.getErrorCode(), 2, this.zzew);
+            } else if (connectionResult.getErrorCode() == 18) {
+                this.zzew.zzdg.registerCallbackOnUpdate(this.zzew.getActivity().getApplicationContext(), new zzn(this, this.zzew.zzdg.showUpdatingDialog(this.zzew.getActivity(), this.zzew)));
+            } else {
+                this.zzew.zza(connectionResult, this.zzev.zzu());
+            }
         }
-        try {
-            zza(zzals);
-        } catch (RemoteException e) {
-            zzc(e);
-            throw e;
-        } catch (RemoteException e2) {
-            zzc(e2);
-        }
-    }
-
-    public final void zzu(Status status) {
-        zzbq.checkArgument(!status.isSuccess(), "Failed result must not be success");
-        setResult(zzb(status));
     }
 }

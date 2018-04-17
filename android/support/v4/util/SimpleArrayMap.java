@@ -1,7 +1,6 @@
 package android.support.v4.util;
 
 import java.util.ConcurrentModificationException;
-import java.util.Map;
 
 public class SimpleArrayMap<K, V> {
     static Object[] mBaseCache;
@@ -11,6 +10,139 @@ public class SimpleArrayMap<K, V> {
     Object[] mArray;
     int[] mHashes;
     int mSize;
+
+    public boolean equals(java.lang.Object r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: android.support.v4.util.SimpleArrayMap.equals(java.lang.Object):boolean
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = 1;
+        if (r8 != r9) goto L_0x0004;
+    L_0x0003:
+        return r0;
+    L_0x0004:
+        r1 = r9 instanceof android.support.v4.util.SimpleArrayMap;
+        r2 = 0;
+        if (r1 == 0) goto L_0x0043;
+    L_0x0009:
+        r1 = r9;
+        r1 = (android.support.v4.util.SimpleArrayMap) r1;
+        r3 = r8.size();
+        r4 = r1.size();
+        if (r3 == r4) goto L_0x0017;
+    L_0x0016:
+        return r2;
+    L_0x0017:
+        r3 = r2;
+        r4 = r8.mSize;	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        if (r3 >= r4) goto L_0x003d;	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+    L_0x001c:
+        r4 = r8.keyAt(r3);	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        r5 = r8.valueAt(r3);	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        r6 = r1.get(r4);	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        if (r5 != 0) goto L_0x0033;	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        if (r6 != 0) goto L_0x0032;	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        r7 = r1.containsKey(r4);	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        if (r7 != 0) goto L_0x003a;	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        return r2;	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        r7 = r5.equals(r6);	 Catch:{ NullPointerException -> 0x0041, ClassCastException -> 0x003f }
+        if (r7 != 0) goto L_0x003a;
+        return r2;
+        r3 = r3 + 1;
+        goto L_0x0018;
+        return r0;
+    L_0x003f:
+        r0 = move-exception;
+        return r2;
+    L_0x0041:
+        r0 = move-exception;
+        return r2;
+    L_0x0043:
+        r1 = r9 instanceof java.util.Map;
+        if (r1 == 0) goto L_0x0081;
+        r1 = r9;
+        r1 = (java.util.Map) r1;
+        r3 = r8.size();
+        r4 = r1.size();
+        if (r3 == r4) goto L_0x0055;
+        return r2;
+        r3 = r2;
+        r4 = r8.mSize;	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        if (r3 >= r4) goto L_0x007b;	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        r4 = r8.keyAt(r3);	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        r5 = r8.valueAt(r3);	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        r6 = r1.get(r4);	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        if (r5 != 0) goto L_0x0071;	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        if (r6 != 0) goto L_0x0070;	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        r7 = r1.containsKey(r4);	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        if (r7 != 0) goto L_0x0078;	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        return r2;	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        r7 = r5.equals(r6);	 Catch:{ NullPointerException -> 0x007f, ClassCastException -> 0x007d }
+        if (r7 != 0) goto L_0x0078;
+        return r2;
+        r3 = r3 + 1;
+        goto L_0x0056;
+        return r0;
+    L_0x007d:
+        r0 = move-exception;
+        return r2;
+    L_0x007f:
+        r0 = move-exception;
+        return r2;
+        return r2;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: android.support.v4.util.SimpleArrayMap.equals(java.lang.Object):boolean");
+    }
+
+    int indexOfValue(java.lang.Object r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: android.support.v4.util.SimpleArrayMap.indexOfValue(java.lang.Object):int
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r4.mSize;
+        r0 = r0 * 2;
+        r1 = r4.mArray;
+        r2 = 1;
+        if (r5 != 0) goto L_0x0016;
+    L_0x000a:
+        if (r2 >= r0) goto L_0x0027;
+        r3 = r1[r2];
+        if (r3 != 0) goto L_0x0013;
+        r3 = r2 >> 1;
+        return r3;
+        r2 = r2 + 2;
+        goto L_0x000a;
+        if (r2 >= r0) goto L_0x0027;
+        r3 = r1[r2];
+        r3 = r5.equals(r3);
+        if (r3 == 0) goto L_0x0024;
+        r3 = r2 >> 1;
+        return r3;
+        r2 = r2 + 2;
+        goto L_0x0017;
+        r2 = -1;
+        return r2;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: android.support.v4.util.SimpleArrayMap.indexOfValue(java.lang.Object):int");
+    }
 
     private static int binarySearchHashes(int[] hashes, int N, int hash) {
         try {
@@ -190,26 +322,6 @@ public class SimpleArrayMap<K, V> {
         return key == null ? indexOfNull() : indexOf(key, key.hashCode());
     }
 
-    int indexOfValue(Object value) {
-        int N = this.mSize * 2;
-        Object[] array = this.mArray;
-        int i;
-        if (value == null) {
-            for (i = 1; i < N; i += 2) {
-                if (array[i] == null) {
-                    return i >> 1;
-                }
-            }
-        } else {
-            for (i = 1; i < N; i += 2) {
-                if (value.equals(array[i])) {
-                    return i >> 1;
-                }
-            }
-        }
-        return -1;
-    }
-
     public boolean containsValue(Object value) {
         return indexOfValue(value) >= 0;
     }
@@ -228,9 +340,9 @@ public class SimpleArrayMap<K, V> {
     }
 
     public V setValueAt(int index, V value) {
-        index = (index << 1) + 1;
-        V old = this.mArray[index];
-        this.mArray[index] = value;
+        int index2 = (index << 1) + 1;
+        V old = this.mArray[index2];
+        this.mArray[index2] = value;
         return old;
     }
 
@@ -241,7 +353,6 @@ public class SimpleArrayMap<K, V> {
     public V put(K key, V value) {
         int hash;
         int index;
-        int n = 8;
         int osize = this.mSize;
         if (key == null) {
             hash = 0;
@@ -251,21 +362,22 @@ public class SimpleArrayMap<K, V> {
             index = indexOf(key, hash);
         }
         if (index >= 0) {
-            index = (index << 1) + 1;
-            V old = this.mArray[index];
-            this.mArray[index] = value;
+            int index2 = (index << 1) + 1;
+            V old = this.mArray[index2];
+            this.mArray[index2] = value;
             return old;
         }
         index ^= -1;
         if (osize >= this.mHashes.length) {
+            index2 = 4;
             if (osize >= 8) {
-                n = osize + (osize >> 1);
-            } else if (osize < 4) {
-                n = 4;
+                index2 = (osize >> 1) + osize;
+            } else if (osize >= 4) {
+                index2 = 8;
             }
             int[] ohashes = this.mHashes;
             Object[] oarray = this.mArray;
-            allocArrays(n);
+            allocArrays(index2);
             if (osize != this.mSize) {
                 throw new ConcurrentModificationException();
             }
@@ -279,14 +391,16 @@ public class SimpleArrayMap<K, V> {
             System.arraycopy(this.mHashes, index, this.mHashes, index + 1, osize - index);
             System.arraycopy(this.mArray, index << 1, this.mArray, (index + 1) << 1, (this.mSize - index) << 1);
         }
-        if (osize != this.mSize || index >= this.mHashes.length) {
-            throw new ConcurrentModificationException();
+        if (osize == this.mSize) {
+            if (index < this.mHashes.length) {
+                this.mHashes[index] = hash;
+                this.mArray[index << 1] = key;
+                this.mArray[(index << 1) + 1] = value;
+                this.mSize++;
+                return null;
+            }
         }
-        this.mHashes[index] = hash;
-        this.mArray[index << 1] = key;
-        this.mArray[(index << 1) + 1] = value;
-        this.mSize++;
-        return null;
+        throw new ConcurrentModificationException();
     }
 
     public V remove(Object key) {
@@ -299,7 +413,6 @@ public class SimpleArrayMap<K, V> {
 
     public V removeAt(int index) {
         int nsize;
-        int n = 8;
         Object old = this.mArray[(index << 1) + 1];
         int osize = this.mSize;
         if (osize <= 1) {
@@ -308,18 +421,20 @@ public class SimpleArrayMap<K, V> {
             this.mArray = ContainerHelpers.EMPTY_OBJECTS;
             nsize = 0;
         } else {
-            nsize = osize - 1;
+            int nsize2 = osize - 1;
+            int i = 8;
             if (this.mHashes.length <= 8 || this.mSize >= this.mHashes.length / 3) {
-                if (index < nsize) {
-                    System.arraycopy(this.mHashes, index + 1, this.mHashes, index, nsize - index);
-                    System.arraycopy(this.mArray, (index + 1) << 1, this.mArray, index << 1, (nsize - index) << 1);
+                if (index < nsize2) {
+                    System.arraycopy(this.mHashes, index + 1, this.mHashes, index, nsize2 - index);
+                    System.arraycopy(this.mArray, (index + 1) << 1, this.mArray, index << 1, (nsize2 - index) << 1);
                 }
-                this.mArray[nsize << 1] = null;
-                this.mArray[(nsize << 1) + 1] = null;
+                this.mArray[nsize2 << 1] = null;
+                this.mArray[(nsize2 << 1) + 1] = null;
             } else {
                 if (osize > 8) {
-                    n = osize + (osize >> 1);
+                    i = osize + (osize >> 1);
                 }
+                int n = i;
                 int[] ohashes = this.mHashes;
                 Object[] oarray = this.mArray;
                 allocArrays(n);
@@ -330,11 +445,12 @@ public class SimpleArrayMap<K, V> {
                     System.arraycopy(ohashes, 0, this.mHashes, 0, index);
                     System.arraycopy(oarray, 0, this.mArray, 0, index << 1);
                 }
-                if (index < nsize) {
-                    System.arraycopy(ohashes, index + 1, this.mHashes, index, nsize - index);
-                    System.arraycopy(oarray, (index + 1) << 1, this.mArray, index << 1, (nsize - index) << 1);
+                if (index < nsize2) {
+                    System.arraycopy(ohashes, index + 1, this.mHashes, index, nsize2 - index);
+                    System.arraycopy(oarray, (index + 1) << 1, this.mArray, index << 1, (nsize2 - index) << 1);
                 }
             }
+            nsize = nsize2;
         }
         if (osize != this.mSize) {
             throw new ConcurrentModificationException();
@@ -347,71 +463,6 @@ public class SimpleArrayMap<K, V> {
         return this.mSize;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        int i;
-        K key;
-        V mine;
-        Object theirs;
-        if (object instanceof SimpleArrayMap) {
-            SimpleArrayMap<?, ?> map = (SimpleArrayMap) object;
-            if (size() != map.size()) {
-                return false;
-            }
-            i = 0;
-            while (i < this.mSize) {
-                try {
-                    key = keyAt(i);
-                    mine = valueAt(i);
-                    theirs = map.get(key);
-                    if (mine == null) {
-                        if (theirs != null || !map.containsKey(key)) {
-                            return false;
-                        }
-                    } else if (!mine.equals(theirs)) {
-                        return false;
-                    }
-                    i++;
-                } catch (NullPointerException e) {
-                    return false;
-                } catch (ClassCastException e2) {
-                    return false;
-                }
-            }
-            return true;
-        } else if (!(object instanceof Map)) {
-            return false;
-        } else {
-            Map<?, ?> map2 = (Map) object;
-            if (size() != map2.size()) {
-                return false;
-            }
-            i = 0;
-            while (i < this.mSize) {
-                try {
-                    key = keyAt(i);
-                    mine = valueAt(i);
-                    theirs = map2.get(key);
-                    if (mine == null) {
-                        if (theirs != null || !map2.containsKey(key)) {
-                            return false;
-                        }
-                    } else if (!mine.equals(theirs)) {
-                        return false;
-                    }
-                    i++;
-                } catch (NullPointerException e3) {
-                    return false;
-                } catch (ClassCastException e4) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
     public int hashCode() {
         int[] hashes = this.mHashes;
         Object[] array = this.mArray;
@@ -421,7 +472,7 @@ public class SimpleArrayMap<K, V> {
         int s = this.mSize;
         while (i < s) {
             Object value = array[v];
-            result += (value == null ? 0 : value.hashCode()) ^ hashes[i];
+            result += hashes[i] ^ (value == null ? 0 : value.hashCode());
             i++;
             v += 2;
         }

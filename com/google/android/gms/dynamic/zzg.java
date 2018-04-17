@@ -1,17 +1,17 @@
 package com.google.android.gms.dynamic;
 
-final class zzg implements zzi {
-    private /* synthetic */ zza zzgwh;
+final class zzg implements zza {
+    private final /* synthetic */ DeferredLifecycleHelper zzabg;
 
-    zzg(zza com_google_android_gms_dynamic_zza) {
-        this.zzgwh = com_google_android_gms_dynamic_zza;
+    zzg(DeferredLifecycleHelper deferredLifecycleHelper) {
+        this.zzabg = deferredLifecycleHelper;
     }
 
     public final int getState() {
-        return 4;
+        return 5;
     }
 
-    public final void zzb(LifecycleDelegate lifecycleDelegate) {
-        this.zzgwh.zzgwd.onStart();
+    public final void zza(LifecycleDelegate lifecycleDelegate) {
+        this.zzabg.zzabc.onResume();
     }
 }

@@ -2,41 +2,41 @@ package com.google.android.gms.wallet.wobs;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class LoyaltyPointsBalance extends zzbfm {
+public final class LoyaltyPointsBalance extends AbstractSafeParcelable {
     public static final Creator<LoyaltyPointsBalance> CREATOR = new zzh();
-    String zzlar;
-    int zzlfx;
-    String zzlfy;
-    double zzlfz;
-    long zzlga;
-    int zzlgb;
+    String zzbn;
+    int zzgt;
+    String zzgu;
+    double zzgv;
+    long zzgw;
+    int zzgx;
 
     LoyaltyPointsBalance() {
-        this.zzlgb = -1;
-        this.zzlfx = -1;
-        this.zzlfz = -1.0d;
+        this.zzgx = -1;
+        this.zzgt = -1;
+        this.zzgv = -1.0d;
     }
 
     LoyaltyPointsBalance(int i, String str, double d, String str2, long j, int i2) {
-        this.zzlfx = i;
-        this.zzlfy = str;
-        this.zzlfz = d;
-        this.zzlar = str2;
-        this.zzlga = j;
-        this.zzlgb = i2;
+        this.zzgt = i;
+        this.zzgu = str;
+        this.zzgv = d;
+        this.zzbn = str2;
+        this.zzgw = j;
+        this.zzgx = i2;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 2, this.zzlfx);
-        zzbfp.zza(parcel, 3, this.zzlfy, false);
-        zzbfp.zza(parcel, 4, this.zzlfz);
-        zzbfp.zza(parcel, 5, this.zzlar, false);
-        zzbfp.zza(parcel, 6, this.zzlga);
-        zzbfp.zzc(parcel, 7, this.zzlgb);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 2, this.zzgt);
+        SafeParcelWriter.writeString(parcel, 3, this.zzgu, false);
+        SafeParcelWriter.writeDouble(parcel, 4, this.zzgv);
+        SafeParcelWriter.writeString(parcel, 5, this.zzbn, false);
+        SafeParcelWriter.writeLong(parcel, 6, this.zzgw);
+        SafeParcelWriter.writeInt(parcel, 7, this.zzgx);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

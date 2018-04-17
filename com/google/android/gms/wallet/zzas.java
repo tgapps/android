@@ -2,24 +2,21 @@ package com.google.android.gms.wallet;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzas implements Creator<zzar> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzbfn.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
-                case 2:
-                    str = zzbfn.zzq(parcel, readInt);
-                    break;
-                default:
-                    zzbfn.zzb(parcel, readInt);
-                    break;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            if (SafeParcelReader.getFieldId(readHeader) != 2) {
+                SafeParcelReader.skipUnknownField(parcel, readHeader);
+            } else {
+                str = SafeParcelReader.createString(parcel, readHeader);
             }
         }
-        zzbfn.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new zzar(str);
     }
 

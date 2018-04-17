@@ -3,28 +3,28 @@ package com.google.android.gms.wallet;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzah implements Creator<PaymentMethodTokenizationParameters> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzbfn.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         int i = 0;
         Bundle bundle = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    i = zzbfn.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    bundle = zzbfn.zzs(parcel, readInt);
+                    bundle = SafeParcelReader.createBundle(parcel, readHeader);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new PaymentMethodTokenizationParameters(i, bundle);
     }
 

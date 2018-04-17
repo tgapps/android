@@ -7,30 +7,32 @@ public final class zzby {
     private zzby() {
     }
 
-    public static void zza(Bundle bundle, String str, Parcelable parcelable) {
-        bundle.setClassLoader(zzby.class.getClassLoader());
-        Bundle bundle2 = bundle.getBundle("map_state");
-        if (bundle2 == null) {
-            bundle2 = new Bundle();
+    private static <T extends Parcelable> T zza(Bundle bundle, String str) {
+        if (bundle == null) {
+            return null;
         }
-        bundle2.setClassLoader(zzby.class.getClassLoader());
-        bundle2.putParcelable(str, parcelable);
-        bundle.putBundle("map_state", bundle2);
+        bundle.setClassLoader(zzby.class.getClassLoader());
+        bundle = bundle.getBundle("map_state");
+        if (bundle == null) {
+            return null;
+        }
+        bundle.setClassLoader(zzby.class.getClassLoader());
+        return bundle.getParcelable(str);
     }
 
-    public static void zzd(Bundle bundle, Bundle bundle2) {
+    public static void zza(Bundle bundle, Bundle bundle2) {
         if (bundle != null && bundle2 != null) {
-            Parcelable zzg = zzg(bundle, "MapOptions");
-            if (zzg != null) {
-                zza(bundle2, "MapOptions", zzg);
+            Parcelable zza = zza(bundle, "MapOptions");
+            if (zza != null) {
+                zza(bundle2, "MapOptions", zza);
             }
-            zzg = zzg(bundle, "StreetViewPanoramaOptions");
-            if (zzg != null) {
-                zza(bundle2, "StreetViewPanoramaOptions", zzg);
+            zza = zza(bundle, "StreetViewPanoramaOptions");
+            if (zza != null) {
+                zza(bundle2, "StreetViewPanoramaOptions", zza);
             }
-            zzg = zzg(bundle, "camera");
-            if (zzg != null) {
-                zza(bundle2, "camera", zzg);
+            zza = zza(bundle, "camera");
+            if (zza != null) {
+                zza(bundle2, "camera", zza);
             }
             if (bundle.containsKey("position")) {
                 bundle2.putString("position", bundle.getString("position"));
@@ -41,16 +43,14 @@ public final class zzby {
         }
     }
 
-    private static <T extends Parcelable> T zzg(Bundle bundle, String str) {
-        if (bundle == null) {
-            return null;
-        }
+    public static void zza(Bundle bundle, String str, Parcelable parcelable) {
         bundle.setClassLoader(zzby.class.getClassLoader());
         Bundle bundle2 = bundle.getBundle("map_state");
         if (bundle2 == null) {
-            return null;
+            bundle2 = new Bundle();
         }
         bundle2.setClassLoader(zzby.class.getClassLoader());
-        return bundle2.getParcelable(str);
+        bundle2.putParcelable(str, parcelable);
+        bundle.putBundle("map_state", bundle2);
     }
 }

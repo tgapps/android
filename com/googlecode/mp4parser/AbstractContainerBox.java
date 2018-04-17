@@ -31,9 +31,16 @@ public class AbstractContainerBox extends BasicContainer implements Box {
     }
 
     public long getSize() {
+        int i;
         long s = getContainerSize();
-        int i = (this.largeBox || 8 + s >= 4294967296L) ? 16 : 8;
-        return ((long) i) + s;
+        if (!this.largeBox) {
+            if (s + 8 < 4294967296L) {
+                i = 8;
+                return s + ((long) i);
+            }
+        }
+        i = 16;
+        return s + ((long) i);
     }
 
     public String getType() {
@@ -42,26 +49,28 @@ public class AbstractContainerBox extends BasicContainer implements Box {
 
     protected ByteBuffer getHeader() {
         ByteBuffer header;
-        byte[] bArr;
-        if (this.largeBox || getSize() >= 4294967296L) {
-            bArr = new byte[16];
-            bArr[3] = (byte) 1;
-            bArr[4] = this.type.getBytes()[0];
-            bArr[5] = this.type.getBytes()[1];
-            bArr[6] = this.type.getBytes()[2];
-            bArr[7] = this.type.getBytes()[3];
-            header = ByteBuffer.wrap(bArr);
-            header.position(8);
-            IsoTypeWriter.writeUInt64(header, getSize());
-        } else {
-            bArr = new byte[8];
-            bArr[4] = this.type.getBytes()[0];
-            bArr[5] = this.type.getBytes()[1];
-            bArr[6] = this.type.getBytes()[2];
-            bArr[7] = this.type.getBytes()[3];
-            header = ByteBuffer.wrap(bArr);
-            IsoTypeWriter.writeUInt32(header, getSize());
+        if (!this.largeBox) {
+            if (getSize() < 4294967296L) {
+                header = new byte[8];
+                header[4] = this.type.getBytes()[0];
+                header[5] = this.type.getBytes()[1];
+                header[6] = this.type.getBytes()[2];
+                header[7] = this.type.getBytes()[3];
+                header = ByteBuffer.wrap(header);
+                IsoTypeWriter.writeUInt32(header, getSize());
+                header.rewind();
+                return header;
+            }
         }
+        byte[] bArr = new byte[16];
+        bArr[3] = (byte) 1;
+        bArr[4] = this.type.getBytes()[0];
+        bArr[5] = this.type.getBytes()[1];
+        bArr[6] = this.type.getBytes()[2];
+        bArr[7] = this.type.getBytes()[3];
+        header = ByteBuffer.wrap(bArr);
+        header.position(8);
+        IsoTypeWriter.writeUInt64(header, getSize());
         header.rewind();
         return header;
     }
@@ -78,10 +87,20 @@ public class AbstractContainerBox extends BasicContainer implements Box {
     }
 
     public void initContainer(DataSource dataSource, long containerSize, BoxParser boxParser) throws IOException {
+        int i;
         this.dataSource = dataSource;
         this.parsePosition = dataSource.position();
         long j = this.parsePosition;
-        int i = (this.largeBox || 8 + containerSize >= 4294967296L) ? 16 : 8;
+        if (!this.largeBox) {
+            if (containerSize + 8 < 4294967296L) {
+                i = 8;
+                this.startPosition = j - ((long) i);
+                dataSource.position(dataSource.position() + containerSize);
+                this.endPosition = dataSource.position();
+                this.boxParser = boxParser;
+            }
+        }
+        i = 16;
         this.startPosition = j - ((long) i);
         dataSource.position(dataSource.position() + containerSize);
         this.endPosition = dataSource.position();

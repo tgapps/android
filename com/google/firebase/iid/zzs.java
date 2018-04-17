@@ -1,14 +1,21 @@
 package com.google.firebase.iid;
 
-public final class zzs extends Exception {
-    private final int errorCode;
+import android.os.Bundle;
 
-    public zzs(int i, String str) {
-        super(str);
-        this.errorCode = i;
+final class zzs extends zzt<Void> {
+    zzs(int i, int i2, Bundle bundle) {
+        super(i, 2, bundle);
     }
 
-    public final int getErrorCode() {
-        return this.errorCode;
+    final void zzh(Bundle bundle) {
+        if (bundle.getBoolean("ack", false)) {
+            finish(null);
+        } else {
+            zza(new zzu(4, "Invalid response to one way request"));
+        }
+    }
+
+    final boolean zzst() {
+        return true;
     }
 }

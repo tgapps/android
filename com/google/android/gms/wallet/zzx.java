@@ -2,66 +2,66 @@ package com.google.android.gms.wallet;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.identity.intents.model.UserAddress;
-import com.google.android.gms.internal.zzbfn;
 
 public final class zzx implements Creator<MaskedWallet> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        InstrumentInfo[] instrumentInfoArr = null;
-        int zzd = zzbfn.zzd(parcel);
-        UserAddress userAddress = null;
-        UserAddress userAddress2 = null;
-        OfferWalletObject[] offerWalletObjectArr = null;
-        LoyaltyWalletObject[] loyaltyWalletObjectArr = null;
-        zza com_google_android_gms_wallet_zza = null;
-        zza com_google_android_gms_wallet_zza2 = null;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
-        String[] strArr = null;
-        String str2 = null;
-        String str3 = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        String str2 = str;
+        String[] strArr = str2;
+        String str3 = strArr;
+        zza com_google_android_gms_wallet_zza = str3;
+        zza com_google_android_gms_wallet_zza2 = com_google_android_gms_wallet_zza;
+        LoyaltyWalletObject[] loyaltyWalletObjectArr = com_google_android_gms_wallet_zza2;
+        OfferWalletObject[] offerWalletObjectArr = loyaltyWalletObjectArr;
+        UserAddress userAddress = offerWalletObjectArr;
+        UserAddress userAddress2 = userAddress;
+        InstrumentInfo[] instrumentInfoArr = userAddress2;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str3 = zzbfn.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = zzbfn.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    strArr = zzbfn.zzaa(parcel, readInt);
+                    strArr = SafeParcelReader.createStringArray(parcel, readHeader);
                     break;
                 case 5:
-                    str = zzbfn.zzq(parcel, readInt);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 6:
-                    com_google_android_gms_wallet_zza2 = (zza) zzbfn.zza(parcel, readInt, zza.CREATOR);
+                    com_google_android_gms_wallet_zza = (zza) SafeParcelReader.createParcelable(parcel, readHeader, zza.CREATOR);
                     break;
                 case 7:
-                    com_google_android_gms_wallet_zza = (zza) zzbfn.zza(parcel, readInt, zza.CREATOR);
+                    com_google_android_gms_wallet_zza2 = (zza) SafeParcelReader.createParcelable(parcel, readHeader, zza.CREATOR);
                     break;
                 case 8:
-                    loyaltyWalletObjectArr = (LoyaltyWalletObject[]) zzbfn.zzb(parcel, readInt, LoyaltyWalletObject.CREATOR);
+                    loyaltyWalletObjectArr = (LoyaltyWalletObject[]) SafeParcelReader.createTypedArray(parcel, readHeader, LoyaltyWalletObject.CREATOR);
                     break;
                 case 9:
-                    offerWalletObjectArr = (OfferWalletObject[]) zzbfn.zzb(parcel, readInt, OfferWalletObject.CREATOR);
+                    offerWalletObjectArr = (OfferWalletObject[]) SafeParcelReader.createTypedArray(parcel, readHeader, OfferWalletObject.CREATOR);
                     break;
                 case 10:
-                    userAddress2 = (UserAddress) zzbfn.zza(parcel, readInt, UserAddress.CREATOR);
+                    userAddress = (UserAddress) SafeParcelReader.createParcelable(parcel, readHeader, UserAddress.CREATOR);
                     break;
                 case 11:
-                    userAddress = (UserAddress) zzbfn.zza(parcel, readInt, UserAddress.CREATOR);
+                    userAddress2 = (UserAddress) SafeParcelReader.createParcelable(parcel, readHeader, UserAddress.CREATOR);
                     break;
                 case 12:
-                    instrumentInfoArr = (InstrumentInfo[]) zzbfn.zzb(parcel, readInt, InstrumentInfo.CREATOR);
+                    instrumentInfoArr = (InstrumentInfo[]) SafeParcelReader.createTypedArray(parcel, readHeader, InstrumentInfo.CREATOR);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new MaskedWallet(str3, str2, strArr, str, com_google_android_gms_wallet_zza2, com_google_android_gms_wallet_zza, loyaltyWalletObjectArr, offerWalletObjectArr, userAddress2, userAddress, instrumentInfoArr);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new MaskedWallet(str, str2, strArr, str3, com_google_android_gms_wallet_zza, com_google_android_gms_wallet_zza2, loyaltyWalletObjectArr, offerWalletObjectArr, userAddress, userAddress2, instrumentInfoArr);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

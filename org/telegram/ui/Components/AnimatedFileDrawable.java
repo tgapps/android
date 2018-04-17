@@ -3,9 +3,7 @@ package org.telegram.ui.Components;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapShader;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Matrix.ScaleToFit;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
@@ -113,7 +111,6 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
                 if (AnimatedFileDrawable.this.backgroundBitmap != null) {
                     AnimatedFileDrawable.this.backgroundBitmap.recycle();
                     AnimatedFileDrawable.this.backgroundBitmap = null;
-                    return;
                 }
                 return;
             }
@@ -142,6 +139,334 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
     private static native void destroyDecoder(long j);
 
     private static native int getVideoFrame(long j, Bitmap bitmap, int[] iArr);
+
+    public void draw(android.graphics.Canvas r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.AnimatedFileDrawable.draw(android.graphics.Canvas):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r11.nativePtr;
+        r2 = 0;
+        r4 = (r0 > r2 ? 1 : (r0 == r2 ? 0 : -1));
+        if (r4 != 0) goto L_0x000c;
+    L_0x0008:
+        r0 = r11.decoderCreated;
+        if (r0 != 0) goto L_0x0010;
+    L_0x000c:
+        r0 = r11.destroyWhenDone;
+        if (r0 == 0) goto L_0x0011;
+    L_0x0010:
+        return;
+    L_0x0011:
+        r0 = java.lang.System.currentTimeMillis();
+        r2 = r11.isRunning;
+        r3 = 0;
+        if (r2 == 0) goto L_0x0048;
+    L_0x001a:
+        r2 = r11.renderingBitmap;
+        if (r2 != 0) goto L_0x0026;
+    L_0x001e:
+        r2 = r11.nextRenderingBitmap;
+        if (r2 != 0) goto L_0x0026;
+    L_0x0022:
+        r11.scheduleNextGetFrame();
+        goto L_0x0071;
+    L_0x0026:
+        r4 = r11.lastFrameTime;
+        r6 = r0 - r4;
+        r4 = java.lang.Math.abs(r6);
+        r2 = r11.invalidateAfter;
+        r6 = (long) r2;
+        r2 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
+        if (r2 < 0) goto L_0x0071;
+    L_0x0035:
+        r2 = r11.nextRenderingBitmap;
+        if (r2 == 0) goto L_0x0071;
+    L_0x0039:
+        r2 = r11.nextRenderingBitmap;
+        r11.renderingBitmap = r2;
+        r2 = r11.nextRenderingShader;
+        r11.renderingShader = r2;
+        r11.nextRenderingBitmap = r3;
+        r11.nextRenderingShader = r3;
+        r11.lastFrameTime = r0;
+        goto L_0x0071;
+    L_0x0048:
+        r2 = r11.isRunning;
+        if (r2 != 0) goto L_0x0071;
+    L_0x004c:
+        r2 = r11.decodeSingleFrame;
+        if (r2 == 0) goto L_0x0071;
+    L_0x0050:
+        r4 = r11.lastFrameTime;
+        r6 = r0 - r4;
+        r4 = java.lang.Math.abs(r6);
+        r2 = r11.invalidateAfter;
+        r6 = (long) r2;
+        r2 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
+        if (r2 < 0) goto L_0x0071;
+    L_0x005f:
+        r2 = r11.nextRenderingBitmap;
+        if (r2 == 0) goto L_0x0071;
+    L_0x0063:
+        r2 = r11.nextRenderingBitmap;
+        r11.renderingBitmap = r2;
+        r2 = r11.nextRenderingShader;
+        r11.renderingShader = r2;
+        r11.nextRenderingBitmap = r3;
+        r11.nextRenderingShader = r3;
+        r11.lastFrameTime = r0;
+    L_0x0071:
+        r2 = r11.renderingBitmap;
+        if (r2 == 0) goto L_0x023e;
+    L_0x0075:
+        r2 = r11.applyTransformation;
+        r3 = 270; // 0x10e float:3.78E-43 double:1.334E-321;
+        r4 = 90;
+        r5 = 2;
+        if (r2 == 0) goto L_0x00bb;
+    L_0x007e:
+        r2 = r11.renderingBitmap;
+        r2 = r2.getWidth();
+        r6 = r11.renderingBitmap;
+        r6 = r6.getHeight();
+        r7 = r11.metaData;
+        r7 = r7[r5];
+        if (r7 == r4) goto L_0x0096;
+    L_0x0090:
+        r7 = r11.metaData;
+        r7 = r7[r5];
+        if (r7 != r3) goto L_0x0099;
+    L_0x0096:
+        r7 = r2;
+        r2 = r6;
+        r6 = r7;
+    L_0x0099:
+        r7 = r11.dstRect;
+        r8 = r11.getBounds();
+        r7.set(r8);
+        r7 = r11.dstRect;
+        r7 = r7.width();
+        r7 = (float) r7;
+        r8 = (float) r2;
+        r7 = r7 / r8;
+        r11.scaleX = r7;
+        r7 = r11.dstRect;
+        r7 = r7.height();
+        r7 = (float) r7;
+        r8 = (float) r6;
+        r7 = r7 / r8;
+        r11.scaleY = r7;
+        r7 = 0;
+        r11.applyTransformation = r7;
+    L_0x00bb:
+        r2 = r11.roundRadius;
+        r6 = 0;
+        if (r2 == 0) goto L_0x01a7;
+    L_0x00c0:
+        r2 = r11.scaleX;
+        r7 = r11.scaleY;
+        r2 = java.lang.Math.max(r2, r7);
+        r7 = r11.renderingShader;
+        if (r7 != 0) goto L_0x00d9;
+    L_0x00cc:
+        r7 = new android.graphics.BitmapShader;
+        r8 = r11.backgroundBitmap;
+        r9 = android.graphics.Shader.TileMode.CLAMP;
+        r10 = android.graphics.Shader.TileMode.CLAMP;
+        r7.<init>(r8, r9, r10);
+        r11.renderingShader = r7;
+    L_0x00d9:
+        r7 = r11.getPaint();
+        r8 = r11.renderingShader;
+        r7.setShader(r8);
+        r7 = r11.roundRect;
+        r8 = r11.dstRect;
+        r7.set(r8);
+        r7 = r11.shaderMatrix;
+        r7.reset();
+        r7 = r11.scaleX;
+        r8 = r11.scaleY;
+        r7 = r7 - r8;
+        r7 = java.lang.Math.abs(r7);
+        r8 = 925353388; // 0x3727c5ac float:1.0E-5 double:4.571853193E-315;
+        r7 = (r7 > r8 ? 1 : (r7 == r8 ? 0 : -1));
+        if (r7 <= 0) goto L_0x016e;
+    L_0x00fe:
+        r6 = r11.metaData;
+        r6 = r6[r5];
+        if (r6 == r4) goto L_0x0128;
+    L_0x0104:
+        r4 = r11.metaData;
+        r4 = r4[r5];
+        if (r4 != r3) goto L_0x010b;
+    L_0x010a:
+        goto L_0x0128;
+    L_0x010b:
+        r3 = r11.dstRect;
+        r3 = r3.width();
+        r3 = (float) r3;
+        r3 = r3 / r2;
+        r3 = (double) r3;
+        r3 = java.lang.Math.floor(r3);
+        r3 = (int) r3;
+        r4 = r11.dstRect;
+        r4 = r4.height();
+        r4 = (float) r4;
+        r4 = r4 / r2;
+        r6 = (double) r4;
+        r6 = java.lang.Math.floor(r6);
+        r4 = (int) r6;
+        goto L_0x0144;
+    L_0x0128:
+        r3 = r11.dstRect;
+        r3 = r3.height();
+        r3 = (float) r3;
+        r3 = r3 / r2;
+        r3 = (double) r3;
+        r3 = java.lang.Math.floor(r3);
+        r3 = (int) r3;
+        r4 = r11.dstRect;
+        r4 = r4.width();
+        r4 = (float) r4;
+        r4 = r4 / r2;
+        r6 = (double) r4;
+        r6 = java.lang.Math.floor(r6);
+        r4 = (int) r6;
+        r6 = r11.bitmapRect;
+        r7 = r11.renderingBitmap;
+        r7 = r7.getWidth();
+        r7 = r7 - r3;
+        r7 = r7 / r5;
+        r7 = (float) r7;
+        r8 = r11.renderingBitmap;
+        r8 = r8.getHeight();
+        r8 = r8 - r4;
+        r8 = r8 / r5;
+        r8 = (float) r8;
+        r9 = (float) r3;
+        r10 = (float) r4;
+        r6.set(r7, r8, r9, r10);
+        r6 = r11.shaderMatrix;
+        r7 = r11.bitmapRect;
+        r8 = r11.roundRect;
+        r9 = r11.metaData;
+        r5 = r9[r5];
+        r9 = android.graphics.Matrix.ScaleToFit.START;
+        org.telegram.messenger.AndroidUtilities.setRectToRect(r6, r7, r8, r5, r9);
+        goto L_0x0190;
+    L_0x016e:
+        r3 = r11.bitmapRect;
+        r4 = r11.renderingBitmap;
+        r4 = r4.getWidth();
+        r4 = (float) r4;
+        r7 = r11.renderingBitmap;
+        r7 = r7.getHeight();
+        r7 = (float) r7;
+        r3.set(r6, r6, r4, r7);
+        r3 = r11.shaderMatrix;
+        r4 = r11.bitmapRect;
+        r6 = r11.roundRect;
+        r7 = r11.metaData;
+        r5 = r7[r5];
+        r7 = android.graphics.Matrix.ScaleToFit.FILL;
+        org.telegram.messenger.AndroidUtilities.setRectToRect(r3, r4, r6, r5, r7);
+        r3 = r11.renderingShader;
+        r4 = r11.shaderMatrix;
+        r3.setLocalMatrix(r4);
+        r3 = r11.actualDrawRect;
+        r4 = r11.roundRadius;
+        r4 = (float) r4;
+        r5 = r11.roundRadius;
+        r5 = (float) r5;
+        r6 = r11.getPaint();
+        r12.drawRoundRect(r3, r4, r5, r6);
+        goto L_0x0212;
+    L_0x01a7:
+        r2 = r11.dstRect;
+        r2 = r2.left;
+        r2 = (float) r2;
+        r7 = r11.dstRect;
+        r7 = r7.top;
+        r7 = (float) r7;
+        r12.translate(r2, r7);
+        r2 = r11.metaData;
+        r2 = r2[r5];
+        if (r2 != r4) goto L_0x01cb;
+        r2 = 1119092736; // 0x42b40000 float:90.0 double:5.529052754E-315;
+        r12.rotate(r2);
+        r2 = r11.dstRect;
+        r2 = r2.width();
+        r2 = -r2;
+        r2 = (float) r2;
+        r12.translate(r6, r2);
+        goto L_0x0202;
+        r2 = r11.metaData;
+        r2 = r2[r5];
+        r4 = 180; // 0xb4 float:2.52E-43 double:8.9E-322;
+        if (r2 != r4) goto L_0x01ec;
+        r2 = 1127481344; // 0x43340000 float:180.0 double:5.570497984E-315;
+        r12.rotate(r2);
+        r2 = r11.dstRect;
+        r2 = r2.width();
+        r2 = -r2;
+        r2 = (float) r2;
+        r3 = r11.dstRect;
+        r3 = r3.height();
+        r3 = -r3;
+        r3 = (float) r3;
+        r12.translate(r2, r3);
+        goto L_0x0202;
+        r2 = r11.metaData;
+        r2 = r2[r5];
+        if (r2 != r3) goto L_0x0202;
+        r2 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
+        r12.rotate(r2);
+        r2 = r11.dstRect;
+        r2 = r2.height();
+        r2 = -r2;
+        r2 = (float) r2;
+        r12.translate(r2, r6);
+        r2 = r11.scaleX;
+        r3 = r11.scaleY;
+        r12.scale(r2, r3);
+        r2 = r11.renderingBitmap;
+        r3 = r11.getPaint();
+        r12.drawBitmap(r2, r6, r6, r3);
+        r2 = r11.isRunning;
+        if (r2 == 0) goto L_0x023e;
+        r2 = 1;
+        r4 = r11.invalidateAfter;
+        r4 = (long) r4;
+        r6 = r11.lastFrameTime;
+        r8 = r0 - r6;
+        r6 = r4 - r8;
+        r4 = 17;
+        r8 = r6 - r4;
+        r2 = java.lang.Math.max(r2, r8);
+        r4 = uiHandler;
+        r5 = r11.mInvalidateTask;
+        r4.removeCallbacks(r5);
+        r4 = uiHandler;
+        r5 = r11.mInvalidateTask;
+        r6 = r11.invalidateAfter;
+        r6 = (long) r6;
+        r6 = java.lang.Math.min(r2, r6);
+        r4.postDelayed(r5, r6);
+    L_0x023e:
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.AnimatedFileDrawable.draw(android.graphics.Canvas):void");
+    }
 
     public AnimatedFileDrawable(File file, boolean createDecoder) {
         this.path = file;
@@ -188,11 +513,10 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
             if (this.nextRenderingBitmap != null) {
                 this.nextRenderingBitmap.recycle();
                 this.nextRenderingBitmap = null;
-                return;
             }
-            return;
+        } else {
+            this.destroyWhenDone = true;
         }
-        this.destroyWhenDone = true;
     }
 
     protected static void runOnUiThread(Runnable task) {
@@ -224,16 +548,11 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
     }
 
     private void scheduleNextGetFrame() {
-        if (this.loadFrameTask != null) {
-            return;
-        }
-        if ((this.nativePtr != 0 || !this.decoderCreated) && !this.destroyWhenDone) {
+        if (this.loadFrameTask == null && !((this.nativePtr == 0 && this.decoderCreated) || this.destroyWhenDone)) {
             if (!this.isRunning) {
-                if (!this.decodeSingleFrame) {
-                    return;
-                }
-                if (this.decodeSingleFrame && this.singleFrameDecoded) {
-                    return;
+                if (this.decodeSingleFrame) {
+                    if (this.decodeSingleFrame && this.singleFrameDecoded) {
+                    }
                 }
             }
             long ms = 0;
@@ -256,19 +575,27 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
     }
 
     public int getIntrinsicHeight() {
-        if (this.decoderCreated) {
-            return (this.metaData[2] == 90 || this.metaData[2] == 270) ? this.metaData[0] : this.metaData[1];
-        } else {
+        if (!this.decoderCreated) {
             return AndroidUtilities.dp(100.0f);
         }
+        if (this.metaData[2] != 90) {
+            if (this.metaData[2] != 270) {
+                return this.metaData[1];
+            }
+        }
+        return this.metaData[0];
     }
 
     public int getIntrinsicWidth() {
-        if (this.decoderCreated) {
-            return (this.metaData[2] == 90 || this.metaData[2] == 270) ? this.metaData[1] : this.metaData[0];
-        } else {
+        if (!this.decoderCreated) {
             return AndroidUtilities.dp(100.0f);
         }
+        if (this.metaData[2] != 90) {
+            if (this.metaData[2] != 270) {
+                return this.metaData[0];
+            }
+        }
+        return this.metaData[1];
     }
 
     protected void onBoundsChange(Rect bounds) {
@@ -276,104 +603,28 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
         this.applyTransformation = true;
     }
 
-    public void draw(Canvas canvas) {
-        if ((this.nativePtr != 0 || !this.decoderCreated) && !this.destroyWhenDone) {
-            long now = System.currentTimeMillis();
-            if (this.isRunning) {
-                if (this.renderingBitmap == null && this.nextRenderingBitmap == null) {
-                    scheduleNextGetFrame();
-                } else if (Math.abs(now - this.lastFrameTime) >= ((long) this.invalidateAfter) && this.nextRenderingBitmap != null) {
-                    this.renderingBitmap = this.nextRenderingBitmap;
-                    this.renderingShader = this.nextRenderingShader;
-                    this.nextRenderingBitmap = null;
-                    this.nextRenderingShader = null;
-                    this.lastFrameTime = now;
-                }
-            } else if (!this.isRunning && this.decodeSingleFrame && Math.abs(now - this.lastFrameTime) >= ((long) this.invalidateAfter) && this.nextRenderingBitmap != null) {
-                this.renderingBitmap = this.nextRenderingBitmap;
-                this.renderingShader = this.nextRenderingShader;
-                this.nextRenderingBitmap = null;
-                this.nextRenderingShader = null;
-                this.lastFrameTime = now;
-            }
-            if (this.renderingBitmap != null) {
-                if (this.applyTransformation) {
-                    int bitmapW = this.renderingBitmap.getWidth();
-                    int bitmapH = this.renderingBitmap.getHeight();
-                    if (this.metaData[2] == 90 || this.metaData[2] == 270) {
-                        int temp = bitmapW;
-                        bitmapW = bitmapH;
-                        bitmapH = temp;
-                    }
-                    this.dstRect.set(getBounds());
-                    this.scaleX = ((float) this.dstRect.width()) / ((float) bitmapW);
-                    this.scaleY = ((float) this.dstRect.height()) / ((float) bitmapH);
-                    this.applyTransformation = false;
-                }
-                if (this.roundRadius != 0) {
-                    float scale = Math.max(this.scaleX, this.scaleY);
-                    if (this.renderingShader == null) {
-                        this.renderingShader = new BitmapShader(this.backgroundBitmap, TileMode.CLAMP, TileMode.CLAMP);
-                    }
-                    getPaint().setShader(this.renderingShader);
-                    this.roundRect.set(this.dstRect);
-                    this.shaderMatrix.reset();
-                    if (Math.abs(this.scaleX - this.scaleY) > 1.0E-5f) {
-                        int w;
-                        int h;
-                        if (this.metaData[2] == 90 || this.metaData[2] == 270) {
-                            w = (int) Math.floor((double) (((float) this.dstRect.height()) / scale));
-                            h = (int) Math.floor((double) (((float) this.dstRect.width()) / scale));
-                        } else {
-                            w = (int) Math.floor((double) (((float) this.dstRect.width()) / scale));
-                            h = (int) Math.floor((double) (((float) this.dstRect.height()) / scale));
-                        }
-                        this.bitmapRect.set((float) ((this.renderingBitmap.getWidth() - w) / 2), (float) ((this.renderingBitmap.getHeight() - h) / 2), (float) w, (float) h);
-                        AndroidUtilities.setRectToRect(this.shaderMatrix, this.bitmapRect, this.roundRect, this.metaData[2], ScaleToFit.START);
-                    } else {
-                        this.bitmapRect.set(0.0f, 0.0f, (float) this.renderingBitmap.getWidth(), (float) this.renderingBitmap.getHeight());
-                        AndroidUtilities.setRectToRect(this.shaderMatrix, this.bitmapRect, this.roundRect, this.metaData[2], ScaleToFit.FILL);
-                    }
-                    this.renderingShader.setLocalMatrix(this.shaderMatrix);
-                    canvas.drawRoundRect(this.actualDrawRect, (float) this.roundRadius, (float) this.roundRadius, getPaint());
-                } else {
-                    canvas.translate((float) this.dstRect.left, (float) this.dstRect.top);
-                    if (this.metaData[2] == 90) {
-                        canvas.rotate(90.0f);
-                        canvas.translate(0.0f, (float) (-this.dstRect.width()));
-                    } else if (this.metaData[2] == 180) {
-                        canvas.rotate(180.0f);
-                        canvas.translate((float) (-this.dstRect.width()), (float) (-this.dstRect.height()));
-                    } else if (this.metaData[2] == 270) {
-                        canvas.rotate(270.0f);
-                        canvas.translate((float) (-this.dstRect.height()), 0.0f);
-                    }
-                    canvas.scale(this.scaleX, this.scaleY);
-                    canvas.drawBitmap(this.renderingBitmap, 0.0f, 0.0f, getPaint());
-                }
-                if (this.isRunning) {
-                    long timeToNextFrame = Math.max(1, (((long) this.invalidateAfter) - (now - this.lastFrameTime)) - 17);
-                    uiHandler.removeCallbacks(this.mInvalidateTask);
-                    uiHandler.postDelayed(this.mInvalidateTask, Math.min(timeToNextFrame, (long) this.invalidateAfter));
-                }
-            }
-        }
-    }
-
     public int getMinimumHeight() {
-        if (this.decoderCreated) {
-            return (this.metaData[2] == 90 || this.metaData[2] == 270) ? this.metaData[0] : this.metaData[1];
-        } else {
+        if (!this.decoderCreated) {
             return AndroidUtilities.dp(100.0f);
         }
+        if (this.metaData[2] != 90) {
+            if (this.metaData[2] != 270) {
+                return this.metaData[1];
+            }
+        }
+        return this.metaData[0];
     }
 
     public int getMinimumWidth() {
-        if (this.decoderCreated) {
-            return (this.metaData[2] == 90 || this.metaData[2] == 270) ? this.metaData[1] : this.metaData[0];
-        } else {
+        if (!this.decoderCreated) {
             return AndroidUtilities.dp(100.0f);
         }
+        if (this.metaData[2] != 90) {
+            if (this.metaData[2] != 270) {
+                return this.metaData[0];
+            }
+        }
+        return this.metaData[1];
     }
 
     public Bitmap getAnimatedBitmap() {

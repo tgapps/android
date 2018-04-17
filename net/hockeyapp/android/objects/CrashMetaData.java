@@ -18,6 +18,15 @@ public class CrashMetaData {
     }
 
     public String toString() {
-        return "\n" + CrashMetaData.class.getSimpleName() + "\nuserDescription " + this.mUserDescription + "\nuserEmail       " + this.mUserEmail + "\nuserID          " + this.mUserID;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\n");
+        stringBuilder.append(CrashMetaData.class.getSimpleName());
+        stringBuilder.append("\nuserDescription ");
+        stringBuilder.append(this.mUserDescription);
+        stringBuilder.append("\nuserEmail       ");
+        stringBuilder.append(this.mUserEmail);
+        stringBuilder.append("\nuserID          ");
+        stringBuilder.append(this.mUserID);
+        return stringBuilder.toString();
     }
 }

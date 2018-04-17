@@ -51,9 +51,19 @@ public class Constants {
     }
 
     public static File getHockeyAppStorageDir(Context context) {
+        boolean success;
         File dir = new File(context.getExternalFilesDir(null), "HockeyApp");
-        boolean success = dir.exists() || dir.mkdirs();
-        if (!success) {
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                success = false;
+                if (!success) {
+                    HockeyLog.warn("Couldn't create HockeyApp Storage dir");
+                }
+                return dir;
+            }
+        }
+        success = true;
+        if (success) {
             HockeyLog.warn("Couldn't create HockeyApp Storage dir");
         }
         return dir;
@@ -65,11 +75,17 @@ public class Constants {
                 PackageManager packageManager = context.getPackageManager();
                 PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
                 APP_PACKAGE = packageInfo.packageName;
-                APP_VERSION = TtmlNode.ANONYMOUS_REGION_ID + packageInfo.versionCode;
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(TtmlNode.ANONYMOUS_REGION_ID);
+                stringBuilder.append(packageInfo.versionCode);
+                APP_VERSION = stringBuilder.toString();
                 APP_VERSION_NAME = packageInfo.versionName;
                 int buildNumber = loadBuildNumber(context, packageManager);
                 if (buildNumber != 0 && buildNumber > packageInfo.versionCode) {
-                    APP_VERSION = TtmlNode.ANONYMOUS_REGION_ID + buildNumber;
+                    StringBuilder stringBuilder2 = new StringBuilder();
+                    stringBuilder2.append(TtmlNode.ANONYMOUS_REGION_ID);
+                    stringBuilder2.append(buildNumber);
+                    APP_VERSION = stringBuilder2.toString();
                 }
             } catch (Throwable e) {
                 HockeyLog.error("Exception thrown when accessing the package info", e);
@@ -78,16 +94,15 @@ public class Constants {
     }
 
     private static int loadBuildNumber(Context context, PackageManager packageManager) {
-        int i = 0;
         try {
             Bundle metaData = packageManager.getApplicationInfo(context.getPackageName(), 128).metaData;
             if (metaData != null) {
-                i = metaData.getInt("buildNumber", 0);
+                return metaData.getInt("buildNumber", 0);
             }
+            return 0;
         } catch (Throwable e) {
             HockeyLog.error("Exception thrown when accessing the application info", e);
         }
-        return i;
     }
 
     @SuppressLint({"StaticFieldLeak"})

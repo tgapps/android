@@ -49,12 +49,12 @@ class NotificationCompatJellybean {
                         return null;
                     }
                 }
-                Bundle bundle = (Bundle) sExtrasField.get(notif);
-                if (bundle == null) {
-                    bundle = new Bundle();
-                    sExtrasField.set(notif, bundle);
+                Bundle extras = (Bundle) sExtrasField.get(notif);
+                if (extras == null) {
+                    extras = new Bundle();
+                    sExtrasField.set(notif, extras);
                 }
-                return bundle;
+                return extras;
             } catch (IllegalAccessException e) {
                 Log.e("NotificationCompat", "Unable to access notification extras", e);
                 sExtrasFieldAccessFailed = true;

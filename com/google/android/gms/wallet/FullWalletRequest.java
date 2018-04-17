@@ -3,33 +3,33 @@ package com.google.android.gms.wallet;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class FullWalletRequest extends zzbfm implements ReflectedParcelable {
+public final class FullWalletRequest extends AbstractSafeParcelable implements ReflectedParcelable {
     public static final Creator<FullWalletRequest> CREATOR = new zzm();
-    String zzlaa;
-    String zzlab;
-    Cart zzlal;
+    String zzaw;
+    String zzax;
+    Cart zzbh;
 
     public final class Builder {
-        private /* synthetic */ FullWalletRequest zzlam;
+        private final /* synthetic */ FullWalletRequest zzbi;
 
         private Builder(FullWalletRequest fullWalletRequest) {
-            this.zzlam = fullWalletRequest;
+            this.zzbi = fullWalletRequest;
         }
 
         public final FullWalletRequest build() {
-            return this.zzlam;
+            return this.zzbi;
         }
 
         public final Builder setCart(Cart cart) {
-            this.zzlam.zzlal = cart;
+            this.zzbi.zzbh = cart;
             return this;
         }
 
         public final Builder setGoogleTransactionId(String str) {
-            this.zzlam.zzlaa = str;
+            this.zzbi.zzaw = str;
             return this;
         }
     }
@@ -38,9 +38,9 @@ public final class FullWalletRequest extends zzbfm implements ReflectedParcelabl
     }
 
     FullWalletRequest(String str, String str2, Cart cart) {
-        this.zzlaa = str;
-        this.zzlab = str2;
-        this.zzlal = cart;
+        this.zzaw = str;
+        this.zzax = str2;
+        this.zzbh = cart;
     }
 
     public static Builder newBuilder() {
@@ -48,10 +48,10 @@ public final class FullWalletRequest extends zzbfm implements ReflectedParcelabl
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 2, this.zzlaa, false);
-        zzbfp.zza(parcel, 3, this.zzlab, false);
-        zzbfp.zza(parcel, 4, this.zzlal, i, false);
-        zzbfp.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, this.zzaw, false);
+        SafeParcelWriter.writeString(parcel, 3, this.zzax, false);
+        SafeParcelWriter.writeParcelable(parcel, 4, this.zzbh, i, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

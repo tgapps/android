@@ -1,6 +1,5 @@
 package org.telegram.messenger;
 
-import android.content.SharedPreferences;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
@@ -26,36 +25,14 @@ public class StatsController {
     };
     private static DispatchQueue statsSaveQueue = new DispatchQueue("statsSaveQueue");
     private byte[] buffer = new byte[8];
-    private int[] callsTotalTime = new int[3];
+    private int[] callsTotalTime;
     private long lastInternalStatsSaveTime;
-    private long[][] receivedBytes = ((long[][]) Array.newInstance(Long.TYPE, new int[]{3, 7}));
-    private int[][] receivedItems = ((int[][]) Array.newInstance(Integer.TYPE, new int[]{3, 7}));
-    private long[] resetStatsDate = new long[3];
-    private Runnable saveRunnable = new Runnable() {
-        public void run() {
-            long newTime = System.currentTimeMillis();
-            if (Math.abs(newTime - StatsController.this.lastInternalStatsSaveTime) >= AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS) {
-                StatsController.this.lastInternalStatsSaveTime = newTime;
-                try {
-                    StatsController.this.statsFile.seek(0);
-                    for (int a = 0; a < 3; a++) {
-                        for (int b = 0; b < 7; b++) {
-                            StatsController.this.statsFile.write(StatsController.this.longToBytes(StatsController.this.sentBytes[a][b]), 0, 8);
-                            StatsController.this.statsFile.write(StatsController.this.longToBytes(StatsController.this.receivedBytes[a][b]), 0, 8);
-                            StatsController.this.statsFile.write(StatsController.this.intToBytes(StatsController.this.sentItems[a][b]), 0, 4);
-                            StatsController.this.statsFile.write(StatsController.this.intToBytes(StatsController.this.receivedItems[a][b]), 0, 4);
-                        }
-                        StatsController.this.statsFile.write(StatsController.this.intToBytes(StatsController.this.callsTotalTime[a]), 0, 4);
-                        StatsController.this.statsFile.write(StatsController.this.longToBytes(StatsController.this.resetStatsDate[a]), 0, 8);
-                    }
-                    StatsController.this.statsFile.getFD().sync();
-                } catch (Exception e) {
-                }
-            }
-        }
-    };
-    private long[][] sentBytes = ((long[][]) Array.newInstance(Long.TYPE, new int[]{3, 7}));
-    private int[][] sentItems = ((int[][]) Array.newInstance(Integer.TYPE, new int[]{3, 7}));
+    private long[][] receivedBytes;
+    private int[][] receivedItems;
+    private long[] resetStatsDate;
+    private Runnable saveRunnable;
+    private long[][] sentBytes;
+    private int[][] sentItems;
     private RandomAccessFile statsFile;
 
     private byte[] intToBytes(int value) {
@@ -90,23 +67,12 @@ public class StatsController {
         StatsController localInstance = Instance[num];
         if (localInstance == null) {
             synchronized (StatsController.class) {
-                try {
-                    localInstance = Instance[num];
-                    if (localInstance == null) {
-                        StatsController[] statsControllerArr = Instance;
-                        StatsController localInstance2 = new StatsController(num);
-                        try {
-                            statsControllerArr[num] = localInstance2;
-                            localInstance = localInstance2;
-                        } catch (Throwable th) {
-                            Throwable th2 = th;
-                            localInstance = localInstance2;
-                            throw th2;
-                        }
-                    }
-                } catch (Throwable th3) {
-                    th2 = th3;
-                    throw th2;
+                localInstance = Instance[num];
+                if (localInstance == null) {
+                    StatsController[] statsControllerArr = Instance;
+                    StatsController statsController = new StatsController(num);
+                    localInstance = statsController;
+                    statsControllerArr[num] = statsController;
                 }
             }
         }
@@ -114,151 +80,176 @@ public class StatsController {
     }
 
     private StatsController(int account) {
-        boolean save;
-        int a;
-        int b;
+        int i = account;
+        int i2 = 7;
+        int i3 = 3;
+        this.sentBytes = (long[][]) Array.newInstance(long.class, new int[]{3, 7});
+        this.receivedBytes = (long[][]) Array.newInstance(long.class, new int[]{3, 7});
+        this.sentItems = (int[][]) Array.newInstance(int.class, new int[]{3, 7});
+        this.receivedItems = (int[][]) Array.newInstance(int.class, new int[]{3, 7});
+        this.resetStatsDate = new long[3];
+        this.callsTotalTime = new int[3];
+        this.saveRunnable = new Runnable() {
+            public void run() {
+                long newTime = System.currentTimeMillis();
+                if (Math.abs(newTime - StatsController.this.lastInternalStatsSaveTime) >= AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS) {
+                    StatsController.this.lastInternalStatsSaveTime = newTime;
+                    try {
+                        StatsController.this.statsFile.seek(0);
+                        for (int a = 0; a < 3; a++) {
+                            for (int b = 0; b < 7; b++) {
+                                StatsController.this.statsFile.write(StatsController.this.longToBytes(StatsController.this.sentBytes[a][b]), 0, 8);
+                                StatsController.this.statsFile.write(StatsController.this.longToBytes(StatsController.this.receivedBytes[a][b]), 0, 8);
+                                StatsController.this.statsFile.write(StatsController.this.intToBytes(StatsController.this.sentItems[a][b]), 0, 4);
+                                StatsController.this.statsFile.write(StatsController.this.intToBytes(StatsController.this.receivedItems[a][b]), 0, 4);
+                            }
+                            StatsController.this.statsFile.write(StatsController.this.intToBytes(StatsController.this.callsTotalTime[a]), 0, 4);
+                            StatsController.this.statsFile.write(StatsController.this.longToBytes(StatsController.this.resetStatsDate[a]), 0, 8);
+                        }
+                        StatsController.this.statsFile.getFD().sync();
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        };
         File filesDir = ApplicationLoader.getFilesDirFixed();
-        if (account != 0) {
-            filesDir = new File(ApplicationLoader.getFilesDirFixed(), "account" + account + "/");
+        if (i != 0) {
+            File filesDirFixed = ApplicationLoader.getFilesDirFixed();
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("account");
+            stringBuilder.append(i);
+            stringBuilder.append("/");
+            filesDir = new File(filesDirFixed, stringBuilder.toString());
             filesDir.mkdirs();
         }
         boolean needConvert = true;
         try {
-            this.statsFile = new RandomAccessFile(new File(filesDir, "stats2.dat"), "rw");
-            if (this.statsFile.length() > 0) {
-                save = false;
-                for (a = 0; a < 3; a++) {
-                    for (b = 0; b < 7; b++) {
-                        this.statsFile.readFully(this.buffer, 0, 8);
-                        this.sentBytes[a][b] = bytesToLong(this.buffer);
-                        this.statsFile.readFully(this.buffer, 0, 8);
-                        this.receivedBytes[a][b] = bytesToLong(this.buffer);
-                        this.statsFile.readFully(this.buffer, 0, 4);
-                        this.sentItems[a][b] = bytesToInt(this.buffer);
-                        this.statsFile.readFully(this.buffer, 0, 4);
-                        this.receivedItems[a][b] = bytesToInt(this.buffer);
+            r1.statsFile = new RandomAccessFile(new File(filesDir, "stats2.dat"), "rw");
+            if (r1.statsFile.length() > 0) {
+                boolean save = false;
+                int a = 0;
+                while (a < 3) {
+                    int b = 0;
+                    for (i2 = 
+/*
+Method generation error in method: org.telegram.messenger.StatsController.<init>(int):void
+jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i2' int) = (r4_1 'i2' int), (r4_24 'i2' int) binds: {(r4_1 'i2' int)=B:7:0x009d, (r4_24 'i2' int)=B:16:0x012a} in method: org.telegram.messenger.StatsController.<init>(int):void
+	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
+	at jadx.core.codegen.RegionGen.makeLoop(RegionGen.java:184)
+	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:61)
+	at jadx.core.codegen.RegionGen.makeSimpleRegion(RegionGen.java:87)
+	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:53)
+	at jadx.core.codegen.RegionGen.makeRegionIndent(RegionGen.java:93)
+	at jadx.core.codegen.RegionGen.makeLoop(RegionGen.java:217)
+	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:61)
+	at jadx.core.codegen.RegionGen.makeSimpleRegion(RegionGen.java:87)
+	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:53)
+	at jadx.core.codegen.RegionGen.makeRegionIndent(RegionGen.java:93)
+	at jadx.core.codegen.RegionGen.makeIf(RegionGen.java:118)
+	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:57)
+	at jadx.core.codegen.RegionGen.makeSimpleRegion(RegionGen.java:87)
+	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:53)
+	at jadx.core.codegen.RegionGen.makeRegionIndent(RegionGen.java:93)
+	at jadx.core.codegen.RegionGen.makeTryCatch(RegionGen.java:277)
+	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:63)
+	at jadx.core.codegen.RegionGen.makeSimpleRegion(RegionGen.java:87)
+	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:53)
+	at jadx.core.codegen.MethodGen.addInstructions(MethodGen.java:183)
+	at jadx.core.codegen.ClassGen.addMethod(ClassGen.java:328)
+	at jadx.core.codegen.ClassGen.addMethods(ClassGen.java:265)
+	at jadx.core.codegen.ClassGen.addClassBody(ClassGen.java:228)
+	at jadx.core.codegen.ClassGen.addClassCode(ClassGen.java:118)
+	at jadx.core.codegen.ClassGen.makeClass(ClassGen.java:83)
+	at jadx.core.codegen.CodeGen.visit(CodeGen.java:19)
+	at jadx.core.ProcessClass.process(ProcessClass.java:43)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in fallback mode
+	at jadx.core.codegen.InsnGen.fallbackOnlyInsn(InsnGen.java:530)
+	at jadx.core.codegen.InsnGen.makeInsnBody(InsnGen.java:514)
+	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:220)
+	... 30 more
+
+*/
+
+                    public void incrementReceivedItemsCount(int networkType, int dataType, int value) {
+                        int[] iArr = this.receivedItems[networkType];
+                        iArr[dataType] = iArr[dataType] + value;
+                        saveStats();
                     }
-                    this.statsFile.readFully(this.buffer, 0, 4);
-                    this.callsTotalTime[a] = bytesToInt(this.buffer);
-                    this.statsFile.readFully(this.buffer, 0, 8);
-                    this.resetStatsDate[a] = bytesToLong(this.buffer);
-                    if (this.resetStatsDate[a] == 0) {
-                        save = true;
-                        this.resetStatsDate[a] = System.currentTimeMillis();
+
+                    public void incrementSentItemsCount(int networkType, int dataType, int value) {
+                        int[] iArr = this.sentItems[networkType];
+                        iArr[dataType] = iArr[dataType] + value;
+                        saveStats();
+                    }
+
+                    public void incrementReceivedBytesCount(int networkType, int dataType, long value) {
+                        long[] jArr = this.receivedBytes[networkType];
+                        jArr[dataType] = jArr[dataType] + value;
+                        saveStats();
+                    }
+
+                    public void incrementSentBytesCount(int networkType, int dataType, long value) {
+                        long[] jArr = this.sentBytes[networkType];
+                        jArr[dataType] = jArr[dataType] + value;
+                        saveStats();
+                    }
+
+                    public void incrementTotalCallsTime(int networkType, int value) {
+                        int[] iArr = this.callsTotalTime;
+                        iArr[networkType] = iArr[networkType] + value;
+                        saveStats();
+                    }
+
+                    public int getRecivedItemsCount(int networkType, int dataType) {
+                        return this.receivedItems[networkType][dataType];
+                    }
+
+                    public int getSentItemsCount(int networkType, int dataType) {
+                        return this.sentItems[networkType][dataType];
+                    }
+
+                    public long getSentBytesCount(int networkType, int dataType) {
+                        if (dataType == 1) {
+                            return (((this.sentBytes[networkType][6] - this.sentBytes[networkType][5]) - this.sentBytes[networkType][3]) - this.sentBytes[networkType][2]) - this.sentBytes[networkType][4];
+                        }
+                        return this.sentBytes[networkType][dataType];
+                    }
+
+                    public long getReceivedBytesCount(int networkType, int dataType) {
+                        if (dataType == 1) {
+                            return (((this.receivedBytes[networkType][6] - this.receivedBytes[networkType][5]) - this.receivedBytes[networkType][3]) - this.receivedBytes[networkType][2]) - this.receivedBytes[networkType][4];
+                        }
+                        return this.receivedBytes[networkType][dataType];
+                    }
+
+                    public int getCallsTotalTime(int networkType) {
+                        return this.callsTotalTime[networkType];
+                    }
+
+                    public long getResetStatsDate(int networkType) {
+                        return this.resetStatsDate[networkType];
+                    }
+
+                    public void resetStats(int networkType) {
+                        this.resetStatsDate[networkType] = System.currentTimeMillis();
+                        for (int a = 0; a < 7; a++) {
+                            this.sentBytes[networkType][a] = 0;
+                            this.receivedBytes[networkType][a] = 0;
+                            this.sentItems[networkType][a] = 0;
+                            this.receivedItems[networkType][a] = 0;
+                        }
+                        this.callsTotalTime[networkType] = 0;
+                        saveStats();
+                    }
+
+                    private void saveStats() {
+                        long newTime = System.currentTimeMillis();
+                        if (Math.abs(newTime - ((Long) lastStatsSaveTime.get()).longValue()) >= AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS) {
+                            lastStatsSaveTime.set(Long.valueOf(newTime));
+                            statsSaveQueue.postRunnable(this.saveRunnable);
+                        }
                     }
                 }
-                if (save) {
-                    saveStats();
-                }
-                needConvert = false;
-            }
-        } catch (Exception e) {
-        }
-        if (needConvert) {
-            SharedPreferences sharedPreferences;
-            if (account == 0) {
-                sharedPreferences = ApplicationLoader.applicationContext.getSharedPreferences("stats", 0);
-            } else {
-                sharedPreferences = ApplicationLoader.applicationContext.getSharedPreferences("stats" + account, 0);
-            }
-            save = false;
-            for (a = 0; a < 3; a++) {
-                this.callsTotalTime[a] = sharedPreferences.getInt("callsTotalTime" + a, 0);
-                this.resetStatsDate[a] = sharedPreferences.getLong("resetStatsDate" + a, 0);
-                for (b = 0; b < 7; b++) {
-                    this.sentBytes[a][b] = sharedPreferences.getLong("sentBytes" + a + "_" + b, 0);
-                    this.receivedBytes[a][b] = sharedPreferences.getLong("receivedBytes" + a + "_" + b, 0);
-                    this.sentItems[a][b] = sharedPreferences.getInt("sentItems" + a + "_" + b, 0);
-                    this.receivedItems[a][b] = sharedPreferences.getInt("receivedItems" + a + "_" + b, 0);
-                }
-                if (this.resetStatsDate[a] == 0) {
-                    save = true;
-                    this.resetStatsDate[a] = System.currentTimeMillis();
-                }
-            }
-            if (save) {
-                saveStats();
-            }
-        }
-    }
-
-    public void incrementReceivedItemsCount(int networkType, int dataType, int value) {
-        int[] iArr = this.receivedItems[networkType];
-        iArr[dataType] = iArr[dataType] + value;
-        saveStats();
-    }
-
-    public void incrementSentItemsCount(int networkType, int dataType, int value) {
-        int[] iArr = this.sentItems[networkType];
-        iArr[dataType] = iArr[dataType] + value;
-        saveStats();
-    }
-
-    public void incrementReceivedBytesCount(int networkType, int dataType, long value) {
-        long[] jArr = this.receivedBytes[networkType];
-        jArr[dataType] = jArr[dataType] + value;
-        saveStats();
-    }
-
-    public void incrementSentBytesCount(int networkType, int dataType, long value) {
-        long[] jArr = this.sentBytes[networkType];
-        jArr[dataType] = jArr[dataType] + value;
-        saveStats();
-    }
-
-    public void incrementTotalCallsTime(int networkType, int value) {
-        int[] iArr = this.callsTotalTime;
-        iArr[networkType] = iArr[networkType] + value;
-        saveStats();
-    }
-
-    public int getRecivedItemsCount(int networkType, int dataType) {
-        return this.receivedItems[networkType][dataType];
-    }
-
-    public int getSentItemsCount(int networkType, int dataType) {
-        return this.sentItems[networkType][dataType];
-    }
-
-    public long getSentBytesCount(int networkType, int dataType) {
-        if (dataType == 1) {
-            return (((this.sentBytes[networkType][6] - this.sentBytes[networkType][5]) - this.sentBytes[networkType][3]) - this.sentBytes[networkType][2]) - this.sentBytes[networkType][4];
-        }
-        return this.sentBytes[networkType][dataType];
-    }
-
-    public long getReceivedBytesCount(int networkType, int dataType) {
-        if (dataType == 1) {
-            return (((this.receivedBytes[networkType][6] - this.receivedBytes[networkType][5]) - this.receivedBytes[networkType][3]) - this.receivedBytes[networkType][2]) - this.receivedBytes[networkType][4];
-        }
-        return this.receivedBytes[networkType][dataType];
-    }
-
-    public int getCallsTotalTime(int networkType) {
-        return this.callsTotalTime[networkType];
-    }
-
-    public long getResetStatsDate(int networkType) {
-        return this.resetStatsDate[networkType];
-    }
-
-    public void resetStats(int networkType) {
-        this.resetStatsDate[networkType] = System.currentTimeMillis();
-        for (int a = 0; a < 7; a++) {
-            this.sentBytes[networkType][a] = 0;
-            this.receivedBytes[networkType][a] = 0;
-            this.sentItems[networkType][a] = 0;
-            this.receivedItems[networkType][a] = 0;
-        }
-        this.callsTotalTime[networkType] = 0;
-        saveStats();
-    }
-
-    private void saveStats() {
-        long newTime = System.currentTimeMillis();
-        if (Math.abs(newTime - ((Long) lastStatsSaveTime.get()).longValue()) >= AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS) {
-            lastStatsSaveTime.set(Long.valueOf(newTime));
-            statsSaveQueue.postRunnable(this.saveRunnable);
-        }
-    }
-}

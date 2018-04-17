@@ -28,6 +28,100 @@ public class NativeByteBuffer extends AbstractSerializedData {
 
     public static native void native_reuse(long j);
 
+    public void writeByteArray(byte[] r1, int r2, int r3) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.tgnet.NativeByteBuffer.writeByteArray(byte[], int, int):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = 253; // 0xfd float:3.55E-43 double:1.25E-321;
+        r1 = 4;
+        r2 = 1;
+        if (r8 > r0) goto L_0x0019;
+    L_0x0006:
+        r3 = r5.justCalc;	 Catch:{ Exception -> 0x0017 }
+        if (r3 != 0) goto L_0x0011;	 Catch:{ Exception -> 0x0017 }
+    L_0x000a:
+        r3 = r5.buffer;	 Catch:{ Exception -> 0x0017 }
+        r4 = (byte) r8;	 Catch:{ Exception -> 0x0017 }
+        r3.put(r4);	 Catch:{ Exception -> 0x0017 }
+        goto L_0x003f;	 Catch:{ Exception -> 0x0017 }
+    L_0x0011:
+        r3 = r5.len;	 Catch:{ Exception -> 0x0017 }
+        r3 = r3 + r2;	 Catch:{ Exception -> 0x0017 }
+        r5.len = r3;	 Catch:{ Exception -> 0x0017 }
+        goto L_0x003f;	 Catch:{ Exception -> 0x0017 }
+    L_0x0017:
+        r0 = move-exception;	 Catch:{ Exception -> 0x0017 }
+        goto L_0x006c;	 Catch:{ Exception -> 0x0017 }
+    L_0x0019:
+        r3 = r5.justCalc;	 Catch:{ Exception -> 0x0017 }
+        if (r3 != 0) goto L_0x003a;	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.buffer;	 Catch:{ Exception -> 0x0017 }
+        r4 = -2;	 Catch:{ Exception -> 0x0017 }
+        r3.put(r4);	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.buffer;	 Catch:{ Exception -> 0x0017 }
+        r4 = (byte) r8;	 Catch:{ Exception -> 0x0017 }
+        r3.put(r4);	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.buffer;	 Catch:{ Exception -> 0x0017 }
+        r4 = r8 >> 8;	 Catch:{ Exception -> 0x0017 }
+        r4 = (byte) r4;	 Catch:{ Exception -> 0x0017 }
+        r3.put(r4);	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.buffer;	 Catch:{ Exception -> 0x0017 }
+        r4 = r8 >> 16;	 Catch:{ Exception -> 0x0017 }
+        r4 = (byte) r4;	 Catch:{ Exception -> 0x0017 }
+        r3.put(r4);	 Catch:{ Exception -> 0x0017 }
+        goto L_0x003f;	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.len;	 Catch:{ Exception -> 0x0017 }
+        r3 = r3 + r1;	 Catch:{ Exception -> 0x0017 }
+        r5.len = r3;	 Catch:{ Exception -> 0x0017 }
+    L_0x003f:
+        r3 = r5.justCalc;	 Catch:{ Exception -> 0x0017 }
+        if (r3 != 0) goto L_0x0049;	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.buffer;	 Catch:{ Exception -> 0x0017 }
+        r3.put(r6, r7, r8);	 Catch:{ Exception -> 0x0017 }
+        goto L_0x004e;	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.len;	 Catch:{ Exception -> 0x0017 }
+        r3 = r3 + r8;	 Catch:{ Exception -> 0x0017 }
+        r5.len = r3;	 Catch:{ Exception -> 0x0017 }
+        if (r8 > r0) goto L_0x0052;	 Catch:{ Exception -> 0x0017 }
+        r0 = r2;	 Catch:{ Exception -> 0x0017 }
+        goto L_0x0053;	 Catch:{ Exception -> 0x0017 }
+        r0 = r1;	 Catch:{ Exception -> 0x0017 }
+        r3 = r8 + r0;	 Catch:{ Exception -> 0x0017 }
+        r3 = r3 % r1;	 Catch:{ Exception -> 0x0017 }
+        if (r3 == 0) goto L_0x006b;	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.justCalc;	 Catch:{ Exception -> 0x0017 }
+        if (r3 != 0) goto L_0x0063;	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.buffer;	 Catch:{ Exception -> 0x0017 }
+        r4 = 0;	 Catch:{ Exception -> 0x0017 }
+        r3.put(r4);	 Catch:{ Exception -> 0x0017 }
+        goto L_0x0068;	 Catch:{ Exception -> 0x0017 }
+        r3 = r5.len;	 Catch:{ Exception -> 0x0017 }
+        r3 = r3 + r2;	 Catch:{ Exception -> 0x0017 }
+        r5.len = r3;	 Catch:{ Exception -> 0x0017 }
+        r0 = r0 + 1;
+        goto L_0x0053;
+        goto L_0x0076;
+        r1 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
+        if (r1 == 0) goto L_0x0076;
+        r1 = "write byte array error";
+        org.telegram.messenger.FileLog.e(r1);
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.tgnet.NativeByteBuffer.writeByteArray(byte[], int, int):void");
+    }
+
     public static NativeByteBuffer wrap(long address) {
         NativeByteBuffer result = (NativeByteBuffer) addressWrapper.get();
         if (address != 0) {
@@ -206,45 +300,6 @@ public class NativeByteBuffer extends AbstractSerializedData {
         }
     }
 
-    public void writeByteArray(byte[] b, int offset, int count) {
-        if (count <= 253) {
-            try {
-                if (this.justCalc) {
-                    this.len++;
-                } else {
-                    this.buffer.put((byte) count);
-                }
-            } catch (Exception e) {
-                if (BuildVars.LOGS_ENABLED) {
-                    FileLog.e("write byte array error");
-                    return;
-                }
-                return;
-            }
-        } else if (this.justCalc) {
-            this.len += 4;
-        } else {
-            this.buffer.put((byte) -2);
-            this.buffer.put((byte) count);
-            this.buffer.put((byte) (count >> 8));
-            this.buffer.put((byte) (count >> 16));
-        }
-        if (this.justCalc) {
-            this.len += count;
-        } else {
-            this.buffer.put(b, offset, count);
-        }
-        int i = count <= 253 ? 1 : 4;
-        while ((count + i) % 4 != 0) {
-            if (this.justCalc) {
-                this.len++;
-            } else {
-                this.buffer.put((byte) 0);
-            }
-            i++;
-        }
-    }
-
     public void writeByteArray(byte[] b) {
         try {
             if (b.length <= 253) {
@@ -387,12 +442,11 @@ public class NativeByteBuffer extends AbstractSerializedData {
         }
         if (exception) {
             throw new RuntimeException("Not bool value!");
-        } else if (!BuildVars.LOGS_ENABLED) {
-            return false;
-        } else {
-            FileLog.e("Not bool value!");
-            return false;
         }
+        if (BuildVars.LOGS_ENABLED) {
+            FileLog.e("Not bool value!");
+        }
+        return false;
     }
 
     public long readInt64(boolean exception) {
@@ -474,12 +528,12 @@ public class NativeByteBuffer extends AbstractSerializedData {
                 l = (getIntFromByte(this.buffer.get()) | (getIntFromByte(this.buffer.get()) << 8)) | (getIntFromByte(this.buffer.get()) << 16);
                 sl = 4;
             }
-            byte[] bArr = new byte[l];
-            this.buffer.get(bArr);
+            byte[] b = new byte[l];
+            this.buffer.get(b);
             for (int i = sl; (l + i) % 4 != 0; i++) {
                 this.buffer.get();
             }
-            return bArr;
+            return b;
         } catch (Exception e) {
             if (exception) {
                 throw new RuntimeException("read byte array error", e);
@@ -499,16 +553,16 @@ public class NativeByteBuffer extends AbstractSerializedData {
                 l = (getIntFromByte(this.buffer.get()) | (getIntFromByte(this.buffer.get()) << 8)) | (getIntFromByte(this.buffer.get()) << 16);
                 sl = 4;
             }
-            NativeByteBuffer nativeByteBuffer = new NativeByteBuffer(l);
+            NativeByteBuffer b = new NativeByteBuffer(l);
             int old = this.buffer.limit();
             this.buffer.limit(this.buffer.position() + l);
-            nativeByteBuffer.buffer.put(this.buffer);
+            b.buffer.put(this.buffer);
             this.buffer.limit(old);
-            nativeByteBuffer.buffer.position(0);
+            b.buffer.position(0);
             for (int i = sl; (l + i) % 4 != 0; i++) {
                 this.buffer.get();
             }
-            return nativeByteBuffer;
+            return b;
         } catch (Exception e) {
             if (exception) {
                 throw new RuntimeException("read byte array error", e);

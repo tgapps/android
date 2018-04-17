@@ -58,8 +58,11 @@ public class KeywordsBox extends AbstractFullBox {
 
     protected long getContentSize() {
         long contentSize = 7;
-        for (String keyword : this.keywords) {
-            contentSize += (long) ((Utf8.utf8StringLengthInBytes(keyword) + 1) + 1);
+        String[] strArr = this.keywords;
+        int i = 0;
+        while (i < strArr.length) {
+            i++;
+            contentSize += (long) ((Utf8.utf8StringLengthInBytes(strArr[i]) + 1) + 1);
         }
         return contentSize;
     }
@@ -88,9 +91,13 @@ public class KeywordsBox extends AbstractFullBox {
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_4, this, this));
         StringBuffer buffer = new StringBuffer();
-        buffer.append("KeywordsBox[language=").append(getLanguage());
+        buffer.append("KeywordsBox[language=");
+        buffer.append(getLanguage());
         for (int i = 0; i < this.keywords.length; i++) {
-            buffer.append(";keyword").append(i).append("=").append(this.keywords[i]);
+            buffer.append(";keyword");
+            buffer.append(i);
+            buffer.append("=");
+            buffer.append(this.keywords[i]);
         }
         buffer.append("]");
         return buffer.toString();

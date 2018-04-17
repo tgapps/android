@@ -1,27 +1,17 @@
 package org.telegram.ui.Adapters;
 
 import android.content.Context;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.support.widget.RecyclerView.LayoutParams;
 import org.telegram.messenger.support.widget.RecyclerView.ViewHolder;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Cells.DividerCell;
 import org.telegram.ui.Cells.DrawerActionCell;
-import org.telegram.ui.Cells.DrawerAddCell;
 import org.telegram.ui.Cells.DrawerProfileCell;
-import org.telegram.ui.Cells.DrawerUserCell;
-import org.telegram.ui.Cells.EmptyCell;
-import org.telegram.ui.Components.RecyclerListView.Holder;
 import org.telegram.ui.Components.RecyclerListView.SelectionAdapter;
 
 public class DrawerLayoutAdapter extends SelectionAdapter {
@@ -47,9 +37,83 @@ public class DrawerLayoutAdapter extends SelectionAdapter {
         }
     }
 
+    public org.telegram.messenger.support.widget.RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup r1, int r2) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Adapters.DrawerLayoutAdapter.onCreateViewHolder(android.view.ViewGroup, int):org.telegram.messenger.support.widget.RecyclerView$ViewHolder
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        if (r6 == 0) goto L_0x0033;
+    L_0x0002:
+        switch(r6) {
+            case 2: goto L_0x002b;
+            case 3: goto L_0x0023;
+            case 4: goto L_0x001b;
+            case 5: goto L_0x0013;
+            default: goto L_0x0005;
+        };
+    L_0x0005:
+        r0 = new org.telegram.ui.Cells.EmptyCell;
+        r1 = r4.mContext;
+        r2 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
+        r2 = org.telegram.messenger.AndroidUtilities.dp(r2);
+        r0.<init>(r1, r2);
+        goto L_0x0049;
+    L_0x0013:
+        r0 = new org.telegram.ui.Cells.DrawerAddCell;
+        r1 = r4.mContext;
+        r0.<init>(r1);
+        goto L_0x0049;
+    L_0x001b:
+        r0 = new org.telegram.ui.Cells.DrawerUserCell;
+        r1 = r4.mContext;
+        r0.<init>(r1);
+        goto L_0x0049;
+    L_0x0023:
+        r0 = new org.telegram.ui.Cells.DrawerActionCell;
+        r1 = r4.mContext;
+        r0.<init>(r1);
+        goto L_0x0049;
+    L_0x002b:
+        r0 = new org.telegram.ui.Cells.DividerCell;
+        r1 = r4.mContext;
+        r0.<init>(r1);
+        goto L_0x0049;
+    L_0x0033:
+        r0 = new org.telegram.ui.Cells.DrawerProfileCell;
+        r1 = r4.mContext;
+        r0.<init>(r1);
+        r4.profileCell = r0;
+        r0 = r4.profileCell;
+        r1 = new org.telegram.ui.Adapters.DrawerLayoutAdapter$1;
+        r1.<init>();
+        r0.setOnArrowClickListener(r1);
+        r0 = r4.profileCell;
+        r1 = new org.telegram.messenger.support.widget.RecyclerView$LayoutParams;
+        r2 = -1;
+        r3 = -2;
+        r1.<init>(r2, r3);
+        r0.setLayoutParams(r1);
+        r1 = new org.telegram.ui.Components.RecyclerListView$Holder;
+        r1.<init>(r0);
+        return r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.DrawerLayoutAdapter.onCreateViewHolder(android.view.ViewGroup, int):org.telegram.messenger.support.widget.RecyclerView$ViewHolder");
+    }
+
     public DrawerLayoutAdapter(Context context) {
-        boolean z = true;
         this.mContext = context;
+        boolean z = true;
         if (UserConfig.getActivatedAccountsCount() <= 1 || !MessagesController.getGlobalMainSettings().getBoolean("accountsShowed", true)) {
             z = false;
         }
@@ -102,62 +166,36 @@ public class DrawerLayoutAdapter extends SelectionAdapter {
 
     public boolean isEnabled(ViewHolder holder) {
         int itemType = holder.getItemViewType();
-        return itemType == 3 || itemType == 4 || itemType == 5;
-    }
-
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view;
-        switch (viewType) {
-            case 0:
-                this.profileCell = new DrawerProfileCell(this.mContext);
-                this.profileCell.setOnArrowClickListener(new OnClickListener() {
-                    public void onClick(View v) {
-                        DrawerLayoutAdapter.this.setAccountsShowed(((DrawerProfileCell) v).isAccountsShowed(), true);
-                    }
-                });
-                view = this.profileCell;
-                break;
-            case 2:
-                view = new DividerCell(this.mContext);
-                break;
-            case 3:
-                view = new DrawerActionCell(this.mContext);
-                break;
-            case 4:
-                view = new DrawerUserCell(this.mContext);
-                break;
-            case 5:
-                view = new DrawerAddCell(this.mContext);
-                break;
-            default:
-                view = new EmptyCell(this.mContext, AndroidUtilities.dp(8.0f));
-                break;
+        if (!(itemType == 3 || itemType == 4)) {
+            if (itemType != 5) {
+                return false;
+            }
         }
-        view.setLayoutParams(new LayoutParams(-1, -2));
-        return new Holder(view);
+        return true;
     }
 
     public void onBindViewHolder(ViewHolder holder, int position) {
-        switch (holder.getItemViewType()) {
-            case 0:
-                ((DrawerProfileCell) holder.itemView).setUser(MessagesController.getInstance(UserConfig.selectedAccount).getUser(Integer.valueOf(UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId())), this.accountsShowed);
-                holder.itemView.setBackgroundColor(Theme.getColor(Theme.key_avatar_backgroundActionBarBlue));
-                return;
-            case 3:
-                position -= 2;
-                if (this.accountsShowed) {
-                    position -= getAccountRowsCount();
-                }
-                DrawerActionCell drawerActionCell = holder.itemView;
-                ((Item) this.items.get(position)).bind(drawerActionCell);
-                drawerActionCell.setPadding(0, 0, 0, 0);
-                return;
-            case 4:
-                holder.itemView.setAccount(((Integer) this.accountNumbers.get(position - 2)).intValue());
-                return;
-            default:
-                return;
+        int itemViewType = holder.getItemViewType();
+        if (itemViewType != 0) {
+            switch (itemViewType) {
+                case 3:
+                    position -= 2;
+                    if (this.accountsShowed) {
+                        position -= getAccountRowsCount();
+                    }
+                    DrawerActionCell drawerActionCell = holder.itemView;
+                    ((Item) this.items.get(position)).bind(drawerActionCell);
+                    drawerActionCell.setPadding(0, 0, 0, 0);
+                    return;
+                case 4:
+                    holder.itemView.setAccount(((Integer) this.accountNumbers.get(position - 2)).intValue());
+                    return;
+                default:
+                    return;
+            }
         }
+        ((DrawerProfileCell) holder.itemView).setUser(MessagesController.getInstance(UserConfig.selectedAccount).getUser(Integer.valueOf(UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId())), this.accountsShowed);
+        holder.itemView.setBackgroundColor(Theme.getColor(Theme.key_avatar_backgroundActionBarBlue));
     }
 
     public int getItemViewType(int i) {
@@ -184,10 +222,7 @@ public class DrawerLayoutAdapter extends SelectionAdapter {
             }
             i -= getAccountRowsCount();
         }
-        if (i == 3) {
-            return 2;
-        }
-        return 3;
+        return i == 3 ? 2 : 3;
     }
 
     private void resetItems() {
@@ -230,12 +265,15 @@ public class DrawerLayoutAdapter extends SelectionAdapter {
         if (this.accountsShowed) {
             position -= getAccountRowsCount();
         }
-        if (position < 0 || position >= this.items.size()) {
-            return -1;
-        }
-        Item item = (Item) this.items.get(position);
-        if (item != null) {
-            return item.id;
+        int i = -1;
+        if (position >= 0) {
+            if (position < this.items.size()) {
+                Item item = (Item) this.items.get(position);
+                if (item != null) {
+                    i = item.id;
+                }
+                return i;
+            }
         }
         return -1;
     }

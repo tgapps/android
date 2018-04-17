@@ -20,49 +20,91 @@ public abstract class AbstractBoxParser implements BoxParser {
     public abstract Box createBox(String str, byte[] bArr, String str2);
 
     public Box parseBox(DataSource byteChannel, Container parent) throws IOException {
+        DataSource dataSource = byteChannel;
+        Container container = parent;
         long startPos = byteChannel.position();
         ((ByteBuffer) this.header.get()).rewind().limit(8);
-        int b;
-        do {
-            b = byteChannel.read((ByteBuffer) this.header.get());
-            if (b == 8) {
-                ((ByteBuffer) this.header.get()).rewind();
-                long size = IsoTypeReader.readUInt32((ByteBuffer) this.header.get());
-                if (size >= 8 || size <= 1) {
-                    long contentSize;
-                    String type = IsoTypeReader.read4cc((ByteBuffer) this.header.get());
-                    byte[] usertype = null;
-                    if (size == 1) {
-                        ((ByteBuffer) this.header.get()).limit(16);
-                        byteChannel.read((ByteBuffer) this.header.get());
-                        ((ByteBuffer) this.header.get()).position(8);
-                        contentSize = IsoTypeReader.readUInt64((ByteBuffer) this.header.get()) - 16;
-                    } else if (size == 0) {
-                        contentSize = byteChannel.size() - byteChannel.position();
-                        size = contentSize + 8;
-                    } else {
-                        contentSize = size - 8;
-                    }
-                    if (UserBox.TYPE.equals(type)) {
-                        ((ByteBuffer) this.header.get()).limit(((ByteBuffer) this.header.get()).limit() + 16);
-                        byteChannel.read((ByteBuffer) this.header.get());
-                        usertype = new byte[16];
-                        for (int i = ((ByteBuffer) this.header.get()).position() - 16; i < ((ByteBuffer) this.header.get()).position(); i++) {
-                            usertype[i - (((ByteBuffer) this.header.get()).position() - 16)] = ((ByteBuffer) this.header.get()).get(i);
-                        }
-                        contentSize -= 16;
-                    }
-                    Box box = createBox(type, usertype, parent instanceof Box ? ((Box) parent).getType() : TtmlNode.ANONYMOUS_REGION_ID);
-                    box.setParent(parent);
-                    ((ByteBuffer) this.header.get()).rewind();
-                    box.parse(byteChannel, (ByteBuffer) this.header.get(), contentSize, this);
-                    return box;
-                }
-                LOG.severe("Plausibility check failed: size < 8 (size = " + size + "). Stop parsing!");
-                return null;
+        while (true) {
+            int read = dataSource.read((ByteBuffer) r6.header.get());
+            int b = read;
+            if (read == 8) {
+                break;
+            } else if (b < 0) {
+                dataSource.position(startPos);
+                throw new EOFException();
+            } else {
+                int i = b;
             }
-        } while (b >= 0);
-        byteChannel.position(startPos);
-        throw new EOFException();
+        }
+        ((ByteBuffer) r6.header.get()).rewind();
+        long size = IsoTypeReader.readUInt32((ByteBuffer) r6.header.get());
+        if (size >= 8 || size <= 1) {
+            long contentSize;
+            long contentSize2;
+            byte[] usertype;
+            byte[] usertype2;
+            byte[] usertype3;
+            Box box;
+            String type = IsoTypeReader.read4cc((ByteBuffer) r6.header.get());
+            if (size == 1) {
+                ((ByteBuffer) r6.header.get()).limit(16);
+                dataSource.read((ByteBuffer) r6.header.get());
+                ((ByteBuffer) r6.header.get()).position(8);
+                size = IsoTypeReader.readUInt64((ByteBuffer) r6.header.get());
+                contentSize = size - 16;
+            } else if (size == 0) {
+                long contentSize3 = byteChannel.size() - byteChannel.position();
+                long j = contentSize3 + 8;
+                contentSize = contentSize3;
+                contentSize2 = contentSize;
+                if (UserBox.TYPE.equals(type)) {
+                    usertype = null;
+                    contentSize = contentSize2;
+                } else {
+                    ((ByteBuffer) r6.header.get()).limit(((ByteBuffer) r6.header.get()).limit() + 16);
+                    dataSource.read((ByteBuffer) r6.header.get());
+                    usertype2 = new byte[16];
+                    for (usertype3 = ((ByteBuffer) r6.header.get()).position() - 16; usertype3 < ((ByteBuffer) r6.header.get()).position(); usertype3++) {
+                        usertype2[usertype3 - (((ByteBuffer) r6.header.get()).position() - 16)] = ((ByteBuffer) r6.header.get()).get(usertype3);
+                    }
+                    usertype = usertype2;
+                    contentSize = contentSize2 - 16;
+                }
+                box = createBox(type, usertype, container instanceof Box ? ((Box) container).getType() : TtmlNode.ANONYMOUS_REGION_ID);
+                box.setParent(container);
+                ((ByteBuffer) r6.header.get()).rewind();
+                box.parse(dataSource, (ByteBuffer) r6.header.get(), contentSize, r6);
+                return box;
+            } else {
+                contentSize = size - 8;
+            }
+            contentSize2 = contentSize;
+            if (UserBox.TYPE.equals(type)) {
+                usertype = null;
+                contentSize = contentSize2;
+            } else {
+                ((ByteBuffer) r6.header.get()).limit(((ByteBuffer) r6.header.get()).limit() + 16);
+                dataSource.read((ByteBuffer) r6.header.get());
+                usertype2 = new byte[16];
+                for (usertype3 = ((ByteBuffer) r6.header.get()).position() - 16; usertype3 < ((ByteBuffer) r6.header.get()).position(); usertype3++) {
+                    usertype2[usertype3 - (((ByteBuffer) r6.header.get()).position() - 16)] = ((ByteBuffer) r6.header.get()).get(usertype3);
+                }
+                usertype = usertype2;
+                contentSize = contentSize2 - 16;
+            }
+            if (container instanceof Box) {
+            }
+            box = createBox(type, usertype, container instanceof Box ? ((Box) container).getType() : TtmlNode.ANONYMOUS_REGION_ID);
+            box.setParent(container);
+            ((ByteBuffer) r6.header.get()).rewind();
+            box.parse(dataSource, (ByteBuffer) r6.header.get(), contentSize, r6);
+            return box;
+        }
+        Logger logger = LOG;
+        StringBuilder stringBuilder = new StringBuilder("Plausibility check failed: size < 8 (size = ");
+        stringBuilder.append(size);
+        stringBuilder.append("). Stop parsing!");
+        logger.severe(stringBuilder.toString());
+        return null;
     }
 }

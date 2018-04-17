@@ -26,6 +26,7 @@ import javax.net.ssl.SSLSocketFactory;
 import org.json.JSONObject;
 import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.exoplayer2.DefaultLoadControl;
+import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 
 public class StripeApiHandler {
     private static final SSLSocketFactory SSL_SOCKET_FACTORY = new StripeSSLSocketFactory();
@@ -40,16 +41,14 @@ public class StripeApiHandler {
         }
     }
 
-    private static com.stripe.android.model.Token requestToken(java.lang.String r15, java.lang.String r16, java.util.Map<java.lang.String, java.lang.Object> r17, com.stripe.android.net.RequestOptions r18) throws com.stripe.android.exception.AuthenticationException, com.stripe.android.exception.InvalidRequestException, com.stripe.android.exception.APIConnectionException, com.stripe.android.exception.CardException, com.stripe.android.exception.APIException {
+    private static com.stripe.android.model.Token requestToken(java.lang.String r12, java.lang.String r13, java.util.Map<java.lang.String, java.lang.Object> r14, com.stripe.android.net.RequestOptions r15) throws com.stripe.android.exception.AuthenticationException, com.stripe.android.exception.InvalidRequestException, com.stripe.android.exception.APIConnectionException, com.stripe.android.exception.CardException, com.stripe.android.exception.APIException {
         /* JADX: method processing error */
 /*
-Error: java.util.NoSuchElementException
-	at java.util.HashMap$HashIterator.nextEntry(HashMap.java:925)
-	at java.util.HashMap$KeyIterator.next(HashMap.java:956)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.applyRemove(BlockFinallyExtract.java:535)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.extractFinally(BlockFinallyExtract.java:175)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.processExceptionHandler(BlockFinallyExtract.java:79)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.visit(BlockFinallyExtract.java:51)
+Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find block by offset: 0x00b8 in list []
+	at jadx.core.utils.BlockUtils.getBlockByOffset(BlockUtils.java:42)
+	at jadx.core.dex.instructions.IfNode.initBlocks(IfNode.java:60)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinish.initBlocksInIfNodes(BlockFinish.java:48)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinish.visit(BlockFinish.java:33)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.ProcessClass.process(ProcessClass.java:37)
@@ -58,117 +57,115 @@ Error: java.util.NoSuchElementException
 	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
 */
         /*
-        if (r18 != 0) goto L_0x0004;
-    L_0x0002:
-        r11 = 0;
+        r0 = 0;
+        if (r15 != 0) goto L_0x0004;
     L_0x0003:
-        return r11;
+        return r0;
     L_0x0004:
-        r4 = 0;
-        r11 = 1;
-        r0 = java.lang.Boolean.valueOf(r11);
-        r11 = "networkaddress.cache.ttl";	 Catch:{ SecurityException -> 0x0037 }
-        r4 = java.security.Security.getProperty(r11);	 Catch:{ SecurityException -> 0x0037 }
-        r11 = "networkaddress.cache.ttl";	 Catch:{ SecurityException -> 0x0037 }
-        r12 = "0";	 Catch:{ SecurityException -> 0x0037 }
-        java.security.Security.setProperty(r11, r12);	 Catch:{ SecurityException -> 0x0037 }
+        r1 = 0;
+        r2 = 1;
+        r2 = java.lang.Boolean.valueOf(r2);
+        r3 = 0;
+        r4 = "networkaddress.cache.ttl";	 Catch:{ SecurityException -> 0x001a }
+        r4 = java.security.Security.getProperty(r4);	 Catch:{ SecurityException -> 0x001a }
+        r1 = r4;	 Catch:{ SecurityException -> 0x001a }
+        r4 = "networkaddress.cache.ttl";	 Catch:{ SecurityException -> 0x001a }
+        r5 = "0";	 Catch:{ SecurityException -> 0x001a }
+        java.security.Security.setProperty(r4, r5);	 Catch:{ SecurityException -> 0x001a }
+        goto L_0x001f;
     L_0x001a:
-        r1 = r18.getPublishableApiKey();
-        r11 = r1.trim();
-        r11 = r11.isEmpty();
-        if (r11 == 0) goto L_0x003e;
-    L_0x0028:
-        r11 = new com.stripe.android.exception.AuthenticationException;
-        r12 = "No API key provided. (HINT: set your API key using 'Stripe.apiKey = <API-KEY>'. You can generate API keys from the Stripe web interface. See https://stripe.com/api for details or email support@stripe.com if you have questions.";
-        r13 = 0;
-        r14 = 0;
-        r14 = java.lang.Integer.valueOf(r14);
-        r11.<init>(r12, r13, r14);
-        throw r11;
-    L_0x0037:
-        r10 = move-exception;
-        r11 = 0;
-        r0 = java.lang.Boolean.valueOf(r11);
-        goto L_0x001a;
-    L_0x003e:
-        r9 = getStripeResponse(r15, r16, r17, r18);	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r6 = r9.getResponseCode();	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r5 = r9.getResponseBody();	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r7 = 0;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r2 = r9.getResponseHeaders();	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        if (r2 != 0) goto L_0x0082;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-    L_0x0051:
-        r8 = 0;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-    L_0x0052:
-        if (r8 == 0) goto L_0x0061;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-    L_0x0054:
-        r11 = r8.size();	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        if (r11 <= 0) goto L_0x0061;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-    L_0x005a:
-        r11 = 0;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r7 = r8.get(r11);	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r7 = (java.lang.String) r7;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-    L_0x0061:
-        r11 = 200; // 0xc8 float:2.8E-43 double:9.9E-322;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        if (r6 < r11) goto L_0x0069;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
+        r4 = move-exception;
+        r2 = java.lang.Boolean.valueOf(r3);
+    L_0x001f:
+        r4 = r15.getPublishableApiKey();
+        r5 = r4.trim();
+        r5 = r5.isEmpty();
+        if (r5 == 0) goto L_0x0039;
+    L_0x002d:
+        r5 = new com.stripe.android.exception.AuthenticationException;
+        r6 = "No API key provided. (HINT: set your API key using 'Stripe.apiKey = <API-KEY>'. You can generate API keys from the Stripe web interface. See https://stripe.com/api for details or email support@stripe.com if you have questions.";
+        r3 = java.lang.Integer.valueOf(r3);
+        r5.<init>(r6, r0, r3);
+        throw r5;
+    L_0x0039:
+        r5 = getStripeResponse(r12, r13, r14, r15);	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        r6 = r5.getResponseCode();	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        r7 = r5.getResponseBody();	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        r8 = 0;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        r9 = r5.getResponseHeaders();	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        if (r9 != 0) goto L_0x004e;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+    L_0x004c:
+        r10 = r0;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        goto L_0x0056;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+    L_0x004e:
+        r10 = "Request-Id";	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        r10 = r9.get(r10);	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        r10 = (java.util.List) r10;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+    L_0x0056:
+        if (r10 == 0) goto L_0x0065;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+    L_0x0058:
+        r11 = r10.size();	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        if (r11 <= 0) goto L_0x0065;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+    L_0x005e:
+        r3 = r10.get(r3);	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        r3 = (java.lang.String) r3;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        r8 = r3;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
     L_0x0065:
-        r11 = 300; // 0x12c float:4.2E-43 double:1.48E-321;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        if (r6 < r11) goto L_0x006c;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
+        r3 = 200; // 0xc8 float:2.8E-43 double:9.9E-322;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        if (r6 < r3) goto L_0x006d;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
     L_0x0069:
-        handleAPIError(r5, r6, r7);	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-    L_0x006c:
-        r11 = com.stripe.android.net.TokenParser.parseToken(r5);	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r12 = r0.booleanValue();
-        if (r12 == 0) goto L_0x0003;
-    L_0x0076:
-        if (r4 != 0) goto L_0x008d;
-    L_0x0078:
-        r12 = "networkaddress.cache.ttl";
-        r13 = "-1";
-        java.security.Security.setProperty(r12, r13);
-        goto L_0x0003;
-    L_0x0082:
-        r11 = "Request-Id";	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r11 = r2.get(r11);	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r11 = (java.util.List) r11;	 Catch:{ JSONException -> 0x0095, all -> 0x00b2 }
-        r8 = r11;
-        goto L_0x0052;
-    L_0x008d:
-        r12 = "networkaddress.cache.ttl";
-        java.security.Security.setProperty(r12, r4);
-        goto L_0x0003;
-    L_0x0095:
+        r3 = 300; // 0x12c float:4.2E-43 double:1.48E-321;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        if (r6 < r3) goto L_0x0070;	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+    L_0x006d:
+        handleAPIError(r7, r6, r8);	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+    L_0x0070:
+        r3 = com.stripe.android.net.TokenParser.parseToken(r7);	 Catch:{ JSONException -> 0x00a1, all -> 0x008a }
+        r0 = r2.booleanValue();
+        if (r0 == 0) goto L_0x0089;
+    L_0x007a:
+        if (r1 != 0) goto L_0x0084;
+    L_0x007c:
+        r0 = "networkaddress.cache.ttl";
+        r11 = "-1";
+        java.security.Security.setProperty(r0, r11);
+        goto L_0x0089;
+    L_0x0084:
+        r0 = "networkaddress.cache.ttl";
+        java.security.Security.setProperty(r0, r1);
+    L_0x0089:
+        return r3;
+    L_0x008a:
+        r0 = move-exception;
+        r3 = r2.booleanValue();
+        if (r3 == 0) goto L_0x00a0;
+    L_0x0091:
+        if (r1 != 0) goto L_0x009b;
+    L_0x0093:
+        r3 = "networkaddress.cache.ttl";
+        r5 = "-1";
+        java.security.Security.setProperty(r3, r5);
+        goto L_0x00a0;
+    L_0x009b:
+        r3 = "networkaddress.cache.ttl";
+        java.security.Security.setProperty(r3, r1);
+    L_0x00a0:
+        throw r0;
+    L_0x00a1:
         r3 = move-exception;
-        r11 = 0;
-        r12 = r0.booleanValue();
-        if (r12 == 0) goto L_0x0003;
-    L_0x009d:
-        if (r4 != 0) goto L_0x00aa;
-    L_0x009f:
-        r12 = "networkaddress.cache.ttl";
-        r13 = "-1";
-        java.security.Security.setProperty(r12, r13);
-        goto L_0x0003;
-    L_0x00aa:
-        r12 = "networkaddress.cache.ttl";
-        java.security.Security.setProperty(r12, r4);
-        goto L_0x0003;
-    L_0x00b2:
-        r11 = move-exception;
-        r12 = r0.booleanValue();
-        if (r12 == 0) goto L_0x00c4;
-    L_0x00b9:
-        if (r4 != 0) goto L_0x00c5;
-    L_0x00bb:
-        r12 = "networkaddress.cache.ttl";
-        r13 = "-1";
-        java.security.Security.setProperty(r12, r13);
-    L_0x00c4:
-        throw r11;
-    L_0x00c5:
-        r12 = "networkaddress.cache.ttl";
-        java.security.Security.setProperty(r12, r4);
-        goto L_0x00c4;
+        r5 = r2.booleanValue();
+        if (r5 == 0) goto L_0x00b8;
+    L_0x00a9:
+        if (r1 != 0) goto L_0x00b3;
+    L_0x00ab:
+        r5 = "networkaddress.cache.ttl";
+        r6 = "-1";
+        java.security.Security.setProperty(r5, r6);
+        goto L_0x00b8;
+    L_0x00b3:
+        r5 = "networkaddress.cache.ttl";
+        java.security.Security.setProperty(r5, r1);
+    L_0x00b8:
+        return r0;
         */
         throw new UnsupportedOperationException("Method not decompiled: com.stripe.android.net.StripeApiHandler.requestToken(java.lang.String, java.lang.String, java.util.Map, com.stripe.android.net.RequestOptions):com.stripe.android.model.Token");
     }
@@ -189,12 +186,14 @@ Error: java.util.NoSuchElementException
     }
 
     static Map<String, String> getHeaders(RequestOptions options) {
-        int i = 0;
         Map<String, String> headers = new HashMap();
         String apiVersion = options.getApiVersion();
         headers.put("Accept-Charset", C.UTF8_NAME);
         headers.put("Accept", "application/json");
-        headers.put("User-Agent", String.format("Stripe/v1 JavaBindings/%s", new Object[]{"3.5.0"}));
+        Object[] objArr = new Object[1];
+        int i = 0;
+        objArr[0] = "3.5.0";
+        headers.put("User-Agent", String.format("Stripe/v1 JavaBindings/%s", objArr));
         headers.put("Authorization", String.format("Bearer %s", new Object[]{options.getPublishableApiKey()}));
         String[] propertyNames = new String[]{"os.name", "os.version", "os.arch", "java.version", "java.vendor", "java.vm.version", "java.vm.vendor"};
         Map<String, String> propertyMap = new HashMap();
@@ -222,11 +221,13 @@ Error: java.util.NoSuchElementException
     }
 
     private static String formatURL(String url, String query) {
-        if (query == null || query.isEmpty()) {
-            return url;
+        if (query != null) {
+            if (!query.isEmpty()) {
+                String separator = url.contains("?") ? "&" : "?";
+                return String.format("%s%s%s", new Object[]{url, separator, query});
+            }
         }
-        String separator = url.contains("?") ? "&" : "?";
-        return String.format("%s%s%s", new Object[]{url, separator, query});
+        return url;
     }
 
     private static HttpURLConnection createGetConnection(String url, String query, RequestOptions options) throws IOException {
@@ -240,14 +241,14 @@ Error: java.util.NoSuchElementException
         conn.setDoOutput(true);
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", String.format("application/x-www-form-urlencoded;charset=%s", new Object[]{C.UTF8_NAME}));
-        OutputStream outputStream = null;
+        OutputStream output = null;
         try {
-            outputStream = conn.getOutputStream();
-            outputStream.write(query.getBytes(C.UTF8_NAME));
+            output = conn.getOutputStream();
+            output.write(query.getBytes(C.UTF8_NAME));
             return conn;
         } finally {
-            if (outputStream != null) {
-                outputStream.close();
+            if (output != null) {
+                output.close();
             }
         }
     }
@@ -293,29 +294,35 @@ Error: java.util.NoSuchElementException
 
     private static List<Parameter> flattenParamsMap(Map<String, Object> params, String keyPrefix) throws InvalidRequestException {
         List<Parameter> flatParams = new LinkedList();
-        if (params != null) {
-            for (Entry<String, Object> entry : params.entrySet()) {
-                String key = (String) entry.getKey();
-                Object value = entry.getValue();
-                String newPrefix = key;
-                if (keyPrefix != null) {
-                    newPrefix = String.format("%s[%s]", new Object[]{keyPrefix, key});
-                }
-                flatParams.addAll(flattenParamsValue(value, newPrefix));
+        if (params == null) {
+            return flatParams;
+        }
+        for (Entry<String, Object> entry : params.entrySet()) {
+            String key = (String) entry.getKey();
+            Object value = entry.getValue();
+            String newPrefix = key;
+            if (keyPrefix != null) {
+                newPrefix = String.format("%s[%s]", new Object[]{keyPrefix, key});
             }
+            flatParams.addAll(flattenParamsValue(value, newPrefix));
         }
         return flatParams;
     }
 
     private static List<Parameter> flattenParamsValue(Object value, String keyPrefix) throws InvalidRequestException {
+        List<Parameter> flatParams;
         if (value instanceof Map) {
-            return flattenParamsMap((Map) value, keyPrefix);
-        }
-        if (value instanceof List) {
-            return flattenParamsList((List) value, keyPrefix);
-        }
-        if (TtmlNode.ANONYMOUS_REGION_ID.equals(value)) {
-            throw new InvalidRequestException("You cannot set '" + keyPrefix + "' to an empty string. We interpret empty strings as null in requests. You may set '" + keyPrefix + "' to null to delete the property.", keyPrefix, null, Integer.valueOf(0), null);
+            flatParams = flattenParamsMap((Map) value, keyPrefix);
+        } else if (value instanceof List) {
+            flatParams = flattenParamsList((List) value, keyPrefix);
+        } else if (TtmlNode.ANONYMOUS_REGION_ID.equals(value)) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("You cannot set '");
+            stringBuilder.append(keyPrefix);
+            stringBuilder.append("' to an empty string. We interpret empty strings as null in requests. You may set '");
+            stringBuilder.append(keyPrefix);
+            stringBuilder.append("' to null to delete the property.");
+            throw new InvalidRequestException(stringBuilder.toString(), keyPrefix, null, Integer.valueOf(0), null);
         } else if (value == null) {
             flatParams = new LinkedList();
             flatParams.add(new Parameter(keyPrefix, TtmlNode.ANONYMOUS_REGION_ID));
@@ -325,26 +332,28 @@ Error: java.util.NoSuchElementException
             flatParams.add(new Parameter(keyPrefix, value.toString()));
             return flatParams;
         }
+        return flatParams;
     }
 
     private static void handleAPIError(String rBody, int rCode, String requestId) throws InvalidRequestException, AuthenticationException, CardException, APIException {
         StripeError stripeError = ErrorParser.parseError(rBody);
-        switch (rCode) {
-            case 400:
-                throw new InvalidRequestException(stripeError.message, stripeError.param, requestId, Integer.valueOf(rCode), null);
-            case 401:
-                throw new AuthenticationException(stripeError.message, requestId, Integer.valueOf(rCode));
-            case 402:
-                throw new CardException(stripeError.message, requestId, stripeError.code, stripeError.param, stripeError.decline_code, stripeError.charge, Integer.valueOf(rCode), null);
-            case 403:
-                throw new PermissionException(stripeError.message, requestId, Integer.valueOf(rCode));
-            case 404:
-                throw new InvalidRequestException(stripeError.message, stripeError.param, requestId, Integer.valueOf(rCode), null);
-            case 429:
-                throw new RateLimitException(stripeError.message, stripeError.param, requestId, Integer.valueOf(rCode), null);
-            default:
-                throw new APIException(stripeError.message, requestId, Integer.valueOf(rCode), null);
+        if (rCode != 429) {
+            switch (rCode) {
+                case 400:
+                    throw new InvalidRequestException(stripeError.message, stripeError.param, requestId, Integer.valueOf(rCode), null);
+                case 401:
+                    throw new AuthenticationException(stripeError.message, requestId, Integer.valueOf(rCode));
+                case 402:
+                    throw new CardException(stripeError.message, requestId, stripeError.code, stripeError.param, stripeError.decline_code, stripeError.charge, Integer.valueOf(rCode), null);
+                case 403:
+                    throw new PermissionException(stripeError.message, requestId, Integer.valueOf(rCode));
+                case 404:
+                    throw new InvalidRequestException(stripeError.message, stripeError.param, requestId, Integer.valueOf(rCode), null);
+                default:
+                    throw new APIException(stripeError.message, requestId, Integer.valueOf(rCode), null);
+            }
         }
+        throw new RateLimitException(stripeError.message, stripeError.param, requestId, Integer.valueOf(rCode), null);
     }
 
     private static String urlEncodePair(String k, String v) throws UnsupportedEncodingException {
@@ -358,103 +367,49 @@ Error: java.util.NoSuchElementException
         return URLEncoder.encode(str, C.UTF8_NAME);
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private static com.stripe.android.net.StripeResponse makeURLConnectionRequest(java.lang.String r10, java.lang.String r11, java.lang.String r12, com.stripe.android.net.RequestOptions r13) throws com.stripe.android.exception.APIConnectionException {
-        /*
-        r7 = 1;
-        r5 = 0;
-        r0 = 0;
-        r6 = -1;
-        r8 = r10.hashCode();	 Catch:{ IOException -> 0x0022 }
-        switch(r8) {
-            case 70454: goto L_0x0048;
-            case 2461856: goto L_0x0052;
-            default: goto L_0x000b;
-        };	 Catch:{ IOException -> 0x0022 }
-    L_0x000b:
-        r5 = r6;
-    L_0x000c:
-        switch(r5) {
-            case 0: goto L_0x005d;
-            case 1: goto L_0x0084;
-            default: goto L_0x000f;
-        };	 Catch:{ IOException -> 0x0022 }
-    L_0x000f:
-        r5 = new com.stripe.android.exception.APIConnectionException;	 Catch:{ IOException -> 0x0022 }
-        r6 = "Unrecognized HTTP method %s. This indicates a bug in the Stripe bindings. Please contact support@stripe.com for assistance.";
-        r7 = 1;
-        r7 = new java.lang.Object[r7];	 Catch:{ IOException -> 0x0022 }
-        r8 = 0;
-        r7[r8] = r10;	 Catch:{ IOException -> 0x0022 }
-        r6 = java.lang.String.format(r6, r7);	 Catch:{ IOException -> 0x0022 }
-        r5.<init>(r6);	 Catch:{ IOException -> 0x0022 }
-        throw r5;	 Catch:{ IOException -> 0x0022 }
-    L_0x0022:
-        r1 = move-exception;
-        r5 = new com.stripe.android.exception.APIConnectionException;	 Catch:{ all -> 0x0041 }
-        r6 = "IOException during API request to Stripe (%s): %s Please check your internet connection and try again. If this problem persists, you should check Stripe's service status at https://twitter.com/stripestatus, or let us know at support@stripe.com.";
-        r7 = 2;
-        r7 = new java.lang.Object[r7];	 Catch:{ all -> 0x0041 }
-        r8 = 0;
-        r9 = getApiUrl();	 Catch:{ all -> 0x0041 }
-        r7[r8] = r9;	 Catch:{ all -> 0x0041 }
-        r8 = 1;
-        r9 = r1.getMessage();	 Catch:{ all -> 0x0041 }
-        r7[r8] = r9;	 Catch:{ all -> 0x0041 }
-        r6 = java.lang.String.format(r6, r7);	 Catch:{ all -> 0x0041 }
-        r5.<init>(r6, r1);	 Catch:{ all -> 0x0041 }
-        throw r5;	 Catch:{ all -> 0x0041 }
-    L_0x0041:
-        r5 = move-exception;
-        if (r0 == 0) goto L_0x0047;
-    L_0x0044:
-        r0.disconnect();
-    L_0x0047:
-        throw r5;
-    L_0x0048:
-        r7 = "GET";
-        r7 = r10.equals(r7);	 Catch:{ IOException -> 0x0022 }
-        if (r7 == 0) goto L_0x000b;
-    L_0x0051:
-        goto L_0x000c;
-    L_0x0052:
-        r5 = "POST";
-        r5 = r10.equals(r5);	 Catch:{ IOException -> 0x0022 }
-        if (r5 == 0) goto L_0x000b;
-    L_0x005b:
-        r5 = r7;
-        goto L_0x000c;
-    L_0x005d:
-        r0 = createGetConnection(r11, r12, r13);	 Catch:{ IOException -> 0x0022 }
-    L_0x0061:
-        r4 = r0.getResponseCode();	 Catch:{ IOException -> 0x0022 }
-        r5 = 200; // 0xc8 float:2.8E-43 double:9.9E-322;
-        if (r4 < r5) goto L_0x0089;
-    L_0x0069:
-        r5 = 300; // 0x12c float:4.2E-43 double:1.48E-321;
-        if (r4 >= r5) goto L_0x0089;
-    L_0x006d:
-        r5 = r0.getInputStream();	 Catch:{ IOException -> 0x0022 }
-        r3 = getResponseBody(r5);	 Catch:{ IOException -> 0x0022 }
-    L_0x0075:
-        r2 = r0.getHeaderFields();	 Catch:{ IOException -> 0x0022 }
-        r5 = new com.stripe.android.net.StripeResponse;	 Catch:{ IOException -> 0x0022 }
-        r5.<init>(r4, r3, r2);	 Catch:{ IOException -> 0x0022 }
-        if (r0 == 0) goto L_0x0083;
-    L_0x0080:
-        r0.disconnect();
-    L_0x0083:
-        return r5;
-    L_0x0084:
-        r0 = createPostConnection(r11, r12, r13);	 Catch:{ IOException -> 0x0022 }
-        goto L_0x0061;
-    L_0x0089:
-        r5 = r0.getErrorStream();	 Catch:{ IOException -> 0x0022 }
-        r3 = getResponseBody(r5);	 Catch:{ IOException -> 0x0022 }
-        goto L_0x0075;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.stripe.android.net.StripeApiHandler.makeURLConnectionRequest(java.lang.String, java.lang.String, java.lang.String, com.stripe.android.net.RequestOptions):com.stripe.android.net.StripeResponse");
+    private static StripeResponse makeURLConnectionRequest(String method, String url, String query, RequestOptions options) throws APIConnectionException {
+        HttpURLConnection conn = null;
+        int i = -1;
+        try {
+            String rBody;
+            int hashCode = method.hashCode();
+            if (hashCode != 70454) {
+                if (hashCode == 2461856) {
+                    if (method.equals("POST")) {
+                        i = 1;
+                    }
+                }
+            } else if (method.equals("GET")) {
+                i = 0;
+            }
+            switch (i) {
+                case 0:
+                    conn = createGetConnection(url, query, options);
+                    break;
+                case 1:
+                    conn = createPostConnection(url, query, options);
+                    break;
+                default:
+                    throw new APIConnectionException(String.format("Unrecognized HTTP method %s. This indicates a bug in the Stripe bindings. Please contact support@stripe.com for assistance.", new Object[]{method}));
+            }
+            i = conn.getResponseCode();
+            if (i < Callback.DEFAULT_DRAG_ANIMATION_DURATION || i >= 300) {
+                rBody = getResponseBody(conn.getErrorStream());
+            } else {
+                rBody = getResponseBody(conn.getInputStream());
+            }
+            StripeResponse stripeResponse = new StripeResponse(i, rBody, conn.getHeaderFields());
+            if (conn != null) {
+                conn.disconnect();
+            }
+            return stripeResponse;
+        } catch (IOException e) {
+            throw new APIConnectionException(String.format("IOException during API request to Stripe (%s): %s Please check your internet connection and try again. If this problem persists, you should check Stripe's service status at https://twitter.com/stripestatus, or let us know at support@stripe.com.", new Object[]{getApiUrl(), e.getMessage()}), e);
+        } catch (Throwable th) {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
     }
 
     private static String getResponseBody(InputStream responseStream) throws IOException {

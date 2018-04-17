@@ -3,20 +3,19 @@ package com.google.android.gms.maps.model;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class LatLng extends zzbfm implements ReflectedParcelable {
+public final class LatLng extends AbstractSafeParcelable implements ReflectedParcelable {
     public static final Creator<LatLng> CREATOR = new zzf();
     public final double latitude;
     public final double longitude;
 
     public LatLng(double d, double d2) {
         if (-180.0d > d2 || d2 >= 180.0d) {
-            this.longitude = ((((d2 - 180.0d) % 360.0d) + 360.0d) % 360.0d) - 180.0d;
-        } else {
-            this.longitude = d2;
+            d2 = ((((d2 - 180.0d) % 360.0d) + 360.0d) % 360.0d) - 180.0d;
         }
+        this.longitude = d2;
         this.latitude = Math.max(-90.0d, Math.min(90.0d, d));
     }
 
@@ -40,13 +39,20 @@ public final class LatLng extends zzbfm implements ReflectedParcelable {
 
     public final String toString() {
         double d = this.latitude;
-        return "lat/lng: (" + d + "," + this.longitude + ")";
+        double d2 = this.longitude;
+        StringBuilder stringBuilder = new StringBuilder(60);
+        stringBuilder.append("lat/lng: (");
+        stringBuilder.append(d);
+        stringBuilder.append(",");
+        stringBuilder.append(d2);
+        stringBuilder.append(")");
+        return stringBuilder.toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 2, this.latitude);
-        zzbfp.zza(parcel, 3, this.longitude);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeDouble(parcel, 2, this.latitude);
+        SafeParcelWriter.writeDouble(parcel, 3, this.longitude);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

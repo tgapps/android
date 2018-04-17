@@ -3,12 +3,12 @@ package com.google.android.gms.wearable;
 import java.io.IOException;
 
 public class ChannelIOException extends IOException {
-    private final int zzlgm;
-    private final int zzlgn;
+    private final int zzg;
+    private final int zzh;
 
     public ChannelIOException(String str, int i, int i2) {
         super(str);
-        this.zzlgm = i;
-        this.zzlgn = i2;
+        this.zzg = i;
+        this.zzh = i2;
     }
 }

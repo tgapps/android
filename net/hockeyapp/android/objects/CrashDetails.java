@@ -1,16 +1,13 @@
 package net.hockeyapp.android.objects;
 
 import android.content.Context;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Date;
 import net.hockeyapp.android.utils.HockeyLog;
-import net.hockeyapp.android.utils.JSONDateUtils;
 import org.json.JSONException;
 
 public class CrashDetails {
@@ -29,6 +26,119 @@ public class CrashDetails {
     private String threadName;
     private String throwableStackTrace;
 
+    public void writeCrashReport(java.io.File r1) throws org.json.JSONException {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: net.hockeyapp.android.objects.CrashDetails.writeCrashReport(java.io.File):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = new java.lang.StringBuilder;
+        r0.<init>();
+        r1 = "Writing unhandled exception to: ";
+        r0.append(r1);
+        r1 = r5.getAbsolutePath();
+        r0.append(r1);
+        r0 = r0.toString();
+        net.hockeyapp.android.utils.HockeyLog.debug(r0);
+        r0 = 0;
+        r1 = new java.io.BufferedWriter;	 Catch:{ IOException -> 0x00a5 }
+        r2 = new java.io.FileWriter;	 Catch:{ IOException -> 0x00a5 }
+        r2.<init>(r5);	 Catch:{ IOException -> 0x00a5 }
+        r1.<init>(r2);	 Catch:{ IOException -> 0x00a5 }
+        r0 = r1;	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Package";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.appPackage;	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Version Code";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.appVersionCode;	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Version Name";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.appVersionName;	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Android";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.osVersion;	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Android Build";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.osBuild;	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Manufacturer";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.deviceManufacturer;	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Model";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.deviceModel;	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Thread";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.threadName;	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "CrashReporter Key";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.reporterKey;	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Start Date";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.appStartDate;	 Catch:{ IOException -> 0x00a5 }
+        r2 = net.hockeyapp.android.utils.JSONDateUtils.toString(r2);	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = "Date";	 Catch:{ IOException -> 0x00a5 }
+        r2 = r4.appCrashDate;	 Catch:{ IOException -> 0x00a5 }
+        r2 = net.hockeyapp.android.utils.JSONDateUtils.toString(r2);	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+        r1 = r4.isXamarinException;	 Catch:{ IOException -> 0x00a5 }
+        r1 = r1.booleanValue();	 Catch:{ IOException -> 0x00a5 }
+        if (r1 == 0) goto L_0x0088;	 Catch:{ IOException -> 0x00a5 }
+    L_0x0081:
+        r1 = "Format";	 Catch:{ IOException -> 0x00a5 }
+        r2 = "Xamarin";	 Catch:{ IOException -> 0x00a5 }
+        r4.writeHeader(r0, r1, r2);	 Catch:{ IOException -> 0x00a5 }
+    L_0x0088:
+        r1 = "\n";	 Catch:{ IOException -> 0x00a5 }
+        r0.write(r1);	 Catch:{ IOException -> 0x00a5 }
+        r1 = r4.throwableStackTrace;	 Catch:{ IOException -> 0x00a5 }
+        r0.write(r1);	 Catch:{ IOException -> 0x00a5 }
+        r0.flush();	 Catch:{ IOException -> 0x00a5 }
+        if (r0 == 0) goto L_0x00a2;
+    L_0x0097:
+        r0.close();	 Catch:{ IOException -> 0x009b }
+        goto L_0x00a2;
+    L_0x009b:
+        r1 = move-exception;
+        r2 = "Error saving crash report!";
+        net.hockeyapp.android.utils.HockeyLog.error(r2, r1);
+        goto L_0x00b1;
+    L_0x00a2:
+        goto L_0x00b1;
+    L_0x00a3:
+        r1 = move-exception;
+        goto L_0x00b2;
+    L_0x00a5:
+        r1 = move-exception;
+        r2 = "Error saving crash report!";	 Catch:{ all -> 0x00a3 }
+        net.hockeyapp.android.utils.HockeyLog.error(r2, r1);	 Catch:{ all -> 0x00a3 }
+        if (r0 == 0) goto L_0x00a2;
+        r0.close();	 Catch:{ IOException -> 0x009b }
+        goto L_0x00a2;
+    L_0x00b1:
+        return;
+        if (r0 == 0) goto L_0x00c0;
+        r0.close();	 Catch:{ IOException -> 0x00b9 }
+        goto L_0x00c0;
+    L_0x00b9:
+        r2 = move-exception;
+        r3 = "Error saving crash report!";
+        net.hockeyapp.android.utils.HockeyLog.error(r3, r2);
+        throw r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.objects.CrashDetails.writeCrashReport(java.io.File):void");
+    }
+
     public CrashDetails(String crashIdentifier) {
         this.crashIdentifier = crashIdentifier;
         this.isXamarinException = Boolean.valueOf(false);
@@ -44,90 +154,27 @@ public class CrashDetails {
     }
 
     public void writeCrashReport(Context context) {
+        File filesDir = context.getFilesDir();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(this.crashIdentifier);
+        stringBuilder.append(".stacktrace");
         try {
-            writeCrashReport(new File(context.getFilesDir(), this.crashIdentifier + ".stacktrace"));
+            writeCrashReport(new File(filesDir, stringBuilder.toString()));
         } catch (JSONException e) {
-            HockeyLog.error("Could not write crash report with error " + e.toString());
-        }
-    }
-
-    public void writeCrashReport(File file) throws JSONException {
-        Throwable e;
-        Throwable th;
-        HockeyLog.debug("Writing unhandled exception to: " + file.getAbsolutePath());
-        BufferedWriter writer = null;
-        try {
-            BufferedWriter writer2 = new BufferedWriter(new FileWriter(file));
-            try {
-                writeHeader(writer2, "Package", this.appPackage);
-                writeHeader(writer2, "Version Code", this.appVersionCode);
-                writeHeader(writer2, "Version Name", this.appVersionName);
-                writeHeader(writer2, "Android", this.osVersion);
-                writeHeader(writer2, "Android Build", this.osBuild);
-                writeHeader(writer2, "Manufacturer", this.deviceManufacturer);
-                writeHeader(writer2, "Model", this.deviceModel);
-                writeHeader(writer2, "Thread", this.threadName);
-                writeHeader(writer2, "CrashReporter Key", this.reporterKey);
-                writeHeader(writer2, "Start Date", JSONDateUtils.toString(this.appStartDate));
-                writeHeader(writer2, "Date", JSONDateUtils.toString(this.appCrashDate));
-                if (this.isXamarinException.booleanValue()) {
-                    writeHeader(writer2, "Format", "Xamarin");
-                }
-                writer2.write("\n");
-                writer2.write(this.throwableStackTrace);
-                writer2.flush();
-                if (writer2 != null) {
-                    try {
-                        writer2.close();
-                    } catch (Throwable e1) {
-                        HockeyLog.error("Error saving crash report!", e1);
-                        writer = writer2;
-                        return;
-                    }
-                }
-                writer = writer2;
-            } catch (IOException e2) {
-                e = e2;
-                writer = writer2;
-                try {
-                    HockeyLog.error("Error saving crash report!", e);
-                    if (writer != null) {
-                        try {
-                            writer.close();
-                        } catch (Throwable e12) {
-                            HockeyLog.error("Error saving crash report!", e12);
-                        }
-                    }
-                } catch (Throwable th2) {
-                    th = th2;
-                    if (writer != null) {
-                        try {
-                            writer.close();
-                        } catch (Throwable e122) {
-                            HockeyLog.error("Error saving crash report!", e122);
-                        }
-                    }
-                    throw th;
-                }
-            } catch (Throwable th3) {
-                th = th3;
-                writer = writer2;
-                if (writer != null) {
-                    writer.close();
-                }
-                throw th;
-            }
-        } catch (IOException e3) {
-            e = e3;
-            HockeyLog.error("Error saving crash report!", e);
-            if (writer != null) {
-                writer.close();
-            }
+            stringBuilder = new StringBuilder();
+            stringBuilder.append("Could not write crash report with error ");
+            stringBuilder.append(e.toString());
+            HockeyLog.error(stringBuilder.toString());
         }
     }
 
     private void writeHeader(Writer writer, String name, String value) throws IOException {
-        writer.write(name + ": " + value + "\n");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(name);
+        stringBuilder.append(": ");
+        stringBuilder.append(value);
+        stringBuilder.append("\n");
+        writer.write(stringBuilder.toString());
     }
 
     public void setReporterKey(String reporterKey) {

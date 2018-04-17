@@ -5,28 +5,27 @@ import android.app.PendingIntent;
 import android.content.IntentSender.SendIntentException;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.zzbg;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class ConnectionResult extends zzbfm {
-    public static final Creator<ConnectionResult> CREATOR = new zzb();
-    public static final ConnectionResult zzfkr = new ConnectionResult(0);
-    private final int zzcd;
-    private int zzeck;
-    private final PendingIntent zzeeo;
-    private final String zzfks;
+public final class ConnectionResult extends AbstractSafeParcelable {
+    public static final Creator<ConnectionResult> CREATOR = new ConnectionResultCreator();
+    public static final ConnectionResult RESULT_SUCCESS = new ConnectionResult(0);
+    private final int zzal;
+    private final int zzam;
+    private final PendingIntent zzan;
+    private final String zzao;
 
     public ConnectionResult(int i) {
         this(i, null, null);
     }
 
     ConnectionResult(int i, int i2, PendingIntent pendingIntent, String str) {
-        this.zzeck = i;
-        this.zzcd = i2;
-        this.zzeeo = pendingIntent;
-        this.zzfks = str;
+        this.zzal = i;
+        this.zzam = i2;
+        this.zzan = pendingIntent;
+        this.zzao = str;
     }
 
     public ConnectionResult(int i, PendingIntent pendingIntent) {
@@ -37,7 +36,13 @@ public final class ConnectionResult extends zzbfm {
         this(1, i, pendingIntent, str);
     }
 
-    static String getStatusString(int i) {
+    static String zza(int i) {
+        if (i == 99) {
+            return "UNFINISHED";
+        }
+        if (i == 1500) {
+            return "DRIVE_EXTERNAL_STORAGE_REQUIRED";
+        }
         switch (i) {
             case -1:
                 return "UNKNOWN";
@@ -65,30 +70,33 @@ public final class ConnectionResult extends zzbfm {
                 return "DEVELOPER_ERROR";
             case 11:
                 return "LICENSE_CHECK_FAILED";
-            case 13:
-                return "CANCELED";
-            case 14:
-                return "TIMEOUT";
-            case 15:
-                return "INTERRUPTED";
-            case 16:
-                return "API_UNAVAILABLE";
-            case 17:
-                return "SIGN_IN_FAILED";
-            case 18:
-                return "SERVICE_UPDATING";
-            case 19:
-                return "SERVICE_MISSING_PERMISSION";
-            case 20:
-                return "RESTRICTED_PROFILE";
-            case 21:
-                return "API_VERSION_UPDATE_REQUIRED";
-            case 99:
-                return "UNFINISHED";
-            case 1500:
-                return "DRIVE_EXTERNAL_STORAGE_REQUIRED";
             default:
-                return "UNKNOWN_ERROR_CODE(" + i + ")";
+                switch (i) {
+                    case 13:
+                        return "CANCELED";
+                    case 14:
+                        return "TIMEOUT";
+                    case 15:
+                        return "INTERRUPTED";
+                    case 16:
+                        return "API_UNAVAILABLE";
+                    case 17:
+                        return "SIGN_IN_FAILED";
+                    case 18:
+                        return "SERVICE_UPDATING";
+                    case 19:
+                        return "SERVICE_MISSING_PERMISSION";
+                    case 20:
+                        return "RESTRICTED_PROFILE";
+                    case 21:
+                        return "API_VERSION_UPDATE_REQUIRED";
+                    default:
+                        StringBuilder stringBuilder = new StringBuilder(31);
+                        stringBuilder.append("UNKNOWN_ERROR_CODE(");
+                        stringBuilder.append(i);
+                        stringBuilder.append(")");
+                        return stringBuilder.toString();
+                }
         }
     }
 
@@ -100,49 +108,49 @@ public final class ConnectionResult extends zzbfm {
             return false;
         }
         ConnectionResult connectionResult = (ConnectionResult) obj;
-        return this.zzcd == connectionResult.zzcd && zzbg.equal(this.zzeeo, connectionResult.zzeeo) && zzbg.equal(this.zzfks, connectionResult.zzfks);
+        return this.zzam == connectionResult.zzam && Objects.equal(this.zzan, connectionResult.zzan) && Objects.equal(this.zzao, connectionResult.zzao);
     }
 
     public final int getErrorCode() {
-        return this.zzcd;
+        return this.zzam;
     }
 
     public final String getErrorMessage() {
-        return this.zzfks;
+        return this.zzao;
     }
 
     public final PendingIntent getResolution() {
-        return this.zzeeo;
+        return this.zzan;
     }
 
     public final boolean hasResolution() {
-        return (this.zzcd == 0 || this.zzeeo == null) ? false : true;
+        return (this.zzam == 0 || this.zzan == null) ? false : true;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(this.zzcd), this.zzeeo, this.zzfks});
+        return Objects.hashCode(Integer.valueOf(this.zzam), this.zzan, this.zzao);
     }
 
     public final boolean isSuccess() {
-        return this.zzcd == 0;
+        return this.zzam == 0;
     }
 
     public final void startResolutionForResult(Activity activity, int i) throws SendIntentException {
         if (hasResolution()) {
-            activity.startIntentSenderForResult(this.zzeeo.getIntentSender(), i, null, 0, 0, 0);
+            activity.startIntentSenderForResult(this.zzan.getIntentSender(), i, null, 0, 0, 0);
         }
     }
 
     public final String toString() {
-        return zzbg.zzx(this).zzg("statusCode", getStatusString(this.zzcd)).zzg("resolution", this.zzeeo).zzg("message", this.zzfks).toString();
+        return Objects.toStringHelper(this).add("statusCode", zza(this.zzam)).add("resolution", this.zzan).add("message", this.zzao).toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 1, this.zzeck);
-        zzbfp.zzc(parcel, 2, getErrorCode());
-        zzbfp.zza(parcel, 3, getResolution(), i, false);
-        zzbfp.zza(parcel, 4, getErrorMessage(), false);
-        zzbfp.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.zzal);
+        SafeParcelWriter.writeInt(parcel, 2, getErrorCode());
+        SafeParcelWriter.writeParcelable(parcel, 3, getResolution(), i, false);
+        SafeParcelWriter.writeString(parcel, 4, getErrorMessage(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

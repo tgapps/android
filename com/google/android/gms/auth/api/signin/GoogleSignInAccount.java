@@ -6,12 +6,12 @@ import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.text.TextUtils;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.common.util.zzd;
-import com.google.android.gms.common.util.zzh;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import com.google.android.gms.common.util.Clock;
+import com.google.android.gms.common.util.DefaultClock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -21,46 +21,43 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GoogleSignInAccount extends zzbfm implements ReflectedParcelable {
-    public static final Creator<GoogleSignInAccount> CREATOR = new zzb();
-    private static zzd zzegr = zzh.zzamg();
-    private int versionCode;
-    private String zzbuz;
-    private List<Scope> zzecp;
-    private String zzefb;
-    private String zzefc;
-    private String zzefs;
-    private String zzegs;
-    private String zzegt;
-    private Uri zzegu;
-    private String zzegv;
-    private long zzegw;
-    private String zzegx;
-    private Set<Scope> zzegy = new HashSet();
+public class GoogleSignInAccount extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<GoogleSignInAccount> CREATOR = new GoogleSignInAccountCreator();
+    public static Clock sClock = DefaultClock.getInstance();
+    private final int versionCode;
+    private String zze;
+    private String zzf;
+    private String zzg;
+    private String zzh;
+    private Uri zzi;
+    private String zzj;
+    private long zzk;
+    private String zzl;
+    private List<Scope> zzm;
+    private String zzn;
+    private String zzo;
+    private Set<Scope> zzp = new HashSet();
 
     GoogleSignInAccount(int i, String str, String str2, String str3, String str4, Uri uri, String str5, long j, String str6, List<Scope> list, String str7, String str8) {
         this.versionCode = i;
-        this.zzbuz = str;
-        this.zzefs = str2;
-        this.zzegs = str3;
-        this.zzegt = str4;
-        this.zzegu = uri;
-        this.zzegv = str5;
-        this.zzegw = j;
-        this.zzegx = str6;
-        this.zzecp = list;
-        this.zzefb = str7;
-        this.zzefc = str8;
+        this.zze = str;
+        this.zzf = str2;
+        this.zzg = str3;
+        this.zzh = str4;
+        this.zzi = uri;
+        this.zzj = str5;
+        this.zzk = j;
+        this.zzl = str6;
+        this.zzm = list;
+        this.zzn = str7;
+        this.zzo = str8;
     }
 
-    private static GoogleSignInAccount zza(String str, String str2, String str3, String str4, String str5, String str6, Uri uri, Long l, String str7, Set<Scope> set) {
-        if (l == null) {
-            l = Long.valueOf(zzegr.currentTimeMillis() / 1000);
-        }
-        return new GoogleSignInAccount(3, str, str2, str3, str4, uri, null, l.longValue(), zzbq.zzgm(str7), new ArrayList((Collection) zzbq.checkNotNull(set)), str5, str6);
+    public static GoogleSignInAccount create(String str, String str2, String str3, String str4, String str5, String str6, Uri uri, Long l, String str7, Set<Scope> set) {
+        return new GoogleSignInAccount(3, str, str2, str3, str4, uri, null, (l == null ? Long.valueOf(sClock.currentTimeMillis() / 1000) : l).longValue(), Preconditions.checkNotEmpty(str7), new ArrayList((Collection) Preconditions.checkNotNull(set)), str5, str6);
     }
 
-    public static GoogleSignInAccount zzeu(String str) throws JSONException {
+    public static GoogleSignInAccount fromJsonString(String str) throws JSONException {
         if (TextUtils.isEmpty(str)) {
             return null;
         }
@@ -74,9 +71,7 @@ public class GoogleSignInAccount extends zzbfm implements ReflectedParcelable {
         for (int i = 0; i < length; i++) {
             hashSet.add(new Scope(jSONArray.getString(i)));
         }
-        GoogleSignInAccount zza = zza(jSONObject.optString(TtmlNode.ATTR_ID), jSONObject.optString("tokenId", null), jSONObject.optString("email", null), jSONObject.optString("displayName", null), jSONObject.optString("givenName", null), jSONObject.optString("familyName", null), parse, Long.valueOf(parseLong), jSONObject.getString("obfuscatedIdentifier"), hashSet);
-        zza.zzegv = jSONObject.optString("serverAuthCode", null);
-        return zza;
+        return create(jSONObject.optString(TtmlNode.ATTR_ID), jSONObject.optString("tokenId", null), jSONObject.optString("email", null), jSONObject.optString("displayName", null), jSONObject.optString("givenName", null), jSONObject.optString("familyName", null), parse, Long.valueOf(parseLong), jSONObject.getString("obfuscatedIdentifier"), hashSet).setServerAuthCode(jSONObject.optString("serverAuthCode", null));
     }
 
     public boolean equals(Object obj) {
@@ -87,69 +82,82 @@ public class GoogleSignInAccount extends zzbfm implements ReflectedParcelable {
             return false;
         }
         GoogleSignInAccount googleSignInAccount = (GoogleSignInAccount) obj;
-        return googleSignInAccount.zzegx.equals(this.zzegx) && googleSignInAccount.zzabb().equals(zzabb());
+        return googleSignInAccount.getObfuscatedIdentifier().equals(getObfuscatedIdentifier()) && googleSignInAccount.getRequestedScopes().equals(getRequestedScopes());
     }
 
     public Account getAccount() {
-        return this.zzegs == null ? null : new Account(this.zzegs, "com.google");
+        return this.zzg == null ? null : new Account(this.zzg, "com.google");
     }
 
     public String getDisplayName() {
-        return this.zzegt;
+        return this.zzh;
     }
 
     public String getEmail() {
-        return this.zzegs;
+        return this.zzg;
+    }
+
+    public long getExpirationTimeSecs() {
+        return this.zzk;
     }
 
     public String getFamilyName() {
-        return this.zzefc;
+        return this.zzo;
     }
 
     public String getGivenName() {
-        return this.zzefb;
+        return this.zzn;
     }
 
     public String getId() {
-        return this.zzbuz;
+        return this.zze;
     }
 
     public String getIdToken() {
-        return this.zzefs;
+        return this.zzf;
+    }
+
+    public String getObfuscatedIdentifier() {
+        return this.zzl;
     }
 
     public Uri getPhotoUrl() {
-        return this.zzegu;
+        return this.zzi;
+    }
+
+    public Set<Scope> getRequestedScopes() {
+        Set<Scope> hashSet = new HashSet(this.zzm);
+        hashSet.addAll(this.zzp);
+        return hashSet;
     }
 
     public String getServerAuthCode() {
-        return this.zzegv;
+        return this.zzj;
     }
 
     public int hashCode() {
-        return ((this.zzegx.hashCode() + 527) * 31) + zzabb().hashCode();
+        return ((527 + getObfuscatedIdentifier().hashCode()) * 31) + getRequestedScopes().hashCode();
+    }
+
+    public GoogleSignInAccount setServerAuthCode(String str) {
+        this.zzj = str;
+        return this;
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 1, this.versionCode);
-        zzbfp.zza(parcel, 2, getId(), false);
-        zzbfp.zza(parcel, 3, getIdToken(), false);
-        zzbfp.zza(parcel, 4, getEmail(), false);
-        zzbfp.zza(parcel, 5, getDisplayName(), false);
-        zzbfp.zza(parcel, 6, getPhotoUrl(), i, false);
-        zzbfp.zza(parcel, 7, getServerAuthCode(), false);
-        zzbfp.zza(parcel, 8, this.zzegw);
-        zzbfp.zza(parcel, 9, this.zzegx, false);
-        zzbfp.zzc(parcel, 10, this.zzecp, false);
-        zzbfp.zza(parcel, 11, getGivenName(), false);
-        zzbfp.zza(parcel, 12, getFamilyName(), false);
-        zzbfp.zzai(parcel, zze);
-    }
-
-    public final Set<Scope> zzabb() {
-        Set<Scope> hashSet = new HashSet(this.zzecp);
-        hashSet.addAll(this.zzegy);
-        return hashSet;
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.versionCode);
+        SafeParcelWriter.writeString(parcel, 2, getId(), false);
+        SafeParcelWriter.writeString(parcel, 3, getIdToken(), false);
+        SafeParcelWriter.writeString(parcel, 4, getEmail(), false);
+        SafeParcelWriter.writeString(parcel, 5, getDisplayName(), false);
+        SafeParcelWriter.writeParcelable(parcel, 6, getPhotoUrl(), i, false);
+        SafeParcelWriter.writeString(parcel, 7, getServerAuthCode(), false);
+        SafeParcelWriter.writeLong(parcel, 8, getExpirationTimeSecs());
+        SafeParcelWriter.writeString(parcel, 9, getObfuscatedIdentifier(), false);
+        SafeParcelWriter.writeTypedList(parcel, 10, this.zzm, false);
+        SafeParcelWriter.writeString(parcel, 11, getGivenName(), false);
+        SafeParcelWriter.writeString(parcel, 12, getFamilyName(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

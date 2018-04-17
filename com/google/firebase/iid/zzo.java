@@ -1,15 +1,13 @@
 package com.google.firebase.iid;
 
 final /* synthetic */ class zzo implements Runnable {
-    private final zzk zznzg;
-    private final zzr zznzh;
+    private final zzm zzbre;
 
-    zzo(zzk com_google_firebase_iid_zzk, zzr com_google_firebase_iid_zzr) {
-        this.zznzg = com_google_firebase_iid_zzk;
-        this.zznzh = com_google_firebase_iid_zzr;
+    zzo(zzm com_google_firebase_iid_zzm) {
+        this.zzbre = com_google_firebase_iid_zzm;
     }
 
     public final void run() {
-        this.zznzg.zzic(this.zznzh.zzift);
+        this.zzbre.zzss();
     }
 }

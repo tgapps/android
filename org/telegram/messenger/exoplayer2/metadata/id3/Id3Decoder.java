@@ -48,466 +48,930 @@ public final class Id3Decoder implements MetadataDecoder {
         }
     }
 
-    private static org.telegram.messenger.exoplayer2.metadata.id3.Id3Frame decodeFrame(int r24, org.telegram.messenger.exoplayer2.util.ParsableByteArray r25, boolean r26, int r27, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.FramePredicate r28) {
+    private static org.telegram.messenger.exoplayer2.metadata.id3.ChapterFrame decodeChapterFrame(org.telegram.messenger.exoplayer2.util.ParsableByteArray r1, int r2, int r3, boolean r4, int r5, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.FramePredicate r6) throws java.io.UnsupportedEncodingException {
         /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dominator for block B:192:? in {2, 7, 10, 18, 21, 22, 23, 35, 38, 41, 42, 46, 47, 48, 53, 56, 59, 62, 65, 66, 67, 68, 69, 70, 71, 73, 75, 77, 87, 89, 91, 96, 106, 107, 110, 119, 129, 130, 138, 139, 147, 157, 158, 167, 176, 178, 183, 185, 186, 187, 188, 189, 190, 191, 193} preds:[]
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.computeDominators(BlockProcessor.java:129)
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.processBlocksTree(BlockProcessor.java:48)
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.rerun(BlockProcessor.java:44)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.visit(BlockFinallyExtract.java:57)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.ProcessClass.process(ProcessClass.java:37)
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.decodeChapterFrame(org.telegram.messenger.exoplayer2.util.ParsableByteArray, int, int, boolean, int, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder$FramePredicate):org.telegram.messenger.exoplayer2.metadata.id3.ChapterFrame
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
 	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
 	at jadx.core.ProcessClass.process(ProcessClass.java:42)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
 */
         /*
-        r4 = r25.readUnsignedByte();
-        r5 = r25.readUnsignedByte();
-        r6 = r25.readUnsignedByte();
-        r2 = 3;
-        r0 = r24;
-        if (r0 < r2) goto L_0x0059;
-    L_0x0011:
-        r7 = r25.readUnsignedByte();
-    L_0x0015:
-        r2 = 4;
-        r0 = r24;
-        if (r0 != r2) goto L_0x005b;
-    L_0x001a:
-        r9 = r25.readUnsignedIntToInt();
-        if (r26 != 0) goto L_0x0038;
-    L_0x0020:
-        r2 = r9 & 255;
-        r3 = r9 >> 8;
+        r0 = r22;
+        r1 = r22.getPosition();
+        r2 = r0.data;
+        r2 = indexOfZeroByte(r2, r1);
+        r4 = new java.lang.String;
+        r3 = r0.data;
+        r5 = r2 - r1;
+        r6 = "ISO-8859-1";
+        r4.<init>(r3, r1, r5, r6);
+        r3 = r2 + 1;
+        r0.setPosition(r3);
+        r12 = r22.readInt();
+        r13 = r22.readInt();
+        r5 = r22.readUnsignedInt();
+        r7 = 4294967295; // 0xffffffff float:NaN double:2.1219957905E-314;
+        r3 = (r5 > r7 ? 1 : (r5 == r7 ? 0 : -1));
+        if (r3 != 0) goto L_0x0033;
+    L_0x0031:
+        r5 = -1;
+    L_0x0033:
+        r14 = r5;
+        r5 = r22.readUnsignedInt();
+        r3 = (r5 > r7 ? 1 : (r5 == r7 ? 0 : -1));
+        if (r3 != 0) goto L_0x003e;
+    L_0x003c:
+        r5 = -1;
+    L_0x003e:
+        r16 = r5;
+        r3 = new java.util.ArrayList;
+        r3.<init>();
+        r11 = r3;
+        r3 = r1 + r23;
+        r9 = r3;
+        r3 = r22.getPosition();
+        if (r3 >= r9) goto L_0x0063;
+    L_0x004f:
+        r10 = r24;
+        r7 = r25;
+        r8 = r26;
+        r6 = r27;
+        r3 = decodeFrame(r10, r0, r7, r8, r6);
+        if (r3 == 0) goto L_0x0060;
+    L_0x005d:
+        r11.add(r3);
+        r3 = r9;
+        goto L_0x0048;
+    L_0x0063:
+        r10 = r24;
+        r7 = r25;
+        r8 = r26;
+        r6 = r27;
+        r3 = r11.size();
+        r5 = new org.telegram.messenger.exoplayer2.metadata.id3.Id3Frame[r3];
+        r11.toArray(r5);
+        r18 = new org.telegram.messenger.exoplayer2.metadata.id3.ChapterFrame;
+        r3 = r18;
+        r19 = r5;
+        r5 = r12;
+        r6 = r13;
+        r7 = r14;
+        r20 = r9;
+        r9 = r16;
+        r21 = r11;
+        r11 = r19;
+        r3.<init>(r4, r5, r6, r7, r9, r11);
+        return r18;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.decodeChapterFrame(org.telegram.messenger.exoplayer2.util.ParsableByteArray, int, int, boolean, int, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder$FramePredicate):org.telegram.messenger.exoplayer2.metadata.id3.ChapterFrame");
+    }
+
+    private static org.telegram.messenger.exoplayer2.metadata.id3.ChapterTocFrame decodeChapterTOCFrame(org.telegram.messenger.exoplayer2.util.ParsableByteArray r1, int r2, int r3, boolean r4, int r5, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.FramePredicate r6) throws java.io.UnsupportedEncodingException {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.decodeChapterTOCFrame(org.telegram.messenger.exoplayer2.util.ParsableByteArray, int, int, boolean, int, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder$FramePredicate):org.telegram.messenger.exoplayer2.metadata.id3.ChapterTocFrame
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = r18;
+        r1 = r18.getPosition();
+        r2 = r0.data;
+        r2 = indexOfZeroByte(r2, r1);
+        r4 = new java.lang.String;
+        r3 = r0.data;
+        r5 = r2 - r1;
+        r6 = "ISO-8859-1";
+        r4.<init>(r3, r1, r5, r6);
+        r3 = r2 + 1;
+        r0.setPosition(r3);
+        r9 = r18.readUnsignedByte();
+        r3 = r9 & 2;
+        r7 = 0;
+        r6 = 1;
+        if (r3 == 0) goto L_0x0028;
+    L_0x0026:
+        r5 = r6;
+        goto L_0x0029;
+    L_0x0028:
+        r5 = r7;
+    L_0x0029:
+        r3 = r9 & 1;
+        if (r3 == 0) goto L_0x002e;
+    L_0x002d:
+        goto L_0x002f;
+    L_0x002e:
+        r6 = r7;
+    L_0x002f:
+        r10 = r18.readUnsignedByte();
+        r11 = new java.lang.String[r10];
+    L_0x0036:
+        r3 = r7;
+        if (r3 >= r10) goto L_0x0058;
+    L_0x0039:
+        r7 = r18.getPosition();
+        r8 = r0.data;
+        r8 = indexOfZeroByte(r8, r7);
+        r12 = new java.lang.String;
+        r13 = r0.data;
+        r14 = r8 - r7;
+        r15 = "ISO-8859-1";
+        r12.<init>(r13, r7, r14, r15);
+        r11[r3] = r12;
+        r12 = r8 + 1;
+        r0.setPosition(r12);
+        r7 = r3 + 1;
+        goto L_0x0036;
+    L_0x0058:
+        r3 = new java.util.ArrayList;
+        r3.<init>();
+        r12 = r3;
+        r3 = r1 + r19;
+        r14 = r3;
+        r3 = r18.getPosition();
+        if (r3 >= r14) goto L_0x007f;
+    L_0x0067:
+        r15 = r20;
+        r8 = r21;
+        r7 = r22;
+        r3 = r23;
+        r16 = r1;
+        r1 = decodeFrame(r15, r0, r8, r7, r3);
+        if (r1 == 0) goto L_0x007a;
+    L_0x0077:
+        r12.add(r1);
+        r3 = r14;
+        r1 = r16;
+        goto L_0x0060;
+    L_0x007f:
+        r15 = r20;
+        r8 = r21;
+        r7 = r22;
+        r3 = r23;
+        r16 = r1;
+        r1 = r12.size();
+        r1 = new org.telegram.messenger.exoplayer2.metadata.id3.Id3Frame[r1];
+        r12.toArray(r1);
+        r17 = new org.telegram.messenger.exoplayer2.metadata.id3.ChapterTocFrame;
+        r3 = r17;
+        r7 = r11;
+        r8 = r1;
+        r3.<init>(r4, r5, r6, r7, r8);
+        return r17;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.decodeChapterTOCFrame(org.telegram.messenger.exoplayer2.util.ParsableByteArray, int, int, boolean, int, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder$FramePredicate):org.telegram.messenger.exoplayer2.metadata.id3.ChapterTocFrame");
+    }
+
+    private static org.telegram.messenger.exoplayer2.metadata.id3.Id3Frame decodeFrame(int r1, org.telegram.messenger.exoplayer2.util.ParsableByteArray r2, boolean r3, int r4, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.FramePredicate r5) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.decodeFrame(int, org.telegram.messenger.exoplayer2.util.ParsableByteArray, boolean, int, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder$FramePredicate):org.telegram.messenger.exoplayer2.metadata.id3.Id3Frame
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r7 = r23;
+        r8 = r24;
+        r9 = r24.readUnsignedByte();
+        r10 = r24.readUnsignedByte();
+        r11 = r24.readUnsignedByte();
+        r12 = 3;
+        if (r7 < r12) goto L_0x0018;
+    L_0x0013:
+        r1 = r24.readUnsignedByte();
+        goto L_0x0019;
+    L_0x0018:
+        r1 = 0;
+    L_0x0019:
+        r14 = r1;
+        r15 = 4;
+        if (r7 != r15) goto L_0x003c;
+    L_0x001d:
+        r1 = r24.readUnsignedIntToInt();
+        if (r25 != 0) goto L_0x0047;
+    L_0x0023:
+        r2 = r1 & 255;
+        r3 = r1 >> 8;
         r3 = r3 & 255;
         r3 = r3 << 7;
         r2 = r2 | r3;
-        r3 = r9 >> 16;
+        r3 = r1 >> 16;
         r3 = r3 & 255;
         r3 = r3 << 14;
         r2 = r2 | r3;
-        r3 = r9 >> 24;
+        r3 = r1 >> 24;
         r3 = r3 & 255;
         r3 = r3 << 21;
-        r9 = r2 | r3;
-    L_0x0038:
-        r2 = 3;
-        r0 = r24;
-        if (r0 < r2) goto L_0x006a;
-    L_0x003d:
-        r15 = r25.readUnsignedShort();
-    L_0x0041:
-        if (r4 != 0) goto L_0x006c;
+        r1 = r2 | r3;
+        goto L_0x0047;
+    L_0x003c:
+        if (r7 != r12) goto L_0x0043;
+    L_0x003e:
+        r1 = r24.readUnsignedIntToInt();
+        goto L_0x0047;
     L_0x0043:
-        if (r5 != 0) goto L_0x006c;
-    L_0x0045:
-        if (r6 != 0) goto L_0x006c;
+        r1 = r24.readUnsignedInt24();
     L_0x0047:
-        if (r7 != 0) goto L_0x006c;
-    L_0x0049:
-        if (r9 != 0) goto L_0x006c;
+        r16 = r1;
+        if (r7 < r12) goto L_0x0050;
     L_0x004b:
-        if (r15 != 0) goto L_0x006c;
-    L_0x004d:
-        r2 = r25.limit();
-        r0 = r25;
-        r0.setPosition(r2);
-        r16 = 0;
+        r1 = r24.readUnsignedShort();
+        goto L_0x0051;
+    L_0x0050:
+        r1 = 0;
+    L_0x0051:
+        r6 = r1;
+        r17 = 0;
+        if (r9 != 0) goto L_0x0068;
+    L_0x0056:
+        if (r10 != 0) goto L_0x0068;
     L_0x0058:
-        return r16;
-    L_0x0059:
-        r7 = 0;
-        goto L_0x0015;
-    L_0x005b:
-        r2 = 3;
-        r0 = r24;
-        if (r0 != r2) goto L_0x0065;
+        if (r11 != 0) goto L_0x0068;
+    L_0x005a:
+        if (r14 != 0) goto L_0x0068;
+    L_0x005c:
+        if (r16 != 0) goto L_0x0068;
+    L_0x005e:
+        if (r6 != 0) goto L_0x0068;
     L_0x0060:
-        r9 = r25.readUnsignedIntToInt();
-        goto L_0x0038;
-    L_0x0065:
-        r9 = r25.readUnsignedInt24();
-        goto L_0x0038;
-    L_0x006a:
-        r15 = 0;
-        goto L_0x0041;
-    L_0x006c:
-        r2 = r25.getPosition();
-        r23 = r2 + r9;
-        r2 = r25.limit();
-        r0 = r23;
-        if (r0 <= r2) goto L_0x008f;
-    L_0x007a:
-        r2 = "Id3Decoder";
-        r3 = "Frame size exceeds remaining tag data";
-        android.util.Log.w(r2, r3);
-        r2 = r25.limit();
-        r0 = r25;
-        r0.setPosition(r2);
-        r16 = 0;
-        goto L_0x0058;
-    L_0x008f:
-        if (r28 == 0) goto L_0x00a5;
-    L_0x0091:
-        r2 = r28;
-        r3 = r24;
-        r2 = r2.evaluate(r3, r4, r5, r6, r7);
-        if (r2 != 0) goto L_0x00a5;
-    L_0x009b:
-        r0 = r25;
-        r1 = r23;
-        r0.setPosition(r1);
-        r16 = 0;
-        goto L_0x0058;
-    L_0x00a5:
-        r20 = 0;
-        r21 = 0;
-        r22 = 0;
-        r17 = 0;
+        r1 = r24.limit();
+        r8.setPosition(r1);
+        return r17;
+    L_0x0068:
+        r1 = r24.getPosition();
+        r5 = r1 + r16;
+        r1 = r24.limit();
+        if (r5 <= r1) goto L_0x0083;
+    L_0x0074:
+        r1 = "Id3Decoder";
+        r2 = "Frame size exceeds remaining tag data";
+        android.util.Log.w(r1, r2);
+        r1 = r24.limit();
+        r8.setPosition(r1);
+        return r17;
+    L_0x0083:
+        if (r27 == 0) goto L_0x0098;
+    L_0x0085:
+        r1 = r27;
+        r2 = r7;
+        r3 = r9;
+        r4 = r10;
+        r13 = r5;
+        r5 = r11;
+        r15 = r6;
+        r6 = r14;
+        r1 = r1.evaluate(r2, r3, r4, r5, r6);
+        if (r1 != 0) goto L_0x009a;
+    L_0x0094:
+        r8.setPosition(r13);
+        return r17;
+    L_0x0098:
+        r13 = r5;
+        r15 = r6;
+    L_0x009a:
+        r1 = 0;
+        r2 = 0;
+        r3 = 0;
+        r4 = 0;
+        r5 = 0;
+        r6 = 1;
+        if (r7 != r12) goto L_0x00bf;
+    L_0x00a2:
+        r12 = r15 & 128;
+        if (r12 == 0) goto L_0x00a8;
+    L_0x00a6:
+        r12 = r6;
+        goto L_0x00a9;
+    L_0x00a8:
+        r12 = 0;
+    L_0x00a9:
+        r1 = r12;
+        r12 = r15 & 64;
+        if (r12 == 0) goto L_0x00b0;
+    L_0x00ae:
+        r12 = r6;
+        goto L_0x00b1;
+    L_0x00b0:
+        r12 = 0;
+    L_0x00b1:
+        r2 = r12;
+        r12 = r15 & 32;
+        if (r12 == 0) goto L_0x00b9;
+    L_0x00b6:
+        r18 = r6;
+        goto L_0x00bb;
+    L_0x00b9:
         r18 = 0;
-        r2 = 3;
-        r0 = r24;
-        if (r0 != r2) goto L_0x00e9;
-    L_0x00b4:
-        r2 = r15 & 128;
-        if (r2 == 0) goto L_0x00e0;
-    L_0x00b8:
-        r20 = 1;
-    L_0x00ba:
-        r2 = r15 & 64;
-        if (r2 == 0) goto L_0x00e3;
-    L_0x00be:
-        r21 = 1;
-    L_0x00c0:
-        r2 = r15 & 32;
-        if (r2 == 0) goto L_0x00e6;
-    L_0x00c4:
-        r18 = 1;
+    L_0x00bb:
+        r5 = r18;
+        r4 = r1;
+        goto L_0x00ed;
+    L_0x00bf:
+        r12 = 4;
+        if (r7 != r12) goto L_0x00ed;
+    L_0x00c2:
+        r12 = r15 & 64;
+        if (r12 == 0) goto L_0x00c8;
     L_0x00c6:
-        r17 = r20;
+        r12 = r6;
+        goto L_0x00c9;
     L_0x00c8:
-        if (r20 != 0) goto L_0x00cc;
-    L_0x00ca:
-        if (r21 == 0) goto L_0x011c;
-    L_0x00cc:
-        r2 = "Id3Decoder";
-        r3 = "Skipping unsupported compressed or encrypted frame";
-        android.util.Log.w(r2, r3);
-        r0 = r25;
-        r1 = r23;
-        r0.setPosition(r1);
-        r16 = 0;
-        goto L_0x0058;
+        r12 = 0;
+    L_0x00c9:
+        r5 = r12;
+        r12 = r15 & 8;
+        if (r12 == 0) goto L_0x00d0;
+    L_0x00ce:
+        r12 = r6;
+        goto L_0x00d1;
+    L_0x00d0:
+        r12 = 0;
+    L_0x00d1:
+        r1 = r12;
+        r12 = r15 & 4;
+        if (r12 == 0) goto L_0x00d8;
+    L_0x00d6:
+        r12 = r6;
+        goto L_0x00d9;
+    L_0x00d8:
+        r12 = 0;
+    L_0x00d9:
+        r2 = r12;
+        r12 = r15 & 2;
+        if (r12 == 0) goto L_0x00e0;
+    L_0x00de:
+        r12 = r6;
+        goto L_0x00e1;
     L_0x00e0:
-        r20 = 0;
-        goto L_0x00ba;
-    L_0x00e3:
-        r21 = 0;
-        goto L_0x00c0;
+        r12 = 0;
+    L_0x00e1:
+        r3 = r12;
+        r12 = r15 & 1;
+        if (r12 == 0) goto L_0x00e9;
     L_0x00e6:
-        r18 = 0;
-        goto L_0x00c6;
+        r18 = r6;
+        goto L_0x00eb;
     L_0x00e9:
-        r2 = 4;
-        r0 = r24;
-        if (r0 != r2) goto L_0x00c8;
-    L_0x00ee:
-        r2 = r15 & 64;
-        if (r2 == 0) goto L_0x010d;
-    L_0x00f2:
-        r18 = 1;
-    L_0x00f4:
-        r2 = r15 & 8;
-        if (r2 == 0) goto L_0x0110;
-    L_0x00f8:
-        r20 = 1;
-    L_0x00fa:
-        r2 = r15 & 4;
-        if (r2 == 0) goto L_0x0113;
-    L_0x00fe:
-        r21 = 1;
-    L_0x0100:
-        r2 = r15 & 2;
-        if (r2 == 0) goto L_0x0116;
-    L_0x0104:
-        r22 = 1;
-    L_0x0106:
-        r2 = r15 & 1;
-        if (r2 == 0) goto L_0x0119;
-    L_0x010a:
-        r17 = 1;
-    L_0x010c:
-        goto L_0x00c8;
-    L_0x010d:
         r18 = 0;
-        goto L_0x00f4;
-    L_0x0110:
-        r20 = 0;
-        goto L_0x00fa;
+    L_0x00eb:
+        r4 = r18;
+    L_0x00ed:
+        r12 = r1;
+        r18 = r2;
+        r19 = r3;
+        r20 = r4;
+        r21 = r5;
+        if (r12 != 0) goto L_0x0253;
+    L_0x00f8:
+        if (r18 == 0) goto L_0x00fc;
+    L_0x00fa:
+        goto L_0x0253;
+    L_0x00fc:
+        if (r21 == 0) goto L_0x0103;
+    L_0x00fe:
+        r16 = r16 + -1;
+        r8.skipBytes(r6);
+    L_0x0103:
+        if (r20 == 0) goto L_0x010b;
+    L_0x0105:
+        r16 = r16 + -4;
+        r1 = 4;
+        r8.skipBytes(r1);
+    L_0x010b:
+        r1 = r16;
+        if (r19 == 0) goto L_0x0113;
+    L_0x010f:
+        r1 = removeUnsynchronization(r8, r1);
     L_0x0113:
-        r21 = 0;
-        goto L_0x0100;
-    L_0x0116:
-        r22 = 0;
-        goto L_0x0106;
-    L_0x0119:
-        r17 = 0;
-        goto L_0x010c;
-    L_0x011c:
-        if (r18 == 0) goto L_0x0126;
-    L_0x011e:
-        r9 = r9 + -1;
-        r2 = 1;
-        r0 = r25;
-        r0.skipBytes(r2);
-    L_0x0126:
-        if (r17 == 0) goto L_0x0130;
+        r6 = r1;
+        r1 = 84;
+        r2 = 88;
+        r3 = 2;
+        if (r9 != r1) goto L_0x0128;
+    L_0x011b:
+        if (r10 != r2) goto L_0x0128;
+    L_0x011d:
+        if (r11 != r2) goto L_0x0128;
+    L_0x011f:
+        if (r7 == r3) goto L_0x0123;
+    L_0x0121:
+        if (r14 != r2) goto L_0x0128;
+    L_0x0123:
+        r1 = decodeTxxxFrame(r8, r6);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0127:
+        goto L_0x0134;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
     L_0x0128:
-        r9 = r9 + -4;
-        r2 = 4;
-        r0 = r25;
-        r0.skipBytes(r2);
-    L_0x0130:
-        if (r22 == 0) goto L_0x0138;
-    L_0x0132:
-        r0 = r25;
-        r9 = removeUnsynchronization(r0, r9);
-    L_0x0138:
-        r2 = 84;
-        if (r4 != r2) goto L_0x0189;
+        if (r9 != r1) goto L_0x0141;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x012a:
+        r1 = getFrameId(r7, r9, r10, r11, r14);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r2 = decodeTextInformationFrame(r8, r6, r1);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r1 = r2;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0134:
+        r2 = r6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        goto L_0x020b;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0137:
+        r0 = move-exception;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r1 = r0;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r2 = r6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        goto L_0x024f;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
     L_0x013c:
-        r2 = 88;
-        if (r5 != r2) goto L_0x0189;
-    L_0x0140:
-        r2 = 88;
-        if (r6 != r2) goto L_0x0189;
-    L_0x0144:
-        r2 = 2;
-        r0 = r24;
-        if (r0 == r2) goto L_0x014d;
+        r0 = move-exception;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r1 = r0;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r2 = r6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        goto L_0x0241;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0141:
+        r4 = 87;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r9 != r4) goto L_0x0152;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0145:
+        if (r10 != r2) goto L_0x0152;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0147:
+        if (r11 != r2) goto L_0x0152;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
     L_0x0149:
-        r2 = 88;
-        if (r7 != r2) goto L_0x0189;
+        if (r7 == r3) goto L_0x014d;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x014b:
+        if (r14 != r2) goto L_0x0152;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
     L_0x014d:
-        r0 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeTxxxFrame(r0, r9);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0153:
-        if (r16 != 0) goto L_0x0180;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0155:
-        r2 = "Id3Decoder";	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r3 = new java.lang.StringBuilder;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r3.<init>();	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r8 = "Failed to decode frame: id=";	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r3 = r3.append(r8);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r0 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r8 = getFrameId(r0, r4, r5, r6, r7);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r3 = r3.append(r8);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r8 = ", frameSize=";	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r3 = r3.append(r8);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r3 = r3.append(r9);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r3 = r3.toString();	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        android.util.Log.w(r2, r3);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0180:
-        r0 = r25;
-        r1 = r23;
-        r0.setPosition(r1);
-        goto L_0x0058;
-    L_0x0189:
-        r2 = 84;
-        if (r4 != r2) goto L_0x019c;
-    L_0x018d:
-        r0 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r19 = getFrameId(r0, r4, r5, r6, r7);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r0 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r1 = r19;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeTextInformationFrame(r0, r9, r1);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x019c:
-        r2 = 87;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r4 != r2) goto L_0x01b8;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01a0:
-        r2 = 88;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r5 != r2) goto L_0x01b8;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01a4:
-        r2 = 88;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r6 != r2) goto L_0x01b8;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
+        r1 = decodeWxxxFrame(r8, r6);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        goto L_0x0127;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0152:
+        r2 = 87;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r9 != r2) goto L_0x0160;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0156:
+        r1 = getFrameId(r7, r9, r10, r11, r14);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r2 = decodeUrlLinkFrame(r8, r6, r1);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r1 = r2;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        goto L_0x0134;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0160:
+        r2 = 73;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r4 = 80;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r9 != r4) goto L_0x0175;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0166:
+        r5 = 82;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r10 != r5) goto L_0x0175;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x016a:
+        if (r11 != r2) goto L_0x0175;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x016c:
+        r5 = 86;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r14 != r5) goto L_0x0175;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0170:
+        r1 = decodePrivFrame(r8, r6);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        goto L_0x0127;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0175:
+        r5 = 71;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        r1 = 79;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r9 != r5) goto L_0x018c;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x017b:
+        r5 = 69;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r10 != r5) goto L_0x018c;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x017f:
+        if (r11 != r1) goto L_0x018c;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0181:
+        r5 = 66;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r14 == r5) goto L_0x0187;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0185:
+        if (r7 != r3) goto L_0x018c;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0187:
+        r1 = decodeGeobFrame(r8, r6);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        goto L_0x0127;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x018c:
+        r5 = 67;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r7 != r3) goto L_0x0197;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0190:
+        if (r9 != r4) goto L_0x01a6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0192:
+        if (r10 != r2) goto L_0x01a6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0194:
+        if (r11 != r5) goto L_0x01a6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0196:
+        goto L_0x01a1;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x0197:
+        r3 = 65;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r9 != r3) goto L_0x01a6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x019b:
+        if (r10 != r4) goto L_0x01a6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x019d:
+        if (r11 != r2) goto L_0x01a6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x019f:
+        if (r14 != r5) goto L_0x01a6;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x01a1:
+        r1 = decodeApicFrame(r8, r6, r7);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        goto L_0x0127;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x01a6:
+        if (r9 != r5) goto L_0x01bb;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
     L_0x01a8:
-        r2 = 2;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r0 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r0 == r2) goto L_0x01b1;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01ad:
-        r2 = 88;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r7 != r2) goto L_0x01b8;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01b1:
-        r0 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeWxxxFrame(r0, r9);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01b8:
-        r2 = 87;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r4 != r2) goto L_0x01cb;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01bc:
-        r0 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r19 = getFrameId(r0, r4, r5, r6, r7);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r0 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r1 = r19;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeUrlLinkFrame(r0, r9, r1);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01cb:
-        r2 = 80;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r4 != r2) goto L_0x01e3;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01cf:
-        r2 = 82;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r5 != r2) goto L_0x01e3;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01d3:
-        r2 = 73;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r6 != r2) goto L_0x01e3;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01d7:
-        r2 = 86;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r7 != r2) goto L_0x01e3;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01db:
-        r0 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodePrivFrame(r0, r9);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01e3:
-        r2 = 71;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r4 != r2) goto L_0x0200;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01e7:
-        r2 = 69;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r5 != r2) goto L_0x0200;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01eb:
-        r2 = 79;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r6 != r2) goto L_0x0200;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
+        if (r10 != r1) goto L_0x01bb;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x01aa:
+        r2 = 77;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r11 != r2) goto L_0x01bb;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x01ae:
+        r2 = 77;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r14 == r2) goto L_0x01b5;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x01b2:
+        r2 = 2;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        if (r7 != r2) goto L_0x01bb;	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+    L_0x01b5:
+        r1 = decodeCommentFrame(r8, r6);	 Catch:{ UnsupportedEncodingException -> 0x013c, all -> 0x0137 }
+        goto L_0x0127;
+    L_0x01bb:
+        if (r9 != r5) goto L_0x01e5;
+    L_0x01bd:
+        r2 = 72;
+        if (r10 != r2) goto L_0x01e5;
+    L_0x01c1:
+        r2 = 65;
+        if (r11 != r2) goto L_0x01e5;
+    L_0x01c5:
+        if (r14 != r4) goto L_0x01e5;
+    L_0x01c7:
+        r1 = r8;
+        r2 = r6;
+        r3 = r7;
+        r4 = r25;
+        r5 = r26;
+        r22 = r6;
+        r6 = r27;
+        r1 = decodeChapterFrame(r1, r2, r3, r4, r5, r6);	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+    L_0x01d6:
+        r2 = r22;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        goto L_0x020b;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+    L_0x01d9:
+        r0 = move-exception;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r1 = r0;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r2 = r22;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        goto L_0x024f;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+    L_0x01df:
+        r0 = move-exception;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r1 = r0;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r2 = r22;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        goto L_0x0241;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+    L_0x01e5:
+        r22 = r6;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        if (r9 != r5) goto L_0x0200;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+    L_0x01e9:
+        r2 = 84;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        if (r10 != r2) goto L_0x0200;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+    L_0x01ed:
+        if (r11 != r1) goto L_0x0200;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
     L_0x01ef:
-        r2 = 66;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r7 == r2) goto L_0x01f8;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01f3:
-        r2 = 2;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r0 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r0 != r2) goto L_0x0200;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x01f8:
-        r0 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeGeobFrame(r0, r9);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
+        if (r14 != r5) goto L_0x0200;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+    L_0x01f1:
+        r1 = r8;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r2 = r22;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r3 = r7;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r4 = r25;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r5 = r26;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r6 = r27;	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        r1 = decodeChapterTOCFrame(r1, r2, r3, r4, r5, r6);	 Catch:{ UnsupportedEncodingException -> 0x01df, all -> 0x01d9 }
+        goto L_0x01d6;
     L_0x0200:
-        r2 = 2;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r0 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r0 != r2) goto L_0x021b;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0205:
-        r2 = 80;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r4 != r2) goto L_0x022b;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0209:
-        r2 = 73;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r5 != r2) goto L_0x022b;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
+        r1 = getFrameId(r7, r9, r10, r11, r14);	 Catch:{ UnsupportedEncodingException -> 0x023d, all -> 0x0238 }
+        r2 = r22;
+        r3 = decodeBinaryFrame(r8, r2, r1);	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r1 = r3;	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+    L_0x020b:
+        if (r1 != 0) goto L_0x0233;	 Catch:{ UnsupportedEncodingException -> 0x0230 }
     L_0x020d:
-        r2 = 67;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r6 != r2) goto L_0x022b;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0211:
-        r0 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r1 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeApicFrame(r0, r9, r1);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x021b:
-        r2 = 65;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r4 != r2) goto L_0x022b;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x021f:
-        r2 = 80;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r5 != r2) goto L_0x022b;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0223:
-        r2 = 73;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r6 != r2) goto L_0x022b;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0227:
-        r2 = 67;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r7 == r2) goto L_0x0211;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x022b:
-        r2 = 67;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r4 != r2) goto L_0x0248;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x022f:
-        r2 = 79;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r5 != r2) goto L_0x0248;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0233:
-        r2 = 77;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r6 != r2) goto L_0x0248;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0237:
-        r2 = 77;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r7 == r2) goto L_0x0240;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x023b:
-        r2 = 2;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r0 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r0 != r2) goto L_0x0248;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0240:
-        r0 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeCommentFrame(r0, r9);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0248:
-        r2 = 67;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r4 != r2) goto L_0x0268;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x024c:
-        r2 = 72;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r5 != r2) goto L_0x0268;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0250:
-        r2 = 65;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r6 != r2) goto L_0x0268;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0254:
-        r2 = 80;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r7 != r2) goto L_0x0268;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0258:
-        r8 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r10 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r11 = r26;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r12 = r27;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r13 = r28;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeChapterFrame(r8, r9, r10, r11, r12, r13);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0268:
-        r2 = 67;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r4 != r2) goto L_0x0288;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x026c:
-        r2 = 84;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r5 != r2) goto L_0x0288;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0270:
-        r2 = 79;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r6 != r2) goto L_0x0288;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0274:
-        r2 = 67;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        if (r7 != r2) goto L_0x0288;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0278:
-        r8 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r10 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r11 = r26;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r12 = r27;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r13 = r28;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeChapterTOCFrame(r8, r9, r10, r11, r12, r13);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-    L_0x0288:
-        r0 = r24;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r19 = getFrameId(r0, r4, r5, r6, r7);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r0 = r25;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r1 = r19;	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = decodeBinaryFrame(r0, r9, r1);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        goto L_0x0153;
-    L_0x0298:
-        r14 = move-exception;
-        r2 = "Id3Decoder";	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r3 = "Unsupported character encoding";	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        android.util.Log.w(r2, r3);	 Catch:{ UnsupportedEncodingException -> 0x0298, all -> 0x02ad }
-        r16 = 0;
-        r0 = r25;
-        r1 = r23;
-        r0.setPosition(r1);
-        goto L_0x0058;
-    L_0x02ad:
-        r2 = move-exception;
-        r0 = r25;
-        r1 = r23;
-        r0.setPosition(r1);
-        throw r2;
+        r3 = "Id3Decoder";	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r4 = new java.lang.StringBuilder;	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r4.<init>();	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r5 = "Failed to decode frame: id=";	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r4.append(r5);	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r5 = getFrameId(r7, r9, r10, r11, r14);	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r4.append(r5);	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r5 = ", frameSize=";	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r4.append(r5);	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r4.append(r2);	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        r4 = r4.toString();	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        android.util.Log.w(r3, r4);	 Catch:{ UnsupportedEncodingException -> 0x0230 }
+        goto L_0x0233;
+    L_0x0230:
+        r0 = move-exception;
+        r1 = r0;
+        goto L_0x0241;
+        r8.setPosition(r13);
+        return r1;
+    L_0x0238:
+        r0 = move-exception;
+        r2 = r22;
+        r1 = r0;
+        goto L_0x024f;
+    L_0x023d:
+        r0 = move-exception;
+        r2 = r22;
+        r1 = r0;
+    L_0x0241:
+        r3 = "Id3Decoder";	 Catch:{ all -> 0x024d }
+        r4 = "Unsupported character encoding";	 Catch:{ all -> 0x024d }
+        android.util.Log.w(r3, r4);	 Catch:{ all -> 0x024d }
+        r8.setPosition(r13);
+        return r17;
+    L_0x024d:
+        r0 = move-exception;
+        r1 = r0;
+    L_0x024f:
+        r8.setPosition(r13);
+        throw r1;
+    L_0x0253:
+        r1 = "Id3Decoder";
+        r2 = "Skipping unsupported compressed or encrypted frame";
+        android.util.Log.w(r1, r2);
+        r8.setPosition(r13);
+        return r17;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.decodeFrame(int, org.telegram.messenger.exoplayer2.util.ParsableByteArray, boolean, int, org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder$FramePredicate):org.telegram.messenger.exoplayer2.metadata.id3.Id3Frame");
+    }
+
+    private static org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.Id3Header decodeHeader(org.telegram.messenger.exoplayer2.util.ParsableByteArray r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.decodeHeader(org.telegram.messenger.exoplayer2.util.ParsableByteArray):org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder$Id3Header
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = r10.bytesLeft();
+        r1 = 0;
+        r2 = 10;
+        if (r0 >= r2) goto L_0x0011;
+    L_0x0009:
+        r0 = "Id3Decoder";
+        r2 = "Data too short to be an ID3 tag";
+        android.util.Log.w(r0, r2);
+        return r1;
+    L_0x0011:
+        r0 = r10.readUnsignedInt24();
+        r2 = ID3_TAG;
+        if (r0 == r2) goto L_0x0030;
+    L_0x0019:
+        r2 = "Id3Decoder";
+        r3 = new java.lang.StringBuilder;
+        r3.<init>();
+        r4 = "Unexpected first three bytes of ID3 tag header: ";
+        r3.append(r4);
+        r3.append(r0);
+        r3 = r3.toString();
+        android.util.Log.w(r2, r3);
+        return r1;
+    L_0x0030:
+        r2 = r10.readUnsignedByte();
+        r3 = 1;
+        r10.skipBytes(r3);
+        r4 = r10.readUnsignedByte();
+        r5 = r10.readSynchSafeInt();
+        r6 = 2;
+        r7 = 4;
+        r8 = 0;
+        if (r2 != r6) goto L_0x0057;
+    L_0x0045:
+        r6 = r4 & 64;
+        if (r6 == 0) goto L_0x004b;
+    L_0x0049:
+        r6 = r3;
+        goto L_0x004c;
+    L_0x004b:
+        r6 = r8;
+    L_0x004c:
+        if (r6 == 0) goto L_0x0056;
+    L_0x004e:
+        r3 = "Id3Decoder";
+        r7 = "Skipped ID3 tag with majorVersion=2 and undefined compression scheme";
+        android.util.Log.w(r3, r7);
+        return r1;
+    L_0x0056:
+        goto L_0x008f;
+    L_0x0057:
+        r6 = 3;
+        if (r2 != r6) goto L_0x006e;
+    L_0x005a:
+        r1 = r4 & 64;
+        if (r1 == 0) goto L_0x0060;
+    L_0x005e:
+        r1 = r3;
+        goto L_0x0061;
+    L_0x0060:
+        r1 = r8;
+    L_0x0061:
+        if (r1 == 0) goto L_0x006d;
+    L_0x0063:
+        r6 = r10.readInt();
+        r10.skipBytes(r6);
+        r9 = r6 + 4;
+        r5 = r5 - r9;
+    L_0x006d:
+        goto L_0x008f;
+    L_0x006e:
+        if (r2 != r7) goto L_0x009e;
+    L_0x0070:
+        r1 = r4 & 64;
+        if (r1 == 0) goto L_0x0076;
+    L_0x0074:
+        r1 = r3;
+        goto L_0x0077;
+    L_0x0076:
+        r1 = r8;
+    L_0x0077:
+        if (r1 == 0) goto L_0x0083;
+    L_0x0079:
+        r6 = r10.readSynchSafeInt();
+        r9 = r6 + -4;
+        r10.skipBytes(r9);
+        r5 = r5 - r6;
+    L_0x0083:
+        r6 = r4 & 16;
+        if (r6 == 0) goto L_0x0089;
+    L_0x0087:
+        r6 = r3;
+        goto L_0x008a;
+    L_0x0089:
+        r6 = r8;
+    L_0x008a:
+        if (r6 == 0) goto L_0x008e;
+    L_0x008c:
+        r5 = r5 + -10;
+    L_0x008f:
+        if (r2 >= r7) goto L_0x0096;
+        r1 = r4 & 128;
+        if (r1 == 0) goto L_0x0096;
+        goto L_0x0097;
+        r3 = r8;
+        r1 = r3;
+        r3 = new org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder$Id3Header;
+        r3.<init>(r2, r1, r5);
+        return r3;
+    L_0x009e:
+        r3 = "Id3Decoder";
+        r6 = new java.lang.StringBuilder;
+        r6.<init>();
+        r7 = "Skipped ID3 tag with unsupported majorVersion=";
+        r6.append(r7);
+        r6.append(r2);
+        r6 = r6.toString();
+        android.util.Log.w(r3, r6);
+        return r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.decodeHeader(org.telegram.messenger.exoplayer2.util.ParsableByteArray):org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder$Id3Header");
+    }
+
+    private static boolean validateFrames(org.telegram.messenger.exoplayer2.util.ParsableByteArray r1, int r2, int r3, boolean r4) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.validateFrames(org.telegram.messenger.exoplayer2.util.ParsableByteArray, int, int, boolean):boolean
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r1 = r22;
+        r2 = r23;
+        r3 = r22.getPosition();
+        r4 = r22.bytesLeft();	 Catch:{ all -> 0x00ce }
+        r5 = 1;
+        r6 = r24;
+        if (r4 < r6) goto L_0x00c9;
+    L_0x0011:
+        r4 = 3;
+        r7 = 0;
+        if (r2 < r4) goto L_0x0025;
+        r8 = r22.readInt();	 Catch:{ all -> 0x0022 }
+        r9 = r22.readUnsignedInt();	 Catch:{ all -> 0x0022 }
+        r11 = r22.readUnsignedShort();	 Catch:{ all -> 0x0022 }
+        goto L_0x002f;	 Catch:{ all -> 0x0022 }
+    L_0x0022:
+        r0 = move-exception;	 Catch:{ all -> 0x0022 }
+        goto L_0x00d1;	 Catch:{ all -> 0x0022 }
+        r8 = r22.readUnsignedInt24();	 Catch:{ all -> 0x0022 }
+        r9 = r22.readUnsignedInt24();	 Catch:{ all -> 0x0022 }
+        r9 = (long) r9;
+        r11 = r7;
+        r12 = 0;
+        if (r8 != 0) goto L_0x003e;
+        r14 = (r9 > r12 ? 1 : (r9 == r12 ? 0 : -1));
+        if (r14 != 0) goto L_0x003e;
+        if (r11 != 0) goto L_0x003e;
+        r1.setPosition(r3);
+        return r5;
+        r14 = 4;
+        if (r2 != r14) goto L_0x0079;
+        if (r25 != 0) goto L_0x0079;
+        r15 = 8421504; // 0x808080 float:1.180104E-38 double:4.160776E-317;
+        r17 = r9 & r15;
+        r15 = (r17 > r12 ? 1 : (r17 == r12 ? 0 : -1));
+        if (r15 == 0) goto L_0x0051;
+        r1.setPosition(r3);
+        return r7;
+        r12 = 255; // 0xff float:3.57E-43 double:1.26E-321;
+        r15 = r9 & r12;
+        r17 = 8;
+        r17 = r9 >> r17;
+        r19 = r17 & r12;
+        r17 = 7;
+        r17 = r19 << r17;
+        r19 = r15 | r17;
+        r15 = 16;
+        r15 = r9 >> r15;
+        r17 = r15 & r12;
+        r15 = 14;
+        r15 = r17 << r15;
+        r17 = r19 | r15;
+        r15 = 24;
+        r15 = r9 >> r15;
+        r19 = r15 & r12;
+        r12 = 21;
+        r12 = r19 << r12;
+        r9 = r17 | r12;
+        r12 = 0;
+        r13 = 0;
+        if (r2 != r14) goto L_0x008d;
+        r4 = r11 & 64;
+        if (r4 == 0) goto L_0x0083;
+        r4 = r5;
+        goto L_0x0084;
+        r4 = r7;
+        r12 = r4;
+        r4 = r11 & 1;
+        if (r4 == 0) goto L_0x008a;
+        goto L_0x008b;
+        r5 = r7;
+        r13 = r5;
+        goto L_0x009e;
+        if (r2 != r4) goto L_0x009e;
+        r4 = r11 & 32;
+        if (r4 == 0) goto L_0x0095;
+        r4 = r5;
+        goto L_0x0096;
+        r4 = r7;
+        r12 = r4;
+        r4 = r11 & 128;
+        if (r4 == 0) goto L_0x009c;
+        goto L_0x009d;
+        r5 = r7;
+        r13 = r5;
+        r4 = 0;
+        if (r12 == 0) goto L_0x00a3;
+        r4 = r4 + 1;
+        if (r13 == 0) goto L_0x00a7;
+        r4 = r4 + 4;
+        r21 = r8;
+        r7 = (long) r4;
+        r5 = (r9 > r7 ? 1 : (r9 == r7 ? 0 : -1));
+        if (r5 >= 0) goto L_0x00b4;
+        r1.setPosition(r3);
+        r5 = 0;
+        return r5;
+        r5 = r22.bytesLeft();	 Catch:{ all -> 0x0022 }
+        r7 = (long) r5;
+        r5 = (r7 > r9 ? 1 : (r7 == r9 ? 0 : -1));
+        if (r5 >= 0) goto L_0x00c3;
+        r1.setPosition(r3);
+        r5 = 0;
+        return r5;
+        r5 = (int) r9;
+        r1.skipBytes(r5);	 Catch:{ all -> 0x0022 }
+        goto L_0x0008;
+        r1.setPosition(r3);
+        return r5;
+    L_0x00ce:
+        r0 = move-exception;
+        r6 = r24;
+        r4 = r0;
+        r1.setPosition(r3);
+        throw r4;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.metadata.id3.Id3Decoder.validateFrames(org.telegram.messenger.exoplayer2.util.ParsableByteArray, int, int, boolean):boolean");
     }
 
     public Id3Decoder() {
@@ -542,7 +1006,11 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
             if (id3Header.majorVersion == 4 && validateFrames(id3Data, 4, frameHeaderSize, true)) {
                 unsignedIntFrameSizeHack = true;
             } else {
-                Log.w(TAG, "Failed to validate ID3 tag with majorVersion=" + id3Header.majorVersion);
+                String str = TAG;
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("Failed to validate ID3 tag with majorVersion=");
+                stringBuilder.append(id3Header.majorVersion);
+                Log.w(str, stringBuilder.toString());
                 return null;
             }
         }
@@ -553,132 +1021,6 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
             }
         }
         return new Metadata(id3Frames);
-    }
-
-    private static Id3Header decodeHeader(ParsableByteArray data) {
-        boolean isUnsynchronized = true;
-        if (data.bytesLeft() < 10) {
-            Log.w(TAG, "Data too short to be an ID3 tag");
-            return null;
-        }
-        int id = data.readUnsignedInt24();
-        if (id != ID3_TAG) {
-            Log.w(TAG, "Unexpected first three bytes of ID3 tag header: " + id);
-            return null;
-        }
-        int majorVersion = data.readUnsignedByte();
-        data.skipBytes(1);
-        int flags = data.readUnsignedByte();
-        int framesSize = data.readSynchSafeInt();
-        if (majorVersion == 2) {
-            boolean isCompressed;
-            if ((flags & 64) != 0) {
-                isCompressed = true;
-            } else {
-                isCompressed = false;
-            }
-            if (isCompressed) {
-                Log.w(TAG, "Skipped ID3 tag with majorVersion=2 and undefined compression scheme");
-                return null;
-            }
-        } else if (majorVersion == 3) {
-            if ((flags & 64) != 0) {
-                hasExtendedHeader = true;
-            } else {
-                hasExtendedHeader = false;
-            }
-            if (hasExtendedHeader) {
-                extendedHeaderSize = data.readInt();
-                data.skipBytes(extendedHeaderSize);
-                framesSize -= extendedHeaderSize + 4;
-            }
-        } else if (majorVersion == 4) {
-            boolean hasFooter;
-            if ((flags & 64) != 0) {
-                hasExtendedHeader = true;
-            } else {
-                hasExtendedHeader = false;
-            }
-            if (hasExtendedHeader) {
-                extendedHeaderSize = data.readSynchSafeInt();
-                data.skipBytes(extendedHeaderSize - 4);
-                framesSize -= extendedHeaderSize;
-            }
-            if ((flags & 16) != 0) {
-                hasFooter = true;
-            } else {
-                hasFooter = false;
-            }
-            if (hasFooter) {
-                framesSize -= 10;
-            }
-        } else {
-            Log.w(TAG, "Skipped ID3 tag with unsupported majorVersion=" + majorVersion);
-            return null;
-        }
-        if (majorVersion >= 4 || (flags & 128) == 0) {
-            isUnsynchronized = false;
-        }
-        return new Id3Header(majorVersion, isUnsynchronized, framesSize);
-    }
-
-    private static boolean validateFrames(ParsableByteArray id3Data, int majorVersion, int frameHeaderSize, boolean unsignedIntFrameSizeHack) {
-        int startPosition = id3Data.getPosition();
-        while (id3Data.bytesLeft() >= frameHeaderSize) {
-            try {
-                int id;
-                long frameSize;
-                int flags;
-                if (majorVersion >= 3) {
-                    id = id3Data.readInt();
-                    frameSize = id3Data.readUnsignedInt();
-                    flags = id3Data.readUnsignedShort();
-                } else {
-                    id = id3Data.readUnsignedInt24();
-                    frameSize = (long) id3Data.readUnsignedInt24();
-                    flags = 0;
-                }
-                if (id == 0 && frameSize == 0 && flags == 0) {
-                    id3Data.setPosition(startPosition);
-                    return true;
-                }
-                if (majorVersion == 4 && !unsignedIntFrameSizeHack) {
-                    if ((8421504 & frameSize) != 0) {
-                        id3Data.setPosition(startPosition);
-                        return false;
-                    }
-                    frameSize = (((255 & frameSize) | (((frameSize >> 8) & 255) << 7)) | (((frameSize >> 16) & 255) << 14)) | (((frameSize >> 24) & 255) << 21);
-                }
-                boolean hasGroupIdentifier = false;
-                boolean hasDataLength = false;
-                if (majorVersion == 4) {
-                    hasGroupIdentifier = (flags & 64) != 0;
-                    hasDataLength = (flags & 1) != 0;
-                } else if (majorVersion == 3) {
-                    hasGroupIdentifier = (flags & 32) != 0;
-                    hasDataLength = (flags & 128) != 0;
-                }
-                int minimumFrameSize = 0;
-                if (hasGroupIdentifier) {
-                    minimumFrameSize = 0 + 1;
-                }
-                if (hasDataLength) {
-                    minimumFrameSize += 4;
-                }
-                if (frameSize < ((long) minimumFrameSize)) {
-                    id3Data.setPosition(startPosition);
-                    return false;
-                } else if (((long) id3Data.bytesLeft()) < frameSize) {
-                    return false;
-                } else {
-                    id3Data.skipBytes((int) frameSize);
-                }
-            } finally {
-                id3Data.setPosition(startPosition);
-            }
-        }
-        id3Data.setPosition(startPosition);
-        return true;
     }
 
     private static TextInformationFrame decodeTxxxFrame(ParsableByteArray id3Data, int frameSize) throws UnsupportedEncodingException {
@@ -692,7 +1034,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         id3Data.readBytes(data, 0, frameSize - 1);
         int descriptionEndIndex = indexOfEos(data, 0, encoding);
         String description = new String(data, 0, descriptionEndIndex, charset);
-        int valueStartIndex = descriptionEndIndex + delimiterLength(encoding);
+        int valueStartIndex = delimiterLength(encoding) + descriptionEndIndex;
         if (valueStartIndex < data.length) {
             value = new String(data, valueStartIndex, indexOfEos(data, valueStartIndex, encoding) - valueStartIndex, charset);
         } else {
@@ -723,7 +1065,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         id3Data.readBytes(data, 0, frameSize - 1);
         int descriptionEndIndex = indexOfEos(data, 0, encoding);
         String description = new String(data, 0, descriptionEndIndex, charset);
-        int urlStartIndex = descriptionEndIndex + delimiterLength(encoding);
+        int urlStartIndex = delimiterLength(encoding) + descriptionEndIndex;
         if (urlStartIndex < data.length) {
             url = new String(data, urlStartIndex, indexOfZeroByte(data, urlStartIndex) - urlStartIndex, "ISO-8859-1");
         } else {
@@ -755,9 +1097,9 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         int filenameStartIndex = mimeTypeEndIndex + 1;
         int filenameEndIndex = indexOfEos(data, filenameStartIndex, encoding);
         String filename = new String(data, filenameStartIndex, filenameEndIndex - filenameStartIndex, charset);
-        int descriptionStartIndex = filenameEndIndex + delimiterLength(encoding);
+        int descriptionStartIndex = delimiterLength(encoding) + filenameEndIndex;
         int descriptionEndIndex = indexOfEos(data, descriptionStartIndex, encoding);
-        return new GeobFrame(mimeType, filename, new String(data, descriptionStartIndex, descriptionEndIndex - descriptionStartIndex, charset), copyOfRangeIfValid(data, descriptionEndIndex + delimiterLength(encoding), data.length));
+        return new GeobFrame(mimeType, filename, new String(data, descriptionStartIndex, descriptionEndIndex - descriptionStartIndex, charset), copyOfRangeIfValid(data, delimiterLength(encoding) + descriptionEndIndex, data.length));
     }
 
     private static ApicFrame decodeApicFrame(ParsableByteArray id3Data, int frameSize, int majorVersion) throws UnsupportedEncodingException {
@@ -767,9 +1109,13 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         String charset = getCharsetName(encoding);
         byte[] data = new byte[(frameSize - 1)];
         id3Data.readBytes(data, 0, frameSize - 1);
+        StringBuilder stringBuilder;
         if (majorVersion == 2) {
             mimeTypeEndIndex = 2;
-            mimeType = "image/" + Util.toLowerInvariant(new String(data, 0, 3, "ISO-8859-1"));
+            stringBuilder = new StringBuilder();
+            stringBuilder.append("image/");
+            stringBuilder.append(Util.toLowerInvariant(new String(data, 0, 3, "ISO-8859-1")));
+            mimeType = stringBuilder.toString();
             if (mimeType.equals("image/jpg")) {
                 mimeType = "image/jpeg";
             }
@@ -777,13 +1123,16 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
             mimeTypeEndIndex = indexOfZeroByte(data, 0);
             mimeType = Util.toLowerInvariant(new String(data, 0, mimeTypeEndIndex, "ISO-8859-1"));
             if (mimeType.indexOf(47) == -1) {
-                mimeType = "image/" + mimeType;
+                stringBuilder = new StringBuilder();
+                stringBuilder.append("image/");
+                stringBuilder.append(mimeType);
+                mimeType = stringBuilder.toString();
             }
         }
         int pictureType = data[mimeTypeEndIndex + 1] & 255;
         int descriptionStartIndex = mimeTypeEndIndex + 2;
         int descriptionEndIndex = indexOfEos(data, descriptionStartIndex, encoding);
-        return new ApicFrame(mimeType, new String(data, descriptionStartIndex, descriptionEndIndex - descriptionStartIndex, charset), pictureType, copyOfRangeIfValid(data, descriptionEndIndex + delimiterLength(encoding), data.length));
+        return new ApicFrame(mimeType, new String(data, descriptionStartIndex, descriptionEndIndex - descriptionStartIndex, charset), pictureType, copyOfRangeIfValid(data, delimiterLength(encoding) + descriptionEndIndex, data.length));
     }
 
     private static CommentFrame decodeCommentFrame(ParsableByteArray id3Data, int frameSize) throws UnsupportedEncodingException {
@@ -800,70 +1149,13 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         id3Data.readBytes(data, 0, frameSize - 4);
         int descriptionEndIndex = indexOfEos(data, 0, encoding);
         String description = new String(data, 0, descriptionEndIndex, charset);
-        int textStartIndex = descriptionEndIndex + delimiterLength(encoding);
+        int textStartIndex = delimiterLength(encoding) + descriptionEndIndex;
         if (textStartIndex < data.length) {
             text = new String(data, textStartIndex, indexOfEos(data, textStartIndex, encoding) - textStartIndex, charset);
         } else {
             text = TtmlNode.ANONYMOUS_REGION_ID;
         }
         return new CommentFrame(language, description, text);
-    }
-
-    private static ChapterFrame decodeChapterFrame(ParsableByteArray id3Data, int frameSize, int majorVersion, boolean unsignedIntFrameSizeHack, int frameHeaderSize, FramePredicate framePredicate) throws UnsupportedEncodingException {
-        int framePosition = id3Data.getPosition();
-        int chapterIdEndIndex = indexOfZeroByte(id3Data.data, framePosition);
-        String chapterId = new String(id3Data.data, framePosition, chapterIdEndIndex - framePosition, "ISO-8859-1");
-        id3Data.setPosition(chapterIdEndIndex + 1);
-        int startTime = id3Data.readInt();
-        int endTime = id3Data.readInt();
-        long startOffset = id3Data.readUnsignedInt();
-        if (startOffset == 4294967295L) {
-            startOffset = -1;
-        }
-        long endOffset = id3Data.readUnsignedInt();
-        if (endOffset == 4294967295L) {
-            endOffset = -1;
-        }
-        ArrayList<Id3Frame> subFrames = new ArrayList();
-        int limit = framePosition + frameSize;
-        while (id3Data.getPosition() < limit) {
-            Id3Frame frame = decodeFrame(majorVersion, id3Data, unsignedIntFrameSizeHack, frameHeaderSize, framePredicate);
-            if (frame != null) {
-                subFrames.add(frame);
-            }
-        }
-        Id3Frame[] subFrameArray = new Id3Frame[subFrames.size()];
-        subFrames.toArray(subFrameArray);
-        return new ChapterFrame(chapterId, startTime, endTime, startOffset, endOffset, subFrameArray);
-    }
-
-    private static ChapterTocFrame decodeChapterTOCFrame(ParsableByteArray id3Data, int frameSize, int majorVersion, boolean unsignedIntFrameSizeHack, int frameHeaderSize, FramePredicate framePredicate) throws UnsupportedEncodingException {
-        int framePosition = id3Data.getPosition();
-        int elementIdEndIndex = indexOfZeroByte(id3Data.data, framePosition);
-        String elementId = new String(id3Data.data, framePosition, elementIdEndIndex - framePosition, "ISO-8859-1");
-        id3Data.setPosition(elementIdEndIndex + 1);
-        int ctocFlags = id3Data.readUnsignedByte();
-        boolean isRoot = (ctocFlags & 2) != 0;
-        boolean isOrdered = (ctocFlags & 1) != 0;
-        int childCount = id3Data.readUnsignedByte();
-        String[] children = new String[childCount];
-        for (int i = 0; i < childCount; i++) {
-            int startIndex = id3Data.getPosition();
-            int endIndex = indexOfZeroByte(id3Data.data, startIndex);
-            children[i] = new String(id3Data.data, startIndex, endIndex - startIndex, "ISO-8859-1");
-            id3Data.setPosition(endIndex + 1);
-        }
-        ArrayList<Id3Frame> subFrames = new ArrayList();
-        int limit = framePosition + frameSize;
-        while (id3Data.getPosition() < limit) {
-            Id3Frame frame = decodeFrame(majorVersion, id3Data, unsignedIntFrameSizeHack, frameHeaderSize, framePredicate);
-            if (frame != null) {
-                subFrames.add(frame);
-            }
-        }
-        Id3Frame[] subFrameArray = new Id3Frame[subFrames.size()];
-        subFrames.toArray(subFrameArray);
-        return new ChapterTocFrame(elementId, isRoot, isOrdered, children, subFrameArray);
     }
 
     private static BinaryFrame decodeBinaryFrame(ParsableByteArray id3Data, int frameSize, String id) {
@@ -909,16 +1201,18 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
 
     private static int indexOfEos(byte[] data, int fromIndex, int encoding) {
         int terminationPos = indexOfZeroByte(data, fromIndex);
-        if (encoding == 0 || encoding == 3) {
-            return terminationPos;
-        }
-        while (terminationPos < data.length - 1) {
-            if (terminationPos % 2 == 0 && data[terminationPos + 1] == (byte) 0) {
-                return terminationPos;
+        if (encoding != 0) {
+            if (encoding != 3) {
+                while (terminationPos < data.length - 1) {
+                    if (terminationPos % 2 == 0 && data[terminationPos + 1] == (byte) 0) {
+                        return terminationPos;
+                    }
+                    terminationPos = indexOfZeroByte(data, terminationPos + 1);
+                }
+                return data.length;
             }
-            terminationPos = indexOfZeroByte(data, terminationPos + 1);
         }
-        return data.length;
+        return terminationPos;
     }
 
     private static int indexOfZeroByte(byte[] data, int fromIndex) {
@@ -931,7 +1225,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
     }
 
     private static int delimiterLength(int encodingByte) {
-        return (encodingByte == 0 || encodingByte == 3) ? 1 : 2;
+        if (encodingByte != 0) {
+            if (encodingByte != 3) {
+                return 2;
+            }
+        }
+        return 1;
     }
 
     private static byte[] copyOfRangeIfValid(byte[] data, int from, int to) {

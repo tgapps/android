@@ -9,7 +9,7 @@ import android.util.Log;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class RemoteInput extends android.support.v4.app.RemoteInputCompatBase.RemoteInput {
+public final class RemoteInput {
     private final boolean mAllowFreeFormTextInput;
     private final Set<String> mAllowedDataTypes;
     private final CharSequence[] mChoices;
@@ -85,10 +85,10 @@ public final class RemoteInput extends android.support.v4.app.RemoteInputCompatB
         }
         if (VERSION.SDK_INT >= 16) {
             Intent clipDataIntent = getClipDataIntentFromIntent(intent);
-            if (clipDataIntent != null) {
-                return (Bundle) clipDataIntent.getExtras().getParcelable("android.remoteinput.resultsData");
+            if (clipDataIntent == null) {
+                return null;
             }
-            return null;
+            return (Bundle) clipDataIntent.getExtras().getParcelable("android.remoteinput.resultsData");
         }
         Log.w("RemoteInput", "RemoteInput is only supported from API Level 16");
         return null;

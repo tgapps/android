@@ -2,91 +2,92 @@ package com.google.android.gms.wallet;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.identity.intents.model.CountrySpecification;
-import com.google.android.gms.internal.zzbfn;
 import java.util.ArrayList;
 
 public final class zzz implements Creator<MaskedWalletRequest> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzbfn.zzd(parcel);
-        String str = null;
-        boolean z = false;
-        boolean z2 = false;
+        Parcel parcel2 = parcel;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        boolean z = true;
+        boolean z2 = z;
         boolean z3 = false;
-        String str2 = null;
-        String str3 = null;
-        String str4 = null;
-        Cart cart = null;
-        boolean z4 = false;
-        boolean z5 = false;
-        CountrySpecification[] countrySpecificationArr = null;
-        boolean z6 = true;
-        boolean z7 = true;
-        ArrayList arrayList = null;
-        PaymentMethodTokenizationParameters paymentMethodTokenizationParameters = null;
-        ArrayList arrayList2 = null;
-        String str5 = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        boolean z4 = z3;
+        boolean z5 = z4;
+        boolean z6 = z5;
+        boolean z7 = z6;
+        String str = null;
+        String str2 = str;
+        String str3 = str2;
+        String str4 = str3;
+        Cart cart = str4;
+        CountrySpecification[] countrySpecificationArr = cart;
+        ArrayList arrayList = countrySpecificationArr;
+        PaymentMethodTokenizationParameters paymentMethodTokenizationParameters = arrayList;
+        ArrayList arrayList2 = paymentMethodTokenizationParameters;
+        String str5 = arrayList2;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = zzbfn.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel2, readHeader);
                     break;
                 case 3:
-                    z = zzbfn.zzc(parcel, readInt);
+                    z3 = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 4:
-                    z2 = zzbfn.zzc(parcel, readInt);
+                    z4 = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 5:
-                    z3 = zzbfn.zzc(parcel, readInt);
+                    z5 = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 6:
-                    str2 = zzbfn.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel2, readHeader);
                     break;
                 case 7:
-                    str3 = zzbfn.zzq(parcel, readInt);
+                    str3 = SafeParcelReader.createString(parcel2, readHeader);
                     break;
                 case 8:
-                    str4 = zzbfn.zzq(parcel, readInt);
+                    str4 = SafeParcelReader.createString(parcel2, readHeader);
                     break;
                 case 9:
-                    cart = (Cart) zzbfn.zza(parcel, readInt, Cart.CREATOR);
+                    cart = (Cart) SafeParcelReader.createParcelable(parcel2, readHeader, Cart.CREATOR);
                     break;
                 case 10:
-                    z4 = zzbfn.zzc(parcel, readInt);
+                    z6 = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 11:
-                    z5 = zzbfn.zzc(parcel, readInt);
+                    z7 = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 12:
-                    countrySpecificationArr = (CountrySpecification[]) zzbfn.zzb(parcel, readInt, CountrySpecification.CREATOR);
+                    countrySpecificationArr = (CountrySpecification[]) SafeParcelReader.createTypedArray(parcel2, readHeader, CountrySpecification.CREATOR);
                     break;
                 case 13:
-                    z6 = zzbfn.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 14:
-                    z7 = zzbfn.zzc(parcel, readInt);
+                    z2 = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 15:
-                    arrayList = zzbfn.zzc(parcel, readInt, CountrySpecification.CREATOR);
+                    arrayList = SafeParcelReader.createTypedList(parcel2, readHeader, CountrySpecification.CREATOR);
                     break;
                 case 16:
-                    paymentMethodTokenizationParameters = (PaymentMethodTokenizationParameters) zzbfn.zza(parcel, readInt, PaymentMethodTokenizationParameters.CREATOR);
+                    paymentMethodTokenizationParameters = (PaymentMethodTokenizationParameters) SafeParcelReader.createParcelable(parcel2, readHeader, PaymentMethodTokenizationParameters.CREATOR);
                     break;
                 case 17:
-                    arrayList2 = zzbfn.zzab(parcel, readInt);
+                    arrayList2 = SafeParcelReader.createIntegerList(parcel2, readHeader);
                     break;
                 case 18:
-                    str5 = zzbfn.zzq(parcel, readInt);
+                    str5 = SafeParcelReader.createString(parcel2, readHeader);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel2, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new MaskedWalletRequest(str, z, z2, z3, str2, str3, str4, cart, z4, z5, countrySpecificationArr, z6, z7, arrayList, paymentMethodTokenizationParameters, arrayList2, str5);
+        SafeParcelReader.ensureAtEnd(parcel2, validateObjectHeader);
+        return new MaskedWalletRequest(str, z3, z4, z5, str2, str3, str4, cart, z6, z7, countrySpecificationArr, z, z2, arrayList, paymentMethodTokenizationParameters, arrayList2, str5);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

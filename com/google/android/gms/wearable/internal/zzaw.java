@@ -3,28 +3,28 @@ package com.google.android.gms.wearable.internal;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.util.Log;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 import com.google.android.gms.wearable.ChannelApi.ChannelListener;
 
-public final class zzaw extends zzbfm {
+public final class zzaw extends AbstractSafeParcelable {
     public static final Creator<zzaw> CREATOR = new zzax();
-    private int type;
-    private int zzljc;
-    private int zzljd;
-    private zzay zzlje;
+    private final int type;
+    private final int zzcj;
+    private final zzay zzck;
+    private final int zzg;
 
     public zzaw(zzay com_google_android_gms_wearable_internal_zzay, int i, int i2, int i3) {
-        this.zzlje = com_google_android_gms_wearable_internal_zzay;
+        this.zzck = com_google_android_gms_wearable_internal_zzay;
         this.type = i;
-        this.zzljc = i2;
-        this.zzljd = i3;
+        this.zzg = i2;
+        this.zzcj = i3;
     }
 
     public final String toString() {
         String str;
         String str2;
-        String valueOf = String.valueOf(this.zzlje);
+        String valueOf = String.valueOf(this.zzck);
         int i = this.type;
         switch (i) {
             case 1:
@@ -43,7 +43,7 @@ public final class zzaw extends zzbfm {
                 str = Integer.toString(i);
                 break;
         }
-        int i2 = this.zzljc;
+        int i2 = this.zzg;
         switch (i2) {
             case 0:
                 str2 = "CLOSE_REASON_NORMAL";
@@ -61,34 +61,49 @@ public final class zzaw extends zzbfm {
                 str2 = Integer.toString(i2);
                 break;
         }
-        return new StringBuilder(((String.valueOf(valueOf).length() + 81) + String.valueOf(str).length()) + String.valueOf(str2).length()).append("ChannelEventParcelable[, channel=").append(valueOf).append(", type=").append(str).append(", closeReason=").append(str2).append(", appErrorCode=").append(this.zzljd).append("]").toString();
+        int i3 = this.zzcj;
+        StringBuilder stringBuilder = new StringBuilder(((81 + String.valueOf(valueOf).length()) + String.valueOf(str).length()) + String.valueOf(str2).length());
+        stringBuilder.append("ChannelEventParcelable[, channel=");
+        stringBuilder.append(valueOf);
+        stringBuilder.append(", type=");
+        stringBuilder.append(str);
+        stringBuilder.append(", closeReason=");
+        stringBuilder.append(str2);
+        stringBuilder.append(", appErrorCode=");
+        stringBuilder.append(i3);
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 2, this.zzlje, i, false);
-        zzbfp.zzc(parcel, 3, this.type);
-        zzbfp.zzc(parcel, 4, this.zzljc);
-        zzbfp.zzc(parcel, 5, this.zzljd);
-        zzbfp.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 2, this.zzck, i, false);
+        SafeParcelWriter.writeInt(parcel, 3, this.type);
+        SafeParcelWriter.writeInt(parcel, 4, this.zzg);
+        SafeParcelWriter.writeInt(parcel, 5, this.zzcj);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
     public final void zza(ChannelListener channelListener) {
         switch (this.type) {
             case 1:
-                channelListener.onChannelOpened(this.zzlje);
+                channelListener.onChannelOpened(this.zzck);
                 return;
             case 2:
-                channelListener.onChannelClosed(this.zzlje, this.zzljc, this.zzljd);
+                channelListener.onChannelClosed(this.zzck, this.zzg, this.zzcj);
                 return;
             case 3:
-                channelListener.onInputClosed(this.zzlje, this.zzljc, this.zzljd);
+                channelListener.onInputClosed(this.zzck, this.zzg, this.zzcj);
                 return;
             case 4:
-                channelListener.onOutputClosed(this.zzlje, this.zzljc, this.zzljd);
+                channelListener.onOutputClosed(this.zzck, this.zzg, this.zzcj);
                 return;
             default:
-                Log.w("ChannelEventParcelable", "Unknown type: " + this.type);
+                int i = this.type;
+                StringBuilder stringBuilder = new StringBuilder(25);
+                stringBuilder.append("Unknown type: ");
+                stringBuilder.append(i);
+                Log.w("ChannelEventParcelable", stringBuilder.toString());
                 return;
         }
     }

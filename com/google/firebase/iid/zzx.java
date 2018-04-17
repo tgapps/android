@@ -1,160 +1,309 @@
 package com.google.firebase.iid;
 
-import android.content.ComponentName;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ResolveInfo;
-import android.content.pm.ServiceInfo;
-import android.support.v4.content.WakefulBroadcastReceiver;
+import android.os.Bundle;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.Parcelable;
+import android.os.RemoteException;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
-import java.util.ArrayDeque;
-import java.util.Queue;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.iid.zzi.zza;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.concurrent.GuardedBy;
 
-public final class zzx {
-    private static zzx zznzp;
-    private final SimpleArrayMap<String, String> zznzq = new SimpleArrayMap();
-    private Boolean zznzr = null;
-    final Queue<Intent> zznzs = new ArrayDeque();
-    private Queue<Intent> zznzt = new ArrayDeque();
+final class zzx {
+    private static int zzbrh = 0;
+    private static PendingIntent zzbro;
+    private final zzw zzbqn;
+    @GuardedBy("responseCallbacks")
+    private final SimpleArrayMap<String, TaskCompletionSource<Bundle>> zzbrp = new SimpleArrayMap();
+    private Messenger zzbrq;
+    private Messenger zzbrr;
+    private zzi zzbrs;
+    private final Context zzqs;
 
-    private zzx() {
+    public zzx(Context context, zzw com_google_firebase_iid_zzw) {
+        this.zzqs = context;
+        this.zzbqn = com_google_firebase_iid_zzw;
+        this.zzbrq = new Messenger(new zzy(this, Looper.getMainLooper()));
     }
 
-    public static synchronized zzx zzcjk() {
-        zzx com_google_firebase_iid_zzx;
+    private static synchronized void zza(Context context, Intent intent) {
         synchronized (zzx.class) {
-            if (zznzp == null) {
-                zznzp = new zzx();
+            if (zzbro == null) {
+                Intent intent2 = new Intent();
+                intent2.setPackage("com.google.example.invalidpackage");
+                zzbro = PendingIntent.getBroadcast(context, 0, intent2, 0);
             }
-            com_google_firebase_iid_zzx = zznzp;
-        }
-        return com_google_firebase_iid_zzx;
-    }
-
-    private final int zze(Context context, Intent intent) {
-        String str;
-        ComponentName startWakefulService;
-        synchronized (this.zznzq) {
-            str = (String) this.zznzq.get(intent.getAction());
-        }
-        if (str == null) {
-            ResolveInfo resolveService = context.getPackageManager().resolveService(intent, 0);
-            if (resolveService == null || resolveService.serviceInfo == null) {
-                Log.e("FirebaseInstanceId", "Failed to resolve target intent service, skipping classname enforcement");
-                if (this.zznzr == null) {
-                    this.zznzr = Boolean.valueOf(context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0);
-                }
-                if (this.zznzr.booleanValue()) {
-                    startWakefulService = WakefulBroadcastReceiver.startWakefulService(context, intent);
-                } else {
-                    startWakefulService = context.startService(intent);
-                    Log.d("FirebaseInstanceId", "Missing wake lock permission, service start may be delayed");
-                }
-                if (startWakefulService == null) {
-                    return -1;
-                }
-                Log.e("FirebaseInstanceId", "Error while delivering the message: ServiceIntent not found.");
-                return 404;
-            }
-            ServiceInfo serviceInfo = resolveService.serviceInfo;
-            if (!context.getPackageName().equals(serviceInfo.packageName) || serviceInfo.name == null) {
-                String str2 = serviceInfo.packageName;
-                str = serviceInfo.name;
-                Log.e("FirebaseInstanceId", new StringBuilder((String.valueOf(str2).length() + 94) + String.valueOf(str).length()).append("Error resolving target intent service, skipping classname enforcement. Resolved service was: ").append(str2).append("/").append(str).toString());
-                if (this.zznzr == null) {
-                    if (context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0) {
-                    }
-                    this.zznzr = Boolean.valueOf(context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0);
-                }
-                if (this.zznzr.booleanValue()) {
-                    startWakefulService = context.startService(intent);
-                    Log.d("FirebaseInstanceId", "Missing wake lock permission, service start may be delayed");
-                } else {
-                    startWakefulService = WakefulBroadcastReceiver.startWakefulService(context, intent);
-                }
-                if (startWakefulService == null) {
-                    return -1;
-                }
-                Log.e("FirebaseInstanceId", "Error while delivering the message: ServiceIntent not found.");
-                return 404;
-            }
-            str = serviceInfo.name;
-            if (str.startsWith(".")) {
-                String valueOf = String.valueOf(context.getPackageName());
-                str = String.valueOf(str);
-                str = str.length() != 0 ? valueOf.concat(str) : new String(valueOf);
-            }
-            synchronized (this.zznzq) {
-                this.zznzq.put(intent.getAction(), str);
-            }
-        }
-        if (Log.isLoggable("FirebaseInstanceId", 3)) {
-            str2 = "FirebaseInstanceId";
-            String str3 = "Restricting intent to a specific service: ";
-            valueOf = String.valueOf(str);
-            Log.d(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
-        }
-        intent.setClassName(context.getPackageName(), str);
-        try {
-            if (this.zznzr == null) {
-                if (context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0) {
-                }
-                this.zznzr = Boolean.valueOf(context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0);
-            }
-            if (this.zznzr.booleanValue()) {
-                startWakefulService = WakefulBroadcastReceiver.startWakefulService(context, intent);
-            } else {
-                startWakefulService = context.startService(intent);
-                Log.d("FirebaseInstanceId", "Missing wake lock permission, service start may be delayed");
-            }
-            if (startWakefulService == null) {
-                return -1;
-            }
-            Log.e("FirebaseInstanceId", "Error while delivering the message: ServiceIntent not found.");
-            return 404;
-        } catch (Throwable e) {
-            Log.e("FirebaseInstanceId", "Error while delivering the message to the serviceIntent", e);
-            return 401;
-        } catch (IllegalStateException e2) {
-            str = String.valueOf(e2);
-            Log.e("FirebaseInstanceId", new StringBuilder(String.valueOf(str).length() + 45).append("Failed to start service while in background: ").append(str).toString());
-            return 402;
+            intent.putExtra("app", zzbro);
         }
     }
 
-    public final int zza(Context context, String str, Intent intent) {
-        Object obj = -1;
-        switch (str.hashCode()) {
-            case -842411455:
-                if (str.equals("com.google.firebase.INSTANCE_ID_EVENT")) {
-                    obj = null;
-                    break;
-                }
-                break;
-            case 41532704:
-                if (str.equals("com.google.firebase.MESSAGING_EVENT")) {
-                    obj = 1;
-                    break;
-                }
-                break;
-        }
-        switch (obj) {
-            case null:
-                this.zznzs.offer(intent);
-                break;
-            case 1:
-                this.zznzt.offer(intent);
-                break;
-            default:
+    private final void zza(String str, Bundle bundle) {
+        synchronized (this.zzbrp) {
+            TaskCompletionSource taskCompletionSource = (TaskCompletionSource) this.zzbrp.remove(str);
+            if (taskCompletionSource == null) {
                 String str2 = "FirebaseInstanceId";
-                String str3 = "Unknown service action: ";
-                String valueOf = String.valueOf(str);
-                Log.w(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
-                return 500;
+                String str3 = "Missing callback for ";
+                str = String.valueOf(str);
+                Log.w(str2, str.length() != 0 ? str3.concat(str) : new String(str3));
+                return;
+            }
+            taskCompletionSource.setResult(bundle);
         }
-        Intent intent2 = new Intent(str);
-        intent2.setPackage(context.getPackageName());
-        return zze(context, intent2);
+    }
+
+    private final void zzb(Message message) {
+        String str;
+        String str2;
+        if (message == null || !(message.obj instanceof Intent)) {
+            str = "FirebaseInstanceId";
+            str2 = "Dropping invalid message";
+        } else {
+            Intent intent = (Intent) message.obj;
+            intent.setExtrasClassLoader(new zza());
+            if (intent.hasExtra("google.messenger")) {
+                Parcelable parcelableExtra = intent.getParcelableExtra("google.messenger");
+                if (parcelableExtra instanceof zzi) {
+                    this.zzbrs = (zzi) parcelableExtra;
+                }
+                if (parcelableExtra instanceof Messenger) {
+                    this.zzbrr = (Messenger) parcelableExtra;
+                }
+            }
+            Intent intent2 = (Intent) message.obj;
+            str2 = intent2.getAction();
+            String str3;
+            if ("com.google.android.c2dm.intent.REGISTRATION".equals(str2)) {
+                CharSequence stringExtra = intent2.getStringExtra("registration_id");
+                if (stringExtra == null) {
+                    stringExtra = intent2.getStringExtra("unregistered");
+                }
+                if (stringExtra == null) {
+                    str2 = intent2.getStringExtra("error");
+                    if (str2 == null) {
+                        str = String.valueOf(intent2.getExtras());
+                        StringBuilder stringBuilder = new StringBuilder(49 + String.valueOf(str).length());
+                        stringBuilder.append("Unexpected response, no error or registration id ");
+                        stringBuilder.append(str);
+                        Log.w("FirebaseInstanceId", stringBuilder.toString());
+                        return;
+                    }
+                    if (Log.isLoggable("FirebaseInstanceId", 3)) {
+                        String str4 = "FirebaseInstanceId";
+                        String str5 = "Received InstanceID error ";
+                        String valueOf = String.valueOf(str2);
+                        Log.d(str4, valueOf.length() != 0 ? str5.concat(valueOf) : new String(str5));
+                    }
+                    if (str2.startsWith("|")) {
+                        String[] split = str2.split("\\|");
+                        if (split.length > 2) {
+                            if ("ID".equals(split[1])) {
+                                str2 = split[2];
+                                str3 = split[3];
+                                if (str3.startsWith(":")) {
+                                    str3 = str3.substring(1);
+                                }
+                                zza(str2, intent2.putExtra("error", str3).getExtras());
+                                return;
+                            }
+                        }
+                        str = "FirebaseInstanceId";
+                        str3 = "Unexpected structured response ";
+                        str2 = String.valueOf(str2);
+                        str2 = str2.length() != 0 ? str3.concat(str2) : new String(str3);
+                    } else {
+                        synchronized (this.zzbrp) {
+                            for (int i = 0; i < this.zzbrp.size(); i++) {
+                                zza((String) this.zzbrp.keyAt(i), intent2.getExtras());
+                            }
+                        }
+                        return;
+                    }
+                }
+                Matcher matcher = Pattern.compile("\\|ID\\|([^|]+)\\|:?+(.*)").matcher(stringExtra);
+                if (matcher.matches()) {
+                    str2 = matcher.group(1);
+                    str3 = matcher.group(2);
+                    Bundle extras = intent2.getExtras();
+                    extras.putString("registration_id", str3);
+                    zza(str2, extras);
+                    return;
+                }
+                if (Log.isLoggable("FirebaseInstanceId", 3)) {
+                    str = "FirebaseInstanceId";
+                    str3 = "Unexpected response string: ";
+                    str2 = String.valueOf(stringExtra);
+                    Log.d(str, str2.length() != 0 ? str3.concat(str2) : new String(str3));
+                }
+                return;
+            }
+            if (Log.isLoggable("FirebaseInstanceId", 3)) {
+                str = "FirebaseInstanceId";
+                str3 = "Unexpected response action: ";
+                str2 = String.valueOf(str2);
+                Log.d(str, str2.length() != 0 ? str3.concat(str2) : new String(str3));
+            }
+            return;
+        }
+        Log.w(str, str2);
+    }
+
+    private final Bundle zzj(Bundle bundle) throws IOException {
+        Bundle zzk = zzk(bundle);
+        if (zzk == null || !zzk.containsKey("google.messenger")) {
+            return zzk;
+        }
+        zzk = zzk(bundle);
+        return (zzk == null || !zzk.containsKey("google.messenger")) ? zzk : null;
+    }
+
+    private final Bundle zzk(Bundle bundle) throws IOException {
+        String zzsz = zzsz();
+        TaskCompletionSource taskCompletionSource = new TaskCompletionSource();
+        synchronized (this.zzbrp) {
+            this.zzbrp.put(zzsz, taskCompletionSource);
+        }
+        if (this.zzbqn.zzsu() == 0) {
+            throw new IOException("MISSING_INSTANCEID_SERVICE");
+        }
+        Intent intent = new Intent();
+        intent.setPackage("com.google.android.gms");
+        intent.setAction(this.zzbqn.zzsu() == 2 ? "com.google.iid.TOKEN_REQUEST" : "com.google.android.c2dm.intent.REGISTER");
+        intent.putExtras(bundle);
+        zza(this.zzqs, intent);
+        StringBuilder stringBuilder = new StringBuilder(5 + String.valueOf(zzsz).length());
+        stringBuilder.append("|ID|");
+        stringBuilder.append(zzsz);
+        stringBuilder.append("|");
+        intent.putExtra("kid", stringBuilder.toString());
+        if (Log.isLoggable("FirebaseInstanceId", 3)) {
+            String valueOf = String.valueOf(intent.getExtras());
+            StringBuilder stringBuilder2 = new StringBuilder(8 + String.valueOf(valueOf).length());
+            stringBuilder2.append("Sending ");
+            stringBuilder2.append(valueOf);
+            Log.d("FirebaseInstanceId", stringBuilder2.toString());
+        }
+        intent.putExtra("google.messenger", this.zzbrq);
+        if (!(this.zzbrr == null && this.zzbrs == null)) {
+            Message obtain = Message.obtain();
+            obtain.obj = intent;
+            try {
+                if (this.zzbrr != null) {
+                    this.zzbrr.send(obtain);
+                } else {
+                    this.zzbrs.send(obtain);
+                }
+            } catch (RemoteException e) {
+                if (Log.isLoggable("FirebaseInstanceId", 3)) {
+                    Log.d("FirebaseInstanceId", "Messenger failed, fallback to startService");
+                }
+            }
+            bundle = (Bundle) Tasks.await(taskCompletionSource.getTask(), 30000, TimeUnit.MILLISECONDS);
+            synchronized (this.zzbrp) {
+                this.zzbrp.remove(zzsz);
+            }
+            return bundle;
+        }
+        if (this.zzbqn.zzsu() == 2) {
+            this.zzqs.sendBroadcast(intent);
+        } else {
+            this.zzqs.startService(intent);
+        }
+        try {
+            bundle = (Bundle) Tasks.await(taskCompletionSource.getTask(), 30000, TimeUnit.MILLISECONDS);
+            synchronized (this.zzbrp) {
+                this.zzbrp.remove(zzsz);
+            }
+            return bundle;
+        } catch (InterruptedException e2) {
+            Log.w("FirebaseInstanceId", "No response");
+            throw new IOException("TIMEOUT");
+        } catch (Throwable e3) {
+            throw new IOException(e3);
+        } catch (Throwable th) {
+            synchronized (this.zzbrp) {
+                this.zzbrp.remove(zzsz);
+            }
+        }
+    }
+
+    private static synchronized String zzsz() {
+        String num;
+        synchronized (zzx.class) {
+            int i = zzbrh;
+            zzbrh = i + 1;
+            num = Integer.toString(i);
+        }
+        return num;
+    }
+
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    final android.os.Bundle zzi(android.os.Bundle r6) throws java.io.IOException {
+        /*
+        r5 = this;
+        r0 = r5.zzbqn;
+        r0 = r0.zzsx();
+        r1 = 12000000; // 0xb71b00 float:1.6815582E-38 double:5.9287878E-317;
+        if (r0 < r1) goto L_0x0068;
+    L_0x000b:
+        r0 = r5.zzqs;
+        r0 = com.google.firebase.iid.zzk.zzv(r0);
+        r1 = 1;
+        r0 = r0.zzb(r1, r6);
+        r0 = com.google.android.gms.tasks.Tasks.await(r0);	 Catch:{ InterruptedException -> 0x001d, InterruptedException -> 0x001d }
+        r0 = (android.os.Bundle) r0;	 Catch:{ InterruptedException -> 0x001d, InterruptedException -> 0x001d }
+        return r0;
+    L_0x001d:
+        r0 = move-exception;
+        r1 = "FirebaseInstanceId";
+        r2 = 3;
+        r1 = android.util.Log.isLoggable(r1, r2);
+        if (r1 == 0) goto L_0x004c;
+    L_0x0027:
+        r1 = "FirebaseInstanceId";
+        r2 = java.lang.String.valueOf(r0);
+        r3 = 22;
+        r4 = java.lang.String.valueOf(r2);
+        r4 = r4.length();
+        r3 = r3 + r4;
+        r4 = new java.lang.StringBuilder;
+        r4.<init>(r3);
+        r3 = "Error making request: ";
+        r4.append(r3);
+        r4.append(r2);
+        r2 = r4.toString();
+        android.util.Log.d(r1, r2);
+    L_0x004c:
+        r1 = r0.getCause();
+        r1 = r1 instanceof com.google.firebase.iid.zzu;
+        if (r1 == 0) goto L_0x0066;
+    L_0x0054:
+        r0 = r0.getCause();
+        r0 = (com.google.firebase.iid.zzu) r0;
+        r0 = r0.getErrorCode();
+        r1 = 4;
+        if (r0 != r1) goto L_0x0066;
+    L_0x0061:
+        r6 = r5.zzj(r6);
+        return r6;
+    L_0x0066:
+        r6 = 0;
+        return r6;
+    L_0x0068:
+        r6 = r5.zzj(r6);
+        return r6;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.firebase.iid.zzx.zzi(android.os.Bundle):android.os.Bundle");
     }
 }

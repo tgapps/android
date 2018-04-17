@@ -93,37 +93,38 @@ public class TrackFragmentRandomAccessBox extends AbstractFullBox {
         }
 
         public String toString() {
-            return "Entry{time=" + this.time + ", moofOffset=" + this.moofOffset + ", trafNumber=" + this.trafNumber + ", trunNumber=" + this.trunNumber + ", sampleNumber=" + this.sampleNumber + '}';
+            StringBuilder stringBuilder = new StringBuilder("Entry{time=");
+            stringBuilder.append(this.time);
+            stringBuilder.append(", moofOffset=");
+            stringBuilder.append(this.moofOffset);
+            stringBuilder.append(", trafNumber=");
+            stringBuilder.append(this.trafNumber);
+            stringBuilder.append(", trunNumber=");
+            stringBuilder.append(this.trunNumber);
+            stringBuilder.append(", sampleNumber=");
+            stringBuilder.append(this.sampleNumber);
+            stringBuilder.append('}');
+            return stringBuilder.toString();
         }
 
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
+            if (o != null) {
+                if (getClass() == o.getClass()) {
+                    Entry entry = (Entry) o;
+                    if (this.moofOffset == entry.moofOffset && this.sampleNumber == entry.sampleNumber && this.time == entry.time && this.trafNumber == entry.trafNumber && this.trunNumber == entry.trunNumber) {
+                        return true;
+                    }
+                    return false;
+                }
             }
-            Entry entry = (Entry) o;
-            if (this.moofOffset != entry.moofOffset) {
-                return false;
-            }
-            if (this.sampleNumber != entry.sampleNumber) {
-                return false;
-            }
-            if (this.time != entry.time) {
-                return false;
-            }
-            if (this.trafNumber != entry.trafNumber) {
-                return false;
-            }
-            if (this.trunNumber != entry.trunNumber) {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public int hashCode() {
-            return (((((((((int) (this.time ^ (this.time >>> 32))) * 31) + ((int) (this.moofOffset ^ (this.moofOffset >>> 32)))) * 31) + ((int) (this.trafNumber ^ (this.trafNumber >>> 32)))) * 31) + ((int) (this.trunNumber ^ (this.trunNumber >>> 32)))) * 31) + ((int) (this.sampleNumber ^ (this.sampleNumber >>> 32)));
+            return (31 * ((31 * ((31 * ((31 * ((int) (this.time ^ (this.time >>> 32)))) + ((int) (this.moofOffset ^ (this.moofOffset >>> 32))))) + ((int) (this.trafNumber ^ (this.trafNumber >>> 32))))) + ((int) (this.trunNumber ^ (this.trunNumber >>> 32))))) + ((int) (this.sampleNumber ^ (this.sampleNumber >>> 32)));
         }
     }
 
@@ -153,11 +154,12 @@ public class TrackFragmentRandomAccessBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        long contentSize = 4 + 12;
+        long contentSize;
+        long contentSize2 = 4 + 12;
         if (getVersion() == 1) {
-            contentSize += (long) (this.entries.size() * 16);
+            contentSize = contentSize2 + ((long) (16 * this.entries.size()));
         } else {
-            contentSize += (long) (this.entries.size() * 8);
+            contentSize = contentSize2 + ((long) (8 * this.entries.size()));
         }
         return ((contentSize + ((long) (this.lengthSizeOfTrafNum * this.entries.size()))) + ((long) (this.lengthSizeOfTrunNum * this.entries.size()))) + ((long) (this.lengthSizeOfSampleNum * this.entries.size()));
     }
@@ -167,9 +169,9 @@ public class TrackFragmentRandomAccessBox extends AbstractFullBox {
         this.trackId = IsoTypeReader.readUInt32(content);
         long temp = IsoTypeReader.readUInt32(content);
         this.reserved = (int) (temp >> 6);
-        this.lengthSizeOfTrafNum = (((int) (63 & temp)) >> 4) + 1;
-        this.lengthSizeOfTrunNum = (((int) (12 & temp)) >> 2) + 1;
-        this.lengthSizeOfSampleNum = ((int) (3 & temp)) + 1;
+        this.lengthSizeOfTrafNum = (((int) (temp & 63)) >> 4) + 1;
+        this.lengthSizeOfTrunNum = (((int) (temp & 12)) >> 2) + 1;
+        this.lengthSizeOfSampleNum = ((int) (temp & 3)) + 1;
         long numberOfEntries = IsoTypeReader.readUInt32(content);
         this.entries = new ArrayList();
         for (int i = 0; ((long) i) < numberOfEntries; i++) {
@@ -269,6 +271,11 @@ public class TrackFragmentRandomAccessBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_12, this, this));
-        return "TrackFragmentRandomAccessBox{trackId=" + this.trackId + ", entries=" + this.entries + '}';
+        StringBuilder stringBuilder = new StringBuilder("TrackFragmentRandomAccessBox{trackId=");
+        stringBuilder.append(this.trackId);
+        stringBuilder.append(", entries=");
+        stringBuilder.append(this.entries);
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 }

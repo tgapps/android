@@ -4,6 +4,7 @@ import com.google.android.gms.common.api.BooleanResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 
+@Deprecated
 public interface Payments {
     @Deprecated
     PendingResult<BooleanResult> isReadyToPay(GoogleApiClient googleApiClient);

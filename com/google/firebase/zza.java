@@ -1,12 +1,12 @@
 package com.google.firebase;
 
-import com.google.android.gms.common.api.internal.zzl;
+import com.google.android.gms.common.api.internal.BackgroundDetector.BackgroundStateChangeListener;
 
-final class zza implements zzl {
+final class zza implements BackgroundStateChangeListener {
     zza() {
     }
 
-    public final void zzbf(boolean z) {
-        FirebaseApp.zzbf(z);
+    public final void onBackgroundStateChanged(boolean z) {
+        FirebaseApp.onBackgroundStateChanged(z);
     }
 }

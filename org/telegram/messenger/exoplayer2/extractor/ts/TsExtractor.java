@@ -118,6 +118,258 @@ public final class TsExtractor implements Extractor {
         private final SparseIntArray trackIdToPidScratch = new SparseIntArray();
         private final SparseArray<TsPayloadReader> trackIdToReaderScratch = new SparseArray();
 
+        public void consume(org.telegram.messenger.exoplayer2.util.ParsableByteArray r1) {
+            /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.PmtReader.consume(org.telegram.messenger.exoplayer2.util.ParsableByteArray):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+            /*
+            r0 = this;
+            r0 = r17;
+            r1 = r18;
+            r2 = r18.readUnsignedByte();
+            r3 = 2;
+            if (r2 == r3) goto L_0x000c;
+        L_0x000b:
+            return;
+        L_0x000c:
+            r4 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r4 = r4.mode;
+            r5 = 0;
+            r6 = 1;
+            if (r4 == r6) goto L_0x0046;
+        L_0x0016:
+            r4 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r4 = r4.mode;
+            if (r4 == r3) goto L_0x0046;
+        L_0x001e:
+            r4 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r4 = r4.remainingPmts;
+            if (r4 != r6) goto L_0x0027;
+        L_0x0026:
+            goto L_0x0046;
+        L_0x0027:
+            r4 = new org.telegram.messenger.exoplayer2.util.TimestampAdjuster;
+            r7 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r7 = r7.timestampAdjusters;
+            r7 = r7.get(r5);
+            r7 = (org.telegram.messenger.exoplayer2.util.TimestampAdjuster) r7;
+            r7 = r7.getFirstSampleTimestampUs();
+            r4.<init>(r7);
+            r7 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r7 = r7.timestampAdjusters;
+            r7.add(r4);
+            goto L_0x0052;
+        L_0x0046:
+            r4 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r4 = r4.timestampAdjusters;
+            r4 = r4.get(r5);
+            r4 = (org.telegram.messenger.exoplayer2.util.TimestampAdjuster) r4;
+        L_0x0052:
+            r1.skipBytes(r3);
+            r7 = r18.readUnsignedShort();
+            r8 = 5;
+            r1.skipBytes(r8);
+            r9 = r0.pmtScratch;
+            r1.readBytes(r9, r3);
+            r9 = r0.pmtScratch;
+            r10 = 4;
+            r9.skipBits(r10);
+            r9 = r0.pmtScratch;
+            r11 = 12;
+            r9 = r9.readBits(r11);
+            r1.skipBytes(r9);
+            r12 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r12 = r12.mode;
+            r13 = 8192; // 0x2000 float:1.14794E-41 double:4.0474E-320;
+            r14 = 21;
+            if (r12 != r3) goto L_0x00b3;
+        L_0x007f:
+            r12 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r12 = r12.id3Reader;
+            if (r12 != 0) goto L_0x00b3;
+        L_0x0087:
+            r12 = new org.telegram.messenger.exoplayer2.extractor.ts.TsPayloadReader$EsInfo;
+            r15 = new byte[r5];
+            r5 = 0;
+            r12.<init>(r14, r5, r5, r15);
+            r5 = r12;
+            r12 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r15 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r15 = r15.payloadReaderFactory;
+            r15 = r15.createPayloadReader(r14, r5);
+            r12.id3Reader = r15;
+            r12 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r12 = r12.id3Reader;
+            r15 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r15 = r15.output;
+            r6 = new org.telegram.messenger.exoplayer2.extractor.ts.TsPayloadReader$TrackIdGenerator;
+            r6.<init>(r7, r14, r13);
+            r12.init(r4, r15, r6);
+        L_0x00b3:
+            r5 = r0.trackIdToReaderScratch;
+            r5.clear();
+            r5 = r0.trackIdToPidScratch;
+            r5.clear();
+            r5 = r18.bytesLeft();
+            if (r5 <= 0) goto L_0x014b;
+        L_0x00c3:
+            r6 = r0.pmtScratch;
+            r1.readBytes(r6, r8);
+            r6 = r0.pmtScratch;
+            r12 = 8;
+            r6 = r6.readBits(r12);
+            r12 = r0.pmtScratch;
+            r15 = 3;
+            r12.skipBits(r15);
+            r12 = r0.pmtScratch;
+            r15 = 13;
+            r12 = r12.readBits(r15);
+            r15 = r0.pmtScratch;
+            r15.skipBits(r10);
+            r15 = r0.pmtScratch;
+            r15 = r15.readBits(r11);
+            r8 = r0.readEsInfo(r1, r15);
+            r10 = 6;
+            if (r6 != r10) goto L_0x00f2;
+        L_0x00f0:
+            r6 = r8.streamType;
+        L_0x00f2:
+            r10 = r15 + 5;
+            r5 = r5 - r10;
+            r10 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r10 = r10.mode;
+            if (r10 != r3) goto L_0x00ff;
+        L_0x00fd:
+            r10 = r6;
+            goto L_0x0100;
+        L_0x00ff:
+            r10 = r12;
+        L_0x0100:
+            r11 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r11 = r11.trackIds;
+            r11 = r11.get(r10);
+            if (r11 == 0) goto L_0x010d;
+        L_0x010c:
+            goto L_0x0143;
+        L_0x010d:
+            r11 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r11 = r11.mode;
+            if (r11 != r3) goto L_0x011e;
+        L_0x0115:
+            if (r6 != r14) goto L_0x011e;
+        L_0x0117:
+            r11 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r11 = r11.id3Reader;
+            goto L_0x0128;
+        L_0x011e:
+            r11 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r11 = r11.payloadReaderFactory;
+            r11 = r11.createPayloadReader(r6, r8);
+        L_0x0128:
+            r14 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r14 = r14.mode;
+            if (r14 != r3) goto L_0x0138;
+        L_0x0130:
+            r14 = r0.trackIdToPidScratch;
+            r14 = r14.get(r10, r13);
+            if (r12 >= r14) goto L_0x0142;
+        L_0x0138:
+            r14 = r0.trackIdToPidScratch;
+            r14.put(r10, r12);
+            r14 = r0.trackIdToReaderScratch;
+            r14.put(r10, r11);
+        L_0x0143:
+            r8 = 5;
+            r10 = 4;
+            r11 = 12;
+            r14 = 21;
+            goto L_0x00c1;
+        L_0x014b:
+            r6 = r0.trackIdToPidScratch;
+            r6 = r6.size();
+            r8 = 0;
+            if (r8 >= r6) goto L_0x0196;
+            r10 = r0.trackIdToPidScratch;
+            r10 = r10.keyAt(r8);
+            r11 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r11 = r11.trackIds;
+            r12 = 1;
+            r11.put(r10, r12);
+            r11 = r0.trackIdToReaderScratch;
+            r11 = r11.valueAt(r8);
+            r11 = (org.telegram.messenger.exoplayer2.extractor.ts.TsPayloadReader) r11;
+            if (r11 == 0) goto L_0x0193;
+            r12 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r12 = r12.id3Reader;
+            if (r11 == r12) goto L_0x0184;
+            r12 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r12 = r12.output;
+            r14 = new org.telegram.messenger.exoplayer2.extractor.ts.TsPayloadReader$TrackIdGenerator;
+            r14.<init>(r7, r10, r13);
+            r11.init(r4, r12, r14);
+            r12 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r12 = r12.tsPayloadReaders;
+            r14 = r0.trackIdToPidScratch;
+            r14 = r14.valueAt(r8);
+            r12.put(r14, r11);
+            r8 = r8 + 1;
+            goto L_0x0152;
+            r8 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r8 = r8.mode;
+            if (r8 != r3) goto L_0x01bc;
+            r3 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r3 = r3.tracksEnded;
+            if (r3 != 0) goto L_0x01f5;
+            r3 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r3 = r3.output;
+            r3.endTracks();
+            r3 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r8 = 0;
+            r3.remainingPmts = r8;
+            r3 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r8 = 1;
+            r3.tracksEnded = r8;
+            goto L_0x01f5;
+            r8 = 0;
+            r3 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r3 = r3.tsPayloadReaders;
+            r10 = r0.pid;
+            r3.remove(r10);
+            r3 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r10 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r10 = r10.mode;
+            r11 = 1;
+            if (r10 != r11) goto L_0x01d4;
+            goto L_0x01db;
+            r8 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r8 = r8.remainingPmts;
+            r8 = r8 - r11;
+            r3.remainingPmts = r8;
+            r3 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r3 = r3.remainingPmts;
+            if (r3 != 0) goto L_0x01f5;
+            r3 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r3 = r3.output;
+            r3.endTracks();
+            r3 = org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.this;
+            r8 = 1;
+            r3.tracksEnded = r8;
+            return;
+            */
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor.PmtReader.consume(org.telegram.messenger.exoplayer2.util.ParsableByteArray):void");
+        }
+
         public PmtReader(int pid) {
             this.pid = pid;
         }
@@ -125,87 +377,8 @@ public final class TsExtractor implements Extractor {
         public void init(TimestampAdjuster timestampAdjuster, ExtractorOutput extractorOutput, TrackIdGenerator idGenerator) {
         }
 
-        public void consume(ParsableByteArray sectionData) {
-            if (sectionData.readUnsignedByte() == 2) {
-                TimestampAdjuster timestampAdjuster;
-                int trackId;
-                TsPayloadReader reader;
-                if (TsExtractor.this.mode == 1 || TsExtractor.this.mode == 2 || TsExtractor.this.remainingPmts == 1) {
-                    timestampAdjuster = (TimestampAdjuster) TsExtractor.this.timestampAdjusters.get(0);
-                } else {
-                    timestampAdjuster = new TimestampAdjuster(((TimestampAdjuster) TsExtractor.this.timestampAdjusters.get(0)).getFirstSampleTimestampUs());
-                    TsExtractor.this.timestampAdjusters.add(timestampAdjuster);
-                }
-                sectionData.skipBytes(2);
-                int programNumber = sectionData.readUnsignedShort();
-                sectionData.skipBytes(5);
-                sectionData.readBytes(this.pmtScratch, 2);
-                this.pmtScratch.skipBits(4);
-                sectionData.skipBytes(this.pmtScratch.readBits(12));
-                if (TsExtractor.this.mode == 2 && TsExtractor.this.id3Reader == null) {
-                    TsExtractor.this.id3Reader = TsExtractor.this.payloadReaderFactory.createPayloadReader(21, new EsInfo(21, null, null, new byte[0]));
-                    TsExtractor.this.id3Reader.init(timestampAdjuster, TsExtractor.this.output, new TrackIdGenerator(programNumber, 21, 8192));
-                }
-                this.trackIdToReaderScratch.clear();
-                this.trackIdToPidScratch.clear();
-                int remainingEntriesLength = sectionData.bytesLeft();
-                while (remainingEntriesLength > 0) {
-                    sectionData.readBytes(this.pmtScratch, 5);
-                    int streamType = this.pmtScratch.readBits(8);
-                    this.pmtScratch.skipBits(3);
-                    int elementaryPid = this.pmtScratch.readBits(13);
-                    this.pmtScratch.skipBits(4);
-                    int esInfoLength = this.pmtScratch.readBits(12);
-                    EsInfo esInfo = readEsInfo(sectionData, esInfoLength);
-                    if (streamType == 6) {
-                        streamType = esInfo.streamType;
-                    }
-                    remainingEntriesLength -= esInfoLength + 5;
-                    if (TsExtractor.this.mode == 2) {
-                        trackId = streamType;
-                    } else {
-                        trackId = elementaryPid;
-                    }
-                    if (!TsExtractor.this.trackIds.get(trackId)) {
-                        if (TsExtractor.this.mode == 2 && streamType == 21) {
-                            reader = TsExtractor.this.id3Reader;
-                        } else {
-                            reader = TsExtractor.this.payloadReaderFactory.createPayloadReader(streamType, esInfo);
-                        }
-                        if (TsExtractor.this.mode != 2 || elementaryPid < this.trackIdToPidScratch.get(trackId, 8192)) {
-                            this.trackIdToPidScratch.put(trackId, elementaryPid);
-                            this.trackIdToReaderScratch.put(trackId, reader);
-                        }
-                    }
-                }
-                int trackIdCount = this.trackIdToPidScratch.size();
-                for (int i = 0; i < trackIdCount; i++) {
-                    trackId = this.trackIdToPidScratch.keyAt(i);
-                    TsExtractor.this.trackIds.put(trackId, true);
-                    reader = (TsPayloadReader) this.trackIdToReaderScratch.valueAt(i);
-                    if (reader != null) {
-                        if (reader != TsExtractor.this.id3Reader) {
-                            reader.init(timestampAdjuster, TsExtractor.this.output, new TrackIdGenerator(programNumber, trackId, 8192));
-                        }
-                        TsExtractor.this.tsPayloadReaders.put(this.trackIdToPidScratch.valueAt(i), reader);
-                    }
-                }
-                if (TsExtractor.this.mode != 2) {
-                    TsExtractor.this.tsPayloadReaders.remove(this.pid);
-                    TsExtractor.this.remainingPmts = TsExtractor.this.mode == 1 ? 0 : TsExtractor.this.remainingPmts - 1;
-                    if (TsExtractor.this.remainingPmts == 0) {
-                        TsExtractor.this.output.endTracks();
-                        TsExtractor.this.tracksEnded = true;
-                    }
-                } else if (!TsExtractor.this.tracksEnded) {
-                    TsExtractor.this.output.endTracks();
-                    TsExtractor.this.remainingPmts = 0;
-                    TsExtractor.this.tracksEnded = true;
-                }
-            }
-        }
-
         private EsInfo readEsInfo(ParsableByteArray data, int length) {
+            ParsableByteArray parsableByteArray = data;
             int descriptorsStartPosition = data.getPosition();
             int descriptorsEndPosition = descriptorsStartPosition + length;
             int streamType = -1;
@@ -230,22 +403,22 @@ public final class TsExtractor implements Extractor {
                 } else if (descriptorTag == TS_PMT_DESC_DTS) {
                     streamType = TsExtractor.TS_STREAM_TYPE_DTS;
                 } else if (descriptorTag == 10) {
-                    language = data.readString(3).trim();
+                    language = parsableByteArray.readString(3).trim();
                 } else if (descriptorTag == 89) {
                     streamType = 89;
                     dvbSubtitleInfos = new ArrayList();
                     while (data.getPosition() < positionOfNextDescriptor) {
-                        String dvbLanguage = data.readString(3).trim();
+                        String dvbLanguage = parsableByteArray.readString(3).trim();
                         int dvbSubtitlingType = data.readUnsignedByte();
                         byte[] initializationData = new byte[4];
-                        data.readBytes(initializationData, 0, 4);
+                        parsableByteArray.readBytes(initializationData, 0, 4);
                         dvbSubtitleInfos.add(new DvbSubtitleInfo(dvbLanguage, dvbSubtitlingType, initializationData));
                     }
                 }
-                data.skipBytes(positionOfNextDescriptor - data.getPosition());
+                parsableByteArray.skipBytes(positionOfNextDescriptor - data.getPosition());
             }
-            data.setPosition(descriptorsEndPosition);
-            return new EsInfo(streamType, language, dvbSubtitleInfos, Arrays.copyOfRange(data.data, descriptorsStartPosition, descriptorsEndPosition));
+            parsableByteArray.setPosition(descriptorsEndPosition);
+            return new EsInfo(streamType, language, dvbSubtitleInfos, Arrays.copyOfRange(parsableByteArray.data, descriptorsStartPosition, descriptorsEndPosition));
         }
     }
 
@@ -264,12 +437,18 @@ public final class TsExtractor implements Extractor {
     public TsExtractor(int mode, TimestampAdjuster timestampAdjuster, Factory payloadReaderFactory) {
         this.payloadReaderFactory = (Factory) Assertions.checkNotNull(payloadReaderFactory);
         this.mode = mode;
-        if (mode == 1 || mode == 2) {
-            this.timestampAdjusters = Collections.singletonList(timestampAdjuster);
-        } else {
-            this.timestampAdjusters = new ArrayList();
-            this.timestampAdjusters.add(timestampAdjuster);
+        if (mode != 1) {
+            if (mode != 2) {
+                this.timestampAdjusters = new ArrayList();
+                this.timestampAdjusters.add(timestampAdjuster);
+                this.tsPacketBuffer = new ParsableByteArray(new byte[BUFFER_SIZE], 0);
+                this.trackIds = new SparseBooleanArray();
+                this.tsPayloadReaders = new SparseArray();
+                this.continuityCounters = new SparseIntArray();
+                resetPayloadReaders();
+            }
         }
+        this.timestampAdjusters = Collections.singletonList(timestampAdjuster);
         this.tsPacketBuffer = new ParsableByteArray(new byte[BUFFER_SIZE], 0);
         this.trackIds = new SparseBooleanArray();
         this.tsPayloadReaders = new SparseArray();
@@ -316,70 +495,76 @@ public final class TsExtractor implements Extractor {
     }
 
     public int read(ExtractorInput input, PositionHolder seekPosition) throws IOException, InterruptedException {
-        int limit;
+        int bytesLeft;
+        int read;
         byte[] data = this.tsPacketBuffer.data;
         if (9400 - this.tsPacketBuffer.getPosition() < TS_PACKET_SIZE) {
-            int bytesLeft = this.tsPacketBuffer.bytesLeft();
+            bytesLeft = r0.tsPacketBuffer.bytesLeft();
             if (bytesLeft > 0) {
-                System.arraycopy(data, this.tsPacketBuffer.getPosition(), data, 0, bytesLeft);
+                System.arraycopy(data, r0.tsPacketBuffer.getPosition(), data, 0, bytesLeft);
             }
-            this.tsPacketBuffer.reset(data, bytesLeft);
+            r0.tsPacketBuffer.reset(data, bytesLeft);
         }
-        while (this.tsPacketBuffer.bytesLeft() < TS_PACKET_SIZE) {
-            limit = this.tsPacketBuffer.limit();
-            int read = input.read(data, limit, 9400 - limit);
+        while (r0.tsPacketBuffer.bytesLeft() < TS_PACKET_SIZE) {
+            bytesLeft = r0.tsPacketBuffer.limit();
+            read = input.read(data, bytesLeft, 9400 - bytesLeft);
             if (read == -1) {
                 return -1;
             }
-            this.tsPacketBuffer.setLimit(limit + read);
+            r0.tsPacketBuffer.setLimit(bytesLeft + read);
         }
-        limit = this.tsPacketBuffer.limit();
-        int position = this.tsPacketBuffer.getPosition();
-        int searchStart = position;
-        while (position < limit && data[position] != TS_SYNC_BYTE) {
-            position++;
+        ExtractorInput extractorInput = input;
+        bytesLeft = r0.tsPacketBuffer.limit();
+        int searchStart = r0.tsPacketBuffer.getPosition();
+        read = searchStart;
+        while (read < bytesLeft && data[read] != (byte) 71) {
+            read++;
         }
-        this.tsPacketBuffer.setPosition(position);
-        int endOfPacket = position + TS_PACKET_SIZE;
-        if (endOfPacket > limit) {
-            this.bytesSinceLastSync += position - searchStart;
-            if (this.mode != 2 || this.bytesSinceLastSync <= 376) {
+        r0.tsPacketBuffer.setPosition(read);
+        int endOfPacket = read + TS_PACKET_SIZE;
+        if (endOfPacket > bytesLeft) {
+            r0.bytesSinceLastSync += read - searchStart;
+            if (r0.mode != 2 || r0.bytesSinceLastSync <= 376) {
                 return 0;
             }
             throw new ParserException("Cannot find sync byte. Most likely not a Transport Stream.");
         }
-        this.bytesSinceLastSync = 0;
-        int tsPacketHeader = this.tsPacketBuffer.readInt();
+        r0.bytesSinceLastSync = 0;
+        int tsPacketHeader = r0.tsPacketBuffer.readInt();
         if ((8388608 & tsPacketHeader) != 0) {
-            this.tsPacketBuffer.setPosition(endOfPacket);
+            r0.tsPacketBuffer.setPosition(endOfPacket);
             return 0;
         }
+        boolean payloadExists = true;
         boolean payloadUnitStartIndicator = (4194304 & tsPacketHeader) != 0;
         int pid = (2096896 & tsPacketHeader) >> 8;
         boolean adaptationFieldExists = (tsPacketHeader & 32) != 0;
-        TsPayloadReader payloadReader = (tsPacketHeader & 16) != 0 ? (TsPayloadReader) this.tsPayloadReaders.get(pid) : null;
+        if ((tsPacketHeader & 16) == 0) {
+            payloadExists = false;
+        }
+        TsPayloadReader payloadReader = payloadExists ? (TsPayloadReader) r0.tsPayloadReaders.get(pid) : null;
         if (payloadReader == null) {
-            this.tsPacketBuffer.setPosition(endOfPacket);
+            r0.tsPacketBuffer.setPosition(endOfPacket);
             return 0;
         }
-        if (this.mode != 2) {
+        if (r0.mode != 2) {
             int continuityCounter = tsPacketHeader & 15;
-            int previousCounter = this.continuityCounters.get(pid, continuityCounter - 1);
-            this.continuityCounters.put(pid, continuityCounter);
+            int previousCounter = r0.continuityCounters.get(pid, continuityCounter - 1);
+            r0.continuityCounters.put(pid, continuityCounter);
             if (previousCounter == continuityCounter) {
-                this.tsPacketBuffer.setPosition(endOfPacket);
+                r0.tsPacketBuffer.setPosition(endOfPacket);
                 return 0;
             } else if (continuityCounter != ((previousCounter + 1) & 15)) {
                 payloadReader.seek();
             }
         }
         if (adaptationFieldExists) {
-            this.tsPacketBuffer.skipBytes(this.tsPacketBuffer.readUnsignedByte());
+            r0.tsPacketBuffer.skipBytes(r0.tsPacketBuffer.readUnsignedByte());
         }
-        this.tsPacketBuffer.setLimit(endOfPacket);
-        payloadReader.consume(this.tsPacketBuffer, payloadUnitStartIndicator);
-        this.tsPacketBuffer.setLimit(limit);
-        this.tsPacketBuffer.setPosition(endOfPacket);
+        r0.tsPacketBuffer.setLimit(endOfPacket);
+        payloadReader.consume(r0.tsPacketBuffer, payloadUnitStartIndicator);
+        r0.tsPacketBuffer.setLimit(bytesLeft);
+        r0.tsPacketBuffer.setPosition(endOfPacket);
         return 0;
     }
 

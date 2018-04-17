@@ -20,7 +20,6 @@ import org.telegram.messenger.exoplayer2.extractor.SeekMap.SeekPoints;
 import org.telegram.messenger.exoplayer2.extractor.TrackOutput;
 import org.telegram.messenger.exoplayer2.source.MediaSourceEventListener.EventDispatcher;
 import org.telegram.messenger.exoplayer2.source.SampleQueue.UpstreamFormatChangedListener;
-import org.telegram.messenger.exoplayer2.trackselection.TrackSelection;
 import org.telegram.messenger.exoplayer2.upstream.Allocator;
 import org.telegram.messenger.exoplayer2.upstream.DataSource;
 import org.telegram.messenger.exoplayer2.upstream.DataSpec;
@@ -90,24 +89,27 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
             Extractor[] extractorArr = this.extractors;
             int length = extractorArr.length;
             int i = 0;
-            loop0:
             while (i < length) {
                 Extractor extractor = extractorArr[i];
                 try {
                     if (extractor.sniff(input)) {
                         this.extractor = extractor;
                         input.resetPeekPosition();
-                        break loop0;
+                        break;
                     }
+                    input.resetPeekPosition();
                     i++;
                 } catch (EOFException e) {
-                    i++;
-                } finally {
+                } catch (Throwable th) {
                     input.resetPeekPosition();
                 }
             }
             if (this.extractor == null) {
-                throw new UnrecognizedInputFormatException("None of the available extractors (" + Util.getCommaDelimitedSimpleClassNames(this.extractors) + ") could read the stream.", uri);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("None of the available extractors (");
+                stringBuilder.append(Util.getCommaDelimitedSimpleClassNames(this.extractors));
+                stringBuilder.append(") could read the stream.");
+                throw new UnrecognizedInputFormatException(stringBuilder.toString(), uri);
             }
             this.extractor.init(this.extractorOutput);
             return this.extractor;
@@ -160,10 +162,9 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
         }
 
         public void load() throws IOException, InterruptedException {
-            Throwable th;
             int result = 0;
             while (result == 0 && !this.loadCanceled) {
-                ExtractorInput input;
+                ExtractorInput input = null;
                 try {
                     long position = this.positionHolder.position;
                     this.dataSpec = new DataSpec(this.uri, position, -1, ExtractorMediaPeriod.this.customCacheKey);
@@ -171,46 +172,38 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
                     if (this.length != -1) {
                         this.length += position;
                     }
-                    input = new DefaultExtractorInput(this.dataSource, position, this.length);
-                    try {
-                        Extractor extractor = this.extractorHolder.selectExtractor(input, this.dataSource.getUri());
-                        if (this.pendingExtractorSeek) {
-                            extractor.seek(position, this.seekTimeUs);
-                            this.pendingExtractorSeek = false;
+                    DefaultExtractorInput input2 = new DefaultExtractorInput(this.dataSource, position, this.length);
+                    Extractor extractor = this.extractorHolder.selectExtractor(input2, this.dataSource.getUri());
+                    if (this.pendingExtractorSeek) {
+                        extractor.seek(position, this.seekTimeUs);
+                        this.pendingExtractorSeek = false;
+                    }
+                    while (result == 0 && !this.loadCanceled) {
+                        this.loadCondition.block();
+                        result = extractor.read(input2, this.positionHolder);
+                        if (input2.getPosition() > position + ExtractorMediaPeriod.this.continueLoadingCheckIntervalBytes) {
+                            position = input2.getPosition();
+                            this.loadCondition.close();
+                            ExtractorMediaPeriod.this.handler.post(ExtractorMediaPeriod.this.onContinueLoadingRequestedRunnable);
                         }
-                        while (result == 0 && !this.loadCanceled) {
-                            this.loadCondition.block();
-                            result = extractor.read(input, this.positionHolder);
-                            if (input.getPosition() > ExtractorMediaPeriod.this.continueLoadingCheckIntervalBytes + position) {
-                                position = input.getPosition();
-                                this.loadCondition.close();
-                                ExtractorMediaPeriod.this.handler.post(ExtractorMediaPeriod.this.onContinueLoadingRequestedRunnable);
-                            }
-                        }
-                        if (result == 1) {
-                            result = 0;
-                        } else if (input != null) {
+                    }
+                    if (result == 1) {
+                        result = 0;
+                    } else if (input2 != null) {
+                        this.positionHolder.position = input2.getPosition();
+                        this.bytesLoaded = this.positionHolder.position - this.dataSpec.absoluteStreamPosition;
+                    }
+                    Util.closeQuietly(this.dataSource);
+                } catch (Throwable th) {
+                    if (result != 1) {
+                        if (input != null) {
                             this.positionHolder.position = input.getPosition();
                             this.bytesLoaded = this.positionHolder.position - this.dataSpec.absoluteStreamPosition;
                         }
-                        Util.closeQuietly(this.dataSource);
-                    } catch (Throwable th2) {
-                        th = th2;
                     }
-                } catch (Throwable th3) {
-                    th = th3;
-                    input = null;
+                    Util.closeQuietly(this.dataSource);
                 }
             }
-            return;
-            if (result != 1) {
-                if (input != null) {
-                    this.positionHolder.position = input.getPosition();
-                    this.bytesLoaded = this.positionHolder.position - this.dataSpec.absoluteStreamPosition;
-                }
-            }
-            Util.closeQuietly(this.dataSource);
-            throw th;
         }
     }
 
@@ -267,10 +260,7 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
         this.pendingResetPositionUs = C.TIME_UNSET;
         this.length = -1;
         this.durationUs = C.TIME_UNSET;
-        if (minLoadableRetryCount == -1) {
-            minLoadableRetryCount = 3;
-        }
-        this.actualMinLoadableRetryCount = minLoadableRetryCount;
+        this.actualMinLoadableRetryCount = minLoadableRetryCount == -1 ? 3 : minLoadableRetryCount;
     }
 
     public void release() {
@@ -305,69 +295,195 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
         return this.tracks;
     }
 
-    public long selectTracks(TrackSelection[] selections, boolean[] mayRetainStreamFlags, SampleStream[] streams, boolean[] streamResetFlags, long positionUs) {
-        Assertions.checkState(this.prepared);
-        int oldEnabledTrackCount = this.enabledTrackCount;
-        int i = 0;
-        while (i < selections.length) {
-            if (streams[i] != null && (selections[i] == null || !mayRetainStreamFlags[i])) {
-                int track = ((SampleStreamImpl) streams[i]).track;
-                Assertions.checkState(this.trackEnabledStates[track]);
-                this.enabledTrackCount--;
-                this.trackEnabledStates[track] = false;
-                streams[i] = null;
-            }
-            i++;
-        }
-        boolean seekRequired = this.seenFirstTrackSelection ? oldEnabledTrackCount == 0 : positionUs != 0;
-        i = 0;
-        while (i < selections.length) {
-            if (streams[i] == null && selections[i] != null) {
-                TrackSelection selection = selections[i];
-                Assertions.checkState(selection.length() == 1);
-                Assertions.checkState(selection.getIndexInTrackGroup(0) == 0);
-                track = this.tracks.indexOf(selection.getTrackGroup());
-                Assertions.checkState(!this.trackEnabledStates[track]);
-                this.enabledTrackCount++;
-                this.trackEnabledStates[track] = true;
-                streams[i] = new SampleStreamImpl(track);
-                streamResetFlags[i] = true;
-                if (!seekRequired) {
-                    SampleQueue sampleQueue;
-                    sampleQueue = this.sampleQueues[track];
-                    sampleQueue.rewind();
-                    if (sampleQueue.advanceTo(positionUs, true, true) != -1 || sampleQueue.getReadIndex() == 0) {
-                        seekRequired = false;
-                    } else {
-                        seekRequired = true;
-                    }
-                }
-            }
-            i++;
-        }
-        if (this.enabledTrackCount == 0) {
-            this.pendingDeferredRetry = false;
-            this.notifyDiscontinuity = false;
-            if (this.loader.isLoading()) {
-                for (SampleQueue sampleQueue2 : this.sampleQueues) {
-                    sampleQueue2.discardToEnd();
-                }
-                this.loader.cancelLoading();
-            } else {
-                for (SampleQueue sampleQueue22 : this.sampleQueues) {
-                    sampleQueue22.reset();
-                }
-            }
-        } else if (seekRequired) {
-            positionUs = seekToUs(positionUs);
-            for (i = 0; i < streams.length; i++) {
-                if (streams[i] != null) {
-                    streamResetFlags[i] = true;
-                }
-            }
-        }
-        this.seenFirstTrackSelection = true;
-        return positionUs;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public long selectTracks(org.telegram.messenger.exoplayer2.trackselection.TrackSelection[] r17, boolean[] r18, org.telegram.messenger.exoplayer2.source.SampleStream[] r19, boolean[] r20, long r21) {
+        /*
+        r16 = this;
+        r0 = r16;
+        r1 = r17;
+        r2 = r19;
+        r3 = r21;
+        r5 = r0.prepared;
+        org.telegram.messenger.exoplayer2.util.Assertions.checkState(r5);
+        r5 = r0.enabledTrackCount;
+        r6 = 0;
+        r7 = r6;
+    L_0x0011:
+        r8 = 1;
+        r9 = r1.length;
+        if (r7 >= r9) goto L_0x003f;
+    L_0x0015:
+        r9 = r2[r7];
+        if (r9 == 0) goto L_0x003c;
+    L_0x0019:
+        r9 = r1[r7];
+        if (r9 == 0) goto L_0x0021;
+    L_0x001d:
+        r10 = r18[r7];
+        if (r10 != 0) goto L_0x003c;
+    L_0x0021:
+        r10 = r2[r7];
+        r10 = (org.telegram.messenger.exoplayer2.source.ExtractorMediaPeriod.SampleStreamImpl) r10;
+        r10 = r10.track;
+        r11 = r0.trackEnabledStates;
+        r11 = r11[r10];
+        org.telegram.messenger.exoplayer2.util.Assertions.checkState(r11);
+        r11 = r0.enabledTrackCount;
+        r11 = r11 - r8;
+        r0.enabledTrackCount = r11;
+        r8 = r0.trackEnabledStates;
+        r8[r10] = r6;
+        r8 = 0;
+        r2[r7] = r8;
+    L_0x003c:
+        r7 = r7 + 1;
+        goto L_0x0011;
+    L_0x003f:
+        r7 = r0.seenFirstTrackSelection;
+        if (r7 == 0) goto L_0x0049;
+    L_0x0043:
+        if (r5 != 0) goto L_0x0047;
+    L_0x0045:
+        r7 = r8;
+        goto L_0x0050;
+    L_0x0047:
+        r7 = r6;
+        goto L_0x0050;
+    L_0x0049:
+        r10 = 0;
+        r7 = (r3 > r10 ? 1 : (r3 == r10 ? 0 : -1));
+        if (r7 == 0) goto L_0x0047;
+    L_0x004f:
+        goto L_0x0045;
+    L_0x0050:
+        r10 = r7;
+        r7 = r6;
+    L_0x0052:
+        r11 = r1.length;
+        if (r7 >= r11) goto L_0x00b9;
+    L_0x0055:
+        r11 = r2[r7];
+        if (r11 != 0) goto L_0x00b5;
+    L_0x0059:
+        r11 = r1[r7];
+        if (r11 == 0) goto L_0x00b5;
+    L_0x005d:
+        r11 = r1[r7];
+        r12 = r11.length();
+        if (r12 != r8) goto L_0x0067;
+    L_0x0065:
+        r12 = r8;
+        goto L_0x0068;
+    L_0x0067:
+        r12 = r6;
+    L_0x0068:
+        org.telegram.messenger.exoplayer2.util.Assertions.checkState(r12);
+        r12 = r11.getIndexInTrackGroup(r6);
+        if (r12 != 0) goto L_0x0073;
+    L_0x0071:
+        r12 = r8;
+        goto L_0x0074;
+    L_0x0073:
+        r12 = r6;
+    L_0x0074:
+        org.telegram.messenger.exoplayer2.util.Assertions.checkState(r12);
+        r12 = r0.tracks;
+        r13 = r11.getTrackGroup();
+        r12 = r12.indexOf(r13);
+        r13 = r0.trackEnabledStates;
+        r13 = r13[r12];
+        r13 = r13 ^ r8;
+        org.telegram.messenger.exoplayer2.util.Assertions.checkState(r13);
+        r13 = r0.enabledTrackCount;
+        r13 = r13 + r8;
+        r0.enabledTrackCount = r13;
+        r13 = r0.trackEnabledStates;
+        r13[r12] = r8;
+        r13 = new org.telegram.messenger.exoplayer2.source.ExtractorMediaPeriod$SampleStreamImpl;
+        r13.<init>(r12);
+        r2[r7] = r13;
+        r20[r7] = r8;
+        if (r10 != 0) goto L_0x00b5;
+    L_0x009d:
+        r13 = r0.sampleQueues;
+        r13 = r13[r12];
+        r13.rewind();
+        r14 = r13.advanceTo(r3, r8, r8);
+        r8 = -1;
+        if (r14 != r8) goto L_0x00b3;
+    L_0x00ab:
+        r8 = r13.getReadIndex();
+        if (r8 == 0) goto L_0x00b3;
+    L_0x00b1:
+        r8 = 1;
+        goto L_0x00b4;
+    L_0x00b3:
+        r8 = r6;
+    L_0x00b4:
+        r10 = r8;
+    L_0x00b5:
+        r7 = r7 + 1;
+        r8 = 1;
+        goto L_0x0052;
+    L_0x00b9:
+        r7 = r0.enabledTrackCount;
+        if (r7 != 0) goto L_0x00e9;
+    L_0x00bd:
+        r0.pendingDeferredRetry = r6;
+        r0.notifyDiscontinuity = r6;
+        r7 = r0.loader;
+        r7 = r7.isLoading();
+        if (r7 == 0) goto L_0x00dc;
+    L_0x00c9:
+        r7 = r0.sampleQueues;
+        r8 = r7.length;
+    L_0x00cc:
+        if (r6 >= r8) goto L_0x00d6;
+    L_0x00ce:
+        r11 = r7[r6];
+        r11.discardToEnd();
+        r6 = r6 + 1;
+        goto L_0x00cc;
+    L_0x00d6:
+        r6 = r0.loader;
+        r6.cancelLoading();
+        goto L_0x00ff;
+    L_0x00dc:
+        r7 = r0.sampleQueues;
+        r8 = r7.length;
+    L_0x00df:
+        if (r6 >= r8) goto L_0x00ff;
+    L_0x00e1:
+        r11 = r7[r6];
+        r11.reset();
+        r6 = r6 + 1;
+        goto L_0x00df;
+    L_0x00e9:
+        if (r10 == 0) goto L_0x00ff;
+    L_0x00eb:
+        r3 = r0.seekToUs(r3);
+    L_0x00f0:
+        r7 = r2.length;
+        if (r6 >= r7) goto L_0x00ff;
+    L_0x00f3:
+        r7 = r2[r6];
+        if (r7 == 0) goto L_0x00fb;
+    L_0x00f7:
+        r7 = 1;
+        r20[r6] = r7;
+        goto L_0x00fc;
+    L_0x00fb:
+        r7 = 1;
+    L_0x00fc:
+        r6 = r6 + 1;
+        goto L_0x00f0;
+    L_0x00ff:
+        r7 = 1;
+        r0.seenFirstTrackSelection = r7;
+        return r3;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.ExtractorMediaPeriod.selectTracks(org.telegram.messenger.exoplayer2.trackselection.TrackSelection[], boolean[], org.telegram.messenger.exoplayer2.source.SampleStream[], boolean[], long):long");
     }
 
     public void discardBuffer(long positionUs, boolean toKeyframe) {
@@ -381,15 +497,17 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
     }
 
     public boolean continueLoading(long playbackPositionUs) {
-        if (this.loadingFinished || this.pendingDeferredRetry || (this.prepared && this.enabledTrackCount == 0)) {
-            return false;
+        if (!(this.loadingFinished || this.pendingDeferredRetry)) {
+            if (!this.prepared || this.enabledTrackCount != 0) {
+                boolean continuedLoading = this.loadCondition.open();
+                if (!this.loader.isLoading()) {
+                    startLoading();
+                    continuedLoading = true;
+                }
+                return continuedLoading;
+            }
         }
-        boolean continuedLoading = this.loadCondition.open();
-        if (this.loader.isLoading()) {
-            return continuedLoading;
-        }
-        startLoading();
-        return true;
+        return false;
     }
 
     public long getNextLoadPositionUs() {
@@ -427,25 +545,24 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
     }
 
     public long seekToUs(long positionUs) {
-        int i = 0;
-        if (!this.seekMap.isSeekable()) {
-            positionUs = 0;
-        }
+        positionUs = this.seekMap.isSeekable() ? positionUs : 0;
         this.lastSeekPositionUs = positionUs;
+        int i = 0;
         this.notifyDiscontinuity = false;
-        if (isPendingReset() || !seekInsideBufferUs(positionUs)) {
-            this.pendingDeferredRetry = false;
-            this.pendingResetPositionUs = positionUs;
-            this.loadingFinished = false;
-            if (this.loader.isLoading()) {
-                this.loader.cancelLoading();
-            } else {
-                SampleQueue[] sampleQueueArr = this.sampleQueues;
-                int length = sampleQueueArr.length;
-                while (i < length) {
-                    sampleQueueArr[i].reset();
-                    i++;
-                }
+        if (!isPendingReset() && seekInsideBufferUs(positionUs)) {
+            return positionUs;
+        }
+        this.pendingDeferredRetry = false;
+        this.pendingResetPositionUs = positionUs;
+        this.loadingFinished = false;
+        if (this.loader.isLoading()) {
+            this.loader.cancelLoading();
+        } else {
+            SampleQueue[] sampleQueueArr = this.sampleQueues;
+            int length = sampleQueueArr.length;
+            while (i < length) {
+                sampleQueueArr[i].reset();
+                i++;
             }
         }
         return positionUs;
@@ -474,13 +591,10 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
         int result = this.sampleQueues[track].read(formatHolder, buffer, formatRequired, this.loadingFinished, this.lastSeekPositionUs);
         if (result == -4) {
             maybeNotifyTrackFormat(track);
-            return result;
-        } else if (result != -3) {
-            return result;
-        } else {
+        } else if (result == -3) {
             maybeStartDeferredRetry(track);
-            return result;
         }
+        return result;
     }
 
     int skipData(int track, long positionUs) {
@@ -499,9 +613,9 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
         }
         if (skipCount > 0) {
             maybeNotifyTrackFormat(track);
-            return skipCount;
+        } else {
+            maybeStartDeferredRetry(track);
         }
-        maybeStartDeferredRetry(track);
         return skipCount;
     }
 
@@ -514,48 +628,55 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
     }
 
     private void maybeStartDeferredRetry(int track) {
-        int i = 0;
-        if (this.pendingDeferredRetry && this.trackIsAudioVideoFlags[track] && !this.sampleQueues[track].hasNextSample()) {
-            this.pendingResetPositionUs = 0;
-            this.pendingDeferredRetry = false;
-            this.notifyDiscontinuity = true;
-            this.lastSeekPositionUs = 0;
-            this.extractedSamplesCountAtStartOfLoad = 0;
-            SampleQueue[] sampleQueueArr = this.sampleQueues;
-            int length = sampleQueueArr.length;
-            while (i < length) {
-                sampleQueueArr[i].reset();
-                i++;
+        if (this.pendingDeferredRetry && this.trackIsAudioVideoFlags[track]) {
+            if (!this.sampleQueues[track].hasNextSample()) {
+                this.pendingResetPositionUs = 0;
+                int i = 0;
+                this.pendingDeferredRetry = false;
+                this.notifyDiscontinuity = true;
+                this.lastSeekPositionUs = 0;
+                this.extractedSamplesCountAtStartOfLoad = 0;
+                SampleQueue[] sampleQueueArr = this.sampleQueues;
+                int length = sampleQueueArr.length;
+                while (i < length) {
+                    sampleQueueArr[i].reset();
+                    i++;
+                }
+                this.callback.onContinueLoadingRequested(this);
             }
-            this.callback.onContinueLoadingRequested(this);
         }
     }
 
     private boolean suppressRead() {
-        return this.notifyDiscontinuity || isPendingReset();
+        if (!this.notifyDiscontinuity) {
+            if (!isPendingReset()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void onLoadCompleted(ExtractingLoadable loadable, long elapsedRealtimeMs, long loadDurationMs) {
         if (this.durationUs == C.TIME_UNSET) {
             long largestQueuedTimestampUs = getLargestQueuedTimestampUs();
-            this.durationUs = largestQueuedTimestampUs == Long.MIN_VALUE ? 0 : DEFAULT_LAST_SAMPLE_DURATION_US + largestQueuedTimestampUs;
-            this.listener.onSourceInfoRefreshed(this.durationUs, this.seekMap.isSeekable());
+            r0.durationUs = largestQueuedTimestampUs == Long.MIN_VALUE ? 0 : largestQueuedTimestampUs + DEFAULT_LAST_SAMPLE_DURATION_US;
+            r0.listener.onSourceInfoRefreshed(r0.durationUs, r0.seekMap.isSeekable());
         }
-        this.eventDispatcher.loadCompleted(loadable.dataSpec, 1, -1, null, 0, null, loadable.seekTimeUs, this.durationUs, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded);
+        r0.eventDispatcher.loadCompleted(loadable.dataSpec, 1, -1, null, 0, null, loadable.seekTimeUs, r0.durationUs, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded);
         copyLengthFromLoader(loadable);
-        this.loadingFinished = true;
-        this.callback.onContinueLoadingRequested(this);
+        r0.loadingFinished = true;
+        r0.callback.onContinueLoadingRequested(r0);
     }
 
     public void onLoadCanceled(ExtractingLoadable loadable, long elapsedRealtimeMs, long loadDurationMs, boolean released) {
         this.eventDispatcher.loadCanceled(loadable.dataSpec, 1, -1, null, 0, null, loadable.seekTimeUs, this.durationUs, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded);
         if (!released) {
             copyLengthFromLoader(loadable);
-            for (SampleQueue sampleQueue : this.sampleQueues) {
+            for (SampleQueue sampleQueue : r0.sampleQueues) {
                 sampleQueue.reset();
             }
-            if (this.enabledTrackCount > 0) {
-                this.callback.onContinueLoadingRequested(this);
+            if (r0.enabledTrackCount > 0) {
+                r0.callback.onContinueLoadingRequested(r0);
             }
         }
     }
@@ -568,12 +689,14 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
             return 3;
         }
         int extractedSamplesCount = getExtractedSamplesCount();
-        boolean madeProgress = extractedSamplesCount > this.extractedSamplesCountAtStartOfLoad;
-        if (configureRetry(loadable, extractedSamplesCount)) {
-            return madeProgress ? 1 : 0;
-        } else {
-            return 2;
+        int i = 0;
+        boolean madeProgress = extractedSamplesCount > r0.extractedSamplesCountAtStartOfLoad;
+        if (!configureRetry(loadable, extractedSamplesCount)) {
+            i = 2;
+        } else if (madeProgress) {
+            i = 1;
         }
+        return i;
     }
 
     public TrackOutput track(int id, int type) {
@@ -583,7 +706,7 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
                 return this.sampleQueues[i];
             }
         }
-        TrackOutput trackOutput = new SampleQueue(this.allocator);
+        SampleQueue trackOutput = new SampleQueue(this.allocator);
         trackOutput.setUpstreamFormatChangeListener(this);
         this.sampleQueueTrackIds = Arrays.copyOf(this.sampleQueueTrackIds, trackCount + 1);
         this.sampleQueueTrackIds[trackCount] = id;
@@ -607,43 +730,50 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
     }
 
     private void maybeFinishPrepare() {
-        if (!this.released && !this.prepared && this.seekMap != null && this.sampleQueuesBuilt) {
-            SampleQueue[] sampleQueueArr = this.sampleQueues;
-            int length = sampleQueueArr.length;
-            int i = 0;
-            while (i < length) {
-                if (sampleQueueArr[i].getUpstreamFormat() != null) {
+        if (!(this.released || this.prepared || this.seekMap == null)) {
+            if (this.sampleQueuesBuilt) {
+                SampleQueue[] sampleQueueArr = this.sampleQueues;
+                int length = sampleQueueArr.length;
+                int i = 0;
+                while (i < length) {
+                    if (sampleQueueArr[i].getUpstreamFormat() != null) {
+                        i++;
+                    } else {
+                        return;
+                    }
+                }
+                this.loadCondition.close();
+                int trackCount = this.sampleQueues.length;
+                TrackGroup[] trackArray = new TrackGroup[trackCount];
+                this.trackIsAudioVideoFlags = new boolean[trackCount];
+                this.trackEnabledStates = new boolean[trackCount];
+                this.trackFormatNotificationSent = new boolean[trackCount];
+                this.durationUs = this.seekMap.getDurationUs();
+                i = 0;
+                while (true) {
+                    boolean isAudioVideo = true;
+                    if (i >= trackCount) {
+                        break;
+                    }
+                    trackArray[i] = new TrackGroup(this.sampleQueues[i].getUpstreamFormat());
+                    String mimeType = trackFormat.sampleMimeType;
+                    if (!MimeTypes.isVideo(mimeType)) {
+                        if (!MimeTypes.isAudio(mimeType)) {
+                            isAudioVideo = false;
+                        }
+                    }
+                    this.trackIsAudioVideoFlags[i] = isAudioVideo;
+                    this.haveAudioVideoTracks |= isAudioVideo;
                     i++;
-                } else {
-                    return;
                 }
-            }
-            this.loadCondition.close();
-            int trackCount = this.sampleQueues.length;
-            TrackGroup[] trackArray = new TrackGroup[trackCount];
-            this.trackIsAudioVideoFlags = new boolean[trackCount];
-            this.trackEnabledStates = new boolean[trackCount];
-            this.trackFormatNotificationSent = new boolean[trackCount];
-            this.durationUs = this.seekMap.getDurationUs();
-            for (int i2 = 0; i2 < trackCount; i2++) {
-                boolean isAudioVideo;
-                trackArray[i2] = new TrackGroup(this.sampleQueues[i2].getUpstreamFormat());
-                String mimeType = trackFormat.sampleMimeType;
-                if (MimeTypes.isVideo(mimeType) || MimeTypes.isAudio(mimeType)) {
-                    isAudioVideo = true;
-                } else {
-                    isAudioVideo = false;
+                this.tracks = new TrackGroupArray(trackArray);
+                if (this.minLoadableRetryCount == -1 && this.length == -1 && this.seekMap.getDurationUs() == C.TIME_UNSET) {
+                    this.actualMinLoadableRetryCount = 6;
                 }
-                this.trackIsAudioVideoFlags[i2] = isAudioVideo;
-                this.haveAudioVideoTracks |= isAudioVideo;
+                this.prepared = true;
+                this.listener.onSourceInfoRefreshed(this.durationUs, this.seekMap.isSeekable());
+                this.callback.onPrepared(this);
             }
-            this.tracks = new TrackGroupArray(trackArray);
-            if (this.minLoadableRetryCount == -1 && this.length == -1 && this.seekMap.getDurationUs() == C.TIME_UNSET) {
-                this.actualMinLoadableRetryCount = 6;
-            }
-            this.prepared = true;
-            this.listener.onSourceInfoRefreshed(this.durationUs, this.seekMap.isSeekable());
-            this.callback.onPrepared(this);
         }
     }
 
@@ -657,60 +787,62 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
         ExtractingLoadable loadable = new ExtractingLoadable(this.uri, this.dataSource, this.extractorHolder, this.loadCondition);
         if (this.prepared) {
             Assertions.checkState(isPendingReset());
-            if (this.durationUs == C.TIME_UNSET || this.pendingResetPositionUs < this.durationUs) {
-                loadable.setLoadPosition(this.seekMap.getSeekPoints(this.pendingResetPositionUs).first.position, this.pendingResetPositionUs);
-                this.pendingResetPositionUs = C.TIME_UNSET;
+            if (r6.durationUs == C.TIME_UNSET || r6.pendingResetPositionUs < r6.durationUs) {
+                loadable.setLoadPosition(r6.seekMap.getSeekPoints(r6.pendingResetPositionUs).first.position, r6.pendingResetPositionUs);
+                r6.pendingResetPositionUs = C.TIME_UNSET;
             } else {
-                this.loadingFinished = true;
-                this.pendingResetPositionUs = C.TIME_UNSET;
+                r6.loadingFinished = true;
+                r6.pendingResetPositionUs = C.TIME_UNSET;
                 return;
             }
         }
-        this.extractedSamplesCountAtStartOfLoad = getExtractedSamplesCount();
-        this.eventDispatcher.loadStarted(loadable.dataSpec, 1, -1, null, 0, null, loadable.seekTimeUs, this.durationUs, this.loader.startLoading(loadable, this, this.actualMinLoadableRetryCount));
+        r6.extractedSamplesCountAtStartOfLoad = getExtractedSamplesCount();
+        r6.eventDispatcher.loadStarted(loadable.dataSpec, 1, -1, null, 0, null, loadable.seekTimeUs, r6.durationUs, r6.loader.startLoading(loadable, r6, r6.actualMinLoadableRetryCount));
     }
 
     private boolean configureRetry(ExtractingLoadable loadable, int currentExtractedSampleCount) {
-        int i = 0;
-        if (this.length != -1 || (this.seekMap != null && this.seekMap.getDurationUs() != C.TIME_UNSET)) {
-            this.extractedSamplesCountAtStartOfLoad = currentExtractedSampleCount;
-            return true;
-        } else if (!this.prepared || suppressRead()) {
-            this.notifyDiscontinuity = this.prepared;
-            this.lastSeekPositionUs = 0;
-            this.extractedSamplesCountAtStartOfLoad = 0;
-            SampleQueue[] sampleQueueArr = this.sampleQueues;
-            int length = sampleQueueArr.length;
-            while (i < length) {
-                sampleQueueArr[i].reset();
-                i++;
+        if (this.length == -1) {
+            if (this.seekMap == null || this.seekMap.getDurationUs() == C.TIME_UNSET) {
+                int i = 0;
+                if (!this.prepared || suppressRead()) {
+                    this.notifyDiscontinuity = this.prepared;
+                    this.lastSeekPositionUs = 0;
+                    this.extractedSamplesCountAtStartOfLoad = 0;
+                    SampleQueue[] sampleQueueArr = this.sampleQueues;
+                    int length = sampleQueueArr.length;
+                    while (i < length) {
+                        sampleQueueArr[i].reset();
+                        i++;
+                    }
+                    loadable.setLoadPosition(0, 0);
+                    return true;
+                }
+                this.pendingDeferredRetry = true;
+                return false;
             }
-            loadable.setLoadPosition(0, 0);
-            return true;
-        } else {
-            this.pendingDeferredRetry = true;
-            return false;
         }
+        this.extractedSamplesCountAtStartOfLoad = currentExtractedSampleCount;
+        return true;
     }
 
     private boolean seekInsideBufferUs(long positionUs) {
         int trackCount = this.sampleQueues.length;
         int i = 0;
-        while (i < trackCount) {
-            boolean seekInsideQueue;
+        while (true) {
+            boolean seekInsideQueue = true;
+            if (i >= trackCount) {
+                return true;
+            }
             SampleQueue sampleQueue = this.sampleQueues[i];
             sampleQueue.rewind();
-            if (sampleQueue.advanceTo(positionUs, true, false) != -1) {
-                seekInsideQueue = true;
-            } else {
+            if (sampleQueue.advanceTo(positionUs, true, false) == -1) {
                 seekInsideQueue = false;
             }
-            if (!seekInsideQueue && (this.trackIsAudioVideoFlags[i] || !this.haveAudioVideoTracks)) {
-                return false;
+            if (seekInsideQueue || (!this.trackIsAudioVideoFlags[i] && this.haveAudioVideoTracks)) {
+                i++;
             }
-            i++;
         }
-        return true;
+        return false;
     }
 
     private int getExtractedSamplesCount() {

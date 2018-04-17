@@ -1,6 +1,5 @@
 package org.telegram.messenger.exoplayer2.upstream.cache;
 
-import android.util.Log;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -51,49 +50,165 @@ public final class CachedRegionTracker implements Listener {
         this.cache.removeListener(this.cacheKey, this);
     }
 
-    public synchronized int getRegionEndTimeMs(long byteOffset) {
-        int i = -1;
-        synchronized (this) {
-            this.lookupRegion.startOffset = byteOffset;
-            Region floorRegion = (Region) this.regions.floor(this.lookupRegion);
-            if (!(floorRegion == null || byteOffset > floorRegion.endOffset || floorRegion.endOffsetIndex == -1)) {
-                int index = floorRegion.endOffsetIndex;
-                if (index == this.chunkIndex.length - 1 && floorRegion.endOffset == this.chunkIndex.offsets[index] + ((long) this.chunkIndex.sizes[index])) {
-                    i = -2;
-                } else {
-                    i = (int) ((this.chunkIndex.timesUs[index] + ((this.chunkIndex.durationsUs[index] * (floorRegion.endOffset - this.chunkIndex.offsets[index])) / ((long) this.chunkIndex.sizes[index]))) / 1000);
-                }
-            }
-        }
-        return i;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public synchronized int getRegionEndTimeMs(long r12) {
+        /*
+        r11 = this;
+        monitor-enter(r11);
+        r0 = r11.lookupRegion;	 Catch:{ all -> 0x0069 }
+        r0.startOffset = r12;	 Catch:{ all -> 0x0069 }
+        r0 = r11.regions;	 Catch:{ all -> 0x0069 }
+        r1 = r11.lookupRegion;	 Catch:{ all -> 0x0069 }
+        r0 = r0.floor(r1);	 Catch:{ all -> 0x0069 }
+        r0 = (org.telegram.messenger.exoplayer2.upstream.cache.CachedRegionTracker.Region) r0;	 Catch:{ all -> 0x0069 }
+        r1 = -1;
+        if (r0 == 0) goto L_0x0067;
+    L_0x0012:
+        r2 = r0.endOffset;	 Catch:{ all -> 0x0069 }
+        r4 = (r12 > r2 ? 1 : (r12 == r2 ? 0 : -1));
+        if (r4 > 0) goto L_0x0067;
+    L_0x0018:
+        r2 = r0.endOffsetIndex;	 Catch:{ all -> 0x0069 }
+        if (r2 != r1) goto L_0x001d;
+    L_0x001c:
+        goto L_0x0067;
+    L_0x001d:
+        r1 = r0.endOffsetIndex;	 Catch:{ all -> 0x0069 }
+        r2 = r11.chunkIndex;	 Catch:{ all -> 0x0069 }
+        r2 = r2.length;	 Catch:{ all -> 0x0069 }
+        r2 = r2 + -1;
+        if (r1 != r2) goto L_0x003f;
+    L_0x0027:
+        r2 = r0.endOffset;	 Catch:{ all -> 0x0069 }
+        r4 = r11.chunkIndex;	 Catch:{ all -> 0x0069 }
+        r4 = r4.offsets;	 Catch:{ all -> 0x0069 }
+        r5 = r4[r1];	 Catch:{ all -> 0x0069 }
+        r4 = r11.chunkIndex;	 Catch:{ all -> 0x0069 }
+        r4 = r4.sizes;	 Catch:{ all -> 0x0069 }
+        r4 = r4[r1];	 Catch:{ all -> 0x0069 }
+        r7 = (long) r4;
+        r9 = r5 + r7;
+        r4 = (r2 > r9 ? 1 : (r2 == r9 ? 0 : -1));
+        if (r4 != 0) goto L_0x003f;
+    L_0x003c:
+        r2 = -2;
+        monitor-exit(r11);
+        return r2;
+    L_0x003f:
+        r2 = r11.chunkIndex;	 Catch:{ all -> 0x0069 }
+        r2 = r2.durationsUs;	 Catch:{ all -> 0x0069 }
+        r3 = r2[r1];	 Catch:{ all -> 0x0069 }
+        r5 = r0.endOffset;	 Catch:{ all -> 0x0069 }
+        r2 = r11.chunkIndex;	 Catch:{ all -> 0x0069 }
+        r2 = r2.offsets;	 Catch:{ all -> 0x0069 }
+        r7 = r2[r1];	 Catch:{ all -> 0x0069 }
+        r9 = r5 - r7;
+        r3 = r3 * r9;
+        r2 = r11.chunkIndex;	 Catch:{ all -> 0x0069 }
+        r2 = r2.sizes;	 Catch:{ all -> 0x0069 }
+        r2 = r2[r1];	 Catch:{ all -> 0x0069 }
+        r5 = (long) r2;	 Catch:{ all -> 0x0069 }
+        r3 = r3 / r5;
+        r2 = r3;
+        r4 = r11.chunkIndex;	 Catch:{ all -> 0x0069 }
+        r4 = r4.timesUs;	 Catch:{ all -> 0x0069 }
+        r5 = r4[r1];	 Catch:{ all -> 0x0069 }
+        r7 = r5 + r2;
+        r4 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
+        r7 = r7 / r4;
+        r4 = (int) r7;
+        monitor-exit(r11);
+        return r4;
+    L_0x0067:
+        monitor-exit(r11);
+        return r1;
+    L_0x0069:
+        r12 = move-exception;
+        monitor-exit(r11);
+        throw r12;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.upstream.cache.CachedRegionTracker.getRegionEndTimeMs(long):int");
     }
 
     public synchronized void onSpanAdded(Cache cache, CacheSpan span) {
         mergeSpan(span);
     }
 
-    public synchronized void onSpanRemoved(Cache cache, CacheSpan span) {
-        Region removedRegion = new Region(span.position, span.position + span.length);
-        Region floorRegion = (Region) this.regions.floor(removedRegion);
-        if (floorRegion == null) {
-            Log.e(TAG, "Removed a span we were not aware of");
-        } else {
-            this.regions.remove(floorRegion);
-            if (floorRegion.startOffset < removedRegion.startOffset) {
-                Region newFloorRegion = new Region(floorRegion.startOffset, removedRegion.startOffset);
-                int index = Arrays.binarySearch(this.chunkIndex.offsets, newFloorRegion.endOffset);
-                if (index < 0) {
-                    index = (-index) - 2;
-                }
-                newFloorRegion.endOffsetIndex = index;
-                this.regions.add(newFloorRegion);
-            }
-            if (floorRegion.endOffset > removedRegion.endOffset) {
-                Region newCeilingRegion = new Region(removedRegion.endOffset + 1, floorRegion.endOffset);
-                newCeilingRegion.endOffsetIndex = floorRegion.endOffsetIndex;
-                this.regions.add(newCeilingRegion);
-            }
-        }
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public synchronized void onSpanRemoved(org.telegram.messenger.exoplayer2.upstream.cache.Cache r10, org.telegram.messenger.exoplayer2.upstream.cache.CacheSpan r11) {
+        /*
+        r9 = this;
+        monitor-enter(r9);
+        r0 = new org.telegram.messenger.exoplayer2.upstream.cache.CachedRegionTracker$Region;	 Catch:{ all -> 0x006f }
+        r1 = r11.position;	 Catch:{ all -> 0x006f }
+        r3 = r11.position;	 Catch:{ all -> 0x006f }
+        r5 = r11.length;	 Catch:{ all -> 0x006f }
+        r7 = r3 + r5;
+        r0.<init>(r1, r7);	 Catch:{ all -> 0x006f }
+        r1 = r9.regions;	 Catch:{ all -> 0x006f }
+        r1 = r1.floor(r0);	 Catch:{ all -> 0x006f }
+        r1 = (org.telegram.messenger.exoplayer2.upstream.cache.CachedRegionTracker.Region) r1;	 Catch:{ all -> 0x006f }
+        if (r1 != 0) goto L_0x0021;
+    L_0x0018:
+        r2 = "CachedRegionTracker";
+        r3 = "Removed a span we were not aware of";
+        android.util.Log.e(r2, r3);	 Catch:{ all -> 0x006f }
+        monitor-exit(r9);
+        return;
+    L_0x0021:
+        r2 = r9.regions;	 Catch:{ all -> 0x006f }
+        r2.remove(r1);	 Catch:{ all -> 0x006f }
+        r2 = r1.startOffset;	 Catch:{ all -> 0x006f }
+        r4 = r0.startOffset;	 Catch:{ all -> 0x006f }
+        r6 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
+        if (r6 >= 0) goto L_0x004f;
+    L_0x002e:
+        r2 = new org.telegram.messenger.exoplayer2.upstream.cache.CachedRegionTracker$Region;	 Catch:{ all -> 0x006f }
+        r3 = r1.startOffset;	 Catch:{ all -> 0x006f }
+        r5 = r0.startOffset;	 Catch:{ all -> 0x006f }
+        r2.<init>(r3, r5);	 Catch:{ all -> 0x006f }
+        r3 = r9.chunkIndex;	 Catch:{ all -> 0x006f }
+        r3 = r3.offsets;	 Catch:{ all -> 0x006f }
+        r4 = r2.endOffset;	 Catch:{ all -> 0x006f }
+        r3 = java.util.Arrays.binarySearch(r3, r4);	 Catch:{ all -> 0x006f }
+        if (r3 >= 0) goto L_0x0047;
+    L_0x0043:
+        r4 = -r3;
+        r4 = r4 + -2;
+        goto L_0x0048;
+    L_0x0047:
+        r4 = r3;
+    L_0x0048:
+        r2.endOffsetIndex = r4;	 Catch:{ all -> 0x006f }
+        r4 = r9.regions;	 Catch:{ all -> 0x006f }
+        r4.add(r2);	 Catch:{ all -> 0x006f }
+    L_0x004f:
+        r2 = r1.endOffset;	 Catch:{ all -> 0x006f }
+        r4 = r0.endOffset;	 Catch:{ all -> 0x006f }
+        r6 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
+        if (r6 <= 0) goto L_0x006d;
+    L_0x0057:
+        r2 = new org.telegram.messenger.exoplayer2.upstream.cache.CachedRegionTracker$Region;	 Catch:{ all -> 0x006f }
+        r3 = r0.endOffset;	 Catch:{ all -> 0x006f }
+        r5 = 1;
+        r7 = r3 + r5;
+        r3 = r1.endOffset;	 Catch:{ all -> 0x006f }
+        r2.<init>(r7, r3);	 Catch:{ all -> 0x006f }
+        r3 = r1.endOffsetIndex;	 Catch:{ all -> 0x006f }
+        r2.endOffsetIndex = r3;	 Catch:{ all -> 0x006f }
+        r3 = r9.regions;	 Catch:{ all -> 0x006f }
+        r3.add(r2);	 Catch:{ all -> 0x006f }
+    L_0x006d:
+        monitor-exit(r9);
+        return;
+    L_0x006f:
+        r10 = move-exception;
+        monitor-exit(r9);
+        throw r10;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.upstream.cache.CachedRegionTracker.onSpanRemoved(org.telegram.messenger.exoplayer2.upstream.cache.Cache, org.telegram.messenger.exoplayer2.upstream.cache.CacheSpan):void");
     }
 
     public void onSpanTouched(Cache cache, CacheSpan oldSpan, CacheSpan newSpan) {
@@ -123,10 +238,7 @@ public final class CachedRegionTracker implements Listener {
             floorRegion.endOffsetIndex = index;
         } else {
             index = Arrays.binarySearch(this.chunkIndex.offsets, newRegion.endOffset);
-            if (index < 0) {
-                index = (-index) - 2;
-            }
-            newRegion.endOffsetIndex = index;
+            newRegion.endOffsetIndex = index < 0 ? (-index) - 2 : index;
             this.regions.add(newRegion);
         }
     }

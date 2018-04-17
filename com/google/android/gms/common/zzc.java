@@ -1,24 +1,26 @@
 package com.google.android.gms.common;
 
-import android.os.Parcel;
-import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import java.lang.ref.WeakReference;
 
-public final class zzc extends zzbfm {
-    public static final Creator<zzc> CREATOR = new zzd();
-    private String name;
-    private int version;
+abstract class zzc extends CertData {
+    private static final WeakReference<byte[]> zzbf = new WeakReference(null);
+    private WeakReference<byte[]> zzbe = zzbf;
 
-    public zzc(String str, int i) {
-        this.name = str;
-        this.version = i;
+    zzc(byte[] bArr) {
+        super(bArr);
     }
 
-    public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 1, this.name, false);
-        zzbfp.zzc(parcel, 2, this.version);
-        zzbfp.zzai(parcel, zze);
+    final byte[] getBytes() {
+        byte[] bArr;
+        synchronized (this) {
+            bArr = (byte[]) this.zzbe.get();
+            if (bArr == null) {
+                bArr = zzf();
+                this.zzbe = new WeakReference(bArr);
+            }
+        }
+        return bArr;
     }
+
+    protected abstract byte[] zzf();
 }

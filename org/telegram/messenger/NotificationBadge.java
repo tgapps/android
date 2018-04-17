@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
-import java.io.Closeable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -194,7 +193,12 @@ public class NotificationBadge {
 
         public void executeBadge(int badgeCount) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(TAG, NotificationBadge.componentName.getPackageName() + "/" + NotificationBadge.componentName.getClassName());
+            String str = TAG;
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(NotificationBadge.componentName.getPackageName());
+            stringBuilder.append("/");
+            stringBuilder.append(NotificationBadge.componentName.getClassName());
+            contentValues.put(str, stringBuilder.toString());
             contentValues.put("count", Integer.valueOf(badgeCount));
             ApplicationLoader.applicationContext.getContentResolver().insert(Uri.parse(CONTENT_URI), contentValues);
         }
@@ -251,7 +255,9 @@ public class NotificationBadge {
             Uri mUri = Uri.parse(CONTENT_URI);
             ContentResolver contentResolver = ApplicationLoader.applicationContext.getContentResolver();
             try {
-                Cursor cursor = contentResolver.query(mUri, CONTENT_PROJECTION, "package=?", new String[]{NotificationBadge.componentName.getPackageName()}, null);
+                ContentResolver contentResolver2 = contentResolver;
+                Uri uri = mUri;
+                Cursor cursor = contentResolver2.query(uri, CONTENT_PROJECTION, "package=?", new String[]{NotificationBadge.componentName.getPackageName()}, null);
                 if (cursor != null) {
                     String entryActivityName = NotificationBadge.componentName.getClassName();
                     boolean entryActivityExist = false;
@@ -379,19 +385,18 @@ public class NotificationBadge {
 
         public void executeBadge(int badgeCount) {
             try {
-                Object obj;
                 Object miuiNotification = Class.forName("android.app.MiuiNotification").newInstance();
                 Field field = miuiNotification.getClass().getDeclaredField("messageCount");
                 field.setAccessible(true);
-                if (badgeCount == 0) {
-                    obj = TtmlNode.ANONYMOUS_REGION_ID;
-                } else {
-                    obj = Integer.valueOf(badgeCount);
-                }
-                field.set(miuiNotification, String.valueOf(obj));
+                field.set(miuiNotification, String.valueOf(badgeCount == 0 ? TtmlNode.ANONYMOUS_REGION_ID : Integer.valueOf(badgeCount)));
             } catch (Throwable th) {
                 final Intent localIntent = new Intent(INTENT_ACTION);
-                localIntent.putExtra(EXTRA_UPDATE_APP_COMPONENT_NAME, NotificationBadge.componentName.getPackageName() + "/" + NotificationBadge.componentName.getClassName());
+                String str = EXTRA_UPDATE_APP_COMPONENT_NAME;
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(NotificationBadge.componentName.getPackageName());
+                stringBuilder.append("/");
+                stringBuilder.append(NotificationBadge.componentName.getClassName());
+                localIntent.putExtra(str, stringBuilder.toString());
                 localIntent.putExtra(EXTRA_UPDATE_APP_MSG_TEXT, String.valueOf(badgeCount == 0 ? TtmlNode.ANONYMOUS_REGION_ID : Integer.valueOf(badgeCount)));
                 if (NotificationBadge.canResolveBroadcast(localIntent)) {
                     AndroidUtilities.runOnUIThread(new Runnable() {
@@ -431,6 +436,31 @@ public class NotificationBadge {
         }
     }
 
+    public static void closeQuietly(java.io.Closeable r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.NotificationBadge.closeQuietly(java.io.Closeable):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        if (r1 == 0) goto L_0x0008;
+    L_0x0002:
+        r1.close();	 Catch:{ Throwable -> 0x0006 }
+        goto L_0x0008;
+    L_0x0006:
+        r0 = move-exception;
+        goto L_0x0009;
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.NotificationBadge.closeQuietly(java.io.Closeable):void");
+    }
+
     static {
         BADGERS.add(AdwHomeBadger.class);
         BADGERS.add(ApexHomeBadger.class);
@@ -465,6 +495,7 @@ public class NotificationBadge {
     private static boolean initBadger() {
         Context context = ApplicationLoader.applicationContext;
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+        int a = 0;
         if (launchIntent == null) {
             return false;
         }
@@ -492,7 +523,7 @@ public class NotificationBadge {
         }
         List<ResolveInfo> resolveInfos = context.getPackageManager().queryIntentActivities(intent, C.DEFAULT_BUFFER_SEGMENT_SIZE);
         if (resolveInfos != null) {
-            for (int a = 0; a < resolveInfos.size(); a++) {
+            while (a < resolveInfos.size()) {
                 currentHomePackage = ((ResolveInfo) resolveInfos.get(a)).activityInfo.packageName;
                 for (Class<? extends Badger> b2 : BADGERS) {
                     shortcutBadger = null;
@@ -508,6 +539,7 @@ public class NotificationBadge {
                 if (badger != null) {
                     break;
                 }
+                a++;
             }
         }
         if (badger == null) {
@@ -537,15 +569,6 @@ public class NotificationBadge {
     public static void close(Cursor cursor) {
         if (cursor != null && !cursor.isClosed()) {
             cursor.close();
-        }
-    }
-
-    public static void closeQuietly(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (Throwable th) {
-            }
         }
     }
 }

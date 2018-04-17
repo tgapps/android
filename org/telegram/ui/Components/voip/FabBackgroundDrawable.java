@@ -58,7 +58,7 @@ public class FabBackgroundDrawable extends Drawable {
     }
 
     public boolean getPadding(Rect padding) {
-        int pad = AndroidUtilities.dp(4.0f);
+        int pad = AndroidUtilities.dp(1082130432);
         padding.set(pad, pad, pad, pad);
         return true;
     }

@@ -1,9 +1,48 @@
 package com.google.android.gms.common.api.internal;
 
+import android.os.Bundle;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.Api;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 
-public interface zzu extends ConnectionCallbacks {
-    void zza(ConnectionResult connectionResult, Api<?> api, boolean z);
+final class zzu implements zzbq {
+    private final /* synthetic */ zzr zzgc;
+
+    private zzu(zzr com_google_android_gms_common_api_internal_zzr) {
+        this.zzgc = com_google_android_gms_common_api_internal_zzr;
+    }
+
+    public final void zzb(int i, boolean z) {
+        this.zzgc.zzga.lock();
+        try {
+            if (this.zzgc.zzfz) {
+                this.zzgc.zzfz = false;
+                this.zzgc.zza(i, z);
+            } else {
+                this.zzgc.zzfz = true;
+                this.zzgc.zzfr.onConnectionSuspended(i);
+            }
+            this.zzgc.zzga.unlock();
+        } catch (Throwable th) {
+            this.zzgc.zzga.unlock();
+        }
+    }
+
+    public final void zzb(Bundle bundle) {
+        this.zzgc.zzga.lock();
+        try {
+            this.zzgc.zzfy = ConnectionResult.RESULT_SUCCESS;
+            this.zzgc.zzaa();
+        } finally {
+            this.zzgc.zzga.unlock();
+        }
+    }
+
+    public final void zzc(ConnectionResult connectionResult) {
+        this.zzgc.zzga.lock();
+        try {
+            this.zzgc.zzfy = connectionResult;
+            this.zzgc.zzaa();
+        } finally {
+            this.zzgc.zzga.unlock();
+        }
+    }
 }

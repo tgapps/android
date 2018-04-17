@@ -7,12 +7,12 @@ import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
-import com.google.android.gms.common.internal.zzbq;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.firebase.FirebaseApp;
 
 public class FirebaseInitProvider extends ContentProvider {
     public void attachInfo(Context context, ProviderInfo providerInfo) {
-        zzbq.checkNotNull(providerInfo, "FirebaseInitProvider ProviderInfo cannot be null.");
+        Preconditions.checkNotNull(providerInfo, "FirebaseInitProvider ProviderInfo cannot be null.");
         if ("com.google.firebase.firebaseinitprovider".equals(providerInfo.authority)) {
             throw new IllegalStateException("Incorrect provider authority in manifest. Most likely due to a missing applicationId variable in application's build.gradle.");
         }
@@ -32,11 +32,16 @@ public class FirebaseInitProvider extends ContentProvider {
     }
 
     public boolean onCreate() {
+        String str;
+        String str2;
         if (FirebaseApp.initializeApp(getContext()) == null) {
-            Log.i("FirebaseInitProvider", "FirebaseApp initialization unsuccessful");
+            str = "FirebaseInitProvider";
+            str2 = "FirebaseApp initialization unsuccessful";
         } else {
-            Log.i("FirebaseInitProvider", "FirebaseApp initialization successful");
+            str = "FirebaseInitProvider";
+            str2 = "FirebaseApp initialization successful";
         }
+        Log.i(str, str2);
         return false;
     }
 

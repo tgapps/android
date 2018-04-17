@@ -3,10 +3,10 @@ package com.google.android.gms.wearable;
 import android.content.Context;
 import android.os.Looper;
 import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.Api.AbstractClientBuilder;
 import com.google.android.gms.common.api.Api.ApiOptions.Optional;
-import com.google.android.gms.common.api.Api.zza;
-import com.google.android.gms.common.api.Api.zzf;
-import com.google.android.gms.common.api.GoogleApi;
+import com.google.android.gms.common.api.Api.ClientKey;
+import com.google.android.gms.common.api.GoogleApi.Settings;
 import com.google.android.gms.wearable.internal.zzaa;
 import com.google.android.gms.wearable.internal.zzaj;
 import com.google.android.gms.wearable.internal.zzbv;
@@ -23,7 +23,9 @@ import com.google.android.gms.wearable.internal.zzo;
 
 public class Wearable {
     @Deprecated
-    public static final Api<WearableOptions> API = new Api("Wearable.API", zzebg, zzebf);
+    public static final Api<WearableOptions> API = new Api("Wearable.API", CLIENT_BUILDER, CLIENT_KEY);
+    private static final AbstractClientBuilder<zzhg, WearableOptions> CLIENT_BUILDER = new zzj();
+    private static final ClientKey<zzhg> CLIENT_KEY = new ClientKey();
     @Deprecated
     public static final CapabilityApi CapabilityApi = new zzo();
     @Deprecated
@@ -34,36 +36,34 @@ public class Wearable {
     public static final MessageApi MessageApi = new zzeu();
     @Deprecated
     public static final NodeApi NodeApi = new zzfg();
-    private static final zzf<zzhg> zzebf = new zzf();
-    private static final zza<zzhg, WearableOptions> zzebg = new zzj();
     @Deprecated
-    private static zzc zzlgy = new zzk();
+    private static final zzi zzaa = new zzgi();
     @Deprecated
-    private static zza zzlgz = new zzh();
+    private static final zzu zzab = new zzhq();
     @Deprecated
-    private static zzf zzlha = new zzbv();
+    private static final zzc zzx = new zzk();
     @Deprecated
-    private static zzi zzlhb = new zzgi();
+    private static final zza zzy = new zzh();
     @Deprecated
-    private static zzu zzlhc = new zzhq();
+    private static final zzf zzz = new zzbv();
 
     public static final class WearableOptions implements Optional {
-        private final Looper zzfml;
+        private final Looper zzac;
 
         public static class Builder {
-            private Looper zzfml;
+            private Looper zzac;
         }
 
         private WearableOptions(Builder builder) {
-            this.zzfml = builder.zzfml;
+            this.zzac = builder.zzac;
         }
     }
 
     public static CapabilityClient getCapabilityClient(Context context) {
-        return new zzaa(context, GoogleApi.zza.zzfmj);
+        return new zzaa(context, Settings.DEFAULT_SETTINGS);
     }
 
     public static MessageClient getMessageClient(Context context) {
-        return new zzez(context, GoogleApi.zza.zzfmj);
+        return new zzez(context, Settings.DEFAULT_SETTINGS);
     }
 }

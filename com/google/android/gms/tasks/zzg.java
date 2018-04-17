@@ -1,24 +1,26 @@
 package com.google.android.gms.tasks;
 
 import java.util.concurrent.Executor;
+import javax.annotation.concurrent.GuardedBy;
 
-final class zzg<TResult> implements zzk<TResult> {
+final class zzg<TResult> implements zzq<TResult> {
     private final Object mLock = new Object();
-    private final Executor zzkev;
-    private OnFailureListener zzkuf;
+    private final Executor zzafk;
+    @GuardedBy("mLock")
+    private OnCanceledListener zzafq;
 
-    public zzg(Executor executor, OnFailureListener onFailureListener) {
-        this.zzkev = executor;
-        this.zzkuf = onFailureListener;
+    public zzg(Executor executor, OnCanceledListener onCanceledListener) {
+        this.zzafk = executor;
+        this.zzafq = onCanceledListener;
     }
 
-    public final void onComplete(Task<TResult> task) {
-        if (!task.isSuccessful()) {
+    public final void onComplete(Task task) {
+        if (task.isCanceled()) {
             synchronized (this.mLock) {
-                if (this.zzkuf == null) {
+                if (this.zzafq == null) {
                     return;
                 }
-                this.zzkev.execute(new zzh(this, task));
+                this.zzafk.execute(new zzh(this));
             }
         }
     }

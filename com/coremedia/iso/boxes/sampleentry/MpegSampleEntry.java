@@ -37,13 +37,22 @@ public class MpegSampleEntry extends AbstractSampleEntry {
     }
 
     public String toString() {
-        return "MpegSampleEntry" + Arrays.asList(new List[]{getBoxes()});
+        StringBuilder stringBuilder = new StringBuilder("MpegSampleEntry");
+        stringBuilder.append(Arrays.asList(new List[]{getBoxes()}));
+        return stringBuilder.toString();
     }
 
     public long getSize() {
+        int i;
         long s = getContainerSize();
         long j = s + 8;
-        int i = (this.largeBox || s + 8 >= 4294967296L) ? 16 : 8;
-        return ((long) i) + j;
+        if (!this.largeBox) {
+            if (s + 8 < 4294967296L) {
+                i = 8;
+                return j + ((long) i);
+            }
+        }
+        i = 16;
+        return j + ((long) i);
     }
 }

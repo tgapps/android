@@ -10,16 +10,11 @@ import android.os.Handler;
 import android.os.Message;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import net.hockeyapp.android.Constants;
 import net.hockeyapp.android.R;
 import net.hockeyapp.android.utils.HockeyLog;
-import net.hockeyapp.android.utils.HttpURLConnectionBuilder;
-import net.hockeyapp.android.utils.Util;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 
 @SuppressLint({"StaticFieldLeak"})
 public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String, String>> {
@@ -92,21 +87,21 @@ public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String,
             return doPostPut();
         }
         HashMap<String, String> result = doPostPutWithAttachments();
-        if (result == null) {
-            return result;
+        if (result != null) {
+            clearTemporaryFolder(result);
         }
-        clearTemporaryFolder(result);
         return result;
     }
 
     private void clearTemporaryFolder(HashMap<String, String> result) {
-        int i = 0;
         String status = (String) result.get("status");
         if (status != null && status.startsWith("2") && this.mContext != null) {
+            File file;
             File folder = new File(this.mContext.getCacheDir(), "HockeyApp");
+            int i = 0;
             if (folder.exists()) {
-                for (File file : folder.listFiles()) {
-                    if (!(file == null || Boolean.valueOf(file.delete()).booleanValue())) {
+                for (File file2 : folder.listFiles()) {
+                    if (!(file2 == null || Boolean.valueOf(file2.delete()).booleanValue())) {
                         HockeyLog.debug("SendFeedbackTask", "Error deleting file from temporary folder");
                     }
                 }
@@ -118,10 +113,14 @@ public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String,
             });
             int length = screenshots.length;
             while (i < length) {
-                File screenshot = screenshots[i];
-                if (this.mAttachmentUris.contains(Uri.fromFile(screenshot))) {
-                    if (screenshot.delete()) {
-                        HockeyLog.debug("SendFeedbackTask", "Screenshot '" + screenshot.getName() + "' has been deleted");
+                file2 = screenshots[i];
+                if (this.mAttachmentUris.contains(Uri.fromFile(file2))) {
+                    if (file2.delete()) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.append("Screenshot '");
+                        stringBuilder.append(file2.getName());
+                        stringBuilder.append("' has been deleted");
+                        HockeyLog.debug("SendFeedbackTask", stringBuilder.toString());
                     } else {
                         HockeyLog.error("SendFeedbackTask", "Error deleting screenshot");
                     }
@@ -153,114 +152,290 @@ public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String,
         }
     }
 
-    private HashMap<String, String> doPostPut() {
-        HashMap<String, String> result = new HashMap();
-        result.put("type", "send");
-        HttpURLConnection urlConnection = null;
-        try {
-            Map<String, String> parameters = new HashMap();
-            parameters.put("name", this.mName);
-            parameters.put("email", this.mEmail);
-            parameters.put("subject", this.mSubject);
-            parameters.put(MimeTypes.BASE_TYPE_TEXT, this.mText);
-            parameters.put("bundle_identifier", Constants.APP_PACKAGE);
-            parameters.put("bundle_short_version", Constants.APP_VERSION_NAME);
-            parameters.put("bundle_version", Constants.APP_VERSION);
-            parameters.put("os_version", Constants.ANDROID_VERSION);
-            parameters.put("oem", Constants.PHONE_MANUFACTURER);
-            parameters.put("model", Constants.PHONE_MODEL);
-            parameters.put("sdk_version", "5.0.4");
-            if (this.mToken != null) {
-                this.mUrlString += this.mToken + "/";
-            }
-            urlConnection = new HttpURLConnectionBuilder(this.mUrlString).setRequestMethod(this.mToken != null ? "PUT" : "POST").writeFormFields(parameters).build();
-            urlConnection.connect();
-            result.put("status", String.valueOf(urlConnection.getResponseCode()));
-            result.put("response", ConnectionTask.getStringFromConnection(urlConnection));
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        } catch (Throwable e) {
-            HockeyLog.error("Failed to send feedback message", e);
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        } catch (Throwable th) {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
-        return result;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private java.util.HashMap<java.lang.String, java.lang.String> doPostPut() {
+        /*
+        r5 = this;
+        r0 = new java.util.HashMap;
+        r0.<init>();
+        r1 = "type";
+        r2 = "send";
+        r0.put(r1, r2);
+        r1 = 0;
+        r2 = new java.util.HashMap;	 Catch:{ IOException -> 0x00bb }
+        r2.<init>();	 Catch:{ IOException -> 0x00bb }
+        r3 = "name";
+        r4 = r5.mName;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "email";
+        r4 = r5.mEmail;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "subject";
+        r4 = r5.mSubject;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "text";
+        r4 = r5.mText;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "bundle_identifier";
+        r4 = net.hockeyapp.android.Constants.APP_PACKAGE;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "bundle_short_version";
+        r4 = net.hockeyapp.android.Constants.APP_VERSION_NAME;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "bundle_version";
+        r4 = net.hockeyapp.android.Constants.APP_VERSION;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "os_version";
+        r4 = net.hockeyapp.android.Constants.ANDROID_VERSION;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "oem";
+        r4 = net.hockeyapp.android.Constants.PHONE_MANUFACTURER;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "model";
+        r4 = net.hockeyapp.android.Constants.PHONE_MODEL;	 Catch:{ IOException -> 0x00bb }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "sdk_version";
+        r4 = "5.0.4";
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = r5.mToken;	 Catch:{ IOException -> 0x00bb }
+        if (r3 == 0) goto L_0x007d;
+    L_0x0063:
+        r3 = new java.lang.StringBuilder;	 Catch:{ IOException -> 0x00bb }
+        r3.<init>();	 Catch:{ IOException -> 0x00bb }
+        r4 = r5.mUrlString;	 Catch:{ IOException -> 0x00bb }
+        r3.append(r4);	 Catch:{ IOException -> 0x00bb }
+        r4 = r5.mToken;	 Catch:{ IOException -> 0x00bb }
+        r3.append(r4);	 Catch:{ IOException -> 0x00bb }
+        r4 = "/";
+        r3.append(r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = r3.toString();	 Catch:{ IOException -> 0x00bb }
+        r5.mUrlString = r3;	 Catch:{ IOException -> 0x00bb }
+    L_0x007d:
+        r3 = new net.hockeyapp.android.utils.HttpURLConnectionBuilder;	 Catch:{ IOException -> 0x00bb }
+        r4 = r5.mUrlString;	 Catch:{ IOException -> 0x00bb }
+        r3.<init>(r4);	 Catch:{ IOException -> 0x00bb }
+        r4 = r5.mToken;	 Catch:{ IOException -> 0x00bb }
+        if (r4 == 0) goto L_0x008b;
+    L_0x0088:
+        r4 = "PUT";
+        goto L_0x008d;
+    L_0x008b:
+        r4 = "POST";
+    L_0x008d:
+        r3 = r3.setRequestMethod(r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = r3.writeFormFields(r2);	 Catch:{ IOException -> 0x00bb }
+        r3 = r3.build();	 Catch:{ IOException -> 0x00bb }
+        r1 = r3;
+        r1.connect();	 Catch:{ IOException -> 0x00bb }
+        r3 = "status";
+        r4 = r1.getResponseCode();	 Catch:{ IOException -> 0x00bb }
+        r4 = java.lang.String.valueOf(r4);	 Catch:{ IOException -> 0x00bb }
+        r0.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        r3 = "response";
+        r4 = net.hockeyapp.android.tasks.ConnectionTask.getStringFromConnection(r1);	 Catch:{ IOException -> 0x00bb }
+        r0.put(r3, r4);	 Catch:{ IOException -> 0x00bb }
+        if (r1 == 0) goto L_0x00c4;
+    L_0x00b5:
+        r1.disconnect();
+        goto L_0x00c4;
+    L_0x00b9:
+        r2 = move-exception;
+        goto L_0x00c5;
+    L_0x00bb:
+        r2 = move-exception;
+        r3 = "Failed to send feedback message";
+        net.hockeyapp.android.utils.HockeyLog.error(r3, r2);	 Catch:{ all -> 0x00b9 }
+        if (r1 == 0) goto L_0x00c4;
+    L_0x00c3:
+        goto L_0x00b5;
+    L_0x00c4:
+        return r0;
+    L_0x00c5:
+        if (r1 == 0) goto L_0x00ca;
+    L_0x00c7:
+        r1.disconnect();
+    L_0x00ca:
+        throw r2;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.tasks.SendFeedbackTask.doPostPut():java.util.HashMap<java.lang.String, java.lang.String>");
     }
 
-    private HashMap<String, String> doPostPutWithAttachments() {
-        HashMap<String, String> result = new HashMap();
-        result.put("type", "send");
-        HttpURLConnection urlConnection = null;
-        try {
-            Map<String, String> parameters = new HashMap();
-            parameters.put("name", this.mName);
-            parameters.put("email", this.mEmail);
-            parameters.put("subject", this.mSubject);
-            parameters.put(MimeTypes.BASE_TYPE_TEXT, this.mText);
-            parameters.put("bundle_identifier", Constants.APP_PACKAGE);
-            parameters.put("bundle_short_version", Constants.APP_VERSION_NAME);
-            parameters.put("bundle_version", Constants.APP_VERSION);
-            parameters.put("os_version", Constants.ANDROID_VERSION);
-            parameters.put("oem", Constants.PHONE_MANUFACTURER);
-            parameters.put("model", Constants.PHONE_MODEL);
-            parameters.put("sdk_version", "5.0.4");
-            if (this.mToken != null) {
-                this.mUrlString += this.mToken + "/";
-            }
-            urlConnection = new HttpURLConnectionBuilder(this.mUrlString).setRequestMethod(this.mToken != null ? "PUT" : "POST").writeMultipartData(parameters, this.mContext, this.mAttachmentUris).build();
-            urlConnection.connect();
-            result.put("status", String.valueOf(urlConnection.getResponseCode()));
-            result.put("response", ConnectionTask.getStringFromConnection(urlConnection));
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        } catch (Throwable e) {
-            HockeyLog.error("Failed to send feedback message", e);
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        } catch (Throwable th) {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
-        return result;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private java.util.HashMap<java.lang.String, java.lang.String> doPostPutWithAttachments() {
+        /*
+        r6 = this;
+        r0 = new java.util.HashMap;
+        r0.<init>();
+        r1 = "type";
+        r2 = "send";
+        r0.put(r1, r2);
+        r1 = 0;
+        r2 = new java.util.HashMap;	 Catch:{ IOException -> 0x00bf }
+        r2.<init>();	 Catch:{ IOException -> 0x00bf }
+        r3 = "name";
+        r4 = r6.mName;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "email";
+        r4 = r6.mEmail;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "subject";
+        r4 = r6.mSubject;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "text";
+        r4 = r6.mText;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "bundle_identifier";
+        r4 = net.hockeyapp.android.Constants.APP_PACKAGE;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "bundle_short_version";
+        r4 = net.hockeyapp.android.Constants.APP_VERSION_NAME;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "bundle_version";
+        r4 = net.hockeyapp.android.Constants.APP_VERSION;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "os_version";
+        r4 = net.hockeyapp.android.Constants.ANDROID_VERSION;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "oem";
+        r4 = net.hockeyapp.android.Constants.PHONE_MANUFACTURER;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "model";
+        r4 = net.hockeyapp.android.Constants.PHONE_MODEL;	 Catch:{ IOException -> 0x00bf }
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "sdk_version";
+        r4 = "5.0.4";
+        r2.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = r6.mToken;	 Catch:{ IOException -> 0x00bf }
+        if (r3 == 0) goto L_0x007d;
+    L_0x0063:
+        r3 = new java.lang.StringBuilder;	 Catch:{ IOException -> 0x00bf }
+        r3.<init>();	 Catch:{ IOException -> 0x00bf }
+        r4 = r6.mUrlString;	 Catch:{ IOException -> 0x00bf }
+        r3.append(r4);	 Catch:{ IOException -> 0x00bf }
+        r4 = r6.mToken;	 Catch:{ IOException -> 0x00bf }
+        r3.append(r4);	 Catch:{ IOException -> 0x00bf }
+        r4 = "/";
+        r3.append(r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = r3.toString();	 Catch:{ IOException -> 0x00bf }
+        r6.mUrlString = r3;	 Catch:{ IOException -> 0x00bf }
+    L_0x007d:
+        r3 = new net.hockeyapp.android.utils.HttpURLConnectionBuilder;	 Catch:{ IOException -> 0x00bf }
+        r4 = r6.mUrlString;	 Catch:{ IOException -> 0x00bf }
+        r3.<init>(r4);	 Catch:{ IOException -> 0x00bf }
+        r4 = r6.mToken;	 Catch:{ IOException -> 0x00bf }
+        if (r4 == 0) goto L_0x008b;
+    L_0x0088:
+        r4 = "PUT";
+        goto L_0x008d;
+    L_0x008b:
+        r4 = "POST";
+    L_0x008d:
+        r3 = r3.setRequestMethod(r4);	 Catch:{ IOException -> 0x00bf }
+        r4 = r6.mContext;	 Catch:{ IOException -> 0x00bf }
+        r5 = r6.mAttachmentUris;	 Catch:{ IOException -> 0x00bf }
+        r3 = r3.writeMultipartData(r2, r4, r5);	 Catch:{ IOException -> 0x00bf }
+        r3 = r3.build();	 Catch:{ IOException -> 0x00bf }
+        r1 = r3;
+        r1.connect();	 Catch:{ IOException -> 0x00bf }
+        r3 = "status";
+        r4 = r1.getResponseCode();	 Catch:{ IOException -> 0x00bf }
+        r4 = java.lang.String.valueOf(r4);	 Catch:{ IOException -> 0x00bf }
+        r0.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        r3 = "response";
+        r4 = net.hockeyapp.android.tasks.ConnectionTask.getStringFromConnection(r1);	 Catch:{ IOException -> 0x00bf }
+        r0.put(r3, r4);	 Catch:{ IOException -> 0x00bf }
+        if (r1 == 0) goto L_0x00c8;
+    L_0x00b9:
+        r1.disconnect();
+        goto L_0x00c8;
+    L_0x00bd:
+        r2 = move-exception;
+        goto L_0x00c9;
+    L_0x00bf:
+        r2 = move-exception;
+        r3 = "Failed to send feedback message";
+        net.hockeyapp.android.utils.HockeyLog.error(r3, r2);	 Catch:{ all -> 0x00bd }
+        if (r1 == 0) goto L_0x00c8;
+    L_0x00c7:
+        goto L_0x00b9;
+    L_0x00c8:
+        return r0;
+    L_0x00c9:
+        if (r1 == 0) goto L_0x00ce;
+    L_0x00cb:
+        r1.disconnect();
+    L_0x00ce:
+        throw r2;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.tasks.SendFeedbackTask.doPostPutWithAttachments():java.util.HashMap<java.lang.String, java.lang.String>");
     }
 
-    private HashMap<String, String> doGet() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.mUrlString).append(Util.encodeParam(this.mToken));
-        if (this.mLastMessageId != -1) {
-            sb.append("?last_message_id=").append(this.mLastMessageId);
-        }
-        HashMap<String, String> result = new HashMap();
-        HttpURLConnection urlConnection = null;
-        try {
-            urlConnection = new HttpURLConnectionBuilder(sb.toString()).build();
-            result.put("type", "fetch");
-            urlConnection.connect();
-            result.put("status", String.valueOf(urlConnection.getResponseCode()));
-            result.put("response", ConnectionTask.getStringFromConnection(urlConnection));
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        } catch (Throwable e) {
-            HockeyLog.error("Failed to fetching feedback messages", e);
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        } catch (Throwable th) {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
-        return result;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private java.util.HashMap<java.lang.String, java.lang.String> doGet() {
+        /*
+        r5 = this;
+        r0 = new java.lang.StringBuilder;
+        r0.<init>();
+        r1 = r5.mUrlString;
+        r0.append(r1);
+        r1 = r5.mToken;
+        r1 = net.hockeyapp.android.utils.Util.encodeParam(r1);
+        r0.append(r1);
+        r1 = r5.mLastMessageId;
+        r2 = -1;
+        if (r1 == r2) goto L_0x0022;
+    L_0x0018:
+        r1 = "?last_message_id=";
+        r0.append(r1);
+        r1 = r5.mLastMessageId;
+        r0.append(r1);
+    L_0x0022:
+        r1 = new java.util.HashMap;
+        r1.<init>();
+        r2 = 0;
+        r3 = new net.hockeyapp.android.utils.HttpURLConnectionBuilder;	 Catch:{ IOException -> 0x005e }
+        r4 = r0.toString();	 Catch:{ IOException -> 0x005e }
+        r3.<init>(r4);	 Catch:{ IOException -> 0x005e }
+        r3 = r3.build();	 Catch:{ IOException -> 0x005e }
+        r2 = r3;
+        r3 = "type";
+        r4 = "fetch";
+        r1.put(r3, r4);	 Catch:{ IOException -> 0x005e }
+        r2.connect();	 Catch:{ IOException -> 0x005e }
+        r3 = "status";
+        r4 = r2.getResponseCode();	 Catch:{ IOException -> 0x005e }
+        r4 = java.lang.String.valueOf(r4);	 Catch:{ IOException -> 0x005e }
+        r1.put(r3, r4);	 Catch:{ IOException -> 0x005e }
+        r3 = "response";
+        r4 = net.hockeyapp.android.tasks.ConnectionTask.getStringFromConnection(r2);	 Catch:{ IOException -> 0x005e }
+        r1.put(r3, r4);	 Catch:{ IOException -> 0x005e }
+        if (r2 == 0) goto L_0x0067;
+    L_0x0058:
+        r2.disconnect();
+        goto L_0x0067;
+    L_0x005c:
+        r3 = move-exception;
+        goto L_0x0068;
+    L_0x005e:
+        r3 = move-exception;
+        r4 = "Failed to fetching feedback messages";
+        net.hockeyapp.android.utils.HockeyLog.error(r4, r3);	 Catch:{ all -> 0x005c }
+        if (r2 == 0) goto L_0x0067;
+    L_0x0066:
+        goto L_0x0058;
+    L_0x0067:
+        return r1;
+    L_0x0068:
+        if (r2 == 0) goto L_0x006d;
+    L_0x006a:
+        r2.disconnect();
+    L_0x006d:
+        throw r3;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.tasks.SendFeedbackTask.doGet():java.util.HashMap<java.lang.String, java.lang.String>");
     }
 
     private String getLoadingMessage() {

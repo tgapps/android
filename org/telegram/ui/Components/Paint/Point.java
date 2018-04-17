@@ -21,7 +21,7 @@ public class Point {
     }
 
     public boolean equals(Object obj) {
-        boolean z = true;
+        boolean z = false;
         if (obj == null) {
             return false;
         }
@@ -32,8 +32,8 @@ public class Point {
             return false;
         }
         Point other = (Point) obj;
-        if (!(this.x == other.x && this.y == other.y && this.z == other.z)) {
-            z = false;
+        if (this.x == other.x && this.y == other.y && this.z == other.z) {
+            z = true;
         }
         return z;
     }

@@ -3,35 +3,34 @@ package com.google.android.gms.common.api;
 import android.app.PendingIntent;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.Objects;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.zzbg;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class Status extends zzbfm implements Result, ReflectedParcelable {
-    public static final Creator<Status> CREATOR = new zzg();
-    public static final Status zzfni = new Status(0);
-    public static final Status zzfnj = new Status(14);
-    public static final Status zzfnk = new Status(8);
-    public static final Status zzfnl = new Status(15);
-    public static final Status zzfnm = new Status(16);
-    public static final Status zzfnn = new Status(17);
-    private static Status zzfno = new Status(18);
-    private final int zzcd;
-    private int zzeck;
-    private final PendingIntent zzeeo;
-    private final String zzfks;
+public final class Status extends AbstractSafeParcelable implements Result, ReflectedParcelable {
+    public static final Creator<Status> CREATOR = new zze();
+    public static final Status RESULT_CANCELED = new Status(16);
+    public static final Status RESULT_DEAD_CLIENT = new Status(18);
+    public static final Status RESULT_INTERNAL_ERROR = new Status(8);
+    public static final Status RESULT_INTERRUPTED = new Status(14);
+    public static final Status RESULT_SUCCESS = new Status(0);
+    public static final Status RESULT_TIMEOUT = new Status(15);
+    private static final Status zzdq = new Status(17);
+    private final int zzal;
+    private final int zzam;
+    private final PendingIntent zzan;
+    private final String zzao;
 
     public Status(int i) {
         this(i, null);
     }
 
     Status(int i, int i2, String str, PendingIntent pendingIntent) {
-        this.zzeck = i;
-        this.zzcd = i2;
-        this.zzfks = str;
-        this.zzeeo = pendingIntent;
+        this.zzal = i;
+        this.zzam = i2;
+        this.zzao = str;
+        this.zzan = pendingIntent;
     }
 
     public Status(int i, String str) {
@@ -47,7 +46,7 @@ public final class Status extends zzbfm implements Result, ReflectedParcelable {
             return false;
         }
         Status status = (Status) obj;
-        return this.zzeck == status.zzeck && this.zzcd == status.zzcd && zzbg.equal(this.zzfks, status.zzfks) && zzbg.equal(this.zzeeo, status.zzeeo);
+        return this.zzal == status.zzal && this.zzam == status.zzam && Objects.equal(this.zzao, status.zzao) && Objects.equal(this.zzan, status.zzan);
     }
 
     public final Status getStatus() {
@@ -55,39 +54,39 @@ public final class Status extends zzbfm implements Result, ReflectedParcelable {
     }
 
     public final int getStatusCode() {
-        return this.zzcd;
+        return this.zzam;
     }
 
     public final String getStatusMessage() {
-        return this.zzfks;
+        return this.zzao;
     }
 
     public final boolean hasResolution() {
-        return this.zzeeo != null;
+        return this.zzan != null;
     }
 
     public final int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(this.zzeck), Integer.valueOf(this.zzcd), this.zzfks, this.zzeeo});
+        return Objects.hashCode(Integer.valueOf(this.zzal), Integer.valueOf(this.zzam), this.zzao, this.zzan);
     }
 
     public final boolean isSuccess() {
-        return this.zzcd <= 0;
+        return this.zzam <= 0;
     }
 
     public final String toString() {
-        return zzbg.zzx(this).zzg("statusCode", zzagx()).zzg("resolution", this.zzeeo).toString();
+        return Objects.toStringHelper(this).add("statusCode", zzp()).add("resolution", this.zzan).toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 1, getStatusCode());
-        zzbfp.zza(parcel, 2, getStatusMessage(), false);
-        zzbfp.zza(parcel, 3, this.zzeeo, i, false);
-        zzbfp.zzc(parcel, 1000, this.zzeck);
-        zzbfp.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, getStatusCode());
+        SafeParcelWriter.writeString(parcel, 2, getStatusMessage(), false);
+        SafeParcelWriter.writeParcelable(parcel, 3, this.zzan, i, false);
+        SafeParcelWriter.writeInt(parcel, 1000, this.zzal);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
-    public final String zzagx() {
-        return this.zzfks != null ? this.zzfks : CommonStatusCodes.getStatusCodeString(this.zzcd);
+    public final String zzp() {
+        return this.zzao != null ? this.zzao : CommonStatusCodes.getStatusCodeString(this.zzam);
     }
 }

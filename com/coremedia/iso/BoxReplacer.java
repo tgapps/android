@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class BoxReplacer {
-    static final /* synthetic */ boolean $assertionsDisabled = (!BoxReplacer.class.desiredAssertionStatus());
+    static final /* synthetic */ boolean $assertionsDisabled = false;
 
     public static void replace(Map<String, Box> replacements, File file) throws IOException {
         IsoFile isoFile = new IsoFile(new FileDataSourceImpl(new RandomAccessFile(file, "r").getChannel()));
@@ -22,16 +22,13 @@ public class BoxReplacer {
             Box b = Path.getPath(isoFile, (String) e.getKey());
             replacementSanitised.put(Path.createPath(b), (Box) e.getValue());
             positions.put(Path.createPath(b), Long.valueOf(b.getOffset()));
-            if (!$assertionsDisabled && b.getSize() != ((Box) e.getValue()).getSize()) {
-                throw new AssertionError();
-            }
         }
         isoFile.close();
         FileChannel fileChannel = new RandomAccessFile(file, "rw").getChannel();
         for (String path : replacementSanitised.keySet()) {
-            b = (Box) replacementSanitised.get(path);
+            Box b2 = (Box) replacementSanitised.get(path);
             fileChannel.position(((Long) positions.get(path)).longValue());
-            b.getBox(fileChannel);
+            b2.getBox(fileChannel);
         }
         fileChannel.close();
     }

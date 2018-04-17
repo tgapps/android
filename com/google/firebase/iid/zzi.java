@@ -1,55 +1,74 @@
 package com.google.firebase.iid;
 
-import android.content.Context;
-import android.os.Bundle;
+import android.os.Build.VERSION;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
+import android.os.RemoteException;
 import android.util.Log;
-import com.google.android.gms.tasks.Task;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import com.google.android.gms.internal.measurement.zzdu;
+import com.google.android.gms.internal.measurement.zzdv;
 
-public final class zzi {
-    private static zzi zznyx;
-    private final Context zzair;
-    private final ScheduledExecutorService zznyy;
-    private zzk zznyz = new zzk();
-    private int zznza = 1;
+public class zzi implements Parcelable {
+    public static final Creator<zzi> CREATOR = new zzj();
+    private Messenger zzbqg;
+    private zzdu zzbqh;
 
-    private zzi(Context context, ScheduledExecutorService scheduledExecutorService) {
-        this.zznyy = scheduledExecutorService;
-        this.zzair = context.getApplicationContext();
-    }
-
-    private final synchronized <T> Task<T> zza(zzr<T> com_google_firebase_iid_zzr_T) {
-        if (Log.isLoggable("MessengerIpcClient", 3)) {
-            String valueOf = String.valueOf(com_google_firebase_iid_zzr_T);
-            Log.d("MessengerIpcClient", new StringBuilder(String.valueOf(valueOf).length() + 9).append("Queueing ").append(valueOf).toString());
-        }
-        if (!this.zznyz.zzb(com_google_firebase_iid_zzr_T)) {
-            this.zznyz = new zzk();
-            this.zznyz.zzb(com_google_firebase_iid_zzr_T);
-        }
-        return com_google_firebase_iid_zzr_T.zzgrq.getTask();
-    }
-
-    private final synchronized int zzcja() {
-        int i;
-        i = this.zznza;
-        this.zznza = i + 1;
-        return i;
-    }
-
-    public static synchronized zzi zzev(Context context) {
-        zzi com_google_firebase_iid_zzi;
-        synchronized (zzi.class) {
-            if (zznyx == null) {
-                zznyx = new zzi(context, Executors.newSingleThreadScheduledExecutor());
+    public static final class zza extends ClassLoader {
+        protected final Class<?> loadClass(String str, boolean z) throws ClassNotFoundException {
+            if (!"com.google.android.gms.iid.MessengerCompat".equals(str)) {
+                return super.loadClass(str, z);
             }
-            com_google_firebase_iid_zzi = zznyx;
+            if (FirebaseInstanceId.zzsj()) {
+                Log.d("FirebaseInstanceId", "Using renamed FirebaseIidMessengerCompat class");
+            }
+            return zzi.class;
         }
-        return com_google_firebase_iid_zzi;
     }
 
-    public final Task<Bundle> zzi(int i, Bundle bundle) {
-        return zza(new zzt(zzcja(), 1, bundle));
+    public zzi(IBinder iBinder) {
+        if (VERSION.SDK_INT >= 21) {
+            this.zzbqg = new Messenger(iBinder);
+        } else {
+            this.zzbqh = zzdv.zzb(iBinder);
+        }
+    }
+
+    private final IBinder getBinder() {
+        return this.zzbqg != null ? this.zzbqg.getBinder() : this.zzbqh.asBinder();
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        try {
+            return getBinder().equals(((zzi) obj).getBinder());
+        } catch (ClassCastException e) {
+            return false;
+        }
+    }
+
+    public int hashCode() {
+        return getBinder().hashCode();
+    }
+
+    public final void send(Message message) throws RemoteException {
+        if (this.zzbqg != null) {
+            this.zzbqg.send(message);
+        } else {
+            this.zzbqh.send(message);
+        }
+    }
+
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeStrongBinder(this.zzbqg != null ? this.zzbqg.getBinder() : this.zzbqh.asBinder());
     }
 }

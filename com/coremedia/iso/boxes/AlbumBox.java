@@ -73,7 +73,12 @@ public class AlbumBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) ((this.trackNumber == -1 ? 0 : 1) + ((Utf8.utf8StringLengthInBytes(this.albumTitle) + 6) + 1));
+        int i = 1;
+        int utf8StringLengthInBytes = (6 + Utf8.utf8StringLengthInBytes(this.albumTitle)) + 1;
+        if (this.trackNumber == -1) {
+            i = 0;
+        }
+        return (long) (utf8StringLengthInBytes + i);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -100,10 +105,14 @@ public class AlbumBox extends AbstractFullBox {
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_6, this, this));
         StringBuilder buffer = new StringBuilder();
-        buffer.append("AlbumBox[language=").append(getLanguage()).append(";");
-        buffer.append("albumTitle=").append(getAlbumTitle());
+        buffer.append("AlbumBox[language=");
+        buffer.append(getLanguage());
+        buffer.append(";");
+        buffer.append("albumTitle=");
+        buffer.append(getAlbumTitle());
         if (this.trackNumber >= 0) {
-            buffer.append(";trackNumber=").append(getTrackNumber());
+            buffer.append(";trackNumber=");
+            buffer.append(getTrackNumber());
         }
         buffer.append("]");
         return buffer.toString();

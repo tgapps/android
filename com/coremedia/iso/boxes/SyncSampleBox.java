@@ -59,7 +59,10 @@ public class SyncSampleBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_1, this, this));
-        return "SyncSampleBox[entryCount=" + this.sampleNumber.length + "]";
+        StringBuilder stringBuilder = new StringBuilder("SyncSampleBox[entryCount=");
+        stringBuilder.append(this.sampleNumber.length);
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 
     public void setSampleNumber(long[] sampleNumber) {

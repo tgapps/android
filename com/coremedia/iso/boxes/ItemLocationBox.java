@@ -69,32 +69,31 @@ public class ItemLocationBox extends AbstractFullBox {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
+            if (o != null) {
+                if (getClass() == o.getClass()) {
+                    Extent extent = (Extent) o;
+                    if (this.extentIndex == extent.extentIndex && this.extentLength == extent.extentLength && this.extentOffset == extent.extentOffset) {
+                        return true;
+                    }
+                    return false;
+                }
             }
-            Extent extent = (Extent) o;
-            if (this.extentIndex != extent.extentIndex) {
-                return false;
-            }
-            if (this.extentLength != extent.extentLength) {
-                return false;
-            }
-            if (this.extentOffset != extent.extentOffset) {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public int hashCode() {
-            return (((((int) (this.extentOffset ^ (this.extentOffset >>> 32))) * 31) + ((int) (this.extentLength ^ (this.extentLength >>> 32)))) * 31) + ((int) (this.extentIndex ^ (this.extentIndex >>> 32)));
+            return (31 * ((31 * ((int) (this.extentOffset ^ (this.extentOffset >>> 32)))) + ((int) (this.extentLength ^ (this.extentLength >>> 32))))) + ((int) (this.extentIndex ^ (this.extentIndex >>> 32)));
         }
 
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Extent");
-            sb.append("{extentOffset=").append(this.extentOffset);
-            sb.append(", extentLength=").append(this.extentLength);
-            sb.append(", extentIndex=").append(this.extentIndex);
+            sb.append("{extentOffset=");
+            sb.append(this.extentOffset);
+            sb.append(", extentLength=");
+            sb.append(this.extentLength);
+            sb.append(", extentIndex=");
+            sb.append(this.extentIndex);
             sb.append('}');
             return sb.toString();
         }
@@ -167,38 +166,44 @@ public class ItemLocationBox extends AbstractFullBox {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Item item = (Item) o;
-            if (this.baseOffset != item.baseOffset) {
-                return false;
-            }
-            if (this.constructionMethod != item.constructionMethod) {
-                return false;
-            }
-            if (this.dataReferenceIndex != item.dataReferenceIndex) {
-                return false;
-            }
-            if (this.itemId != item.itemId) {
-                return false;
-            }
-            if (this.extents != null) {
-                if (this.extents.equals(item.extents)) {
-                    return true;
+            if (o != null) {
+                if (getClass() == o.getClass()) {
+                    Item item = (Item) o;
+                    if (this.baseOffset != item.baseOffset || this.constructionMethod != item.constructionMethod || this.dataReferenceIndex != item.dataReferenceIndex || this.itemId != item.itemId) {
+                        return false;
+                    }
+                    if (this.extents != null) {
+                        if (!this.extents.equals(item.extents)) {
+                        }
+                        return true;
+                    } else if (item.extents != null) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                    return false;
                 }
-            } else if (item.extents == null) {
-                return true;
             }
             return false;
         }
 
         public int hashCode() {
-            return (((((((this.itemId * 31) + this.constructionMethod) * 31) + this.dataReferenceIndex) * 31) + ((int) (this.baseOffset ^ (this.baseOffset >>> 32)))) * 31) + (this.extents != null ? this.extents.hashCode() : 0);
+            return (31 * ((31 * ((31 * ((31 * this.itemId) + this.constructionMethod)) + this.dataReferenceIndex)) + ((int) (this.baseOffset ^ (this.baseOffset >>> 32))))) + (this.extents != null ? this.extents.hashCode() : 0);
         }
 
         public String toString() {
-            return "Item{baseOffset=" + this.baseOffset + ", itemId=" + this.itemId + ", constructionMethod=" + this.constructionMethod + ", dataReferenceIndex=" + this.dataReferenceIndex + ", extents=" + this.extents + '}';
+            StringBuilder stringBuilder = new StringBuilder("Item{baseOffset=");
+            stringBuilder.append(this.baseOffset);
+            stringBuilder.append(", itemId=");
+            stringBuilder.append(this.itemId);
+            stringBuilder.append(", constructionMethod=");
+            stringBuilder.append(this.constructionMethod);
+            stringBuilder.append(", dataReferenceIndex=");
+            stringBuilder.append(this.dataReferenceIndex);
+            stringBuilder.append(", extents=");
+            stringBuilder.append(this.extents);
+            stringBuilder.append('}');
+            return stringBuilder.toString();
         }
     }
 

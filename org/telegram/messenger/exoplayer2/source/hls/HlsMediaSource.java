@@ -61,31 +61,31 @@ public final class HlsMediaSource implements MediaSource, PrimaryPlaylistListene
         }
 
         public Factory setExtractorFactory(HlsExtractorFactory extractorFactory) {
-            Assertions.checkState(!this.isCreateCalled);
+            Assertions.checkState(this.isCreateCalled ^ 1);
             this.extractorFactory = (HlsExtractorFactory) Assertions.checkNotNull(extractorFactory);
             return this;
         }
 
         public Factory setMinLoadableRetryCount(int minLoadableRetryCount) {
-            Assertions.checkState(!this.isCreateCalled);
+            Assertions.checkState(this.isCreateCalled ^ 1);
             this.minLoadableRetryCount = minLoadableRetryCount;
             return this;
         }
 
         public Factory setPlaylistParser(Parser<HlsPlaylist> playlistParser) {
-            Assertions.checkState(!this.isCreateCalled);
+            Assertions.checkState(this.isCreateCalled ^ 1);
             this.playlistParser = (Parser) Assertions.checkNotNull(playlistParser);
             return this;
         }
 
         public Factory setCompositeSequenceableLoaderFactory(CompositeSequenceableLoaderFactory compositeSequenceableLoaderFactory) {
-            Assertions.checkState(!this.isCreateCalled);
+            Assertions.checkState(this.isCreateCalled ^ 1);
             this.compositeSequenceableLoaderFactory = (CompositeSequenceableLoaderFactory) Assertions.checkNotNull(compositeSequenceableLoaderFactory);
             return this;
         }
 
         public Factory setAllowChunklessPreparation(boolean allowChunklessPreparation) {
-            Assertions.checkState(!this.isCreateCalled);
+            Assertions.checkState(this.isCreateCalled ^ 1);
             this.allowChunklessPreparation = allowChunklessPreparation;
             return this;
         }
@@ -166,34 +166,28 @@ public final class HlsMediaSource implements MediaSource, PrimaryPlaylistListene
 
     public void onPrimaryPlaylistRefreshed(HlsMediaPlaylist playlist) {
         SinglePeriodTimeline timeline;
-        long presentationStartTimeMs = playlist.hasProgramDateTime ? 0 : C.TIME_UNSET;
-        long windowStartTimeMs = playlist.hasProgramDateTime ? C.usToMs(playlist.startTimeUs) : C.TIME_UNSET;
-        long windowDefaultStartPositionUs = playlist.startOffsetUs;
-        if (this.playlistTracker.isLive()) {
-            boolean z;
-            long periodDurationUs = playlist.hasEndTag ? playlist.startTimeUs + playlist.durationUs : C.TIME_UNSET;
-            List<Segment> segments = playlist.segments;
+        HlsMediaSource hlsMediaSource = this;
+        HlsMediaPlaylist hlsMediaPlaylist = playlist;
+        long presentationStartTimeMs = hlsMediaPlaylist.hasProgramDateTime ? 0 : C.TIME_UNSET;
+        long windowStartTimeMs = hlsMediaPlaylist.hasProgramDateTime ? C.usToMs(hlsMediaPlaylist.startTimeUs) : C.TIME_UNSET;
+        long windowDefaultStartPositionUs = hlsMediaPlaylist.startOffsetUs;
+        if (hlsMediaSource.playlistTracker.isLive()) {
+            long windowDefaultStartPositionUs2;
+            long periodDurationUs = hlsMediaPlaylist.hasEndTag ? hlsMediaPlaylist.startTimeUs + hlsMediaPlaylist.durationUs : C.TIME_UNSET;
+            List<Segment> segments = hlsMediaPlaylist.segments;
             if (windowDefaultStartPositionUs == C.TIME_UNSET) {
-                if (segments.isEmpty()) {
-                    windowDefaultStartPositionUs = 0;
-                } else {
-                    windowDefaultStartPositionUs = ((Segment) segments.get(Math.max(0, segments.size() - 3))).relativeStartTimeUs;
-                }
-            }
-            long j = playlist.durationUs;
-            long j2 = playlist.startTimeUs;
-            if (playlist.hasEndTag) {
-                z = false;
+                windowDefaultStartPositionUs2 = segments.isEmpty() ? 0 : ((Segment) segments.get(Math.max(0, segments.size() - 3))).relativeStartTimeUs;
             } else {
-                z = true;
+                windowDefaultStartPositionUs2 = windowDefaultStartPositionUs;
             }
-            timeline = new SinglePeriodTimeline(presentationStartTimeMs, windowStartTimeMs, periodDurationUs, j, j2, windowDefaultStartPositionUs, true, z);
+            timeline = new SinglePeriodTimeline(presentationStartTimeMs, windowStartTimeMs, periodDurationUs, hlsMediaPlaylist.durationUs, hlsMediaPlaylist.startTimeUs, windowDefaultStartPositionUs2, true, hlsMediaPlaylist.hasEndTag ^ 1);
+            windowDefaultStartPositionUs = windowDefaultStartPositionUs2;
         } else {
             if (windowDefaultStartPositionUs == C.TIME_UNSET) {
                 windowDefaultStartPositionUs = 0;
             }
-            SinglePeriodTimeline singlePeriodTimeline = new SinglePeriodTimeline(presentationStartTimeMs, windowStartTimeMs, playlist.startTimeUs + playlist.durationUs, playlist.durationUs, playlist.startTimeUs, windowDefaultStartPositionUs, true, false);
+            SinglePeriodTimeline singlePeriodTimeline = new SinglePeriodTimeline(presentationStartTimeMs, windowStartTimeMs, hlsMediaPlaylist.startTimeUs + hlsMediaPlaylist.durationUs, hlsMediaPlaylist.durationUs, hlsMediaPlaylist.startTimeUs, windowDefaultStartPositionUs, true, false);
         }
-        this.sourceListener.onSourceInfoRefreshed(this, timeline, new HlsManifest(this.playlistTracker.getMasterPlaylist(), playlist));
+        hlsMediaSource.sourceListener.onSourceInfoRefreshed(hlsMediaSource, timeline, new HlsManifest(hlsMediaSource.playlistTracker.getMasterPlaylist(), hlsMediaPlaylist));
     }
 }

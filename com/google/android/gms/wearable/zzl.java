@@ -1,21 +1,20 @@
 package com.google.android.gms.wearable;
 
-import com.google.android.gms.common.data.AbstractDataBuffer;
 import com.google.android.gms.common.data.DataHolder;
 
 final class zzl implements Runnable {
-    private /* synthetic */ DataHolder zzlhn;
-    private /* synthetic */ zzd zzlho;
+    private final /* synthetic */ DataHolder zzan;
+    private final /* synthetic */ zzd zzao;
 
     zzl(zzd com_google_android_gms_wearable_WearableListenerService_zzd, DataHolder dataHolder) {
-        this.zzlho = com_google_android_gms_wearable_WearableListenerService_zzd;
-        this.zzlhn = dataHolder;
+        this.zzao = com_google_android_gms_wearable_WearableListenerService_zzd;
+        this.zzan = dataHolder;
     }
 
     public final void run() {
-        AbstractDataBuffer dataEventBuffer = new DataEventBuffer(this.zzlhn);
+        DataEventBuffer dataEventBuffer = new DataEventBuffer(this.zzan);
         try {
-            this.zzlho.zzlhk.onDataChanged(dataEventBuffer);
+            this.zzao.zzak.onDataChanged(dataEventBuffer);
         } finally {
             dataEventBuffer.release();
         }

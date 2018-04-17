@@ -19,14 +19,19 @@ public class CubicBezierInterpolator implements Interpolator {
         this.a = new PointF();
         this.b = new PointF();
         this.c = new PointF();
-        if (start.x < 0.0f || start.x > 1.0f) {
-            throw new IllegalArgumentException("startX value must be in the range [0, 1]");
-        } else if (end.x < 0.0f || end.x > 1.0f) {
-            throw new IllegalArgumentException("endX value must be in the range [0, 1]");
-        } else {
-            this.start = start;
-            this.end = end;
+        if (start.x >= 0.0f) {
+            if (start.x <= 1.0f) {
+                if (end.x >= 0.0f) {
+                    if (end.x <= 1.0f) {
+                        this.start = start;
+                        this.end = end;
+                        return;
+                    }
+                }
+                throw new IllegalArgumentException("endX value must be in the range [0, 1]");
+            }
         }
+        throw new IllegalArgumentException("startX value must be in the range [0, 1]");
     }
 
     public CubicBezierInterpolator(float startX, float startY, float endX, float endY) {
@@ -43,7 +48,7 @@ public class CubicBezierInterpolator implements Interpolator {
 
     protected float getBezierCoordinateY(float time) {
         this.c.y = this.start.y * 3.0f;
-        this.b.y = ((this.end.y - this.start.y) * 3.0f) - this.c.y;
+        this.b.y = (3.0f * (this.end.y - this.start.y)) - this.c.y;
         this.a.y = (1.0f - this.c.y) - this.b.y;
         return (this.c.y + ((this.b.y + (this.a.y * time)) * time)) * time;
     }
@@ -66,7 +71,7 @@ public class CubicBezierInterpolator implements Interpolator {
 
     private float getBezierCoordinateX(float time) {
         this.c.x = this.start.x * 3.0f;
-        this.b.x = ((this.end.x - this.start.x) * 3.0f) - this.c.x;
+        this.b.x = (3.0f * (this.end.x - this.start.x)) - this.c.x;
         this.a.x = (1.0f - this.c.x) - this.b.x;
         return (this.c.x + ((this.b.x + (this.a.x * time)) * time)) * time;
     }

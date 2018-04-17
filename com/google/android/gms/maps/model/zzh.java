@@ -3,77 +3,78 @@ package com.google.android.gms.maps.model;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzh implements Creator<MarkerOptions> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzbfn.zzd(parcel);
-        LatLng latLng = null;
-        String str = null;
-        String str2 = null;
-        IBinder iBinder = null;
-        float f = 0.0f;
-        float f2 = 0.0f;
+        Parcel parcel2 = parcel;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         boolean z = false;
-        boolean z2 = false;
-        boolean z3 = false;
-        float f3 = 0.0f;
-        float f4 = 0.5f;
-        float f5 = 0.0f;
-        float f6 = 1.0f;
-        float f7 = 0.0f;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        boolean z2 = z;
+        boolean z3 = z2;
+        LatLng latLng = null;
+        String str = latLng;
+        String str2 = str;
+        IBinder iBinder = str2;
+        float f = 0.0f;
+        float f2 = f;
+        float f3 = f2;
+        float f4 = f3;
+        float f5 = f4;
+        float f6 = 0.5f;
+        float f7 = 1.0f;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    latLng = (LatLng) zzbfn.zza(parcel, readInt, LatLng.CREATOR);
+                    latLng = (LatLng) SafeParcelReader.createParcelable(parcel2, readHeader, LatLng.CREATOR);
                     break;
                 case 3:
-                    str = zzbfn.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel2, readHeader);
                     break;
                 case 4:
-                    str2 = zzbfn.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel2, readHeader);
                     break;
                 case 5:
-                    iBinder = zzbfn.zzr(parcel, readInt);
+                    iBinder = SafeParcelReader.readIBinder(parcel2, readHeader);
                     break;
                 case 6:
-                    f = zzbfn.zzl(parcel, readInt);
+                    f = SafeParcelReader.readFloat(parcel2, readHeader);
                     break;
                 case 7:
-                    f2 = zzbfn.zzl(parcel, readInt);
+                    f2 = SafeParcelReader.readFloat(parcel2, readHeader);
                     break;
                 case 8:
-                    z = zzbfn.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 9:
-                    z2 = zzbfn.zzc(parcel, readInt);
+                    z2 = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 10:
-                    z3 = zzbfn.zzc(parcel, readInt);
+                    z3 = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 11:
-                    f3 = zzbfn.zzl(parcel, readInt);
+                    f3 = SafeParcelReader.readFloat(parcel2, readHeader);
                     break;
                 case 12:
-                    f4 = zzbfn.zzl(parcel, readInt);
+                    f6 = SafeParcelReader.readFloat(parcel2, readHeader);
                     break;
                 case 13:
-                    f5 = zzbfn.zzl(parcel, readInt);
+                    f4 = SafeParcelReader.readFloat(parcel2, readHeader);
                     break;
                 case 14:
-                    f6 = zzbfn.zzl(parcel, readInt);
+                    f7 = SafeParcelReader.readFloat(parcel2, readHeader);
                     break;
                 case 15:
-                    f7 = zzbfn.zzl(parcel, readInt);
+                    f5 = SafeParcelReader.readFloat(parcel2, readHeader);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel2, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new MarkerOptions(latLng, str, str2, iBinder, f, f2, z, z2, z3, f3, f4, f5, f6, f7);
+        SafeParcelReader.ensureAtEnd(parcel2, validateObjectHeader);
+        return new MarkerOptions(latLng, str, str2, iBinder, f, f2, z, z2, z3, f3, f6, f4, f7, f5);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

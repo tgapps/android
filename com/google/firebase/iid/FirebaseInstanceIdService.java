@@ -4,7 +4,14 @@ import android.content.Intent;
 import android.util.Log;
 
 public class FirebaseInstanceIdService extends zzb {
-    public final void handleIntent(Intent intent) {
+    public void onTokenRefresh() {
+    }
+
+    protected final Intent zzf(Intent intent) {
+        return (Intent) zzz.zzta().zzbrx.poll();
+    }
+
+    public final void zzh(Intent intent) {
         if ("com.google.firebase.iid.TOKEN_REFRESH".equals(intent.getAction())) {
             onTokenRefresh();
             return;
@@ -13,20 +20,22 @@ public class FirebaseInstanceIdService extends zzb {
         if (stringExtra != null) {
             if (Log.isLoggable("FirebaseInstanceId", 3)) {
                 String valueOf = String.valueOf(intent.getExtras());
-                Log.d("FirebaseInstanceId", new StringBuilder((String.valueOf(stringExtra).length() + 21) + String.valueOf(valueOf).length()).append("Received command: ").append(stringExtra).append(" - ").append(valueOf).toString());
+                StringBuilder stringBuilder = new StringBuilder((21 + String.valueOf(stringExtra).length()) + String.valueOf(valueOf).length());
+                stringBuilder.append("Received command: ");
+                stringBuilder.append(stringExtra);
+                stringBuilder.append(" - ");
+                stringBuilder.append(valueOf);
+                Log.d("FirebaseInstanceId", stringBuilder.toString());
             }
-            if ("RST".equals(stringExtra) || "RST_FULL".equals(stringExtra)) {
-                FirebaseInstanceId.getInstance().zzciy();
-            } else if ("SYNC".equals(stringExtra)) {
-                FirebaseInstanceId.getInstance().zzciz();
+            if (!"RST".equals(stringExtra)) {
+                if (!"RST_FULL".equals(stringExtra)) {
+                    if ("SYNC".equals(stringExtra)) {
+                        FirebaseInstanceId.getInstance().zzsl();
+                        return;
+                    }
+                }
             }
+            FirebaseInstanceId.getInstance().zzsk();
         }
-    }
-
-    public void onTokenRefresh() {
-    }
-
-    protected final Intent zzp(Intent intent) {
-        return (Intent) zzx.zzcjk().zznzs.poll();
     }
 }

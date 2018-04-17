@@ -2,19 +2,19 @@ package com.google.android.gms.wearable.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class zzi extends zzbfm {
+public final class zzi extends AbstractSafeParcelable {
     public static final Creator<zzi> CREATOR = new zzj();
-    private final String mValue;
-    private byte zzlib;
-    private final byte zzlic;
+    private final String value;
+    private byte zzbd;
+    private final byte zzbe;
 
     public zzi(byte b, byte b2, String str) {
-        this.zzlib = b;
-        this.zzlic = b2;
-        this.mValue = str;
+        this.zzbd = b;
+        this.zzbe = b2;
+        this.value = str;
     }
 
     public final boolean equals(Object obj) {
@@ -25,25 +25,34 @@ public final class zzi extends zzbfm {
             return false;
         }
         zzi com_google_android_gms_wearable_internal_zzi = (zzi) obj;
-        return this.zzlib != com_google_android_gms_wearable_internal_zzi.zzlib ? false : this.zzlic != com_google_android_gms_wearable_internal_zzi.zzlic ? false : this.mValue.equals(com_google_android_gms_wearable_internal_zzi.mValue);
+        return this.zzbd == com_google_android_gms_wearable_internal_zzi.zzbd && this.zzbe == com_google_android_gms_wearable_internal_zzi.zzbe && this.value.equals(com_google_android_gms_wearable_internal_zzi.value);
     }
 
     public final int hashCode() {
-        return ((((this.zzlib + 31) * 31) + this.zzlic) * 31) + this.mValue.hashCode();
+        return ((((this.zzbd + 31) * 31) + this.zzbe) * 31) + this.value.hashCode();
     }
 
     public final String toString() {
-        byte b = this.zzlib;
-        byte b2 = this.zzlic;
-        String str = this.mValue;
-        return new StringBuilder(String.valueOf(str).length() + 73).append("AmsEntityUpdateParcelable{, mEntityId=").append(b).append(", mAttributeId=").append(b2).append(", mValue='").append(str).append("'}").toString();
+        byte b = this.zzbd;
+        byte b2 = this.zzbe;
+        String str = this.value;
+        StringBuilder stringBuilder = new StringBuilder(73 + String.valueOf(str).length());
+        stringBuilder.append("AmsEntityUpdateParcelable{, mEntityId=");
+        stringBuilder.append(b);
+        stringBuilder.append(", mAttributeId=");
+        stringBuilder.append(b2);
+        stringBuilder.append(", mValue='");
+        stringBuilder.append(str);
+        stringBuilder.append('\'');
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 2, this.zzlib);
-        zzbfp.zza(parcel, 3, this.zzlic);
-        zzbfp.zza(parcel, 4, this.mValue, false);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeByte(parcel, 2, this.zzbd);
+        SafeParcelWriter.writeByte(parcel, 3, this.zzbe);
+        SafeParcelWriter.writeString(parcel, 4, this.value, false);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

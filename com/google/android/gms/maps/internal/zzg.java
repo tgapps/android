@@ -6,91 +6,91 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import com.google.android.gms.dynamic.IObjectWrapper;
-import com.google.android.gms.internal.zzeu;
-import com.google.android.gms.internal.zzew;
+import com.google.android.gms.internal.maps.zza;
+import com.google.android.gms.internal.maps.zzc;
+import com.google.android.gms.internal.maps.zzt;
+import com.google.android.gms.internal.maps.zzu;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.internal.zzp;
-import com.google.android.gms.maps.model.internal.zzq;
 
-public final class zzg extends zzeu implements IGoogleMapDelegate {
+public final class zzg extends zza implements IGoogleMapDelegate {
     zzg(IBinder iBinder) {
         super(iBinder, "com.google.android.gms.maps.internal.IGoogleMapDelegate");
     }
 
-    public final zzp addMarker(MarkerOptions markerOptions) throws RemoteException {
-        Parcel zzbe = zzbe();
-        zzew.zza(zzbe, (Parcelable) markerOptions);
-        zzbe = zza(11, zzbe);
-        zzp zzbk = zzq.zzbk(zzbe.readStrongBinder());
-        zzbe.recycle();
-        return zzbk;
+    public final zzt addMarker(MarkerOptions markerOptions) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) markerOptions);
+        Parcel transactAndReadException = transactAndReadException(11, obtainAndWriteInterfaceToken);
+        zzt zzg = zzu.zzg(transactAndReadException.readStrongBinder());
+        transactAndReadException.recycle();
+        return zzg;
     }
 
     public final void animateCamera(IObjectWrapper iObjectWrapper) throws RemoteException {
-        Parcel zzbe = zzbe();
-        zzew.zza(zzbe, (IInterface) iObjectWrapper);
-        zzb(5, zzbe);
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper);
+        transactAndReadExceptionReturnVoid(5, obtainAndWriteInterfaceToken);
     }
 
     public final CameraPosition getCameraPosition() throws RemoteException {
-        Parcel zza = zza(1, zzbe());
-        CameraPosition cameraPosition = (CameraPosition) zzew.zza(zza, CameraPosition.CREATOR);
-        zza.recycle();
+        Parcel transactAndReadException = transactAndReadException(1, obtainAndWriteInterfaceToken());
+        CameraPosition cameraPosition = (CameraPosition) zzc.zza(transactAndReadException, CameraPosition.CREATOR);
+        transactAndReadException.recycle();
         return cameraPosition;
     }
 
     public final float getMaxZoomLevel() throws RemoteException {
-        Parcel zza = zza(2, zzbe());
-        float readFloat = zza.readFloat();
-        zza.recycle();
+        Parcel transactAndReadException = transactAndReadException(2, obtainAndWriteInterfaceToken());
+        float readFloat = transactAndReadException.readFloat();
+        transactAndReadException.recycle();
         return readFloat;
     }
 
     public final IUiSettingsDelegate getUiSettings() throws RemoteException {
         IUiSettingsDelegate iUiSettingsDelegate;
-        Parcel zza = zza(25, zzbe());
-        IBinder readStrongBinder = zza.readStrongBinder();
+        Parcel transactAndReadException = transactAndReadException(25, obtainAndWriteInterfaceToken());
+        IBinder readStrongBinder = transactAndReadException.readStrongBinder();
         if (readStrongBinder == null) {
             iUiSettingsDelegate = null;
         } else {
             IInterface queryLocalInterface = readStrongBinder.queryLocalInterface("com.google.android.gms.maps.internal.IUiSettingsDelegate");
             iUiSettingsDelegate = queryLocalInterface instanceof IUiSettingsDelegate ? (IUiSettingsDelegate) queryLocalInterface : new zzbx(readStrongBinder);
         }
-        zza.recycle();
+        transactAndReadException.recycle();
         return iUiSettingsDelegate;
     }
 
     public final void moveCamera(IObjectWrapper iObjectWrapper) throws RemoteException {
-        Parcel zzbe = zzbe();
-        zzew.zza(zzbe, (IInterface) iObjectWrapper);
-        zzb(4, zzbe);
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper);
+        transactAndReadExceptionReturnVoid(4, obtainAndWriteInterfaceToken);
     }
 
     public final void setMapType(int i) throws RemoteException {
-        Parcel zzbe = zzbe();
-        zzbe.writeInt(i);
-        zzb(16, zzbe);
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        obtainAndWriteInterfaceToken.writeInt(i);
+        transactAndReadExceptionReturnVoid(16, obtainAndWriteInterfaceToken);
     }
 
     public final void setMyLocationEnabled(boolean z) throws RemoteException {
-        Parcel zzbe = zzbe();
-        zzew.zza(zzbe, z);
-        zzb(22, zzbe);
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, z);
+        transactAndReadExceptionReturnVoid(22, obtainAndWriteInterfaceToken);
     }
 
     public final void setOnMyLocationChangeListener(zzax com_google_android_gms_maps_internal_zzax) throws RemoteException {
-        Parcel zzbe = zzbe();
-        zzew.zza(zzbe, (IInterface) com_google_android_gms_maps_internal_zzax);
-        zzb(36, zzbe);
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (IInterface) com_google_android_gms_maps_internal_zzax);
+        transactAndReadExceptionReturnVoid(36, obtainAndWriteInterfaceToken);
     }
 
     public final void setPadding(int i, int i2, int i3, int i4) throws RemoteException {
-        Parcel zzbe = zzbe();
-        zzbe.writeInt(i);
-        zzbe.writeInt(i2);
-        zzbe.writeInt(i3);
-        zzbe.writeInt(i4);
-        zzb(39, zzbe);
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        obtainAndWriteInterfaceToken.writeInt(i);
+        obtainAndWriteInterfaceToken.writeInt(i2);
+        obtainAndWriteInterfaceToken.writeInt(i3);
+        obtainAndWriteInterfaceToken.writeInt(i4);
+        transactAndReadExceptionReturnVoid(39, obtainAndWriteInterfaceToken);
     }
 }

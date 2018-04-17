@@ -2,53 +2,61 @@ package com.google.android.gms.wearable.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 import com.google.android.gms.wearable.MessageEvent;
 
-public final class zzfe extends zzbfm implements MessageEvent {
+public final class zzfe extends AbstractSafeParcelable implements MessageEvent {
     public static final Creator<zzfe> CREATOR = new zzff();
-    private final String mPath;
-    private final String zzdrc;
-    private final int zzgiq;
-    private final byte[] zzhyw;
+    private final byte[] data;
+    private final String zzcl;
+    private final int zzeh;
+    private final String zzek;
 
     public zzfe(int i, String str, byte[] bArr, String str2) {
-        this.zzgiq = i;
-        this.mPath = str;
-        this.zzhyw = bArr;
-        this.zzdrc = str2;
+        this.zzeh = i;
+        this.zzcl = str;
+        this.data = bArr;
+        this.zzek = str2;
     }
 
     public final byte[] getData() {
-        return this.zzhyw;
+        return this.data;
     }
 
     public final String getPath() {
-        return this.mPath;
+        return this.zzcl;
     }
 
     public final int getRequestId() {
-        return this.zzgiq;
+        return this.zzeh;
     }
 
     public final String getSourceNodeId() {
-        return this.zzdrc;
+        return this.zzek;
     }
 
     public final String toString() {
-        int i = this.zzgiq;
-        String str = this.mPath;
-        String valueOf = String.valueOf(this.zzhyw == null ? "null" : Integer.valueOf(this.zzhyw.length));
-        return new StringBuilder((String.valueOf(str).length() + 43) + String.valueOf(valueOf).length()).append("MessageEventParcelable[").append(i).append(",").append(str).append(", size=").append(valueOf).append("]").toString();
+        int i = this.zzeh;
+        String str = this.zzcl;
+        String valueOf = String.valueOf(this.data == null ? "null" : Integer.valueOf(this.data.length));
+        StringBuilder stringBuilder = new StringBuilder((43 + String.valueOf(str).length()) + String.valueOf(valueOf).length());
+        stringBuilder.append("MessageEventParcelable[");
+        stringBuilder.append(i);
+        stringBuilder.append(",");
+        stringBuilder.append(str);
+        stringBuilder.append(", size=");
+        stringBuilder.append(valueOf);
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 2, getRequestId());
-        zzbfp.zza(parcel, 3, getPath(), false);
-        zzbfp.zza(parcel, 4, getData(), false);
-        zzbfp.zza(parcel, 5, getSourceNodeId(), false);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 2, getRequestId());
+        SafeParcelWriter.writeString(parcel, 3, getPath(), false);
+        SafeParcelWriter.writeByteArray(parcel, 4, getData(), false);
+        SafeParcelWriter.writeString(parcel, 5, getSourceNodeId(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

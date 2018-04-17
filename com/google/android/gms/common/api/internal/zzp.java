@@ -1,23 +1,42 @@
 package com.google.android.gms.common.api.internal;
 
+import android.os.Bundle;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.internal.zzbq;
+import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.internal.Preconditions;
 
-final class zzp {
-    private final int zzfon;
-    private final ConnectionResult zzfoo;
+public final class zzp implements ConnectionCallbacks, OnConnectionFailedListener {
+    public final Api<?> mApi;
+    private final boolean zzfo;
+    private zzq zzfp;
 
-    zzp(ConnectionResult connectionResult, int i) {
-        zzbq.checkNotNull(connectionResult);
-        this.zzfoo = connectionResult;
-        this.zzfon = i;
+    public zzp(Api<?> api, boolean z) {
+        this.mApi = api;
+        this.zzfo = z;
     }
 
-    final int zzahe() {
-        return this.zzfon;
+    private final void zzy() {
+        Preconditions.checkNotNull(this.zzfp, "Callbacks must be attached to a ClientConnectionHelper instance before connecting the client.");
     }
 
-    final ConnectionResult zzahf() {
-        return this.zzfoo;
+    public final void onConnected(Bundle bundle) {
+        zzy();
+        this.zzfp.onConnected(bundle);
+    }
+
+    public final void onConnectionFailed(ConnectionResult connectionResult) {
+        zzy();
+        this.zzfp.zza(connectionResult, this.mApi, this.zzfo);
+    }
+
+    public final void onConnectionSuspended(int i) {
+        zzy();
+        this.zzfp.onConnectionSuspended(i);
+    }
+
+    public final void zza(zzq com_google_android_gms_common_api_internal_zzq) {
+        this.zzfp = com_google_android_gms_common_api_internal_zzq;
     }
 }

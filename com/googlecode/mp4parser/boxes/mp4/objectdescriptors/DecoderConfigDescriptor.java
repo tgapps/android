@@ -25,8 +25,6 @@ public class DecoderConfigDescriptor extends BaseDescriptor {
     int upStream;
 
     public void parseDetail(ByteBuffer bb) throws IOException {
-        BaseDescriptor descriptor;
-        Object valueOf;
         this.objectTypeIndication = IsoTypeReader.readUInt8(bb);
         int data = IsoTypeReader.readUInt8(bb);
         this.streamType = data >>> 2;
@@ -36,16 +34,16 @@ public class DecoderConfigDescriptor extends BaseDescriptor {
         this.avgBitRate = IsoTypeReader.readUInt32(bb);
         if (bb.remaining() > 2) {
             int begin = bb.position();
-            descriptor = ObjectDescriptorFactory.createFrom(this.objectTypeIndication, bb);
+            BaseDescriptor descriptor = ObjectDescriptorFactory.createFrom(this.objectTypeIndication, bb);
             int read = bb.position() - begin;
             Logger logger = log;
-            StringBuilder append = new StringBuilder().append(descriptor).append(" - DecoderConfigDescr1 read: ").append(read).append(", size: ");
-            if (descriptor != null) {
-                valueOf = Integer.valueOf(descriptor.getSize());
-            } else {
-                valueOf = null;
-            }
-            logger.finer(append.append(valueOf).toString());
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(descriptor);
+            stringBuilder.append(" - DecoderConfigDescr1 read: ");
+            stringBuilder.append(read);
+            stringBuilder.append(", size: ");
+            stringBuilder.append(descriptor != null ? Integer.valueOf(descriptor.getSize()) : null);
+            logger.finer(stringBuilder.toString());
             if (descriptor != null) {
                 int size = descriptor.getSize();
                 if (read < size) {
@@ -62,24 +60,24 @@ public class DecoderConfigDescriptor extends BaseDescriptor {
         }
         while (bb.remaining() > 2) {
             long begin2 = (long) bb.position();
-            descriptor = ObjectDescriptorFactory.createFrom(this.objectTypeIndication, bb);
+            BaseDescriptor descriptor2 = ObjectDescriptorFactory.createFrom(this.objectTypeIndication, bb);
             long read2 = ((long) bb.position()) - begin2;
             logger = log;
-            append = new StringBuilder().append(descriptor).append(" - DecoderConfigDescr2 read: ").append(read2).append(", size: ");
-            if (descriptor != null) {
-                valueOf = Integer.valueOf(descriptor.getSize());
-            } else {
-                valueOf = null;
-            }
-            logger.finer(append.append(valueOf).toString());
-            if (descriptor instanceof ProfileLevelIndicationDescriptor) {
-                this.profileLevelIndicationDescriptors.add((ProfileLevelIndicationDescriptor) descriptor);
+            stringBuilder = new StringBuilder();
+            stringBuilder.append(descriptor2);
+            stringBuilder.append(" - DecoderConfigDescr2 read: ");
+            stringBuilder.append(read2);
+            stringBuilder.append(", size: ");
+            stringBuilder.append(descriptor2 != null ? Integer.valueOf(descriptor2.getSize()) : null);
+            logger.finer(stringBuilder.toString());
+            if (descriptor2 instanceof ProfileLevelIndicationDescriptor) {
+                this.profileLevelIndicationDescriptors.add((ProfileLevelIndicationDescriptor) descriptor2);
             }
         }
     }
 
     public int serializedSize() {
-        return (this.audioSpecificInfo == null ? 0 : this.audioSpecificInfo.serializedSize()) + 15;
+        return 15 + (this.audioSpecificInfo == null ? 0 : this.audioSpecificInfo.serializedSize());
     }
 
     public ByteBuffer serialize() {
@@ -124,16 +122,26 @@ public class DecoderConfigDescriptor extends BaseDescriptor {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("DecoderConfigDescriptor");
-        sb.append("{objectTypeIndication=").append(this.objectTypeIndication);
-        sb.append(", streamType=").append(this.streamType);
-        sb.append(", upStream=").append(this.upStream);
-        sb.append(", bufferSizeDB=").append(this.bufferSizeDB);
-        sb.append(", maxBitRate=").append(this.maxBitRate);
-        sb.append(", avgBitRate=").append(this.avgBitRate);
-        sb.append(", decoderSpecificInfo=").append(this.decoderSpecificInfo);
-        sb.append(", audioSpecificInfo=").append(this.audioSpecificInfo);
-        sb.append(", configDescriptorDeadBytes=").append(Hex.encodeHex(this.configDescriptorDeadBytes != null ? this.configDescriptorDeadBytes : new byte[0]));
-        sb.append(", profileLevelIndicationDescriptors=").append(this.profileLevelIndicationDescriptors == null ? "null" : Arrays.asList(new List[]{this.profileLevelIndicationDescriptors}).toString());
+        sb.append("{objectTypeIndication=");
+        sb.append(this.objectTypeIndication);
+        sb.append(", streamType=");
+        sb.append(this.streamType);
+        sb.append(", upStream=");
+        sb.append(this.upStream);
+        sb.append(", bufferSizeDB=");
+        sb.append(this.bufferSizeDB);
+        sb.append(", maxBitRate=");
+        sb.append(this.maxBitRate);
+        sb.append(", avgBitRate=");
+        sb.append(this.avgBitRate);
+        sb.append(", decoderSpecificInfo=");
+        sb.append(this.decoderSpecificInfo);
+        sb.append(", audioSpecificInfo=");
+        sb.append(this.audioSpecificInfo);
+        sb.append(", configDescriptorDeadBytes=");
+        sb.append(Hex.encodeHex(this.configDescriptorDeadBytes != null ? this.configDescriptorDeadBytes : new byte[0]));
+        sb.append(", profileLevelIndicationDescriptors=");
+        sb.append(this.profileLevelIndicationDescriptors == null ? "null" : Arrays.asList(new List[]{this.profileLevelIndicationDescriptors}).toString());
         sb.append('}');
         return sb.toString();
     }

@@ -28,7 +28,6 @@ public abstract class CustomTabsService extends Service {
         }
 
         public boolean newSession(ICustomTabsCallback callback) {
-            boolean z = false;
             final CustomTabsSessionToken sessionToken = new CustomTabsSessionToken(callback);
             try {
                 DeathRecipient deathRecipient = new DeathRecipient() {
@@ -40,10 +39,10 @@ public abstract class CustomTabsService extends Service {
                     callback.asBinder().linkToDeath(deathRecipient, 0);
                     CustomTabsService.this.mDeathRecipientMap.put(callback.asBinder(), deathRecipient);
                 }
-                z = CustomTabsService.this.newSession(sessionToken);
+                return CustomTabsService.this.newSession(sessionToken);
             } catch (RemoteException e) {
+                return false;
             }
-            return z;
         }
 
         public boolean mayLaunchUrl(ICustomTabsCallback callback, Uri url, Bundle extras, List<Bundle> otherLikelyBundles) {

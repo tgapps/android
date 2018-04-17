@@ -2,28 +2,28 @@ package com.google.android.gms.wearable.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzdu implements Creator<zzdv> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        boolean z = false;
-        int zzd = zzbfn.zzd(parcel);
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         int i = 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        boolean z = false;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    i = zzbfn.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    z = zzbfn.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new zzdv(i, z);
     }
 

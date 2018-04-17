@@ -1,18 +1,16 @@
 package com.google.android.gms.tasks;
 
 final class zzh implements Runnable {
-    private /* synthetic */ Task zzkua;
-    private /* synthetic */ zzg zzkug;
+    private final /* synthetic */ zzg zzafr;
 
-    zzh(zzg com_google_android_gms_tasks_zzg, Task task) {
-        this.zzkug = com_google_android_gms_tasks_zzg;
-        this.zzkua = task;
+    zzh(zzg com_google_android_gms_tasks_zzg) {
+        this.zzafr = com_google_android_gms_tasks_zzg;
     }
 
     public final void run() {
-        synchronized (this.zzkug.mLock) {
-            if (this.zzkug.zzkuf != null) {
-                this.zzkug.zzkuf.onFailure(this.zzkua.getException());
+        synchronized (this.zzafr.mLock) {
+            if (this.zzafr.zzafq != null) {
+                this.zzafr.zzafq.onCanceled();
             }
         }
     }

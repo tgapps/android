@@ -16,7 +16,6 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
     private static final SparseArray<WakeLock> sActiveWakeLocks = new SparseArray();
 
     public static ComponentName startWakefulService(Context context, Intent intent) {
-        ComponentName comp;
         synchronized (sActiveWakeLocks) {
             int id = mNextId;
             mNextId++;
@@ -24,17 +23,20 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
                 mNextId = 1;
             }
             intent.putExtra("android.support.content.wakelockid", id);
-            comp = context.startService(intent);
+            ComponentName comp = context.startService(intent);
             if (comp == null) {
-                comp = null;
-            } else {
-                WakeLock wl = ((PowerManager) context.getSystemService("power")).newWakeLock(1, "wake:" + comp.flattenToShortString());
-                wl.setReferenceCounted(false);
-                wl.acquire(ChunkedTrackBlacklistUtil.DEFAULT_TRACK_BLACKLIST_MS);
-                sActiveWakeLocks.put(id, wl);
+                return null;
             }
+            PowerManager pm = (PowerManager) context.getSystemService("power");
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("wake:");
+            stringBuilder.append(comp.flattenToShortString());
+            WakeLock wl = pm.newWakeLock(1, stringBuilder.toString());
+            wl.setReferenceCounted(false);
+            wl.acquire(ChunkedTrackBlacklistUtil.DEFAULT_TRACK_BLACKLIST_MS);
+            sActiveWakeLocks.put(id, wl);
+            return comp;
         }
-        return comp;
     }
 
     public static boolean completeWakefulIntent(Intent intent) {
@@ -49,7 +51,10 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
                 sActiveWakeLocks.remove(id);
                 return true;
             }
-            Log.w("WakefulBroadcastReceiv.", "No active wake lock id #" + id);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("No active wake lock id #");
+            stringBuilder.append(id);
+            Log.w("WakefulBroadcastReceiv.", stringBuilder.toString());
             return true;
         }
     }

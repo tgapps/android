@@ -72,21 +72,20 @@ public class EditListBox extends AbstractFullBox {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
+            if (o != null) {
+                if (getClass() == o.getClass()) {
+                    Entry entry = (Entry) o;
+                    if (this.mediaTime == entry.mediaTime && this.segmentDuration == entry.segmentDuration) {
+                        return true;
+                    }
+                    return false;
+                }
             }
-            Entry entry = (Entry) o;
-            if (this.mediaTime != entry.mediaTime) {
-                return false;
-            }
-            if (this.segmentDuration != entry.segmentDuration) {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public int hashCode() {
-            return (((int) (this.segmentDuration ^ (this.segmentDuration >>> 32))) * 31) + ((int) (this.mediaTime ^ (this.mediaTime >>> 32)));
+            return (31 * ((int) (this.segmentDuration ^ (this.segmentDuration >>> 32)))) + ((int) (this.mediaTime ^ (this.mediaTime >>> 32)));
         }
 
         public void getContent(ByteBuffer bb) {
@@ -101,7 +100,14 @@ public class EditListBox extends AbstractFullBox {
         }
 
         public String toString() {
-            return "Entry{segmentDuration=" + this.segmentDuration + ", mediaTime=" + this.mediaTime + ", mediaRate=" + this.mediaRate + '}';
+            StringBuilder stringBuilder = new StringBuilder("Entry{segmentDuration=");
+            stringBuilder.append(this.segmentDuration);
+            stringBuilder.append(", mediaTime=");
+            stringBuilder.append(this.mediaTime);
+            stringBuilder.append(", mediaRate=");
+            stringBuilder.append(this.mediaRate);
+            stringBuilder.append('}');
+            return stringBuilder.toString();
         }
     }
 
@@ -156,6 +162,9 @@ public class EditListBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        return "EditListBox{entries=" + this.entries + '}';
+        StringBuilder stringBuilder = new StringBuilder("EditListBox{entries=");
+        stringBuilder.append(this.entries);
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 }

@@ -79,13 +79,15 @@ class FastScroller extends ItemDecoration implements OnItemTouchListener {
         private boolean mCanceled;
 
         private AnimatorListener() {
-            this.mCanceled = false;
+            this.mCanceled = null;
         }
 
         public void onAnimationEnd(Animator animation) {
             if (this.mCanceled) {
                 this.mCanceled = false;
-            } else if (((Float) FastScroller.this.mShowHideAnimator.getAnimatedValue()).floatValue() == 0.0f) {
+                return;
+            }
+            if (((Float) FastScroller.this.mShowHideAnimator.getAnimatedValue()).floatValue() == 0.0f) {
                 FastScroller.this.mAnimationState = 0;
                 FastScroller.this.setState(0);
             } else {
@@ -104,7 +106,7 @@ class FastScroller extends ItemDecoration implements OnItemTouchListener {
         }
 
         public void onAnimationUpdate(ValueAnimator valueAnimator) {
-            int alpha = (int) (((Float) valueAnimator.getAnimatedValue()).floatValue() * 255.0f);
+            int alpha = (int) (255.0f * ((Float) valueAnimator.getAnimatedValue()).floatValue());
             FastScroller.this.mVerticalThumbDrawable.setAlpha(alpha);
             FastScroller.this.mVerticalTrackDrawable.setAlpha(alpha);
             FastScroller.this.requestRedraw();
@@ -117,6 +119,65 @@ class FastScroller extends ItemDecoration implements OnItemTouchListener {
 
     @Retention(RetentionPolicy.SOURCE)
     private @interface State {
+    }
+
+    public boolean onInterceptTouchEvent(org.telegram.messenger.support.widget.RecyclerView r1, android.view.MotionEvent r2) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.FastScroller.onInterceptTouchEvent(org.telegram.messenger.support.widget.RecyclerView, android.view.MotionEvent):boolean
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r6.mState;
+        r1 = 0;
+        r2 = 1;
+        r3 = 2;
+        if (r0 != r2) goto L_0x0049;
+    L_0x0007:
+        r0 = r8.getX();
+        r4 = r8.getY();
+        r0 = r6.isPointInsideVerticalThumb(r0, r4);
+        r4 = r8.getX();
+        r5 = r8.getY();
+        r4 = r6.isPointInsideHorizontalThumb(r4, r5);
+        r5 = r8.getAction();
+        if (r5 != 0) goto L_0x0047;
+    L_0x0025:
+        if (r0 != 0) goto L_0x0029;
+        if (r4 == 0) goto L_0x0047;
+        if (r4 == 0) goto L_0x0036;
+        r6.mDragState = r2;
+        r1 = r8.getX();
+        r1 = (int) r1;
+        r1 = (float) r1;
+        r6.mHorizontalDragX = r1;
+        goto L_0x0042;
+        if (r0 == 0) goto L_0x0042;
+        r6.mDragState = r3;
+        r1 = r8.getY();
+        r1 = (int) r1;
+        r1 = (float) r1;
+        r6.mVerticalDragY = r1;
+        r6.setState(r3);
+        r1 = 1;
+        goto L_0x0048;
+        goto L_0x0050;
+    L_0x0049:
+        r0 = r6.mState;
+        if (r0 != r3) goto L_0x004f;
+        r1 = 1;
+        goto L_0x0050;
+        r0 = r1;
+        return r0;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.FastScroller.onInterceptTouchEvent(org.telegram.messenger.support.widget.RecyclerView, android.view.MotionEvent):boolean");
     }
 
     FastScroller(RecyclerView recyclerView, StateListDrawable verticalThumbDrawable, Drawable verticalTrackDrawable, StateListDrawable horizontalThumbDrawable, Drawable horizontalTrackDrawable, int defaultWidth, int scrollbarMinimumRange, int margin) {
@@ -202,14 +263,13 @@ class FastScroller extends ItemDecoration implements OnItemTouchListener {
     }
 
     public void show() {
-        switch (this.mAnimationState) {
-            case 0:
-                break;
-            case 3:
+        int i = this.mAnimationState;
+        if (i != 0) {
+            if (i == 3) {
                 this.mShowHideAnimator.cancel();
-                break;
-            default:
+            } else {
                 return;
+            }
         }
         this.mAnimationState = 1;
         this.mShowHideAnimator.setFloatValues(new float[]{((Float) this.mShowHideAnimator.getAnimatedValue()).floatValue(), 1.0f});
@@ -248,18 +308,22 @@ class FastScroller extends ItemDecoration implements OnItemTouchListener {
     }
 
     public void onDrawOver(Canvas canvas, RecyclerView parent, org.telegram.messenger.support.widget.RecyclerView.State state) {
-        if (this.mRecyclerViewWidth != this.mRecyclerView.getWidth() || this.mRecyclerViewHeight != this.mRecyclerView.getHeight()) {
-            this.mRecyclerViewWidth = this.mRecyclerView.getWidth();
-            this.mRecyclerViewHeight = this.mRecyclerView.getHeight();
-            setState(0);
-        } else if (this.mAnimationState != 0) {
-            if (this.mNeedVerticalScrollbar) {
-                drawVerticalScrollbar(canvas);
-            }
-            if (this.mNeedHorizontalScrollbar) {
-                drawHorizontalScrollbar(canvas);
+        if (this.mRecyclerViewWidth == this.mRecyclerView.getWidth()) {
+            if (this.mRecyclerViewHeight == this.mRecyclerView.getHeight()) {
+                if (this.mAnimationState != 0) {
+                    if (this.mNeedVerticalScrollbar) {
+                        drawVerticalScrollbar(canvas);
+                    }
+                    if (this.mNeedHorizontalScrollbar) {
+                        drawHorizontalScrollbar(canvas);
+                    }
+                }
+                return;
             }
         }
+        this.mRecyclerViewWidth = this.mRecyclerView.getWidth();
+        this.mRecyclerViewHeight = this.mRecyclerView.getHeight();
+        setState(0);
     }
 
     private void drawVerticalScrollbar(Canvas canvas) {
@@ -296,23 +360,14 @@ class FastScroller extends ItemDecoration implements OnItemTouchListener {
     }
 
     void updateScrollPosition(int offsetX, int offsetY) {
-        boolean z;
         int verticalContentLength = this.mRecyclerView.computeVerticalScrollRange();
         int verticalVisibleLength = this.mRecyclerViewHeight;
-        if (verticalContentLength - verticalVisibleLength <= 0 || this.mRecyclerViewHeight < this.mScrollbarMinimumRange) {
-            z = false;
-        } else {
-            z = true;
-        }
+        boolean z = verticalContentLength - verticalVisibleLength > 0 && this.mRecyclerViewHeight >= this.mScrollbarMinimumRange;
         this.mNeedVerticalScrollbar = z;
         int horizontalContentLength = this.mRecyclerView.computeHorizontalScrollRange();
         int horizontalVisibleLength = this.mRecyclerViewWidth;
-        if (horizontalContentLength - horizontalVisibleLength <= 0 || this.mRecyclerViewWidth < this.mScrollbarMinimumRange) {
-            z = false;
-        } else {
-            z = true;
-        }
-        this.mNeedHorizontalScrollbar = z;
+        boolean z2 = horizontalContentLength - horizontalVisibleLength > 0 && this.mRecyclerViewWidth >= this.mScrollbarMinimumRange;
+        this.mNeedHorizontalScrollbar = z2;
         if (this.mNeedVerticalScrollbar || this.mNeedHorizontalScrollbar) {
             if (this.mNeedVerticalScrollbar) {
                 this.mVerticalThumbCenterY = (int) ((((float) verticalVisibleLength) * (((float) offsetY) + (((float) verticalVisibleLength) / 2.0f))) / ((float) verticalContentLength));
@@ -325,31 +380,10 @@ class FastScroller extends ItemDecoration implements OnItemTouchListener {
             if (this.mState == 0 || this.mState == 1) {
                 setState(1);
             }
-        } else if (this.mState != 0) {
-            setState(0);
+            return;
         }
-    }
-
-    public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent ev) {
-        if (this.mState == 1) {
-            boolean insideVerticalThumb = isPointInsideVerticalThumb(ev.getX(), ev.getY());
-            boolean insideHorizontalThumb = isPointInsideHorizontalThumb(ev.getX(), ev.getY());
-            if (ev.getAction() != 0 || (!insideVerticalThumb && !insideHorizontalThumb)) {
-                return false;
-            }
-            if (insideHorizontalThumb) {
-                this.mDragState = 1;
-                this.mHorizontalDragX = (float) ((int) ev.getX());
-            } else if (insideVerticalThumb) {
-                this.mDragState = 2;
-                this.mVerticalDragY = (float) ((int) ev.getY());
-            }
-            setState(2);
-            return true;
-        } else if (this.mState == 2) {
-            return true;
-        } else {
-            return false;
+        if (this.mState != 0) {
+            setState(0);
         }
     }
 
@@ -426,13 +460,53 @@ class FastScroller extends ItemDecoration implements OnItemTouchListener {
         return scrollingBy;
     }
 
-    boolean isPointInsideVerticalThumb(float x, float y) {
-        if (isLayoutRTL() ? x <= ((float) (this.mVerticalThumbWidth / 2)) : x >= ((float) (this.mRecyclerViewWidth - this.mVerticalThumbWidth))) {
-            if (y >= ((float) (this.mVerticalThumbCenterY - (this.mVerticalThumbHeight / 2))) && y <= ((float) (this.mVerticalThumbCenterY + (this.mVerticalThumbHeight / 2)))) {
-                return true;
-            }
-        }
-        return false;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    boolean isPointInsideVerticalThumb(float r3, float r4) {
+        /*
+        r2 = this;
+        r0 = r2.isLayoutRTL();
+        if (r0 == 0) goto L_0x0010;
+    L_0x0006:
+        r0 = r2.mVerticalThumbWidth;
+        r0 = r0 / 2;
+        r0 = (float) r0;
+        r0 = (r3 > r0 ? 1 : (r3 == r0 ? 0 : -1));
+        if (r0 > 0) goto L_0x0034;
+    L_0x000f:
+        goto L_0x001a;
+    L_0x0010:
+        r0 = r2.mRecyclerViewWidth;
+        r1 = r2.mVerticalThumbWidth;
+        r0 = r0 - r1;
+        r0 = (float) r0;
+        r0 = (r3 > r0 ? 1 : (r3 == r0 ? 0 : -1));
+        if (r0 < 0) goto L_0x0034;
+    L_0x001a:
+        r0 = r2.mVerticalThumbCenterY;
+        r1 = r2.mVerticalThumbHeight;
+        r1 = r1 / 2;
+        r0 = r0 - r1;
+        r0 = (float) r0;
+        r0 = (r4 > r0 ? 1 : (r4 == r0 ? 0 : -1));
+        if (r0 < 0) goto L_0x0034;
+    L_0x0026:
+        r0 = r2.mVerticalThumbCenterY;
+        r1 = r2.mVerticalThumbHeight;
+        r1 = r1 / 2;
+        r0 = r0 + r1;
+        r0 = (float) r0;
+        r0 = (r4 > r0 ? 1 : (r4 == r0 ? 0 : -1));
+        if (r0 > 0) goto L_0x0034;
+    L_0x0032:
+        r0 = 1;
+        goto L_0x0035;
+    L_0x0034:
+        r0 = 0;
+    L_0x0035:
+        return r0;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.FastScroller.isPointInsideVerticalThumb(float, float):boolean");
     }
 
     boolean isPointInsideHorizontalThumb(float x, float y) {

@@ -13,6 +13,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Handler;
@@ -24,46 +25,46 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ProgressBar;
-import com.google.android.gms.R;
+import com.google.android.gms.base.R;
 import com.google.android.gms.common.api.GoogleApiActivity;
-import com.google.android.gms.common.api.internal.zzbx;
-import com.google.android.gms.common.api.internal.zzby;
-import com.google.android.gms.common.api.internal.zzcf;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.common.internal.zzu;
-import com.google.android.gms.common.internal.zzv;
-import com.google.android.gms.common.util.zzi;
-import com.google.android.gms.common.util.zzq;
+import com.google.android.gms.common.api.internal.GooglePlayServicesUpdatedReceiver;
+import com.google.android.gms.common.api.internal.GooglePlayServicesUpdatedReceiver.Callback;
+import com.google.android.gms.common.api.internal.LifecycleFragment;
+import com.google.android.gms.common.internal.ConnectionErrorMessages;
+import com.google.android.gms.common.internal.DialogRedirect;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.util.DeviceProperties;
+import com.google.android.gms.common.util.PlatformVersion;
 
-public class GoogleApiAvailability extends zzf {
-    public static final int GOOGLE_PLAY_SERVICES_VERSION_CODE = zzf.GOOGLE_PLAY_SERVICES_VERSION_CODE;
+public class GoogleApiAvailability extends GoogleApiAvailabilityLight {
+    public static final int GOOGLE_PLAY_SERVICES_VERSION_CODE = GoogleApiAvailabilityLight.GOOGLE_PLAY_SERVICES_VERSION_CODE;
     private static final Object mLock = new Object();
-    private static final GoogleApiAvailability zzfku = new GoogleApiAvailability();
-    private String zzfkv;
+    private static final GoogleApiAvailability zzas = new GoogleApiAvailability();
+    private String zzat;
 
     @SuppressLint({"HandlerLeak"})
-    class zza extends Handler {
-        private final Context mApplicationContext;
-        private /* synthetic */ GoogleApiAvailability zzfkw;
+    private class zza extends Handler {
+        private final Context zzau;
+        private final /* synthetic */ GoogleApiAvailability zzav;
 
         public zza(GoogleApiAvailability googleApiAvailability, Context context) {
-            this.zzfkw = googleApiAvailability;
+            this.zzav = googleApiAvailability;
             super(Looper.myLooper() == null ? Looper.getMainLooper() : Looper.myLooper());
-            this.mApplicationContext = context.getApplicationContext();
+            this.zzau = context.getApplicationContext();
         }
 
         public final void handleMessage(Message message) {
-            switch (message.what) {
-                case 1:
-                    int isGooglePlayServicesAvailable = this.zzfkw.isGooglePlayServicesAvailable(this.mApplicationContext);
-                    if (this.zzfkw.isUserResolvableError(isGooglePlayServicesAvailable)) {
-                        this.zzfkw.showErrorNotification(this.mApplicationContext, isGooglePlayServicesAvailable);
-                        return;
-                    }
-                    return;
-                default:
-                    Log.w("GoogleApiAvailability", "Don't know how to handle this message: " + message.what);
-                    return;
+            if (message.what != 1) {
+                int i = message.what;
+                StringBuilder stringBuilder = new StringBuilder(50);
+                stringBuilder.append("Don't know how to handle this message: ");
+                stringBuilder.append(i);
+                Log.w("GoogleApiAvailability", stringBuilder.toString());
+                return;
+            }
+            i = this.zzav.isGooglePlayServicesAvailable(this.zzau);
+            if (this.zzav.isUserResolvableError(i)) {
+                this.zzav.showErrorNotification(this.zzau, i);
             }
         }
     }
@@ -72,23 +73,10 @@ public class GoogleApiAvailability extends zzf {
     }
 
     public static GoogleApiAvailability getInstance() {
-        return zzfku;
+        return zzas;
     }
 
-    public static Dialog zza(Activity activity, OnCancelListener onCancelListener) {
-        View progressBar = new ProgressBar(activity, null, 16842874);
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(0);
-        Builder builder = new Builder(activity);
-        builder.setView(progressBar);
-        builder.setMessage(zzu.zzi(activity, 18));
-        builder.setPositiveButton(TtmlNode.ANONYMOUS_REGION_ID, null);
-        Dialog create = builder.create();
-        zza(activity, create, "GooglePlayServicesUpdatingDialog", onCancelListener);
-        return create;
-    }
-
-    static Dialog zza(Context context, int i, zzv com_google_android_gms_common_internal_zzv, OnCancelListener onCancelListener) {
+    static Dialog zza(Context context, int i, DialogRedirect dialogRedirect, OnCancelListener onCancelListener) {
         Builder builder = null;
         if (i == 0) {
             return null;
@@ -101,51 +89,38 @@ public class GoogleApiAvailability extends zzf {
         if (builder == null) {
             builder = new Builder(context);
         }
-        builder.setMessage(zzu.zzi(context, i));
+        builder.setMessage(ConnectionErrorMessages.getErrorMessage(context, i));
         if (onCancelListener != null) {
             builder.setOnCancelListener(onCancelListener);
         }
-        CharSequence zzk = zzu.zzk(context, i);
-        if (zzk != null) {
-            builder.setPositiveButton(zzk, com_google_android_gms_common_internal_zzv);
+        CharSequence errorDialogButtonMessage = ConnectionErrorMessages.getErrorDialogButtonMessage(context, i);
+        if (errorDialogButtonMessage != null) {
+            builder.setPositiveButton(errorDialogButtonMessage, dialogRedirect);
         }
-        zzk = zzu.zzg(context, i);
-        if (zzk != null) {
-            builder.setTitle(zzk);
+        CharSequence errorTitle = ConnectionErrorMessages.getErrorTitle(context, i);
+        if (errorTitle != null) {
+            builder.setTitle(errorTitle);
         }
         return builder.create();
     }
 
-    public static zzbx zza(Context context, zzby com_google_android_gms_common_api_internal_zzby) {
-        IntentFilter intentFilter = new IntentFilter("android.intent.action.PACKAGE_ADDED");
-        intentFilter.addDataScheme("package");
-        BroadcastReceiver com_google_android_gms_common_api_internal_zzbx = new zzbx(com_google_android_gms_common_api_internal_zzby);
-        context.registerReceiver(com_google_android_gms_common_api_internal_zzbx, intentFilter);
-        com_google_android_gms_common_api_internal_zzbx.setContext(context);
-        if (zzp.zzv(context, "com.google.android.gms")) {
-            return com_google_android_gms_common_api_internal_zzbx;
-        }
-        com_google_android_gms_common_api_internal_zzby.zzahg();
-        com_google_android_gms_common_api_internal_zzbx.unregister();
-        return null;
-    }
-
     @TargetApi(26)
     private final String zza(Context context, NotificationManager notificationManager) {
-        zzbq.checkState(zzq.isAtLeastO());
-        String zzafx = zzafx();
-        if (zzafx == null) {
-            zzafx = "com.google.android.gms.availability";
-            NotificationChannel notificationChannel = notificationManager.getNotificationChannel(zzafx);
-            CharSequence zzcn = zzu.zzcn(context);
+        Preconditions.checkState(PlatformVersion.isAtLeastO());
+        String zzb = zzb();
+        if (zzb == null) {
+            zzb = "com.google.android.gms.availability";
+            NotificationChannel notificationChannel = notificationManager.getNotificationChannel(zzb);
+            CharSequence defaultNotificationChannelName = ConnectionErrorMessages.getDefaultNotificationChannelName(context);
             if (notificationChannel == null) {
-                notificationManager.createNotificationChannel(new NotificationChannel(zzafx, zzcn, 4));
-            } else if (!zzcn.equals(notificationChannel.getName())) {
-                notificationChannel.setName(zzcn);
-                notificationManager.createNotificationChannel(notificationChannel);
+                notificationChannel = new NotificationChannel(zzb, defaultNotificationChannelName, 4);
+            } else if (!defaultNotificationChannelName.equals(notificationChannel.getName())) {
+                notificationChannel.setName(defaultNotificationChannelName);
             }
+            notificationManager.createNotificationChannel(notificationChannel);
+            return zzb;
         }
-        return zzafx;
+        return zzb;
     }
 
     static void zza(Activity activity, Dialog dialog, String str, OnCancelListener onCancelListener) {
@@ -159,59 +134,86 @@ public class GoogleApiAvailability extends zzf {
     @TargetApi(20)
     private final void zza(Context context, int i, String str, PendingIntent pendingIntent) {
         if (i == 18) {
-            zzcc(context);
-        } else if (pendingIntent != null) {
+            zza(context);
+        } else if (pendingIntent == null) {
+            if (i == 6) {
+                Log.w("GoogleApiAvailability", "Missing resolution for ConnectionResult.RESOLUTION_REQUIRED. Call GoogleApiAvailability#showErrorNotification(Context, ConnectionResult) instead.");
+            }
+        } else {
             Notification build;
-            int i2;
-            CharSequence zzh = zzu.zzh(context, i);
-            CharSequence zzj = zzu.zzj(context, i);
+            CharSequence errorNotificationTitle = ConnectionErrorMessages.getErrorNotificationTitle(context, i);
+            CharSequence errorNotificationMessage = ConnectionErrorMessages.getErrorNotificationMessage(context, i);
             Resources resources = context.getResources();
             NotificationManager notificationManager = (NotificationManager) context.getSystemService("notification");
-            if (zzi.zzct(context)) {
-                zzbq.checkState(zzq.zzamm());
-                Notification.Builder addAction = new Notification.Builder(context).setSmallIcon(context.getApplicationInfo().icon).setPriority(2).setAutoCancel(true).setContentTitle(zzh).setStyle(new BigTextStyle().bigText(zzj)).addAction(R.drawable.common_full_open_on_phone, resources.getString(R.string.common_open_on_phone), pendingIntent);
-                if (zzq.isAtLeastO() && zzq.isAtLeastO()) {
-                    addAction.setChannelId(zza(context, notificationManager));
+            if (DeviceProperties.isWearable(context)) {
+                Preconditions.checkState(PlatformVersion.isAtLeastKitKatWatch());
+                Notification.Builder style = new Notification.Builder(context).setSmallIcon(context.getApplicationInfo().icon).setPriority(2).setAutoCancel(true).setContentTitle(errorNotificationTitle).setStyle(new BigTextStyle().bigText(errorNotificationMessage));
+                if (DeviceProperties.isWearableWithoutPlayStore(context)) {
+                    style.addAction(R.drawable.common_full_open_on_phone, resources.getString(R.string.common_open_on_phone), pendingIntent);
+                } else {
+                    style.setContentIntent(pendingIntent);
                 }
-                build = addAction.build();
-            } else {
-                NotificationCompat.Builder style = new NotificationCompat.Builder(context).setSmallIcon(17301642).setTicker(resources.getString(R.string.common_google_play_services_notification_ticker)).setWhen(System.currentTimeMillis()).setAutoCancel(true).setContentIntent(pendingIntent).setContentTitle(zzh).setContentText(zzj).setLocalOnly(true).setStyle(new NotificationCompat.BigTextStyle().bigText(zzj));
-                if (zzq.isAtLeastO() && zzq.isAtLeastO()) {
+                if (PlatformVersion.isAtLeastO() && PlatformVersion.isAtLeastO()) {
                     style.setChannelId(zza(context, notificationManager));
                 }
                 build = style.build();
+            } else {
+                NotificationCompat.Builder style2 = new NotificationCompat.Builder(context).setSmallIcon(17301642).setTicker(resources.getString(R.string.common_google_play_services_notification_ticker)).setWhen(System.currentTimeMillis()).setAutoCancel(true).setContentIntent(pendingIntent).setContentTitle(errorNotificationTitle).setContentText(errorNotificationMessage).setLocalOnly(true).setStyle(new NotificationCompat.BigTextStyle().bigText(errorNotificationMessage));
+                if (PlatformVersion.isAtLeastO() && PlatformVersion.isAtLeastO()) {
+                    style2.setChannelId(zza(context, notificationManager));
+                }
+                build = style2.build();
             }
             switch (i) {
                 case 1:
                 case 2:
                 case 3:
-                    i2 = 10436;
-                    zzp.zzfln.set(false);
+                    i = 10436;
+                    GooglePlayServicesUtilLight.zzbt.set(false);
                     break;
                 default:
-                    i2 = 39789;
+                    i = 39789;
                     break;
             }
-            notificationManager.notify(i2, build);
-        } else if (i == 6) {
-            Log.w("GoogleApiAvailability", "Missing resolution for ConnectionResult.RESOLUTION_REQUIRED. Call GoogleApiAvailability#showErrorNotification(Context, ConnectionResult) instead.");
+            if (str == null) {
+                notificationManager.notify(i, build);
+            } else {
+                notificationManager.notify(str, i, build);
+            }
         }
     }
 
-    private final String zzafx() {
+    private final String zzb() {
         String str;
         synchronized (mLock) {
-            str = this.zzfkv;
+            str = this.zzat;
         }
         return str;
     }
 
+    public int getApkVersion(Context context) {
+        return super.getApkVersion(context);
+    }
+
     public Dialog getErrorDialog(Activity activity, int i, int i2, OnCancelListener onCancelListener) {
-        return zza((Context) activity, i, zzv.zza(activity, zzf.zza(activity, i, "d"), i2), onCancelListener);
+        return zza((Context) activity, i, DialogRedirect.getInstance(activity, getErrorResolutionIntent(activity, i, "d"), i2), onCancelListener);
+    }
+
+    @Deprecated
+    public Intent getErrorResolutionIntent(int i) {
+        return super.getErrorResolutionIntent(i);
+    }
+
+    public Intent getErrorResolutionIntent(Context context, int i, String str) {
+        return super.getErrorResolutionIntent(context, i, str);
     }
 
     public PendingIntent getErrorResolutionPendingIntent(Context context, int i, int i2) {
         return super.getErrorResolutionPendingIntent(context, i, i2);
+    }
+
+    public PendingIntent getErrorResolutionPendingIntent(Context context, int i, int i2, String str) {
+        return super.getErrorResolutionPendingIntent(context, i, i2, str);
     }
 
     public PendingIntent getErrorResolutionPendingIntent(Context context, ConnectionResult connectionResult) {
@@ -226,8 +228,30 @@ public class GoogleApiAvailability extends zzf {
         return super.isGooglePlayServicesAvailable(context);
     }
 
+    public int isGooglePlayServicesAvailable(Context context, int i) {
+        return super.isGooglePlayServicesAvailable(context, i);
+    }
+
+    public boolean isPlayServicesPossiblyUpdating(Context context, int i) {
+        return super.isPlayServicesPossiblyUpdating(context, i);
+    }
+
     public final boolean isUserResolvableError(int i) {
         return super.isUserResolvableError(i);
+    }
+
+    public GooglePlayServicesUpdatedReceiver registerCallbackOnUpdate(Context context, Callback callback) {
+        IntentFilter intentFilter = new IntentFilter("android.intent.action.PACKAGE_ADDED");
+        intentFilter.addDataScheme("package");
+        BroadcastReceiver googlePlayServicesUpdatedReceiver = new GooglePlayServicesUpdatedReceiver(callback);
+        context.registerReceiver(googlePlayServicesUpdatedReceiver, intentFilter);
+        googlePlayServicesUpdatedReceiver.zzc(context);
+        if (isUninstalledAppPossiblyUpdating(context, "com.google.android.gms")) {
+            return googlePlayServicesUpdatedReceiver;
+        }
+        callback.zzv();
+        googlePlayServicesUpdatedReceiver.unregister();
+        return null;
     }
 
     public boolean showErrorDialogFragment(Activity activity, int i, int i2, OnCancelListener onCancelListener) {
@@ -239,12 +263,8 @@ public class GoogleApiAvailability extends zzf {
         return true;
     }
 
-    public void showErrorNotification(Context context, int i) {
-        zza(context, i, null, zza(context, i, 0, "n"));
-    }
-
-    public final boolean zza(Activity activity, zzcf com_google_android_gms_common_api_internal_zzcf, int i, int i2, OnCancelListener onCancelListener) {
-        Dialog zza = zza((Context) activity, i, zzv.zza(com_google_android_gms_common_api_internal_zzcf, zzf.zza(activity, i, "d"), 2), onCancelListener);
+    public boolean showErrorDialogFragment(Activity activity, LifecycleFragment lifecycleFragment, int i, int i2, OnCancelListener onCancelListener) {
+        Dialog zza = zza((Context) activity, i, DialogRedirect.getInstance(lifecycleFragment, getErrorResolutionIntent(activity, i, "d"), i2), onCancelListener);
         if (zza == null) {
             return false;
         }
@@ -252,7 +272,28 @@ public class GoogleApiAvailability extends zzf {
         return true;
     }
 
-    public final boolean zza(Context context, ConnectionResult connectionResult, int i) {
+    public void showErrorNotification(Context context, int i) {
+        showErrorNotification(context, i, null);
+    }
+
+    public void showErrorNotification(Context context, int i, String str) {
+        zza(context, i, str, getErrorResolutionPendingIntent(context, i, 0, "n"));
+    }
+
+    public Dialog showUpdatingDialog(Activity activity, OnCancelListener onCancelListener) {
+        View progressBar = new ProgressBar(activity, null, 16842874);
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(0);
+        Builder builder = new Builder(activity);
+        builder.setView(progressBar);
+        builder.setMessage(ConnectionErrorMessages.getErrorMessage(activity, 18));
+        builder.setPositiveButton(TtmlNode.ANONYMOUS_REGION_ID, null);
+        Dialog create = builder.create();
+        zza(activity, create, "GooglePlayServicesUpdatingDialog", onCancelListener);
+        return create;
+    }
+
+    public boolean showWrappedErrorNotification(Context context, ConnectionResult connectionResult, int i) {
         PendingIntent errorResolutionPendingIntent = getErrorResolutionPendingIntent(context, connectionResult);
         if (errorResolutionPendingIntent == null) {
             return false;
@@ -261,7 +302,7 @@ public class GoogleApiAvailability extends zzf {
         return true;
     }
 
-    final void zzcc(Context context) {
+    final void zza(Context context) {
         new zza(this, context).sendEmptyMessageDelayed(1, 120000);
     }
 }

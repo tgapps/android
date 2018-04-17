@@ -44,28 +44,32 @@ public class ProgressiveDownloadInformationBox extends AbstractFullBox {
         }
 
         public String toString() {
-            return "Entry{rate=" + this.rate + ", initialDelay=" + this.initialDelay + '}';
+            StringBuilder stringBuilder = new StringBuilder("Entry{rate=");
+            stringBuilder.append(this.rate);
+            stringBuilder.append(", initialDelay=");
+            stringBuilder.append(this.initialDelay);
+            stringBuilder.append('}');
+            return stringBuilder.toString();
         }
 
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
+            if (o != null) {
+                if (getClass() == o.getClass()) {
+                    Entry entry = (Entry) o;
+                    if (this.initialDelay == entry.initialDelay && this.rate == entry.rate) {
+                        return true;
+                    }
+                    return false;
+                }
             }
-            Entry entry = (Entry) o;
-            if (this.initialDelay != entry.initialDelay) {
-                return false;
-            }
-            if (this.rate != entry.rate) {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public int hashCode() {
-            return (((int) (this.rate ^ (this.rate >>> 32))) * 31) + ((int) (this.initialDelay ^ (this.initialDelay >>> 32)));
+            return (31 * ((int) (this.rate ^ (this.rate >>> 32)))) + ((int) (this.initialDelay ^ (this.initialDelay >>> 32)));
         }
     }
 
@@ -85,7 +89,7 @@ public class ProgressiveDownloadInformationBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) ((this.entries.size() * 8) + 4);
+        return (long) (4 + (this.entries.size() * 8));
     }
 
     protected void getContent(ByteBuffer byteBuffer) {
@@ -116,6 +120,9 @@ public class ProgressiveDownloadInformationBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        return "ProgressiveDownloadInfoBox{entries=" + this.entries + '}';
+        StringBuilder stringBuilder = new StringBuilder("ProgressiveDownloadInfoBox{entries=");
+        stringBuilder.append(this.entries);
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 }

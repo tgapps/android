@@ -2,37 +2,43 @@ package com.google.android.gms.wearable.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
-public final class zzl extends zzbfm {
+@Immutable
+public final class zzl extends AbstractSafeParcelable {
     public static final Creator<zzl> CREATOR = new zzm();
-    private final String mAppId;
-    private int mId;
-    private final String mPackageName;
-    private final String zzegt;
-    private final String zzemt;
-    private final String zzepx;
-    private final String zzlid;
-    private final String zzlie;
-    private final byte zzlif;
-    private final byte zzlig;
-    private final byte zzlih;
-    private final byte zzlii;
+    private int id;
+    @Nullable
+    private final String packageName;
+    private final String zzbf;
+    @Nullable
+    private final String zzbg;
+    private final String zzbh;
+    private final String zzbi;
+    private final String zzbj;
+    @Nullable
+    private final String zzbk;
+    private final byte zzbl;
+    private final byte zzbm;
+    private final byte zzbn;
+    private final byte zzbo;
 
-    public zzl(int i, String str, String str2, String str3, String str4, String str5, String str6, byte b, byte b2, byte b3, byte b4, String str7) {
-        this.mId = i;
-        this.mAppId = str;
-        this.zzlid = str2;
-        this.zzepx = str3;
-        this.zzemt = str4;
-        this.zzlie = str5;
-        this.zzegt = str6;
-        this.zzlif = b;
-        this.zzlig = b2;
-        this.zzlih = b3;
-        this.zzlii = b4;
-        this.mPackageName = str7;
+    public zzl(int i, String str, @Nullable String str2, String str3, String str4, String str5, @Nullable String str6, byte b, byte b2, byte b3, byte b4, @Nullable String str7) {
+        this.id = i;
+        this.zzbf = str;
+        this.zzbg = str2;
+        this.zzbh = str3;
+        this.zzbi = str4;
+        this.zzbj = str5;
+        this.zzbk = str6;
+        this.zzbl = b;
+        this.zzbm = b2;
+        this.zzbn = b3;
+        this.zzbo = b4;
+        this.packageName = str7;
     }
 
     public final boolean equals(Object obj) {
@@ -43,48 +49,101 @@ public final class zzl extends zzbfm {
             return false;
         }
         zzl com_google_android_gms_wearable_internal_zzl = (zzl) obj;
-        return this.mId != com_google_android_gms_wearable_internal_zzl.mId ? false : this.zzlif != com_google_android_gms_wearable_internal_zzl.zzlif ? false : this.zzlig != com_google_android_gms_wearable_internal_zzl.zzlig ? false : this.zzlih != com_google_android_gms_wearable_internal_zzl.zzlih ? false : this.zzlii != com_google_android_gms_wearable_internal_zzl.zzlii ? false : !this.mAppId.equals(com_google_android_gms_wearable_internal_zzl.mAppId) ? false : (this.zzlid == null ? com_google_android_gms_wearable_internal_zzl.zzlid != null : !this.zzlid.equals(com_google_android_gms_wearable_internal_zzl.zzlid)) ? false : !this.zzepx.equals(com_google_android_gms_wearable_internal_zzl.zzepx) ? false : !this.zzemt.equals(com_google_android_gms_wearable_internal_zzl.zzemt) ? false : !this.zzlie.equals(com_google_android_gms_wearable_internal_zzl.zzlie) ? false : (this.zzegt == null ? com_google_android_gms_wearable_internal_zzl.zzegt != null : !this.zzegt.equals(com_google_android_gms_wearable_internal_zzl.zzegt)) ? false : this.mPackageName != null ? this.mPackageName.equals(com_google_android_gms_wearable_internal_zzl.mPackageName) : com_google_android_gms_wearable_internal_zzl.mPackageName == null;
+        if (this.id != com_google_android_gms_wearable_internal_zzl.id || this.zzbl != com_google_android_gms_wearable_internal_zzl.zzbl || this.zzbm != com_google_android_gms_wearable_internal_zzl.zzbm || this.zzbn != com_google_android_gms_wearable_internal_zzl.zzbn || this.zzbo != com_google_android_gms_wearable_internal_zzl.zzbo || !this.zzbf.equals(com_google_android_gms_wearable_internal_zzl.zzbf)) {
+            return false;
+        }
+        if (this.zzbg != null) {
+            if (!this.zzbg.equals(com_google_android_gms_wearable_internal_zzl.zzbg)) {
+                return false;
+            }
+        } else if (com_google_android_gms_wearable_internal_zzl.zzbg != null) {
+            return false;
+        }
+        if (!this.zzbh.equals(com_google_android_gms_wearable_internal_zzl.zzbh) || !this.zzbi.equals(com_google_android_gms_wearable_internal_zzl.zzbi) || !this.zzbj.equals(com_google_android_gms_wearable_internal_zzl.zzbj)) {
+            return false;
+        }
+        if (this.zzbk != null) {
+            if (!this.zzbk.equals(com_google_android_gms_wearable_internal_zzl.zzbk)) {
+                return false;
+            }
+        } else if (com_google_android_gms_wearable_internal_zzl.zzbk != null) {
+            return false;
+        }
+        return this.packageName != null ? this.packageName.equals(com_google_android_gms_wearable_internal_zzl.packageName) : com_google_android_gms_wearable_internal_zzl.packageName == null;
     }
 
     public final int hashCode() {
         int i = 0;
-        int hashCode = ((((((((((this.zzegt != null ? this.zzegt.hashCode() : 0) + (((((((((this.zzlid != null ? this.zzlid.hashCode() : 0) + ((((this.mId + 31) * 31) + this.mAppId.hashCode()) * 31)) * 31) + this.zzepx.hashCode()) * 31) + this.zzemt.hashCode()) * 31) + this.zzlie.hashCode()) * 31)) * 31) + this.zzlif) * 31) + this.zzlig) * 31) + this.zzlih) * 31) + this.zzlii) * 31;
-        if (this.mPackageName != null) {
-            i = this.mPackageName.hashCode();
+        int hashCode = (((((((((((((((((((((this.id + 31) * 31) + this.zzbf.hashCode()) * 31) + (this.zzbg != null ? this.zzbg.hashCode() : 0)) * 31) + this.zzbh.hashCode()) * 31) + this.zzbi.hashCode()) * 31) + this.zzbj.hashCode()) * 31) + (this.zzbk != null ? this.zzbk.hashCode() : 0)) * 31) + this.zzbl) * 31) + this.zzbm) * 31) + this.zzbn) * 31) + this.zzbo) * 31;
+        if (this.packageName != null) {
+            i = this.packageName.hashCode();
         }
         return hashCode + i;
     }
 
     public final String toString() {
-        int i = this.mId;
-        String str = this.mAppId;
-        String str2 = this.zzlid;
-        String str3 = this.zzepx;
-        String str4 = this.zzemt;
-        String str5 = this.zzlie;
-        String str6 = this.zzegt;
-        byte b = this.zzlif;
-        byte b2 = this.zzlig;
-        byte b3 = this.zzlih;
-        byte b4 = this.zzlii;
-        String str7 = this.mPackageName;
-        return new StringBuilder(((((((String.valueOf(str).length() + 211) + String.valueOf(str2).length()) + String.valueOf(str3).length()) + String.valueOf(str4).length()) + String.valueOf(str5).length()) + String.valueOf(str6).length()) + String.valueOf(str7).length()).append("AncsNotificationParcelable{, id=").append(i).append(", appId='").append(str).append("', dateTime='").append(str2).append("', notificationText='").append(str3).append("', title='").append(str4).append("', subtitle='").append(str5).append("', displayName='").append(str6).append("', eventId=").append(b).append(", eventFlags=").append(b2).append(", categoryId=").append(b3).append(", categoryCount=").append(b4).append(", packageName='").append(str7).append("'}").toString();
+        int i = this.id;
+        String str = this.zzbf;
+        String str2 = this.zzbg;
+        String str3 = this.zzbh;
+        String str4 = this.zzbi;
+        String str5 = this.zzbj;
+        String str6 = this.zzbk;
+        byte b = this.zzbl;
+        byte b2 = this.zzbm;
+        byte b3 = this.zzbn;
+        byte b4 = this.zzbo;
+        String str7 = this.packageName;
+        StringBuilder stringBuilder = new StringBuilder(((((((211 + String.valueOf(str).length()) + String.valueOf(str2).length()) + String.valueOf(str3).length()) + String.valueOf(str4).length()) + String.valueOf(str5).length()) + String.valueOf(str6).length()) + String.valueOf(str7).length());
+        stringBuilder.append("AncsNotificationParcelable{, id=");
+        stringBuilder.append(i);
+        stringBuilder.append(", appId='");
+        stringBuilder.append(str);
+        stringBuilder.append('\'');
+        stringBuilder.append(", dateTime='");
+        stringBuilder.append(str2);
+        stringBuilder.append('\'');
+        stringBuilder.append(", notificationText='");
+        stringBuilder.append(str3);
+        stringBuilder.append('\'');
+        stringBuilder.append(", title='");
+        stringBuilder.append(str4);
+        stringBuilder.append('\'');
+        stringBuilder.append(", subtitle='");
+        stringBuilder.append(str5);
+        stringBuilder.append('\'');
+        stringBuilder.append(", displayName='");
+        stringBuilder.append(str6);
+        stringBuilder.append('\'');
+        stringBuilder.append(", eventId=");
+        stringBuilder.append(b);
+        stringBuilder.append(", eventFlags=");
+        stringBuilder.append(b2);
+        stringBuilder.append(", categoryId=");
+        stringBuilder.append(b3);
+        stringBuilder.append(", categoryCount=");
+        stringBuilder.append(b4);
+        stringBuilder.append(", packageName='");
+        stringBuilder.append(str7);
+        stringBuilder.append('\'');
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 2, this.mId);
-        zzbfp.zza(parcel, 3, this.mAppId, false);
-        zzbfp.zza(parcel, 4, this.zzlid, false);
-        zzbfp.zza(parcel, 5, this.zzepx, false);
-        zzbfp.zza(parcel, 6, this.zzemt, false);
-        zzbfp.zza(parcel, 7, this.zzlie, false);
-        zzbfp.zza(parcel, 8, this.zzegt == null ? this.mAppId : this.zzegt, false);
-        zzbfp.zza(parcel, 9, this.zzlif);
-        zzbfp.zza(parcel, 10, this.zzlig);
-        zzbfp.zza(parcel, 11, this.zzlih);
-        zzbfp.zza(parcel, 12, this.zzlii);
-        zzbfp.zza(parcel, 13, this.mPackageName, false);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 2, this.id);
+        SafeParcelWriter.writeString(parcel, 3, this.zzbf, false);
+        SafeParcelWriter.writeString(parcel, 4, this.zzbg, false);
+        SafeParcelWriter.writeString(parcel, 5, this.zzbh, false);
+        SafeParcelWriter.writeString(parcel, 6, this.zzbi, false);
+        SafeParcelWriter.writeString(parcel, 7, this.zzbj, false);
+        SafeParcelWriter.writeString(parcel, 8, this.zzbk == null ? this.zzbf : this.zzbk, false);
+        SafeParcelWriter.writeByte(parcel, 9, this.zzbl);
+        SafeParcelWriter.writeByte(parcel, 10, this.zzbm);
+        SafeParcelWriter.writeByte(parcel, 11, this.zzbn);
+        SafeParcelWriter.writeByte(parcel, 12, this.zzbo);
+        SafeParcelWriter.writeString(parcel, 13, this.packageName, false);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

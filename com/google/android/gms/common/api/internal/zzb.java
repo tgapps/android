@@ -2,35 +2,32 @@ package com.google.android.gms.common.api.internal;
 
 import android.os.DeadObjectException;
 import android.os.RemoteException;
-import com.google.android.gms.common.api.ApiException;
+import android.os.TransactionTooLargeException;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.gms.common.api.internal.GoogleApiManager.zza;
+import com.google.android.gms.common.util.PlatformVersion;
 
-abstract class zzb<T> extends zza {
-    protected final TaskCompletionSource<T> zzedx;
+public abstract class zzb {
+    private final int type;
 
-    public zzb(int i, TaskCompletionSource<T> taskCompletionSource) {
-        super(i);
-        this.zzedx = taskCompletionSource;
+    public zzb(int i) {
+        this.type = i;
     }
 
-    public void zza(zzae com_google_android_gms_common_api_internal_zzae, boolean z) {
-    }
-
-    public final void zza(zzbo<?> com_google_android_gms_common_api_internal_zzbo_) throws DeadObjectException {
-        try {
-            zzb(com_google_android_gms_common_api_internal_zzbo_);
-        } catch (RemoteException e) {
-            zzs(zza.zza(e));
-            throw e;
-        } catch (RemoteException e2) {
-            zzs(zza.zza(e2));
+    private static Status zza(RemoteException remoteException) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (PlatformVersion.isAtLeastIceCreamSandwichMR1() && (remoteException instanceof TransactionTooLargeException)) {
+            stringBuilder.append("TransactionTooLargeException: ");
         }
+        stringBuilder.append(remoteException.getLocalizedMessage());
+        return new Status(8, stringBuilder.toString());
     }
 
-    protected abstract void zzb(zzbo<?> com_google_android_gms_common_api_internal_zzbo_) throws RemoteException;
+    public abstract void zza(Status status);
 
-    public void zzs(Status status) {
-        this.zzedx.trySetException(new ApiException(status));
-    }
+    public abstract void zza(zza<?> com_google_android_gms_common_api_internal_GoogleApiManager_zza_) throws DeadObjectException;
+
+    public abstract void zza(zzaa com_google_android_gms_common_api_internal_zzaa, boolean z);
+
+    public abstract void zza(RuntimeException runtimeException);
 }

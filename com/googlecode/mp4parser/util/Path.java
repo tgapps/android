@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Path {
-    static final /* synthetic */ boolean $assertionsDisabled = (!Path.class.desiredAssertionStatus());
+    static final /* synthetic */ boolean $assertionsDisabled = false;
     static Pattern component = Pattern.compile("(....|\\.\\.)(\\[(.*)\\])?");
 
     private Path() {
@@ -30,7 +30,9 @@ public class Path {
                 index++;
             }
         }
-        path = new StringBuilder(String.valueOf(String.format("/%s[%d]", new Object[]{box.getType(), Integer.valueOf(index)}))).append(path).toString();
+        StringBuilder stringBuilder = new StringBuilder(String.valueOf(String.format("/%s[%d]", new Object[]{box.getType(), Integer.valueOf(index)})));
+        stringBuilder.append(path);
+        path = stringBuilder.toString();
         if (parent instanceof Box) {
             return createPath((Box) parent, path);
         }
@@ -55,35 +57,31 @@ public class Path {
     }
 
     private static <T extends Box> List<T> getPaths(Object thing, String path, boolean singleResult) {
-        Object obj;
         if (path.startsWith("/")) {
-            path = path.substring(1);
+            String path2 = path.substring(1);
             while (thing instanceof Box) {
                 thing = ((Box) thing).getParent();
             }
-            obj = thing;
-        } else {
-            obj = thing;
+            path = path2;
         }
         if (path.length() != 0) {
             String later;
-            String now;
             if (path.contains("/")) {
                 later = path.substring(path.indexOf(47) + 1);
-                now = path.substring(0, path.indexOf(47));
+                path2 = path.substring(0, path.indexOf(47));
             } else {
-                now = path;
+                path2 = path;
                 later = TtmlNode.ANONYMOUS_REGION_ID;
             }
-            Matcher m = component.matcher(now);
+            Matcher m = component.matcher(path2);
             if (m.matches()) {
                 String type = m.group(1);
                 if ("..".equals(type)) {
-                    if (obj instanceof Box) {
-                        return getPaths(((Box) obj).getParent(), later, singleResult);
+                    if (thing instanceof Box) {
+                        return getPaths(((Box) thing).getParent(), later, singleResult);
                     }
                     return Collections.emptyList();
-                } else if (!(obj instanceof Container)) {
+                } else if (!(thing instanceof Container)) {
                     return Collections.emptyList();
                 } else {
                     int index = -1;
@@ -92,7 +90,7 @@ public class Path {
                     }
                     List<T> children = new LinkedList();
                     int currentIndex = 0;
-                    for (Box box1 : ((Container) obj).getBoxes()) {
+                    for (Box box1 : ((Container) thing).getBoxes()) {
                         if (box1.getType().matches(type)) {
                             if (index == -1 || index == currentIndex) {
                                 children.addAll(getPaths(box1, later, singleResult));
@@ -106,9 +104,11 @@ public class Path {
                     return children;
                 }
             }
-            throw new RuntimeException(new StringBuilder(String.valueOf(now)).append(" is invalid path.").toString());
-        } else if (obj instanceof Box) {
-            return Collections.singletonList((Box) obj);
+            StringBuilder stringBuilder = new StringBuilder(String.valueOf(path2));
+            stringBuilder.append(" is invalid path.");
+            throw new RuntimeException(stringBuilder.toString());
+        } else if (thing instanceof Box) {
+            return Collections.singletonList((Box) thing);
         } else {
             throw new RuntimeException("Result of path expression seems to be the root container. This is not allowed!");
         }

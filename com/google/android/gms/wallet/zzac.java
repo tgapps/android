@@ -1,43 +1,52 @@
 package com.google.android.gms.wallet;
 
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.identity.intents.model.UserAddress;
-import com.google.android.gms.internal.zzbfn;
 
 public final class zzac implements Creator<PaymentData> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
-        int zzd = zzbfn.zzd(parcel);
-        PaymentMethodToken paymentMethodToken = null;
-        UserAddress userAddress = null;
-        CardInfo cardInfo = null;
-        String str2 = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        CardInfo cardInfo = str;
+        UserAddress userAddress = cardInfo;
+        PaymentMethodToken paymentMethodToken = userAddress;
+        String str2 = paymentMethodToken;
+        Bundle bundle = str2;
+        String str3 = bundle;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    str2 = zzbfn.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 2:
-                    cardInfo = (CardInfo) zzbfn.zza(parcel, readInt, CardInfo.CREATOR);
+                    cardInfo = (CardInfo) SafeParcelReader.createParcelable(parcel, readHeader, CardInfo.CREATOR);
                     break;
                 case 3:
-                    userAddress = (UserAddress) zzbfn.zza(parcel, readInt, UserAddress.CREATOR);
+                    userAddress = (UserAddress) SafeParcelReader.createParcelable(parcel, readHeader, UserAddress.CREATOR);
                     break;
                 case 4:
-                    paymentMethodToken = (PaymentMethodToken) zzbfn.zza(parcel, readInt, PaymentMethodToken.CREATOR);
+                    paymentMethodToken = (PaymentMethodToken) SafeParcelReader.createParcelable(parcel, readHeader, PaymentMethodToken.CREATOR);
                     break;
                 case 5:
-                    str = zzbfn.zzq(parcel, readInt);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 6:
+                    bundle = SafeParcelReader.createBundle(parcel, readHeader);
+                    break;
+                case 7:
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new PaymentData(str2, cardInfo, userAddress, paymentMethodToken, str);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new PaymentData(str, cardInfo, userAddress, paymentMethodToken, str2, bundle, str3);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

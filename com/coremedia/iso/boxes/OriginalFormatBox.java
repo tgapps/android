@@ -9,7 +9,7 @@ import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.reflect.Factory;
 
 public class OriginalFormatBox extends AbstractBox {
-    static final /* synthetic */ boolean $assertionsDisabled = (!OriginalFormatBox.class.desiredAssertionStatus());
+    static final /* synthetic */ boolean $assertionsDisabled = false;
     public static final String TYPE = "frma";
     private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
     private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
@@ -38,11 +38,7 @@ public class OriginalFormatBox extends AbstractBox {
 
     public void setDataFormat(String dataFormat) {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_1, (Object) this, (Object) this, (Object) dataFormat));
-        if ($assertionsDisabled || dataFormat.length() == 4) {
-            this.dataFormat = dataFormat;
-            return;
-        }
-        throw new AssertionError();
+        this.dataFormat = dataFormat;
     }
 
     protected long getContentSize() {
@@ -59,6 +55,9 @@ public class OriginalFormatBox extends AbstractBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        return "OriginalFormatBox[dataFormat=" + getDataFormat() + "]";
+        StringBuilder stringBuilder = new StringBuilder("OriginalFormatBox[dataFormat=");
+        stringBuilder.append(getDataFormat());
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 }

@@ -1,6 +1,5 @@
 package org.telegram.messenger.exoplayer2;
 
-import android.util.Pair;
 import org.telegram.messenger.exoplayer2.Timeline.Period;
 import org.telegram.messenger.exoplayer2.Timeline.Window;
 import org.telegram.messenger.exoplayer2.source.MediaPeriod;
@@ -22,6 +21,173 @@ final class MediaPeriodQueue {
     private boolean shuffleModeEnabled;
     private Timeline timeline;
     private final Window window = new Window();
+
+    private org.telegram.messenger.exoplayer2.MediaPeriodInfo getFollowingMediaPeriodInfo(org.telegram.messenger.exoplayer2.MediaPeriodInfo r1, long r2, long r4) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.MediaPeriodQueue.getFollowingMediaPeriodInfo(org.telegram.messenger.exoplayer2.MediaPeriodInfo, long, long):org.telegram.messenger.exoplayer2.MediaPeriodInfo
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r6 = r20;
+        r7 = r21;
+        r0 = r7.isLastInTimelinePeriod;
+        r1 = -1;
+        r2 = 0;
+        if (r0 == 0) goto L_0x007b;
+    L_0x000a:
+        r8 = r6.timeline;
+        r0 = r7.id;
+        r9 = r0.periodIndex;
+        r10 = r6.period;
+        r11 = r6.window;
+        r12 = r6.repeatMode;
+        r13 = r6.shuffleModeEnabled;
+        r0 = r8.getNextPeriodIndex(r9, r10, r11, r12, r13);
+        if (r0 != r1) goto L_0x001f;
+    L_0x001e:
+        return r2;
+    L_0x001f:
+        r1 = r6.timeline;
+        r3 = r6.period;
+        r1 = r1.getPeriod(r0, r3);
+        r4 = r1.windowIndex;
+        r1 = r6.timeline;
+        r3 = r6.window;
+        r1 = r1.getWindow(r4, r3);
+        r1 = r1.firstPeriodIndex;
+        r8 = 0;
+        if (r1 != r0) goto L_0x006b;
+    L_0x0037:
+        r10 = r7.durationUs;
+        r12 = r22 + r10;
+        r14 = r12 - r24;
+        r1 = r6.timeline;
+        r3 = r6.window;
+        r10 = r6.period;
+        r12 = -9223372036854775807; // 0x8000000000000001 float:1.4E-45 double:-4.9E-324;
+        r16 = java.lang.Math.max(r8, r14);
+        r8 = r1;
+        r9 = r3;
+        r11 = r4;
+        r18 = r14;
+        r14 = r16;
+        r1 = r8.getPeriodPosition(r9, r10, r11, r12, r14);
+        if (r1 != 0) goto L_0x005a;
+        return r2;
+        r2 = r1.first;
+        r2 = (java.lang.Integer) r2;
+        r0 = r2.intValue();
+        r2 = r1.second;
+        r2 = (java.lang.Long) r2;
+        r8 = r2.longValue();
+        goto L_0x006c;
+        r10 = r0;
+        r11 = r6.resolveMediaPeriodIdForAds(r10, r8);
+        r0 = r6;
+        r1 = r11;
+        r2 = r8;
+        r12 = r4;
+        r4 = r8;
+        r0 = r0.getMediaPeriodInfo(r1, r2, r4);
+        return r0;
+    L_0x007b:
+        r8 = r7.id;
+        r0 = r8.isAd();
+        r3 = -9223372036854775808;
+        if (r0 == 0) goto L_0x00d1;
+        r9 = r8.adGroupIndex;
+        r0 = r6.timeline;
+        r5 = r8.periodIndex;
+        r10 = r6.period;
+        r0.getPeriod(r5, r10);
+        r0 = r6.period;
+        r10 = r0.getAdCountInAdGroup(r9);
+        if (r10 != r1) goto L_0x0099;
+        return r2;
+        r0 = r8.adIndexInAdGroup;
+        r11 = r0 + 1;
+        if (r11 >= r10) goto L_0x00b4;
+        r0 = r6.period;
+        r0 = r0.isAdAvailable(r9, r11);
+        if (r0 != 0) goto L_0x00a8;
+        goto L_0x00b3;
+        r1 = r8.periodIndex;
+        r4 = r7.contentPositionUs;
+        r0 = r6;
+        r2 = r9;
+        r3 = r11;
+        r2 = r0.getMediaPeriodInfoForAd(r1, r2, r3, r4);
+        return r2;
+        r0 = r6.period;
+        r12 = r7.contentPositionUs;
+        r12 = r0.getAdGroupIndexAfterPositionUs(r12);
+        if (r12 != r1) goto L_0x00c0;
+        r4 = r3;
+        goto L_0x00c7;
+        r0 = r6.period;
+        r0 = r0.getAdGroupTimeUs(r12);
+        r4 = r0;
+        r1 = r8.periodIndex;
+        r2 = r7.contentPositionUs;
+        r0 = r6;
+        r0 = r0.getMediaPeriodInfoForContent(r1, r2, r4);
+        return r0;
+        r0 = r7.endPositionUs;
+        r5 = (r0 > r3 ? 1 : (r0 == r3 ? 0 : -1));
+        r0 = 0;
+        if (r5 == 0) goto L_0x00f5;
+        r1 = r6.period;
+        r3 = r7.endPositionUs;
+        r9 = r1.getAdGroupIndexForPositionUs(r3);
+        r1 = r6.period;
+        r0 = r1.isAdAvailable(r9, r0);
+        if (r0 != 0) goto L_0x00e9;
+        goto L_0x00f4;
+        r1 = r8.periodIndex;
+        r3 = 0;
+        r4 = r7.endPositionUs;
+        r0 = r6;
+        r2 = r9;
+        r2 = r0.getMediaPeriodInfoForAd(r1, r2, r3, r4);
+        return r2;
+        r1 = r6.period;
+        r9 = r1.getAdGroupCount();
+        if (r9 == 0) goto L_0x0130;
+        r1 = r6.period;
+        r5 = r9 + -1;
+        r10 = r1.getAdGroupTimeUs(r5);
+        r1 = (r10 > r3 ? 1 : (r10 == r3 ? 0 : -1));
+        if (r1 != 0) goto L_0x0130;
+        r1 = r6.period;
+        r3 = r9 + -1;
+        r1 = r1.hasPlayedAdGroup(r3);
+        if (r1 != 0) goto L_0x0130;
+        r1 = r6.period;
+        r3 = r9 + -1;
+        r0 = r1.isAdAvailable(r3, r0);
+        if (r0 != 0) goto L_0x011e;
+        goto L_0x0130;
+        r0 = r6.period;
+        r10 = r0.getDurationUs();
+        r1 = r8.periodIndex;
+        r2 = r9 + -1;
+        r3 = 0;
+        r0 = r6;
+        r4 = r10;
+        r0 = r0.getMediaPeriodInfoForAd(r1, r2, r3, r4);
+        return r0;
+        return r2;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.MediaPeriodQueue.getFollowingMediaPeriodInfo(org.telegram.messenger.exoplayer2.MediaPeriodInfo, long, long):org.telegram.messenger.exoplayer2.MediaPeriodInfo");
+    }
 
     public void setTimeline(Timeline timeline) {
         this.timeline = timeline;
@@ -46,7 +212,12 @@ final class MediaPeriodQueue {
     }
 
     public boolean shouldLoadNextMediaPeriod() {
-        return this.loading == null || (!this.loading.info.isFinal && this.loading.isFullyBuffered() && this.loading.info.durationUs != C.TIME_UNSET && this.length < MAXIMUM_BUFFER_AHEAD_PERIODS);
+        if (this.loading != null) {
+            if (this.loading.info.isFinal || !this.loading.isFullyBuffered() || this.loading.info.durationUs == C.TIME_UNSET || this.length >= MAXIMUM_BUFFER_AHEAD_PERIODS) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public MediaPeriodInfo getNextMediaPeriodInfo(long rendererPositionUs, PlaybackInfo playbackInfo) {
@@ -57,19 +228,22 @@ final class MediaPeriodQueue {
     }
 
     public MediaPeriod enqueueNextMediaPeriod(RendererCapabilities[] rendererCapabilities, long rendererTimestampOffsetUs, TrackSelector trackSelector, Allocator allocator, MediaSource mediaSource, Object uid, MediaPeriodInfo info) {
+        MediaPeriodInfo mediaPeriodInfo;
         long rendererPositionOffsetUs;
         if (this.loading == null) {
-            rendererPositionOffsetUs = info.startPositionUs + rendererTimestampOffsetUs;
+            mediaPeriodInfo = info;
+            rendererPositionOffsetUs = mediaPeriodInfo.startPositionUs + rendererTimestampOffsetUs;
         } else {
-            rendererPositionOffsetUs = this.loading.getRendererOffset() + this.loading.info.durationUs;
+            mediaPeriodInfo = info;
+            rendererPositionOffsetUs = r0.loading.getRendererOffset() + r0.loading.info.durationUs;
         }
-        MediaPeriodHolder newPeriodHolder = new MediaPeriodHolder(rendererCapabilities, rendererPositionOffsetUs, trackSelector, allocator, mediaSource, uid, info);
-        if (this.loading != null) {
+        MediaPeriodHolder newPeriodHolder = new MediaPeriodHolder(rendererCapabilities, rendererPositionOffsetUs, trackSelector, allocator, mediaSource, uid, mediaPeriodInfo);
+        if (r0.loading != null) {
             Assertions.checkState(hasPlayingPeriod());
-            this.loading.next = newPeriodHolder;
+            r0.loading.next = newPeriodHolder;
         }
-        this.loading = newPeriodHolder;
-        this.length++;
+        r0.loading = newPeriodHolder;
+        r0.length++;
         return newPeriodHolder.mediaPeriod;
     }
 
@@ -172,86 +346,39 @@ final class MediaPeriodQueue {
         return getMediaPeriodInfo(playbackInfo.periodId, playbackInfo.contentPositionUs, playbackInfo.startPositionUs);
     }
 
-    private MediaPeriodInfo getFollowingMediaPeriodInfo(MediaPeriodInfo currentMediaPeriodInfo, long rendererOffsetUs, long rendererPositionUs) {
-        if (currentMediaPeriodInfo.isLastInTimelinePeriod) {
-            int nextPeriodIndex = this.timeline.getNextPeriodIndex(currentMediaPeriodInfo.id.periodIndex, this.period, this.window, this.repeatMode, this.shuffleModeEnabled);
-            if (nextPeriodIndex == -1) {
-                return null;
-            }
-            long startPositionUs;
-            int nextWindowIndex = this.timeline.getPeriod(nextPeriodIndex, this.period).windowIndex;
-            if (this.timeline.getWindow(nextWindowIndex, this.window).firstPeriodIndex == nextPeriodIndex) {
-                Pair<Integer, Long> defaultPosition = this.timeline.getPeriodPosition(this.window, this.period, nextWindowIndex, C.TIME_UNSET, Math.max(0, (currentMediaPeriodInfo.durationUs + rendererOffsetUs) - rendererPositionUs));
-                if (defaultPosition == null) {
-                    return null;
-                }
-                nextPeriodIndex = ((Integer) defaultPosition.first).intValue();
-                startPositionUs = ((Long) defaultPosition.second).longValue();
-            } else {
-                startPositionUs = 0;
-            }
-            return getMediaPeriodInfo(resolveMediaPeriodIdForAds(nextPeriodIndex, startPositionUs), startPositionUs, startPositionUs);
-        }
-        MediaPeriodId currentPeriodId = currentMediaPeriodInfo.id;
-        int nextAdGroupIndex;
-        if (currentPeriodId.isAd()) {
-            int currentAdGroupIndex = currentPeriodId.adGroupIndex;
-            this.timeline.getPeriod(currentPeriodId.periodIndex, this.period);
-            int adCountInCurrentAdGroup = this.period.getAdCountInAdGroup(currentAdGroupIndex);
-            if (adCountInCurrentAdGroup == -1) {
-                return null;
-            }
-            int nextAdIndexInAdGroup = currentPeriodId.adIndexInAdGroup + 1;
-            if (nextAdIndexInAdGroup >= adCountInCurrentAdGroup) {
-                long endUs;
-                nextAdGroupIndex = this.period.getAdGroupIndexAfterPositionUs(currentMediaPeriodInfo.contentPositionUs);
-                if (nextAdGroupIndex == -1) {
-                    endUs = Long.MIN_VALUE;
-                } else {
-                    endUs = this.period.getAdGroupTimeUs(nextAdGroupIndex);
-                }
-                return getMediaPeriodInfoForContent(currentPeriodId.periodIndex, currentMediaPeriodInfo.contentPositionUs, endUs);
-            } else if (this.period.isAdAvailable(currentAdGroupIndex, nextAdIndexInAdGroup)) {
-                return getMediaPeriodInfoForAd(currentPeriodId.periodIndex, currentAdGroupIndex, nextAdIndexInAdGroup, currentMediaPeriodInfo.contentPositionUs);
-            } else {
-                return null;
-            }
-        } else if (currentMediaPeriodInfo.endPositionUs != Long.MIN_VALUE) {
-            nextAdGroupIndex = this.period.getAdGroupIndexForPositionUs(currentMediaPeriodInfo.endPositionUs);
-            if (this.period.isAdAvailable(nextAdGroupIndex, 0)) {
-                return getMediaPeriodInfoForAd(currentPeriodId.periodIndex, nextAdGroupIndex, 0, currentMediaPeriodInfo.endPositionUs);
-            }
-            return null;
-        } else {
-            int adGroupCount = this.period.getAdGroupCount();
-            if (adGroupCount == 0 || this.period.getAdGroupTimeUs(adGroupCount - 1) != Long.MIN_VALUE || this.period.hasPlayedAdGroup(adGroupCount - 1) || !this.period.isAdAvailable(adGroupCount - 1, 0)) {
-                return null;
-            }
-            return getMediaPeriodInfoForAd(currentPeriodId.periodIndex, adGroupCount - 1, 0, this.period.getDurationUs());
-        }
-    }
-
     private MediaPeriodInfo getUpdatedMediaPeriodInfo(MediaPeriodInfo info, MediaPeriodId newId) {
-        long startPositionUs = info.startPositionUs;
-        long endPositionUs = info.endPositionUs;
-        boolean isLastInPeriod = isLastInPeriod(newId, endPositionUs);
-        boolean isLastInTimeline = isLastInTimeline(newId, isLastInPeriod);
-        this.timeline.getPeriod(newId.periodIndex, this.period);
-        long durationUs = newId.isAd() ? this.period.getAdDurationUs(newId.adGroupIndex, newId.adIndexInAdGroup) : endPositionUs == Long.MIN_VALUE ? this.period.getDurationUs() : endPositionUs;
-        return new MediaPeriodInfo(newId, startPositionUs, endPositionUs, info.contentPositionUs, durationUs, isLastInPeriod, isLastInTimeline);
+        long adDurationUs;
+        long durationUs;
+        MediaPeriodInfo mediaPeriodInfo = info;
+        MediaPeriodId mediaPeriodId = newId;
+        long startPositionUs = mediaPeriodInfo.startPositionUs;
+        long endPositionUs = mediaPeriodInfo.endPositionUs;
+        boolean isLastInPeriod = isLastInPeriod(mediaPeriodId, endPositionUs);
+        boolean isLastInTimeline = isLastInTimeline(mediaPeriodId, isLastInPeriod);
+        this.timeline.getPeriod(mediaPeriodId.periodIndex, this.period);
+        if (newId.isAd()) {
+            adDurationUs = r0.period.getAdDurationUs(mediaPeriodId.adGroupIndex, mediaPeriodId.adIndexInAdGroup);
+        } else if (endPositionUs == Long.MIN_VALUE) {
+            adDurationUs = r0.period.getDurationUs();
+        } else {
+            durationUs = endPositionUs;
+            return new MediaPeriodInfo(mediaPeriodId, startPositionUs, endPositionUs, mediaPeriodInfo.contentPositionUs, durationUs, isLastInPeriod, isLastInTimeline);
+        }
+        durationUs = adDurationUs;
+        return new MediaPeriodInfo(mediaPeriodId, startPositionUs, endPositionUs, mediaPeriodInfo.contentPositionUs, durationUs, isLastInPeriod, isLastInTimeline);
     }
 
     private MediaPeriodInfo getMediaPeriodInfo(MediaPeriodId id, long contentPositionUs, long startPositionUs) {
         this.timeline.getPeriod(id.periodIndex, this.period);
         if (!id.isAd()) {
-            long endUs;
+            long j;
             int nextAdGroupIndex = this.period.getAdGroupIndexAfterPositionUs(startPositionUs);
             if (nextAdGroupIndex == -1) {
-                endUs = Long.MIN_VALUE;
+                j = Long.MIN_VALUE;
             } else {
-                endUs = this.period.getAdGroupTimeUs(nextAdGroupIndex);
+                j = this.period.getAdGroupTimeUs(nextAdGroupIndex);
             }
-            return getMediaPeriodInfoForContent(id.periodIndex, startPositionUs, endUs);
+            return getMediaPeriodInfoForContent(id.periodIndex, startPositionUs, j);
         } else if (this.period.isAdAvailable(id.adGroupIndex, id.adIndexInAdGroup)) {
             return getMediaPeriodInfoForAd(id.periodIndex, id.adGroupIndex, id.adIndexInAdGroup, contentPositionUs);
         } else {
@@ -260,54 +387,50 @@ final class MediaPeriodQueue {
     }
 
     private MediaPeriodInfo getMediaPeriodInfoForAd(int periodIndex, int adGroupIndex, int adIndexInAdGroup, long contentPositionUs) {
-        MediaPeriodId id = new MediaPeriodId(periodIndex, adGroupIndex, adIndexInAdGroup);
+        int i = adGroupIndex;
+        int i2 = adIndexInAdGroup;
+        MediaPeriodId id = new MediaPeriodId(periodIndex, i, i2);
         boolean isLastInPeriod = isLastInPeriod(id, Long.MIN_VALUE);
         boolean isLastInTimeline = isLastInTimeline(id, isLastInPeriod);
-        return new MediaPeriodInfo(id, adIndexInAdGroup == this.period.getNextAdIndexToPlay(adGroupIndex) ? this.period.getAdResumePositionUs() : 0, Long.MIN_VALUE, contentPositionUs, this.timeline.getPeriod(id.periodIndex, this.period).getAdDurationUs(id.adGroupIndex, id.adIndexInAdGroup), isLastInPeriod, isLastInTimeline);
+        boolean isLastInPeriod2 = isLastInPeriod;
+        return new MediaPeriodInfo(id, i2 == this.period.getNextAdIndexToPlay(i) ? r0.period.getAdResumePositionUs() : 0, Long.MIN_VALUE, contentPositionUs, this.timeline.getPeriod(id.periodIndex, this.period).getAdDurationUs(id.adGroupIndex, id.adIndexInAdGroup), isLastInPeriod, isLastInTimeline);
     }
 
     private MediaPeriodInfo getMediaPeriodInfoForContent(int periodIndex, long startPositionUs, long endUs) {
-        long durationUs;
+        long j = endUs;
         MediaPeriodId id = new MediaPeriodId(periodIndex);
-        boolean isLastInPeriod = isLastInPeriod(id, endUs);
+        boolean isLastInPeriod = isLastInPeriod(id, j);
         boolean isLastInTimeline = isLastInTimeline(id, isLastInPeriod);
         this.timeline.getPeriod(id.periodIndex, this.period);
-        if (endUs == Long.MIN_VALUE) {
-            durationUs = this.period.getDurationUs();
-        } else {
-            durationUs = endUs;
-        }
-        return new MediaPeriodInfo(id, startPositionUs, endUs, C.TIME_UNSET, durationUs, isLastInPeriod, isLastInTimeline);
+        boolean isLastInPeriod2 = isLastInPeriod;
+        return new MediaPeriodInfo(id, startPositionUs, j, C.TIME_UNSET, j == Long.MIN_VALUE ? r0.period.getDurationUs() : j, isLastInPeriod, isLastInTimeline);
     }
 
     private boolean isLastInPeriod(MediaPeriodId id, long endPositionUs) {
-        boolean z = false;
         int adGroupCount = this.timeline.getPeriod(id.periodIndex, this.period).getAdGroupCount();
+        boolean z = true;
         if (adGroupCount == 0) {
             return true;
         }
         int lastAdGroupIndex = adGroupCount - 1;
         boolean isAd = id.isAd();
-        if (this.period.getAdGroupTimeUs(lastAdGroupIndex) == Long.MIN_VALUE) {
-            int postrollAdCount = this.period.getAdCountInAdGroup(lastAdGroupIndex);
-            if (postrollAdCount == -1) {
-                return false;
-            }
-            boolean isLastAd;
-            if (isAd && id.adGroupIndex == lastAdGroupIndex && id.adIndexInAdGroup == postrollAdCount - 1) {
-                isLastAd = true;
-            } else {
-                isLastAd = false;
-            }
-            if (isLastAd || (!isAd && this.period.getNextAdIndexToPlay(lastAdGroupIndex) == postrollAdCount)) {
-                z = true;
+        if (this.period.getAdGroupTimeUs(lastAdGroupIndex) != Long.MIN_VALUE) {
+            if (isAd || endPositionUs != Long.MIN_VALUE) {
+                z = false;
             }
             return z;
-        } else if (isAd || endPositionUs != Long.MIN_VALUE) {
-            return false;
-        } else {
-            return true;
         }
+        int postrollAdCount = this.period.getAdCountInAdGroup(lastAdGroupIndex);
+        if (postrollAdCount == -1) {
+            return false;
+        }
+        boolean isLastAd = isAd && id.adGroupIndex == lastAdGroupIndex && id.adIndexInAdGroup == postrollAdCount - 1;
+        if (!isLastAd) {
+            if (isAd || this.period.getNextAdIndexToPlay(lastAdGroupIndex) != postrollAdCount) {
+                z = false;
+            }
+        }
+        return z;
     }
 
     private boolean isLastInTimeline(MediaPeriodId id, boolean isLastMediaPeriodInPeriod) {

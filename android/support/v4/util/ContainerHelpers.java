@@ -19,21 +19,26 @@ class ContainerHelpers {
     }
 
     public static boolean equal(Object a, Object b) {
-        return a == b || (a != null && a.equals(b));
+        if (a != b) {
+            if (a == null || !a.equals(b)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     static int binarySearch(int[] array, int size, int value) {
         int lo = 0;
         int hi = size - 1;
         while (lo <= hi) {
-            int i = (lo + hi) >>> 1;
-            int midVal = array[i];
+            int mid = (lo + hi) >>> 1;
+            int midVal = array[mid];
             if (midVal < value) {
-                lo = i + 1;
+                lo = mid + 1;
             } else if (midVal <= value) {
-                return i;
+                return mid;
             } else {
-                hi = i - 1;
+                hi = mid - 1;
             }
         }
         return lo ^ -1;
@@ -43,14 +48,14 @@ class ContainerHelpers {
         int lo = 0;
         int hi = size - 1;
         while (lo <= hi) {
-            int i = (lo + hi) >>> 1;
-            long midVal = array[i];
+            int mid = (lo + hi) >>> 1;
+            long midVal = array[mid];
             if (midVal < value) {
-                lo = i + 1;
+                lo = mid + 1;
             } else if (midVal <= value) {
-                return i;
+                return mid;
             } else {
-                hi = i - 1;
+                hi = mid - 1;
             }
         }
         return lo ^ -1;

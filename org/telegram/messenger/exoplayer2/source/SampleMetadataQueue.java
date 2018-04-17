@@ -1,8 +1,6 @@
 package org.telegram.messenger.exoplayer2.source;
 
 import org.telegram.messenger.exoplayer2.Format;
-import org.telegram.messenger.exoplayer2.FormatHolder;
-import org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer;
 import org.telegram.messenger.exoplayer2.extractor.TrackOutput.CryptoData;
 import org.telegram.messenger.exoplayer2.util.Assertions;
 import org.telegram.messenger.exoplayer2.util.Util;
@@ -101,50 +99,143 @@ final class SampleMetadataQueue {
         this.readPosition = 0;
     }
 
-    public synchronized int read(FormatHolder formatHolder, DecoderInputBuffer buffer, boolean formatRequired, boolean loadingFinished, Format downstreamFormat, SampleExtrasHolder extrasHolder) {
-        int i = -4;
-        synchronized (this) {
-            if (hasNextSample()) {
-                int relativeReadIndex = getRelativeIndex(this.readPosition);
-                if (formatRequired || this.formats[relativeReadIndex] != downstreamFormat) {
-                    formatHolder.format = this.formats[relativeReadIndex];
-                    i = -5;
-                } else if (buffer.isFlagsOnly()) {
-                    i = -3;
-                } else {
-                    buffer.timeUs = this.timesUs[relativeReadIndex];
-                    buffer.setFlags(this.flags[relativeReadIndex]);
-                    extrasHolder.size = this.sizes[relativeReadIndex];
-                    extrasHolder.offset = this.offsets[relativeReadIndex];
-                    extrasHolder.cryptoData = this.cryptoDatas[relativeReadIndex];
-                    this.readPosition++;
-                }
-            } else if (loadingFinished) {
-                buffer.setFlags(4);
-            } else if (this.upstreamFormat == null || (!formatRequired && this.upstreamFormat == downstreamFormat)) {
-                i = -3;
-            } else {
-                formatHolder.format = this.upstreamFormat;
-                i = -5;
-            }
-        }
-        return i;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public synchronized int read(org.telegram.messenger.exoplayer2.FormatHolder r7, org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer r8, boolean r9, boolean r10, org.telegram.messenger.exoplayer2.Format r11, org.telegram.messenger.exoplayer2.source.SampleMetadataQueue.SampleExtrasHolder r12) {
+        /*
+        r6 = this;
+        monitor-enter(r6);
+        r0 = r6.hasNextSample();	 Catch:{ all -> 0x006a }
+        r1 = -3;
+        r2 = -5;
+        r3 = -4;
+        if (r0 != 0) goto L_0x0024;
+    L_0x000a:
+        if (r10 == 0) goto L_0x0012;
+    L_0x000c:
+        r0 = 4;
+        r8.setFlags(r0);	 Catch:{ all -> 0x006a }
+        monitor-exit(r6);
+        return r3;
+    L_0x0012:
+        r0 = r6.upstreamFormat;	 Catch:{ all -> 0x006a }
+        if (r0 == 0) goto L_0x0022;
+    L_0x0016:
+        if (r9 != 0) goto L_0x001c;
+    L_0x0018:
+        r0 = r6.upstreamFormat;	 Catch:{ all -> 0x006a }
+        if (r0 == r11) goto L_0x0022;
+    L_0x001c:
+        r0 = r6.upstreamFormat;	 Catch:{ all -> 0x006a }
+        r7.format = r0;	 Catch:{ all -> 0x006a }
+        monitor-exit(r6);
+        return r2;
+    L_0x0022:
+        monitor-exit(r6);
+        return r1;
+    L_0x0024:
+        r0 = r6.readPosition;	 Catch:{ all -> 0x006a }
+        r0 = r6.getRelativeIndex(r0);	 Catch:{ all -> 0x006a }
+        if (r9 != 0) goto L_0x0062;
+    L_0x002c:
+        r4 = r6.formats;	 Catch:{ all -> 0x006a }
+        r4 = r4[r0];	 Catch:{ all -> 0x006a }
+        if (r4 == r11) goto L_0x0033;
+    L_0x0032:
+        goto L_0x0062;
+    L_0x0033:
+        r2 = r8.isFlagsOnly();	 Catch:{ all -> 0x006a }
+        if (r2 == 0) goto L_0x003b;
+    L_0x0039:
+        monitor-exit(r6);
+        return r1;
+    L_0x003b:
+        r1 = r6.timesUs;	 Catch:{ all -> 0x006a }
+        r4 = r1[r0];	 Catch:{ all -> 0x006a }
+        r8.timeUs = r4;	 Catch:{ all -> 0x006a }
+        r1 = r6.flags;	 Catch:{ all -> 0x006a }
+        r1 = r1[r0];	 Catch:{ all -> 0x006a }
+        r8.setFlags(r1);	 Catch:{ all -> 0x006a }
+        r1 = r6.sizes;	 Catch:{ all -> 0x006a }
+        r1 = r1[r0];	 Catch:{ all -> 0x006a }
+        r12.size = r1;	 Catch:{ all -> 0x006a }
+        r1 = r6.offsets;	 Catch:{ all -> 0x006a }
+        r4 = r1[r0];	 Catch:{ all -> 0x006a }
+        r12.offset = r4;	 Catch:{ all -> 0x006a }
+        r1 = r6.cryptoDatas;	 Catch:{ all -> 0x006a }
+        r1 = r1[r0];	 Catch:{ all -> 0x006a }
+        r12.cryptoData = r1;	 Catch:{ all -> 0x006a }
+        r1 = r6.readPosition;	 Catch:{ all -> 0x006a }
+        r1 = r1 + 1;
+        r6.readPosition = r1;	 Catch:{ all -> 0x006a }
+        monitor-exit(r6);
+        return r3;
+    L_0x0062:
+        r1 = r6.formats;	 Catch:{ all -> 0x006a }
+        r1 = r1[r0];	 Catch:{ all -> 0x006a }
+        r7.format = r1;	 Catch:{ all -> 0x006a }
+        monitor-exit(r6);
+        return r2;
+    L_0x006a:
+        r7 = move-exception;
+        monitor-exit(r6);
+        throw r7;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.SampleMetadataQueue.read(org.telegram.messenger.exoplayer2.FormatHolder, org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer, boolean, boolean, org.telegram.messenger.exoplayer2.Format, org.telegram.messenger.exoplayer2.source.SampleMetadataQueue$SampleExtrasHolder):int");
     }
 
-    public synchronized int advanceTo(long timeUs, boolean toKeyframe, boolean allowTimeBeyondBuffer) {
-        int i;
-        int relativeReadIndex = getRelativeIndex(this.readPosition);
-        if (!hasNextSample() || timeUs < this.timesUs[relativeReadIndex] || (timeUs > this.largestQueuedTimestampUs && !allowTimeBeyondBuffer)) {
-            i = -1;
-        } else {
-            i = findSampleBefore(relativeReadIndex, this.length - this.readPosition, timeUs, toKeyframe);
-            if (i == -1) {
-                i = -1;
-            } else {
-                this.readPosition += i;
-            }
-        }
-        return i;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public synchronized int advanceTo(long r9, boolean r11, boolean r12) {
+        /*
+        r8 = this;
+        monitor-enter(r8);
+        r0 = r8.readPosition;	 Catch:{ all -> 0x003a }
+        r0 = r8.getRelativeIndex(r0);	 Catch:{ all -> 0x003a }
+        r1 = r8.hasNextSample();	 Catch:{ all -> 0x003a }
+        r7 = -1;
+        if (r1 == 0) goto L_0x0038;
+    L_0x000e:
+        r1 = r8.timesUs;	 Catch:{ all -> 0x003a }
+        r2 = r1[r0];	 Catch:{ all -> 0x003a }
+        r1 = (r9 > r2 ? 1 : (r9 == r2 ? 0 : -1));
+        if (r1 < 0) goto L_0x0038;
+    L_0x0016:
+        r1 = r8.largestQueuedTimestampUs;	 Catch:{ all -> 0x003a }
+        r3 = (r9 > r1 ? 1 : (r9 == r1 ? 0 : -1));
+        if (r3 <= 0) goto L_0x001f;
+    L_0x001c:
+        if (r12 != 0) goto L_0x001f;
+    L_0x001e:
+        goto L_0x0038;
+    L_0x001f:
+        r1 = r8.length;	 Catch:{ all -> 0x003a }
+        r2 = r8.readPosition;	 Catch:{ all -> 0x003a }
+        r3 = r1 - r2;
+        r1 = r8;
+        r2 = r0;
+        r4 = r9;
+        r6 = r11;
+        r1 = r1.findSampleBefore(r2, r3, r4, r6);	 Catch:{ all -> 0x003a }
+        if (r1 != r7) goto L_0x0031;
+    L_0x002f:
+        monitor-exit(r8);
+        return r7;
+    L_0x0031:
+        r2 = r8.readPosition;	 Catch:{ all -> 0x003a }
+        r2 = r2 + r1;
+        r8.readPosition = r2;	 Catch:{ all -> 0x003a }
+        monitor-exit(r8);
+        return r1;
+    L_0x0038:
+        monitor-exit(r8);
+        return r7;
+    L_0x003a:
+        r9 = move-exception;
+        monitor-exit(r8);
+        throw r9;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.SampleMetadataQueue.advanceTo(long, boolean, boolean):int");
     }
 
     public synchronized int advanceToEnd() {
@@ -155,163 +246,288 @@ final class SampleMetadataQueue {
     }
 
     public synchronized boolean setReadPosition(int sampleIndex) {
-        boolean z;
         if (this.absoluteFirstIndex > sampleIndex || sampleIndex > this.absoluteFirstIndex + this.length) {
-            z = false;
-        } else {
-            this.readPosition = sampleIndex - this.absoluteFirstIndex;
-            z = true;
+            return false;
         }
-        return z;
+        this.readPosition = sampleIndex - this.absoluteFirstIndex;
+        return true;
     }
 
-    public synchronized long discardTo(long timeUs, boolean toKeyframe, boolean stopAtReadPosition) {
-        long j;
-        if (this.length == 0 || timeUs < this.timesUs[this.relativeFirstIndex]) {
-            j = -1;
-        } else {
-            int searchLength;
-            int discardCount;
-            if (stopAtReadPosition) {
-                if (this.readPosition != this.length) {
-                    searchLength = this.readPosition + 1;
-                    discardCount = findSampleBefore(this.relativeFirstIndex, searchLength, timeUs, toKeyframe);
-                    if (discardCount != -1) {
-                        j = -1;
-                    } else {
-                        j = discardSamples(discardCount);
-                    }
-                }
-            }
-            searchLength = this.length;
-            discardCount = findSampleBefore(this.relativeFirstIndex, searchLength, timeUs, toKeyframe);
-            if (discardCount != -1) {
-                j = discardSamples(discardCount);
-            } else {
-                j = -1;
-            }
-        }
-        return j;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public synchronized long discardTo(long r10, boolean r12, boolean r13) {
+        /*
+        r9 = this;
+        monitor-enter(r9);
+        r0 = r9.length;	 Catch:{ all -> 0x0038 }
+        r1 = -1;
+        if (r0 == 0) goto L_0x0036;
+    L_0x0007:
+        r0 = r9.timesUs;	 Catch:{ all -> 0x0038 }
+        r3 = r9.relativeFirstIndex;	 Catch:{ all -> 0x0038 }
+        r3 = r0[r3];	 Catch:{ all -> 0x0038 }
+        r0 = (r10 > r3 ? 1 : (r10 == r3 ? 0 : -1));
+        if (r0 >= 0) goto L_0x0012;
+    L_0x0011:
+        goto L_0x0036;
+    L_0x0012:
+        if (r13 == 0) goto L_0x001f;
+    L_0x0014:
+        r0 = r9.readPosition;	 Catch:{ all -> 0x0038 }
+        r3 = r9.length;	 Catch:{ all -> 0x0038 }
+        if (r0 == r3) goto L_0x001f;
+    L_0x001a:
+        r0 = r9.readPosition;	 Catch:{ all -> 0x0038 }
+        r0 = r0 + 1;
+        goto L_0x0021;
+    L_0x001f:
+        r0 = r9.length;	 Catch:{ all -> 0x0038 }
+    L_0x0021:
+        r5 = r0;
+        r4 = r9.relativeFirstIndex;	 Catch:{ all -> 0x0038 }
+        r3 = r9;
+        r6 = r10;
+        r8 = r12;
+        r0 = r3.findSampleBefore(r4, r5, r6, r8);	 Catch:{ all -> 0x0038 }
+        r3 = -1;
+        if (r0 != r3) goto L_0x0030;
+    L_0x002e:
+        monitor-exit(r9);
+        return r1;
+    L_0x0030:
+        r1 = r9.discardSamples(r0);	 Catch:{ all -> 0x0038 }
+        monitor-exit(r9);
+        return r1;
+    L_0x0036:
+        monitor-exit(r9);
+        return r1;
+    L_0x0038:
+        r10 = move-exception;
+        monitor-exit(r9);
+        throw r10;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.SampleMetadataQueue.discardTo(long, boolean, boolean):long");
     }
 
     public synchronized long discardToRead() {
-        long j;
         if (this.readPosition == 0) {
-            j = -1;
-        } else {
-            j = discardSamples(this.readPosition);
+            return -1;
         }
-        return j;
+        return discardSamples(this.readPosition);
     }
 
     public synchronized long discardToEnd() {
-        long j;
         if (this.length == 0) {
-            j = -1;
-        } else {
-            j = discardSamples(this.length);
+            return -1;
         }
-        return j;
+        return discardSamples(this.length);
     }
 
     public synchronized boolean format(Format format) {
-        boolean z = false;
-        synchronized (this) {
-            if (format == null) {
-                this.upstreamFormatRequired = true;
-            } else {
-                this.upstreamFormatRequired = false;
-                if (!Util.areEqual(format, this.upstreamFormat)) {
-                    this.upstreamFormat = format;
-                    z = true;
-                }
-            }
+        if (format == null) {
+            this.upstreamFormatRequired = true;
+            return false;
         }
-        return z;
+        this.upstreamFormatRequired = false;
+        if (Util.areEqual(format, this.upstreamFormat)) {
+            return false;
+        }
+        this.upstreamFormat = format;
+        return true;
     }
 
-    public synchronized void commitSample(long timeUs, int sampleFlags, long offset, int size, CryptoData cryptoData) {
-        if (this.upstreamKeyframeRequired) {
-            if ((sampleFlags & 1) != 0) {
-                this.upstreamKeyframeRequired = false;
-            }
-        }
-        Assertions.checkState(!this.upstreamFormatRequired);
-        commitSampleTimestamp(timeUs);
-        int relativeEndIndex = getRelativeIndex(this.length);
-        this.timesUs[relativeEndIndex] = timeUs;
-        this.offsets[relativeEndIndex] = offset;
-        this.sizes[relativeEndIndex] = size;
-        this.flags[relativeEndIndex] = sampleFlags;
-        this.cryptoDatas[relativeEndIndex] = cryptoData;
-        this.formats[relativeEndIndex] = this.upstreamFormat;
-        this.sourceIds[relativeEndIndex] = this.upstreamSourceId;
-        this.length++;
-        if (this.length == this.capacity) {
-            int newCapacity = this.capacity + SAMPLE_CAPACITY_INCREMENT;
-            int[] newSourceIds = new int[newCapacity];
-            long[] newOffsets = new long[newCapacity];
-            long[] newTimesUs = new long[newCapacity];
-            int[] newFlags = new int[newCapacity];
-            int[] newSizes = new int[newCapacity];
-            CryptoData[] newCryptoDatas = new CryptoData[newCapacity];
-            Format[] newFormats = new Format[newCapacity];
-            int beforeWrap = this.capacity - this.relativeFirstIndex;
-            System.arraycopy(this.offsets, this.relativeFirstIndex, newOffsets, 0, beforeWrap);
-            System.arraycopy(this.timesUs, this.relativeFirstIndex, newTimesUs, 0, beforeWrap);
-            System.arraycopy(this.flags, this.relativeFirstIndex, newFlags, 0, beforeWrap);
-            System.arraycopy(this.sizes, this.relativeFirstIndex, newSizes, 0, beforeWrap);
-            System.arraycopy(this.cryptoDatas, this.relativeFirstIndex, newCryptoDatas, 0, beforeWrap);
-            System.arraycopy(this.formats, this.relativeFirstIndex, newFormats, 0, beforeWrap);
-            System.arraycopy(this.sourceIds, this.relativeFirstIndex, newSourceIds, 0, beforeWrap);
-            int afterWrap = this.relativeFirstIndex;
-            System.arraycopy(this.offsets, 0, newOffsets, beforeWrap, afterWrap);
-            System.arraycopy(this.timesUs, 0, newTimesUs, beforeWrap, afterWrap);
-            System.arraycopy(this.flags, 0, newFlags, beforeWrap, afterWrap);
-            System.arraycopy(this.sizes, 0, newSizes, beforeWrap, afterWrap);
-            System.arraycopy(this.cryptoDatas, 0, newCryptoDatas, beforeWrap, afterWrap);
-            System.arraycopy(this.formats, 0, newFormats, beforeWrap, afterWrap);
-            System.arraycopy(this.sourceIds, 0, newSourceIds, beforeWrap, afterWrap);
-            this.offsets = newOffsets;
-            this.timesUs = newTimesUs;
-            this.flags = newFlags;
-            this.sizes = newSizes;
-            this.cryptoDatas = newCryptoDatas;
-            this.formats = newFormats;
-            this.sourceIds = newSourceIds;
-            this.relativeFirstIndex = 0;
-            this.length = this.capacity;
-            this.capacity = newCapacity;
-        }
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public synchronized void commitSample(long r17, int r19, long r20, int r22, org.telegram.messenger.exoplayer2.extractor.TrackOutput.CryptoData r23) {
+        /*
+        r16 = this;
+        r1 = r16;
+        monitor-enter(r16);
+        r3 = r1.upstreamKeyframeRequired;	 Catch:{ all -> 0x00d6 }
+        r4 = 0;
+        if (r3 == 0) goto L_0x0010;
+    L_0x0008:
+        r3 = r19 & 1;
+        if (r3 != 0) goto L_0x000e;
+    L_0x000c:
+        monitor-exit(r16);
+        return;
+    L_0x000e:
+        r1.upstreamKeyframeRequired = r4;	 Catch:{ all -> 0x00d6 }
+    L_0x0010:
+        r3 = r1.upstreamFormatRequired;	 Catch:{ all -> 0x00d6 }
+        r3 = r3 ^ 1;
+        org.telegram.messenger.exoplayer2.util.Assertions.checkState(r3);	 Catch:{ all -> 0x00d6 }
+        r16.commitSampleTimestamp(r17);	 Catch:{ all -> 0x00d6 }
+        r3 = r1.length;	 Catch:{ all -> 0x00d6 }
+        r3 = r1.getRelativeIndex(r3);	 Catch:{ all -> 0x00d6 }
+        r5 = r1.timesUs;	 Catch:{ all -> 0x00d6 }
+        r5[r3] = r17;	 Catch:{ all -> 0x00d6 }
+        r5 = r1.offsets;	 Catch:{ all -> 0x00d6 }
+        r5[r3] = r20;	 Catch:{ all -> 0x00d6 }
+        r5 = r1.sizes;	 Catch:{ all -> 0x00d6 }
+        r5[r3] = r22;	 Catch:{ all -> 0x00d6 }
+        r5 = r1.flags;	 Catch:{ all -> 0x00d6 }
+        r5[r3] = r19;	 Catch:{ all -> 0x00d6 }
+        r5 = r1.cryptoDatas;	 Catch:{ all -> 0x00d6 }
+        r5[r3] = r23;	 Catch:{ all -> 0x00d6 }
+        r5 = r1.formats;	 Catch:{ all -> 0x00d6 }
+        r10 = r1.upstreamFormat;	 Catch:{ all -> 0x00d6 }
+        r5[r3] = r10;	 Catch:{ all -> 0x00d6 }
+        r5 = r1.sourceIds;	 Catch:{ all -> 0x00d6 }
+        r10 = r1.upstreamSourceId;	 Catch:{ all -> 0x00d6 }
+        r5[r3] = r10;	 Catch:{ all -> 0x00d6 }
+        r5 = r1.length;	 Catch:{ all -> 0x00d6 }
+        r5 = r5 + 1;
+        r1.length = r5;	 Catch:{ all -> 0x00d6 }
+        r5 = r1.length;	 Catch:{ all -> 0x00d6 }
+        r10 = r1.capacity;	 Catch:{ all -> 0x00d6 }
+        if (r5 != r10) goto L_0x00d3;
+    L_0x004c:
+        r5 = r1.capacity;	 Catch:{ all -> 0x00d6 }
+        r5 = r5 + 1000;
+        r10 = new int[r5];	 Catch:{ all -> 0x00d6 }
+        r11 = new long[r5];	 Catch:{ all -> 0x00d6 }
+        r12 = new long[r5];	 Catch:{ all -> 0x00d6 }
+        r13 = new int[r5];	 Catch:{ all -> 0x00d6 }
+        r4 = new int[r5];	 Catch:{ all -> 0x00d6 }
+        r2 = new org.telegram.messenger.exoplayer2.extractor.TrackOutput.CryptoData[r5];	 Catch:{ all -> 0x00d6 }
+        r14 = r3;
+        r3 = new org.telegram.messenger.exoplayer2.Format[r5];	 Catch:{ all -> 0x00d6 }
+        r6 = r1.capacity;	 Catch:{ all -> 0x00d6 }
+        r7 = r1.relativeFirstIndex;	 Catch:{ all -> 0x00d6 }
+        r6 = r6 - r7;
+        r7 = r1.offsets;	 Catch:{ all -> 0x00d6 }
+        r8 = r1.relativeFirstIndex;	 Catch:{ all -> 0x00d6 }
+        r9 = 0;
+        java.lang.System.arraycopy(r7, r8, r11, r9, r6);	 Catch:{ all -> 0x00d6 }
+        r7 = r1.timesUs;	 Catch:{ all -> 0x00d6 }
+        r8 = r1.relativeFirstIndex;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r7, r8, r12, r9, r6);	 Catch:{ all -> 0x00d6 }
+        r7 = r1.flags;	 Catch:{ all -> 0x00d6 }
+        r8 = r1.relativeFirstIndex;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r7, r8, r13, r9, r6);	 Catch:{ all -> 0x00d6 }
+        r7 = r1.sizes;	 Catch:{ all -> 0x00d6 }
+        r8 = r1.relativeFirstIndex;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r7, r8, r4, r9, r6);	 Catch:{ all -> 0x00d6 }
+        r7 = r1.cryptoDatas;	 Catch:{ all -> 0x00d6 }
+        r8 = r1.relativeFirstIndex;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r7, r8, r2, r9, r6);	 Catch:{ all -> 0x00d6 }
+        r7 = r1.formats;	 Catch:{ all -> 0x00d6 }
+        r8 = r1.relativeFirstIndex;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r7, r8, r3, r9, r6);	 Catch:{ all -> 0x00d6 }
+        r7 = r1.sourceIds;	 Catch:{ all -> 0x00d6 }
+        r8 = r1.relativeFirstIndex;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r7, r8, r10, r9, r6);	 Catch:{ all -> 0x00d6 }
+        r7 = r1.relativeFirstIndex;	 Catch:{ all -> 0x00d6 }
+        r8 = r1.offsets;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r8, r9, r11, r6, r7);	 Catch:{ all -> 0x00d6 }
+        r8 = r1.timesUs;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r8, r9, r12, r6, r7);	 Catch:{ all -> 0x00d6 }
+        r8 = r1.flags;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r8, r9, r13, r6, r7);	 Catch:{ all -> 0x00d6 }
+        r8 = r1.sizes;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r8, r9, r4, r6, r7);	 Catch:{ all -> 0x00d6 }
+        r8 = r1.cryptoDatas;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r8, r9, r2, r6, r7);	 Catch:{ all -> 0x00d6 }
+        r8 = r1.formats;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r8, r9, r3, r6, r7);	 Catch:{ all -> 0x00d6 }
+        r8 = r1.sourceIds;	 Catch:{ all -> 0x00d6 }
+        java.lang.System.arraycopy(r8, r9, r10, r6, r7);	 Catch:{ all -> 0x00d6 }
+        r1.offsets = r11;	 Catch:{ all -> 0x00d6 }
+        r1.timesUs = r12;	 Catch:{ all -> 0x00d6 }
+        r1.flags = r13;	 Catch:{ all -> 0x00d6 }
+        r1.sizes = r4;	 Catch:{ all -> 0x00d6 }
+        r1.cryptoDatas = r2;	 Catch:{ all -> 0x00d6 }
+        r1.formats = r3;	 Catch:{ all -> 0x00d6 }
+        r1.sourceIds = r10;	 Catch:{ all -> 0x00d6 }
+        r8 = 0;
+        r1.relativeFirstIndex = r8;	 Catch:{ all -> 0x00d6 }
+        r8 = r1.capacity;	 Catch:{ all -> 0x00d6 }
+        r1.length = r8;	 Catch:{ all -> 0x00d6 }
+        r1.capacity = r5;	 Catch:{ all -> 0x00d6 }
+        goto L_0x00d4;
+    L_0x00d3:
+        r14 = r3;
+    L_0x00d4:
+        monitor-exit(r16);
+        return;
+    L_0x00d6:
+        r0 = move-exception;
+        r2 = r0;
+        monitor-exit(r16);
+        throw r2;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.SampleMetadataQueue.commitSample(long, int, long, int, org.telegram.messenger.exoplayer2.extractor.TrackOutput$CryptoData):void");
     }
 
     public synchronized void commitSampleTimestamp(long timeUs) {
         this.largestQueuedTimestampUs = Math.max(this.largestQueuedTimestampUs, timeUs);
     }
 
-    public synchronized boolean attemptSplice(long timeUs) {
-        boolean z = true;
-        synchronized (this) {
-            if (this.length == 0) {
-                if (timeUs <= this.largestDiscardedTimestampUs) {
-                    z = false;
-                }
-            } else if (Math.max(this.largestDiscardedTimestampUs, getLargestTimestamp(this.readPosition)) >= timeUs) {
-                z = false;
-            } else {
-                int retainCount = this.length;
-                int relativeSampleIndex = getRelativeIndex(this.length - 1);
-                while (retainCount > this.readPosition && this.timesUs[relativeSampleIndex] >= timeUs) {
-                    retainCount--;
-                    relativeSampleIndex--;
-                    if (relativeSampleIndex == -1) {
-                        relativeSampleIndex = this.capacity - 1;
-                    }
-                }
-                discardUpstreamSamples(this.absoluteFirstIndex + retainCount);
-            }
-        }
-        return z;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public synchronized boolean attemptSplice(long r9) {
+        /*
+        r8 = this;
+        monitor-enter(r8);
+        r0 = r8.length;	 Catch:{ all -> 0x004c }
+        r1 = 0;
+        r2 = 1;
+        if (r0 != 0) goto L_0x0011;
+    L_0x0007:
+        r3 = r8.largestDiscardedTimestampUs;	 Catch:{ all -> 0x004c }
+        r0 = (r9 > r3 ? 1 : (r9 == r3 ? 0 : -1));
+        if (r0 <= 0) goto L_0x000f;
+    L_0x000d:
+        r1 = r2;
+    L_0x000f:
+        monitor-exit(r8);
+        return r1;
+    L_0x0011:
+        r3 = r8.largestDiscardedTimestampUs;	 Catch:{ all -> 0x004c }
+        r0 = r8.readPosition;	 Catch:{ all -> 0x004c }
+        r5 = r8.getLargestTimestamp(r0);	 Catch:{ all -> 0x004c }
+        r3 = java.lang.Math.max(r3, r5);	 Catch:{ all -> 0x004c }
+        r0 = (r3 > r9 ? 1 : (r3 == r9 ? 0 : -1));
+        if (r0 < 0) goto L_0x0023;
+    L_0x0021:
+        monitor-exit(r8);
+        return r1;
+    L_0x0023:
+        r0 = r8.length;	 Catch:{ all -> 0x004c }
+        r1 = r8.length;	 Catch:{ all -> 0x004c }
+        r1 = r1 - r2;
+        r1 = r8.getRelativeIndex(r1);	 Catch:{ all -> 0x004c }
+    L_0x002c:
+        r5 = r8.readPosition;	 Catch:{ all -> 0x004c }
+        if (r0 <= r5) goto L_0x0044;
+    L_0x0030:
+        r5 = r8.timesUs;	 Catch:{ all -> 0x004c }
+        r6 = r5[r1];	 Catch:{ all -> 0x004c }
+        r5 = (r6 > r9 ? 1 : (r6 == r9 ? 0 : -1));
+        if (r5 < 0) goto L_0x0044;
+    L_0x0038:
+        r0 = r0 + -1;
+        r1 = r1 + -1;
+        r5 = -1;
+        if (r1 != r5) goto L_0x002c;
+    L_0x003f:
+        r5 = r8.capacity;	 Catch:{ all -> 0x004c }
+        r1 = r5 + -1;
+        goto L_0x002c;
+    L_0x0044:
+        r5 = r8.absoluteFirstIndex;	 Catch:{ all -> 0x004c }
+        r5 = r5 + r0;
+        r8.discardUpstreamSamples(r5);	 Catch:{ all -> 0x004c }
+        monitor-exit(r8);
+        return r2;
+    L_0x004c:
+        r9 = move-exception;
+        monitor-exit(r8);
+        throw r9;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.SampleMetadataQueue.attemptSplice(long):boolean");
     }
 
     private int findSampleBefore(int relativeStartIndex, int length, long timeUs, boolean keyframe) {
@@ -357,7 +573,7 @@ final class SampleMetadataQueue {
         for (int i = 0; i < length; i++) {
             largestTimestampUs = Math.max(largestTimestampUs, this.timesUs[relativeSampleIndex]);
             if ((this.flags[relativeSampleIndex] & 1) != 0) {
-                return largestTimestampUs;
+                break;
             }
             relativeSampleIndex--;
             if (relativeSampleIndex == -1) {

@@ -1,1246 +1,2797 @@
 package org.telegram.messenger;
 
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Base64;
-import com.google.android.gms.gcm.GcmListenerService;
-import java.util.ArrayList;
-import java.util.Arrays;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.RendererCapabilities;
-import org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor;
-import org.telegram.messenger.voip.VoIPService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+import java.util.Map;
 import org.telegram.tgnet.ConnectionsManager;
-import org.telegram.tgnet.NativeByteBuffer;
-import org.telegram.tgnet.TLRPC;
-import org.telegram.tgnet.TLRPC.Message;
-import org.telegram.tgnet.TLRPC.TL_message;
-import org.telegram.tgnet.TLRPC.TL_messageActionPinMessage;
-import org.telegram.tgnet.TLRPC.TL_messageMediaEmpty;
-import org.telegram.tgnet.TLRPC.TL_peerChannel;
-import org.telegram.tgnet.TLRPC.TL_peerChat;
-import org.telegram.tgnet.TLRPC.TL_peerUser;
-import org.telegram.tgnet.TLRPC.TL_updateReadChannelInbox;
-import org.telegram.tgnet.TLRPC.TL_updateReadHistoryInbox;
-import org.telegram.tgnet.TLRPC.TL_updateServiceNotification;
 import org.telegram.tgnet.TLRPC.TL_updates;
-import org.telegram.tgnet.TLRPC.Update;
 
-public class GcmPushListenerService extends GcmListenerService {
+public class GcmPushListenerService extends FirebaseMessagingService {
     public static final int NOTIFICATION_ID = 1;
 
-    public void onMessageReceived(String from, final Bundle bundle) {
+    public void onMessageReceived(RemoteMessage message) {
+        String from = message.getFrom();
+        final Map data = message.getData();
+        final long time = message.getSentTime();
         if (BuildVars.LOGS_ENABLED) {
-            FileLog.d("GCM received bundle: " + bundle + " from: " + from);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("GCM received data: ");
+            stringBuilder.append(data);
+            stringBuilder.append(" from: ");
+            stringBuilder.append(from);
+            FileLog.d(stringBuilder.toString());
         }
         AndroidUtilities.runOnUIThread(new Runnable() {
             public void run() {
                 ApplicationLoader.postInitApplication();
                 Utilities.stageQueue.postRunnable(new Runnable() {
-                    public void run() {
-                        String loc_key = null;
-                        int currentAccount;
-                        Throwable e;
-                        try {
-                            Object value = bundle.get(TtmlNode.TAG_P);
-                            if (value instanceof String) {
-                                byte[] bytes = Base64.decode((String) value, 8);
-                                NativeByteBuffer nativeByteBuffer = new NativeByteBuffer(bytes.length);
-                                nativeByteBuffer.writeBytes(bytes);
-                                nativeByteBuffer.position(0);
-                                if (SharedConfig.pushAuthKeyId == null) {
-                                    SharedConfig.pushAuthKeyId = new byte[8];
-                                    Object authKeyHash = Utilities.computeSHA1(SharedConfig.pushAuthKey);
-                                    System.arraycopy(authKeyHash, authKeyHash.length - 8, SharedConfig.pushAuthKeyId, 0, 8);
-                                }
-                                byte[] inAuthKeyId = new byte[8];
-                                nativeByteBuffer.readBytes(inAuthKeyId, true);
-                                if (Arrays.equals(SharedConfig.pushAuthKeyId, inAuthKeyId)) {
-                                    byte[] messageKey = new byte[16];
-                                    nativeByteBuffer.readBytes(messageKey, true);
-                                    MessageKeyData messageKeyData = MessageKeyData.generateMessageKeyData(SharedConfig.pushAuthKey, messageKey, true, 2);
-                                    Utilities.aesIgeEncryption(nativeByteBuffer.buffer, messageKeyData.aesKey, messageKeyData.aesIv, false, false, 24, bytes.length - 24);
-                                    if (Utilities.arraysEquals(messageKey, 0, Utilities.computeSHA256(SharedConfig.pushAuthKey, 96, 32, nativeByteBuffer.buffer, 24, nativeByteBuffer.buffer.limit()), 8)) {
-                                        Object obj;
-                                        int accountUserId;
-                                        int a;
-                                        long time;
-                                        byte[] strBytes = new byte[nativeByteBuffer.readInt32(true)];
-                                        nativeByteBuffer.readBytes(strBytes, true);
-                                        JSONObject json = new JSONObject(new String(strBytes, C.UTF8_NAME));
-                                        JSONObject custom = json.getJSONObject("custom");
-                                        if (json.has("user_id")) {
-                                            obj = json.get("user_id");
-                                        } else {
-                                            obj = null;
-                                        }
-                                        if (obj == null) {
-                                            accountUserId = UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId();
-                                        } else if (obj instanceof Integer) {
-                                            accountUserId = ((Integer) obj).intValue();
-                                        } else if (obj instanceof String) {
-                                            accountUserId = Utilities.parseInt((String) obj).intValue();
-                                        } else {
-                                            accountUserId = UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId();
-                                        }
-                                        int account = UserConfig.selectedAccount;
-                                        for (a = 0; a < 3; a++) {
-                                            if (UserConfig.getInstance(a).getClientUserId() == accountUserId) {
-                                                account = a;
-                                                break;
-                                            }
-                                        }
-                                        currentAccount = account;
-                                        final int accountFinal = account;
-                                        try {
-                                        } catch (Exception e2) {
-                                            time = System.currentTimeMillis();
-                                        } catch (Throwable th) {
-                                            e = th;
-                                        }
-                                        if (UserConfig.getInstance(currentAccount).isClientActivated()) {
-                                            if (json.has("loc_key")) {
-                                                loc_key = json.getString("loc_key");
-                                            } else {
-                                                loc_key = TtmlNode.ANONYMOUS_REGION_ID;
-                                            }
-                                            Object obj2 = bundle.get("google.sent_time");
-                                            if (obj2 instanceof String) {
-                                                time = Utilities.parseLong((String) obj2).longValue();
-                                            } else if (obj2 instanceof Long) {
-                                                time = ((Long) obj2).longValue();
-                                            } else {
-                                                time = System.currentTimeMillis();
-                                            }
-                                            Object obj3 = -1;
-                                            switch (loc_key.hashCode()) {
-                                                case -920689527:
-                                                    if (loc_key.equals("DC_UPDATE")) {
-                                                        obj3 = null;
-                                                        break;
-                                                    }
-                                                    break;
-                                                case 633004703:
-                                                    if (loc_key.equals("MESSAGE_ANNOUNCEMENT")) {
-                                                        obj3 = 1;
-                                                        break;
-                                                    }
-                                                    break;
-                                            }
-                                            switch (obj3) {
-                                                case null:
-                                                    int dc = custom.getInt("dc");
-                                                    String[] parts = custom.getString("addr").split(":");
-                                                    if (parts.length == 2) {
-                                                        ConnectionsManager.getInstance(currentAccount).applyDatacenterAddress(dc, parts[0], Integer.parseInt(parts[1]));
-                                                        ConnectionsManager.getInstance(currentAccount).resumeNetworkMaybe();
-                                                        return;
-                                                    }
-                                                    return;
-                                                case 1:
-                                                    TL_updateServiceNotification update = new TL_updateServiceNotification();
-                                                    update.popup = false;
-                                                    update.flags = 2;
-                                                    update.inbox_date = (int) (time / 1000);
-                                                    update.message = json.getString("message");
-                                                    update.type = "announcement";
-                                                    update.media = new TL_messageMediaEmpty();
-                                                    TL_updates updates = new TL_updates();
-                                                    updates.updates.add(update);
-                                                    final TL_updates tL_updates = updates;
-                                                    Utilities.stageQueue.postRunnable(new Runnable() {
-                                                        public void run() {
-                                                            MessagesController.getInstance(accountFinal).processUpdates(tL_updates, false);
-                                                        }
-                                                    });
-                                                    ConnectionsManager.getInstance(currentAccount).resumeNetworkMaybe();
-                                                    return;
-                                                default:
-                                                    int channel_id;
-                                                    int user_id;
-                                                    int chat_id;
-                                                    long dialog_id = 0;
-                                                    if (custom.has("channel_id")) {
-                                                        channel_id = custom.getInt("channel_id");
-                                                        dialog_id = (long) (-channel_id);
-                                                    } else {
-                                                        channel_id = 0;
-                                                    }
-                                                    if (custom.has("from_id")) {
-                                                        user_id = custom.getInt("from_id");
-                                                        dialog_id = (long) user_id;
-                                                    } else {
-                                                        user_id = 0;
-                                                    }
-                                                    if (custom.has("chat_id")) {
-                                                        chat_id = custom.getInt("chat_id");
-                                                        dialog_id = (long) (-chat_id);
-                                                    } else {
-                                                        chat_id = 0;
-                                                    }
-                                                    if (dialog_id != 0) {
-                                                        int badge;
-                                                        if (json.has("badge")) {
-                                                            badge = json.getInt("badge");
-                                                        } else {
-                                                            badge = 0;
-                                                        }
-                                                        if (badge != 0) {
-                                                            int msg_id = custom.getInt("msg_id");
-                                                            Integer currentReadValue = (Integer) MessagesController.getInstance(currentAccount).dialogs_read_inbox_max.get(Long.valueOf(dialog_id));
-                                                            if (currentReadValue == null) {
-                                                                currentReadValue = Integer.valueOf(MessagesStorage.getInstance(currentAccount).getDialogReadMax(false, dialog_id));
-                                                                MessagesController.getInstance(accountFinal).dialogs_read_inbox_max.put(Long.valueOf(dialog_id), currentReadValue);
-                                                            }
-                                                            if (msg_id > currentReadValue.intValue()) {
-                                                                int chat_from_id;
-                                                                String[] args;
-                                                                if (custom.has("chat_from_id")) {
-                                                                    chat_from_id = custom.getInt("chat_from_id");
-                                                                } else {
-                                                                    chat_from_id = 0;
-                                                                }
-                                                                boolean mention = custom.has("mention") && custom.getInt("mention") != 0;
-                                                                if (json.has("loc_args")) {
-                                                                    JSONArray loc_args = json.getJSONArray("loc_args");
-                                                                    args = new String[loc_args.length()];
-                                                                    for (a = 0; a < args.length; a++) {
-                                                                        args[a] = loc_args.getString(a);
-                                                                    }
-                                                                } else {
-                                                                    args = null;
-                                                                }
-                                                                String messageText = null;
-                                                                String message = null;
-                                                                String name = args[0];
-                                                                boolean localMessage = false;
-                                                                boolean supergroup = false;
-                                                                boolean pinned = false;
-                                                                boolean channel = false;
-                                                                if (loc_key.startsWith("CHAT_")) {
-                                                                    supergroup = channel_id != 0;
-                                                                    if (!supergroup) {
-                                                                        name = args[1];
-                                                                    }
-                                                                } else if (loc_key.startsWith("PINNED_")) {
-                                                                    supergroup = chat_from_id != 0;
-                                                                    pinned = true;
-                                                                } else if (loc_key.startsWith("CHANNEL_")) {
-                                                                    channel = true;
-                                                                }
-                                                                if (BuildVars.LOGS_ENABLED) {
-                                                                    FileLog.d("GCM received message notification " + loc_key + " for dialogId = " + dialog_id + " mid = " + msg_id);
-                                                                }
-                                                                obj3 = -1;
-                                                                switch (loc_key.hashCode()) {
-                                                                    case -2091498420:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_CONTACT")) {
-                                                                            obj3 = 28;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -2053872415:
-                                                                        if (loc_key.equals("CHAT_CREATED")) {
-                                                                            obj3 = 50;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -2039746363:
-                                                                        if (loc_key.equals("MESSAGE_STICKER")) {
-                                                                            obj3 = 9;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1979538588:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_DOC")) {
-                                                                            obj3 = 25;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1979536003:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_GEO")) {
-                                                                            obj3 = 29;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1979535888:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_GIF")) {
-                                                                            obj3 = 31;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1969004705:
-                                                                        if (loc_key.equals("CHAT_ADD_MEMBER")) {
-                                                                            obj3 = 53;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1946699248:
-                                                                        if (loc_key.equals("CHAT_JOINED")) {
-                                                                            obj3 = 59;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1528047021:
-                                                                        if (loc_key.equals("CHAT_MESSAGES")) {
-                                                                            obj3 = 62;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1493579426:
-                                                                        if (loc_key.equals("MESSAGE_AUDIO")) {
-                                                                            obj3 = 10;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1480102982:
-                                                                        if (loc_key.equals("MESSAGE_PHOTO")) {
-                                                                            obj3 = 2;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1478041834:
-                                                                        if (loc_key.equals("MESSAGE_ROUND")) {
-                                                                            obj3 = 7;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1474543101:
-                                                                        if (loc_key.equals("MESSAGE_VIDEO")) {
-                                                                            obj3 = 4;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1465695932:
-                                                                        if (loc_key.equals("ENCRYPTION_ACCEPT")) {
-                                                                            obj3 = 81;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1374906292:
-                                                                        if (loc_key.equals("ENCRYPTED_MESSAGE")) {
-                                                                            obj3 = 82;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1372940586:
-                                                                        if (loc_key.equals("CHAT_RETURNED")) {
-                                                                            obj3 = 58;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1264245338:
-                                                                        if (loc_key.equals("PINNED_INVOICE")) {
-                                                                            obj3 = 75;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1236086700:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_FWDS")) {
-                                                                            obj3 = 33;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1236077786:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_GAME")) {
-                                                                            obj3 = 32;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1235686303:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_TEXT")) {
-                                                                            obj3 = 20;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1198046100:
-                                                                        if (loc_key.equals("MESSAGE_VIDEO_SECRET")) {
-                                                                            obj3 = 5;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1124254527:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_CONTACT")) {
-                                                                            obj3 = 44;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1085137927:
-                                                                        if (loc_key.equals("PINNED_GAME")) {
-                                                                            obj3 = 74;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -1084746444:
-                                                                        if (loc_key.equals("PINNED_TEXT")) {
-                                                                            obj3 = 63;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -819729482:
-                                                                        if (loc_key.equals("PINNED_STICKER")) {
-                                                                            obj3 = 69;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -772141857:
-                                                                        if (loc_key.equals("PHONE_CALL_REQUEST")) {
-                                                                            obj3 = 84;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -638310039:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_STICKER")) {
-                                                                            obj3 = 26;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -589196239:
-                                                                        if (loc_key.equals("PINNED_DOC")) {
-                                                                            obj3 = 68;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -589193654:
-                                                                        if (loc_key.equals("PINNED_GEO")) {
-                                                                            obj3 = 72;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -589193539:
-                                                                        if (loc_key.equals("PINNED_GIF")) {
-                                                                            obj3 = 76;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -440169325:
-                                                                        if (loc_key.equals("AUTH_UNKNOWN")) {
-                                                                            obj3 = 78;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -412748110:
-                                                                        if (loc_key.equals("CHAT_DELETE_YOU")) {
-                                                                            obj3 = 56;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -228518075:
-                                                                        if (loc_key.equals("MESSAGE_GEOLIVE")) {
-                                                                            obj3 = 13;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -213586509:
-                                                                        if (loc_key.equals("ENCRYPTION_REQUEST")) {
-                                                                            obj3 = 80;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -115582002:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_INVOICE")) {
-                                                                            obj3 = 49;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -112621464:
-                                                                        if (loc_key.equals("CONTACT_JOINED")) {
-                                                                            obj3 = 77;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -108522133:
-                                                                        if (loc_key.equals("AUTH_REGION")) {
-                                                                            obj3 = 79;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -107572034:
-                                                                        if (loc_key.equals("MESSAGE_SCREENSHOT")) {
-                                                                            obj3 = 6;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case -40534265:
-                                                                        if (loc_key.equals("CHAT_DELETE_MEMBER")) {
-                                                                            obj3 = 55;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 65254746:
-                                                                        if (loc_key.equals("CHAT_ADD_YOU")) {
-                                                                            obj3 = 54;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 141040782:
-                                                                        if (loc_key.equals("CHAT_LEFT")) {
-                                                                            obj3 = 57;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 309993049:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_DOC")) {
-                                                                            obj3 = 41;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 309995634:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_GEO")) {
-                                                                            obj3 = 45;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 309995749:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_GIF")) {
-                                                                            obj3 = 47;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 320532812:
-                                                                        if (loc_key.equals("MESSAGES")) {
-                                                                            obj3 = 19;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 328933854:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_STICKER")) {
-                                                                            obj3 = 42;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 331340546:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_AUDIO")) {
-                                                                            obj3 = 27;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 344816990:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_PHOTO")) {
-                                                                            obj3 = 22;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 346878138:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_ROUND")) {
-                                                                            obj3 = 24;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 350376871:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_VIDEO")) {
-                                                                            obj3 = 23;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 615714517:
-                                                                        if (loc_key.equals("MESSAGE_PHOTO_SECRET")) {
-                                                                            obj3 = 3;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 715508879:
-                                                                        if (loc_key.equals("PINNED_AUDIO")) {
-                                                                            obj3 = 70;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 728985323:
-                                                                        if (loc_key.equals("PINNED_PHOTO")) {
-                                                                            obj3 = 65;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 731046471:
-                                                                        if (loc_key.equals("PINNED_ROUND")) {
-                                                                            obj3 = 67;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 734545204:
-                                                                        if (loc_key.equals("PINNED_VIDEO")) {
-                                                                            obj3 = 66;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 802032552:
-                                                                        if (loc_key.equals("MESSAGE_CONTACT")) {
-                                                                            obj3 = 11;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 991498806:
-                                                                        if (loc_key.equals("PINNED_GEOLIVE")) {
-                                                                            obj3 = 73;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1019917311:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_FWDS")) {
-                                                                            obj3 = 60;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1019926225:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_GAME")) {
-                                                                            obj3 = 48;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1020317708:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_TEXT")) {
-                                                                            obj3 = 36;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1060349560:
-                                                                        if (loc_key.equals("MESSAGE_FWDS")) {
-                                                                            obj3 = 17;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1060358474:
-                                                                        if (loc_key.equals("MESSAGE_GAME")) {
-                                                                            obj3 = 15;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1060749957:
-                                                                        if (loc_key.equals("MESSAGE_TEXT")) {
-                                                                            obj3 = null;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1073049781:
-                                                                        if (loc_key.equals("PINNED_NOTEXT")) {
-                                                                            obj3 = 64;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1078101399:
-                                                                        if (loc_key.equals("CHAT_TITLE_EDITED")) {
-                                                                            obj3 = 51;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1110103437:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_NOTEXT")) {
-                                                                            obj3 = 37;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1160762272:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_PHOTOS")) {
-                                                                            obj3 = 61;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1172918249:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_GEOLIVE")) {
-                                                                            obj3 = 30;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1281128640:
-                                                                        if (loc_key.equals("MESSAGE_DOC")) {
-                                                                            obj3 = 8;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1281131225:
-                                                                        if (loc_key.equals("MESSAGE_GEO")) {
-                                                                            obj3 = 12;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1281131340:
-                                                                        if (loc_key.equals("MESSAGE_GIF")) {
-                                                                            obj3 = 14;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1310789062:
-                                                                        if (loc_key.equals("MESSAGE_NOTEXT")) {
-                                                                            obj3 = 1;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1361447897:
-                                                                        if (loc_key.equals("MESSAGE_PHOTOS")) {
-                                                                            obj3 = 18;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1498266155:
-                                                                        if (loc_key.equals("PHONE_CALL_MISSED")) {
-                                                                            obj3 = 85;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1547988151:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_AUDIO")) {
-                                                                            obj3 = 43;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1561464595:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_PHOTO")) {
-                                                                            obj3 = 38;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1563525743:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_ROUND")) {
-                                                                            obj3 = 40;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1567024476:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_VIDEO")) {
-                                                                            obj3 = 39;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1810705077:
-                                                                        if (loc_key.equals("MESSAGE_INVOICE")) {
-                                                                            obj3 = 16;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1815177512:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGES")) {
-                                                                            obj3 = 35;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 1963241394:
-                                                                        if (loc_key.equals("LOCKED_MESSAGE")) {
-                                                                            obj3 = 83;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 2014789757:
-                                                                        if (loc_key.equals("CHAT_PHOTO_EDITED")) {
-                                                                            obj3 = 52;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 2022049433:
-                                                                        if (loc_key.equals("PINNED_CONTACT")) {
-                                                                            obj3 = 71;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 2048733346:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_NOTEXT")) {
-                                                                            obj3 = 21;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 2099392181:
-                                                                        if (loc_key.equals("CHANNEL_MESSAGE_PHOTOS")) {
-                                                                            obj3 = 34;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 2140162142:
-                                                                        if (loc_key.equals("CHAT_MESSAGE_GEOLIVE")) {
-                                                                            obj3 = 46;
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                }
-                                                                switch (obj3) {
-                                                                    case null:
-                                                                        messageText = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, args[0], args[1]);
-                                                                        message = args[1];
-                                                                        break;
-                                                                    case 1:
-                                                                        messageText = LocaleController.formatString("NotificationMessageNoText", R.string.NotificationMessageNoText, args[0]);
-                                                                        message = TtmlNode.ANONYMOUS_REGION_ID;
-                                                                        break;
-                                                                    case 2:
-                                                                        messageText = LocaleController.formatString("NotificationMessagePhoto", R.string.NotificationMessagePhoto, args[0]);
-                                                                        message = LocaleController.getString("AttachPhoto", R.string.AttachPhoto);
-                                                                        break;
-                                                                    case 3:
-                                                                        messageText = LocaleController.formatString("NotificationMessageSDPhoto", R.string.NotificationMessageSDPhoto, args[0]);
-                                                                        message = LocaleController.getString("AttachPhoto", R.string.AttachPhoto);
-                                                                        break;
-                                                                    case 4:
-                                                                        messageText = LocaleController.formatString("NotificationMessageVideo", R.string.NotificationMessageVideo, args[0]);
-                                                                        message = LocaleController.getString("AttachVideo", R.string.AttachVideo);
-                                                                        break;
-                                                                    case 5:
-                                                                        messageText = LocaleController.formatString("NotificationMessageSDVideo", R.string.NotificationMessageSDVideo, args[0]);
-                                                                        message = LocaleController.getString("AttachVideo", R.string.AttachVideo);
-                                                                        break;
-                                                                    case 6:
-                                                                        messageText = LocaleController.getString("ActionTakeScreenshoot", R.string.ActionTakeScreenshoot).replace("un1", args[0]);
-                                                                        break;
-                                                                    case 7:
-                                                                        messageText = LocaleController.formatString("NotificationMessageRound", R.string.NotificationMessageRound, args[0]);
-                                                                        message = LocaleController.getString("AttachRound", R.string.AttachRound);
-                                                                        break;
-                                                                    case 8:
-                                                                        messageText = LocaleController.formatString("NotificationMessageDocument", R.string.NotificationMessageDocument, args[0]);
-                                                                        message = LocaleController.getString("AttachDocument", R.string.AttachDocument);
-                                                                        break;
-                                                                    case 9:
-                                                                        if (args.length <= 1 || TextUtils.isEmpty(args[1])) {
-                                                                            messageText = LocaleController.formatString("NotificationMessageSticker", R.string.NotificationMessageSticker, args[0]);
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationMessageStickerEmoji", R.string.NotificationMessageStickerEmoji, args[0], args[1]);
-                                                                        }
-                                                                        message = LocaleController.getString("AttachSticker", R.string.AttachSticker);
-                                                                        break;
-                                                                    case 10:
-                                                                        messageText = LocaleController.formatString("NotificationMessageAudio", R.string.NotificationMessageAudio, args[0]);
-                                                                        message = LocaleController.getString("AttachAudio", R.string.AttachAudio);
-                                                                        break;
-                                                                    case 11:
-                                                                        messageText = LocaleController.formatString("NotificationMessageContact", R.string.NotificationMessageContact, args[0]);
-                                                                        message = LocaleController.getString("AttachContact", R.string.AttachContact);
-                                                                        break;
-                                                                    case 12:
-                                                                        messageText = LocaleController.formatString("NotificationMessageMap", R.string.NotificationMessageMap, args[0]);
-                                                                        message = LocaleController.getString("AttachLocation", R.string.AttachLocation);
-                                                                        break;
-                                                                    case 13:
-                                                                        messageText = LocaleController.formatString("NotificationMessageLiveLocation", R.string.NotificationMessageLiveLocation, args[0]);
-                                                                        message = LocaleController.getString("AttachLiveLocation", R.string.AttachLiveLocation);
-                                                                        break;
-                                                                    case 14:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGif", R.string.NotificationMessageGif, args[0]);
-                                                                        message = LocaleController.getString("AttachGif", R.string.AttachGif);
-                                                                        break;
-                                                                    case 15:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGame", R.string.NotificationMessageGame, args[0]);
-                                                                        message = LocaleController.getString("AttachGame", R.string.AttachGame);
-                                                                        break;
-                                                                    case 16:
-                                                                        messageText = LocaleController.formatString("NotificationMessageInvoice", R.string.NotificationMessageInvoice, args[0], args[1]);
-                                                                        message = LocaleController.getString("PaymentInvoice", R.string.PaymentInvoice);
-                                                                        break;
-                                                                    case 17:
-                                                                        messageText = LocaleController.formatString("NotificationMessageForwardFew", R.string.NotificationMessageForwardFew, args[0], LocaleController.formatPluralString("messages", Utilities.parseInt(args[1]).intValue()));
-                                                                        localMessage = true;
-                                                                        break;
-                                                                    case 18:
-                                                                        messageText = LocaleController.formatString("NotificationMessageFew", R.string.NotificationMessageFew, args[0], LocaleController.formatPluralString("Photos", Utilities.parseInt(args[1]).intValue()));
-                                                                        localMessage = true;
-                                                                        break;
-                                                                    case 19:
-                                                                        messageText = LocaleController.formatString("NotificationMessageFew", R.string.NotificationMessageFew, args[0], LocaleController.formatPluralString("messages", Utilities.parseInt(args[1]).intValue()));
-                                                                        localMessage = true;
-                                                                        break;
-                                                                    case 20:
-                                                                        messageText = LocaleController.formatString("NotificationMessageText", R.string.NotificationMessageText, args[0], args[1]);
-                                                                        message = args[1];
-                                                                        break;
-                                                                    case 21:
-                                                                        messageText = LocaleController.formatString("ChannelMessageNoText", R.string.ChannelMessageNoText, args[0]);
-                                                                        message = TtmlNode.ANONYMOUS_REGION_ID;
-                                                                        break;
-                                                                    case 22:
-                                                                        messageText = LocaleController.formatString("ChannelMessagePhoto", R.string.ChannelMessagePhoto, args[0]);
-                                                                        message = LocaleController.getString("AttachPhoto", R.string.AttachPhoto);
-                                                                        break;
-                                                                    case 23:
-                                                                        messageText = LocaleController.formatString("ChannelMessageVideo", R.string.ChannelMessageVideo, args[0]);
-                                                                        message = LocaleController.getString("AttachVideo", R.string.AttachVideo);
-                                                                        break;
-                                                                    case RendererCapabilities.ADAPTIVE_SUPPORT_MASK /*24*/:
-                                                                        messageText = LocaleController.formatString("ChannelMessageRound", R.string.ChannelMessageRound, args[0]);
-                                                                        message = LocaleController.getString("AttachRound", R.string.AttachRound);
-                                                                        break;
-                                                                    case 25:
-                                                                        messageText = LocaleController.formatString("ChannelMessageDocument", R.string.ChannelMessageDocument, args[0]);
-                                                                        message = LocaleController.getString("AttachDocument", R.string.AttachDocument);
-                                                                        break;
-                                                                    case 26:
-                                                                        if (args.length <= 1 || TextUtils.isEmpty(args[1])) {
-                                                                            messageText = LocaleController.formatString("ChannelMessageSticker", R.string.ChannelMessageSticker, args[0]);
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("ChannelMessageStickerEmoji", R.string.ChannelMessageStickerEmoji, args[0], args[1]);
-                                                                        }
-                                                                        message = LocaleController.getString("AttachSticker", R.string.AttachSticker);
-                                                                        break;
-                                                                    case 27:
-                                                                        messageText = LocaleController.formatString("ChannelMessageAudio", R.string.ChannelMessageAudio, args[0]);
-                                                                        message = LocaleController.getString("AttachAudio", R.string.AttachAudio);
-                                                                        break;
-                                                                    case 28:
-                                                                        messageText = LocaleController.formatString("ChannelMessageContact", R.string.ChannelMessageContact, args[0]);
-                                                                        message = LocaleController.getString("AttachContact", R.string.AttachContact);
-                                                                        break;
-                                                                    case 29:
-                                                                        messageText = LocaleController.formatString("ChannelMessageMap", R.string.ChannelMessageMap, args[0]);
-                                                                        message = LocaleController.getString("AttachLocation", R.string.AttachLocation);
-                                                                        break;
-                                                                    case 30:
-                                                                        messageText = LocaleController.formatString("ChannelMessageLiveLocation", R.string.ChannelMessageLiveLocation, args[0]);
-                                                                        message = LocaleController.getString("AttachLiveLocation", R.string.AttachLiveLocation);
-                                                                        break;
-                                                                    case 31:
-                                                                        messageText = LocaleController.formatString("ChannelMessageGIF", R.string.ChannelMessageGIF, args[0]);
-                                                                        message = LocaleController.getString("AttachGif", R.string.AttachGif);
-                                                                        break;
-                                                                    case 32:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGame", R.string.NotificationMessageGame, args[0]);
-                                                                        message = LocaleController.getString("AttachGame", R.string.AttachGame);
-                                                                        break;
-                                                                    case 33:
-                                                                        messageText = LocaleController.formatString("ChannelMessageFew", R.string.ChannelMessageFew, args[0], LocaleController.formatPluralString("ForwardedMessageCount", Utilities.parseInt(args[1]).intValue()).toLowerCase());
-                                                                        localMessage = true;
-                                                                        break;
-                                                                    case 34:
-                                                                        messageText = LocaleController.formatString("ChannelMessageFew", R.string.ChannelMessageFew, args[0], LocaleController.formatPluralString("Photos", Utilities.parseInt(args[1]).intValue()));
-                                                                        localMessage = true;
-                                                                        break;
-                                                                    case 35:
-                                                                        messageText = LocaleController.formatString("ChannelMessageFew", R.string.ChannelMessageFew, args[0], LocaleController.formatPluralString("messages", Utilities.parseInt(args[1]).intValue()));
-                                                                        localMessage = true;
-                                                                        break;
-                                                                    case TsExtractor.TS_STREAM_TYPE_H265 /*36*/:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupText", R.string.NotificationMessageGroupText, args[0], args[1], args[2]);
-                                                                        message = args[1];
-                                                                        break;
-                                                                    case 37:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupNoText", R.string.NotificationMessageGroupNoText, args[0], args[1]);
-                                                                        message = TtmlNode.ANONYMOUS_REGION_ID;
-                                                                        break;
-                                                                    case 38:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupPhoto", R.string.NotificationMessageGroupPhoto, args[0], args[1]);
-                                                                        message = LocaleController.getString("AttachPhoto", R.string.AttachPhoto);
-                                                                        break;
-                                                                    case 39:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupVideo", R.string.NotificationMessageGroupVideo, args[0], args[1]);
-                                                                        message = LocaleController.getString("AttachVideo", R.string.AttachVideo);
-                                                                        break;
-                                                                    case 40:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupRound", R.string.NotificationMessageGroupRound, args[0], args[1]);
-                                                                        message = LocaleController.getString("AttachRound", R.string.AttachRound);
-                                                                        break;
-                                                                    case 41:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupDocument", R.string.NotificationMessageGroupDocument, args[0], args[1]);
-                                                                        message = LocaleController.getString("AttachDocument", R.string.AttachDocument);
-                                                                        break;
-                                                                    case 42:
-                                                                        if (args.length <= 1 || TextUtils.isEmpty(args[1])) {
-                                                                            messageText = LocaleController.formatString("NotificationMessageGroupSticker", R.string.NotificationMessageGroupSticker, args[0]);
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationMessageGroupStickerEmoji", R.string.NotificationMessageGroupStickerEmoji, args[0], args[1]);
-                                                                        }
-                                                                        message = LocaleController.getString("AttachSticker", R.string.AttachSticker);
-                                                                        break;
-                                                                    case 43:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupAudio", R.string.NotificationMessageGroupAudio, args[0], args[1]);
-                                                                        message = LocaleController.getString("AttachAudio", R.string.AttachAudio);
-                                                                        break;
-                                                                    case 44:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupContact", R.string.NotificationMessageGroupContact, args[0], args[1]);
-                                                                        message = LocaleController.getString("AttachContact", R.string.AttachContact);
-                                                                        break;
-                                                                    case 45:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupMap", R.string.NotificationMessageGroupMap, args[0], args[1]);
-                                                                        message = LocaleController.getString("AttachLocation", R.string.AttachLocation);
-                                                                        break;
-                                                                    case 46:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupLiveLocation", R.string.NotificationMessageGroupLiveLocation, args[0], args[1]);
-                                                                        message = LocaleController.getString("AttachLiveLocation", R.string.AttachLiveLocation);
-                                                                        break;
-                                                                    case 47:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupGif", R.string.NotificationMessageGroupGif, args[0], args[1]);
-                                                                        message = LocaleController.getString("AttachGif", R.string.AttachGif);
-                                                                        break;
-                                                                    case 48:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupGame", R.string.NotificationMessageGroupGame, args[0], args[1], args[2]);
-                                                                        message = LocaleController.getString("AttachGame", R.string.AttachGame);
-                                                                        break;
-                                                                    case 49:
-                                                                        messageText = LocaleController.formatString("NotificationMessageGroupInvoice", R.string.NotificationMessageGroupInvoice, args[0], args[1], args[2]);
-                                                                        message = LocaleController.getString("PaymentInvoice", R.string.PaymentInvoice);
-                                                                        break;
-                                                                    case 50:
-                                                                        messageText = LocaleController.formatString("NotificationInvitedToGroup", R.string.NotificationInvitedToGroup, args[0], args[1]);
-                                                                        break;
-                                                                    case 51:
-                                                                        messageText = LocaleController.formatString("NotificationEditedGroupName", R.string.NotificationEditedGroupName, args[0], args[1]);
-                                                                        break;
-                                                                    case 52:
-                                                                        messageText = LocaleController.formatString("NotificationEditedGroupPhoto", R.string.NotificationEditedGroupPhoto, args[0], args[1]);
-                                                                        break;
-                                                                    case 53:
-                                                                        messageText = LocaleController.formatString("NotificationGroupAddMember", R.string.NotificationGroupAddMember, args[0], args[1], args[2]);
-                                                                        break;
-                                                                    case 54:
-                                                                        messageText = LocaleController.formatString("NotificationInvitedToGroup", R.string.NotificationInvitedToGroup, args[0], args[1]);
-                                                                        break;
-                                                                    case 55:
-                                                                        messageText = LocaleController.formatString("NotificationGroupKickMember", R.string.NotificationGroupKickMember, args[0], args[1]);
-                                                                        break;
-                                                                    case 56:
-                                                                        messageText = LocaleController.formatString("NotificationGroupKickYou", R.string.NotificationGroupKickYou, args[0], args[1]);
-                                                                        break;
-                                                                    case 57:
-                                                                        messageText = LocaleController.formatString("NotificationGroupLeftMember", R.string.NotificationGroupLeftMember, args[0], args[1]);
-                                                                        break;
-                                                                    case 58:
-                                                                        messageText = LocaleController.formatString("NotificationGroupAddSelf", R.string.NotificationGroupAddSelf, args[0], args[1]);
-                                                                        break;
-                                                                    case 59:
-                                                                        messageText = LocaleController.formatString("NotificationGroupAddSelfMega", R.string.NotificationGroupAddSelfMega, args[0], args[1]);
-                                                                        break;
-                                                                    case 60:
-                                                                        messageText = LocaleController.formatString("NotificationGroupForwardedFew", R.string.NotificationGroupForwardedFew, args[0], args[1], LocaleController.formatPluralString("messages", Utilities.parseInt(args[2]).intValue()));
-                                                                        localMessage = true;
-                                                                        break;
-                                                                    case 61:
-                                                                        messageText = LocaleController.formatString("NotificationGroupFew", R.string.NotificationGroupFew, args[0], args[1], LocaleController.formatPluralString("Photos", Utilities.parseInt(args[2]).intValue()));
-                                                                        localMessage = true;
-                                                                        break;
-                                                                    case 62:
-                                                                        messageText = LocaleController.formatString("NotificationGroupFew", R.string.NotificationGroupFew, args[0], args[1], LocaleController.formatPluralString("messages", Utilities.parseInt(args[2]).intValue()));
-                                                                        localMessage = true;
-                                                                        break;
-                                                                    case 63:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedTextChannel", R.string.NotificationActionPinnedTextChannel, args[0], args[1]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedText", R.string.NotificationActionPinnedText, args[0], args[1], args[2]);
-                                                                            break;
-                                                                        }
-                                                                    case 64:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedNoTextChannel", R.string.NotificationActionPinnedNoTextChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedNoText", R.string.NotificationActionPinnedNoText, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case VoIPService.CALL_MIN_LAYER /*65*/:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedPhotoChannel", R.string.NotificationActionPinnedPhotoChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedPhoto", R.string.NotificationActionPinnedPhoto, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case 66:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedVideoChannel", R.string.NotificationActionPinnedVideoChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedVideo", R.string.NotificationActionPinnedVideo, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case 67:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedRoundChannel", R.string.NotificationActionPinnedRoundChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedRound", R.string.NotificationActionPinnedRound, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case 68:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedFileChannel", R.string.NotificationActionPinnedFileChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedFile", R.string.NotificationActionPinnedFile, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case 69:
-                                                                        if (args.length > 1 && !TextUtils.isEmpty(args[1])) {
-                                                                            if (chat_from_id == 0) {
-                                                                                messageText = LocaleController.formatString("NotificationActionPinnedStickerEmojiChannel", R.string.NotificationActionPinnedStickerEmojiChannel, args[0], args[1]);
-                                                                                break;
-                                                                            } else {
-                                                                                messageText = LocaleController.formatString("NotificationActionPinnedStickerEmoji", R.string.NotificationActionPinnedStickerEmoji, args[0], args[2], args[1]);
-                                                                                break;
-                                                                            }
-                                                                        } else if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedStickerChannel", R.string.NotificationActionPinnedStickerChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedSticker", R.string.NotificationActionPinnedSticker, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                    case 70:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedVoiceChannel", R.string.NotificationActionPinnedVoiceChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedVoice", R.string.NotificationActionPinnedVoice, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case 71:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedContactChannel", R.string.NotificationActionPinnedContactChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedContact", R.string.NotificationActionPinnedContact, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case 72:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedGeoChannel", R.string.NotificationActionPinnedGeoChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedGeo", R.string.NotificationActionPinnedGeo, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case SecretChatHelper.CURRENT_SECRET_CHAT_LAYER /*73*/:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedGeoLiveChannel", R.string.NotificationActionPinnedGeoLiveChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedGeoLive", R.string.NotificationActionPinnedGeoLive, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case VoIPService.CALL_MAX_LAYER /*74*/:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedGameChannel", R.string.NotificationActionPinnedGameChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedGame", R.string.NotificationActionPinnedGame, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case 75:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedInvoiceChannel", R.string.NotificationActionPinnedInvoiceChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedInvoice", R.string.NotificationActionPinnedInvoice, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case TLRPC.LAYER /*76*/:
-                                                                        if (chat_from_id == 0) {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedGifChannel", R.string.NotificationActionPinnedGifChannel, args[0]);
-                                                                            break;
-                                                                        } else {
-                                                                            messageText = LocaleController.formatString("NotificationActionPinnedGif", R.string.NotificationActionPinnedGif, args[0], args[1]);
-                                                                            break;
-                                                                        }
-                                                                    case 77:
-                                                                    case 78:
-                                                                    case 79:
-                                                                    case 80:
-                                                                    case 81:
-                                                                    case 82:
-                                                                    case 83:
-                                                                    case 84:
-                                                                    case 85:
-                                                                        break;
-                                                                    default:
-                                                                        if (BuildVars.LOGS_ENABLED) {
-                                                                            FileLog.w("unhandled loc_key = " + loc_key);
-                                                                            break;
-                                                                        }
-                                                                        break;
-                                                                }
-                                                                if (messageText != null) {
-                                                                    Message messageOwner = new TL_message();
-                                                                    messageOwner.id = msg_id;
-                                                                    if (message == null) {
-                                                                        message = messageText;
-                                                                    }
-                                                                    messageOwner.message = message;
-                                                                    messageOwner.date = (int) (time / 1000);
-                                                                    if (pinned) {
-                                                                        messageOwner.action = new TL_messageActionPinMessage();
-                                                                    }
-                                                                    if (supergroup) {
-                                                                        messageOwner.flags |= Integer.MIN_VALUE;
-                                                                    }
-                                                                    if (channel_id != 0) {
-                                                                        messageOwner.to_id = new TL_peerChannel();
-                                                                        messageOwner.to_id.channel_id = channel_id;
-                                                                        messageOwner.dialog_id = (long) (-channel_id);
-                                                                    } else if (chat_id != 0) {
-                                                                        messageOwner.to_id = new TL_peerChat();
-                                                                        messageOwner.to_id.chat_id = chat_id;
-                                                                        messageOwner.dialog_id = (long) (-chat_id);
-                                                                    } else {
-                                                                        messageOwner.to_id = new TL_peerUser();
-                                                                        messageOwner.to_id.user_id = user_id;
-                                                                        messageOwner.dialog_id = (long) user_id;
-                                                                    }
-                                                                    messageOwner.from_id = chat_from_id;
-                                                                    messageOwner.mentioned = mention;
-                                                                    MessageObject messageObject = new MessageObject(currentAccount, messageOwner, messageText, name, localMessage, channel);
-                                                                    ArrayList<MessageObject> arrayList = new ArrayList();
-                                                                    arrayList.add(messageObject);
-                                                                    NotificationsController.getInstance(currentAccount).processNewMessages(arrayList, true, true);
-                                                                }
-                                                            } else {
-                                                                return;
-                                                            }
-                                                        }
-                                                        int max_id = custom.getInt("max_id");
-                                                        ArrayList<Update> updates2 = new ArrayList();
-                                                        if (BuildVars.LOGS_ENABLED) {
-                                                            FileLog.d("GCM received read notification max_id = " + max_id + " for dialogId = " + dialog_id);
-                                                        }
-                                                        if (channel_id != 0) {
-                                                            TL_updateReadChannelInbox update2 = new TL_updateReadChannelInbox();
-                                                            update2.channel_id = channel_id;
-                                                            update2.max_id = max_id;
-                                                            updates2.add(update2);
-                                                        } else {
-                                                            TL_updateReadHistoryInbox update3 = new TL_updateReadHistoryInbox();
-                                                            if (user_id != 0) {
-                                                                update3.peer = new TL_peerUser();
-                                                                update3.peer.user_id = user_id;
-                                                            } else {
-                                                                update3.peer = new TL_peerChat();
-                                                                update3.peer.chat_id = chat_id;
-                                                            }
-                                                            update3.max_id = max_id;
-                                                            updates2.add(update3);
-                                                        }
-                                                        MessagesController.getInstance(accountFinal).processUpdateArray(updates2, null, null, false);
-                                                        ConnectionsManager.onInternalPushReceived(currentAccount);
-                                                        ConnectionsManager.getInstance(currentAccount).resumeNetworkMaybe();
-                                                        return;
-                                                    }
-                                                    return;
-                                            }
-                                            e = th;
-                                            if (currentAccount != -1) {
-                                                ConnectionsManager.onInternalPushReceived(currentAccount);
-                                                ConnectionsManager.getInstance(currentAccount).resumeNetworkMaybe();
-                                            } else {
-                                                GcmPushListenerService.this.onDecryptError();
-                                            }
-                                            if (BuildVars.LOGS_ENABLED) {
-                                                FileLog.e("error in loc_key = " + loc_key);
-                                            }
-                                            FileLog.e(e);
-                                            return;
-                                        }
-                                        return;
-                                    }
-                                    GcmPushListenerService.this.onDecryptError();
-                                    currentAccount = -1;
-                                    return;
-                                }
-                                GcmPushListenerService.this.onDecryptError();
-                                currentAccount = -1;
-                                return;
-                            }
-                            GcmPushListenerService.this.onDecryptError();
-                            currentAccount = -1;
-                        } catch (Throwable th2) {
-                            e = th2;
-                            currentAccount = -1;
+
+                    class AnonymousClass1 implements Runnable {
+                        final /* synthetic */ int val$accountFinal;
+                        final /* synthetic */ TL_updates val$updates;
+
+                        AnonymousClass1(int i, TL_updates tL_updates) {
+                            this.val$accountFinal = i;
+                            this.val$updates = tL_updates;
                         }
+
+                        public void run() {
+                            MessagesController.getInstance(this.val$accountFinal).processUpdates(this.val$updates, false);
+                        }
+                    }
+
+                    public void run() {
+                        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.GcmPushListenerService.1.1.run():void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+                        /*
+                        r0 = this;
+                        r1 = r75;
+                        r2 = -1;
+                        r3 = 0;
+                        r4 = r3;
+                        r6 = org.telegram.messenger.GcmPushListenerService.AnonymousClass1.this;	 Catch:{ Throwable -> 0x1494 }
+                        r6 = r1;	 Catch:{ Throwable -> 0x1494 }
+                        r7 = "p";	 Catch:{ Throwable -> 0x1494 }
+                        r6 = r6.get(r7);	 Catch:{ Throwable -> 0x1494 }
+                        r7 = r6 instanceof java.lang.String;	 Catch:{ Throwable -> 0x1494 }
+                        if (r7 != 0) goto L_0x0020;
+                    L_0x0013:
+                        r3 = org.telegram.messenger.GcmPushListenerService.AnonymousClass1.this;	 Catch:{ Throwable -> 0x001b }
+                        r3 = org.telegram.messenger.GcmPushListenerService.this;	 Catch:{ Throwable -> 0x001b }
+                        r3.onDecryptError();	 Catch:{ Throwable -> 0x001b }
+                        return;
+                    L_0x001b:
+                        r0 = move-exception;
+                    L_0x001c:
+                        r3 = r2;
+                        r2 = r0;
+                        goto L_0x149c;
+                    L_0x0020:
+                        r7 = r6;	 Catch:{ Throwable -> 0x1494 }
+                        r7 = (java.lang.String) r7;	 Catch:{ Throwable -> 0x1494 }
+                        r8 = 8;	 Catch:{ Throwable -> 0x1494 }
+                        r7 = android.util.Base64.decode(r7, r8);	 Catch:{ Throwable -> 0x1494 }
+                        r9 = new org.telegram.tgnet.NativeByteBuffer;	 Catch:{ Throwable -> 0x1494 }
+                        r10 = r7.length;	 Catch:{ Throwable -> 0x1494 }
+                        r9.<init>(r10);	 Catch:{ Throwable -> 0x1494 }
+                        r9.writeBytes(r7);	 Catch:{ Throwable -> 0x1494 }
+                        r10 = 0;	 Catch:{ Throwable -> 0x1494 }
+                        r9.position(r10);	 Catch:{ Throwable -> 0x1494 }
+                        r11 = org.telegram.messenger.SharedConfig.pushAuthKeyId;	 Catch:{ Throwable -> 0x1494 }
+                        if (r11 != 0) goto L_0x004b;
+                    L_0x003a:
+                        r11 = new byte[r8];	 Catch:{ Throwable -> 0x001b }
+                        org.telegram.messenger.SharedConfig.pushAuthKeyId = r11;	 Catch:{ Throwable -> 0x001b }
+                        r11 = org.telegram.messenger.SharedConfig.pushAuthKey;	 Catch:{ Throwable -> 0x001b }
+                        r11 = org.telegram.messenger.Utilities.computeSHA1(r11);	 Catch:{ Throwable -> 0x001b }
+                        r12 = r11.length;	 Catch:{ Throwable -> 0x001b }
+                        r12 = r12 - r8;	 Catch:{ Throwable -> 0x001b }
+                        r13 = org.telegram.messenger.SharedConfig.pushAuthKeyId;	 Catch:{ Throwable -> 0x001b }
+                        java.lang.System.arraycopy(r11, r12, r13, r10, r8);	 Catch:{ Throwable -> 0x001b }
+                    L_0x004b:
+                        r11 = new byte[r8];	 Catch:{ Throwable -> 0x1494 }
+                        r12 = 1;	 Catch:{ Throwable -> 0x1494 }
+                        r9.readBytes(r11, r12);	 Catch:{ Throwable -> 0x1494 }
+                        r13 = org.telegram.messenger.SharedConfig.pushAuthKeyId;	 Catch:{ Throwable -> 0x1494 }
+                        r13 = java.util.Arrays.equals(r13, r11);	 Catch:{ Throwable -> 0x1494 }
+                        if (r13 != 0) goto L_0x0061;
+                    L_0x0059:
+                        r3 = org.telegram.messenger.GcmPushListenerService.AnonymousClass1.this;	 Catch:{ Throwable -> 0x001b }
+                        r3 = org.telegram.messenger.GcmPushListenerService.this;	 Catch:{ Throwable -> 0x001b }
+                        r3.onDecryptError();	 Catch:{ Throwable -> 0x001b }
+                        return;
+                    L_0x0061:
+                        r13 = 16;
+                        r13 = new byte[r13];	 Catch:{ Throwable -> 0x1494 }
+                        r9.readBytes(r13, r12);	 Catch:{ Throwable -> 0x1494 }
+                        r14 = org.telegram.messenger.SharedConfig.pushAuthKey;	 Catch:{ Throwable -> 0x1494 }
+                        r15 = 2;	 Catch:{ Throwable -> 0x1494 }
+                        r14 = org.telegram.messenger.MessageKeyData.generateMessageKeyData(r14, r13, r12, r15);	 Catch:{ Throwable -> 0x1494 }
+                        r5 = r9.buffer;	 Catch:{ Throwable -> 0x1494 }
+                        r3 = r14.aesKey;	 Catch:{ Throwable -> 0x1494 }
+                        r15 = r14.aesIv;	 Catch:{ Throwable -> 0x1494 }
+                        r19 = 0;	 Catch:{ Throwable -> 0x1494 }
+                        r20 = 0;	 Catch:{ Throwable -> 0x1494 }
+                        r21 = 24;	 Catch:{ Throwable -> 0x1494 }
+                        r12 = r7.length;	 Catch:{ Throwable -> 0x1494 }
+                        r22 = r12 + -24;	 Catch:{ Throwable -> 0x1494 }
+                        r16 = r5;	 Catch:{ Throwable -> 0x1494 }
+                        r17 = r3;	 Catch:{ Throwable -> 0x1494 }
+                        r18 = r15;	 Catch:{ Throwable -> 0x1494 }
+                        org.telegram.messenger.Utilities.aesIgeEncryption(r16, r17, r18, r19, r20, r21, r22);	 Catch:{ Throwable -> 0x1494 }
+                        r25 = org.telegram.messenger.SharedConfig.pushAuthKey;	 Catch:{ Throwable -> 0x1494 }
+                        r26 = 96;	 Catch:{ Throwable -> 0x1494 }
+                        r27 = 32;	 Catch:{ Throwable -> 0x1494 }
+                        r3 = r9.buffer;	 Catch:{ Throwable -> 0x1494 }
+                        r29 = 24;	 Catch:{ Throwable -> 0x1494 }
+                        r5 = r9.buffer;	 Catch:{ Throwable -> 0x1494 }
+                        r30 = r5.limit();	 Catch:{ Throwable -> 0x1494 }
+                        r28 = r3;	 Catch:{ Throwable -> 0x1494 }
+                        r3 = org.telegram.messenger.Utilities.computeSHA256(r25, r26, r27, r28, r29, r30);	 Catch:{ Throwable -> 0x1494 }
+                        r5 = org.telegram.messenger.Utilities.arraysEquals(r13, r10, r3, r8);	 Catch:{ Throwable -> 0x1494 }
+                        if (r5 != 0) goto L_0x00ab;
+                    L_0x00a3:
+                        r5 = org.telegram.messenger.GcmPushListenerService.AnonymousClass1.this;	 Catch:{ Throwable -> 0x001b }
+                        r5 = org.telegram.messenger.GcmPushListenerService.this;	 Catch:{ Throwable -> 0x001b }
+                        r5.onDecryptError();	 Catch:{ Throwable -> 0x001b }
+                        return;
+                    L_0x00ab:
+                        r5 = 1;
+                        r12 = r9.readInt32(r5);	 Catch:{ Throwable -> 0x1494 }
+                        r15 = new byte[r12];	 Catch:{ Throwable -> 0x1494 }
+                        r9.readBytes(r15, r5);	 Catch:{ Throwable -> 0x1494 }
+                        r5 = new java.lang.String;	 Catch:{ Throwable -> 0x1494 }
+                        r8 = "UTF-8";	 Catch:{ Throwable -> 0x1494 }
+                        r5.<init>(r15, r8);	 Catch:{ Throwable -> 0x1494 }
+                        r8 = new org.json.JSONObject;	 Catch:{ Throwable -> 0x1494 }
+                        r8.<init>(r5);	 Catch:{ Throwable -> 0x1494 }
+                        r10 = "custom";	 Catch:{ Throwable -> 0x1494 }
+                        r10 = r8.getJSONObject(r10);	 Catch:{ Throwable -> 0x1494 }
+                        r31 = r2;
+                        r2 = "user_id";	 Catch:{ Throwable -> 0x148d }
+                        r2 = r8.has(r2);	 Catch:{ Throwable -> 0x148d }
+                        if (r2 == 0) goto L_0x00de;
+                    L_0x00d1:
+                        r2 = "user_id";	 Catch:{ Throwable -> 0x00d8 }
+                        r2 = r8.get(r2);	 Catch:{ Throwable -> 0x00d8 }
+                        goto L_0x00df;	 Catch:{ Throwable -> 0x00d8 }
+                    L_0x00d8:
+                        r0 = move-exception;	 Catch:{ Throwable -> 0x00d8 }
+                        r2 = r0;	 Catch:{ Throwable -> 0x00d8 }
+                        r3 = r31;	 Catch:{ Throwable -> 0x00d8 }
+                        goto L_0x149c;	 Catch:{ Throwable -> 0x00d8 }
+                    L_0x00de:
+                        r2 = 0;	 Catch:{ Throwable -> 0x00d8 }
+                    L_0x00df:
+                        if (r2 != 0) goto L_0x00ee;	 Catch:{ Throwable -> 0x00d8 }
+                    L_0x00e1:
+                        r32 = r3;	 Catch:{ Throwable -> 0x00d8 }
+                        r3 = org.telegram.messenger.UserConfig.selectedAccount;	 Catch:{ Throwable -> 0x00d8 }
+                        r3 = org.telegram.messenger.UserConfig.getInstance(r3);	 Catch:{ Throwable -> 0x00d8 }
+                        r3 = r3.getClientUserId();	 Catch:{ Throwable -> 0x00d8 }
+                    L_0x00ed:
+                        goto L_0x0116;
+                    L_0x00ee:
+                        r32 = r3;
+                        r3 = r2 instanceof java.lang.Integer;	 Catch:{ Throwable -> 0x148d }
+                        if (r3 == 0) goto L_0x00fc;
+                    L_0x00f4:
+                        r3 = r2;	 Catch:{ Throwable -> 0x00d8 }
+                        r3 = (java.lang.Integer) r3;	 Catch:{ Throwable -> 0x00d8 }
+                        r3 = r3.intValue();	 Catch:{ Throwable -> 0x00d8 }
+                        goto L_0x00ed;
+                    L_0x00fc:
+                        r3 = r2 instanceof java.lang.String;	 Catch:{ Throwable -> 0x148d }
+                        if (r3 == 0) goto L_0x010c;
+                    L_0x0100:
+                        r3 = r2;	 Catch:{ Throwable -> 0x00d8 }
+                        r3 = (java.lang.String) r3;	 Catch:{ Throwable -> 0x00d8 }
+                        r3 = org.telegram.messenger.Utilities.parseInt(r3);	 Catch:{ Throwable -> 0x00d8 }
+                        r3 = r3.intValue();	 Catch:{ Throwable -> 0x00d8 }
+                        goto L_0x00ed;
+                    L_0x010c:
+                        r3 = org.telegram.messenger.UserConfig.selectedAccount;	 Catch:{ Throwable -> 0x148d }
+                        r3 = org.telegram.messenger.UserConfig.getInstance(r3);	 Catch:{ Throwable -> 0x148d }
+                        r3 = r3.getClientUserId();	 Catch:{ Throwable -> 0x148d }
+                    L_0x0116:
+                        r16 = org.telegram.messenger.UserConfig.selectedAccount;	 Catch:{ Throwable -> 0x148d }
+                        r17 = 0;
+                    L_0x011a:
+                        r33 = r17;
+                        r34 = r2;
+                        r2 = 3;
+                        r35 = r4;
+                        r4 = r33;
+                        if (r4 >= r2) goto L_0x0141;
+                    L_0x0125:
+                        r2 = org.telegram.messenger.UserConfig.getInstance(r4);	 Catch:{ Throwable -> 0x0139 }
+                        r2 = r2.getClientUserId();	 Catch:{ Throwable -> 0x0139 }
+                        if (r2 != r3) goto L_0x0132;
+                    L_0x012f:
+                        r16 = r4;
+                        goto L_0x0141;
+                    L_0x0132:
+                        r17 = r4 + 1;
+                        r2 = r34;
+                        r4 = r35;
+                        goto L_0x011a;
+                    L_0x0139:
+                        r0 = move-exception;
+                        r2 = r0;
+                        r3 = r31;
+                        r4 = r35;
+                        goto L_0x149c;
+                    L_0x0141:
+                        r2 = r16;
+                        r4 = r16;
+                        r44 = r3;
+                        r3 = org.telegram.messenger.UserConfig.getInstance(r2);	 Catch:{ Throwable -> 0x1487 }
+                        r3 = r3.isClientActivated();	 Catch:{ Throwable -> 0x1487 }
+                        if (r3 != 0) goto L_0x0152;	 Catch:{ Throwable -> 0x1487 }
+                    L_0x0151:
+                        return;	 Catch:{ Throwable -> 0x1487 }
+                    L_0x0152:
+                        r3 = "loc_key";	 Catch:{ Throwable -> 0x1487 }
+                        r3 = r8.has(r3);	 Catch:{ Throwable -> 0x1487 }
+                        if (r3 == 0) goto L_0x0161;	 Catch:{ Throwable -> 0x1487 }
+                    L_0x015a:
+                        r3 = "loc_key";	 Catch:{ Throwable -> 0x1487 }
+                        r3 = r8.getString(r3);	 Catch:{ Throwable -> 0x1487 }
+                        goto L_0x0163;	 Catch:{ Throwable -> 0x1487 }
+                    L_0x0161:
+                        r3 = "";	 Catch:{ Throwable -> 0x1487 }
+                    L_0x0163:
+                        r45 = r5;
+                        r5 = org.telegram.messenger.GcmPushListenerService.AnonymousClass1.this;	 Catch:{ Throwable -> 0x147f }
+                        r5 = r1;	 Catch:{ Throwable -> 0x147f }
+                        r46 = r6;	 Catch:{ Throwable -> 0x147f }
+                        r6 = "google.sent_time";	 Catch:{ Throwable -> 0x147f }
+                        r5 = r5.get(r6);	 Catch:{ Throwable -> 0x147f }
+                        r6 = r3.hashCode();	 Catch:{ Throwable -> 0x147f }
+                        r47 = r5;
+                        r5 = -920689527; // 0xffffffffc91f6489 float:-652872.56 double:NaN;
+                        if (r6 == r5) goto L_0x0190;
+                    L_0x017c:
+                        r5 = 633004703; // 0x25bae29f float:3.241942E-16 double:3.127458774E-315;
+                        if (r6 == r5) goto L_0x0182;
+                    L_0x0181:
+                        goto L_0x019a;
+                    L_0x0182:
+                        r5 = "MESSAGE_ANNOUNCEMENT";	 Catch:{ Throwable -> 0x018c }
+                        r5 = r3.equals(r5);	 Catch:{ Throwable -> 0x018c }
+                        if (r5 == 0) goto L_0x019a;
+                    L_0x018a:
+                        r5 = 1;
+                        goto L_0x019b;
+                    L_0x018c:
+                        r0 = move-exception;
+                        r4 = r3;
+                        goto L_0x001c;
+                    L_0x0190:
+                        r5 = "DC_UPDATE";	 Catch:{ Throwable -> 0x147f }
+                        r5 = r3.equals(r5);	 Catch:{ Throwable -> 0x147f }
+                        if (r5 == 0) goto L_0x019a;	 Catch:{ Throwable -> 0x147f }
+                    L_0x0198:
+                        r5 = 0;	 Catch:{ Throwable -> 0x147f }
+                        goto L_0x019b;	 Catch:{ Throwable -> 0x147f }
+                    L_0x019a:
+                        r5 = -1;	 Catch:{ Throwable -> 0x147f }
+                    L_0x019b:
+                        switch(r5) {
+                            case 0: goto L_0x01f1;
+                            case 1: goto L_0x01a8;
+                            default: goto L_0x019e;
+                        };	 Catch:{ Throwable -> 0x147f }
+                    L_0x019e:
+                        r48 = r7;	 Catch:{ Throwable -> 0x147f }
+                        r51 = r9;	 Catch:{ Throwable -> 0x147f }
+                        r5 = 0;	 Catch:{ Throwable -> 0x147f }
+                        r7 = "channel_id";	 Catch:{ Throwable -> 0x147f }
+                        goto L_0x0229;
+                    L_0x01a8:
+                        r5 = new org.telegram.tgnet.TLRPC$TL_updateServiceNotification;	 Catch:{ Throwable -> 0x018c }
+                        r5.<init>();	 Catch:{ Throwable -> 0x018c }
+                        r6 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r5.popup = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r5.flags = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.GcmPushListenerService.AnonymousClass1.this;	 Catch:{ Throwable -> 0x018c }
+                        r48 = r7;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r2;	 Catch:{ Throwable -> 0x018c }
+                        r17 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6 / r17;	 Catch:{ Throwable -> 0x018c }
+                        r6 = (int) r6;	 Catch:{ Throwable -> 0x018c }
+                        r5.inbox_date = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = "message";	 Catch:{ Throwable -> 0x018c }
+                        r6 = r8.getString(r6);	 Catch:{ Throwable -> 0x018c }
+                        r5.message = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = "announcement";	 Catch:{ Throwable -> 0x018c }
+                        r5.type = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = new org.telegram.tgnet.TLRPC$TL_messageMediaEmpty;	 Catch:{ Throwable -> 0x018c }
+                        r6.<init>();	 Catch:{ Throwable -> 0x018c }
+                        r5.media = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = new org.telegram.tgnet.TLRPC$TL_updates;	 Catch:{ Throwable -> 0x018c }
+                        r6.<init>();	 Catch:{ Throwable -> 0x018c }
+                        r7 = r6.updates;	 Catch:{ Throwable -> 0x018c }
+                        r7.add(r5);	 Catch:{ Throwable -> 0x018c }
+                        r7 = org.telegram.messenger.Utilities.stageQueue;	 Catch:{ Throwable -> 0x018c }
+                        r49 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = new org.telegram.messenger.GcmPushListenerService$1$1$1;	 Catch:{ Throwable -> 0x018c }
+                        r5.<init>(r4, r6);	 Catch:{ Throwable -> 0x018c }
+                        r7.postRunnable(r5);	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.tgnet.ConnectionsManager.getInstance(r2);	 Catch:{ Throwable -> 0x018c }
+                        r5.resumeNetworkMaybe();	 Catch:{ Throwable -> 0x018c }
+                        return;	 Catch:{ Throwable -> 0x018c }
+                    L_0x01f1:
+                        r48 = r7;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "dc";	 Catch:{ Throwable -> 0x018c }
+                        r5 = r10.getInt(r5);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "addr";	 Catch:{ Throwable -> 0x018c }
+                        r6 = r10.getString(r6);	 Catch:{ Throwable -> 0x018c }
+                        r7 = ":";	 Catch:{ Throwable -> 0x018c }
+                        r7 = r6.split(r7);	 Catch:{ Throwable -> 0x018c }
+                        r50 = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r7.length;	 Catch:{ Throwable -> 0x018c }
+                        r51 = r9;	 Catch:{ Throwable -> 0x018c }
+                        r9 = 2;	 Catch:{ Throwable -> 0x018c }
+                        if (r6 == r9) goto L_0x020e;	 Catch:{ Throwable -> 0x018c }
+                    L_0x020d:
+                        return;	 Catch:{ Throwable -> 0x018c }
+                    L_0x020e:
+                        r6 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r7[r6];	 Catch:{ Throwable -> 0x018c }
+                        r9 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r9 = r7[r9];	 Catch:{ Throwable -> 0x018c }
+                        r9 = java.lang.Integer.parseInt(r9);	 Catch:{ Throwable -> 0x018c }
+                        r52 = r7;	 Catch:{ Throwable -> 0x018c }
+                        r7 = org.telegram.tgnet.ConnectionsManager.getInstance(r2);	 Catch:{ Throwable -> 0x018c }
+                        r7.applyDatacenterAddress(r5, r6, r9);	 Catch:{ Throwable -> 0x018c }
+                        r7 = org.telegram.tgnet.ConnectionsManager.getInstance(r2);	 Catch:{ Throwable -> 0x018c }
+                        r7.resumeNetworkMaybe();	 Catch:{ Throwable -> 0x018c }
+                        return;
+                    L_0x0229:
+                        r7 = r10.has(r7);	 Catch:{ Throwable -> 0x147f }
+                        if (r7 == 0) goto L_0x0238;
+                    L_0x022f:
+                        r7 = "channel_id";	 Catch:{ Throwable -> 0x018c }
+                        r7 = r10.getInt(r7);	 Catch:{ Throwable -> 0x018c }
+                        r9 = -r7;
+                        r5 = (long) r9;
+                        goto L_0x0239;
+                    L_0x0238:
+                        r7 = 0;
+                    L_0x0239:
+                        r9 = "from_id";	 Catch:{ Throwable -> 0x147f }
+                        r9 = r10.has(r9);	 Catch:{ Throwable -> 0x147f }
+                        if (r9 == 0) goto L_0x0249;
+                    L_0x0241:
+                        r9 = "from_id";	 Catch:{ Throwable -> 0x018c }
+                        r9 = r10.getInt(r9);	 Catch:{ Throwable -> 0x018c }
+                        r5 = (long) r9;
+                        goto L_0x024a;
+                    L_0x0249:
+                        r9 = 0;
+                    L_0x024a:
+                        r53 = r5;
+                        r5 = "chat_id";	 Catch:{ Throwable -> 0x147f }
+                        r5 = r10.has(r5);	 Catch:{ Throwable -> 0x147f }
+                        if (r5 == 0) goto L_0x025f;
+                    L_0x0254:
+                        r5 = "chat_id";	 Catch:{ Throwable -> 0x018c }
+                        r5 = r10.getInt(r5);	 Catch:{ Throwable -> 0x018c }
+                        r6 = -r5;
+                        r55 = r5;
+                        r5 = (long) r6;
+                        goto L_0x0263;
+                    L_0x025f:
+                        r5 = r53;
+                        r55 = 0;
+                    L_0x0263:
+                        r56 = r55;
+                        r17 = 0;
+                        r19 = (r5 > r17 ? 1 : (r5 == r17 ? 0 : -1));
+                        if (r19 != 0) goto L_0x026c;
+                    L_0x026b:
+                        return;
+                    L_0x026c:
+                        r57 = r11;
+                        r11 = "badge";	 Catch:{ Throwable -> 0x147f }
+                        r11 = r8.has(r11);	 Catch:{ Throwable -> 0x147f }
+                        if (r11 == 0) goto L_0x027d;
+                    L_0x0276:
+                        r11 = "badge";	 Catch:{ Throwable -> 0x018c }
+                        r11 = r8.getInt(r11);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x027e;
+                    L_0x027d:
+                        r11 = 0;
+                    L_0x027e:
+                        if (r11 == 0) goto L_0x13ed;
+                    L_0x0280:
+                        r58 = r11;
+                        r11 = "msg_id";	 Catch:{ Throwable -> 0x147f }
+                        r11 = r10.getInt(r11);	 Catch:{ Throwable -> 0x147f }
+                        r59 = r12;	 Catch:{ Throwable -> 0x147f }
+                        r12 = org.telegram.messenger.MessagesController.getInstance(r2);	 Catch:{ Throwable -> 0x147f }
+                        r12 = r12.dialogs_read_inbox_max;	 Catch:{ Throwable -> 0x147f }
+                        r60 = r13;	 Catch:{ Throwable -> 0x147f }
+                        r13 = java.lang.Long.valueOf(r5);	 Catch:{ Throwable -> 0x147f }
+                        r12 = r12.get(r13);	 Catch:{ Throwable -> 0x147f }
+                        r12 = (java.lang.Integer) r12;	 Catch:{ Throwable -> 0x147f }
+                        if (r12 != 0) goto L_0x02bd;
+                    L_0x029e:
+                        r13 = org.telegram.messenger.MessagesStorage.getInstance(r2);	 Catch:{ Throwable -> 0x018c }
+                        r61 = r12;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r13 = r13.getDialogReadMax(r12, r5);	 Catch:{ Throwable -> 0x018c }
+                        r12 = java.lang.Integer.valueOf(r13);	 Catch:{ Throwable -> 0x018c }
+                        r13 = org.telegram.messenger.MessagesController.getInstance(r4);	 Catch:{ Throwable -> 0x018c }
+                        r13 = r13.dialogs_read_inbox_max;	 Catch:{ Throwable -> 0x018c }
+                        r62 = r14;	 Catch:{ Throwable -> 0x018c }
+                        r14 = java.lang.Long.valueOf(r5);	 Catch:{ Throwable -> 0x018c }
+                        r13.put(r14, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x02c1;
+                    L_0x02bd:
+                        r61 = r12;
+                        r62 = r14;
+                    L_0x02c1:
+                        r13 = r12.intValue();	 Catch:{ Throwable -> 0x147f }
+                        if (r11 > r13) goto L_0x02c8;	 Catch:{ Throwable -> 0x147f }
+                    L_0x02c7:
+                        return;	 Catch:{ Throwable -> 0x147f }
+                    L_0x02c8:
+                        r13 = "chat_from_id";	 Catch:{ Throwable -> 0x147f }
+                        r13 = r10.has(r13);	 Catch:{ Throwable -> 0x147f }
+                        if (r13 == 0) goto L_0x02d7;
+                    L_0x02d0:
+                        r13 = "chat_from_id";	 Catch:{ Throwable -> 0x018c }
+                        r13 = r10.getInt(r13);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x02d8;
+                    L_0x02d7:
+                        r13 = 0;
+                    L_0x02d8:
+                        r14 = "mention";	 Catch:{ Throwable -> 0x147f }
+                        r14 = r10.has(r14);	 Catch:{ Throwable -> 0x147f }
+                        if (r14 == 0) goto L_0x02ea;
+                    L_0x02e0:
+                        r14 = "mention";	 Catch:{ Throwable -> 0x018c }
+                        r14 = r10.getInt(r14);	 Catch:{ Throwable -> 0x018c }
+                        if (r14 == 0) goto L_0x02ea;
+                    L_0x02e8:
+                        r14 = 1;
+                        goto L_0x02eb;
+                    L_0x02ea:
+                        r14 = 0;
+                    L_0x02eb:
+                        r63 = r12;
+                        r12 = "loc_args";	 Catch:{ Throwable -> 0x147f }
+                        r12 = r8.has(r12);	 Catch:{ Throwable -> 0x147f }
+                        if (r12 == 0) goto L_0x0321;
+                    L_0x02f5:
+                        r12 = "loc_args";	 Catch:{ Throwable -> 0x018c }
+                        r12 = r8.getJSONArray(r12);	 Catch:{ Throwable -> 0x018c }
+                        r64 = r8;	 Catch:{ Throwable -> 0x018c }
+                        r8 = r12.length();	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.String[r8];	 Catch:{ Throwable -> 0x018c }
+                        r17 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r65 = r17;	 Catch:{ Throwable -> 0x018c }
+                        r66 = r15;	 Catch:{ Throwable -> 0x018c }
+                        r15 = r8.length;	 Catch:{ Throwable -> 0x018c }
+                        r67 = r4;	 Catch:{ Throwable -> 0x018c }
+                        r4 = r65;	 Catch:{ Throwable -> 0x018c }
+                        if (r4 >= r15) goto L_0x031d;	 Catch:{ Throwable -> 0x018c }
+                    L_0x0310:
+                        r15 = r12.getString(r4);	 Catch:{ Throwable -> 0x018c }
+                        r8[r4] = r15;	 Catch:{ Throwable -> 0x018c }
+                        r17 = r4 + 1;
+                        r15 = r66;
+                        r4 = r67;
+                        goto L_0x0305;
+                        r23 = r8;
+                        goto L_0x0329;
+                    L_0x0321:
+                        r67 = r4;
+                        r64 = r8;
+                        r66 = r15;
+                        r23 = 0;
+                        r4 = r23;
+                        r8 = 0;
+                        r12 = 0;
+                        r15 = 0;
+                        r17 = r4[r15];	 Catch:{ Throwable -> 0x147f }
+                        r15 = r17;	 Catch:{ Throwable -> 0x147f }
+                        r17 = 0;	 Catch:{ Throwable -> 0x147f }
+                        r18 = 0;	 Catch:{ Throwable -> 0x147f }
+                        r19 = 0;	 Catch:{ Throwable -> 0x147f }
+                        r20 = 0;	 Catch:{ Throwable -> 0x147f }
+                        r21 = 0;	 Catch:{ Throwable -> 0x147f }
+                        r68 = r8;	 Catch:{ Throwable -> 0x147f }
+                        r8 = "CHAT_";	 Catch:{ Throwable -> 0x147f }
+                        r8 = r3.startsWith(r8);	 Catch:{ Throwable -> 0x147f }
+                        if (r8 == 0) goto L_0x0357;
+                        if (r7 == 0) goto L_0x034a;
+                        r8 = 1;
+                        goto L_0x034b;
+                        r8 = 0;
+                        r19 = r8;
+                        r8 = r15;
+                        r17 = 1;
+                        r22 = r4[r17];	 Catch:{ Throwable -> 0x018c }
+                        r15 = r22;
+                        r17 = r8;
+                        goto L_0x0374;
+                        r8 = "PINNED_";	 Catch:{ Throwable -> 0x147f }
+                        r8 = r3.startsWith(r8);	 Catch:{ Throwable -> 0x147f }
+                        if (r8 == 0) goto L_0x0369;	 Catch:{ Throwable -> 0x147f }
+                        if (r13 == 0) goto L_0x0363;	 Catch:{ Throwable -> 0x147f }
+                        r8 = 1;	 Catch:{ Throwable -> 0x147f }
+                        goto L_0x0364;	 Catch:{ Throwable -> 0x147f }
+                        r8 = 0;	 Catch:{ Throwable -> 0x147f }
+                        r19 = r8;	 Catch:{ Throwable -> 0x147f }
+                        r20 = 1;	 Catch:{ Throwable -> 0x147f }
+                        goto L_0x0374;	 Catch:{ Throwable -> 0x147f }
+                        r8 = "CHANNEL_";	 Catch:{ Throwable -> 0x147f }
+                        r8 = r3.startsWith(r8);	 Catch:{ Throwable -> 0x147f }
+                        if (r8 == 0) goto L_0x0374;	 Catch:{ Throwable -> 0x147f }
+                        r8 = 1;	 Catch:{ Throwable -> 0x147f }
+                        r21 = r8;	 Catch:{ Throwable -> 0x147f }
+                        r8 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Throwable -> 0x147f }
+                        if (r8 == 0) goto L_0x039f;
+                        r8 = new java.lang.StringBuilder;	 Catch:{ Throwable -> 0x018c }
+                        r8.<init>();	 Catch:{ Throwable -> 0x018c }
+                        r69 = r12;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "GCM received message notification ";	 Catch:{ Throwable -> 0x018c }
+                        r8.append(r12);	 Catch:{ Throwable -> 0x018c }
+                        r8.append(r3);	 Catch:{ Throwable -> 0x018c }
+                        r12 = " for dialogId = ";	 Catch:{ Throwable -> 0x018c }
+                        r8.append(r12);	 Catch:{ Throwable -> 0x018c }
+                        r8.append(r5);	 Catch:{ Throwable -> 0x018c }
+                        r12 = " mid = ";	 Catch:{ Throwable -> 0x018c }
+                        r8.append(r12);	 Catch:{ Throwable -> 0x018c }
+                        r8.append(r11);	 Catch:{ Throwable -> 0x018c }
+                        r8 = r8.toString();	 Catch:{ Throwable -> 0x018c }
+                        org.telegram.messenger.FileLog.d(r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x03a1;
+                        r69 = r12;
+                        r8 = r3.hashCode();	 Catch:{ Throwable -> 0x147f }
+                        switch(r8) {
+                            case -2091498420: goto L_0x0796;
+                            case -2053872415: goto L_0x078b;
+                            case -2039746363: goto L_0x0780;
+                            case -1979538588: goto L_0x0775;
+                            case -1979536003: goto L_0x076a;
+                            case -1979535888: goto L_0x075f;
+                            case -1969004705: goto L_0x0754;
+                            case -1946699248: goto L_0x0749;
+                            case -1528047021: goto L_0x073e;
+                            case -1493579426: goto L_0x0732;
+                            case -1480102982: goto L_0x0727;
+                            case -1478041834: goto L_0x071c;
+                            case -1474543101: goto L_0x0711;
+                            case -1465695932: goto L_0x0705;
+                            case -1374906292: goto L_0x06f9;
+                            case -1372940586: goto L_0x06ed;
+                            case -1264245338: goto L_0x06e1;
+                            case -1236086700: goto L_0x06d5;
+                            case -1236077786: goto L_0x06c9;
+                            case -1235686303: goto L_0x06bd;
+                            case -1198046100: goto L_0x06b2;
+                            case -1124254527: goto L_0x06a6;
+                            case -1085137927: goto L_0x069a;
+                            case -1084746444: goto L_0x068e;
+                            case -819729482: goto L_0x0682;
+                            case -772141857: goto L_0x0676;
+                            case -638310039: goto L_0x066a;
+                            case -589196239: goto L_0x065e;
+                            case -589193654: goto L_0x0652;
+                            case -589193539: goto L_0x0646;
+                            case -440169325: goto L_0x063a;
+                            case -412748110: goto L_0x062e;
+                            case -228518075: goto L_0x0622;
+                            case -213586509: goto L_0x0616;
+                            case -115582002: goto L_0x060a;
+                            case -112621464: goto L_0x05fe;
+                            case -108522133: goto L_0x05f2;
+                            case -107572034: goto L_0x05e7;
+                            case -40534265: goto L_0x05db;
+                            case 65254746: goto L_0x05cf;
+                            case 141040782: goto L_0x05c3;
+                            case 309993049: goto L_0x05b7;
+                            case 309995634: goto L_0x05ab;
+                            case 309995749: goto L_0x059f;
+                            case 320532812: goto L_0x0593;
+                            case 328933854: goto L_0x0587;
+                            case 331340546: goto L_0x057b;
+                            case 344816990: goto L_0x056f;
+                            case 346878138: goto L_0x0563;
+                            case 350376871: goto L_0x0557;
+                            case 615714517: goto L_0x054c;
+                            case 715508879: goto L_0x0540;
+                            case 728985323: goto L_0x0534;
+                            case 731046471: goto L_0x0528;
+                            case 734545204: goto L_0x051c;
+                            case 802032552: goto L_0x0510;
+                            case 991498806: goto L_0x0504;
+                            case 1019917311: goto L_0x04f8;
+                            case 1019926225: goto L_0x04ec;
+                            case 1020317708: goto L_0x04e0;
+                            case 1060349560: goto L_0x04d4;
+                            case 1060358474: goto L_0x04c8;
+                            case 1060749957: goto L_0x04bd;
+                            case 1073049781: goto L_0x04b1;
+                            case 1078101399: goto L_0x04a5;
+                            case 1110103437: goto L_0x0499;
+                            case 1160762272: goto L_0x048d;
+                            case 1172918249: goto L_0x0481;
+                            case 1281128640: goto L_0x0475;
+                            case 1281131225: goto L_0x0469;
+                            case 1281131340: goto L_0x045d;
+                            case 1310789062: goto L_0x0452;
+                            case 1361447897: goto L_0x0446;
+                            case 1498266155: goto L_0x043a;
+                            case 1547988151: goto L_0x042e;
+                            case 1561464595: goto L_0x0422;
+                            case 1563525743: goto L_0x0416;
+                            case 1567024476: goto L_0x040a;
+                            case 1810705077: goto L_0x03fe;
+                            case 1815177512: goto L_0x03f2;
+                            case 1963241394: goto L_0x03e6;
+                            case 2014789757: goto L_0x03da;
+                            case 2022049433: goto L_0x03ce;
+                            case 2048733346: goto L_0x03c2;
+                            case 2099392181: goto L_0x03b6;
+                            case 2140162142: goto L_0x03aa;
+                            default: goto L_0x03a8;
+                        };
+                        goto L_0x07a1;
+                        r8 = "CHAT_MESSAGE_GEOLIVE";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 46;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_PHOTOS";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 34;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_NOTEXT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 21;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_CONTACT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 71;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_PHOTO_EDITED";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 52;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "LOCKED_MESSAGE";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 83;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGES";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 35;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_INVOICE";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 16;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_VIDEO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 39;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_ROUND";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 40;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_PHOTO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 38;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_AUDIO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 43;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PHONE_CALL_MISSED";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 85;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_PHOTOS";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 18;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_NOTEXT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_GIF";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 14;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_GEO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 12;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_DOC";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 8;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_GEOLIVE";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 30;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_PHOTOS";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 61;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_NOTEXT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 37;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_TITLE_EDITED";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 51;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_NOTEXT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 64;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_TEXT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_GAME";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 15;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_FWDS";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 17;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_TEXT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 36;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_GAME";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 48;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_FWDS";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 60;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_GEOLIVE";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 73;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_CONTACT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 11;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_VIDEO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 66;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_ROUND";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 67;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_PHOTO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 65;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_AUDIO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 70;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_PHOTO_SECRET";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_VIDEO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 23;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_ROUND";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 24;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_PHOTO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 22;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_AUDIO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 27;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_STICKER";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 42;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGES";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 19;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_GIF";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 47;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_GEO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 45;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_DOC";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 41;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_LEFT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 57;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_ADD_YOU";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 54;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_DELETE_MEMBER";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 55;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_SCREENSHOT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "AUTH_REGION";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 79;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CONTACT_JOINED";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 77;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_INVOICE";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 49;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "ENCRYPTION_REQUEST";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 80;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_GEOLIVE";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 13;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_DELETE_YOU";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 56;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "AUTH_UNKNOWN";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 78;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_GIF";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 76;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_GEO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 72;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_DOC";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 68;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_STICKER";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 26;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PHONE_CALL_REQUEST";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 84;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_STICKER";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 69;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_TEXT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 63;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_GAME";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 74;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGE_CONTACT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 44;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_VIDEO_SECRET";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 5;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_TEXT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 20;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_GAME";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 32;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_FWDS";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 33;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "PINNED_INVOICE";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 75;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_RETURNED";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 58;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "ENCRYPTED_MESSAGE";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 82;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "ENCRYPTION_ACCEPT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 81;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_VIDEO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 4;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_ROUND";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 7;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_PHOTO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_AUDIO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 10;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_MESSAGES";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 62;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_JOINED";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 59;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_ADD_MEMBER";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 53;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_GIF";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 31;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_GEO";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 29;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_DOC";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 25;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "MESSAGE_STICKER";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 9;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHAT_CREATED";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 50;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x07a2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = "CHANNEL_MESSAGE_CONTACT";	 Catch:{ Throwable -> 0x018c }
+                        r8 = r3.equals(r8);	 Catch:{ Throwable -> 0x018c }
+                        if (r8 == 0) goto L_0x07a1;
+                        r8 = 28;
+                        goto L_0x07a2;
+                        r8 = -1;
+                        r12 = 2131493043; // 0x7f0c00b3 float:1.8609555E38 double:1.053097487E-314;
+                        switch(r8) {
+                            case 0: goto L_0x1317;
+                            case 1: goto L_0x12fd;
+                            case 2: goto L_0x12df;
+                            case 3: goto L_0x12c1;
+                            case 4: goto L_0x12a3;
+                            case 5: goto L_0x1284;
+                            case 6: goto L_0x126e;
+                            case 7: goto L_0x124f;
+                            case 8: goto L_0x1230;
+                            case 9: goto L_0x11ee;
+                            case 10: goto L_0x11cf;
+                            case 11: goto L_0x11b0;
+                            case 12: goto L_0x1191;
+                            case 13: goto L_0x1172;
+                            case 14: goto L_0x1153;
+                            case 15: goto L_0x1134;
+                            case 16: goto L_0x1110;
+                            case 17: goto L_0x10e2;
+                            case 18: goto L_0x10b8;
+                            case 19: goto L_0x108e;
+                            case 20: goto L_0x1071;
+                            case 21: goto L_0x1059;
+                            case 22: goto L_0x103a;
+                            case 23: goto L_0x101b;
+                            case 24: goto L_0x0ffc;
+                            case 25: goto L_0x0fdd;
+                            case 26: goto L_0x0f9b;
+                            case 27: goto L_0x0f7c;
+                            case 28: goto L_0x0f5d;
+                            case 29: goto L_0x0f3e;
+                            case 30: goto L_0x0f1f;
+                            case 31: goto L_0x0f00;
+                            case 32: goto L_0x0ee1;
+                            case 33: goto L_0x0eb2;
+                            case 34: goto L_0x0e87;
+                            case 35: goto L_0x0e5c;
+                            case 36: goto L_0x0e39;
+                            case 37: goto L_0x0e1c;
+                            case 38: goto L_0x0df8;
+                            case 39: goto L_0x0dd5;
+                            case 40: goto L_0x0db1;
+                            case 41: goto L_0x0d8d;
+                            case 42: goto L_0x0d41;
+                            case 43: goto L_0x0d1d;
+                            case 44: goto L_0x0cf9;
+                            case 45: goto L_0x0cd5;
+                            case 46: goto L_0x0cb1;
+                            case 47: goto L_0x0c8d;
+                            case 48: goto L_0x0c64;
+                            case 49: goto L_0x0c3b;
+                            case 50: goto L_0x0c21;
+                            case 51: goto L_0x0c07;
+                            case 52: goto L_0x0bed;
+                            case 53: goto L_0x0bce;
+                            case 54: goto L_0x0bb4;
+                            case 55: goto L_0x0b9a;
+                            case 56: goto L_0x0b80;
+                            case 57: goto L_0x0b66;
+                            case 58: goto L_0x0b4c;
+                            case 59: goto L_0x0b32;
+                            case 60: goto L_0x0b02;
+                            case 61: goto L_0x0ad2;
+                            case 62: goto L_0x0aa2;
+                            case 63: goto L_0x0a6a;
+                            case 64: goto L_0x0a3b;
+                            case 65: goto L_0x0a0d;
+                            case 66: goto L_0x09df;
+                            case 67: goto L_0x09b0;
+                            case 68: goto L_0x0981;
+                            case 69: goto L_0x0905;
+                            case 70: goto L_0x08d6;
+                            case 71: goto L_0x08a7;
+                            case 72: goto L_0x0878;
+                            case 73: goto L_0x0849;
+                            case 74: goto L_0x081a;
+                            case 75: goto L_0x07eb;
+                            case 76: goto L_0x07b8;
+                            case 77: goto L_0x07b3;
+                            case 78: goto L_0x07b2;
+                            case 79: goto L_0x07b1;
+                            case 80: goto L_0x07b0;
+                            case 81: goto L_0x07b0;
+                            case 82: goto L_0x07b0;
+                            case 83: goto L_0x07b0;
+                            case 84: goto L_0x07af;
+                            case 85: goto L_0x07ae;
+                            default: goto L_0x07a8;
+                        };
+                        r70 = r5;
+                        r5 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Throwable -> 0x147f }
+                        goto L_0x1333;
+                        goto L_0x07b4;
+                        goto L_0x07b4;
+                        goto L_0x07b4;
+                        goto L_0x07b4;
+                        goto L_0x07b4;
+                        r70 = r5;
+                        goto L_0x1349;
+                        if (r13 == 0) goto L_0x07d6;
+                        r8 = "NotificationActionPinnedGif";	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r12];	 Catch:{ Throwable -> 0x018c }
+                        r22 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r23 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r12[r22] = r23;	 Catch:{ Throwable -> 0x018c }
+                        r22 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r23 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r12[r22] = r23;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = 2131493930; // 0x7f0c042a float:1.8611354E38 double:1.053097925E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r8, r5, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedGifChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493931; // 0x7f0c042b float:1.8611356E38 double:1.0530979256E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x0807;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedInvoice";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493932; // 0x7f0c042c float:1.8611358E38 double:1.053097926E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedInvoiceChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493933; // 0x7f0c042d float:1.861136E38 double:1.0530979266E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x0836;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedGame";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493924; // 0x7f0c0424 float:1.8611342E38 double:1.053097922E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedGameChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493925; // 0x7f0c0425 float:1.8611344E38 double:1.0530979227E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x0865;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedGeoLive";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493928; // 0x7f0c0428 float:1.861135E38 double:1.053097924E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedGeoLiveChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493929; // 0x7f0c0429 float:1.8611352E38 double:1.0530979246E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x0894;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedGeo";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493926; // 0x7f0c0426 float:1.8611346E38 double:1.053097923E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedGeoChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493927; // 0x7f0c0427 float:1.8611348E38 double:1.0530979236E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x08c3;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedContact";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493920; // 0x7f0c0420 float:1.8611334E38 double:1.05309792E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedContactChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493921; // 0x7f0c0421 float:1.8611336E38 double:1.0530979207E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x08f2;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedVoice";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493950; // 0x7f0c043e float:1.8611395E38 double:1.053097935E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedVoiceChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493951; // 0x7f0c043f float:1.8611397E38 double:1.0530979355E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x094a;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4.length;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2;	 Catch:{ Throwable -> 0x018c }
+                        if (r5 <= r6) goto L_0x0932;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4[r6];	 Catch:{ Throwable -> 0x018c }
+                        r5 = android.text.TextUtils.isEmpty(r5);	 Catch:{ Throwable -> 0x018c }
+                        if (r5 != 0) goto L_0x0932;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedStickerEmoji";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493944; // 0x7f0c0438 float:1.8611382E38 double:1.053097932E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedSticker";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493942; // 0x7f0c0436 float:1.8611378E38 double:1.053097931E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4.length;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        if (r5 <= r6) goto L_0x096e;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4[r6];	 Catch:{ Throwable -> 0x018c }
+                        r5 = android.text.TextUtils.isEmpty(r5);	 Catch:{ Throwable -> 0x018c }
+                        if (r5 != 0) goto L_0x096e;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedStickerEmojiChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493945; // 0x7f0c0439 float:1.8611384E38 double:1.0530979325E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedStickerChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493943; // 0x7f0c0437 float:1.861138E38 double:1.0530979316E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x099d;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedFile";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493922; // 0x7f0c0422 float:1.8611338E38 double:1.053097921E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedFileChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493923; // 0x7f0c0423 float:1.861134E38 double:1.0530979217E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x09cc;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedRound";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493940; // 0x7f0c0434 float:1.8611374E38 double:1.05309793E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedRoundChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493941; // 0x7f0c0435 float:1.8611376E38 double:1.0530979306E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x09fa;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedVideo";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493948; // 0x7f0c043c float:1.861139E38 double:1.053097934E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedVideoChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493949; // 0x7f0c043d float:1.8611393E38 double:1.0530979345E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x0a28;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedPhoto";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493938; // 0x7f0c0432 float:1.861137E38 double:1.053097929E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedPhotoChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493939; // 0x7f0c0433 float:1.8611372E38 double:1.0530979296E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x0a57;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedNoText";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493936; // 0x7f0c0430 float:1.8611366E38 double:1.053097928E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedNoTextChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493937; // 0x7f0c0431 float:1.8611368E38 double:1.0530979286E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        if (r13 == 0) goto L_0x0a8a;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedText";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493946; // 0x7f0c043a float:1.8611386E38 double:1.053097933E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0a55;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationActionPinnedTextChannel";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493947; // 0x7f0c043b float:1.8611389E38 double:1.0530979335E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationGroupFew";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "messages";	 Catch:{ Throwable -> 0x018c }
+                        r22 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.Utilities.parseInt(r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.intValue();	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.formatPluralString(r12, r6);	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493959; // 0x7f0c0447 float:1.8611413E38 double:1.0530979395E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x110c;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationGroupFew";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "Photos";	 Catch:{ Throwable -> 0x018c }
+                        r22 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.Utilities.parseInt(r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.intValue();	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.formatPluralString(r12, r6);	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493959; // 0x7f0c0447 float:1.8611413E38 double:1.0530979395E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x110c;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationGroupForwardedFew";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "messages";	 Catch:{ Throwable -> 0x018c }
+                        r22 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.Utilities.parseInt(r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.intValue();	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.formatPluralString(r12, r6);	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493960; // 0x7f0c0448 float:1.8611415E38 double:1.05309794E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x110c;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationGroupAddSelfMega";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493958; // 0x7f0c0446 float:1.861141E38 double:1.053097939E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationGroupAddSelf";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493957; // 0x7f0c0445 float:1.8611409E38 double:1.0530979385E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationGroupLeftMember";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493963; // 0x7f0c044b float:1.861142E38 double:1.0530979414E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationGroupKickYou";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493962; // 0x7f0c044a float:1.8611419E38 double:1.053097941E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationGroupKickMember";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493961; // 0x7f0c0449 float:1.8611417E38 double:1.0530979404E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationInvitedToGroup";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493964; // 0x7f0c044c float:1.8611423E38 double:1.053097942E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationGroupAddMember";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493956; // 0x7f0c0444 float:1.8611407E38 double:1.053097938E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationEditedGroupPhoto";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493955; // 0x7f0c0443 float:1.8611405E38 double:1.0530979375E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationEditedGroupName";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493954; // 0x7f0c0442 float:1.8611403E38 double:1.053097937E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationInvitedToGroup";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493964; // 0x7f0c044c float:1.8611423E38 double:1.053097942E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupInvoice";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493978; // 0x7f0c045a float:1.8611451E38 double:1.053097949E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "PaymentInvoice";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131494102; // 0x7f0c04d6 float:1.8611703E38 double:1.05309801E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupGame";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493976; // 0x7f0c0458 float:1.8611447E38 double:1.053097948E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachGame";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493027; // 0x7f0c00a3 float:1.8609523E38 double:1.053097479E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupGif";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493977; // 0x7f0c0459 float:1.861145E38 double:1.0530979484E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachGif";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493028; // 0x7f0c00a4 float:1.8609525E38 double:1.0530974795E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupLiveLocation";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493979; // 0x7f0c045b float:1.8611453E38 double:1.0530979493E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachLiveLocation";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493031; // 0x7f0c00a7 float:1.860953E38 double:1.053097481E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupMap";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493980; // 0x7f0c045c float:1.8611455E38 double:1.05309795E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachLocation";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493033; // 0x7f0c00a9 float:1.8609535E38 double:1.053097482E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupContact";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493974; // 0x7f0c0456 float:1.8611443E38 double:1.053097947E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachContact";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493025; // 0x7f0c00a1 float:1.8609518E38 double:1.053097478E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupAudio";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493973; // 0x7f0c0455 float:1.8611441E38 double:1.0530979464E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachAudio";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493023; // 0x7f0c009f float:1.8609514E38 double:1.053097477E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4.length;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2;	 Catch:{ Throwable -> 0x018c }
+                        if (r5 <= r6) goto L_0x0d6b;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4[r6];	 Catch:{ Throwable -> 0x018c }
+                        r5 = android.text.TextUtils.isEmpty(r5);	 Catch:{ Throwable -> 0x018c }
+                        if (r5 != 0) goto L_0x0d6b;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupStickerEmoji";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493986; // 0x7f0c0462 float:1.8611468E38 double:1.053097953E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0d81;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupSticker";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493985; // 0x7f0c0461 float:1.8611466E38 double:1.0530979523E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachSticker";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493040; // 0x7f0c00b0 float:1.8609549E38 double:1.0530974854E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupDocument";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493975; // 0x7f0c0457 float:1.8611445E38 double:1.0530979474E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachDocument";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493026; // 0x7f0c00a2 float:1.860952E38 double:1.0530974785E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupRound";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493984; // 0x7f0c0460 float:1.8611464E38 double:1.053097952E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachRound";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493039; // 0x7f0c00af float:1.8609547E38 double:1.053097485E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupVideo";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493988; // 0x7f0c0464 float:1.8611472E38 double:1.053097954E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r22 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r23 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r8[r22] = r23;	 Catch:{ Throwable -> 0x018c }
+                        r22 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r23 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r8[r22] = r23;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachVideo";	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupPhoto";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493983; // 0x7f0c045f float:1.8611462E38 double:1.0530979513E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachPhoto";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493037; // 0x7f0c00ad float:1.8609543E38 double:1.053097484E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupNoText";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493982; // 0x7f0c045e float:1.861146E38 double:1.053097951E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "";	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGroupText";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493987; // 0x7f0c0463 float:1.861147E38 double:1.0530979533E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 3;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r8 = r4[r6];	 Catch:{ Throwable -> 0x018c }
+                        r12 = r8;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageFew";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "messages";	 Catch:{ Throwable -> 0x018c }
+                        r22 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.Utilities.parseInt(r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.intValue();	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.formatPluralString(r12, r6);	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493182; // 0x7f0c013e float:1.8609837E38 double:1.0530975556E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x110c;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageFew";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "Photos";	 Catch:{ Throwable -> 0x018c }
+                        r22 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.Utilities.parseInt(r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.intValue();	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.formatPluralString(r12, r6);	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493182; // 0x7f0c013e float:1.8609837E38 double:1.0530975556E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x110c;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageFew";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "ForwardedMessageCount";	 Catch:{ Throwable -> 0x018c }
+                        r22 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.Utilities.parseInt(r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.intValue();	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.formatPluralString(r12, r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.toLowerCase();	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493182; // 0x7f0c013e float:1.8609837E38 double:1.0530975556E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x110c;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGame";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493971; // 0x7f0c0453 float:1.8611437E38 double:1.0530979454E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachGame";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493027; // 0x7f0c00a3 float:1.8609523E38 double:1.053097479E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageGIF";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493183; // 0x7f0c013f float:1.8609839E38 double:1.053097556E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachGif";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493028; // 0x7f0c00a4 float:1.8609525E38 double:1.0530974795E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageLiveLocation";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493184; // 0x7f0c0140 float:1.860984E38 double:1.0530975566E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachLiveLocation";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493031; // 0x7f0c00a7 float:1.860953E38 double:1.053097481E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageMap";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493185; // 0x7f0c0141 float:1.8609843E38 double:1.053097557E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachLocation";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493033; // 0x7f0c00a9 float:1.8609535E38 double:1.053097482E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageContact";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493180; // 0x7f0c013c float:1.8609833E38 double:1.0530975546E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachContact";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493025; // 0x7f0c00a1 float:1.8609518E38 double:1.053097478E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageAudio";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493179; // 0x7f0c013b float:1.860983E38 double:1.053097554E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachAudio";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493023; // 0x7f0c009f float:1.8609514E38 double:1.053097477E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4.length;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        if (r5 <= r6) goto L_0x0fc0;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4[r6];	 Catch:{ Throwable -> 0x018c }
+                        r5 = android.text.TextUtils.isEmpty(r5);	 Catch:{ Throwable -> 0x018c }
+                        if (r5 != 0) goto L_0x0fc0;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageStickerEmoji";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493191; // 0x7f0c0147 float:1.8609855E38 double:1.05309756E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x0fd1;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageSticker";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493190; // 0x7f0c0146 float:1.8609853E38 double:1.0530975595E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachSticker";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493040; // 0x7f0c00b0 float:1.8609549E38 double:1.0530974854E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageDocument";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493181; // 0x7f0c013d float:1.8609835E38 double:1.053097555E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachDocument";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493026; // 0x7f0c00a2 float:1.860952E38 double:1.0530974785E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageRound";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493189; // 0x7f0c0145 float:1.8609851E38 double:1.053097559E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachRound";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493039; // 0x7f0c00af float:1.8609547E38 double:1.053097485E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageVideo";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493192; // 0x7f0c0148 float:1.8609857E38 double:1.0530975605E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachVideo";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493043; // 0x7f0c00b3 float:1.8609555E38 double:1.053097487E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessagePhoto";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493188; // 0x7f0c0144 float:1.860985E38 double:1.0530975585E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachPhoto";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493037; // 0x7f0c00ad float:1.8609543E38 double:1.053097484E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ChannelMessageNoText";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493187; // 0x7f0c0143 float:1.8609847E38 double:1.053097558E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "";	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageText";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131494000; // 0x7f0c0470 float:1.8611496E38 double:1.0530979597E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageFew";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "messages";	 Catch:{ Throwable -> 0x018c }
+                        r22 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.Utilities.parseInt(r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.intValue();	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.formatPluralString(r12, r6);	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493969; // 0x7f0c0451 float:1.8611433E38 double:1.0530979444E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x110c;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageFew";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "Photos";	 Catch:{ Throwable -> 0x018c }
+                        r22 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.Utilities.parseInt(r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.intValue();	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.formatPluralString(r12, r6);	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493969; // 0x7f0c0451 float:1.8611433E38 double:1.0530979444E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x110c;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageForwardFew";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = "messages";	 Catch:{ Throwable -> 0x018c }
+                        r22 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r22];	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.Utilities.parseInt(r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r6.intValue();	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.formatPluralString(r12, r6);	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r6;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493970; // 0x7f0c0452 float:1.8611435E38 double:1.053097945E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r18 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageInvoice";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493989; // 0x7f0c0465 float:1.8611474E38 double:1.0530979543E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "PaymentInvoice";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131494102; // 0x7f0c04d6 float:1.8611703E38 double:1.05309801E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGame";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493971; // 0x7f0c0453 float:1.8611437E38 double:1.0530979454E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachGame";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493027; // 0x7f0c00a3 float:1.8609523E38 double:1.053097479E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageGif";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493972; // 0x7f0c0454 float:1.861144E38 double:1.053097946E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachGif";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493028; // 0x7f0c00a4 float:1.8609525E38 double:1.0530974795E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageLiveLocation";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493990; // 0x7f0c0466 float:1.8611476E38 double:1.053097955E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachLiveLocation";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493031; // 0x7f0c00a7 float:1.860953E38 double:1.053097481E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageMap";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493991; // 0x7f0c0467 float:1.8611478E38 double:1.0530979553E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachLocation";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493033; // 0x7f0c00a9 float:1.8609535E38 double:1.053097482E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageContact";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493967; // 0x7f0c044f float:1.861143E38 double:1.0530979434E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachContact";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493025; // 0x7f0c00a1 float:1.8609518E38 double:1.053097478E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageAudio";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493966; // 0x7f0c044e float:1.8611427E38 double:1.053097943E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachAudio";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493023; // 0x7f0c009f float:1.8609514E38 double:1.053097477E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4.length;	 Catch:{ Throwable -> 0x018c }
+                        r6 = 1;	 Catch:{ Throwable -> 0x018c }
+                        if (r5 <= r6) goto L_0x1213;	 Catch:{ Throwable -> 0x018c }
+                        r5 = r4[r6];	 Catch:{ Throwable -> 0x018c }
+                        r5 = android.text.TextUtils.isEmpty(r5);	 Catch:{ Throwable -> 0x018c }
+                        if (r5 != 0) goto L_0x1213;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageStickerEmoji";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493999; // 0x7f0c046f float:1.8611494E38 double:1.053097959E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1224;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageSticker";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493998; // 0x7f0c046e float:1.8611492E38 double:1.0530979587E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachSticker";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493040; // 0x7f0c00b0 float:1.8609549E38 double:1.0530974854E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageDocument";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493968; // 0x7f0c0450 float:1.8611431E38 double:1.053097944E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachDocument";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493026; // 0x7f0c00a2 float:1.860952E38 double:1.0530974785E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageRound";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493995; // 0x7f0c046b float:1.8611486E38 double:1.053097957E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachRound";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493039; // 0x7f0c00af float:1.8609547E38 double:1.053097485E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "ActionTakeScreenshoot";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131492907; // 0x7f0c002b float:1.860928E38 double:1.0530974197E-314;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.getString(r5, r6);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "un1";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r8 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r5 = r5.replace(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageSDVideo";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493997; // 0x7f0c046d float:1.861149E38 double:1.053097958E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachVideo";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493043; // 0x7f0c00b3 float:1.8609555E38 double:1.053097487E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageVideo";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131494001; // 0x7f0c0471 float:1.8611498E38 double:1.05309796E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachVideo";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493043; // 0x7f0c00b3 float:1.8609555E38 double:1.053097487E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageSDPhoto";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493996; // 0x7f0c046c float:1.8611488E38 double:1.0530979577E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachPhoto";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493037; // 0x7f0c00ad float:1.8609543E38 double:1.053097484E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessagePhoto";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493994; // 0x7f0c046a float:1.8611484E38 double:1.0530979568E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "AttachPhoto";	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2131493037; // 0x7f0c00ad float:1.8609543E38 double:1.053097484E-314;	 Catch:{ Throwable -> 0x018c }
+                        r6 = org.telegram.messenger.LocaleController.getString(r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageNoText";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131493993; // 0x7f0c0469 float:1.8611482E38 double:1.0530979563E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r12 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r8 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12[r8] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r12);	 Catch:{ Throwable -> 0x018c }
+                        r6 = "";	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        r69 = r12;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x134b;	 Catch:{ Throwable -> 0x018c }
+                        r70 = r5;	 Catch:{ Throwable -> 0x018c }
+                        r5 = "NotificationMessageText";	 Catch:{ Throwable -> 0x018c }
+                        r6 = 2131494000; // 0x7f0c0470 float:1.8611496E38 double:1.0530979597E-314;	 Catch:{ Throwable -> 0x018c }
+                        r8 = 2;	 Catch:{ Throwable -> 0x018c }
+                        r8 = new java.lang.Object[r8];	 Catch:{ Throwable -> 0x018c }
+                        r12 = 0;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r12 = 1;	 Catch:{ Throwable -> 0x018c }
+                        r22 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r8[r12] = r22;	 Catch:{ Throwable -> 0x018c }
+                        r5 = org.telegram.messenger.LocaleController.formatString(r5, r6, r8);	 Catch:{ Throwable -> 0x018c }
+                        r6 = r4[r12];	 Catch:{ Throwable -> 0x018c }
+                        r12 = r6;	 Catch:{ Throwable -> 0x018c }
+                        goto L_0x1314;	 Catch:{ Throwable -> 0x018c }
+                        if (r5 == 0) goto L_0x1349;	 Catch:{ Throwable -> 0x018c }
+                        r5 = new java.lang.StringBuilder;	 Catch:{ Throwable -> 0x018c }
+                        r5.<init>();	 Catch:{ Throwable -> 0x018c }
+                        r6 = "unhandled loc_key = ";	 Catch:{ Throwable -> 0x018c }
+                        r5.append(r6);	 Catch:{ Throwable -> 0x018c }
+                        r5.append(r3);	 Catch:{ Throwable -> 0x018c }
+                        r5 = r5.toString();	 Catch:{ Throwable -> 0x018c }
+                        org.telegram.messenger.FileLog.w(r5);	 Catch:{ Throwable -> 0x018c }
+                        r5 = r68;
+                        if (r5 == 0) goto L_0x13e3;
+                        r6 = new org.telegram.tgnet.TLRPC$TL_message;	 Catch:{ Throwable -> 0x147f }
+                        r6.<init>();	 Catch:{ Throwable -> 0x147f }
+                        r6.id = r11;	 Catch:{ Throwable -> 0x147f }
+                        if (r69 == 0) goto L_0x1359;	 Catch:{ Throwable -> 0x147f }
+                        r8 = r69;	 Catch:{ Throwable -> 0x147f }
+                        goto L_0x135a;	 Catch:{ Throwable -> 0x147f }
+                        r8 = r5;	 Catch:{ Throwable -> 0x147f }
+                        r6.message = r8;	 Catch:{ Throwable -> 0x147f }
+                        r8 = org.telegram.messenger.GcmPushListenerService.AnonymousClass1.this;	 Catch:{ Throwable -> 0x147f }
+                        r72 = r3;
+                        r73 = r4;
+                        r3 = r2;	 Catch:{ Throwable -> 0x1479 }
+                        r23 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = r3 / r23;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = (int) r3;	 Catch:{ Throwable -> 0x1479 }
+                        r6.date = r3;	 Catch:{ Throwable -> 0x1479 }
+                        if (r20 == 0) goto L_0x1374;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = new org.telegram.tgnet.TLRPC$TL_messageActionPinMessage;	 Catch:{ Throwable -> 0x1479 }
+                        r3.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r6.action = r3;	 Catch:{ Throwable -> 0x1479 }
+                        if (r19 == 0) goto L_0x137d;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = r6.flags;	 Catch:{ Throwable -> 0x1479 }
+                        r4 = -2147483648; // 0xffffffff80000000 float:-0.0 double:NaN;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = r3 | r4;	 Catch:{ Throwable -> 0x1479 }
+                        r6.flags = r3;	 Catch:{ Throwable -> 0x1479 }
+                        if (r7 == 0) goto L_0x1393;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = new org.telegram.tgnet.TLRPC$TL_peerChannel;	 Catch:{ Throwable -> 0x1479 }
+                        r3.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r6.to_id = r3;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = r6.to_id;	 Catch:{ Throwable -> 0x1479 }
+                        r3.channel_id = r7;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = -r7;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = (long) r3;	 Catch:{ Throwable -> 0x1479 }
+                        r6.dialog_id = r3;	 Catch:{ Throwable -> 0x1479 }
+                        r74 = r11;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = r56;	 Catch:{ Throwable -> 0x1479 }
+                        goto L_0x13b9;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = r56;	 Catch:{ Throwable -> 0x1479 }
+                        if (r3 == 0) goto L_0x13a9;	 Catch:{ Throwable -> 0x1479 }
+                        r4 = new org.telegram.tgnet.TLRPC$TL_peerChat;	 Catch:{ Throwable -> 0x1479 }
+                        r4.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r6.to_id = r4;	 Catch:{ Throwable -> 0x1479 }
+                        r4 = r6.to_id;	 Catch:{ Throwable -> 0x1479 }
+                        r4.chat_id = r3;	 Catch:{ Throwable -> 0x1479 }
+                        r4 = -r3;	 Catch:{ Throwable -> 0x1479 }
+                        r74 = r11;	 Catch:{ Throwable -> 0x1479 }
+                        r11 = (long) r4;	 Catch:{ Throwable -> 0x1479 }
+                        r6.dialog_id = r11;	 Catch:{ Throwable -> 0x1479 }
+                        goto L_0x13b9;	 Catch:{ Throwable -> 0x1479 }
+                        r74 = r11;	 Catch:{ Throwable -> 0x1479 }
+                        r4 = new org.telegram.tgnet.TLRPC$TL_peerUser;	 Catch:{ Throwable -> 0x1479 }
+                        r4.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r6.to_id = r4;	 Catch:{ Throwable -> 0x1479 }
+                        r4 = r6.to_id;	 Catch:{ Throwable -> 0x1479 }
+                        r4.user_id = r9;	 Catch:{ Throwable -> 0x1479 }
+                        r11 = (long) r9;	 Catch:{ Throwable -> 0x1479 }
+                        r6.dialog_id = r11;	 Catch:{ Throwable -> 0x1479 }
+                        r6.from_id = r13;	 Catch:{ Throwable -> 0x1479 }
+                        r6.mentioned = r14;	 Catch:{ Throwable -> 0x1479 }
+                        r4 = new org.telegram.messenger.MessageObject;	 Catch:{ Throwable -> 0x1479 }
+                        r36 = r4;	 Catch:{ Throwable -> 0x1479 }
+                        r37 = r2;	 Catch:{ Throwable -> 0x1479 }
+                        r38 = r6;	 Catch:{ Throwable -> 0x1479 }
+                        r39 = r5;	 Catch:{ Throwable -> 0x1479 }
+                        r40 = r15;	 Catch:{ Throwable -> 0x1479 }
+                        r41 = r17;	 Catch:{ Throwable -> 0x1479 }
+                        r42 = r18;	 Catch:{ Throwable -> 0x1479 }
+                        r43 = r21;	 Catch:{ Throwable -> 0x1479 }
+                        r36.<init>(r37, r38, r39, r40, r41, r42, r43);	 Catch:{ Throwable -> 0x1479 }
+                        r8 = new java.util.ArrayList;	 Catch:{ Throwable -> 0x1479 }
+                        r8.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r8.add(r4);	 Catch:{ Throwable -> 0x1479 }
+                        r11 = org.telegram.messenger.NotificationsController.getInstance(r2);	 Catch:{ Throwable -> 0x1479 }
+                        r12 = 1;	 Catch:{ Throwable -> 0x1479 }
+                        r11.processNewMessages(r8, r12, r12);	 Catch:{ Throwable -> 0x1479 }
+                        goto L_0x13e7;	 Catch:{ Throwable -> 0x1479 }
+                        r72 = r3;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = r56;	 Catch:{ Throwable -> 0x1479 }
+                        r6 = r67;	 Catch:{ Throwable -> 0x1479 }
+                        r11 = r70;	 Catch:{ Throwable -> 0x1479 }
+                        goto L_0x146e;	 Catch:{ Throwable -> 0x1479 }
+                    L_0x13ed:
+                        r72 = r3;	 Catch:{ Throwable -> 0x1479 }
+                        r67 = r4;	 Catch:{ Throwable -> 0x1479 }
+                        r70 = r5;	 Catch:{ Throwable -> 0x1479 }
+                        r64 = r8;	 Catch:{ Throwable -> 0x1479 }
+                        r58 = r11;	 Catch:{ Throwable -> 0x1479 }
+                        r59 = r12;	 Catch:{ Throwable -> 0x1479 }
+                        r60 = r13;	 Catch:{ Throwable -> 0x1479 }
+                        r62 = r14;	 Catch:{ Throwable -> 0x1479 }
+                        r66 = r15;	 Catch:{ Throwable -> 0x1479 }
+                        r3 = r56;	 Catch:{ Throwable -> 0x1479 }
+                        r4 = "max_id";	 Catch:{ Throwable -> 0x1479 }
+                        r4 = r10.getInt(r4);	 Catch:{ Throwable -> 0x1479 }
+                        r5 = new java.util.ArrayList;	 Catch:{ Throwable -> 0x1479 }
+                        r5.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r6 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Throwable -> 0x1479 }
+                        if (r6 == 0) goto L_0x142f;	 Catch:{ Throwable -> 0x1479 }
+                        r6 = new java.lang.StringBuilder;	 Catch:{ Throwable -> 0x1479 }
+                        r6.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r8 = "GCM received read notification max_id = ";	 Catch:{ Throwable -> 0x1479 }
+                        r6.append(r8);	 Catch:{ Throwable -> 0x1479 }
+                        r6.append(r4);	 Catch:{ Throwable -> 0x1479 }
+                        r8 = " for dialogId = ";	 Catch:{ Throwable -> 0x1479 }
+                        r6.append(r8);	 Catch:{ Throwable -> 0x1479 }
+                        r11 = r70;	 Catch:{ Throwable -> 0x1479 }
+                        r6.append(r11);	 Catch:{ Throwable -> 0x1479 }
+                        r6 = r6.toString();	 Catch:{ Throwable -> 0x1479 }
+                        org.telegram.messenger.FileLog.d(r6);	 Catch:{ Throwable -> 0x1479 }
+                        goto L_0x1431;	 Catch:{ Throwable -> 0x1479 }
+                        r11 = r70;	 Catch:{ Throwable -> 0x1479 }
+                        if (r7 == 0) goto L_0x1440;	 Catch:{ Throwable -> 0x1479 }
+                        r6 = new org.telegram.tgnet.TLRPC$TL_updateReadChannelInbox;	 Catch:{ Throwable -> 0x1479 }
+                        r6.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r6.channel_id = r7;	 Catch:{ Throwable -> 0x1479 }
+                        r6.max_id = r4;	 Catch:{ Throwable -> 0x1479 }
+                        r5.add(r6);	 Catch:{ Throwable -> 0x1479 }
+                        goto L_0x1463;	 Catch:{ Throwable -> 0x1479 }
+                        r6 = new org.telegram.tgnet.TLRPC$TL_updateReadHistoryInbox;	 Catch:{ Throwable -> 0x1479 }
+                        r6.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        if (r9 == 0) goto L_0x1453;	 Catch:{ Throwable -> 0x1479 }
+                        r8 = new org.telegram.tgnet.TLRPC$TL_peerUser;	 Catch:{ Throwable -> 0x1479 }
+                        r8.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r6.peer = r8;	 Catch:{ Throwable -> 0x1479 }
+                        r8 = r6.peer;	 Catch:{ Throwable -> 0x1479 }
+                        r8.user_id = r9;	 Catch:{ Throwable -> 0x1479 }
+                        goto L_0x145e;	 Catch:{ Throwable -> 0x1479 }
+                        r8 = new org.telegram.tgnet.TLRPC$TL_peerChat;	 Catch:{ Throwable -> 0x1479 }
+                        r8.<init>();	 Catch:{ Throwable -> 0x1479 }
+                        r6.peer = r8;	 Catch:{ Throwable -> 0x1479 }
+                        r8 = r6.peer;	 Catch:{ Throwable -> 0x1479 }
+                        r8.chat_id = r3;	 Catch:{ Throwable -> 0x1479 }
+                        r6.max_id = r4;	 Catch:{ Throwable -> 0x1479 }
+                        r5.add(r6);	 Catch:{ Throwable -> 0x1479 }
+                        r6 = r67;	 Catch:{ Throwable -> 0x1479 }
+                        r8 = org.telegram.messenger.MessagesController.getInstance(r6);	 Catch:{ Throwable -> 0x1479 }
+                        r13 = 0;	 Catch:{ Throwable -> 0x1479 }
+                        r14 = 0;	 Catch:{ Throwable -> 0x1479 }
+                        r8.processUpdateArray(r5, r14, r14, r13);	 Catch:{ Throwable -> 0x1479 }
+                        org.telegram.tgnet.ConnectionsManager.onInternalPushReceived(r2);	 Catch:{ Throwable -> 0x1479 }
+                        r4 = org.telegram.tgnet.ConnectionsManager.getInstance(r2);	 Catch:{ Throwable -> 0x1479 }
+                        r4.resumeNetworkMaybe();	 Catch:{ Throwable -> 0x1479 }
+                        goto L_0x14cf;
+                    L_0x1479:
+                        r0 = move-exception;
+                        r3 = r2;
+                        r4 = r72;
+                        goto L_0x001d;
+                    L_0x147f:
+                        r0 = move-exception;
+                        r72 = r3;
+                        r3 = r2;
+                        r4 = r72;
+                        r2 = r0;
+                        goto L_0x149c;
+                    L_0x1487:
+                        r0 = move-exception;
+                        r3 = r2;
+                        r4 = r35;
+                        goto L_0x001d;
+                    L_0x148d:
+                        r0 = move-exception;
+                        r35 = r4;
+                        r2 = r0;
+                        r3 = r31;
+                        goto L_0x149c;
+                    L_0x1494:
+                        r0 = move-exception;
+                        r31 = r2;
+                        r35 = r4;
+                        r2 = r0;
+                        r3 = r31;
+                    L_0x149c:
+                        r5 = -1;
+                        if (r3 == r5) goto L_0x14aa;
+                        org.telegram.tgnet.ConnectionsManager.onInternalPushReceived(r3);
+                        r5 = org.telegram.tgnet.ConnectionsManager.getInstance(r3);
+                        r5.resumeNetworkMaybe();
+                        goto L_0x14b1;
+                        r5 = org.telegram.messenger.GcmPushListenerService.AnonymousClass1.this;
+                        r5 = org.telegram.messenger.GcmPushListenerService.this;
+                        r5.onDecryptError();
+                        r5 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
+                        if (r5 == 0) goto L_0x14c9;
+                        r5 = new java.lang.StringBuilder;
+                        r5.<init>();
+                        r6 = "error in loc_key = ";
+                        r5.append(r6);
+                        r5.append(r4);
+                        r5 = r5.toString();
+                        org.telegram.messenger.FileLog.e(r5);
+                        org.telegram.messenger.FileLog.e(r2);
+                        r2 = r3;
+                        r72 = r4;
+                        return;
+                        */
+                        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.GcmPushListenerService.1.1.run():void");
                     }
                 });
             }

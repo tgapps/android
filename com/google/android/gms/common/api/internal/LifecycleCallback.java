@@ -8,23 +8,23 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
 public class LifecycleCallback {
-    protected final zzcf zzfud;
+    protected final LifecycleFragment mLifecycleFragment;
 
-    protected LifecycleCallback(zzcf com_google_android_gms_common_api_internal_zzcf) {
-        this.zzfud = com_google_android_gms_common_api_internal_zzcf;
+    protected LifecycleCallback(LifecycleFragment lifecycleFragment) {
+        this.mLifecycleFragment = lifecycleFragment;
     }
 
     @Keep
-    private static zzcf getChimeraLifecycleFragmentImpl(zzce com_google_android_gms_common_api_internal_zzce) {
+    private static LifecycleFragment getChimeraLifecycleFragmentImpl(LifecycleActivity lifecycleActivity) {
         throw new IllegalStateException("Method not available in SDK.");
     }
 
-    protected static zzcf zzb(zzce com_google_android_gms_common_api_internal_zzce) {
-        if (com_google_android_gms_common_api_internal_zzce.zzajj()) {
-            return zzdb.zza(com_google_android_gms_common_api_internal_zzce.zzajm());
+    protected static LifecycleFragment getFragment(LifecycleActivity lifecycleActivity) {
+        if (lifecycleActivity.zzbv()) {
+            return zzcc.zza(lifecycleActivity.zzby());
         }
-        if (com_google_android_gms_common_api_internal_zzce.zzajk()) {
-            return zzcg.zzo(com_google_android_gms_common_api_internal_zzce.zzajl());
+        if (lifecycleActivity.zzbw()) {
+            return zzbr.zzc(lifecycleActivity.zzbx());
         }
         throw new IllegalArgumentException("Can't get fragment for unexpected activity.");
     }
@@ -33,7 +33,7 @@ public class LifecycleCallback {
     }
 
     public final Activity getActivity() {
-        return this.zzfud.zzajn();
+        return this.mLifecycleFragment.getLifecycleActivity();
     }
 
     public void onActivityResult(int i, int i2, Intent intent) {

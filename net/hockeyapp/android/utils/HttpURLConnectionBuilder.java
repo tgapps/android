@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -43,12 +44,24 @@ public class HttpURLConnectionBuilder {
 
     public HttpURLConnectionBuilder writeFormFields(Map<String, String> fields) {
         if (fields.size() > 25) {
-            throw new IllegalArgumentException("Fields size too large: " + fields.size() + " - max allowed: " + 25);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Fields size too large: ");
+            stringBuilder.append(fields.size());
+            stringBuilder.append(" - max allowed: ");
+            stringBuilder.append(25);
+            throw new IllegalArgumentException(stringBuilder.toString());
         }
         for (String key : fields.keySet()) {
             String value = (String) fields.get(key);
             if (value != null && ((long) value.length()) > 4194304) {
-                throw new IllegalArgumentException("Form field " + key + " size too large: " + value.length() + " - max allowed: " + 4194304);
+                StringBuilder stringBuilder2 = new StringBuilder();
+                stringBuilder2.append("Form field ");
+                stringBuilder2.append(key);
+                stringBuilder2.append(" size too large: ");
+                stringBuilder2.append(value.length());
+                stringBuilder2.append(" - max allowed: ");
+                stringBuilder2.append(4194304);
+                throw new IllegalArgumentException(stringBuilder2.toString());
             }
         }
         try {
@@ -68,15 +81,26 @@ public class HttpURLConnectionBuilder {
             for (String key : fields.keySet()) {
                 this.mMultipartEntity.addPart(key, (String) fields.get(key));
             }
-            int i = 0;
-            while (i < attachmentUris.size()) {
+            for (int i = 0; i < attachmentUris.size(); i++) {
                 Uri attachmentUri = (Uri) attachmentUris.get(i);
-                boolean lastFile = i == attachmentUris.size() + -1;
-                this.mMultipartEntity.addPart("attachment" + i, attachmentUri.getLastPathSegment(), context.getContentResolver().openInputStream(attachmentUri), lastFile);
-                i++;
+                boolean z = true;
+                if (i != attachmentUris.size() - 1) {
+                    z = false;
+                }
+                boolean lastFile = z;
+                InputStream input = context.getContentResolver().openInputStream(attachmentUri);
+                String filename = attachmentUri.getLastPathSegment();
+                SimpleMultipartEntity simpleMultipartEntity = this.mMultipartEntity;
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("attachment");
+                stringBuilder.append(i);
+                simpleMultipartEntity.addPart(stringBuilder.toString(), filename, input, lastFile);
             }
             this.mMultipartEntity.writeLastBoundaryIfNeeds();
-            setHeader("Content-Type", "multipart/form-data; boundary=" + this.mMultipartEntity.getBoundary());
+            StringBuilder stringBuilder2 = new StringBuilder();
+            stringBuilder2.append("multipart/form-data; boundary=");
+            stringBuilder2.append(this.mMultipartEntity.getBoundary());
+            setHeader("Content-Type", stringBuilder2.toString());
             return this;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -89,7 +113,14 @@ public class HttpURLConnectionBuilder {
     }
 
     public HttpURLConnectionBuilder setBasicAuthorization(String username, String password) {
-        setHeader("Authorization", "Basic " + Base64.encodeToString((username + ":" + password).getBytes(), 2));
+        String authString = new StringBuilder();
+        authString.append("Basic ");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(username);
+        stringBuilder.append(":");
+        stringBuilder.append(password);
+        authString.append(Base64.encodeToString(stringBuilder.toString().getBytes(), 2));
+        setHeader("Authorization", authString.toString());
         return this;
     }
 
@@ -124,7 +155,12 @@ public class HttpURLConnectionBuilder {
         for (String key : params.keySet()) {
             String value = (String) params.get(key);
             String key2 = URLEncoder.encode(key2, charset);
-            protoList.add(key2 + "=" + URLEncoder.encode(value, charset));
+            value = URLEncoder.encode(value, charset);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(key2);
+            stringBuilder.append("=");
+            stringBuilder.append(value);
+            protoList.add(stringBuilder.toString());
         }
         return TextUtils.join("&", protoList);
     }

@@ -57,20 +57,31 @@ public class SampleDependencyTypeBox extends AbstractFullBox {
         }
 
         public String toString() {
-            return "Entry{reserved=" + getReserved() + ", sampleDependsOn=" + getSampleDependsOn() + ", sampleIsDependentOn=" + getSampleIsDependentOn() + ", sampleHasRedundancy=" + getSampleHasRedundancy() + '}';
+            StringBuilder stringBuilder = new StringBuilder("Entry{reserved=");
+            stringBuilder.append(getReserved());
+            stringBuilder.append(", sampleDependsOn=");
+            stringBuilder.append(getSampleDependsOn());
+            stringBuilder.append(", sampleIsDependentOn=");
+            stringBuilder.append(getSampleIsDependentOn());
+            stringBuilder.append(", sampleHasRedundancy=");
+            stringBuilder.append(getSampleHasRedundancy());
+            stringBuilder.append('}');
+            return stringBuilder.toString();
         }
 
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
+            if (o != null) {
+                if (getClass() == o.getClass()) {
+                    if (this.value != ((Entry) o).value) {
+                        return false;
+                    }
+                    return true;
+                }
             }
-            if (this.value != ((Entry) o).value) {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public int hashCode() {
@@ -94,7 +105,7 @@ public class SampleDependencyTypeBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (this.entries.size() + 4);
+        return (long) (4 + this.entries.size());
     }
 
     protected void getContent(ByteBuffer byteBuffer) {
@@ -125,7 +136,8 @@ public class SampleDependencyTypeBox extends AbstractFullBox {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
         StringBuilder sb = new StringBuilder();
         sb.append("SampleDependencyTypeBox");
-        sb.append("{entries=").append(this.entries);
+        sb.append("{entries=");
+        sb.append(this.entries);
         sb.append('}');
         return sb.toString();
     }

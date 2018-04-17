@@ -1,19 +1,19 @@
 package com.google.android.gms.wearable.internal;
 
+import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzc;
 import com.google.android.gms.wearable.DataItem;
 
-public final class zzcy extends zzc {
-    private final int zzhwi;
+public final class zzcy extends DataBufferRef {
+    private final int zzdl;
 
     public zzcy(DataHolder dataHolder, int i, int i2) {
         super(dataHolder, i);
-        this.zzhwi = i2;
+        this.zzdl = i2;
     }
 
     public final DataItem getDataItem() {
-        return new zzdf(this.zzfqt, this.zzfvx, this.zzhwi);
+        return new zzdf(this.mDataHolder, this.mDataRow, this.zzdl);
     }
 
     public final int getType() {
@@ -23,6 +23,12 @@ public final class zzcy extends zzc {
     public final String toString() {
         String str = getType() == 1 ? "changed" : getType() == 2 ? "deleted" : "unknown";
         String valueOf = String.valueOf(getDataItem());
-        return new StringBuilder((String.valueOf(str).length() + 32) + String.valueOf(valueOf).length()).append("DataEventRef{ type=").append(str).append(", dataitem=").append(valueOf).append(" }").toString();
+        StringBuilder stringBuilder = new StringBuilder((32 + String.valueOf(str).length()) + String.valueOf(valueOf).length());
+        stringBuilder.append("DataEventRef{ type=");
+        stringBuilder.append(str);
+        stringBuilder.append(", dataitem=");
+        stringBuilder.append(valueOf);
+        stringBuilder.append(" }");
+        return stringBuilder.toString();
     }
 }

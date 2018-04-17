@@ -2,22 +2,19 @@ package com.google.android.gms.maps.internal;
 
 import android.os.Parcel;
 import android.os.RemoteException;
-import com.google.android.gms.dynamic.IObjectWrapper.zza;
-import com.google.android.gms.internal.zzev;
+import com.google.android.gms.dynamic.IObjectWrapper.Stub;
+import com.google.android.gms.internal.maps.zzb;
 
-public abstract class zzay extends zzev implements zzax {
+public abstract class zzay extends zzb implements zzax {
     public zzay() {
-        attachInterface(this, "com.google.android.gms.maps.internal.IOnMyLocationChangeListener");
+        super("com.google.android.gms.maps.internal.IOnMyLocationChangeListener");
     }
 
-    public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        if (zza(i, parcel, parcel2, i2)) {
-            return true;
-        }
+    protected final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
         if (i != 1) {
             return false;
         }
-        zzy(zza.zzaq(parcel.readStrongBinder()));
+        zza(Stub.asInterface(parcel.readStrongBinder()));
         parcel2.writeNoException();
         return true;
     }

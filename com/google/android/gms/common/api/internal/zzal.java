@@ -1,89 +1,41 @@
 package com.google.android.gms.common.api.internal;
 
-import android.os.Bundle;
-import android.os.DeadObjectException;
+import android.os.Looper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Api;
-import com.google.android.gms.common.api.Api.zzb;
-import com.google.android.gms.common.api.Api.zze;
-import com.google.android.gms.common.api.Result;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.common.internal.zzbz;
+import com.google.android.gms.common.internal.BaseGmsClient.ConnectionProgressReportCallbacks;
+import com.google.android.gms.common.internal.Preconditions;
+import java.lang.ref.WeakReference;
 
-public final class zzal implements zzbh {
-    private final zzbi zzfqv;
-    private boolean zzfqw = false;
+final class zzal implements ConnectionProgressReportCallbacks {
+    private final Api<?> mApi;
+    private final boolean zzfo;
+    private final WeakReference<zzaj> zzhw;
 
-    public zzal(zzbi com_google_android_gms_common_api_internal_zzbi) {
-        this.zzfqv = com_google_android_gms_common_api_internal_zzbi;
+    public zzal(zzaj com_google_android_gms_common_api_internal_zzaj, Api<?> api, boolean z) {
+        this.zzhw = new WeakReference(com_google_android_gms_common_api_internal_zzaj);
+        this.mApi = api;
+        this.zzfo = z;
     }
 
-    public final void begin() {
-    }
-
-    public final void connect() {
-        if (this.zzfqw) {
-            this.zzfqw = false;
-            this.zzfqv.zza(new zzan(this, this));
-        }
-    }
-
-    public final boolean disconnect() {
-        if (this.zzfqw) {
-            return false;
-        }
-        if (this.zzfqv.zzfpi.zzail()) {
-            this.zzfqw = true;
-            for (zzdg zzajs : this.zzfqv.zzfpi.zzfsg) {
-                zzajs.zzajs();
-            }
-            return false;
-        }
-        this.zzfqv.zzg(null);
-        return true;
-    }
-
-    public final void onConnected(Bundle bundle) {
-    }
-
-    public final void onConnectionSuspended(int i) {
-        this.zzfqv.zzg(null);
-        this.zzfqv.zzfsu.zzf(i, this.zzfqw);
-    }
-
-    public final void zza(ConnectionResult connectionResult, Api<?> api, boolean z) {
-    }
-
-    final void zzaia() {
-        if (this.zzfqw) {
-            this.zzfqw = false;
-            this.zzfqv.zzfpi.zzfsh.release();
-            disconnect();
-        }
-    }
-
-    public final <A extends zzb, R extends Result, T extends zzm<R, A>> T zzd(T t) {
-        return zze(t);
-    }
-
-    public final <A extends zzb, T extends zzm<? extends Result, A>> T zze(T t) {
-        try {
-            this.zzfqv.zzfpi.zzfsh.zzb(t);
-            zzba com_google_android_gms_common_api_internal_zzba = this.zzfqv.zzfpi;
-            zzb com_google_android_gms_common_api_Api_zzb = (zze) com_google_android_gms_common_api_internal_zzba.zzfsb.get(t.zzagf());
-            zzbq.checkNotNull(com_google_android_gms_common_api_Api_zzb, "Appropriate Api was not requested.");
-            if (com_google_android_gms_common_api_Api_zzb.isConnected() || !this.zzfqv.zzfsq.containsKey(t.zzagf())) {
-                if (com_google_android_gms_common_api_Api_zzb instanceof zzbz) {
-                    com_google_android_gms_common_api_Api_zzb = zzbz.zzals();
+    public final void onReportServiceBinding(ConnectionResult connectionResult) {
+        zzaj com_google_android_gms_common_api_internal_zzaj = (zzaj) this.zzhw.get();
+        if (com_google_android_gms_common_api_internal_zzaj != null) {
+            Preconditions.checkState(Looper.myLooper() == com_google_android_gms_common_api_internal_zzaj.zzhf.zzfq.getLooper(), "onReportServiceBinding must be called on the GoogleApiClient handler thread");
+            com_google_android_gms_common_api_internal_zzaj.zzga.lock();
+            try {
+                if (com_google_android_gms_common_api_internal_zzaj.zze(0)) {
+                    if (!connectionResult.isSuccess()) {
+                        com_google_android_gms_common_api_internal_zzaj.zzb(connectionResult, this.mApi, this.zzfo);
+                    }
+                    if (com_google_android_gms_common_api_internal_zzaj.zzar()) {
+                        com_google_android_gms_common_api_internal_zzaj.zzas();
+                    }
                 }
-                t.zzb(com_google_android_gms_common_api_Api_zzb);
-                return t;
+                com_google_android_gms_common_api_internal_zzaj.zzga.unlock();
+            } catch (Throwable th) {
+                com_google_android_gms_common_api_internal_zzaj.zzga.unlock();
             }
-            t.zzu(new Status(17));
-            return t;
-        } catch (DeadObjectException e) {
-            this.zzfqv.zza(new zzam(this, this));
         }
     }
 }

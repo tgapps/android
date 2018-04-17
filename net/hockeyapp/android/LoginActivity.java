@@ -41,11 +41,10 @@ public class LoginActivity extends Activity {
                     activity.finish();
                     if (LoginManager.listener != null) {
                         LoginManager.listener.onSuccess();
-                        return;
                     }
-                    return;
+                } else {
+                    Toast.makeText(activity, "Login failed. Check your credentials.", 1).show();
                 }
-                Toast.makeText(activity, "Login failed. Check your credentials.", 1).show();
             }
         }
     }
@@ -108,24 +107,24 @@ public class LoginActivity extends Activity {
             boolean ready = false;
             Map<String, String> params = new HashMap();
             if (this.mMode == 1) {
-                ready = !TextUtils.isEmpty(email);
+                ready = TextUtils.isEmpty(email) ^ 1;
                 params.put("email", email);
-                params.put("authcode", md5(this.mSecret + email));
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(this.mSecret);
+                stringBuilder.append(email);
+                params.put("authcode", md5(stringBuilder.toString()));
             } else if (this.mMode == 2) {
-                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                    ready = false;
-                } else {
-                    ready = true;
-                }
+                boolean z = (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) ? false : true;
+                ready = z;
                 params.put("email", email);
                 params.put("password", password);
             }
             if (ready) {
                 this.mLoginTask = new LoginTask(this, this.mLoginHandler, this.mUrl, this.mMode, params);
                 AsyncTaskUtils.execute(this.mLoginTask);
-                return;
+            } else {
+                Toast.makeText(this, getString(R.string.hockeyapp_login_missing_credentials_toast), 1).show();
             }
-            Toast.makeText(this, getString(R.string.hockeyapp_login_missing_credentials_toast), 1).show();
             return;
         }
         Toast.makeText(this, R.string.hockeyapp_error_no_network_message, 1).show();

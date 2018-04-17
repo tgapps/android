@@ -44,7 +44,12 @@ public class Ovc1VisualSampleEntryImpl extends AbstractSampleEntry {
     }
 
     public long getSize() {
-        int i = (this.largeBox || ((long) (this.vc1Content.length + 16)) >= 4294967296L) ? 16 : 8;
-        return (((long) this.vc1Content.length) + ((long) i)) + 8;
+        int i = 16;
+        if (!this.largeBox) {
+            if (((long) (this.vc1Content.length + 16)) < 4294967296L) {
+                i = 8;
+            }
+        }
+        return (((long) i) + ((long) this.vc1Content.length)) + 8;
     }
 }

@@ -1,14 +1,14 @@
 package com.google.android.gms.maps.model;
 
 import android.os.RemoteException;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.maps.model.internal.zzp;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.internal.maps.zzt;
 
 public final class Marker {
-    private final zzp zzivf;
+    private final zzt zzdl;
 
-    public Marker(zzp com_google_android_gms_maps_model_internal_zzp) {
-        this.zzivf = (zzp) zzbq.checkNotNull(com_google_android_gms_maps_model_internal_zzp);
+    public Marker(zzt com_google_android_gms_internal_maps_zzt) {
+        this.zzdl = (zzt) Preconditions.checkNotNull(com_google_android_gms_internal_maps_zzt);
     }
 
     public final boolean equals(Object obj) {
@@ -16,7 +16,7 @@ public final class Marker {
             return false;
         }
         try {
-            return this.zzivf.zzj(((Marker) obj).zzivf);
+            return this.zzdl.zzj(((Marker) obj).zzdl);
         } catch (RemoteException e) {
             throw new RuntimeRemoteException(e);
         }
@@ -24,7 +24,7 @@ public final class Marker {
 
     public final LatLng getPosition() {
         try {
-            return this.zzivf.getPosition();
+            return this.zzdl.getPosition();
         } catch (RemoteException e) {
             throw new RuntimeRemoteException(e);
         }
@@ -32,7 +32,7 @@ public final class Marker {
 
     public final int hashCode() {
         try {
-            return this.zzivf.hashCodeRemote();
+            return this.zzdl.zzi();
         } catch (RemoteException e) {
             throw new RuntimeRemoteException(e);
         }
@@ -43,7 +43,7 @@ public final class Marker {
             throw new IllegalArgumentException("latlng cannot be null - a position is required.");
         }
         try {
-            this.zzivf.setPosition(latLng);
+            this.zzdl.setPosition(latLng);
         } catch (RemoteException e) {
             throw new RuntimeRemoteException(e);
         }

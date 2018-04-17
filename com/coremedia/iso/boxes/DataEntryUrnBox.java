@@ -59,6 +59,11 @@ public class DataEntryUrnBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        return "DataEntryUrlBox[name=" + getName() + ";location=" + getLocation() + "]";
+        StringBuilder stringBuilder = new StringBuilder("DataEntryUrlBox[name=");
+        stringBuilder.append(getName());
+        stringBuilder.append(";location=");
+        stringBuilder.append(getLocation());
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 }

@@ -2,57 +2,68 @@ package com.google.android.gms.wearable.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 import com.google.android.gms.wearable.Node;
 
-public final class zzfo extends zzbfm implements Node {
+public final class zzfo extends AbstractSafeParcelable implements Node {
     public static final Creator<zzfo> CREATOR = new zzfp();
-    private final String zzbuz;
-    private final String zzegt;
-    private final int zzlkz;
-    private final boolean zzlla;
+    private final String zzbk;
+    private final String zzdm;
+    private final int zzen;
+    private final boolean zzeo;
 
     public zzfo(String str, String str2, int i, boolean z) {
-        this.zzbuz = str;
-        this.zzegt = str2;
-        this.zzlkz = i;
-        this.zzlla = z;
+        this.zzdm = str;
+        this.zzbk = str2;
+        this.zzen = i;
+        this.zzeo = z;
     }
 
     public final boolean equals(Object obj) {
-        return !(obj instanceof zzfo) ? false : ((zzfo) obj).zzbuz.equals(this.zzbuz);
+        return !(obj instanceof zzfo) ? false : ((zzfo) obj).zzdm.equals(this.zzdm);
     }
 
     public final String getDisplayName() {
-        return this.zzegt;
+        return this.zzbk;
     }
 
     public final String getId() {
-        return this.zzbuz;
+        return this.zzdm;
     }
 
     public final int hashCode() {
-        return this.zzbuz.hashCode();
+        return this.zzdm.hashCode();
     }
 
     public final boolean isNearby() {
-        return this.zzlla;
+        return this.zzeo;
     }
 
     public final String toString() {
-        String str = this.zzegt;
-        String str2 = this.zzbuz;
-        int i = this.zzlkz;
-        return new StringBuilder((String.valueOf(str).length() + 45) + String.valueOf(str2).length()).append("Node{").append(str).append(", id=").append(str2).append(", hops=").append(i).append(", isNearby=").append(this.zzlla).append("}").toString();
+        String str = this.zzbk;
+        String str2 = this.zzdm;
+        int i = this.zzen;
+        boolean z = this.zzeo;
+        StringBuilder stringBuilder = new StringBuilder((45 + String.valueOf(str).length()) + String.valueOf(str2).length());
+        stringBuilder.append("Node{");
+        stringBuilder.append(str);
+        stringBuilder.append(", id=");
+        stringBuilder.append(str2);
+        stringBuilder.append(", hops=");
+        stringBuilder.append(i);
+        stringBuilder.append(", isNearby=");
+        stringBuilder.append(z);
+        stringBuilder.append("}");
+        return stringBuilder.toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 2, getId(), false);
-        zzbfp.zza(parcel, 3, getDisplayName(), false);
-        zzbfp.zzc(parcel, 4, this.zzlkz);
-        zzbfp.zza(parcel, 5, isNearby());
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, getId(), false);
+        SafeParcelWriter.writeString(parcel, 3, getDisplayName(), false);
+        SafeParcelWriter.writeInt(parcel, 4, this.zzen);
+        SafeParcelWriter.writeBoolean(parcel, 5, isNearby());
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

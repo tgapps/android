@@ -1,17 +1,18 @@
 package com.google.android.gms.dynamite;
 
 import android.content.Context;
-import com.google.android.gms.dynamite.DynamiteModule.zzc;
+import com.google.android.gms.dynamite.DynamiteModule.LoadingException;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.IVersions;
 
-final class zza implements zzi {
+final class zza implements IVersions {
     zza() {
     }
 
-    public final int zzab(Context context, String str) {
-        return DynamiteModule.zzab(context, str);
+    public final int getLocalVersion(Context context, String str) {
+        return DynamiteModule.getLocalVersion(context, str);
     }
 
-    public final int zzc(Context context, String str, boolean z) throws zzc {
-        return DynamiteModule.zzc(context, str, z);
+    public final int getRemoteVersion(Context context, String str, boolean z) throws LoadingException {
+        return DynamiteModule.getRemoteVersion(context, str, z);
     }
 }

@@ -54,7 +54,7 @@ public interface zzek extends IInterface {
 
     void zza(zzge com_google_android_gms_wearable_internal_zzge) throws RemoteException;
 
-    void zzat(DataHolder dataHolder) throws RemoteException;
+    void zzb(DataHolder dataHolder) throws RemoteException;
 
     void zzb(zzbt com_google_android_gms_wearable_internal_zzbt) throws RemoteException;
 }

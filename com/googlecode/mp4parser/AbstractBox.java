@@ -11,11 +11,12 @@ import com.googlecode.mp4parser.util.CastUtils;
 import com.googlecode.mp4parser.util.Logger;
 import com.googlecode.mp4parser.util.Path;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 
 public abstract class AbstractBox implements Box {
-    static final /* synthetic */ boolean $assertionsDisabled = (!AbstractBox.class.desiredAssertionStatus());
+    static final /* synthetic */ boolean $assertionsDisabled = false;
     private static Logger LOG = Logger.getLogger(AbstractBox.class);
     private ByteBuffer content;
     long contentStartPosition;
@@ -35,10 +36,79 @@ public abstract class AbstractBox implements Box {
 
     protected abstract long getContentSize();
 
+    public long getSize() {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: com.googlecode.mp4parser.AbstractBox.getSize():long
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r8.isRead;
+        r1 = 0;
+        if (r0 == 0) goto L_0x001c;
+    L_0x0005:
+        r0 = r8.isParsed;
+        if (r0 == 0) goto L_0x000e;
+    L_0x0009:
+        r2 = r8.getContentSize();
+        goto L_0x001e;
+    L_0x000e:
+        r0 = r8.content;
+        if (r0 == 0) goto L_0x0019;
+        r0 = r8.content;
+        r0 = r0.limit();
+        goto L_0x001a;
+        r0 = r1;
+        r2 = (long) r0;
+        goto L_0x001e;
+    L_0x001c:
+        r2 = r8.memMapSize;
+        r4 = 4294967288; // 0xfffffff8 float:NaN double:2.121995787E-314;
+        r0 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
+        r4 = 8;
+        if (r0 < 0) goto L_0x002c;
+        r0 = r4;
+        goto L_0x002e;
+        r0 = r1;
+        r4 = r4 + r0;
+        r0 = "uuid";
+        r5 = r8.getType();
+        r0 = r0.equals(r5);
+        if (r0 == 0) goto L_0x003e;
+        r0 = 16;
+        goto L_0x003f;
+        r0 = r1;
+        r4 = r4 + r0;
+        r4 = (long) r4;
+        r6 = r2 + r4;
+        r0 = r8.deadBytes;
+        if (r0 != 0) goto L_0x0048;
+        goto L_0x004e;
+        r0 = r8.deadBytes;
+        r1 = r0.limit();
+        r0 = (long) r1;
+        r2 = r6 + r0;
+        return r2;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.googlecode.mp4parser.AbstractBox.getSize():long");
+    }
+
     private synchronized void readContent() {
         if (!this.isRead) {
             try {
-                LOG.logDebug("mem mapping " + getType());
+                Logger logger = LOG;
+                StringBuilder stringBuilder = new StringBuilder("mem mapping ");
+                stringBuilder.append(getType());
+                logger.logDebug(stringBuilder.toString());
                 this.content = this.dataSource.map(this.contentStartPosition, this.memMapSize);
                 this.isRead = true;
             } catch (IOException e) {
@@ -76,38 +146,39 @@ public abstract class AbstractBox implements Box {
 
     public void getBox(WritableByteChannel os) throws IOException {
         int i = 8;
-        int i2 = 16;
+        int i2 = 0;
+        int i3 = 16;
         ByteBuffer header;
         if (!this.isRead) {
             if (!isSmallBox()) {
                 i = 16;
             }
-            if (!UserBox.TYPE.equals(getType())) {
-                i2 = 0;
+            if (UserBox.TYPE.equals(getType())) {
+                i2 = 16;
             }
             header = ByteBuffer.allocate(i + i2);
             getHeader(header);
             os.write((ByteBuffer) header.rewind());
             this.dataSource.transferTo(this.contentStartPosition, this.memMapSize, os);
         } else if (this.isParsed) {
-            ByteBuffer bb = ByteBuffer.allocate(CastUtils.l2i(getSize()));
-            getHeader(bb);
-            getContent(bb);
+            header = ByteBuffer.allocate(CastUtils.l2i(getSize()));
+            getHeader(header);
+            getContent(header);
             if (this.deadBytes != null) {
                 this.deadBytes.rewind();
                 while (this.deadBytes.remaining() > 0) {
-                    bb.put(this.deadBytes);
+                    header.put(this.deadBytes);
                 }
             }
-            os.write((ByteBuffer) bb.rewind());
+            os.write((ByteBuffer) header.rewind());
         } else {
             if (!isSmallBox()) {
                 i = 16;
             }
             if (!UserBox.TYPE.equals(getType())) {
-                i2 = 0;
+                i3 = 0;
             }
-            header = ByteBuffer.allocate(i + i2);
+            header = ByteBuffer.allocate(i + i3);
             getHeader(header);
             os.write((ByteBuffer) header.rewind());
             os.write((ByteBuffer) this.content.position(0));
@@ -116,7 +187,10 @@ public abstract class AbstractBox implements Box {
 
     public final synchronized void parseDetails() {
         readContent();
-        LOG.logDebug("parsing details of " + getType());
+        Logger logger = LOG;
+        StringBuilder stringBuilder = new StringBuilder("parsing details of ");
+        stringBuilder.append(getType());
+        logger.logDebug(stringBuilder.toString());
         if (this.content != null) {
             ByteBuffer content = this.content;
             this.isParsed = true;
@@ -126,43 +200,11 @@ public abstract class AbstractBox implements Box {
                 this.deadBytes = content.slice();
             }
             this.content = null;
-            if (!($assertionsDisabled || verify(content))) {
-                throw new AssertionError();
-            }
         }
     }
 
     protected void setDeadBytes(ByteBuffer newDeadBytes) {
         this.deadBytes = newDeadBytes;
-    }
-
-    public long getSize() {
-        long size;
-        int i;
-        int i2 = 0;
-        if (!this.isRead) {
-            size = this.memMapSize;
-        } else if (this.isParsed) {
-            size = getContentSize();
-        } else {
-            size = (long) (this.content != null ? this.content.limit() : 0);
-        }
-        if (size >= 4294967288L) {
-            i = 8;
-        } else {
-            i = 0;
-        }
-        int i3 = i + 8;
-        if (UserBox.TYPE.equals(getType())) {
-            i = 16;
-        } else {
-            i = 0;
-        }
-        size += (long) (i + i3);
-        if (this.deadBytes != null) {
-            i2 = this.deadBytes.limit();
-        }
-        return size + ((long) i2);
     }
 
     public String getType() {
@@ -186,7 +228,7 @@ public abstract class AbstractBox implements Box {
     }
 
     private boolean verify(ByteBuffer content) {
-        ByteBuffer bb = ByteBuffer.allocate(CastUtils.l2i(((long) (this.deadBytes != null ? this.deadBytes.limit() : 0)) + getContentSize()));
+        ByteBuffer bb = ByteBuffer.allocate(CastUtils.l2i(getContentSize() + ((long) (this.deadBytes != null ? this.deadBytes.limit() : 0))));
         getContent(bb);
         if (this.deadBytes != null) {
             this.deadBytes.rewind();
@@ -197,8 +239,20 @@ public abstract class AbstractBox implements Box {
         content.rewind();
         bb.rewind();
         if (content.remaining() != bb.remaining()) {
-            System.err.print(getType() + ": remaining differs " + content.remaining() + " vs. " + bb.remaining());
-            LOG.logError(getType() + ": remaining differs " + content.remaining() + " vs. " + bb.remaining());
+            PrintStream printStream = System.err;
+            StringBuilder stringBuilder = new StringBuilder(String.valueOf(getType()));
+            stringBuilder.append(": remaining differs ");
+            stringBuilder.append(content.remaining());
+            stringBuilder.append(" vs. ");
+            stringBuilder.append(bb.remaining());
+            printStream.print(stringBuilder.toString());
+            Logger logger = LOG;
+            stringBuilder = new StringBuilder(String.valueOf(getType()));
+            stringBuilder.append(": remaining differs ");
+            stringBuilder.append(content.remaining());
+            stringBuilder.append(" vs. ");
+            stringBuilder.append(bb.remaining());
+            logger.logError(stringBuilder.toString());
             return false;
         }
         int p = content.position();
@@ -211,8 +265,14 @@ public abstract class AbstractBox implements Box {
                 byte[] b2 = new byte[bb.remaining()];
                 content.get(b1);
                 bb.get(b2);
-                System.err.println("original      : " + Hex.encodeHex(b1, 4));
-                System.err.println("reconstructed : " + Hex.encodeHex(b2, 4));
+                PrintStream printStream2 = System.err;
+                StringBuilder stringBuilder2 = new StringBuilder("original      : ");
+                stringBuilder2.append(Hex.encodeHex(b1, 4));
+                printStream2.println(stringBuilder2.toString());
+                printStream2 = System.err;
+                stringBuilder2 = new StringBuilder("reconstructed : ");
+                stringBuilder2.append(Hex.encodeHex(b2, 4));
+                printStream2.println(stringBuilder2.toString());
                 return false;
             }
             i--;
@@ -226,21 +286,14 @@ public abstract class AbstractBox implements Box {
         if (UserBox.TYPE.equals(getType())) {
             baseSize = 8 + 16;
         }
-        if (this.isRead) {
-            if (this.isParsed) {
-                if ((getContentSize() + ((long) (this.deadBytes != null ? this.deadBytes.limit() : 0))) + ((long) baseSize) < 4294967296L) {
-                    return true;
-                }
-                return false;
-            } else if (((long) (this.content.limit() + baseSize)) >= 4294967296L) {
-                return false;
-            } else {
-                return true;
-            }
-        } else if (this.memMapSize + ((long) baseSize) >= 4294967296L) {
-            return false;
+        if (!this.isRead) {
+            return this.memMapSize + ((long) baseSize) < 4294967296L;
         } else {
-            return true;
+            if (!this.isParsed) {
+                return ((long) (this.content.limit() + baseSize)) < 4294967296L;
+            } else {
+                return (getContentSize() + ((long) (this.deadBytes != null ? this.deadBytes.limit() : 0))) + ((long) baseSize) < 4294967296L;
+            }
         }
     }
 

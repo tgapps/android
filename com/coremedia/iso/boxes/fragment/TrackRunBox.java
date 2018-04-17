@@ -85,7 +85,16 @@ public class TrackRunBox extends AbstractFullBox {
         }
 
         public String toString() {
-            return "Entry{duration=" + this.sampleDuration + ", size=" + this.sampleSize + ", dlags=" + this.sampleFlags + ", compTimeOffset=" + this.sampleCompositionTimeOffset + '}';
+            StringBuilder stringBuilder = new StringBuilder("Entry{duration=");
+            stringBuilder.append(this.sampleDuration);
+            stringBuilder.append(", size=");
+            stringBuilder.append(this.sampleSize);
+            stringBuilder.append(", dlags=");
+            stringBuilder.append(this.sampleFlags);
+            stringBuilder.append(", compTimeOffset=");
+            stringBuilder.append(this.sampleCompositionTimeOffset);
+            stringBuilder.append('}');
+            return stringBuilder.toString();
         }
     }
 
@@ -149,28 +158,28 @@ public class TrackRunBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        long size = 8;
+        long j = 8;
         int flags = getFlags();
         if ((flags & 1) == 1) {
-            size = 8 + 4;
+            j = 8 + 4;
         }
         if ((flags & 4) == 4) {
-            size += 4;
+            j += 4;
         }
-        long entrySize = 0;
+        long j2 = 0;
         if ((flags & 256) == 256) {
-            entrySize = 0 + 4;
+            j2 = 0 + 4;
         }
         if ((flags & 512) == 512) {
-            entrySize += 4;
+            j2 += 4;
         }
         if ((flags & 1024) == 1024) {
-            entrySize += 4;
+            j2 += 4;
         }
         if ((flags & 2048) == 2048) {
-            entrySize += 4;
+            j2 += 4;
         }
-        return size + (((long) this.entries.size()) * entrySize);
+        return j + (((long) this.entries.size()) * j2);
     }
 
     protected void getContent(ByteBuffer byteBuffer) {
@@ -336,14 +345,22 @@ public class TrackRunBox extends AbstractFullBox {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_18, this, this));
         StringBuilder sb = new StringBuilder();
         sb.append("TrackRunBox");
-        sb.append("{sampleCount=").append(this.entries.size());
-        sb.append(", dataOffset=").append(this.dataOffset);
-        sb.append(", dataOffsetPresent=").append(isDataOffsetPresent());
-        sb.append(", sampleSizePresent=").append(isSampleSizePresent());
-        sb.append(", sampleDurationPresent=").append(isSampleDurationPresent());
-        sb.append(", sampleFlagsPresentPresent=").append(isSampleFlagsPresent());
-        sb.append(", sampleCompositionTimeOffsetPresent=").append(isSampleCompositionTimeOffsetPresent());
-        sb.append(", firstSampleFlags=").append(this.firstSampleFlags);
+        sb.append("{sampleCount=");
+        sb.append(this.entries.size());
+        sb.append(", dataOffset=");
+        sb.append(this.dataOffset);
+        sb.append(", dataOffsetPresent=");
+        sb.append(isDataOffsetPresent());
+        sb.append(", sampleSizePresent=");
+        sb.append(isSampleSizePresent());
+        sb.append(", sampleDurationPresent=");
+        sb.append(isSampleDurationPresent());
+        sb.append(", sampleFlagsPresentPresent=");
+        sb.append(isSampleFlagsPresent());
+        sb.append(", sampleCompositionTimeOffsetPresent=");
+        sb.append(isSampleCompositionTimeOffsetPresent());
+        sb.append(", firstSampleFlags=");
+        sb.append(this.firstSampleFlags);
         sb.append('}');
         return sb.toString();
     }

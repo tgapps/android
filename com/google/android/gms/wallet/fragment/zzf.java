@@ -2,37 +2,37 @@ package com.google.android.gms.wallet.fragment;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzf implements Creator<WalletFragmentOptions> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzbfn.zzd(parcel);
-        int i = 0;
-        int i2 = 1;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        int i = 1;
+        int i2 = 0;
         WalletFragmentStyle walletFragmentStyle = null;
         int i3 = 1;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    i2 = zzbfn.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    i = zzbfn.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 4:
-                    walletFragmentStyle = (WalletFragmentStyle) zzbfn.zza(parcel, readInt, WalletFragmentStyle.CREATOR);
+                    walletFragmentStyle = (WalletFragmentStyle) SafeParcelReader.createParcelable(parcel, readHeader, WalletFragmentStyle.CREATOR);
                     break;
                 case 5:
-                    i3 = zzbfn.zzg(parcel, readInt);
+                    i3 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new WalletFragmentOptions(i2, i, walletFragmentStyle, i3);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new WalletFragmentOptions(i, i2, walletFragmentStyle, i3);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

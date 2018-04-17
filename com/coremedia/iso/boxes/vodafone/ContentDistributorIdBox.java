@@ -43,7 +43,7 @@ public class ContentDistributorIdBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) ((Utf8.utf8StringLengthInBytes(this.contentDistributorId) + 2) + 5);
+        return (long) ((2 + Utf8.utf8StringLengthInBytes(this.contentDistributorId)) + 5);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -61,6 +61,11 @@ public class ContentDistributorIdBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        return "ContentDistributorIdBox[language=" + getLanguage() + ";contentDistributorId=" + getContentDistributorId() + "]";
+        StringBuilder stringBuilder = new StringBuilder("ContentDistributorIdBox[language=");
+        stringBuilder.append(getLanguage());
+        stringBuilder.append(";contentDistributorId=");
+        stringBuilder.append(getContentDistributorId());
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 }

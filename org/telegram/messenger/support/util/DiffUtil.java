@@ -2,7 +2,6 @@ package org.telegram.messenger.support.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import org.telegram.messenger.support.widget.RecyclerView.Adapter;
@@ -44,6 +43,208 @@ public class DiffUtil {
         private final int[] mOldItemStatuses;
         private final int mOldListSize;
         private final List<Snake> mSnakes;
+
+        private void dispatchAdditions(java.util.List<org.telegram.messenger.support.util.DiffUtil.PostponedUpdate> r1, org.telegram.messenger.support.util.ListUpdateCallback r2, int r3, int r4, int r5) {
+            /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.util.DiffUtil.DiffResult.dispatchAdditions(java.util.List, org.telegram.messenger.support.util.ListUpdateCallback, int, int, int):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+            /*
+            r0 = this;
+            r0 = r7.mDetectMoves;
+            if (r0 != 0) goto L_0x0008;
+        L_0x0004:
+            r9.onInserted(r10, r11);
+            return;
+        L_0x0008:
+            r0 = r11 + -1;
+            if (r0 < 0) goto L_0x0091;
+        L_0x000c:
+            r1 = r7.mNewItemStatuses;
+            r2 = r12 + r0;
+            r1 = r1[r2];
+            r1 = r1 & 31;
+            r2 = 1;
+            if (r1 == 0) goto L_0x0073;
+        L_0x0017:
+            r3 = 4;
+            if (r1 == r3) goto L_0x0054;
+        L_0x001a:
+            r4 = 8;
+            if (r1 == r4) goto L_0x0054;
+        L_0x001e:
+            r2 = 16;
+            if (r1 == r2) goto L_0x0048;
+        L_0x0022:
+            r2 = new java.lang.IllegalStateException;
+            r3 = new java.lang.StringBuilder;
+            r3.<init>();
+            r4 = "unknown flag for pos ";
+            r3.append(r4);
+            r4 = r12 + r0;
+            r3.append(r4);
+            r4 = " ";
+            r3.append(r4);
+            r4 = (long) r1;
+            r4 = java.lang.Long.toBinaryString(r4);
+            r3.append(r4);
+            r3 = r3.toString();
+            r2.<init>(r3);
+            throw r2;
+        L_0x0048:
+            r2 = new org.telegram.messenger.support.util.DiffUtil$PostponedUpdate;
+            r3 = r12 + r0;
+            r4 = 0;
+            r2.<init>(r3, r10, r4);
+            r8.add(r2);
+            goto L_0x008d;
+        L_0x0054:
+            r4 = r7.mNewItemStatuses;
+            r5 = r12 + r0;
+            r4 = r4[r5];
+            r4 = r4 >> 5;
+            r5 = removePostponedUpdate(r8, r4, r2);
+            r6 = r5.currentPos;
+            r9.onMoved(r6, r10);
+            if (r1 != r3) goto L_0x008d;
+        L_0x0067:
+            r3 = r7.mCallback;
+            r6 = r12 + r0;
+            r3 = r3.getChangePayload(r4, r6);
+            r9.onChanged(r10, r2, r3);
+            goto L_0x008d;
+        L_0x0073:
+            r9.onInserted(r10, r2);
+            r3 = r8.iterator();
+            r4 = r3.hasNext();
+            if (r4 == 0) goto L_0x008c;
+        L_0x0080:
+            r4 = r3.next();
+            r4 = (org.telegram.messenger.support.util.DiffUtil.PostponedUpdate) r4;
+            r5 = r4.currentPos;
+            r5 = r5 + r2;
+            r4.currentPos = r5;
+            goto L_0x007a;
+        L_0x008d:
+            r0 = r0 + -1;
+            goto L_0x000a;
+        L_0x0091:
+            return;
+            */
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.util.DiffUtil.DiffResult.dispatchAdditions(java.util.List, org.telegram.messenger.support.util.ListUpdateCallback, int, int, int):void");
+        }
+
+        private void dispatchRemovals(java.util.List<org.telegram.messenger.support.util.DiffUtil.PostponedUpdate> r1, org.telegram.messenger.support.util.ListUpdateCallback r2, int r3, int r4, int r5) {
+            /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.util.DiffUtil.DiffResult.dispatchRemovals(java.util.List, org.telegram.messenger.support.util.ListUpdateCallback, int, int, int):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+            /*
+            r0 = this;
+            r0 = r8.mDetectMoves;
+            if (r0 != 0) goto L_0x0008;
+        L_0x0004:
+            r10.onRemoved(r11, r12);
+            return;
+        L_0x0008:
+            r0 = r12 + -1;
+            if (r0 < 0) goto L_0x009b;
+        L_0x000c:
+            r1 = r8.mOldItemStatuses;
+            r2 = r13 + r0;
+            r1 = r1[r2];
+            r1 = r1 & 31;
+            r2 = 1;
+            if (r1 == 0) goto L_0x007b;
+        L_0x0017:
+            r3 = 4;
+            if (r1 == r3) goto L_0x0055;
+        L_0x001a:
+            r4 = 8;
+            if (r1 == r4) goto L_0x0055;
+        L_0x001e:
+            r3 = 16;
+            if (r1 == r3) goto L_0x0048;
+        L_0x0022:
+            r2 = new java.lang.IllegalStateException;
+            r3 = new java.lang.StringBuilder;
+            r3.<init>();
+            r4 = "unknown flag for pos ";
+            r3.append(r4);
+            r4 = r13 + r0;
+            r3.append(r4);
+            r4 = " ";
+            r3.append(r4);
+            r4 = (long) r1;
+            r4 = java.lang.Long.toBinaryString(r4);
+            r3.append(r4);
+            r3 = r3.toString();
+            r2.<init>(r3);
+            throw r2;
+        L_0x0048:
+            r3 = new org.telegram.messenger.support.util.DiffUtil$PostponedUpdate;
+            r4 = r13 + r0;
+            r5 = r11 + r0;
+            r3.<init>(r4, r5, r2);
+            r9.add(r3);
+            goto L_0x0097;
+        L_0x0055:
+            r4 = r8.mOldItemStatuses;
+            r5 = r13 + r0;
+            r4 = r4[r5];
+            r4 = r4 >> 5;
+            r5 = 0;
+            r5 = removePostponedUpdate(r9, r4, r5);
+            r6 = r11 + r0;
+            r7 = r5.currentPos;
+            r7 = r7 - r2;
+            r10.onMoved(r6, r7);
+            if (r1 != r3) goto L_0x0097;
+        L_0x006c:
+            r3 = r5.currentPos;
+            r3 = r3 - r2;
+            r6 = r8.mCallback;
+            r7 = r13 + r0;
+            r6 = r6.getChangePayload(r7, r4);
+            r10.onChanged(r3, r2, r6);
+            goto L_0x0097;
+        L_0x007b:
+            r3 = r11 + r0;
+            r10.onRemoved(r3, r2);
+            r3 = r9.iterator();
+            r4 = r3.hasNext();
+            if (r4 == 0) goto L_0x0096;
+        L_0x008a:
+            r4 = r3.next();
+            r4 = (org.telegram.messenger.support.util.DiffUtil.PostponedUpdate) r4;
+            r5 = r4.currentPos;
+            r5 = r5 - r2;
+            r4.currentPos = r5;
+            goto L_0x0084;
+        L_0x0097:
+            r0 = r0 + -1;
+            goto L_0x000a;
+        L_0x009b:
+            return;
+            */
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.util.DiffUtil.DiffResult.dispatchRemovals(java.util.List, org.telegram.messenger.support.util.ListUpdateCallback, int, int, int):void");
+        }
 
         DiffResult(Callback callback, List<Snake> snakes, int[] oldItemStatuses, int[] newItemStatuses, boolean detectMoves) {
             this.mSnakes = snakes;
@@ -117,6 +318,7 @@ public class DiffUtil {
             int myItemPos;
             int curX;
             int curY;
+            DiffResult diffResult = this;
             if (removal) {
                 myItemPos = y - 1;
                 curX = x;
@@ -126,174 +328,135 @@ public class DiffUtil {
                 curX = x - 1;
                 curY = y;
             }
-            for (int i = snakeIndex; i >= 0; i--) {
-                Snake snake = (Snake) this.mSnakes.get(i);
+            int curY2 = curY;
+            curY = curX;
+            for (curX = snakeIndex; curX >= 0; curX--) {
+                Snake snake = (Snake) diffResult.mSnakes.get(curX);
                 int endX = snake.x + snake.size;
                 int endY = snake.y + snake.size;
+                int changeFlag = 4;
                 int pos;
-                int changeFlag;
                 if (removal) {
-                    for (pos = curX - 1; pos >= endX; pos--) {
-                        if (this.mCallback.areItemsTheSame(pos, myItemPos)) {
-                            changeFlag = this.mCallback.areContentsTheSame(pos, myItemPos) ? 8 : 4;
-                            this.mNewItemStatuses[myItemPos] = (pos << 5) | 16;
-                            this.mOldItemStatuses[pos] = (myItemPos << 5) | changeFlag;
+                    for (pos = curY - 1; pos >= endX; pos--) {
+                        if (diffResult.mCallback.areItemsTheSame(pos, myItemPos)) {
+                            if (diffResult.mCallback.areContentsTheSame(pos, myItemPos)) {
+                                changeFlag = 8;
+                            }
+                            diffResult.mNewItemStatuses[myItemPos] = (pos << 5) | 16;
+                            diffResult.mOldItemStatuses[pos] = (myItemPos << 5) | changeFlag;
                             return true;
                         }
                     }
                     continue;
                 } else {
-                    for (pos = curY - 1; pos >= endY; pos--) {
-                        if (this.mCallback.areItemsTheSame(myItemPos, pos)) {
-                            changeFlag = this.mCallback.areContentsTheSame(myItemPos, pos) ? 8 : 4;
-                            this.mOldItemStatuses[x - 1] = (pos << 5) | 16;
-                            this.mNewItemStatuses[pos] = ((x - 1) << 5) | changeFlag;
+                    for (pos = curY2 - 1; pos >= endY; pos--) {
+                        if (diffResult.mCallback.areItemsTheSame(myItemPos, pos)) {
+                            if (diffResult.mCallback.areContentsTheSame(myItemPos, pos)) {
+                                changeFlag = 8;
+                            }
+                            diffResult.mOldItemStatuses[x - 1] = (pos << 5) | 16;
+                            diffResult.mNewItemStatuses[pos] = ((x - 1) << 5) | changeFlag;
                             return true;
                         }
                     }
                     continue;
                 }
-                curX = snake.x;
-                curY = snake.y;
+                curY = snake.x;
+                curY2 = snake.y;
             }
             return false;
         }
 
-        public void dispatchUpdatesTo(final Adapter adapter) {
-            dispatchUpdatesTo(new ListUpdateCallback() {
-                public void onInserted(int position, int count) {
-                    adapter.notifyItemRangeInserted(position, count);
-                }
-
-                public void onRemoved(int position, int count) {
-                    adapter.notifyItemRangeRemoved(position, count);
-                }
-
-                public void onMoved(int fromPosition, int toPosition) {
-                    adapter.notifyItemMoved(fromPosition, toPosition);
-                }
-
-                public void onChanged(int position, int count, Object payload) {
-                    adapter.notifyItemRangeChanged(position, count, payload);
-                }
-            });
+        public void dispatchUpdatesTo(Adapter adapter) {
+            dispatchUpdatesTo(new AdapterListUpdateCallback(adapter));
         }
 
         public void dispatchUpdatesTo(ListUpdateCallback updateCallback) {
-            BatchingListUpdateCallback batchingCallback;
-            if (updateCallback instanceof BatchingListUpdateCallback) {
-                batchingCallback = (BatchingListUpdateCallback) updateCallback;
+            BatchingListUpdateCallback batchingListUpdateCallback;
+            DiffResult diffResult = this;
+            ListUpdateCallback listUpdateCallback = updateCallback;
+            if (listUpdateCallback instanceof BatchingListUpdateCallback) {
+                batchingListUpdateCallback = (BatchingListUpdateCallback) listUpdateCallback;
             } else {
-                batchingCallback = new BatchingListUpdateCallback(updateCallback);
-                BatchingListUpdateCallback updateCallback2 = batchingCallback;
+                batchingListUpdateCallback = new BatchingListUpdateCallback(listUpdateCallback);
+                Object updateCallback2 = batchingListUpdateCallback;
             }
+            ListUpdateCallback updateCallback3 = listUpdateCallback;
+            BatchingListUpdateCallback batchingCallback = batchingListUpdateCallback;
             List<PostponedUpdate> postponedUpdates = new ArrayList();
-            int posOld = this.mOldListSize;
-            int posNew = this.mNewListSize;
-            for (int snakeIndex = this.mSnakes.size() - 1; snakeIndex >= 0; snakeIndex--) {
-                Snake snake = (Snake) this.mSnakes.get(snakeIndex);
-                int snakeSize = snake.size;
-                int endX = snake.x + snakeSize;
-                int endY = snake.y + snakeSize;
-                if (endX < posOld) {
-                    dispatchRemovals(postponedUpdates, batchingCallback, endX, posOld - endX, endX);
-                }
-                if (endY < posNew) {
-                    dispatchAdditions(postponedUpdates, batchingCallback, endX, posNew - endY, endY);
-                }
-                for (int i = snakeSize - 1; i >= 0; i--) {
-                    if ((this.mOldItemStatuses[snake.x + i] & FLAG_MASK) == 2) {
-                        batchingCallback.onChanged(snake.x + i, 1, this.mCallback.getChangePayload(snake.x + i, snake.y + i));
+            int posOld = diffResult.mOldListSize;
+            int snakeIndex = diffResult.mSnakes.size() - 1;
+            int posOld2 = posOld;
+            int posNew = diffResult.mNewListSize;
+            while (true) {
+                int snakeIndex2 = snakeIndex;
+                if (snakeIndex2 >= 0) {
+                    int endY;
+                    Snake snake = (Snake) diffResult.mSnakes.get(snakeIndex2);
+                    int snakeSize = snake.size;
+                    int endX = snake.x + snakeSize;
+                    int endY2 = snake.y + snakeSize;
+                    if (endX < posOld2) {
+                        endY = endY2;
+                        dispatchRemovals(postponedUpdates, batchingCallback, endX, posOld2 - endX, endX);
+                    } else {
+                        endY = endY2;
                     }
+                    if (endY < posNew) {
+                        posOld = snakeSize;
+                        dispatchAdditions(postponedUpdates, batchingCallback, endX, posNew - endY, endY);
+                    } else {
+                        posOld = snakeSize;
+                    }
+                    snakeSize = posOld - 1;
+                    while (true) {
+                        int i = snakeSize;
+                        if (i < 0) {
+                            break;
+                        }
+                        if ((diffResult.mOldItemStatuses[snake.x + i] & FLAG_MASK) == 2) {
+                            batchingCallback.onChanged(snake.x + i, 1, diffResult.mCallback.getChangePayload(snake.x + i, snake.y + i));
+                        }
+                        snakeSize = i - 1;
+                    }
+                    posOld2 = snake.x;
+                    posNew = snake.y;
+                    snakeIndex = snakeIndex2 - 1;
+                    endY = 1;
+                } else {
+                    batchingCallback.dispatchLastEvent();
+                    return;
                 }
-                posOld = snake.x;
-                posNew = snake.y;
             }
-            batchingCallback.dispatchLastEvent();
         }
 
         private static PostponedUpdate removePostponedUpdate(List<PostponedUpdate> updates, int pos, boolean removal) {
             for (int i = updates.size() - 1; i >= 0; i--) {
-                PostponedUpdate postponedUpdate = (PostponedUpdate) updates.get(i);
-                if (postponedUpdate.posInOwnerList == pos && postponedUpdate.removal == removal) {
+                PostponedUpdate update = (PostponedUpdate) updates.get(i);
+                if (update.posInOwnerList == pos && update.removal == removal) {
                     updates.remove(i);
                     for (int j = i; j < updates.size(); j++) {
-                        PostponedUpdate postponedUpdate2 = (PostponedUpdate) updates.get(j);
-                        postponedUpdate2.currentPos = (removal ? 1 : -1) + postponedUpdate2.currentPos;
+                        PostponedUpdate postponedUpdate = (PostponedUpdate) updates.get(j);
+                        postponedUpdate.currentPos += removal ? 1 : -1;
                     }
-                    return postponedUpdate;
+                    return update;
                 }
             }
             return null;
         }
 
-        private void dispatchAdditions(List<PostponedUpdate> postponedUpdates, ListUpdateCallback updateCallback, int start, int count, int globalIndex) {
-            if (this.mDetectMoves) {
-                for (int i = count - 1; i >= 0; i--) {
-                    int status = this.mNewItemStatuses[globalIndex + i] & FLAG_MASK;
-                    switch (status) {
-                        case 0:
-                            updateCallback.onInserted(start, 1);
-                            for (PostponedUpdate update : postponedUpdates) {
-                                update.currentPos++;
-                            }
-                            break;
-                        case 4:
-                        case 8:
-                            int pos = this.mNewItemStatuses[globalIndex + i] >> 5;
-                            updateCallback.onMoved(removePostponedUpdate(postponedUpdates, pos, true).currentPos, start);
-                            if (status != 4) {
-                                break;
-                            }
-                            updateCallback.onChanged(start, 1, this.mCallback.getChangePayload(pos, globalIndex + i));
-                            break;
-                        case 16:
-                            postponedUpdates.add(new PostponedUpdate(globalIndex + i, start, false));
-                            break;
-                        default:
-                            throw new IllegalStateException("unknown flag for pos " + (globalIndex + i) + " " + Long.toBinaryString((long) status));
-                    }
-                }
-                return;
-            }
-            updateCallback.onInserted(start, count);
-        }
-
-        private void dispatchRemovals(List<PostponedUpdate> postponedUpdates, ListUpdateCallback updateCallback, int start, int count, int globalIndex) {
-            if (this.mDetectMoves) {
-                for (int i = count - 1; i >= 0; i--) {
-                    int status = this.mOldItemStatuses[globalIndex + i] & FLAG_MASK;
-                    switch (status) {
-                        case 0:
-                            updateCallback.onRemoved(start + i, 1);
-                            for (PostponedUpdate update : postponedUpdates) {
-                                update.currentPos--;
-                            }
-                            break;
-                        case 4:
-                        case 8:
-                            int pos = this.mOldItemStatuses[globalIndex + i] >> 5;
-                            PostponedUpdate update2 = removePostponedUpdate(postponedUpdates, pos, false);
-                            updateCallback.onMoved(start + i, update2.currentPos - 1);
-                            if (status != 4) {
-                                break;
-                            }
-                            updateCallback.onChanged(update2.currentPos - 1, 1, this.mCallback.getChangePayload(globalIndex + i, pos));
-                            break;
-                        case 16:
-                            postponedUpdates.add(new PostponedUpdate(globalIndex + i, start + i, true));
-                            break;
-                        default:
-                            throw new IllegalStateException("unknown flag for pos " + (globalIndex + i) + " " + Long.toBinaryString((long) status));
-                    }
-                }
-                return;
-            }
-            updateCallback.onRemoved(start, count);
-        }
-
         List<Snake> getSnakes() {
             return this.mSnakes;
+        }
+    }
+
+    public static abstract class ItemCallback<T> {
+        public abstract boolean areContentsTheSame(T t, T t2);
+
+        public abstract boolean areItemsTheSame(T t, T t2);
+
+        public Object getChangePayload(T t, T t2) {
+            return null;
         }
     }
 
@@ -334,149 +497,438 @@ public class DiffUtil {
         }
     }
 
+    public static org.telegram.messenger.support.util.DiffUtil.DiffResult calculateDiff(org.telegram.messenger.support.util.DiffUtil.Callback r1, boolean r2) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.util.DiffUtil.calculateDiff(org.telegram.messenger.support.util.DiffUtil$Callback, boolean):org.telegram.messenger.support.util.DiffUtil$DiffResult
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = r19.getOldListSize();
+        r1 = r19.getNewListSize();
+        r2 = new java.util.ArrayList;
+        r2.<init>();
+        r3 = new java.util.ArrayList;
+        r3.<init>();
+        r9 = r3;
+        r3 = new org.telegram.messenger.support.util.DiffUtil$Range;
+        r4 = 0;
+        r3.<init>(r4, r0, r4, r1);
+        r9.add(r3);
+        r3 = r0 + r1;
+        r4 = r0 - r1;
+        r4 = java.lang.Math.abs(r4);
+        r18 = r3 + r4;
+        r3 = r18 * 2;
+        r8 = new int[r3];
+        r3 = r18 * 2;
+        r7 = new int[r3];
+        r3 = new java.util.ArrayList;
+        r3.<init>();
+        r6 = r3;
+        r3 = r9.isEmpty();
+        if (r3 != 0) goto L_0x00fd;
+    L_0x003a:
+        r3 = r9.size();
+        r3 = r3 + -1;
+        r3 = r9.remove(r3);
+        r3 = (org.telegram.messenger.support.util.DiffUtil.Range) r3;
+        r11 = r3.oldListStart;
+        r12 = r3.oldListEnd;
+        r13 = r3.newListStart;
+        r14 = r3.newListEnd;
+        r10 = r19;
+        r15 = r8;
+        r16 = r7;
+        r17 = r18;
+        r4 = diffPartial(r10, r11, r12, r13, r14, r15, r16, r17);
+        if (r4 == 0) goto L_0x00f6;
+    L_0x005b:
+        r5 = r4.size;
+        if (r5 <= 0) goto L_0x0062;
+    L_0x005f:
+        r2.add(r4);
+    L_0x0062:
+        r5 = r4.x;
+        r10 = r3.oldListStart;
+        r5 = r5 + r10;
+        r4.x = r5;
+        r5 = r4.y;
+        r10 = r3.newListStart;
+        r5 = r5 + r10;
+        r4.y = r5;
+        r5 = r6.isEmpty();
+        if (r5 == 0) goto L_0x007c;
+    L_0x0076:
+        r5 = new org.telegram.messenger.support.util.DiffUtil$Range;
+        r5.<init>();
+        goto L_0x0088;
+    L_0x007c:
+        r5 = r6.size();
+        r5 = r5 + -1;
+        r5 = r6.remove(r5);
+        r5 = (org.telegram.messenger.support.util.DiffUtil.Range) r5;
+    L_0x0088:
+        r10 = r3.oldListStart;
+        r5.oldListStart = r10;
+        r10 = r3.newListStart;
+        r5.newListStart = r10;
+        r10 = r4.reverse;
+        if (r10 == 0) goto L_0x009d;
+    L_0x0094:
+        r10 = r4.x;
+        r5.oldListEnd = r10;
+        r10 = r4.y;
+        r5.newListEnd = r10;
+        goto L_0x00b6;
+    L_0x009d:
+        r10 = r4.removal;
+        if (r10 == 0) goto L_0x00ac;
+    L_0x00a1:
+        r10 = r4.x;
+        r10 = r10 + -1;
+        r5.oldListEnd = r10;
+        r10 = r4.y;
+        r5.newListEnd = r10;
+        goto L_0x00b6;
+    L_0x00ac:
+        r10 = r4.x;
+        r5.oldListEnd = r10;
+        r10 = r4.y;
+        r10 = r10 + -1;
+        r5.newListEnd = r10;
+    L_0x00b6:
+        r9.add(r5);
+        r10 = r3;
+        r11 = r4.reverse;
+        if (r11 == 0) goto L_0x00e4;
+    L_0x00be:
+        r11 = r4.removal;
+        if (r11 == 0) goto L_0x00d3;
+    L_0x00c2:
+        r11 = r4.x;
+        r12 = r4.size;
+        r11 = r11 + r12;
+        r11 = r11 + 1;
+        r10.oldListStart = r11;
+        r11 = r4.y;
+        r12 = r4.size;
+        r11 = r11 + r12;
+        r10.newListStart = r11;
+        goto L_0x00f2;
+    L_0x00d3:
+        r11 = r4.x;
+        r12 = r4.size;
+        r11 = r11 + r12;
+        r10.oldListStart = r11;
+        r11 = r4.y;
+        r12 = r4.size;
+        r11 = r11 + r12;
+        r11 = r11 + 1;
+        r10.newListStart = r11;
+        goto L_0x00f2;
+    L_0x00e4:
+        r11 = r4.x;
+        r12 = r4.size;
+        r11 = r11 + r12;
+        r10.oldListStart = r11;
+        r11 = r4.y;
+        r12 = r4.size;
+        r11 = r11 + r12;
+        r10.newListStart = r11;
+    L_0x00f2:
+        r9.add(r10);
+        goto L_0x00f9;
+    L_0x00f6:
+        r6.add(r3);
+        r3 = r6;
+        goto L_0x0033;
+    L_0x00fd:
+        r3 = SNAKE_COMPARATOR;
+        java.util.Collections.sort(r2, r3);
+        r10 = new org.telegram.messenger.support.util.DiffUtil$DiffResult;
+        r3 = r10;
+        r4 = r19;
+        r5 = r2;
+        r11 = r6;
+        r6 = r8;
+        r12 = r7;
+        r13 = r8;
+        r8 = r20;
+        r3.<init>(r4, r5, r6, r7, r8);
+        return r10;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.util.DiffUtil.calculateDiff(org.telegram.messenger.support.util.DiffUtil$Callback, boolean):org.telegram.messenger.support.util.DiffUtil$DiffResult");
+    }
+
+    private static org.telegram.messenger.support.util.DiffUtil.Snake diffPartial(org.telegram.messenger.support.util.DiffUtil.Callback r1, int r2, int r3, int r4, int r5, int[] r6, int[] r7, int r8) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.util.DiffUtil.diffPartial(org.telegram.messenger.support.util.DiffUtil$Callback, int, int, int, int, int[], int[], int):org.telegram.messenger.support.util.DiffUtil$Snake
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = r21;
+        r4 = r26;
+        r5 = r27;
+        r6 = r23 - r22;
+        r7 = r25 - r24;
+        r8 = r23 - r22;
+        r9 = 1;
+        if (r8 < r9) goto L_0x017c;
+    L_0x000f:
+        r8 = r25 - r24;
+        if (r8 >= r9) goto L_0x0019;
+    L_0x0013:
+        r18 = r6;
+        r19 = r7;
+        goto L_0x0180;
+    L_0x0019:
+        r8 = r6 - r7;
+        r10 = r6 + r7;
+        r10 = r10 + r9;
+        r10 = r10 / 2;
+        r11 = r28 - r10;
+        r11 = r11 - r9;
+        r12 = r28 + r10;
+        r12 = r12 + r9;
+        r13 = 0;
+        java.util.Arrays.fill(r4, r11, r12, r13);
+        r11 = r28 - r10;
+        r11 = r11 - r9;
+        r11 = r11 + r8;
+        r12 = r28 + r10;
+        r12 = r12 + r9;
+        r12 = r12 + r8;
+        java.util.Arrays.fill(r5, r11, r12, r6);
+        r11 = r8 % 2;
+        if (r11 == 0) goto L_0x003b;
+    L_0x0039:
+        r11 = r9;
+        goto L_0x003c;
+    L_0x003b:
+        r11 = r13;
+    L_0x003c:
+        r12 = r13;
+        if (r12 > r10) goto L_0x0170;
+    L_0x003f:
+        r13 = -r12;
+        if (r13 > r12) goto L_0x00d9;
+    L_0x0042:
+        r9 = -r12;
+        if (r13 == r9) goto L_0x005f;
+    L_0x0045:
+        if (r13 == r12) goto L_0x0056;
+    L_0x0047:
+        r9 = r28 + r13;
+        r15 = 1;
+        r9 = r9 - r15;
+        r9 = r4[r9];
+        r16 = r28 + r13;
+        r16 = r16 + 1;
+        r2 = r4[r16];
+        if (r9 >= r2) goto L_0x0057;
+    L_0x0055:
+        goto L_0x0060;
+    L_0x0056:
+        r15 = 1;
+    L_0x0057:
+        r2 = r28 + r13;
+        r2 = r2 - r15;
+        r2 = r4[r2];
+        r2 = r2 + r15;
+        r9 = r15;
+        goto L_0x0066;
+    L_0x005f:
+        r15 = 1;
+    L_0x0060:
+        r2 = r28 + r13;
+        r2 = r2 + r15;
+        r2 = r4[r2];
+        r9 = 0;
+        r16 = r2 - r13;
+        r17 = r16;
+        if (r2 >= r6) goto L_0x008d;
+        r3 = r17;
+        if (r3 >= r7) goto L_0x0088;
+        r18 = r6;
+        r6 = r22 + r2;
+        r19 = r7;
+        r7 = r24 + r3;
+        r6 = r0.areItemsTheSame(r6, r7);
+        if (r6 == 0) goto L_0x0093;
+        r2 = r2 + 1;
+        r16 = r3 + 1;
+        r6 = r18;
+        r7 = r19;
+        goto L_0x0069;
+        r18 = r6;
+        r19 = r7;
+        goto L_0x0093;
+        r18 = r6;
+        r19 = r7;
+        r3 = r17;
+        r6 = r28 + r13;
+        r4[r6] = r2;
+        if (r11 == 0) goto L_0x00cf;
+        r6 = r8 - r12;
+        r7 = 1;
+        r6 = r6 + r7;
+        if (r13 < r6) goto L_0x00cf;
+        r6 = r8 + r12;
+        r6 = r6 - r7;
+        if (r13 > r6) goto L_0x00cf;
+        r6 = r28 + r13;
+        r6 = r4[r6];
+        r7 = r28 + r13;
+        r7 = r5[r7];
+        if (r6 < r7) goto L_0x00cf;
+        r6 = new org.telegram.messenger.support.util.DiffUtil$Snake;
+        r6.<init>();
+        r7 = r28 + r13;
+        r7 = r5[r7];
+        r6.x = r7;
+        r7 = r6.x;
+        r7 = r7 - r13;
+        r6.y = r7;
+        r7 = r28 + r13;
+        r7 = r4[r7];
+        r15 = r28 + r13;
+        r15 = r5[r15];
+        r7 = r7 - r15;
+        r6.size = r7;
+        r6.removal = r9;
+        r7 = 0;
+        r6.reverse = r7;
+        return r6;
+        r7 = 0;
+        r13 = r13 + 2;
+        r6 = r18;
+        r7 = r19;
+        r9 = 1;
+        goto L_0x0040;
+    L_0x00d9:
+        r18 = r6;
+        r19 = r7;
+        r7 = 0;
+        r2 = -r12;
+        if (r2 > r12) goto L_0x0165;
+        r3 = r2 + r8;
+        r6 = r12 + r8;
+        if (r3 == r6) goto L_0x0102;
+        r6 = -r12;
+        r6 = r6 + r8;
+        if (r3 == r6) goto L_0x00f9;
+        r6 = r28 + r3;
+        r15 = 1;
+        r6 = r6 - r15;
+        r6 = r5[r6];
+        r9 = r28 + r3;
+        r9 = r9 + r15;
+        r9 = r5[r9];
+        if (r6 >= r9) goto L_0x00fa;
+        goto L_0x0103;
+        r15 = 1;
+        r6 = r28 + r3;
+        r6 = r6 + r15;
+        r6 = r5[r6];
+        r6 = r6 - r15;
+        r9 = r15;
+        goto L_0x0109;
+        r15 = 1;
+        r6 = r28 + r3;
+        r6 = r6 - r15;
+        r6 = r5[r6];
+        r9 = 0;
+        r13 = r6 - r3;
+        if (r6 <= 0) goto L_0x0125;
+        if (r13 <= 0) goto L_0x0125;
+        r14 = r22 + r6;
+        r15 = 1;
+        r7 = r14 + -1;
+        r14 = r24 + r13;
+        r1 = r14 + -1;
+        r1 = r0.areItemsTheSame(r7, r1);
+        if (r1 == 0) goto L_0x0125;
+        r6 = r6 + -1;
+        r13 = r13 + -1;
+        r7 = 0;
+        goto L_0x010c;
+        r1 = r28 + r3;
+        r5[r1] = r6;
+        if (r11 != 0) goto L_0x015f;
+        r1 = r2 + r8;
+        r7 = -r12;
+        if (r1 < r7) goto L_0x015f;
+        r1 = r2 + r8;
+        if (r1 > r12) goto L_0x015f;
+        r1 = r28 + r3;
+        r1 = r4[r1];
+        r7 = r28 + r3;
+        r7 = r5[r7];
+        if (r1 < r7) goto L_0x015f;
+        r1 = new org.telegram.messenger.support.util.DiffUtil$Snake;
+        r1.<init>();
+        r7 = r28 + r3;
+        r7 = r5[r7];
+        r1.x = r7;
+        r7 = r1.x;
+        r7 = r7 - r3;
+        r1.y = r7;
+        r7 = r28 + r3;
+        r7 = r4[r7];
+        r14 = r28 + r3;
+        r14 = r5[r14];
+        r7 = r7 - r14;
+        r1.size = r7;
+        r1.removal = r9;
+        r7 = 1;
+        r1.reverse = r7;
+        return r1;
+        r7 = 1;
+        r2 = r2 + 2;
+        r7 = 0;
+        goto L_0x00df;
+        r7 = 1;
+        r12 = r12 + 1;
+        r9 = r7;
+        r6 = r18;
+        r7 = r19;
+        r13 = 0;
+        goto L_0x003d;
+    L_0x0170:
+        r18 = r6;
+        r19 = r7;
+        r1 = new java.lang.IllegalStateException;
+        r2 = "DiffUtil hit an unexpected case while trying to calculate the optimal path. Please make sure your data is not changing during the diff calculation.";
+        r1.<init>(r2);
+        throw r1;
+    L_0x017c:
+        r18 = r6;
+        r19 = r7;
+    L_0x0180:
+        r1 = 0;
+        return r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.util.DiffUtil.diffPartial(org.telegram.messenger.support.util.DiffUtil$Callback, int, int, int, int, int[], int[], int):org.telegram.messenger.support.util.DiffUtil$Snake");
+    }
+
     private DiffUtil() {
     }
 
     public static DiffResult calculateDiff(Callback cb) {
         return calculateDiff(cb, true);
-    }
-
-    public static DiffResult calculateDiff(Callback cb, boolean detectMoves) {
-        int oldSize = cb.getOldListSize();
-        int newSize = cb.getNewListSize();
-        List<Snake> snakes = new ArrayList();
-        List<Range> stack = new ArrayList();
-        stack.add(new Range(0, oldSize, 0, newSize));
-        int max = (oldSize + newSize) + Math.abs(oldSize - newSize);
-        int[] forward = new int[(max * 2)];
-        int[] backward = new int[(max * 2)];
-        List<Range> rangePool = new ArrayList();
-        while (!stack.isEmpty()) {
-            Range range = (Range) stack.remove(stack.size() - 1);
-            Snake snake = diffPartial(cb, range.oldListStart, range.oldListEnd, range.newListStart, range.newListEnd, forward, backward, max);
-            if (snake != null) {
-                Range left;
-                if (snake.size > 0) {
-                    snakes.add(snake);
-                }
-                snake.x += range.oldListStart;
-                snake.y += range.newListStart;
-                if (rangePool.isEmpty()) {
-                    left = new Range();
-                } else {
-                    left = (Range) rangePool.remove(rangePool.size() - 1);
-                }
-                left.oldListStart = range.oldListStart;
-                left.newListStart = range.newListStart;
-                if (snake.reverse) {
-                    left.oldListEnd = snake.x;
-                    left.newListEnd = snake.y;
-                } else if (snake.removal) {
-                    left.oldListEnd = snake.x - 1;
-                    left.newListEnd = snake.y;
-                } else {
-                    left.oldListEnd = snake.x;
-                    left.newListEnd = snake.y - 1;
-                }
-                stack.add(left);
-                Range right = range;
-                if (!snake.reverse) {
-                    right.oldListStart = snake.x + snake.size;
-                    right.newListStart = snake.y + snake.size;
-                } else if (snake.removal) {
-                    right.oldListStart = (snake.x + snake.size) + 1;
-                    right.newListStart = snake.y + snake.size;
-                } else {
-                    right.oldListStart = snake.x + snake.size;
-                    right.newListStart = (snake.y + snake.size) + 1;
-                }
-                stack.add(right);
-            } else {
-                rangePool.add(range);
-            }
-        }
-        Collections.sort(snakes, SNAKE_COMPARATOR);
-        return new DiffResult(cb, snakes, forward, backward, detectMoves);
-    }
-
-    private static Snake diffPartial(Callback cb, int startOld, int endOld, int startNew, int endNew, int[] forward, int[] backward, int kOffset) {
-        int oldSize = endOld - startOld;
-        int newSize = endNew - startNew;
-        if (endOld - startOld < 1 || endNew - startNew < 1) {
-            return null;
-        }
-        int delta = oldSize - newSize;
-        int dLimit = ((oldSize + newSize) + 1) / 2;
-        Arrays.fill(forward, (kOffset - dLimit) - 1, (kOffset + dLimit) + 1, 0);
-        Arrays.fill(backward, ((kOffset - dLimit) - 1) + delta, ((kOffset + dLimit) + 1) + delta, oldSize);
-        boolean checkInFwd = delta % 2 != 0;
-        int d = 0;
-        while (d <= dLimit) {
-            boolean removal;
-            int k = -d;
-            while (k <= d) {
-                int x;
-                if (k == (-d) || (k != d && forward[(kOffset + k) - 1] < forward[(kOffset + k) + 1])) {
-                    x = forward[(kOffset + k) + 1];
-                    removal = false;
-                } else {
-                    x = forward[(kOffset + k) - 1] + 1;
-                    removal = true;
-                }
-                int y = x - k;
-                while (x < oldSize && y < newSize) {
-                    if (!cb.areItemsTheSame(startOld + x, startNew + y)) {
-                        break;
-                    }
-                    x++;
-                    y++;
-                }
-                forward[kOffset + k] = x;
-                if (!checkInFwd || k < (delta - d) + 1 || k > (delta + d) - 1 || forward[kOffset + k] < backward[kOffset + k]) {
-                    k += 2;
-                } else {
-                    Snake outSnake = new Snake();
-                    outSnake.x = backward[kOffset + k];
-                    outSnake.y = outSnake.x - k;
-                    outSnake.size = forward[kOffset + k] - backward[kOffset + k];
-                    outSnake.removal = removal;
-                    outSnake.reverse = false;
-                    return outSnake;
-                }
-            }
-            k = -d;
-            while (k <= d) {
-                int backwardK = k + delta;
-                if (backwardK == d + delta || (backwardK != (-d) + delta && backward[(kOffset + backwardK) - 1] < backward[(kOffset + backwardK) + 1])) {
-                    x = backward[(kOffset + backwardK) - 1];
-                    removal = false;
-                } else {
-                    x = backward[(kOffset + backwardK) + 1] - 1;
-                    removal = true;
-                }
-                y = x - backwardK;
-                while (x > 0 && y > 0) {
-                    if (!cb.areItemsTheSame((startOld + x) - 1, (startNew + y) - 1)) {
-                        break;
-                    }
-                    x--;
-                    y--;
-                }
-                backward[kOffset + backwardK] = x;
-                if (checkInFwd || k + delta < (-d) || k + delta > d || forward[kOffset + backwardK] < backward[kOffset + backwardK]) {
-                    k += 2;
-                } else {
-                    outSnake = new Snake();
-                    outSnake.x = backward[kOffset + backwardK];
-                    outSnake.y = outSnake.x - backwardK;
-                    outSnake.size = forward[kOffset + backwardK] - backward[kOffset + backwardK];
-                    outSnake.removal = removal;
-                    outSnake.reverse = true;
-                    return outSnake;
-                }
-            }
-            d++;
-        }
-        throw new IllegalStateException("DiffUtil hit an unexpected case while trying to calculate the optimal path. Please make sure your data is not changing during the diff calculation.");
     }
 }

@@ -2,82 +2,82 @@ package com.google.android.gms.maps.model;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 import java.util.List;
 import org.telegram.ui.ActionBar.Theme;
 
-public final class CircleOptions extends zzbfm {
+public final class CircleOptions extends AbstractSafeParcelable {
     public static final Creator<CircleOptions> CREATOR = new zzc();
-    private int mFillColor = 0;
-    private int mStrokeColor = Theme.ACTION_BAR_VIDEO_EDIT_COLOR;
-    private float mStrokeWidth = 10.0f;
-    private LatLng zziuk = null;
-    private double zziul = 0.0d;
-    private float zzium = 0.0f;
-    private boolean zziun = true;
-    private boolean zziuo = false;
-    private List<PatternItem> zziup = null;
+    private int fillColor = 0;
+    private int strokeColor = Theme.ACTION_BAR_VIDEO_EDIT_COLOR;
+    private LatLng zzco = null;
+    private double zzcp = 0.0d;
+    private float zzcq = 10.0f;
+    private float zzcr = 0.0f;
+    private boolean zzcs = true;
+    private boolean zzct = false;
+    private List<PatternItem> zzcu = null;
 
     CircleOptions(LatLng latLng, double d, float f, int i, int i2, float f2, boolean z, boolean z2, List<PatternItem> list) {
-        this.zziuk = latLng;
-        this.zziul = d;
-        this.mStrokeWidth = f;
-        this.mStrokeColor = i;
-        this.mFillColor = i2;
-        this.zzium = f2;
-        this.zziun = z;
-        this.zziuo = z2;
-        this.zziup = list;
+        this.zzco = latLng;
+        this.zzcp = d;
+        this.zzcq = f;
+        this.strokeColor = i;
+        this.fillColor = i2;
+        this.zzcr = f2;
+        this.zzcs = z;
+        this.zzct = z2;
+        this.zzcu = list;
     }
 
     public final LatLng getCenter() {
-        return this.zziuk;
+        return this.zzco;
     }
 
     public final int getFillColor() {
-        return this.mFillColor;
+        return this.fillColor;
     }
 
     public final double getRadius() {
-        return this.zziul;
+        return this.zzcp;
     }
 
     public final int getStrokeColor() {
-        return this.mStrokeColor;
+        return this.strokeColor;
     }
 
     public final List<PatternItem> getStrokePattern() {
-        return this.zziup;
+        return this.zzcu;
     }
 
     public final float getStrokeWidth() {
-        return this.mStrokeWidth;
+        return this.zzcq;
     }
 
     public final float getZIndex() {
-        return this.zzium;
+        return this.zzcr;
     }
 
     public final boolean isClickable() {
-        return this.zziuo;
+        return this.zzct;
     }
 
     public final boolean isVisible() {
-        return this.zziun;
+        return this.zzcs;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 2, getCenter(), i, false);
-        zzbfp.zza(parcel, 3, getRadius());
-        zzbfp.zza(parcel, 4, getStrokeWidth());
-        zzbfp.zzc(parcel, 5, getStrokeColor());
-        zzbfp.zzc(parcel, 6, getFillColor());
-        zzbfp.zza(parcel, 7, getZIndex());
-        zzbfp.zza(parcel, 8, isVisible());
-        zzbfp.zza(parcel, 9, isClickable());
-        zzbfp.zzc(parcel, 10, getStrokePattern(), false);
-        zzbfp.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeParcelable(parcel, 2, getCenter(), i, false);
+        SafeParcelWriter.writeDouble(parcel, 3, getRadius());
+        SafeParcelWriter.writeFloat(parcel, 4, getStrokeWidth());
+        SafeParcelWriter.writeInt(parcel, 5, getStrokeColor());
+        SafeParcelWriter.writeInt(parcel, 6, getFillColor());
+        SafeParcelWriter.writeFloat(parcel, 7, getZIndex());
+        SafeParcelWriter.writeBoolean(parcel, 8, isVisible());
+        SafeParcelWriter.writeBoolean(parcel, 9, isClickable());
+        SafeParcelWriter.writeTypedList(parcel, 10, getStrokePattern(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -1,27 +1,51 @@
 package com.google.android.gms.common.api.internal;
 
-import com.google.android.gms.common.api.Api.zze;
-import java.util.ArrayList;
+import android.os.Bundle;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.Api.AnyClient;
+import com.google.android.gms.common.api.Api.Client;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.internal.BaseImplementation.ApiMethodImpl;
+import java.util.Collections;
 
-final class zzau extends zzay {
-    private /* synthetic */ zzao zzfrl;
-    private final ArrayList<zze> zzfrr;
+public final class zzau implements zzbc {
+    private final zzbd zzhf;
 
-    public zzau(zzao com_google_android_gms_common_api_internal_zzao, ArrayList<zze> arrayList) {
-        this.zzfrl = com_google_android_gms_common_api_internal_zzao;
-        super(com_google_android_gms_common_api_internal_zzao);
-        this.zzfrr = arrayList;
+    public zzau(zzbd com_google_android_gms_common_api_internal_zzbd) {
+        this.zzhf = com_google_android_gms_common_api_internal_zzbd;
     }
 
-    public final void zzaib() {
-        this.zzfrl.zzfqv.zzfpi.zzfsc = this.zzfrl.zzaih();
-        ArrayList arrayList = this.zzfrr;
-        int size = arrayList.size();
-        int i = 0;
-        while (i < size) {
-            Object obj = arrayList.get(i);
-            i++;
-            ((zze) obj).zza(this.zzfrl.zzfrh, this.zzfrl.zzfqv.zzfpi.zzfsc);
+    public final void begin() {
+        for (Client disconnect : this.zzhf.zzil.values()) {
+            disconnect.disconnect();
         }
+        this.zzhf.zzfq.zzim = Collections.emptySet();
+    }
+
+    public final void connect() {
+        this.zzhf.zzbc();
+    }
+
+    public final boolean disconnect() {
+        return true;
+    }
+
+    public final <A extends AnyClient, R extends Result, T extends ApiMethodImpl<R, A>> T enqueue(T t) {
+        this.zzhf.zzfq.zzgo.add(t);
+        return t;
+    }
+
+    public final <A extends AnyClient, T extends ApiMethodImpl<? extends Result, A>> T execute(T t) {
+        throw new IllegalStateException("GoogleApiClient is not connected yet.");
+    }
+
+    public final void onConnected(Bundle bundle) {
+    }
+
+    public final void onConnectionSuspended(int i) {
+    }
+
+    public final void zza(ConnectionResult connectionResult, Api<?> api, boolean z) {
     }
 }

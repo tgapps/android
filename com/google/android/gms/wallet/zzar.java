@@ -2,23 +2,23 @@ package com.google.android.gms.wallet;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class zzar extends zzbfm {
+public final class zzar extends AbstractSafeParcelable {
     public static final Creator<zzar> CREATOR = new zzas();
-    private String zzlee;
+    private String zzeu;
 
     private zzar() {
     }
 
     zzar(String str) {
-        this.zzlee = str;
+        this.zzeu = str;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 2, this.zzlee, false);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, this.zzeu, false);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

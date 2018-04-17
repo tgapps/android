@@ -75,8 +75,6 @@ public class NotificationCompat {
             }
 
             public Action build() {
-                RemoteInput[] dataOnlyInputsArr;
-                RemoteInput[] textInputsArr;
                 List<RemoteInput> dataOnlyInputs = new ArrayList();
                 List<RemoteInput> textInputs = new ArrayList();
                 if (this.mRemoteInputs != null) {
@@ -90,17 +88,12 @@ public class NotificationCompat {
                         }
                     }
                 }
-                if (dataOnlyInputs.isEmpty()) {
-                    dataOnlyInputsArr = null;
-                } else {
-                    dataOnlyInputsArr = (RemoteInput[]) dataOnlyInputs.toArray(new RemoteInput[dataOnlyInputs.size()]);
+                RemoteInput[] remoteInputArr = null;
+                RemoteInput[] dataOnlyInputsArr = dataOnlyInputs.isEmpty() ? null : (RemoteInput[]) dataOnlyInputs.toArray(new RemoteInput[dataOnlyInputs.size()]);
+                if (!textInputs.isEmpty()) {
+                    remoteInputArr = (RemoteInput[]) textInputs.toArray(new RemoteInput[textInputs.size()]);
                 }
-                if (textInputs.isEmpty()) {
-                    textInputsArr = null;
-                } else {
-                    textInputsArr = (RemoteInput[]) textInputs.toArray(new RemoteInput[textInputs.size()]);
-                }
-                return new Action(this.mIcon, this.mTitle, this.mIntent, this.mExtras, textInputsArr, dataOnlyInputsArr, this.mAllowGeneratedReplies);
+                return new Action(this.mIcon, this.mTitle, this.mIntent, this.mExtras, remoteInputArr, dataOnlyInputsArr, this.mAllowGeneratedReplies);
             }
         }
 
@@ -112,10 +105,7 @@ public class NotificationCompat {
             this.icon = icon;
             this.title = Builder.limitCharSequenceLength(title);
             this.actionIntent = intent;
-            if (extras == null) {
-                extras = new Bundle();
-            }
-            this.mExtras = extras;
+            this.mExtras = extras != null ? extras : new Bundle();
             this.mRemoteInputs = remoteInputs;
             this.mDataOnlyRemoteInputs = dataOnlyRemoteInputs;
             this.mAllowGeneratedReplies = allowGeneratedReplies;
@@ -280,12 +270,18 @@ public class NotificationCompat {
         public Builder setSound(Uri sound) {
             this.mNotification.sound = sound;
             this.mNotification.audioStreamType = -1;
+            if (VERSION.SDK_INT >= 21) {
+                this.mNotification.audioAttributes = new android.media.AudioAttributes.Builder().setContentType(4).setUsage(5).build();
+            }
             return this;
         }
 
         public Builder setSound(Uri sound, int streamType) {
             this.mNotification.sound = sound;
             this.mNotification.audioStreamType = streamType;
+            if (VERSION.SDK_INT >= 21) {
+                this.mNotification.audioAttributes = new android.media.AudioAttributes.Builder().setContentType(4).setLegacyStreamType(streamType).build();
+            }
             return this;
         }
 
@@ -295,20 +291,15 @@ public class NotificationCompat {
         }
 
         public Builder setLights(int argb, int onMs, int offMs) {
-            boolean showLights;
-            int i = 1;
             this.mNotification.ledARGB = argb;
             this.mNotification.ledOnMS = onMs;
             this.mNotification.ledOffMS = offMs;
-            if (this.mNotification.ledOnMS == 0 || this.mNotification.ledOffMS == 0) {
-                showLights = false;
-            } else {
-                showLights = true;
-            }
+            int i = 0;
+            boolean showLights = (this.mNotification.ledOnMS == 0 || this.mNotification.ledOffMS == 0) ? false : true;
             Notification notification = this.mNotification;
             int i2 = this.mNotification.flags & -2;
-            if (!showLights) {
-                i = 0;
+            if (showLights) {
+                i = 1;
             }
             notification.flags = i | i2;
             return this;
@@ -425,8 +416,11 @@ public class NotificationCompat {
         }
 
         protected static CharSequence limitCharSequenceLength(CharSequence cs) {
-            if (cs != null && cs.length() > 5120) {
-                return cs.subSequence(0, 5120);
+            if (cs == null) {
+                return cs;
+            }
+            if (cs.length() > 5120) {
+                cs = cs.subSequence(0, 5120);
             }
             return cs;
         }
@@ -580,15 +574,17 @@ public class NotificationCompat {
         private static Bundle getBundleForUnreadConversation(UnreadConversation uc) {
             Bundle b = new Bundle();
             String author = null;
+            int i = 0;
             if (uc.getParticipants() != null && uc.getParticipants().length > 1) {
                 author = uc.getParticipants()[0];
             }
             Parcelable[] messages = new Parcelable[uc.getMessages().length];
-            for (int i = 0; i < messages.length; i++) {
+            while (i < messages.length) {
                 Bundle m = new Bundle();
                 m.putString(MimeTypes.BASE_TYPE_TEXT, uc.getMessages()[i]);
                 m.putString("author", author);
                 messages[i] = m;
+                i++;
             }
             b.putParcelableArray("messages", messages);
             RemoteInput remoteInputCompat = uc.getRemoteInput();
@@ -603,19 +599,20 @@ public class NotificationCompat {
         }
 
         public Builder extend(Builder builder) {
-            if (VERSION.SDK_INT >= 21) {
-                Bundle carExtensions = new Bundle();
-                if (this.mLargeIcon != null) {
-                    carExtensions.putParcelable("large_icon", this.mLargeIcon);
-                }
-                if (this.mColor != 0) {
-                    carExtensions.putInt("app_color", this.mColor);
-                }
-                if (this.mUnreadConversation != null) {
-                    carExtensions.putBundle("car_conversation", getBundleForUnreadConversation(this.mUnreadConversation));
-                }
-                builder.getExtras().putBundle("android.car.EXTENSIONS", carExtensions);
+            if (VERSION.SDK_INT < 21) {
+                return builder;
             }
+            Bundle carExtensions = new Bundle();
+            if (this.mLargeIcon != null) {
+                carExtensions.putParcelable("large_icon", this.mLargeIcon);
+            }
+            if (this.mColor != 0) {
+                carExtensions.putInt("app_color", this.mColor);
+            }
+            if (this.mUnreadConversation != null) {
+                carExtensions.putBundle("car_conversation", getBundleForUnreadConversation(this.mUnreadConversation));
+            }
+            builder.getExtras().putBundle("android.car.EXTENSIONS", carExtensions);
             return builder;
         }
 
@@ -749,13 +746,12 @@ public class NotificationCompat {
         }
 
         public void apply(NotificationBuilderWithBuilderAccessor builder) {
-            Message message;
             if (VERSION.SDK_INT >= 24) {
                 android.app.Notification.MessagingStyle style = new android.app.Notification.MessagingStyle(this.mUserDisplayName).setConversationTitle(this.mConversationTitle);
-                for (Message message2 : this.mMessages) {
-                    android.app.Notification.MessagingStyle.Message frameworkMessage = new android.app.Notification.MessagingStyle.Message(message2.getText(), message2.getTimestamp(), message2.getSender());
-                    if (message2.getDataMimeType() != null) {
-                        frameworkMessage.setData(message2.getDataMimeType(), message2.getDataUri());
+                for (Message message : this.mMessages) {
+                    android.app.Notification.MessagingStyle.Message frameworkMessage = new android.app.Notification.MessagingStyle.Message(message.getText(), message.getTimestamp(), message.getSender());
+                    if (message.getDataMimeType() != null) {
+                        frameworkMessage.setData(message.getDataMimeType(), message.getDataUri());
                     }
                     style.addMessage(frameworkMessage);
                 }
@@ -780,15 +776,29 @@ public class NotificationCompat {
             }
             if (VERSION.SDK_INT >= 16) {
                 boolean showNames;
+                int i;
+                Message message2;
+                CharSequence line;
                 SpannableStringBuilder completeMessage = new SpannableStringBuilder();
-                if (this.mConversationTitle != null || hasMessagesWithoutSender()) {
-                    showNames = true;
-                } else {
-                    showNames = false;
+                if (this.mConversationTitle == null) {
+                    if (!hasMessagesWithoutSender()) {
+                        showNames = false;
+                        for (i = this.mMessages.size() - 1; i >= 0; i--) {
+                            message2 = (Message) this.mMessages.get(i);
+                            line = showNames ? makeMessageLine(message2) : message2.getText();
+                            if (i != this.mMessages.size() - 1) {
+                                completeMessage.insert(0, "\n");
+                            }
+                            completeMessage.insert(0, line);
+                        }
+                        new android.app.Notification.BigTextStyle(builder.getBuilder()).setBigContentTitle(null).bigText(completeMessage);
+                    }
                 }
-                for (int i = this.mMessages.size() - 1; i >= 0; i--) {
+                showNames = true;
+                for (i = this.mMessages.size() - 1; i >= 0; i--) {
                     message2 = (Message) this.mMessages.get(i);
-                    CharSequence line = showNames ? makeMessageLine(message2) : message2.getText();
+                    if (showNames) {
+                    }
                     if (i != this.mMessages.size() - 1) {
                         completeMessage.insert(0, "\n");
                     }
@@ -828,9 +838,8 @@ public class NotificationCompat {
             CharSequence replyName = message.getSender();
             if (TextUtils.isEmpty(message.getSender())) {
                 replyName = this.mUserDisplayName == null ? TtmlNode.ANONYMOUS_REGION_ID : this.mUserDisplayName;
-                if (afterLollipop && this.mBuilder.getColor() != 0) {
-                    color = this.mBuilder.getColor();
-                }
+                int color2 = (!afterLollipop || this.mBuilder.getColor() == 0) ? color : this.mBuilder.getColor();
+                color = color2;
             }
             CharSequence senderText = bidi.unicodeWrap(replyName);
             sb.append(senderText);

@@ -1,50 +1,101 @@
 package com.google.android.gms.common.internal;
 
-import android.util.Log;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import java.util.HashSet;
+import java.util.Set;
 
-public abstract class zzi<TListener> {
-    private TListener zzfuk;
-    private /* synthetic */ zzd zzfza;
-    private boolean zzfzb = false;
+final class zzi implements ServiceConnection {
+    private ComponentName mComponentName;
+    private int mState = 2;
+    private IBinder zzry;
+    private final Set<ServiceConnection> zztv = new HashSet();
+    private boolean zztw;
+    private final ConnectionStatusConfig zztx;
+    private final /* synthetic */ zzh zzty;
 
-    public zzi(zzd com_google_android_gms_common_internal_zzd, TListener tListener) {
-        this.zzfza = com_google_android_gms_common_internal_zzd;
-        this.zzfuk = tListener;
+    public zzi(zzh com_google_android_gms_common_internal_zzh, ConnectionStatusConfig connectionStatusConfig) {
+        this.zzty = com_google_android_gms_common_internal_zzh;
+        this.zztx = connectionStatusConfig;
     }
 
-    public final void removeListener() {
-        synchronized (this) {
-            this.zzfuk = null;
-        }
+    public final IBinder getBinder() {
+        return this.zzry;
     }
 
-    public final void unregister() {
-        removeListener();
-        synchronized (this.zzfza.zzfyo) {
-            this.zzfza.zzfyo.remove(this);
-        }
+    public final ComponentName getComponentName() {
+        return this.mComponentName;
     }
 
-    public final void zzaks() {
-        synchronized (this) {
-            Object obj = this.zzfuk;
-            if (this.zzfzb) {
-                String valueOf = String.valueOf(this);
-                Log.w("GmsClient", new StringBuilder(String.valueOf(valueOf).length() + 47).append("Callback proxy ").append(valueOf).append(" being reused. This is not safe.").toString());
+    public final int getState() {
+        return this.mState;
+    }
+
+    public final boolean isBound() {
+        return this.zztw;
+    }
+
+    public final void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        synchronized (this.zzty.zztr) {
+            this.zzty.mHandler.removeMessages(1, this.zztx);
+            this.zzry = iBinder;
+            this.mComponentName = componentName;
+            for (ServiceConnection onServiceConnected : this.zztv) {
+                onServiceConnected.onServiceConnected(componentName, iBinder);
             }
+            this.mState = 1;
         }
-        if (obj != null) {
-            try {
-                zzw(obj);
-            } catch (RuntimeException e) {
-                throw e;
-            }
-        }
-        synchronized (this) {
-            this.zzfzb = true;
-        }
-        unregister();
     }
 
-    protected abstract void zzw(TListener tListener);
+    public final void onServiceDisconnected(ComponentName componentName) {
+        synchronized (this.zzty.zztr) {
+            this.zzty.mHandler.removeMessages(1, this.zztx);
+            this.zzry = null;
+            this.mComponentName = componentName;
+            for (ServiceConnection onServiceDisconnected : this.zztv) {
+                onServiceDisconnected.onServiceDisconnected(componentName);
+            }
+            this.mState = 2;
+        }
+    }
+
+    public final void zza(ServiceConnection serviceConnection, String str) {
+        this.zzty.zzts.logConnectService(this.zzty.zzau, serviceConnection, str, this.zztx.getStartServiceIntent(this.zzty.zzau));
+        this.zztv.add(serviceConnection);
+    }
+
+    public final boolean zza(ServiceConnection serviceConnection) {
+        return this.zztv.contains(serviceConnection);
+    }
+
+    public final void zzb(ServiceConnection serviceConnection, String str) {
+        this.zzty.zzts.logDisconnectService(this.zzty.zzau, serviceConnection);
+        this.zztv.remove(serviceConnection);
+    }
+
+    public final boolean zzcv() {
+        return this.zztv.isEmpty();
+    }
+
+    public final void zzj(String str) {
+        this.mState = 3;
+        this.zztw = this.zzty.zzts.bindService(this.zzty.zzau, str, this.zztx.getStartServiceIntent(this.zzty.zzau), this, this.zztx.getBindFlags());
+        if (this.zztw) {
+            this.zzty.mHandler.sendMessageDelayed(this.zzty.mHandler.obtainMessage(1, this.zztx), this.zzty.zztu);
+            return;
+        }
+        this.mState = 2;
+        try {
+            this.zzty.zzts.unbindService(this.zzty.zzau, this);
+        } catch (IllegalArgumentException e) {
+        }
+    }
+
+    public final void zzk(String str) {
+        this.zzty.mHandler.removeMessages(1, this.zztx);
+        this.zzty.zzts.unbindService(this.zzty.zzau, this);
+        this.zztw = false;
+        this.mState = 2;
+    }
 }

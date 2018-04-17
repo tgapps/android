@@ -16,34 +16,34 @@ public final class R {
     }
 
     public static final class id {
-        public static final int button_add_response = 2131230737;
-        public static final int button_attachment = 2131230738;
-        public static final int button_login = 2131230739;
-        public static final int button_refresh = 2131230740;
-        public static final int button_send = 2131230741;
-        public static final int button_update = 2131230742;
-        public static final int input_email = 2131230767;
-        public static final int input_message = 2131230768;
-        public static final int input_name = 2131230769;
-        public static final int input_password = 2131230770;
-        public static final int input_subject = 2131230771;
-        public static final int label_author = 2131230773;
-        public static final int label_date = 2131230774;
-        public static final int label_last_updated = 2131230775;
-        public static final int label_message = 2131230776;
-        public static final int label_text = 2131230777;
-        public static final int label_title = 2131230778;
-        public static final int label_version = 2131230779;
-        public static final int list_attachments = 2131230783;
-        public static final int list_feedback_messages = 2131230784;
-        public static final int text_headline = 2131230824;
-        public static final int view_header = 2131230828;
-        public static final int web_update_details = 2131230829;
-        public static final int wrapper_attachments = 2131230832;
-        public static final int wrapper_feedback = 2131230833;
-        public static final int wrapper_feedback_scroll = 2131230834;
-        public static final int wrapper_messages = 2131230835;
-        public static final int wrapper_messages_buttons = 2131230836;
+        public static final int button_add_response = 2131230739;
+        public static final int button_attachment = 2131230740;
+        public static final int button_login = 2131230741;
+        public static final int button_refresh = 2131230742;
+        public static final int button_send = 2131230743;
+        public static final int button_update = 2131230744;
+        public static final int input_email = 2131230779;
+        public static final int input_message = 2131230780;
+        public static final int input_name = 2131230781;
+        public static final int input_password = 2131230782;
+        public static final int input_subject = 2131230783;
+        public static final int label_author = 2131230785;
+        public static final int label_date = 2131230786;
+        public static final int label_last_updated = 2131230787;
+        public static final int label_message = 2131230788;
+        public static final int label_text = 2131230789;
+        public static final int label_title = 2131230790;
+        public static final int label_version = 2131230791;
+        public static final int list_attachments = 2131230796;
+        public static final int list_feedback_messages = 2131230797;
+        public static final int text_headline = 2131230840;
+        public static final int view_header = 2131230845;
+        public static final int web_update_details = 2131230846;
+        public static final int wrapper_attachments = 2131230849;
+        public static final int wrapper_feedback = 2131230850;
+        public static final int wrapper_feedback_scroll = 2131230851;
+        public static final int wrapper_messages = 2131230852;
+        public static final int wrapper_messages_buttons = 2131230853;
     }
 
     public static final class layout {

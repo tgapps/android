@@ -13,6 +13,11 @@ public class StripeJsonUtils {
     }
 
     static String nullIfNullOrEmpty(String possibleNull) {
-        return ("null".equals(possibleNull) || TtmlNode.ANONYMOUS_REGION_ID.equals(possibleNull)) ? null : possibleNull;
+        if (!"null".equals(possibleNull)) {
+            if (!TtmlNode.ANONYMOUS_REGION_ID.equals(possibleNull)) {
+                return possibleNull;
+            }
+        }
+        return null;
     }
 }

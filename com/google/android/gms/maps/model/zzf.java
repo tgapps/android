@@ -2,29 +2,29 @@ package com.google.android.gms.maps.model;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzf implements Creator<LatLng> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         double d = 0.0d;
-        int zzd = zzbfn.zzd(parcel);
         double d2 = 0.0d;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    d2 = zzbfn.zzn(parcel, readInt);
+                    d = SafeParcelReader.readDouble(parcel, readHeader);
                     break;
                 case 3:
-                    d = zzbfn.zzn(parcel, readInt);
+                    d2 = SafeParcelReader.readDouble(parcel, readHeader);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new LatLng(d2, d);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new LatLng(d, d2);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

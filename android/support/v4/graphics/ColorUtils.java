@@ -20,7 +20,7 @@ public final class ColorUtils {
         if (a == 0) {
             return 0;
         }
-        return (((fgC * 255) * fgA) + ((bgC * bgA) * (255 - fgA))) / (a * 255);
+        return (((255 * fgC) * fgA) + ((bgC * bgA) * (255 - fgA))) / (a * 255);
     }
 
     public static double calculateLuminance(int color) {
@@ -31,7 +31,10 @@ public final class ColorUtils {
 
     public static double calculateContrast(int foreground, int background) {
         if (Color.alpha(background) != 255) {
-            throw new IllegalArgumentException("background can not be translucent: #" + Integer.toHexString(background));
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("background can not be translucent: #");
+            stringBuilder.append(Integer.toHexString(background));
+            throw new IllegalArgumentException(stringBuilder.toString());
         }
         if (Color.alpha(foreground) < 255) {
             foreground = compositeColors(foreground, background);
@@ -42,13 +45,16 @@ public final class ColorUtils {
     }
 
     public static int calculateMinimumAlpha(int foreground, int background, float minContrastRatio) {
+        int maxAlpha = 255;
         if (Color.alpha(background) != 255) {
-            throw new IllegalArgumentException("background can not be translucent: #" + Integer.toHexString(background));
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("background can not be translucent: #");
+            stringBuilder.append(Integer.toHexString(background));
+            throw new IllegalArgumentException(stringBuilder.toString());
         } else if (calculateContrast(setAlphaComponent(foreground, 255), background) < ((double) minContrastRatio)) {
             return -1;
         } else {
             int minAlpha = 0;
-            int maxAlpha = 255;
             for (int numIterations = 0; numIterations <= 10 && maxAlpha - minAlpha > 1; numIterations++) {
                 int testAlpha = (minAlpha + maxAlpha) / 2;
                 if (calculateContrast(setAlphaComponent(foreground, testAlpha), background) < ((double) minContrastRatio)) {
@@ -81,14 +87,15 @@ public final class ColorUtils {
                 h = ((bf - rf) / deltaMaxMin) + 2.0f;
             } else {
                 h = ((rf - gf) / deltaMaxMin) + 4.0f;
+                s = deltaMaxMin / (1.0f - Math.abs((2.0f * l) - 1.0f));
             }
             s = deltaMaxMin / (1.0f - Math.abs((2.0f * l) - 1.0f));
         }
-        h = (60.0f * h) % 360.0f;
-        if (h < 0.0f) {
-            h += 360.0f;
+        float h2 = (60.0f * h) % 360.0f;
+        if (h2 < 0.0f) {
+            h2 += 360.0f;
         }
-        outHsl[0] = constrain(h, 0.0f, 360.0f);
+        outHsl[0] = constrain(h2, 0.0f, 360.0f);
         outHsl[1] = constrain(s, 0.0f, 1.0f);
         outHsl[2] = constrain(l, 0.0f, 1.0f);
     }
@@ -98,8 +105,10 @@ public final class ColorUtils {
     }
 
     public static int setAlphaComponent(int color, int alpha) {
-        if (alpha >= 0 && alpha <= 255) {
-            return (16777215 & color) | (alpha << 24);
+        if (alpha >= 0) {
+            if (alpha <= 255) {
+                return (16777215 & color) | (alpha << 24);
+            }
         }
         throw new IllegalArgumentException("alpha must be between 0 and 255.");
     }
@@ -109,18 +118,19 @@ public final class ColorUtils {
     }
 
     public static void RGBToXYZ(int r, int g, int b, double[] outXyz) {
-        if (outXyz.length != 3) {
+        double[] dArr = outXyz;
+        if (dArr.length != 3) {
             throw new IllegalArgumentException("outXyz must have a length of 3.");
         }
         double sr = ((double) r) / 255.0d;
-        sr = sr < 0.04045d ? sr / 12.92d : Math.pow((0.055d + sr) / 1.055d, 2.4d);
+        sr = sr < 0.04045d ? sr / 12.92d : Math.pow((sr + 0.055d) / 1.055d, 2.4d);
         double sg = ((double) g) / 255.0d;
-        sg = sg < 0.04045d ? sg / 12.92d : Math.pow((0.055d + sg) / 1.055d, 2.4d);
+        double sg2 = sg < 0.04045d ? sg / 12.92d : Math.pow((sg + 0.055d) / 1.055d, 2.4d);
         double sb = ((double) b) / 255.0d;
-        sb = sb < 0.04045d ? sb / 12.92d : Math.pow((0.055d + sb) / 1.055d, 2.4d);
-        outXyz[0] = 100.0d * (((0.4124d * sr) + (0.3576d * sg)) + (0.1805d * sb));
-        outXyz[1] = 100.0d * (((0.2126d * sr) + (0.7152d * sg)) + (0.0722d * sb));
-        outXyz[2] = 100.0d * (((0.0193d * sr) + (0.1192d * sg)) + (0.9505d * sb));
+        double sb2 = sb < 0.04045d ? sb / 12.92d : Math.pow((0.055d + sb) / 1.055d, 2.4d);
+        dArr[0] = (((0.4124d * sr) + (0.3576d * sg2)) + (0.1805d * sb2)) * 100.0d;
+        dArr[1] = (((0.2126d * sr) + (0.7152d * sg2)) + (0.0722d * sb2)) * 100.0d;
+        dArr[2] = 100.0d * (((0.0193d * sr) + (0.1192d * sg2)) + (0.9505d * sb2));
     }
 
     private static float constrain(float amount, float low, float high) {

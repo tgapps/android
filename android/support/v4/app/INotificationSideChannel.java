@@ -82,34 +82,35 @@ public interface INotificationSideChannel extends IInterface {
         }
 
         public boolean onTransact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
-            switch (code) {
-                case 1:
-                    Notification _arg3;
-                    data.enforceInterface("android.support.v4.app.INotificationSideChannel");
-                    String _arg0 = data.readString();
-                    int _arg1 = data.readInt();
-                    String _arg2 = data.readString();
-                    if (data.readInt() != 0) {
-                        _arg3 = (Notification) Notification.CREATOR.createFromParcel(data);
-                    } else {
-                        _arg3 = null;
-                    }
-                    notify(_arg0, _arg1, _arg2, _arg3);
-                    return true;
-                case 2:
-                    data.enforceInterface("android.support.v4.app.INotificationSideChannel");
-                    cancel(data.readString(), data.readInt(), data.readString());
-                    return true;
-                case 3:
-                    data.enforceInterface("android.support.v4.app.INotificationSideChannel");
-                    cancelAll(data.readString());
-                    return true;
-                case 1598968902:
-                    reply.writeString("android.support.v4.app.INotificationSideChannel");
-                    return true;
-                default:
-                    return super.onTransact(code, data, reply, flags);
+            if (code != 1598968902) {
+                switch (code) {
+                    case 1:
+                        Notification _arg3;
+                        data.enforceInterface("android.support.v4.app.INotificationSideChannel");
+                        String _arg0 = data.readString();
+                        int _arg1 = data.readInt();
+                        String _arg2 = data.readString();
+                        if (data.readInt() != 0) {
+                            _arg3 = (Notification) Notification.CREATOR.createFromParcel(data);
+                        } else {
+                            _arg3 = null;
+                        }
+                        notify(_arg0, _arg1, _arg2, _arg3);
+                        return true;
+                    case 2:
+                        data.enforceInterface("android.support.v4.app.INotificationSideChannel");
+                        cancel(data.readString(), data.readInt(), data.readString());
+                        return true;
+                    case 3:
+                        data.enforceInterface("android.support.v4.app.INotificationSideChannel");
+                        cancelAll(data.readString());
+                        return true;
+                    default:
+                        return super.onTransact(code, data, reply, flags);
+                }
             }
+            reply.writeString("android.support.v4.app.INotificationSideChannel");
+            return true;
         }
     }
 

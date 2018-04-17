@@ -2,27 +2,33 @@ package com.google.android.gms.maps.model;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.zzbg;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
-import java.util.Arrays;
+import com.google.android.gms.common.internal.Objects;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public class PatternItem extends zzbfm {
+public class PatternItem extends AbstractSafeParcelable {
     public static final Creator<PatternItem> CREATOR = new zzi();
     private static final String TAG = PatternItem.class.getSimpleName();
     private final int type;
-    private final Float zzivm;
+    private final Float zzdu;
 
     public PatternItem(int i, Float f) {
         boolean z = true;
-        if (i != 1 && (f == null || f.floatValue() < 0.0f)) {
-            z = false;
+        if (i != 1) {
+            if (f == null || f.floatValue() < 0.0f) {
+                z = false;
+            }
         }
         String valueOf = String.valueOf(f);
-        zzbq.checkArgument(z, new StringBuilder(String.valueOf(valueOf).length() + 45).append("Invalid PatternItem: type=").append(i).append(" length=").append(valueOf).toString());
+        StringBuilder stringBuilder = new StringBuilder(45 + String.valueOf(valueOf).length());
+        stringBuilder.append("Invalid PatternItem: type=");
+        stringBuilder.append(i);
+        stringBuilder.append(" length=");
+        stringBuilder.append(valueOf);
+        Preconditions.checkArgument(z, stringBuilder.toString());
         this.type = i;
-        this.zzivm = f;
+        this.zzdu = f;
     }
 
     public boolean equals(Object obj) {
@@ -33,23 +39,29 @@ public class PatternItem extends zzbfm {
             return false;
         }
         PatternItem patternItem = (PatternItem) obj;
-        return this.type == patternItem.type && zzbg.equal(this.zzivm, patternItem.zzivm);
+        return this.type == patternItem.type && Objects.equal(this.zzdu, patternItem.zzdu);
     }
 
     public int hashCode() {
-        return Arrays.hashCode(new Object[]{Integer.valueOf(this.type), this.zzivm});
+        return Objects.hashCode(Integer.valueOf(this.type), this.zzdu);
     }
 
     public String toString() {
         int i = this.type;
-        String valueOf = String.valueOf(this.zzivm);
-        return new StringBuilder(String.valueOf(valueOf).length() + 39).append("[PatternItem: type=").append(i).append(" length=").append(valueOf).append("]").toString();
+        String valueOf = String.valueOf(this.zzdu);
+        StringBuilder stringBuilder = new StringBuilder(39 + String.valueOf(valueOf).length());
+        stringBuilder.append("[PatternItem: type=");
+        stringBuilder.append(i);
+        stringBuilder.append(" length=");
+        stringBuilder.append(valueOf);
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 2, this.type);
-        zzbfp.zza(parcel, 3, this.zzivm, false);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 2, this.type);
+        SafeParcelWriter.writeFloatObject(parcel, 3, this.zzdu, false);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

@@ -35,7 +35,14 @@ public class UserBox extends AbstractBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_0, this, this));
-        return "UserBox[type=" + getType() + ";userType=" + new String(getUserType()) + ";contentLength=" + this.data.length + "]";
+        StringBuilder stringBuilder = new StringBuilder("UserBox[type=");
+        stringBuilder.append(getType());
+        stringBuilder.append(";userType=");
+        stringBuilder.append(new String(getUserType()));
+        stringBuilder.append(";contentLength=");
+        stringBuilder.append(this.data.length);
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 
     public byte[] getData() {

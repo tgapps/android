@@ -1,21 +1,33 @@
 package com.google.android.gms.common.api;
 
-import android.os.Looper;
-import com.google.android.gms.common.api.GoogleApi.zza;
-import com.google.android.gms.common.api.internal.zzcz;
-import com.google.android.gms.common.api.internal.zzg;
+import android.os.Parcel;
+import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
-public final class zzd {
-    private Looper zzall;
-    private zzcz zzfmh;
+public final class zzd implements Creator<Scope> {
+    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        int i = 0;
+        String str = null;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 1:
+                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    break;
+                case 2:
+                    str = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
+            }
+        }
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new Scope(i, str);
+    }
 
-    public final zza zzagq() {
-        if (this.zzfmh == null) {
-            this.zzfmh = new zzg();
-        }
-        if (this.zzall == null) {
-            this.zzall = Looper.getMainLooper();
-        }
-        return new zza(this.zzfmh, this.zzall);
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new Scope[i];
     }
 }

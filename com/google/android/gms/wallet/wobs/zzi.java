@@ -2,32 +2,33 @@ package com.google.android.gms.wallet.wobs;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzi implements Creator<LoyaltyPoints> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzbfn.zzd(parcel);
-        TimeInterval timeInterval = null;
-        LoyaltyPointsBalance loyaltyPointsBalance = null;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
-                case 2:
-                    str = zzbfn.zzq(parcel, readInt);
-                    break;
-                case 3:
-                    loyaltyPointsBalance = (LoyaltyPointsBalance) zzbfn.zza(parcel, readInt, LoyaltyPointsBalance.CREATOR);
-                    break;
-                case 5:
-                    timeInterval = (TimeInterval) zzbfn.zza(parcel, readInt, TimeInterval.CREATOR);
-                    break;
-                default:
-                    zzbfn.zzb(parcel, readInt);
-                    break;
+        LoyaltyPointsBalance loyaltyPointsBalance = null;
+        TimeInterval timeInterval = loyaltyPointsBalance;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            int fieldId = SafeParcelReader.getFieldId(readHeader);
+            if (fieldId != 5) {
+                switch (fieldId) {
+                    case 2:
+                        str = SafeParcelReader.createString(parcel, readHeader);
+                        break;
+                    case 3:
+                        loyaltyPointsBalance = (LoyaltyPointsBalance) SafeParcelReader.createParcelable(parcel, readHeader, LoyaltyPointsBalance.CREATOR);
+                        break;
+                    default:
+                        SafeParcelReader.skipUnknownField(parcel, readHeader);
+                        break;
+                }
             }
+            timeInterval = (TimeInterval) SafeParcelReader.createParcelable(parcel, readHeader, TimeInterval.CREATOR);
         }
-        zzbfn.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new LoyaltyPoints(str, loyaltyPointsBalance, timeInterval);
     }
 

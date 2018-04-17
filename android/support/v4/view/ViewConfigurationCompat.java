@@ -7,7 +7,6 @@ import android.util.TypedValue;
 import android.view.ViewConfiguration;
 import java.lang.reflect.Method;
 
-@Deprecated
 public final class ViewConfigurationCompat {
     private static Method sGetScaledScrollFactorMethod;
 

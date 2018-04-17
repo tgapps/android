@@ -32,7 +32,8 @@ public class SLConfigDescriptor extends BaseDescriptor {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("SLConfigDescriptor");
-        sb.append("{predefined=").append(this.predefined);
+        sb.append("{predefined=");
+        sb.append(this.predefined);
         sb.append('}');
         return sb.toString();
     }
@@ -41,13 +42,15 @@ public class SLConfigDescriptor extends BaseDescriptor {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        if (o != null) {
+            if (getClass() == o.getClass()) {
+                if (this.predefined != ((SLConfigDescriptor) o).predefined) {
+                    return false;
+                }
+                return true;
+            }
         }
-        if (this.predefined != ((SLConfigDescriptor) o).predefined) {
-            return false;
-        }
-        return true;
+        return false;
     }
 
     public int hashCode() {

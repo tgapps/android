@@ -6,23 +6,26 @@ import android.os.Message;
 import android.util.Log;
 
 final class zzbf extends Handler {
-    private /* synthetic */ zzba zzfsj;
+    private final /* synthetic */ zzbd zzjh;
 
-    zzbf(zzba com_google_android_gms_common_api_internal_zzba, Looper looper) {
-        this.zzfsj = com_google_android_gms_common_api_internal_zzba;
+    zzbf(zzbd com_google_android_gms_common_api_internal_zzbd, Looper looper) {
+        this.zzjh = com_google_android_gms_common_api_internal_zzbd;
         super(looper);
     }
 
     public final void handleMessage(Message message) {
         switch (message.what) {
             case 1:
-                this.zzfsj.zzaij();
+                ((zzbe) message.obj).zzc(this.zzjh);
                 return;
             case 2:
-                this.zzfsj.resume();
-                return;
+                throw ((RuntimeException) message.obj);
             default:
-                Log.w("GoogleApiClientImpl", "Unknown message id: " + message.what);
+                int i = message.what;
+                StringBuilder stringBuilder = new StringBuilder(31);
+                stringBuilder.append("Unknown message id: ");
+                stringBuilder.append(i);
+                Log.w("GACStateManager", stringBuilder.toString());
                 return;
         }
     }

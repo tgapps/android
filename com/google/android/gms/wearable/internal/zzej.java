@@ -2,21 +2,18 @@ package com.google.android.gms.wearable.internal;
 
 import android.os.Parcel;
 import android.os.RemoteException;
-import com.google.android.gms.internal.zzev;
+import com.google.android.gms.internal.wearable.zzb;
 
-public abstract class zzej extends zzev implements zzei {
+public abstract class zzej extends zzb implements zzei {
     public zzej() {
-        attachInterface(this, "com.google.android.gms.wearable.internal.IChannelStreamCallbacks");
+        super("com.google.android.gms.wearable.internal.IChannelStreamCallbacks");
     }
 
-    public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        if (zza(i, parcel, parcel2, i2)) {
-            return true;
-        }
+    protected final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
         if (i != 2) {
             return false;
         }
-        zzs(parcel.readInt(), parcel.readInt());
+        zza(parcel.readInt(), parcel.readInt());
         parcel2.writeNoException();
         return true;
     }

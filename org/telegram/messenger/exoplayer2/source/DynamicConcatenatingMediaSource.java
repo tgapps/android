@@ -11,7 +11,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.ExoPlaybackException;
 import org.telegram.messenger.exoplayer2.ExoPlayer;
 import org.telegram.messenger.exoplayer2.PlayerMessage.Target;
 import org.telegram.messenger.exoplayer2.Timeline;
@@ -126,7 +125,7 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
 
         public Window getWindow(int windowIndex, Window window, boolean setIds, long defaultPositionProjectionUs) {
             if (this.timeline != null) {
-                return this.timeline.getWindow(windowIndex, window, setIds, defaultPositionProjectionUs);
+                return r0.timeline.getWindow(windowIndex, window, setIds, defaultPositionProjectionUs);
             }
             return window.set(setIds ? DUMMY_ID : null, C.TIME_UNSET, C.TIME_UNSET, false, true, 0, C.TIME_UNSET, 0, 0, 0);
         }
@@ -136,24 +135,18 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
         }
 
         public Period getPeriod(int periodIndex, Period period, boolean setIds) {
-            Object obj = null;
             if (this.timeline == null) {
-                Object obj2;
-                if (setIds) {
-                    obj2 = DUMMY_ID;
-                } else {
-                    obj2 = null;
-                }
+                Object obj = null;
+                Object obj2 = setIds ? DUMMY_ID : null;
                 if (setIds) {
                     obj = DUMMY_ID;
                 }
                 return period.set(obj2, obj, 0, C.TIME_UNSET, C.TIME_UNSET);
             }
             this.timeline.getPeriod(periodIndex, period, setIds);
-            if (period.uid != this.replacedID) {
-                return period;
+            if (period.uid == this.replacedID) {
+                period.uid = DUMMY_ID;
             }
-            period.uid = DUMMY_ID;
             return period;
         }
 
@@ -161,11 +154,14 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
             if (this.timeline == null) {
                 return uid == DUMMY_ID ? 0 : -1;
             } else {
+                Object obj;
                 Timeline timeline = this.timeline;
                 if (uid == DUMMY_ID) {
-                    uid = this.replacedID;
+                    obj = this.replacedID;
+                } else {
+                    obj = uid;
                 }
-                return timeline.getIndexOfPeriod(uid);
+                return timeline.getIndexOfPeriod(obj);
             }
         }
     }
@@ -209,14 +205,15 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
         }
 
         protected int getChildIndexByChildUid(Object childUid) {
+            int i = -1;
             if (!(childUid instanceof Integer)) {
                 return -1;
             }
             int index = this.childIndexByUid.get(((Integer) childUid).intValue(), -1);
-            if (index == -1) {
-                index = -1;
+            if (index != -1) {
+                i = index;
             }
-            return index;
+            return i;
         }
 
         protected Timeline getTimelineByChildIndex(int childIndex) {
@@ -242,6 +239,109 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
         public int getPeriodCount() {
             return this.periodCount;
         }
+    }
+
+    public void handleMessage(int r1, java.lang.Object r2) throws org.telegram.messenger.exoplayer2.ExoPlaybackException {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.source.DynamicConcatenatingMediaSource.handleMessage(int, java.lang.Object):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = 4;
+        if (r5 != r0) goto L_0x000a;
+    L_0x0003:
+        r0 = r6;
+        r0 = (org.telegram.messenger.exoplayer2.source.DynamicConcatenatingMediaSource.EventDispatcher) r0;
+        r0.dispatchEvent();
+        return;
+    L_0x000a:
+        r0 = 1;
+        r4.preventListenerNotification = r0;
+        switch(r5) {
+            case 0: goto L_0x007b;
+            case 1: goto L_0x0058;
+            case 2: goto L_0x0043;
+            case 3: goto L_0x0016;
+            default: goto L_0x0010;
+        };
+    L_0x0010:
+        r0 = new java.lang.IllegalStateException;
+        r0.<init>();
+        throw r0;
+    L_0x0016:
+        r1 = r6;
+        r1 = (org.telegram.messenger.exoplayer2.source.DynamicConcatenatingMediaSource.MessageData) r1;
+        r2 = r4.shuffleOrder;
+        r3 = r1.index;
+        r2 = r2.cloneAndRemove(r3);
+        r4.shuffleOrder = r2;
+        r2 = r4.shuffleOrder;
+        r3 = r1.customData;
+        r3 = (java.lang.Integer) r3;
+        r3 = r3.intValue();
+        r0 = r2.cloneAndInsert(r3, r0);
+        r4.shuffleOrder = r0;
+        r0 = r1.index;
+        r2 = r1.customData;
+        r2 = (java.lang.Integer) r2;
+        r2 = r2.intValue();
+        r4.moveMediaSourceInternal(r0, r2);
+        r0 = r1.actionOnCompletion;
+        goto L_0x0094;
+    L_0x0043:
+        r0 = r6;
+        r0 = (org.telegram.messenger.exoplayer2.source.DynamicConcatenatingMediaSource.MessageData) r0;
+        r1 = r4.shuffleOrder;
+        r2 = r0.index;
+        r1 = r1.cloneAndRemove(r2);
+        r4.shuffleOrder = r1;
+        r1 = r0.index;
+        r4.removeMediaSourceInternal(r1);
+        r1 = r0.actionOnCompletion;
+        goto L_0x0079;
+    L_0x0058:
+        r0 = r6;
+        r0 = (org.telegram.messenger.exoplayer2.source.DynamicConcatenatingMediaSource.MessageData) r0;
+        r1 = r4.shuffleOrder;
+        r2 = r0.index;
+        r3 = r0.customData;
+        r3 = (java.util.Collection) r3;
+        r3 = r3.size();
+        r1 = r1.cloneAndInsert(r2, r3);
+        r4.shuffleOrder = r1;
+        r1 = r0.index;
+        r2 = r0.customData;
+        r2 = (java.util.Collection) r2;
+        r4.addMediaSourcesInternal(r1, r2);
+        r1 = r0.actionOnCompletion;
+        r0 = r1;
+        goto L_0x0094;
+    L_0x007b:
+        r1 = r6;
+        r1 = (org.telegram.messenger.exoplayer2.source.DynamicConcatenatingMediaSource.MessageData) r1;
+        r2 = r4.shuffleOrder;
+        r3 = r1.index;
+        r0 = r2.cloneAndInsert(r3, r0);
+        r4.shuffleOrder = r0;
+        r0 = r1.index;
+        r2 = r1.customData;
+        r2 = (org.telegram.messenger.exoplayer2.source.MediaSource) r2;
+        r4.addMediaSourceInternal(r0, r2);
+        r0 = r1.actionOnCompletion;
+        r1 = 0;
+        r4.preventListenerNotification = r1;
+        r4.maybeNotifyListener(r0);
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.DynamicConcatenatingMediaSource.handleMessage(int, java.lang.Object):void");
     }
 
     public DynamicConcatenatingMediaSource() {
@@ -270,19 +370,13 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
     }
 
     public synchronized void addMediaSource(int index, MediaSource mediaSource, Runnable actionOnCompletion) {
-        boolean z = false;
-        synchronized (this) {
-            Assertions.checkNotNull(mediaSource);
-            if (!this.mediaSourcesPublic.contains(mediaSource)) {
-                z = true;
-            }
-            Assertions.checkArgument(z);
-            this.mediaSourcesPublic.add(index, mediaSource);
-            if (this.player != null) {
-                this.player.createMessage(this).setType(0).setPayload(new MessageData(index, mediaSource, actionOnCompletion)).send();
-            } else if (actionOnCompletion != null) {
-                actionOnCompletion.run();
-            }
+        Assertions.checkNotNull(mediaSource);
+        Assertions.checkArgument(this.mediaSourcesPublic.contains(mediaSource) ^ 1);
+        this.mediaSourcesPublic.add(index, mediaSource);
+        if (this.player != null) {
+            this.player.createMessage(this).setType(0).setPayload(new MessageData(index, mediaSource, actionOnCompletion)).send();
+        } else if (actionOnCompletion != null) {
+            actionOnCompletion.run();
         }
     }
 
@@ -301,7 +395,7 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
     public synchronized void addMediaSources(int index, Collection<MediaSource> mediaSources, Runnable actionOnCompletion) {
         for (MediaSource mediaSource : mediaSources) {
             Assertions.checkNotNull(mediaSource);
-            Assertions.checkArgument(!this.mediaSourcesPublic.contains(mediaSource));
+            Assertions.checkArgument(true ^ this.mediaSourcesPublic.contains(mediaSource));
         }
         this.mediaSourcesPublic.addAll(index, mediaSources);
         if (this.player != null && !mediaSources.isEmpty()) {
@@ -328,15 +422,47 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
         moveMediaSource(currentIndex, newIndex, null);
     }
 
-    public synchronized void moveMediaSource(int currentIndex, int newIndex, Runnable actionOnCompletion) {
-        if (currentIndex != newIndex) {
-            this.mediaSourcesPublic.add(newIndex, this.mediaSourcesPublic.remove(currentIndex));
-            if (this.player != null) {
-                this.player.createMessage(this).setType(3).setPayload(new MessageData(currentIndex, Integer.valueOf(newIndex), actionOnCompletion)).send();
-            } else if (actionOnCompletion != null) {
-                actionOnCompletion.run();
-            }
-        }
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public synchronized void moveMediaSource(int r4, int r5, java.lang.Runnable r6) {
+        /*
+        r3 = this;
+        monitor-enter(r3);
+        if (r4 != r5) goto L_0x0005;
+    L_0x0003:
+        monitor-exit(r3);
+        return;
+    L_0x0005:
+        r0 = r3.mediaSourcesPublic;	 Catch:{ all -> 0x0037 }
+        r1 = r3.mediaSourcesPublic;	 Catch:{ all -> 0x0037 }
+        r1 = r1.remove(r4);	 Catch:{ all -> 0x0037 }
+        r0.add(r5, r1);	 Catch:{ all -> 0x0037 }
+        r0 = r3.player;	 Catch:{ all -> 0x0037 }
+        if (r0 == 0) goto L_0x0030;
+    L_0x0014:
+        r0 = r3.player;	 Catch:{ all -> 0x0037 }
+        r0 = r0.createMessage(r3);	 Catch:{ all -> 0x0037 }
+        r1 = 3;
+        r0 = r0.setType(r1);	 Catch:{ all -> 0x0037 }
+        r1 = new org.telegram.messenger.exoplayer2.source.DynamicConcatenatingMediaSource$MessageData;	 Catch:{ all -> 0x0037 }
+        r2 = java.lang.Integer.valueOf(r5);	 Catch:{ all -> 0x0037 }
+        r1.<init>(r4, r2, r6);	 Catch:{ all -> 0x0037 }
+        r0 = r0.setPayload(r1);	 Catch:{ all -> 0x0037 }
+        r0.send();	 Catch:{ all -> 0x0037 }
+        goto L_0x0035;
+    L_0x0030:
+        if (r6 == 0) goto L_0x0035;
+    L_0x0032:
+        r6.run();	 Catch:{ all -> 0x0037 }
+    L_0x0035:
+        monitor-exit(r3);
+        return;
+    L_0x0037:
+        r4 = move-exception;
+        monitor-exit(r3);
+        throw r4;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.DynamicConcatenatingMediaSource.moveMediaSource(int, int, java.lang.Runnable):void");
     }
 
     public synchronized int getSize() {
@@ -348,20 +474,14 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
     }
 
     public synchronized void prepareSource(ExoPlayer player, boolean isTopLevelSource, Listener listener) {
-        boolean z = true;
-        synchronized (this) {
-            if (this.listener != null) {
-                z = false;
-            }
-            Assertions.checkState(z, MediaSource.MEDIA_SOURCE_REUSED_ERROR_MESSAGE);
-            this.player = player;
-            this.listener = listener;
-            this.preventListenerNotification = true;
-            this.shuffleOrder = this.shuffleOrder.cloneAndInsert(0, this.mediaSourcesPublic.size());
-            addMediaSourcesInternal(0, this.mediaSourcesPublic);
-            this.preventListenerNotification = false;
-            maybeNotifyListener(null);
-        }
+        Assertions.checkState(this.listener == null, MediaSource.MEDIA_SOURCE_REUSED_ERROR_MESSAGE);
+        this.player = player;
+        this.listener = listener;
+        this.preventListenerNotification = true;
+        this.shuffleOrder = this.shuffleOrder.cloneAndInsert(0, this.mediaSourcesPublic.size());
+        addMediaSourcesInternal(0, this.mediaSourcesPublic);
+        this.preventListenerNotification = false;
+        maybeNotifyListener(null);
     }
 
     public void maybeThrowSourceInfoRefreshError() throws IOException {
@@ -401,46 +521,6 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
         }
     }
 
-    public void handleMessage(int messageType, Object message) throws ExoPlaybackException {
-        if (messageType == 4) {
-            ((EventDispatcher) message).dispatchEvent();
-            return;
-        }
-        EventDispatcher actionOnCompletion;
-        this.preventListenerNotification = true;
-        switch (messageType) {
-            case 0:
-                MessageData<MediaSource> messageData = (MessageData) message;
-                this.shuffleOrder = this.shuffleOrder.cloneAndInsert(messageData.index, 1);
-                addMediaSourceInternal(messageData.index, (MediaSource) messageData.customData);
-                actionOnCompletion = messageData.actionOnCompletion;
-                break;
-            case 1:
-                MessageData<Collection<MediaSource>> messageData2 = (MessageData) message;
-                this.shuffleOrder = this.shuffleOrder.cloneAndInsert(messageData2.index, ((Collection) messageData2.customData).size());
-                addMediaSourcesInternal(messageData2.index, (Collection) messageData2.customData);
-                actionOnCompletion = messageData2.actionOnCompletion;
-                break;
-            case 2:
-                MessageData<Void> messageData3 = (MessageData) message;
-                this.shuffleOrder = this.shuffleOrder.cloneAndRemove(messageData3.index);
-                removeMediaSourceInternal(messageData3.index);
-                actionOnCompletion = messageData3.actionOnCompletion;
-                break;
-            case 3:
-                MessageData<Integer> messageData4 = (MessageData) message;
-                this.shuffleOrder = this.shuffleOrder.cloneAndRemove(messageData4.index);
-                this.shuffleOrder = this.shuffleOrder.cloneAndInsert(((Integer) messageData4.customData).intValue(), 1);
-                moveMediaSourceInternal(messageData4.index, ((Integer) messageData4.customData).intValue());
-                actionOnCompletion = messageData4.actionOnCompletion;
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-        this.preventListenerNotification = false;
-        maybeNotifyListener(actionOnCompletion);
-    }
-
     private void maybeNotifyListener(EventDispatcher actionOnCompletion) {
         if (!this.preventListenerNotification) {
             this.listener.onSourceInfoRefreshed(this, new ConcatenatedTimeline(this.mediaSourceHolders, this.windowCount, this.periodCount, this.shuffleOrder), null);
@@ -452,11 +532,11 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
 
     private void addMediaSourceInternal(int newIndex, MediaSource newMediaSource) {
         MediaSourceHolder newMediaSourceHolder;
-        Integer newUid = Integer.valueOf(System.identityHashCode(newMediaSource));
+        Object newUid = Integer.valueOf(System.identityHashCode(newMediaSource));
         DeferredTimeline newTimeline = new DeferredTimeline();
         if (newIndex > 0) {
             MediaSourceHolder previousHolder = (MediaSourceHolder) this.mediaSourceHolders.get(newIndex - 1);
-            newMediaSourceHolder = new MediaSourceHolder(newMediaSource, newTimeline, previousHolder.timeline.getWindowCount() + previousHolder.firstWindowIndexInChild, previousHolder.timeline.getPeriodCount() + previousHolder.firstPeriodIndexInChild, newUid);
+            newMediaSourceHolder = new MediaSourceHolder(newMediaSource, newTimeline, previousHolder.firstWindowIndexInChild + previousHolder.timeline.getWindowCount(), previousHolder.firstPeriodIndexInChild + previousHolder.timeline.getPeriodCount(), newUid);
         } else {
             newMediaSourceHolder = new MediaSourceHolder(newMediaSource, newTimeline, 0, 0, newUid);
         }
@@ -516,12 +596,14 @@ public final class DynamicConcatenatingMediaSource implements Target, MediaSourc
         int windowOffset = ((MediaSourceHolder) this.mediaSourceHolders.get(startIndex)).firstWindowIndexInChild;
         int periodOffset = ((MediaSourceHolder) this.mediaSourceHolders.get(startIndex)).firstPeriodIndexInChild;
         this.mediaSourceHolders.add(newIndex, this.mediaSourceHolders.remove(currentIndex));
-        for (int i = startIndex; i <= endIndex; i++) {
-            MediaSourceHolder holder = (MediaSourceHolder) this.mediaSourceHolders.get(i);
-            holder.firstWindowIndexInChild = windowOffset;
-            holder.firstPeriodIndexInChild = periodOffset;
-            windowOffset += holder.timeline.getWindowCount();
-            periodOffset += holder.timeline.getPeriodCount();
+        int periodOffset2 = periodOffset;
+        periodOffset = windowOffset;
+        for (windowOffset = startIndex; windowOffset <= endIndex; windowOffset++) {
+            MediaSourceHolder holder = (MediaSourceHolder) this.mediaSourceHolders.get(windowOffset);
+            holder.firstWindowIndexInChild = periodOffset;
+            holder.firstPeriodIndexInChild = periodOffset2;
+            periodOffset += holder.timeline.getWindowCount();
+            periodOffset2 += holder.timeline.getPeriodCount();
         }
     }
 

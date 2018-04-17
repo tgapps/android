@@ -65,6 +65,117 @@ final class TtmlNode {
     public final String tag;
     public final String text;
 
+    private android.text.SpannableStringBuilder cleanUpText(android.text.SpannableStringBuilder r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.text.ttml.TtmlNode.cleanUpText(android.text.SpannableStringBuilder):android.text.SpannableStringBuilder
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r7.length();
+        r1 = 0;
+        r2 = r0;
+        r0 = r1;
+    L_0x0007:
+        r3 = 32;
+        if (r0 >= r2) goto L_0x0031;
+    L_0x000b:
+        r4 = r7.charAt(r0);
+        if (r4 != r3) goto L_0x002e;
+    L_0x0011:
+        r4 = r0 + 1;
+    L_0x0013:
+        r5 = r7.length();
+        if (r4 >= r5) goto L_0x0022;
+    L_0x0019:
+        r5 = r7.charAt(r4);
+        if (r5 != r3) goto L_0x0022;
+    L_0x001f:
+        r4 = r4 + 1;
+        goto L_0x0013;
+    L_0x0022:
+        r3 = r0 + 1;
+        r3 = r4 - r3;
+        if (r3 <= 0) goto L_0x002e;
+    L_0x0028:
+        r5 = r0 + r3;
+        r7.delete(r0, r5);
+        r2 = r2 - r3;
+    L_0x002e:
+        r0 = r0 + 1;
+        goto L_0x0007;
+    L_0x0031:
+        if (r2 <= 0) goto L_0x003f;
+    L_0x0033:
+        r0 = r7.charAt(r1);
+        if (r0 != r3) goto L_0x003f;
+    L_0x0039:
+        r0 = 1;
+        r7.delete(r1, r0);
+        r2 = r2 + -1;
+    L_0x003f:
+        r0 = r1;
+    L_0x0040:
+        r4 = r2 + -1;
+        r5 = 10;
+        if (r0 >= r4) goto L_0x0060;
+    L_0x0046:
+        r4 = r7.charAt(r0);
+        if (r4 != r5) goto L_0x005d;
+    L_0x004c:
+        r4 = r0 + 1;
+        r4 = r7.charAt(r4);
+        if (r4 != r3) goto L_0x005d;
+    L_0x0054:
+        r4 = r0 + 1;
+        r5 = r0 + 2;
+        r7.delete(r4, r5);
+        r2 = r2 + -1;
+    L_0x005d:
+        r0 = r0 + 1;
+        goto L_0x0040;
+    L_0x0060:
+        if (r2 <= 0) goto L_0x0071;
+    L_0x0062:
+        r0 = r2 + -1;
+        r0 = r7.charAt(r0);
+        if (r0 != r3) goto L_0x0071;
+        r0 = r2 + -1;
+        r7.delete(r0, r2);
+        r2 = r2 + -1;
+        r0 = r1;
+        r1 = r2 + -1;
+        if (r0 >= r1) goto L_0x008f;
+        r1 = r7.charAt(r0);
+        if (r1 != r3) goto L_0x008c;
+        r1 = r0 + 1;
+        r1 = r7.charAt(r1);
+        if (r1 != r5) goto L_0x008c;
+        r1 = r0 + 1;
+        r7.delete(r0, r1);
+        r2 = r2 + -1;
+        r1 = r0 + 1;
+        goto L_0x0072;
+        if (r2 <= 0) goto L_0x009e;
+        r0 = r2 + -1;
+        r0 = r7.charAt(r0);
+        if (r0 != r5) goto L_0x009e;
+        r0 = r2 + -1;
+        r7.delete(r0, r2);
+        return r7;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.text.ttml.TtmlNode.cleanUpText(android.text.SpannableStringBuilder):android.text.SpannableStringBuilder");
+    }
+
     public static TtmlNode buildTextNode(String text) {
         return new TtmlNode(null, TtmlRenderUtil.applyTextElementSpacePolicy(text), C.TIME_UNSET, C.TIME_UNSET, null, null, ANONYMOUS_REGION_ID);
     }
@@ -134,8 +245,15 @@ final class TtmlNode {
         }
         if (this.children != null) {
             for (int i = 0; i < this.children.size(); i++) {
+                boolean z;
                 TtmlNode ttmlNode = (TtmlNode) this.children.get(i);
-                boolean z = descendsPNode || isPNode;
+                if (!descendsPNode) {
+                    if (!isPNode) {
+                        z = false;
+                        ttmlNode.getEventTimes(out, z);
+                    }
+                }
+                z = true;
                 ttmlNode.getEventTimes(out, z);
             }
         }
@@ -152,8 +270,11 @@ final class TtmlNode {
         List<Cue> cues = new ArrayList();
         for (Entry<String, SpannableStringBuilder> entry : regionOutputs.entrySet()) {
             TtmlRegion region = (TtmlRegion) regionMap.get(entry.getKey());
-            cues.add(new Cue(cleanUpText((SpannableStringBuilder) entry.getValue()), null, region.line, region.lineType, region.lineAnchor, region.position, Integer.MIN_VALUE, region.width));
+            Cue cue = r8;
+            Cue cue2 = new Cue(cleanUpText((SpannableStringBuilder) entry.getValue()), null, region.line, region.lineType, region.lineAnchor, region.position, Integer.MIN_VALUE, region.width);
+            cues.add(cue);
         }
+        Map<String, TtmlRegion> map = regionMap;
         return cues;
     }
 
@@ -168,21 +289,37 @@ final class TtmlNode {
             getRegionOutput(resolvedRegionId, regionOutputs).append(this.text);
         } else if (TAG_BR.equals(this.tag) && descendsPNode) {
             getRegionOutput(resolvedRegionId, regionOutputs).append('\n');
-        } else if (!TAG_METADATA.equals(this.tag) && isActive(timeUs)) {
-            boolean isPNode = TAG_P.equals(this.tag);
-            for (Entry<String, SpannableStringBuilder> entry : regionOutputs.entrySet()) {
-                this.nodeStartsByRegion.put(entry.getKey(), Integer.valueOf(((SpannableStringBuilder) entry.getValue()).length()));
-            }
-            for (int i = 0; i < getChildCount(); i++) {
-                TtmlNode child = getChild(i);
-                boolean z = descendsPNode || isPNode;
-                child.traverseForText(timeUs, z, resolvedRegionId, regionOutputs);
-            }
-            if (isPNode) {
-                TtmlRenderUtil.endParagraph(getRegionOutput(resolvedRegionId, regionOutputs));
-            }
-            for (Entry<String, SpannableStringBuilder> entry2 : regionOutputs.entrySet()) {
-                this.nodeEndsByRegion.put(entry2.getKey(), Integer.valueOf(((SpannableStringBuilder) entry2.getValue()).length()));
+        } else if (!TAG_METADATA.equals(this.tag)) {
+            if (isActive(timeUs)) {
+                boolean isPNode = TAG_P.equals(this.tag);
+                for (Entry<String, SpannableStringBuilder> entry : regionOutputs.entrySet()) {
+                    this.nodeStartsByRegion.put(entry.getKey(), Integer.valueOf(((SpannableStringBuilder) entry.getValue()).length()));
+                }
+                int i = 0;
+                while (true) {
+                    int i2 = i;
+                    if (i2 >= getChildCount()) {
+                        break;
+                    }
+                    boolean z;
+                    TtmlNode child = getChild(i2);
+                    if (!descendsPNode) {
+                        if (!isPNode) {
+                            z = false;
+                            child.traverseForText(timeUs, z, resolvedRegionId, regionOutputs);
+                            i = i2 + 1;
+                        }
+                    }
+                    z = true;
+                    child.traverseForText(timeUs, z, resolvedRegionId, regionOutputs);
+                    i = i2 + 1;
+                }
+                if (isPNode) {
+                    TtmlRenderUtil.endParagraph(getRegionOutput(resolvedRegionId, regionOutputs));
+                }
+                for (Entry<String, SpannableStringBuilder> entry2 : regionOutputs.entrySet()) {
+                    this.nodeEndsByRegion.put(entry2.getKey(), Integer.valueOf(((SpannableStringBuilder) entry2.getValue()).length()));
+                }
             }
         }
     }
@@ -197,9 +334,11 @@ final class TtmlNode {
     private void traverseForStyle(Map<String, TtmlStyle> globalStyles, Map<String, SpannableStringBuilder> regionOutputs) {
         for (Entry<String, Integer> entry : this.nodeEndsByRegion.entrySet()) {
             String regionId = (String) entry.getKey();
+            int i = 0;
             applyStyleToOutput(globalStyles, (SpannableStringBuilder) regionOutputs.get(regionId), this.nodeStartsByRegion.containsKey(regionId) ? ((Integer) this.nodeStartsByRegion.get(regionId)).intValue() : 0, ((Integer) entry.getValue()).intValue());
-            for (int i = 0; i < getChildCount(); i++) {
+            while (i < getChildCount()) {
                 getChild(i).traverseForStyle(globalStyles, regionOutputs);
+                i++;
             }
         }
     }
@@ -211,51 +350,5 @@ final class TtmlNode {
                 TtmlRenderUtil.applyStylesToSpan(regionOutput, start, end, resolvedStyle);
             }
         }
-    }
-
-    private SpannableStringBuilder cleanUpText(SpannableStringBuilder builder) {
-        int i;
-        int builderLength = builder.length();
-        for (i = 0; i < builderLength; i++) {
-            if (builder.charAt(i) == ' ') {
-                int j = i + 1;
-                while (j < builder.length() && builder.charAt(j) == ' ') {
-                    j++;
-                }
-                int spacesToDelete = j - (i + 1);
-                if (spacesToDelete > 0) {
-                    builder.delete(i, i + spacesToDelete);
-                    builderLength -= spacesToDelete;
-                }
-            }
-        }
-        if (builderLength > 0 && builder.charAt(0) == ' ') {
-            builder.delete(0, 1);
-            builderLength--;
-        }
-        i = 0;
-        while (i < builderLength - 1) {
-            if (builder.charAt(i) == '\n' && builder.charAt(i + 1) == ' ') {
-                builder.delete(i + 1, i + 2);
-                builderLength--;
-            }
-            i++;
-        }
-        if (builderLength > 0 && builder.charAt(builderLength - 1) == ' ') {
-            builder.delete(builderLength - 1, builderLength);
-            builderLength--;
-        }
-        i = 0;
-        while (i < builderLength - 1) {
-            if (builder.charAt(i) == ' ' && builder.charAt(i + 1) == '\n') {
-                builder.delete(i, i + 1);
-                builderLength--;
-            }
-            i++;
-        }
-        if (builderLength > 0 && builder.charAt(builderLength - 1) == '\n') {
-            builder.delete(builderLength - 1, builderLength);
-        }
-        return builder;
     }
 }

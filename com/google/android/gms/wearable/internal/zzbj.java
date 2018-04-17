@@ -1,65 +1,67 @@
 package com.google.android.gms.wearable.internal;
 
-import com.google.android.gms.common.internal.zzbq;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.wearable.ChannelIOException;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.Nullable;
 
 public final class zzbj extends InputStream {
-    private final InputStream zzljl;
-    private volatile zzav zzljm;
+    private final InputStream zzcv;
+    @Nullable
+    private volatile zzav zzcw;
 
     public zzbj(InputStream inputStream) {
-        this.zzljl = (InputStream) zzbq.checkNotNull(inputStream);
+        this.zzcv = (InputStream) Preconditions.checkNotNull(inputStream);
     }
 
-    private final int zzfd(int i) throws ChannelIOException {
+    private final int zza(int i) throws ChannelIOException {
         if (i == -1) {
-            zzav com_google_android_gms_wearable_internal_zzav = this.zzljm;
+            zzav com_google_android_gms_wearable_internal_zzav = this.zzcw;
             if (com_google_android_gms_wearable_internal_zzav != null) {
-                throw new ChannelIOException("Channel closed unexpectedly before stream was finished", com_google_android_gms_wearable_internal_zzav.zzljc, com_google_android_gms_wearable_internal_zzav.zzljd);
+                throw new ChannelIOException("Channel closed unexpectedly before stream was finished", com_google_android_gms_wearable_internal_zzav.zzg, com_google_android_gms_wearable_internal_zzav.zzcj);
             }
         }
         return i;
     }
 
     public final int available() throws IOException {
-        return this.zzljl.available();
+        return this.zzcv.available();
     }
 
     public final void close() throws IOException {
-        this.zzljl.close();
+        this.zzcv.close();
     }
 
     public final void mark(int i) {
-        this.zzljl.mark(i);
+        this.zzcv.mark(i);
     }
 
     public final boolean markSupported() {
-        return this.zzljl.markSupported();
+        return this.zzcv.markSupported();
     }
 
     public final int read() throws IOException {
-        return zzfd(this.zzljl.read());
+        return zza(this.zzcv.read());
     }
 
     public final int read(byte[] bArr) throws IOException {
-        return zzfd(this.zzljl.read(bArr));
+        return zza(this.zzcv.read(bArr));
     }
 
     public final int read(byte[] bArr, int i, int i2) throws IOException {
-        return zzfd(this.zzljl.read(bArr, i, i2));
+        return zza(this.zzcv.read(bArr, i, i2));
     }
 
     public final void reset() throws IOException {
-        this.zzljl.reset();
+        this.zzcv.reset();
     }
 
     public final long skip(long j) throws IOException {
-        return this.zzljl.skip(j);
+        return this.zzcv.skip(j);
     }
 
     final void zza(zzav com_google_android_gms_wearable_internal_zzav) {
-        this.zzljm = (zzav) zzbq.checkNotNull(com_google_android_gms_wearable_internal_zzav);
+        this.zzcw = (zzav) Preconditions.checkNotNull(com_google_android_gms_wearable_internal_zzav);
     }
 }

@@ -88,7 +88,7 @@ public class RatingBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (Utf8.utf8StringLengthInBytes(this.ratingInfo) + 15);
+        return (long) (15 + Utf8.utf8StringLengthInBytes(this.ratingInfo));
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -111,11 +111,16 @@ public class RatingBox extends AbstractFullBox {
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_8, this, this));
         StringBuilder buffer = new StringBuilder();
-        buffer.append("RatingBox[language=").append(getLanguage());
-        buffer.append("ratingEntity=").append(getRatingEntity());
-        buffer.append(";ratingCriteria=").append(getRatingCriteria());
-        buffer.append(";language=").append(getLanguage());
-        buffer.append(";ratingInfo=").append(getRatingInfo());
+        buffer.append("RatingBox[language=");
+        buffer.append(getLanguage());
+        buffer.append("ratingEntity=");
+        buffer.append(getRatingEntity());
+        buffer.append(";ratingCriteria=");
+        buffer.append(getRatingCriteria());
+        buffer.append(";language=");
+        buffer.append(getLanguage());
+        buffer.append(";ratingInfo=");
+        buffer.append(getRatingInfo());
         buffer.append("]");
         return buffer.toString();
     }

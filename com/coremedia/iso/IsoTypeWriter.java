@@ -4,31 +4,19 @@ import java.nio.ByteBuffer;
 import org.telegram.ui.ActionBar.Theme;
 
 public final class IsoTypeWriter {
-    static final /* synthetic */ boolean $assertionsDisabled = (!IsoTypeWriter.class.desiredAssertionStatus());
+    static final /* synthetic */ boolean $assertionsDisabled = false;
 
     public static void writeUInt64(ByteBuffer bb, long u) {
-        if ($assertionsDisabled || u >= 0) {
-            bb.putLong(u);
-            return;
-        }
-        throw new AssertionError("The given long is negative");
+        bb.putLong(u);
     }
 
     public static void writeUInt32(ByteBuffer bb, long u) {
-        if ($assertionsDisabled || (u >= 0 && u <= 4294967296L)) {
-            bb.putInt((int) u);
-            return;
-        }
-        throw new AssertionError("The given long is not in the range of uint32 (" + u + ")");
+        bb.putInt((int) u);
     }
 
     public static void writeUInt32BE(ByteBuffer bb, long u) {
-        if ($assertionsDisabled || (u >= 0 && u <= 4294967296L)) {
-            writeUInt16BE(bb, ((int) u) & 65535);
-            writeUInt16BE(bb, (int) ((u >> 16) & 65535));
-            return;
-        }
-        throw new AssertionError("The given long is not in the range of uint32 (" + u + ")");
+        writeUInt16BE(bb, ((int) u) & 65535);
+        writeUInt16BE(bb, (int) ((u >> 16) & 65535));
     }
 
     public static void writeUInt24(ByteBuffer bb, int i) {
@@ -38,9 +26,9 @@ public final class IsoTypeWriter {
     }
 
     public static void writeUInt48(ByteBuffer bb, long l) {
-        l &= 281474976710655L;
-        writeUInt16(bb, (int) (l >> 32));
-        writeUInt32(bb, 4294967295L & l);
+        long l2 = l & 281474976710655L;
+        writeUInt16(bb, (int) (l2 >> 32));
+        writeUInt32(bb, l2 & 4294967295L);
     }
 
     public static void writeUInt16(ByteBuffer bb, int i) {
@@ -83,7 +71,10 @@ public final class IsoTypeWriter {
 
     public static void writeIso639(ByteBuffer bb, String language) {
         if (language.getBytes().length != 3) {
-            throw new IllegalArgumentException("\"" + language + "\" language string isn't exactly 3 characters long!");
+            StringBuilder stringBuilder = new StringBuilder("\"");
+            stringBuilder.append(language);
+            stringBuilder.append("\" language string isn't exactly 3 characters long!");
+            throw new IllegalArgumentException(stringBuilder.toString());
         }
         int bits = 0;
         for (int i = 0; i < 3; i++) {
@@ -94,12 +85,8 @@ public final class IsoTypeWriter {
 
     public static void writePascalUtfString(ByteBuffer bb, String string) {
         byte[] b = Utf8.convert(string);
-        if ($assertionsDisabled || b.length < 255) {
-            writeUInt8(bb, b.length);
-            bb.put(b);
-            return;
-        }
-        throw new AssertionError();
+        writeUInt8(bb, b.length);
+        bb.put(b);
     }
 
     public static void writeZeroTermUtf8String(ByteBuffer bb, String string) {

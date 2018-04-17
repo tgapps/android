@@ -123,6 +123,8 @@ public class PaintView extends ImageView {
                 touchMove(x, y);
                 invalidate();
                 break;
+            default:
+                break;
         }
         return true;
     }

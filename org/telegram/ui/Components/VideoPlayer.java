@@ -2,7 +2,6 @@ package org.telegram.ui.Components;
 
 import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
-import android.net.Uri;
 import android.os.Handler;
 import android.view.TextureView;
 import org.telegram.messenger.ApplicationLoader;
@@ -17,16 +16,7 @@ import org.telegram.messenger.exoplayer2.Player;
 import org.telegram.messenger.exoplayer2.SimpleExoPlayer;
 import org.telegram.messenger.exoplayer2.SimpleExoPlayer.VideoListener;
 import org.telegram.messenger.exoplayer2.Timeline;
-import org.telegram.messenger.exoplayer2.extractor.DefaultExtractorsFactory;
-import org.telegram.messenger.exoplayer2.source.ExtractorMediaSource;
-import org.telegram.messenger.exoplayer2.source.LoopingMediaSource;
-import org.telegram.messenger.exoplayer2.source.MediaSource;
 import org.telegram.messenger.exoplayer2.source.TrackGroupArray;
-import org.telegram.messenger.exoplayer2.source.dash.DashMediaSource;
-import org.telegram.messenger.exoplayer2.source.dash.DefaultDashChunkSource;
-import org.telegram.messenger.exoplayer2.source.hls.HlsMediaSource;
-import org.telegram.messenger.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
-import org.telegram.messenger.exoplayer2.source.smoothstreaming.SsMediaSource;
 import org.telegram.messenger.exoplayer2.trackselection.AdaptiveTrackSelection;
 import org.telegram.messenger.exoplayer2.trackselection.DefaultTrackSelector;
 import org.telegram.messenger.exoplayer2.trackselection.MappingTrackSelector;
@@ -76,6 +66,268 @@ public class VideoPlayer implements NotificationCenterDelegate, EventListener, V
         void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture);
 
         void onVideoSizeChanged(int i, int i2, int i3, float f);
+    }
+
+    public void preparePlayer(android.net.Uri r1, java.lang.String r2) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.VideoPlayer.preparePlayer(android.net.Uri, java.lang.String):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = 0;
+        r9.videoPlayerReady = r0;
+        r9.mixedAudio = r0;
+        r1 = r10.getScheme();
+        r2 = 1;
+        if (r1 == 0) goto L_0x0016;
+    L_0x000c:
+        r3 = "file";
+        r3 = r1.startsWith(r3);
+        if (r3 != 0) goto L_0x0016;
+    L_0x0014:
+        r3 = r2;
+        goto L_0x0017;
+    L_0x0016:
+        r3 = r0;
+    L_0x0017:
+        r9.isStreaming = r3;
+        r9.ensurePleyaerCreated();
+        r3 = -1;
+        r4 = r11.hashCode();
+        r5 = 3680; // 0xe60 float:5.157E-42 double:1.818E-320;
+        if (r4 == r5) goto L_0x0043;
+    L_0x0025:
+        r5 = 103407; // 0x193ef float:1.44904E-40 double:5.109E-319;
+        if (r4 == r5) goto L_0x0039;
+    L_0x002a:
+        r5 = 3075986; // 0x2eef92 float:4.310374E-39 double:1.519739E-317;
+        if (r4 == r5) goto L_0x0030;
+    L_0x002f:
+        goto L_0x004d;
+    L_0x0030:
+        r4 = "dash";
+        r4 = r11.equals(r4);
+        if (r4 == 0) goto L_0x004d;
+    L_0x0038:
+        goto L_0x004e;
+    L_0x0039:
+        r0 = "hls";
+        r0 = r11.equals(r0);
+        if (r0 == 0) goto L_0x004d;
+    L_0x0041:
+        r0 = r2;
+        goto L_0x004e;
+    L_0x0043:
+        r0 = "ss";
+        r0 = r11.equals(r0);
+        if (r0 == 0) goto L_0x004d;
+    L_0x004b:
+        r0 = 2;
+        goto L_0x004e;
+    L_0x004d:
+        r0 = r3;
+    L_0x004e:
+        switch(r0) {
+            case 0: goto L_0x0082;
+            case 1: goto L_0x0077;
+            case 2: goto L_0x0063;
+            default: goto L_0x0051;
+        };
+    L_0x0051:
+        r0 = new org.telegram.messenger.exoplayer2.source.ExtractorMediaSource;
+        r5 = r9.mediaDataSourceFactory;
+        r6 = new org.telegram.messenger.exoplayer2.extractor.DefaultExtractorsFactory;
+        r6.<init>();
+        r7 = r9.mainHandler;
+        r8 = 0;
+        r3 = r0;
+        r4 = r10;
+        r3.<init>(r4, r5, r6, r7, r8);
+        goto L_0x0096;
+    L_0x0063:
+        r0 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.SsMediaSource;
+        r5 = r9.mediaDataSourceFactory;
+        r6 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.DefaultSsChunkSource$Factory;
+        r3 = r9.mediaDataSourceFactory;
+        r6.<init>(r3);
+        r7 = r9.mainHandler;
+        r8 = 0;
+        r3 = r0;
+        r4 = r10;
+        r3.<init>(r4, r5, r6, r7, r8);
+        goto L_0x0096;
+    L_0x0077:
+        r0 = new org.telegram.messenger.exoplayer2.source.hls.HlsMediaSource;
+        r3 = r9.mediaDataSourceFactory;
+        r4 = r9.mainHandler;
+        r5 = 0;
+        r0.<init>(r10, r3, r4, r5);
+        goto L_0x0096;
+    L_0x0082:
+        r0 = new org.telegram.messenger.exoplayer2.source.dash.DashMediaSource;
+        r5 = r9.mediaDataSourceFactory;
+        r6 = new org.telegram.messenger.exoplayer2.source.dash.DefaultDashChunkSource$Factory;
+        r3 = r9.mediaDataSourceFactory;
+        r6.<init>(r3);
+        r7 = r9.mainHandler;
+        r8 = 0;
+        r3 = r0;
+        r4 = r10;
+        r3.<init>(r4, r5, r6, r7, r8);
+        r3 = r9.player;
+        r3.prepare(r0, r2, r2);
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.VideoPlayer.preparePlayer(android.net.Uri, java.lang.String):void");
+    }
+
+    public void preparePlayerLoop(android.net.Uri r1, java.lang.String r2, android.net.Uri r3, java.lang.String r4) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.VideoPlayer.preparePlayerLoop(android.net.Uri, java.lang.String, android.net.Uri, java.lang.String):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r15;
+        r1 = 1;
+        r0.mixedAudio = r1;
+        r2 = 0;
+        r0.audioPlayerReady = r2;
+        r0.videoPlayerReady = r2;
+        r0.ensurePleyaerCreated();
+        r3 = 0;
+        r4 = 0;
+        r5 = r4;
+        r4 = r3;
+        r3 = r2;
+        r6 = 2;
+        if (r3 >= r6) goto L_0x00a8;
+    L_0x0014:
+        if (r3 != 0) goto L_0x001b;
+    L_0x0016:
+        r7 = r17;
+        r8 = r16;
+        goto L_0x001f;
+    L_0x001b:
+        r7 = r19;
+        r8 = r18;
+    L_0x001f:
+        r9 = -1;
+        r10 = r7.hashCode();
+        r11 = 3680; // 0xe60 float:5.157E-42 double:1.818E-320;
+        if (r10 == r11) goto L_0x0047;
+    L_0x0028:
+        r6 = 103407; // 0x193ef float:1.44904E-40 double:5.109E-319;
+        if (r10 == r6) goto L_0x003d;
+    L_0x002d:
+        r6 = 3075986; // 0x2eef92 float:4.310374E-39 double:1.519739E-317;
+        if (r10 == r6) goto L_0x0033;
+    L_0x0032:
+        goto L_0x0050;
+    L_0x0033:
+        r6 = "dash";
+        r6 = r7.equals(r6);
+        if (r6 == 0) goto L_0x0050;
+    L_0x003b:
+        r9 = r2;
+        goto L_0x0050;
+    L_0x003d:
+        r6 = "hls";
+        r6 = r7.equals(r6);
+        if (r6 == 0) goto L_0x0050;
+    L_0x0045:
+        r9 = r1;
+        goto L_0x0050;
+    L_0x0047:
+        r10 = "ss";
+        r10 = r7.equals(r10);
+        if (r10 == 0) goto L_0x0050;
+    L_0x004f:
+        r9 = r6;
+    L_0x0050:
+        switch(r9) {
+            case 0: goto L_0x0084;
+            case 1: goto L_0x0079;
+            case 2: goto L_0x0065;
+            default: goto L_0x0053;
+        };
+    L_0x0053:
+        r6 = new org.telegram.messenger.exoplayer2.source.ExtractorMediaSource;
+        r11 = r0.mediaDataSourceFactory;
+        r12 = new org.telegram.messenger.exoplayer2.extractor.DefaultExtractorsFactory;
+        r12.<init>();
+        r13 = r0.mainHandler;
+        r14 = 0;
+        r9 = r6;
+        r10 = r8;
+        r9.<init>(r10, r11, r12, r13, r14);
+        goto L_0x0098;
+    L_0x0065:
+        r6 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.SsMediaSource;
+        r11 = r0.mediaDataSourceFactory;
+        r12 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.DefaultSsChunkSource$Factory;
+        r9 = r0.mediaDataSourceFactory;
+        r12.<init>(r9);
+        r13 = r0.mainHandler;
+        r14 = 0;
+        r9 = r6;
+        r10 = r8;
+        r9.<init>(r10, r11, r12, r13, r14);
+        goto L_0x0098;
+    L_0x0079:
+        r6 = new org.telegram.messenger.exoplayer2.source.hls.HlsMediaSource;
+        r9 = r0.mediaDataSourceFactory;
+        r10 = r0.mainHandler;
+        r11 = 0;
+        r6.<init>(r8, r9, r10, r11);
+        goto L_0x0098;
+    L_0x0084:
+        r6 = new org.telegram.messenger.exoplayer2.source.dash.DashMediaSource;
+        r11 = r0.mediaDataSourceFactory;
+        r12 = new org.telegram.messenger.exoplayer2.source.dash.DefaultDashChunkSource$Factory;
+        r9 = r0.mediaDataSourceFactory;
+        r12.<init>(r9);
+        r13 = r0.mainHandler;
+        r14 = 0;
+        r9 = r6;
+        r10 = r8;
+        r9.<init>(r10, r11, r12, r13, r14);
+        r9 = new org.telegram.messenger.exoplayer2.source.LoopingMediaSource;
+        r9.<init>(r6);
+        r6 = r9;
+        if (r3 != 0) goto L_0x00a3;
+        r4 = r6;
+        goto L_0x00a4;
+        r5 = r6;
+        r3 = r3 + 1;
+        goto L_0x0011;
+    L_0x00a8:
+        r2 = r0.player;
+        r2.prepare(r4, r1, r1);
+        r2 = r0.audioPlayer;
+        r2.prepare(r5, r1, r1);
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.VideoPlayer.preparePlayerLoop(android.net.Uri, java.lang.String, android.net.Uri, java.lang.String):void");
     }
 
     public VideoPlayer() {
@@ -137,173 +389,6 @@ public class VideoPlayer implements NotificationCenterDelegate, EventListener, V
         }
     }
 
-    public void preparePlayerLoop(Uri videoUri, String videoType, Uri audioUri, String audioType) {
-        this.mixedAudio = true;
-        this.audioPlayerReady = false;
-        this.videoPlayerReady = false;
-        ensurePleyaerCreated();
-        MediaSource mediaSource1 = null;
-        MediaSource mediaSource2 = null;
-        for (int a = 0; a < 2; a++) {
-            String type;
-            Uri uri;
-            MediaSource mediaSource;
-            if (a == 0) {
-                type = videoType;
-                uri = videoUri;
-            } else {
-                type = audioType;
-                uri = audioUri;
-            }
-            Object obj = -1;
-            switch (type.hashCode()) {
-                case 3680:
-                    if (type.equals("ss")) {
-                        obj = 2;
-                        break;
-                    }
-                    break;
-                case 103407:
-                    if (type.equals("hls")) {
-                        obj = 1;
-                        break;
-                    }
-                    break;
-                case 3075986:
-                    if (type.equals("dash")) {
-                        obj = null;
-                        break;
-                    }
-                    break;
-            }
-            switch (obj) {
-                case null:
-                    mediaSource = new DashMediaSource(uri, this.mediaDataSourceFactory, new DefaultDashChunkSource.Factory(this.mediaDataSourceFactory), this.mainHandler, null);
-                    break;
-                case 1:
-                    mediaSource = new HlsMediaSource(uri, this.mediaDataSourceFactory, this.mainHandler, null);
-                    break;
-                case 2:
-                    mediaSource = new SsMediaSource(uri, this.mediaDataSourceFactory, new DefaultSsChunkSource.Factory(this.mediaDataSourceFactory), this.mainHandler, null);
-                    break;
-                default:
-                    mediaSource = new ExtractorMediaSource(uri, this.mediaDataSourceFactory, new DefaultExtractorsFactory(), this.mainHandler, null);
-                    break;
-            }
-            MediaSource mediaSource3 = new LoopingMediaSource(mediaSource);
-            if (a == 0) {
-                mediaSource1 = mediaSource3;
-            } else {
-                mediaSource2 = mediaSource3;
-            }
-        }
-        this.player.prepare(mediaSource1, true, true);
-        this.audioPlayer.prepare(mediaSource2, true, true);
-    }
-
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public void preparePlayer(android.net.Uri r9, java.lang.String r10) {
-        /*
-        r8 = this;
-        r5 = 0;
-        r7 = 1;
-        r2 = 0;
-        r8.videoPlayerReady = r2;
-        r8.mixedAudio = r2;
-        r6 = r9.getScheme();
-        if (r6 == 0) goto L_0x003d;
-    L_0x000d:
-        r1 = "file";
-        r1 = r6.startsWith(r1);
-        if (r1 != 0) goto L_0x003d;
-    L_0x0016:
-        r1 = r7;
-    L_0x0017:
-        r8.isStreaming = r1;
-        r8.ensurePleyaerCreated();
-        r1 = -1;
-        r3 = r10.hashCode();
-        switch(r3) {
-            case 3680: goto L_0x0054;
-            case 103407: goto L_0x0049;
-            case 3075986: goto L_0x003f;
-            default: goto L_0x0024;
-        };
-    L_0x0024:
-        r2 = r1;
-    L_0x0025:
-        switch(r2) {
-            case 0: goto L_0x005f;
-            case 1: goto L_0x0071;
-            case 2: goto L_0x007b;
-            default: goto L_0x0028;
-        };
-    L_0x0028:
-        r0 = new org.telegram.messenger.exoplayer2.source.ExtractorMediaSource;
-        r2 = r8.mediaDataSourceFactory;
-        r3 = new org.telegram.messenger.exoplayer2.extractor.DefaultExtractorsFactory;
-        r3.<init>();
-        r4 = r8.mainHandler;
-        r1 = r9;
-        r0.<init>(r1, r2, r3, r4, r5);
-    L_0x0037:
-        r1 = r8.player;
-        r1.prepare(r0, r7, r7);
-        return;
-    L_0x003d:
-        r1 = r2;
-        goto L_0x0017;
-    L_0x003f:
-        r3 = "dash";
-        r3 = r10.equals(r3);
-        if (r3 == 0) goto L_0x0024;
-    L_0x0048:
-        goto L_0x0025;
-    L_0x0049:
-        r2 = "hls";
-        r2 = r10.equals(r2);
-        if (r2 == 0) goto L_0x0024;
-    L_0x0052:
-        r2 = r7;
-        goto L_0x0025;
-    L_0x0054:
-        r2 = "ss";
-        r2 = r10.equals(r2);
-        if (r2 == 0) goto L_0x0024;
-    L_0x005d:
-        r2 = 2;
-        goto L_0x0025;
-    L_0x005f:
-        r0 = new org.telegram.messenger.exoplayer2.source.dash.DashMediaSource;
-        r2 = r8.mediaDataSourceFactory;
-        r3 = new org.telegram.messenger.exoplayer2.source.dash.DefaultDashChunkSource$Factory;
-        r1 = r8.mediaDataSourceFactory;
-        r3.<init>(r1);
-        r4 = r8.mainHandler;
-        r1 = r9;
-        r0.<init>(r1, r2, r3, r4, r5);
-        goto L_0x0037;
-    L_0x0071:
-        r0 = new org.telegram.messenger.exoplayer2.source.hls.HlsMediaSource;
-        r1 = r8.mediaDataSourceFactory;
-        r2 = r8.mainHandler;
-        r0.<init>(r9, r1, r2, r5);
-        goto L_0x0037;
-    L_0x007b:
-        r0 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.SsMediaSource;
-        r2 = r8.mediaDataSourceFactory;
-        r3 = new org.telegram.messenger.exoplayer2.source.smoothstreaming.DefaultSsChunkSource$Factory;
-        r1 = r8.mediaDataSourceFactory;
-        r3.<init>(r1);
-        r4 = r8.mainHandler;
-        r1 = r9;
-        r0.<init>(r1, r2, r3, r4, r5);
-        goto L_0x0037;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.VideoPlayer.preparePlayer(android.net.Uri, java.lang.String):void");
-    }
-
     public boolean isPlayerPrepared() {
         return this.player != null;
     }
@@ -337,7 +422,6 @@ public class VideoPlayer implements NotificationCenterDelegate, EventListener, V
             }
             if (this.audioPlayer != null) {
                 this.audioPlayer.setPlayWhenReady(true);
-                return;
             }
             return;
         }
@@ -367,7 +451,6 @@ public class VideoPlayer implements NotificationCenterDelegate, EventListener, V
             }
             if (this.audioPlayer != null) {
                 this.audioPlayer.setPlayWhenReady(false);
-                return;
             }
             return;
         }
@@ -393,14 +476,14 @@ public class VideoPlayer implements NotificationCenterDelegate, EventListener, V
     }
 
     public void setMute(boolean value) {
-        float f = 0.0f;
+        float f = 1.0f;
         if (this.player != null) {
             this.player.setVolume(value ? 0.0f : 1.0f);
         }
         if (this.audioPlayer != null) {
             SimpleExoPlayer simpleExoPlayer = this.audioPlayer;
-            if (!value) {
-                f = 1.0f;
+            if (value) {
+                f = 0.0f;
             }
             simpleExoPlayer.setVolume(f);
         }

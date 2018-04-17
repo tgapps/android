@@ -3,26 +3,26 @@ package com.google.android.gms.wearable;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.common.data.DataHolder;
-import com.google.android.gms.common.data.zzg;
+import com.google.android.gms.common.data.EntityBuffer;
 import com.google.android.gms.wearable.internal.zzcy;
 
-public class DataEventBuffer extends zzg<Object> implements Result {
-    private final Status mStatus;
+public class DataEventBuffer extends EntityBuffer<Object> implements Result {
+    private final Status zzp;
 
     public DataEventBuffer(DataHolder dataHolder) {
         super(dataHolder);
-        this.mStatus = new Status(dataHolder.getStatusCode());
+        this.zzp = new Status(dataHolder.getStatusCode());
     }
 
-    public Status getStatus() {
-        return this.mStatus;
+    protected /* synthetic */ Object getEntry(int i, int i2) {
+        return new zzcy(this.mDataHolder, i, i2);
     }
 
-    protected final String zzaka() {
+    protected String getPrimaryDataMarkerColumn() {
         return "path";
     }
 
-    protected final /* synthetic */ Object zzl(int i, int i2) {
-        return new zzcy(this.zzfqt, i, i2);
+    public Status getStatus() {
+        return this.zzp;
     }
 }

@@ -2,8 +2,6 @@ package org.telegram.ui.Cells;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.text.Layout.Alignment;
 import android.text.Spannable;
 import android.text.StaticLayout;
 import android.text.TextUtils;
@@ -12,7 +10,6 @@ import android.view.MotionEvent;
 import android.view.View.MeasureSpec;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLoader;
-import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
@@ -24,7 +21,6 @@ import org.telegram.tgnet.TLRPC.PhotoSize;
 import org.telegram.tgnet.TLRPC.TL_documentEmpty;
 import org.telegram.tgnet.TLRPC.TL_messageActionUserUpdatedPhoto;
 import org.telegram.tgnet.TLRPC.TL_photoEmpty;
-import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.PhotoViewer;
 
@@ -59,6 +55,758 @@ public class ChatActionCell extends BaseCell {
         void needOpenUserProfile(int i);
     }
 
+    protected void onDraw(android.graphics.Canvas r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Cells.ChatActionCell.onDraw(android.graphics.Canvas):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r6 = r40;
+        r7 = r41;
+        r0 = r6.currentMessageObject;
+        if (r0 == 0) goto L_0x0015;
+    L_0x0008:
+        r0 = r6.currentMessageObject;
+        r0 = r0.type;
+        r1 = 11;
+        if (r0 != r1) goto L_0x0015;
+    L_0x0010:
+        r0 = r6.imageReceiver;
+        r0.draw(r7);
+    L_0x0015:
+        r0 = r6.textLayout;
+        if (r0 == 0) goto L_0x04ec;
+    L_0x0019:
+        r0 = r6.textLayout;
+        r8 = r0.getLineCount();
+        r9 = 1093664768; // 0x41300000 float:11.0 double:5.4034219E-315;
+        r10 = org.telegram.messenger.AndroidUtilities.dp(r9);
+        r11 = 1086324736; // 0x40c00000 float:6.0 double:5.367157323E-315;
+        r12 = org.telegram.messenger.AndroidUtilities.dp(r11);
+        r13 = r10 - r12;
+        r0 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
+        r14 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r0 = 1088421888; // 0x40e00000 float:7.0 double:5.37751863E-315;
+        r0 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r1 = 0;
+        r2 = r0;
+        r0 = 0;
+        r5 = r0;
+        if (r5 >= r8) goto L_0x04d4;
+    L_0x003f:
+        r0 = r6.findMaxWidthAroundLine(r5);
+        r3 = r40.getMeasuredWidth();
+        r3 = r3 - r0;
+        r3 = r3 - r13;
+        r4 = 2;
+        r3 = r3 / r4;
+        r0 = r0 + r13;
+        r15 = r6.textLayout;
+        r15 = r15.getLineBottom(r5);
+        r16 = r15 - r1;
+        r17 = 0;
+        r18 = r15;
+        r1 = r8 + -1;
+        r11 = 1;
+        if (r5 != r1) goto L_0x005f;
+    L_0x005d:
+        r1 = r11;
+        goto L_0x0060;
+    L_0x005f:
+        r1 = 0;
+    L_0x0060:
+        if (r5 != 0) goto L_0x0065;
+    L_0x0062:
+        r20 = r11;
+        goto L_0x0067;
+    L_0x0065:
+        r20 = 0;
+    L_0x0067:
+        r9 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        if (r20 == 0) goto L_0x0077;
+    L_0x006b:
+        r22 = org.telegram.messenger.AndroidUtilities.dp(r9);
+        r2 = r2 - r22;
+        r22 = org.telegram.messenger.AndroidUtilities.dp(r9);
+        r16 = r16 + r22;
+    L_0x0077:
+        r22 = r2;
+        if (r1 == 0) goto L_0x0081;
+    L_0x007b:
+        r2 = org.telegram.messenger.AndroidUtilities.dp(r9);
+        r16 = r16 + r2;
+    L_0x0081:
+        r2 = r22;
+        r23 = r16;
+        r24 = 0;
+        r25 = 0;
+        r26 = 0;
+        r27 = 0;
+        if (r1 != 0) goto L_0x00b1;
+    L_0x008f:
+        r9 = r5 + 1;
+        if (r9 >= r8) goto L_0x00b1;
+    L_0x0093:
+        r9 = r5 + 1;
+        r9 = r6.findMaxWidthAroundLine(r9);
+        r9 = r9 + r13;
+        r26 = r13 * 2;
+        r4 = r9 + r26;
+        if (r4 >= r0) goto L_0x00a6;
+    L_0x00a0:
+        r24 = 1;
+        r1 = 1;
+    L_0x00a3:
+        r26 = r9;
+        goto L_0x00b1;
+    L_0x00a6:
+        r4 = r13 * 2;
+        r4 = r4 + r0;
+        if (r4 >= r9) goto L_0x00ae;
+    L_0x00ab:
+        r24 = 2;
+        goto L_0x00a3;
+    L_0x00ae:
+        r24 = 3;
+        goto L_0x00a3;
+    L_0x00b1:
+        r9 = r24;
+        r24 = r1;
+        if (r20 != 0) goto L_0x00d7;
+    L_0x00b7:
+        if (r5 <= 0) goto L_0x00d7;
+    L_0x00b9:
+        r1 = r5 + -1;
+        r1 = r6.findMaxWidthAroundLine(r1);
+        r1 = r1 + r13;
+        r4 = r13 * 2;
+        r4 = r4 + r1;
+        if (r4 >= r0) goto L_0x00cc;
+    L_0x00c5:
+        r25 = 1;
+        r20 = 1;
+    L_0x00c9:
+        r27 = r1;
+        goto L_0x00d7;
+    L_0x00cc:
+        r4 = r13 * 2;
+        r4 = r4 + r0;
+        if (r4 >= r1) goto L_0x00d4;
+    L_0x00d1:
+        r25 = 2;
+        goto L_0x00c9;
+    L_0x00d4:
+        r25 = 3;
+        goto L_0x00c9;
+    L_0x00d7:
+        r4 = r25;
+        if (r9 == 0) goto L_0x0219;
+    L_0x00db:
+        if (r9 != r11) goto L_0x0175;
+    L_0x00dd:
+        r25 = r40.getMeasuredWidth();
+        r25 = r25 - r26;
+        r29 = 2;
+        r11 = r25 / 2;
+        r1 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r17 = org.telegram.messenger.AndroidUtilities.dp(r1);
+        r25 = r5 + 1;
+        r30 = r0;
+        r0 = r6;
+        r31 = r15;
+        r15 = 3;
+        r1 = r26;
+        r32 = r2;
+        r2 = r30;
+        r15 = r3;
+        r3 = r25;
+        r6 = r4;
+        r33 = r10;
+        r10 = r29;
+        r4 = r8;
+        r25 = r5;
+        r5 = r13;
+        r0 = r0.isLineBottom(r1, r2, r3, r4, r5);
+        if (r0 == 0) goto L_0x0142;
+    L_0x010d:
+        r3 = r15 + r12;
+        r1 = (float) r3;
+        r0 = r22 + r16;
+        r2 = (float) r0;
+        r0 = r11 - r13;
+        r3 = (float) r0;
+        r0 = r22 + r16;
+        r4 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r5 = org.telegram.messenger.AndroidUtilities.dp(r4);
+        r0 = r0 + r5;
+        r4 = (float) r0;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r0 = r11 + r26;
+        r0 = r0 + r13;
+        r1 = (float) r0;
+        r0 = r22 + r16;
+        r2 = (float) r0;
+        r3 = r15 + r30;
+        r3 = r3 - r12;
+        r3 = (float) r3;
+        r0 = r22 + r16;
+        r4 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r5 = org.telegram.messenger.AndroidUtilities.dp(r4);
+        r0 = r0 + r5;
+        r4 = (float) r0;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        goto L_0x0173;
+    L_0x0142:
+        r3 = r15 + r12;
+        r1 = (float) r3;
+        r0 = r22 + r16;
+        r2 = (float) r0;
+        r3 = (float) r11;
+        r0 = r22 + r16;
+        r4 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r5 = org.telegram.messenger.AndroidUtilities.dp(r4);
+        r0 = r0 + r5;
+        r4 = (float) r0;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r0 = r11 + r26;
+        r1 = (float) r0;
+        r0 = r22 + r16;
+        r2 = (float) r0;
+        r3 = r15 + r30;
+        r3 = r3 - r12;
+        r3 = (float) r3;
+        r0 = r22 + r16;
+        r4 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r5 = org.telegram.messenger.AndroidUtilities.dp(r4);
+        r0 = r0 + r5;
+        r4 = (float) r0;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+    L_0x0173:
+        goto L_0x0225;
+    L_0x0175:
+        r30 = r0;
+        r32 = r2;
+        r6 = r4;
+        r25 = r5;
+        r33 = r10;
+        r31 = r15;
+        r10 = 2;
+        r15 = r3;
+        if (r9 != r10) goto L_0x0212;
+    L_0x0184:
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r17 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r0 = r22 + r16;
+        r1 = 1093664768; // 0x41300000 float:11.0 double:5.4034219E-315;
+        r2 = org.telegram.messenger.AndroidUtilities.dp(r1);
+        r11 = r0 - r2;
+        r3 = r15 - r14;
+        if (r6 == r10) goto L_0x019c;
+    L_0x0198:
+        r0 = 3;
+        if (r6 == r0) goto L_0x019c;
+    L_0x019b:
+        r3 = r3 - r13;
+    L_0x019c:
+        r5 = r3;
+        if (r20 != 0) goto L_0x01a5;
+    L_0x019f:
+        if (r24 == 0) goto L_0x01a2;
+    L_0x01a1:
+        goto L_0x01a5;
+    L_0x01a2:
+        r34 = r5;
+        goto L_0x01c2;
+    L_0x01a5:
+        r0 = r5 + r14;
+        r1 = (float) r0;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r2 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r2 = r2 + r11;
+        r2 = (float) r2;
+        r0 = r5 + r14;
+        r0 = r0 + r33;
+        r3 = (float) r0;
+        r0 = r11 + r33;
+        r4 = (float) r0;
+        r29 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r34 = r5;
+        r5 = r29;
+        r0.drawRect(r1, r2, r3, r4, r5);
+    L_0x01c2:
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerInner;
+        r0 = r0[r10];
+        r3 = r34;
+        r5 = r3 + r14;
+        r1 = r11 + r14;
+        r0.setBounds(r3, r11, r5, r1);
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerInner;
+        r0 = r0[r10];
+        r0.draw(r7);
+        r3 = r15 + r30;
+        if (r6 == r10) goto L_0x01de;
+    L_0x01da:
+        r0 = 3;
+        if (r6 == r0) goto L_0x01de;
+    L_0x01dd:
+        r3 = r3 + r13;
+    L_0x01de:
+        r5 = r3;
+        if (r20 != 0) goto L_0x01e6;
+    L_0x01e1:
+        if (r24 == 0) goto L_0x01e4;
+    L_0x01e3:
+        goto L_0x01e6;
+    L_0x01e4:
+        r10 = r5;
+        goto L_0x01fe;
+    L_0x01e6:
+        r0 = r5 - r33;
+        r1 = (float) r0;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r2 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r2 = r2 + r11;
+        r2 = (float) r2;
+        r3 = (float) r5;
+        r0 = r11 + r33;
+        r4 = (float) r0;
+        r29 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r10 = r5;
+        r5 = r29;
+        r0.drawRect(r1, r2, r3, r4, r5);
+    L_0x01fe:
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerInner;
+        r1 = 3;
+        r0 = r0[r1];
+        r5 = r10 + r14;
+        r2 = r11 + r14;
+        r0.setBounds(r10, r11, r5, r2);
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerInner;
+        r0 = r0[r1];
+        r0.draw(r7);
+        goto L_0x0225;
+    L_0x0212:
+        r0 = 1086324736; // 0x40c00000 float:6.0 double:5.367157323E-315;
+        r17 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        goto L_0x0225;
+    L_0x0219:
+        r30 = r0;
+        r32 = r2;
+        r6 = r4;
+        r25 = r5;
+        r33 = r10;
+        r31 = r15;
+        r15 = r3;
+    L_0x0225:
+        if (r6 == 0) goto L_0x036e;
+    L_0x0227:
+        r0 = 1;
+        if (r6 != r0) goto L_0x02b5;
+    L_0x022a:
+        r10 = r6;
+        r6 = r40;
+        r0 = r40.getMeasuredWidth();
+        r0 = r0 - r27;
+        r1 = 2;
+        r11 = r0 / 2;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r1 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r5 = r22 - r1;
+        r1 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r16 = r16 + r1;
+        r3 = r25 + -1;
+        r0 = r6;
+        r1 = r27;
+        r2 = r30;
+        r4 = r8;
+        r35 = r8;
+        r8 = r5;
+        r5 = r13;
+        r0 = r0.isLineTop(r1, r2, r3, r4, r5);
+        if (r0 == 0) goto L_0x0285;
+    L_0x0256:
+        r3 = r15 + r12;
+        r1 = (float) r3;
+        r2 = (float) r8;
+        r0 = r11 - r13;
+        r3 = (float) r0;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r5 = r8 + r4;
+        r4 = (float) r5;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r0 = r11 + r27;
+        r0 = r0 + r13;
+        r1 = (float) r0;
+        r2 = (float) r8;
+        r3 = r15 + r30;
+        r3 = r3 - r12;
+        r3 = (float) r3;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r0 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r5 = r8 + r0;
+        r4 = (float) r5;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        goto L_0x02b0;
+    L_0x0285:
+        r3 = r15 + r12;
+        r1 = (float) r3;
+        r2 = (float) r8;
+        r3 = (float) r11;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r5 = r8 + r4;
+        r4 = (float) r5;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r0 = r11 + r27;
+        r1 = (float) r0;
+        r2 = (float) r8;
+        r3 = r15 + r30;
+        r3 = r3 - r12;
+        r3 = (float) r3;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r0 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r5 = r8 + r0;
+        r4 = (float) r5;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r28 = 1093664768; // 0x41300000 float:11.0 double:5.4034219E-315;
+        goto L_0x0377;
+    L_0x02b5:
+        r10 = r6;
+        r35 = r8;
+        r6 = r40;
+        r0 = 2;
+        if (r10 != r0) goto L_0x035b;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r1 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r22 = r22 - r1;
+        r1 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r16 = r16 + r1;
+        r0 = 1086744166; // 0x40c66666 float:6.2 double:5.36922958E-315;
+        r0 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r8 = r22 + r0;
+        r3 = r15 - r14;
+        r0 = 2;
+        if (r9 == r0) goto L_0x02dd;
+        r0 = 3;
+        if (r9 == r0) goto L_0x02dd;
+        r3 = r3 - r13;
+        r11 = r3;
+        if (r20 != 0) goto L_0x02e2;
+        if (r24 == 0) goto L_0x0302;
+        r0 = r11 + r14;
+        r1 = (float) r0;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r2 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r2 = r22 + r2;
+        r2 = (float) r2;
+        r0 = r11 + r14;
+        r0 = r0 + r33;
+        r3 = (float) r0;
+        r0 = 1093664768; // 0x41300000 float:11.0 double:5.4034219E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r4 = r22 + r4;
+        r4 = (float) r4;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerInner;
+        r1 = 0;
+        r0 = r0[r1];
+        r2 = r11 + r14;
+        r3 = r8 + r14;
+        r0.setBounds(r11, r8, r2, r3);
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerInner;
+        r0 = r0[r1];
+        r0.draw(r7);
+        r3 = r15 + r30;
+        r0 = 2;
+        if (r9 == r0) goto L_0x031e;
+        r0 = 3;
+        if (r9 == r0) goto L_0x031e;
+        r3 = r3 + r13;
+        r11 = r3;
+        if (r20 != 0) goto L_0x0327;
+        if (r24 == 0) goto L_0x0324;
+        goto L_0x0327;
+        r28 = 1093664768; // 0x41300000 float:11.0 double:5.4034219E-315;
+        goto L_0x0347;
+        r0 = r11 - r33;
+        r1 = (float) r0;
+        r0 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
+        r0 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r0 = r22 + r0;
+        r2 = (float) r0;
+        r3 = (float) r11;
+        r5 = 1093664768; // 0x41300000 float:11.0 double:5.4034219E-315;
+        r0 = org.telegram.messenger.AndroidUtilities.dp(r5);
+        r0 = r22 + r0;
+        r4 = (float) r0;
+        r21 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r28 = r5;
+        r5 = r21;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerInner;
+        r1 = 1;
+        r0 = r0[r1];
+        r2 = r11 + r14;
+        r3 = r8 + r14;
+        r0.setBounds(r11, r8, r2, r3);
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerInner;
+        r0 = r0[r1];
+        r0.draw(r7);
+        goto L_0x036b;
+        r28 = 1093664768; // 0x41300000 float:11.0 double:5.4034219E-315;
+        r0 = 1086324736; // 0x40c00000 float:6.0 double:5.367157323E-315;
+        r1 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r22 = r22 - r1;
+        r1 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r16 = r16 + r1;
+        r8 = r22;
+        goto L_0x0377;
+    L_0x036e:
+        r10 = r6;
+        r35 = r8;
+        r6 = r40;
+        r28 = 1093664768; // 0x41300000 float:11.0 double:5.4034219E-315;
+        r8 = r22;
+        if (r20 != 0) goto L_0x038f;
+        if (r24 == 0) goto L_0x037e;
+        r11 = r32;
+        goto L_0x0391;
+        r1 = (float) r15;
+        r11 = r32;
+        r2 = (float) r11;
+        r3 = r15 + r30;
+        r3 = (float) r3;
+        r0 = r11 + r23;
+        r4 = (float) r0;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        goto L_0x03a2;
+        r11 = r32;
+        r3 = r15 + r12;
+        r1 = (float) r3;
+        r2 = (float) r11;
+        r3 = r15 + r30;
+        r3 = r3 - r12;
+        r3 = (float) r3;
+        r0 = r11 + r23;
+        r4 = (float) r0;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r5 = r15 - r13;
+        r3 = r15 + r30;
+        r4 = r3 - r12;
+        if (r20 == 0) goto L_0x03f5;
+        if (r24 != 0) goto L_0x03f5;
+        r0 = 2;
+        if (r9 == r0) goto L_0x03f5;
+        r1 = (float) r5;
+        r0 = r8 + r33;
+        r2 = (float) r0;
+        r0 = r5 + r33;
+        r3 = (float) r0;
+        r0 = r8 + r16;
+        r0 = r0 + r17;
+        r36 = r4;
+        r4 = 1086324736; // 0x40c00000 float:6.0 double:5.367157323E-315;
+        r21 = org.telegram.messenger.AndroidUtilities.dp(r4);
+        r0 = r0 - r21;
+        r4 = (float) r0;
+        r21 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r37 = r9;
+        r9 = r36;
+        r38 = r11;
+        r11 = r5;
+        r5 = r21;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r1 = (float) r9;
+        r0 = r8 + r33;
+        r2 = (float) r0;
+        r4 = r9 + r33;
+        r3 = (float) r4;
+        r0 = r8 + r16;
+        r0 = r0 + r17;
+        r5 = 1086324736; // 0x40c00000 float:6.0 double:5.367157323E-315;
+        r4 = org.telegram.messenger.AndroidUtilities.dp(r5);
+        r0 = r0 - r4;
+        r4 = (float) r0;
+        r19 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r21 = r5;
+        r5 = r19;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r39 = r10;
+        goto L_0x046c;
+        r37 = r9;
+        r38 = r11;
+        r21 = 1086324736; // 0x40c00000 float:6.0 double:5.367157323E-315;
+        r9 = r4;
+        r11 = r5;
+        if (r24 == 0) goto L_0x043e;
+        if (r20 != 0) goto L_0x043e;
+        r0 = 2;
+        if (r10 == r0) goto L_0x043e;
+        r1 = (float) r11;
+        r0 = r8 + r33;
+        r5 = 1084227584; // 0x40a00000 float:5.0 double:5.356796015E-315;
+        r2 = org.telegram.messenger.AndroidUtilities.dp(r5);
+        r0 = r0 - r2;
+        r2 = (float) r0;
+        r0 = r11 + r33;
+        r3 = (float) r0;
+        r0 = r8 + r16;
+        r0 = r0 + r17;
+        r0 = r0 - r33;
+        r4 = (float) r0;
+        r19 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r39 = r10;
+        r10 = r5;
+        r5 = r19;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r1 = (float) r9;
+        r0 = r8 + r33;
+        r2 = org.telegram.messenger.AndroidUtilities.dp(r10);
+        r0 = r0 - r2;
+        r2 = (float) r0;
+        r4 = r9 + r33;
+        r3 = (float) r4;
+        r0 = r8 + r16;
+        r0 = r0 + r17;
+        r0 = r0 - r33;
+        r4 = (float) r0;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        goto L_0x046c;
+        r39 = r10;
+        if (r20 != 0) goto L_0x0444;
+        if (r24 == 0) goto L_0x046c;
+        r1 = (float) r11;
+        r10 = r8 + r33;
+        r2 = (float) r10;
+        r5 = r11 + r33;
+        r3 = (float) r5;
+        r0 = r8 + r16;
+        r0 = r0 + r17;
+        r0 = r0 - r33;
+        r4 = (float) r0;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        r1 = (float) r9;
+        r10 = r8 + r33;
+        r2 = (float) r10;
+        r4 = r9 + r33;
+        r3 = (float) r4;
+        r0 = r8 + r16;
+        r0 = r0 + r17;
+        r0 = r0 - r33;
+        r4 = (float) r0;
+        r5 = org.telegram.ui.ActionBar.Theme.chat_actionBackgroundPaint;
+        r0 = r7;
+        r0.drawRect(r1, r2, r3, r4, r5);
+        if (r20 == 0) goto L_0x0495;
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerOuter;
+        r3 = 0;
+        r0 = r0[r3];
+        r5 = r11 + r33;
+        r10 = r8 + r33;
+        r0.setBounds(r11, r8, r5, r10);
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerOuter;
+        r0 = r0[r3];
+        r0.draw(r7);
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerOuter;
+        r1 = 1;
+        r0 = r0[r1];
+        r4 = r9 + r33;
+        r10 = r8 + r33;
+        r0.setBounds(r9, r8, r4, r10);
+        r0 = org.telegram.ui.ActionBar.Theme.chat_cornerOuter;
+        r0 = r0[r1];
+        r0.draw(r7);
+        goto L_0x0496;
+        r3 = 0;
+        if (r24 == 0) goto L_0x04c4;
+        r0 = r8 + r16;
+        r0 = r0 + r17;
+        r0 = r0 - r33;
+        r1 = org.telegram.ui.ActionBar.Theme.chat_cornerOuter;
+        r2 = 2;
+        r1 = r1[r2];
+        r4 = r9 + r33;
+        r10 = r0 + r33;
+        r1.setBounds(r9, r0, r4, r10);
+        r1 = org.telegram.ui.ActionBar.Theme.chat_cornerOuter;
+        r1 = r1[r2];
+        r1.draw(r7);
+        r1 = org.telegram.ui.ActionBar.Theme.chat_cornerOuter;
+        r2 = 3;
+        r1 = r1[r2];
+        r5 = r11 + r33;
+        r10 = r0 + r33;
+        r1.setBounds(r11, r0, r5, r10);
+        r1 = org.telegram.ui.ActionBar.Theme.chat_cornerOuter;
+        r1 = r1[r2];
+        r1.draw(r7);
+        r2 = r8 + r16;
+        r0 = r25 + 1;
+        r1 = r18;
+        r11 = r21;
+        r9 = r28;
+        r10 = r33;
+        r8 = r35;
+        goto L_0x003c;
+    L_0x04d4:
+        r35 = r8;
+        r33 = r10;
+        r41.save();
+        r0 = r6.textXLeft;
+        r0 = (float) r0;
+        r3 = r6.textY;
+        r3 = (float) r3;
+        r7.translate(r0, r3);
+        r0 = r6.textLayout;
+        r0.draw(r7);
+        r41.restore();
+    L_0x04ec:
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatActionCell.onDraw(android.graphics.Canvas):void");
+    }
+
     public ChatActionCell(Context context) {
         super(context);
         this.imageReceiver.setRoundRadius(AndroidUtilities.dp(32.0f));
@@ -90,7 +838,6 @@ public class ChatActionCell extends BaseCell {
     }
 
     public void setMessageObject(MessageObject messageObject) {
-        boolean z = true;
         if (this.currentMessageObject != messageObject || (!this.hasReplyMessage && messageObject.replyMessageObject != null)) {
             this.currentMessageObject = messageObject;
             this.hasReplyMessage = messageObject.replyMessageObject != null;
@@ -120,11 +867,7 @@ public class ChatActionCell extends BaseCell {
                         this.imageReceiver.setImageBitmap(this.avatarDrawable);
                     }
                 }
-                ImageReceiver imageReceiver = this.imageReceiver;
-                if (PhotoViewer.isShowingImage(this.currentMessageObject)) {
-                    z = false;
-                }
-                imageReceiver.setVisible(z, false);
+                this.imageReceiver.setVisible(true ^ PhotoViewer.isShowingImage(this.currentMessageObject), false);
             } else {
                 this.imageReceiver.setImageBitmap((Bitmap) null);
             }
@@ -215,41 +958,90 @@ public class ChatActionCell extends BaseCell {
                 }
             }
         }
-        if (result) {
-            return result;
+        if (!result) {
+            result = super.onTouchEvent(event);
         }
-        return super.onTouchEvent(event);
+        return result;
     }
 
-    private void createLayout(CharSequence text, int width) {
-        int maxWidth = width - AndroidUtilities.dp(30.0f);
-        this.textLayout = new StaticLayout(text, Theme.chat_actionTextPaint, maxWidth, Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
-        this.textHeight = 0;
-        this.textWidth = 0;
-        int linesCount = this.textLayout.getLineCount();
-        int a = 0;
-        while (a < linesCount) {
-            float lineWidth;
-            try {
-                lineWidth = this.textLayout.getLineWidth(a);
-                if (lineWidth > ((float) maxWidth)) {
-                    lineWidth = (float) maxWidth;
-                }
-                this.textHeight = (int) Math.max((double) this.textHeight, Math.ceil((double) this.textLayout.getLineBottom(a)));
-            } catch (Throwable e) {
-                FileLog.e(e);
-                return;
-            }
-            try {
-                this.textWidth = (int) Math.max((double) this.textWidth, Math.ceil((double) lineWidth));
-                a++;
-            } catch (Throwable e2) {
-                FileLog.e(e2);
-            }
-        }
-        this.textX = (width - this.textWidth) / 2;
-        this.textY = AndroidUtilities.dp(7.0f);
-        this.textXLeft = (width - this.textLayout.getWidth()) / 2;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void createLayout(java.lang.CharSequence r11, int r12) {
+        /*
+        r10 = this;
+        r0 = 1106247680; // 0x41f00000 float:30.0 double:5.465589745E-315;
+        r0 = org.telegram.messenger.AndroidUtilities.dp(r0);
+        r0 = r12 - r0;
+        r9 = new android.text.StaticLayout;
+        r3 = org.telegram.ui.ActionBar.Theme.chat_actionTextPaint;
+        r5 = android.text.Layout.Alignment.ALIGN_CENTER;
+        r6 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        r7 = 0;
+        r8 = 0;
+        r1 = r9;
+        r2 = r11;
+        r4 = r0;
+        r1.<init>(r2, r3, r4, r5, r6, r7, r8);
+        r10.textLayout = r9;
+        r1 = 0;
+        r10.textHeight = r1;
+        r10.textWidth = r1;
+        r2 = r10.textLayout;	 Catch:{ Exception -> 0x0063 }
+        r2 = r2.getLineCount();	 Catch:{ Exception -> 0x0063 }
+    L_0x0026:
+        if (r1 >= r2) goto L_0x0062;
+    L_0x0028:
+        r3 = r10.textLayout;	 Catch:{ Exception -> 0x005d }
+        r3 = r3.getLineWidth(r1);	 Catch:{ Exception -> 0x005d }
+        r4 = (float) r0;	 Catch:{ Exception -> 0x005d }
+        r4 = (r3 > r4 ? 1 : (r3 == r4 ? 0 : -1));
+        if (r4 <= 0) goto L_0x0034;
+    L_0x0033:
+        r3 = (float) r0;	 Catch:{ Exception -> 0x005d }
+    L_0x0034:
+        r4 = r10.textHeight;	 Catch:{ Exception -> 0x005d }
+        r4 = (double) r4;	 Catch:{ Exception -> 0x005d }
+        r6 = r10.textLayout;	 Catch:{ Exception -> 0x005d }
+        r6 = r6.getLineBottom(r1);	 Catch:{ Exception -> 0x005d }
+        r6 = (double) r6;	 Catch:{ Exception -> 0x005d }
+        r6 = java.lang.Math.ceil(r6);	 Catch:{ Exception -> 0x005d }
+        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x005d }
+        r4 = (int) r4;	 Catch:{ Exception -> 0x005d }
+        r10.textHeight = r4;	 Catch:{ Exception -> 0x005d }
+        r4 = r10.textWidth;	 Catch:{ Exception -> 0x0063 }
+        r4 = (double) r4;	 Catch:{ Exception -> 0x0063 }
+        r6 = (double) r3;	 Catch:{ Exception -> 0x0063 }
+        r6 = java.lang.Math.ceil(r6);	 Catch:{ Exception -> 0x0063 }
+        r4 = java.lang.Math.max(r4, r6);	 Catch:{ Exception -> 0x0063 }
+        r4 = (int) r4;	 Catch:{ Exception -> 0x0063 }
+        r10.textWidth = r4;	 Catch:{ Exception -> 0x0063 }
+        r1 = r1 + 1;
+        goto L_0x0026;
+    L_0x005d:
+        r3 = move-exception;
+        org.telegram.messenger.FileLog.e(r3);	 Catch:{ Exception -> 0x0063 }
+        return;
+    L_0x0062:
+        goto L_0x0067;
+    L_0x0063:
+        r1 = move-exception;
+        org.telegram.messenger.FileLog.e(r1);
+    L_0x0067:
+        r1 = r10.textWidth;
+        r1 = r12 - r1;
+        r1 = r1 / 2;
+        r10.textX = r1;
+        r1 = 1088421888; // 0x40e00000 float:7.0 double:5.37751863E-315;
+        r1 = org.telegram.messenger.AndroidUtilities.dp(r1);
+        r10.textY = r1;
+        r1 = r10.textLayout;
+        r1 = r1.getWidth();
+        r1 = r12 - r1;
+        r1 = r1 / 2;
+        r10.textXLeft = r1;
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatActionCell.createLayout(java.lang.CharSequence, int):void");
     }
 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -257,7 +1049,6 @@ public class ChatActionCell extends BaseCell {
             setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), this.textHeight + AndroidUtilities.dp(14.0f));
             return;
         }
-        int i;
         int width = Math.max(AndroidUtilities.dp(30.0f), MeasureSpec.getSize(widthMeasureSpec));
         if (width != this.previousWidth) {
             CharSequence text;
@@ -278,13 +1069,9 @@ public class ChatActionCell extends BaseCell {
                 this.imageReceiver.setImageCoords((width - AndroidUtilities.dp(64.0f)) / 2, this.textHeight + AndroidUtilities.dp(15.0f), AndroidUtilities.dp(64.0f), AndroidUtilities.dp(64.0f));
             }
         }
-        int i2 = this.textHeight;
-        if (this.currentMessageObject == null || this.currentMessageObject.type != 11) {
-            i = 0;
-        } else {
-            i = 70;
-        }
-        setMeasuredDimension(width, AndroidUtilities.dp((float) (i + 14)) + i2);
+        int i = this.textHeight;
+        int i2 = (this.currentMessageObject == null || this.currentMessageObject.type != 11) ? 0 : 70;
+        setMeasuredDimension(width, i + AndroidUtilities.dp((float) (14 + i2)));
     }
 
     public int getCustomDate() {
@@ -313,181 +1100,20 @@ public class ChatActionCell extends BaseCell {
     }
 
     private boolean isLineTop(int prevWidth, int currentWidth, int line, int count, int cornerRest) {
-        return line == 0 || (line >= 0 && line < count && findMaxWidthAroundLine(line - 1) + (cornerRest * 3) < prevWidth);
+        if (line != 0) {
+            if (line < 0 || line >= count || findMaxWidthAroundLine(line - 1) + (cornerRest * 3) >= prevWidth) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean isLineBottom(int nextWidth, int currentWidth, int line, int count, int cornerRest) {
-        return line == count + -1 || (line >= 0 && line <= count - 1 && findMaxWidthAroundLine(line + 1) + (cornerRest * 3) < nextWidth);
-    }
-
-    protected void onDraw(Canvas canvas) {
-        if (this.currentMessageObject != null && this.currentMessageObject.type == 11) {
-            this.imageReceiver.draw(canvas);
-        }
-        if (this.textLayout != null) {
-            int count = this.textLayout.getLineCount();
-            int corner = AndroidUtilities.dp(11.0f);
-            int cornerOffset = AndroidUtilities.dp(6.0f);
-            int cornerRest = corner - cornerOffset;
-            int cornerIn = AndroidUtilities.dp(8.0f);
-            int y = AndroidUtilities.dp(7.0f);
-            int previousLineBottom = 0;
-            int a = 0;
-            while (a < count) {
-                int dy;
-                int dx;
-                int width = findMaxWidthAroundLine(a);
-                int x = ((getMeasuredWidth() - width) - cornerRest) / 2;
-                width += cornerRest;
-                int lineBottom = this.textLayout.getLineBottom(a);
-                int height = lineBottom - previousLineBottom;
-                int additionalHeight = 0;
-                previousLineBottom = lineBottom;
-                boolean drawBottomCorners = a == count + -1;
-                boolean drawTopCorners = a == 0;
-                if (drawTopCorners) {
-                    y -= AndroidUtilities.dp(3.0f);
-                    height += AndroidUtilities.dp(3.0f);
-                }
-                if (drawBottomCorners) {
-                    height += AndroidUtilities.dp(3.0f);
-                }
-                int yOld = y;
-                int hOld = height;
-                int drawInnerBottom = 0;
-                int drawInnerTop = 0;
-                int nextLineWidth = 0;
-                int prevLineWidth = 0;
-                if (!drawBottomCorners && a + 1 < count) {
-                    nextLineWidth = findMaxWidthAroundLine(a + 1) + cornerRest;
-                    if ((cornerRest * 2) + nextLineWidth < width) {
-                        drawInnerBottom = 1;
-                        drawBottomCorners = true;
-                    } else {
-                        drawInnerBottom = (cornerRest * 2) + width < nextLineWidth ? 2 : 3;
-                    }
-                }
-                if (!drawTopCorners && a > 0) {
-                    prevLineWidth = findMaxWidthAroundLine(a - 1) + cornerRest;
-                    if ((cornerRest * 2) + prevLineWidth < width) {
-                        drawInnerTop = 1;
-                        drawTopCorners = true;
-                    } else {
-                        drawInnerTop = (cornerRest * 2) + width < prevLineWidth ? 2 : 3;
-                    }
-                }
-                if (drawInnerBottom != 0) {
-                    if (drawInnerBottom == 1) {
-                        int nextX = (getMeasuredWidth() - nextLineWidth) / 2;
-                        additionalHeight = AndroidUtilities.dp(3.0f);
-                        if (isLineBottom(nextLineWidth, width, a + 1, count, cornerRest)) {
-                            canvas.drawRect((float) (x + cornerOffset), (float) (y + height), (float) (nextX - cornerRest), (float) ((y + height) + AndroidUtilities.dp(3.0f)), Theme.chat_actionBackgroundPaint);
-                            canvas.drawRect((float) ((nextX + nextLineWidth) + cornerRest), (float) (y + height), (float) ((x + width) - cornerOffset), (float) ((y + height) + AndroidUtilities.dp(3.0f)), Theme.chat_actionBackgroundPaint);
-                        } else {
-                            canvas.drawRect((float) (x + cornerOffset), (float) (y + height), (float) nextX, (float) ((y + height) + AndroidUtilities.dp(3.0f)), Theme.chat_actionBackgroundPaint);
-                            canvas.drawRect((float) (nextX + nextLineWidth), (float) (y + height), (float) ((x + width) - cornerOffset), (float) ((y + height) + AndroidUtilities.dp(3.0f)), Theme.chat_actionBackgroundPaint);
-                        }
-                    } else if (drawInnerBottom == 2) {
-                        additionalHeight = AndroidUtilities.dp(3.0f);
-                        dy = (y + height) - AndroidUtilities.dp(11.0f);
-                        dx = x - cornerIn;
-                        if (!(drawInnerTop == 2 || drawInnerTop == 3)) {
-                            dx -= cornerRest;
-                        }
-                        if (drawTopCorners || drawBottomCorners) {
-                            canvas.drawRect((float) (dx + cornerIn), (float) (AndroidUtilities.dp(3.0f) + dy), (float) ((dx + cornerIn) + corner), (float) (dy + corner), Theme.chat_actionBackgroundPaint);
-                        }
-                        Theme.chat_cornerInner[2].setBounds(dx, dy, dx + cornerIn, dy + cornerIn);
-                        Theme.chat_cornerInner[2].draw(canvas);
-                        dx = x + width;
-                        if (!(drawInnerTop == 2 || drawInnerTop == 3)) {
-                            dx += cornerRest;
-                        }
-                        if (drawTopCorners || drawBottomCorners) {
-                            canvas.drawRect((float) (dx - corner), (float) (AndroidUtilities.dp(3.0f) + dy), (float) dx, (float) (dy + corner), Theme.chat_actionBackgroundPaint);
-                        }
-                        Theme.chat_cornerInner[3].setBounds(dx, dy, dx + cornerIn, dy + cornerIn);
-                        Theme.chat_cornerInner[3].draw(canvas);
-                    } else {
-                        additionalHeight = AndroidUtilities.dp(6.0f);
-                    }
-                }
-                if (drawInnerTop != 0) {
-                    if (drawInnerTop == 1) {
-                        int prevX = (getMeasuredWidth() - prevLineWidth) / 2;
-                        y -= AndroidUtilities.dp(3.0f);
-                        height += AndroidUtilities.dp(3.0f);
-                        if (isLineTop(prevLineWidth, width, a - 1, count, cornerRest)) {
-                            canvas.drawRect((float) (x + cornerOffset), (float) y, (float) (prevX - cornerRest), (float) (AndroidUtilities.dp(3.0f) + y), Theme.chat_actionBackgroundPaint);
-                            canvas.drawRect((float) ((prevX + prevLineWidth) + cornerRest), (float) y, (float) ((x + width) - cornerOffset), (float) (AndroidUtilities.dp(3.0f) + y), Theme.chat_actionBackgroundPaint);
-                        } else {
-                            canvas.drawRect((float) (x + cornerOffset), (float) y, (float) prevX, (float) (AndroidUtilities.dp(3.0f) + y), Theme.chat_actionBackgroundPaint);
-                            canvas.drawRect((float) (prevX + prevLineWidth), (float) y, (float) ((x + width) - cornerOffset), (float) (AndroidUtilities.dp(3.0f) + y), Theme.chat_actionBackgroundPaint);
-                        }
-                    } else if (drawInnerTop == 2) {
-                        y -= AndroidUtilities.dp(3.0f);
-                        height += AndroidUtilities.dp(3.0f);
-                        dy = y + AndroidUtilities.dp(6.2f);
-                        dx = x - cornerIn;
-                        if (!(drawInnerBottom == 2 || drawInnerBottom == 3)) {
-                            dx -= cornerRest;
-                        }
-                        if (drawTopCorners || drawBottomCorners) {
-                            canvas.drawRect((float) (dx + cornerIn), (float) (AndroidUtilities.dp(3.0f) + y), (float) ((dx + cornerIn) + corner), (float) (AndroidUtilities.dp(11.0f) + y), Theme.chat_actionBackgroundPaint);
-                        }
-                        Theme.chat_cornerInner[0].setBounds(dx, dy, dx + cornerIn, dy + cornerIn);
-                        Theme.chat_cornerInner[0].draw(canvas);
-                        dx = x + width;
-                        if (!(drawInnerBottom == 2 || drawInnerBottom == 3)) {
-                            dx += cornerRest;
-                        }
-                        if (drawTopCorners || drawBottomCorners) {
-                            canvas.drawRect((float) (dx - corner), (float) (AndroidUtilities.dp(3.0f) + y), (float) dx, (float) (AndroidUtilities.dp(11.0f) + y), Theme.chat_actionBackgroundPaint);
-                        }
-                        Theme.chat_cornerInner[1].setBounds(dx, dy, dx + cornerIn, dy + cornerIn);
-                        Theme.chat_cornerInner[1].draw(canvas);
-                    } else {
-                        y -= AndroidUtilities.dp(6.0f);
-                        height += AndroidUtilities.dp(6.0f);
-                    }
-                }
-                if (drawTopCorners || drawBottomCorners) {
-                    canvas.drawRect((float) (x + cornerOffset), (float) yOld, (float) ((x + width) - cornerOffset), (float) (yOld + hOld), Theme.chat_actionBackgroundPaint);
-                } else {
-                    canvas.drawRect((float) x, (float) yOld, (float) (x + width), (float) (yOld + hOld), Theme.chat_actionBackgroundPaint);
-                }
-                dx = x - cornerRest;
-                int dx2 = (x + width) - cornerOffset;
-                if (drawTopCorners && !drawBottomCorners && drawInnerBottom != 2) {
-                    canvas.drawRect((float) dx, (float) (y + corner), (float) (dx + corner), (float) (((y + height) + additionalHeight) - AndroidUtilities.dp(6.0f)), Theme.chat_actionBackgroundPaint);
-                    canvas.drawRect((float) dx2, (float) (y + corner), (float) (dx2 + corner), (float) (((y + height) + additionalHeight) - AndroidUtilities.dp(6.0f)), Theme.chat_actionBackgroundPaint);
-                } else if (drawBottomCorners && !drawTopCorners && drawInnerTop != 2) {
-                    canvas.drawRect((float) dx, (float) ((y + corner) - AndroidUtilities.dp(5.0f)), (float) (dx + corner), (float) (((y + height) + additionalHeight) - corner), Theme.chat_actionBackgroundPaint);
-                    canvas.drawRect((float) dx2, (float) ((y + corner) - AndroidUtilities.dp(5.0f)), (float) (dx2 + corner), (float) (((y + height) + additionalHeight) - corner), Theme.chat_actionBackgroundPaint);
-                } else if (drawTopCorners || drawBottomCorners) {
-                    canvas.drawRect((float) dx, (float) (y + corner), (float) (dx + corner), (float) (((y + height) + additionalHeight) - corner), Theme.chat_actionBackgroundPaint);
-                    canvas.drawRect((float) dx2, (float) (y + corner), (float) (dx2 + corner), (float) (((y + height) + additionalHeight) - corner), Theme.chat_actionBackgroundPaint);
-                }
-                if (drawTopCorners) {
-                    Theme.chat_cornerOuter[0].setBounds(dx, y, dx + corner, y + corner);
-                    Theme.chat_cornerOuter[0].draw(canvas);
-                    Theme.chat_cornerOuter[1].setBounds(dx2, y, dx2 + corner, y + corner);
-                    Theme.chat_cornerOuter[1].draw(canvas);
-                }
-                if (drawBottomCorners) {
-                    dy = ((y + height) + additionalHeight) - corner;
-                    Theme.chat_cornerOuter[2].setBounds(dx2, dy, dx2 + corner, dy + corner);
-                    Theme.chat_cornerOuter[2].draw(canvas);
-                    Theme.chat_cornerOuter[3].setBounds(dx, dy, dx + corner, dy + corner);
-                    Theme.chat_cornerOuter[3].draw(canvas);
-                }
-                y += height;
-                a++;
+        if (line != count - 1) {
+            if (line < 0 || line > count - 1 || findMaxWidthAroundLine(line + 1) + (cornerRest * 3) >= nextWidth) {
+                return false;
             }
-            canvas.save();
-            canvas.translate((float) this.textXLeft, (float) this.textY);
-            this.textLayout.draw(canvas);
-            canvas.restore();
         }
+        return true;
     }
 }

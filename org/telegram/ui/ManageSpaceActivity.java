@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Shader.TileMode;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,9 +34,118 @@ public class ManageSpaceActivity extends Activity implements ActionBarLayoutDele
     private boolean finished;
     private ActionBarLayout layersActionBarLayout;
 
+    public void needLayout() {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.ManageSpaceActivity.needLayout():void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = org.telegram.messenger.AndroidUtilities.isTablet();
+        if (r0 == 0) goto L_0x00ac;
+    L_0x0006:
+        r0 = r7.layersActionBarLayout;
+        r0 = r0.getLayoutParams();
+        r0 = (android.widget.RelativeLayout.LayoutParams) r0;
+        r1 = org.telegram.messenger.AndroidUtilities.displaySize;
+        r1 = r1.x;
+        r2 = r0.width;
+        r1 = r1 - r2;
+        r2 = 2;
+        r1 = r1 / r2;
+        r0.leftMargin = r1;
+        r1 = android.os.Build.VERSION.SDK_INT;
+        r3 = 21;
+        if (r1 < r3) goto L_0x0022;
+    L_0x001f:
+        r1 = org.telegram.messenger.AndroidUtilities.statusBarHeight;
+        goto L_0x0023;
+    L_0x0022:
+        r1 = 0;
+    L_0x0023:
+        r3 = org.telegram.messenger.AndroidUtilities.displaySize;
+        r3 = r3.y;
+        r4 = r0.height;
+        r3 = r3 - r4;
+        r3 = r3 - r1;
+        r3 = r3 / r2;
+        r3 = r3 + r1;
+        r0.topMargin = r3;
+        r3 = r7.layersActionBarLayout;
+        r3.setLayoutParams(r0);
+        r3 = org.telegram.messenger.AndroidUtilities.isSmallTablet();
+        r4 = -1;
+        if (r3 == 0) goto L_0x005b;
+    L_0x003b:
+        r3 = r7.getResources();
+        r3 = r3.getConfiguration();
+        r3 = r3.orientation;
+        if (r3 != r2) goto L_0x0048;
+    L_0x0047:
+        goto L_0x005b;
+    L_0x0048:
+        r2 = r7.actionBarLayout;
+        r2 = r2.getLayoutParams();
+        r0 = r2;
+        r0 = (android.widget.RelativeLayout.LayoutParams) r0;
+        r0.width = r4;
+        r0.height = r4;
+        r2 = r7.actionBarLayout;
+        r2.setLayoutParams(r0);
+        goto L_0x00ac;
+    L_0x005b:
+        r3 = org.telegram.messenger.AndroidUtilities.displaySize;
+        r3 = r3.x;
+        r3 = r3 / 100;
+        r3 = r3 * 35;
+        r5 = 1134559232; // 0x43a00000 float:320.0 double:5.605467397E-315;
+        r6 = org.telegram.messenger.AndroidUtilities.dp(r5);
+        if (r3 >= r6) goto L_0x006f;
+    L_0x006b:
+        r3 = org.telegram.messenger.AndroidUtilities.dp(r5);
+    L_0x006f:
+        r5 = r7.actionBarLayout;
+        r5 = r5.getLayoutParams();
+        r0 = r5;
+        r0 = (android.widget.RelativeLayout.LayoutParams) r0;
+        r0.width = r3;
+        r0.height = r4;
+        r4 = r7.actionBarLayout;
+        r4.setLayoutParams(r0);
+        r4 = org.telegram.messenger.AndroidUtilities.isSmallTablet();
+        if (r4 == 0) goto L_0x00ab;
+    L_0x0087:
+        r4 = r7.actionBarLayout;
+        r4 = r4.fragmentsStack;
+        r4 = r4.size();
+        if (r4 != r2) goto L_0x00ab;
+        r2 = r7.actionBarLayout;
+        r2 = r2.fragmentsStack;
+        r4 = 1;
+        r2 = r2.get(r4);
+        r2 = (org.telegram.ui.ActionBar.BaseFragment) r2;
+        r2.onPause();
+        r5 = r7.actionBarLayout;
+        r5 = r5.fragmentsStack;
+        r5.remove(r4);
+        r4 = r7.actionBarLayout;
+        r4.showLastFragment();
+    L_0x00ac:
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ManageSpaceActivity.needLayout():void");
+    }
+
     protected void onCreate(Bundle savedInstanceState) {
-        boolean z = true;
         ApplicationLoader.postInitApplication();
+        boolean z = true;
         requestWindowFeature(1);
         setTheme(R.style.Theme.TMessages);
         getWindow().setBackgroundDrawableResource(R.drawable.transparent);
@@ -79,18 +187,18 @@ public class ManageSpaceActivity extends Activity implements ActionBarLayoutDele
                     ManageSpaceActivity.this.layersActionBarLayout.getLocationOnScreen(location);
                     int viewX = location[0];
                     int viewY = location[1];
-                    if (ManageSpaceActivity.this.layersActionBarLayout.checkTransitionAnimation() || (x > ((float) viewX) && x < ((float) (ManageSpaceActivity.this.layersActionBarLayout.getWidth() + viewX)) && y > ((float) viewY) && y < ((float) (ManageSpaceActivity.this.layersActionBarLayout.getHeight() + viewY)))) {
-                        return false;
-                    }
-                    if (!ManageSpaceActivity.this.layersActionBarLayout.fragmentsStack.isEmpty()) {
-                        int a = 0;
-                        while (ManageSpaceActivity.this.layersActionBarLayout.fragmentsStack.size() - 1 > 0) {
-                            ManageSpaceActivity.this.layersActionBarLayout.removeFragmentFromStack((BaseFragment) ManageSpaceActivity.this.layersActionBarLayout.fragmentsStack.get(0));
-                            a = (a - 1) + 1;
+                    if (!ManageSpaceActivity.this.layersActionBarLayout.checkTransitionAnimation()) {
+                        if (x <= ((float) viewX) || x >= ((float) (ManageSpaceActivity.this.layersActionBarLayout.getWidth() + viewX)) || y <= ((float) viewY) || y >= ((float) (ManageSpaceActivity.this.layersActionBarLayout.getHeight() + viewY))) {
+                            if (!ManageSpaceActivity.this.layersActionBarLayout.fragmentsStack.isEmpty()) {
+                                for (int a = 0; a < ManageSpaceActivity.this.layersActionBarLayout.fragmentsStack.size() - 1; a = (a - 1) + 1) {
+                                    ManageSpaceActivity.this.layersActionBarLayout.removeFragmentFromStack((BaseFragment) ManageSpaceActivity.this.layersActionBarLayout.fragmentsStack.get(0));
+                                }
+                                ManageSpaceActivity.this.layersActionBarLayout.closeLastFragment(true);
+                            }
+                            return true;
                         }
-                        ManageSpaceActivity.this.layersActionBarLayout.closeLastFragment(true);
                     }
-                    return true;
+                    return false;
                 }
             });
             shadowTablet.setOnClickListener(new OnClickListener() {
@@ -159,37 +267,6 @@ public class ManageSpaceActivity extends Activity implements ActionBarLayoutDele
 
     public boolean presentFragment(BaseFragment fragment, boolean removeLast, boolean forceWithoutAnimation) {
         return this.actionBarLayout.presentFragment(fragment, removeLast, forceWithoutAnimation, true);
-    }
-
-    public void needLayout() {
-        if (AndroidUtilities.isTablet()) {
-            RelativeLayout.LayoutParams relativeLayoutParams = (RelativeLayout.LayoutParams) this.layersActionBarLayout.getLayoutParams();
-            relativeLayoutParams.leftMargin = (AndroidUtilities.displaySize.x - relativeLayoutParams.width) / 2;
-            int y = VERSION.SDK_INT >= 21 ? AndroidUtilities.statusBarHeight : 0;
-            relativeLayoutParams.topMargin = (((AndroidUtilities.displaySize.y - relativeLayoutParams.height) - y) / 2) + y;
-            this.layersActionBarLayout.setLayoutParams(relativeLayoutParams);
-            if (!AndroidUtilities.isSmallTablet() || getResources().getConfiguration().orientation == 2) {
-                int leftWidth = (AndroidUtilities.displaySize.x / 100) * 35;
-                if (leftWidth < AndroidUtilities.dp(320.0f)) {
-                    leftWidth = AndroidUtilities.dp(320.0f);
-                }
-                relativeLayoutParams = (RelativeLayout.LayoutParams) this.actionBarLayout.getLayoutParams();
-                relativeLayoutParams.width = leftWidth;
-                relativeLayoutParams.height = -1;
-                this.actionBarLayout.setLayoutParams(relativeLayoutParams);
-                if (AndroidUtilities.isSmallTablet() && this.actionBarLayout.fragmentsStack.size() == 2) {
-                    ((BaseFragment) this.actionBarLayout.fragmentsStack.get(1)).onPause();
-                    this.actionBarLayout.fragmentsStack.remove(1);
-                    this.actionBarLayout.showLastFragment();
-                    return;
-                }
-                return;
-            }
-            relativeLayoutParams = (RelativeLayout.LayoutParams) this.actionBarLayout.getLayoutParams();
-            relativeLayoutParams.width = -1;
-            relativeLayoutParams.height = -1;
-            this.actionBarLayout.setLayoutParams(relativeLayoutParams);
-        }
     }
 
     public void fixLayout() {

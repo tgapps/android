@@ -1,24 +1,26 @@
 package com.google.android.gms.dynamite;
 
 import android.content.Context;
-import com.google.android.gms.dynamite.DynamiteModule.zzc;
-import com.google.android.gms.dynamite.DynamiteModule.zzd;
+import com.google.android.gms.dynamite.DynamiteModule.LoadingException;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.IVersions;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.SelectionResult;
 
-final class zzb implements zzd {
+final class zzb implements VersionPolicy {
     zzb() {
     }
 
-    public final zzj zza(Context context, String str, zzi com_google_android_gms_dynamite_zzi) throws zzc {
-        zzj com_google_android_gms_dynamite_zzj = new zzj();
-        com_google_android_gms_dynamite_zzj.zzgxh = com_google_android_gms_dynamite_zzi.zzc(context, str, true);
-        if (com_google_android_gms_dynamite_zzj.zzgxh != 0) {
-            com_google_android_gms_dynamite_zzj.zzgxi = 1;
-        } else {
-            com_google_android_gms_dynamite_zzj.zzgxg = com_google_android_gms_dynamite_zzi.zzab(context, str);
-            if (com_google_android_gms_dynamite_zzj.zzgxg != 0) {
-                com_google_android_gms_dynamite_zzj.zzgxi = -1;
-            }
+    public final SelectionResult selectModule(Context context, String str, IVersions iVersions) throws LoadingException {
+        SelectionResult selectionResult = new SelectionResult();
+        selectionResult.remoteVersion = iVersions.getRemoteVersion(context, str, true);
+        if (selectionResult.remoteVersion != 0) {
+            selectionResult.selection = 1;
+            return selectionResult;
         }
-        return com_google_android_gms_dynamite_zzj;
+        selectionResult.localVersion = iVersions.getLocalVersion(context, str);
+        if (selectionResult.localVersion != 0) {
+            selectionResult.selection = -1;
+        }
+        return selectionResult;
     }
 }

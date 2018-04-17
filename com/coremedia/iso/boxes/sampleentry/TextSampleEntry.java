@@ -54,27 +54,20 @@ public class TextSampleEntry extends AbstractSampleEntry {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
+            if (o != null) {
+                if (getClass() == o.getClass()) {
+                    BoxRecord boxRecord = (BoxRecord) o;
+                    if (this.bottom == boxRecord.bottom && this.left == boxRecord.left && this.right == boxRecord.right && this.top == boxRecord.top) {
+                        return true;
+                    }
+                    return false;
+                }
             }
-            BoxRecord boxRecord = (BoxRecord) o;
-            if (this.bottom != boxRecord.bottom) {
-                return false;
-            }
-            if (this.left != boxRecord.left) {
-                return false;
-            }
-            if (this.right != boxRecord.right) {
-                return false;
-            }
-            if (this.top != boxRecord.top) {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public int hashCode() {
-            return (((((this.top * 31) + this.left) * 31) + this.bottom) * 31) + this.right;
+            return (31 * ((31 * ((31 * this.top) + this.left)) + this.bottom)) + this.right;
         }
     }
 
@@ -124,33 +117,20 @@ public class TextSampleEntry extends AbstractSampleEntry {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            StyleRecord that = (StyleRecord) o;
-            if (this.endChar != that.endChar) {
-                return false;
-            }
-            if (this.faceStyleFlags != that.faceStyleFlags) {
-                return false;
-            }
-            if (this.fontId != that.fontId) {
-                return false;
-            }
-            if (this.fontSize != that.fontSize) {
-                return false;
-            }
-            if (this.startChar != that.startChar) {
-                return false;
-            }
-            if (Arrays.equals(this.textColor, that.textColor)) {
-                return true;
+            if (o != null) {
+                if (getClass() == o.getClass()) {
+                    StyleRecord that = (StyleRecord) o;
+                    if (this.endChar == that.endChar && this.faceStyleFlags == that.faceStyleFlags && this.fontId == that.fontId && this.fontSize == that.fontSize && this.startChar == that.startChar && Arrays.equals(this.textColor, that.textColor)) {
+                        return true;
+                    }
+                    return false;
+                }
             }
             return false;
         }
 
         public int hashCode() {
-            return (((((((((this.startChar * 31) + this.endChar) * 31) + this.fontId) * 31) + this.faceStyleFlags) * 31) + this.fontSize) * 31) + (this.textColor != null ? Arrays.hashCode(this.textColor) : 0);
+            return (31 * ((31 * ((31 * ((31 * ((31 * this.startChar) + this.endChar)) + this.fontId)) + this.faceStyleFlags)) + this.fontSize)) + (this.textColor != null ? Arrays.hashCode(this.textColor) : 0);
         }
 
         public int getSize() {
@@ -331,9 +311,16 @@ public class TextSampleEntry extends AbstractSampleEntry {
     }
 
     public long getSize() {
+        int i;
         long s = getContainerSize();
         long j = s + 38;
-        int i = (this.largeBox || s + 38 >= 4294967296L) ? 16 : 8;
-        return ((long) i) + j;
+        if (!this.largeBox) {
+            if (s + 38 < 4294967296L) {
+                i = 8;
+                return j + ((long) i);
+            }
+        }
+        i = 16;
+        return j + ((long) i);
     }
 }

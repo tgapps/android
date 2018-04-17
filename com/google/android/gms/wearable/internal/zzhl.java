@@ -1,26 +1,26 @@
 package com.google.android.gms.wearable.internal;
 
-import com.google.android.gms.common.api.internal.zzcl;
+import com.google.android.gms.common.api.internal.ListenerHolder.Notifier;
 import com.google.android.gms.common.data.DataHolder;
 import com.google.android.gms.wearable.DataApi.DataListener;
 import com.google.android.gms.wearable.DataEventBuffer;
 
-final class zzhl implements zzcl<DataListener> {
-    private /* synthetic */ DataHolder zzlhn;
+final class zzhl implements Notifier<DataListener> {
+    private final /* synthetic */ DataHolder zzan;
 
     zzhl(DataHolder dataHolder) {
-        this.zzlhn = dataHolder;
+        this.zzan = dataHolder;
     }
 
-    public final void zzahz() {
-        this.zzlhn.close();
-    }
-
-    public final /* synthetic */ void zzu(Object obj) {
+    public final /* synthetic */ void notifyListener(Object obj) {
         try {
-            ((DataListener) obj).onDataChanged(new DataEventBuffer(this.zzlhn));
+            ((DataListener) obj).onDataChanged(new DataEventBuffer(this.zzan));
         } finally {
-            this.zzlhn.close();
+            this.zzan.close();
         }
+    }
+
+    public final void onNotifyListenerFailed() {
+        this.zzan.close();
     }
 }

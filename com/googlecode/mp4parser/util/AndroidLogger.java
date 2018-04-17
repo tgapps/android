@@ -10,10 +10,16 @@ public class AndroidLogger extends Logger {
     }
 
     public void logDebug(String message) {
-        Log.d("isoparser", this.name + ":" + message);
+        StringBuilder stringBuilder = new StringBuilder(String.valueOf(this.name));
+        stringBuilder.append(":");
+        stringBuilder.append(message);
+        Log.d("isoparser", stringBuilder.toString());
     }
 
     public void logError(String message) {
-        Log.e("isoparser", this.name + ":" + message);
+        StringBuilder stringBuilder = new StringBuilder(String.valueOf(this.name));
+        stringBuilder.append(":");
+        stringBuilder.append(message);
+        Log.e("isoparser", stringBuilder.toString());
     }
 }

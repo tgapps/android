@@ -4,32 +4,33 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzde implements Creator<zzdd> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzbfn.zzd(parcel);
-        byte[] bArr = null;
-        Bundle bundle = null;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         Uri uri = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
-                case 2:
-                    uri = (Uri) zzbfn.zza(parcel, readInt, Uri.CREATOR);
-                    break;
-                case 4:
-                    bundle = zzbfn.zzs(parcel, readInt);
-                    break;
-                case 5:
-                    bArr = zzbfn.zzt(parcel, readInt);
-                    break;
-                default:
-                    zzbfn.zzb(parcel, readInt);
-                    break;
+        Bundle bundle = null;
+        byte[] bArr = bundle;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            int fieldId = SafeParcelReader.getFieldId(readHeader);
+            if (fieldId != 2) {
+                switch (fieldId) {
+                    case 4:
+                        bundle = SafeParcelReader.createBundle(parcel, readHeader);
+                        break;
+                    case 5:
+                        bArr = SafeParcelReader.createByteArray(parcel, readHeader);
+                        break;
+                    default:
+                        SafeParcelReader.skipUnknownField(parcel, readHeader);
+                        break;
+                }
             }
+            uri = (Uri) SafeParcelReader.createParcelable(parcel, readHeader, Uri.CREATOR);
         }
-        zzbfn.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new zzdd(uri, bundle, bArr);
     }
 

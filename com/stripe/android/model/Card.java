@@ -40,18 +40,12 @@ public class Card {
         this.addressState = StripeTextUtils.nullIfBlank(addressState);
         this.addressZip = StripeTextUtils.nullIfBlank(addressZip);
         this.addressCountry = StripeTextUtils.nullIfBlank(addressCountry);
-        if (StripeTextUtils.asCardBrand(brand) == null) {
-            brand = getBrand();
-        }
-        this.brand = brand;
-        if (StripeTextUtils.nullIfBlank(last4) == null) {
-            last4 = getLast4();
-        }
-        this.last4 = last4;
-        this.fingerprint = StripeTextUtils.nullIfBlank(fingerprint);
-        this.funding = StripeTextUtils.asFundingType(funding);
-        this.country = StripeTextUtils.nullIfBlank(country);
-        this.currency = StripeTextUtils.nullIfBlank(currency);
+        r0.brand = StripeTextUtils.asCardBrand(brand) == null ? getBrand() : brand;
+        r0.last4 = StripeTextUtils.nullIfBlank(last4) == null ? getLast4() : last4;
+        r0.fingerprint = StripeTextUtils.nullIfBlank(fingerprint);
+        r0.funding = StripeTextUtils.asFundingType(funding);
+        r0.country = StripeTextUtils.nullIfBlank(country);
+        r0.currency = StripeTextUtils.nullIfBlank(currency);
     }
 
     public Card(String number, Integer expMonth, Integer expYear, String cvc, String name, String addressLine1, String addressLine2, String addressCity, String addressState, String addressZip, String addressCountry, String currency) {
@@ -59,53 +53,52 @@ public class Card {
     }
 
     public boolean validateNumber() {
+        boolean z = false;
         if (StripeTextUtils.isBlank(this.number)) {
             return false;
         }
         String rawNumber = this.number.trim().replaceAll("\\s+|-", TtmlNode.ANONYMOUS_REGION_ID);
-        if (StripeTextUtils.isBlank(rawNumber) || !StripeTextUtils.isWholePositiveNumber(rawNumber) || !isValidLuhnNumber(rawNumber)) {
-            return false;
-        }
-        String updatedType = getBrand();
-        if ("American Express".equals(updatedType)) {
-            if (rawNumber.length() != 15) {
-                return false;
+        if (!StripeTextUtils.isBlank(rawNumber) && StripeTextUtils.isWholePositiveNumber(rawNumber)) {
+            if (isValidLuhnNumber(rawNumber)) {
+                String updatedType = getBrand();
+                if ("American Express".equals(updatedType)) {
+                    if (rawNumber.length() == 15) {
+                        z = true;
+                    }
+                    return z;
+                } else if ("Diners Club".equals(updatedType)) {
+                    if (rawNumber.length() == 14) {
+                        z = true;
+                    }
+                    return z;
+                } else {
+                    if (rawNumber.length() == 16) {
+                        z = true;
+                    }
+                    return z;
+                }
             }
-            return true;
-        } else if ("Diners Club".equals(updatedType)) {
-            if (rawNumber.length() != 14) {
-                return false;
-            }
-            return true;
-        } else if (rawNumber.length() != 16) {
-            return false;
-        } else {
-            return true;
         }
+        return false;
     }
 
     public boolean validateExpiryDate() {
-        if (validateExpMonth() && validateExpYear() && !DateUtils.hasMonthPassed(this.expYear.intValue(), this.expMonth.intValue())) {
-            return true;
+        if (validateExpMonth() && validateExpYear()) {
+            return DateUtils.hasMonthPassed(this.expYear.intValue(), this.expMonth.intValue()) ^ 1;
         }
         return false;
     }
 
     public boolean validateCVC() {
-        boolean z = true;
+        boolean z = false;
         if (StripeTextUtils.isBlank(this.cvc)) {
             return false;
         }
         String cvcValue = this.cvc.trim();
         String updatedType = getBrand();
-        boolean validLength;
-        if ((updatedType != null || cvcValue.length() < 3 || cvcValue.length() > 4) && !(("American Express".equals(updatedType) && cvcValue.length() == 4) || cvcValue.length() == 3)) {
-            validLength = false;
-        } else {
-            validLength = true;
-        }
-        if (!(StripeTextUtils.isWholePositiveNumber(cvcValue) && validLength)) {
-            z = false;
+        boolean validLength = (updatedType == null && cvcValue.length() >= 3 && cvcValue.length() <= 4) || (("American Express".equals(updatedType) && cvcValue.length() == 4) || cvcValue.length() == 3);
+        if (StripeTextUtils.isWholePositiveNumber(cvcValue) && validLength) {
+            z = true;
         }
         return z;
     }
@@ -199,6 +192,7 @@ public class Card {
                 evaluatedType = "MasterCard";
             } else {
                 evaluatedType = "Unknown";
+                this.brand = evaluatedType;
             }
             this.brand = evaluatedType;
         }
@@ -206,20 +200,27 @@ public class Card {
     }
 
     private boolean isValidLuhnNumber(String number) {
-        boolean z = true;
         boolean isOdd = true;
         int sum = 0;
-        for (int index = number.length() - 1; index >= 0; index--) {
+        boolean z = true;
+        int index = number.length() - 1;
+        while (true) {
+            boolean z2 = false;
+            if (index < 0) {
+                break;
+            }
             char c = number.charAt(index);
             if (!Character.isDigit(c)) {
                 return false;
             }
-            int digitInteger = Integer.parseInt(TtmlNode.ANONYMOUS_REGION_ID + c);
-            if (isOdd) {
-                isOdd = false;
-            } else {
-                isOdd = true;
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(TtmlNode.ANONYMOUS_REGION_ID);
+            stringBuilder.append(c);
+            int digitInteger = Integer.parseInt(stringBuilder.toString());
+            if (!isOdd) {
+                z2 = true;
             }
+            isOdd = z2;
             if (isOdd) {
                 digitInteger *= 2;
             }
@@ -227,6 +228,7 @@ public class Card {
                 digitInteger -= 9;
             }
             sum += digitInteger;
+            index--;
         }
         if (sum % 10 != 0) {
             z = false;

@@ -29,8 +29,8 @@ class ViewInfoStore {
         }
 
         static InfoRecord obtain() {
-            InfoRecord infoRecord = (InfoRecord) sPool.acquire();
-            return infoRecord == null ? new InfoRecord() : infoRecord;
+            InfoRecord record = (InfoRecord) sPool.acquire();
+            return record == null ? new InfoRecord() : record;
         }
 
         static void recycle(InfoRecord record) {
@@ -41,8 +41,8 @@ class ViewInfoStore {
         }
 
         static void drainCache() {
-            do {
-            } while (sPool.acquire() != null);
+            while (sPool.acquire() != null) {
+            }
         }
     }
 
@@ -54,6 +54,67 @@ class ViewInfoStore {
         void processPersistent(ViewHolder viewHolder, ItemHolderInfo itemHolderInfo, ItemHolderInfo itemHolderInfo2);
 
         void unused(ViewHolder viewHolder);
+    }
+
+    private org.telegram.messenger.support.widget.RecyclerView.ItemAnimator.ItemHolderInfo popFromLayoutStep(org.telegram.messenger.support.widget.RecyclerView.ViewHolder r1, int r2) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.ViewInfoStore.popFromLayoutStep(org.telegram.messenger.support.widget.RecyclerView$ViewHolder, int):org.telegram.messenger.support.widget.RecyclerView$ItemAnimator$ItemHolderInfo
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r4.mLayoutHolderMap;
+        r0 = r0.indexOfKey(r5);
+        r1 = 0;
+        if (r0 >= 0) goto L_0x000a;
+    L_0x0009:
+        return r1;
+    L_0x000a:
+        r2 = r4.mLayoutHolderMap;
+        r2 = r2.valueAt(r0);
+        r2 = (org.telegram.messenger.support.widget.ViewInfoStore.InfoRecord) r2;
+        if (r2 == 0) goto L_0x0045;
+    L_0x0014:
+        r3 = r2.flags;
+        r3 = r3 & r6;
+        if (r3 == 0) goto L_0x0045;
+    L_0x0019:
+        r1 = r2.flags;
+        r3 = r6 ^ -1;
+        r1 = r1 & r3;
+        r2.flags = r1;
+        r1 = 4;
+        if (r6 != r1) goto L_0x0026;
+    L_0x0023:
+        r1 = r2.preInfo;
+        goto L_0x002d;
+    L_0x0026:
+        r1 = 8;
+        if (r6 != r1) goto L_0x003d;
+        r1 = r2.postInfo;
+        goto L_0x0025;
+        r3 = r2.flags;
+        r3 = r3 & 12;
+        if (r3 != 0) goto L_0x003c;
+        r3 = r4.mLayoutHolderMap;
+        r3.removeAt(r0);
+        org.telegram.messenger.support.widget.ViewInfoStore.InfoRecord.recycle(r2);
+        return r1;
+        r1 = new java.lang.IllegalArgumentException;
+        r3 = "Must provide flag PRE or POST";
+        r1.<init>(r3);
+        throw r1;
+    L_0x0045:
+        return r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.ViewInfoStore.popFromLayoutStep(org.telegram.messenger.support.widget.RecyclerView$ViewHolder, int):org.telegram.messenger.support.widget.RecyclerView$ItemAnimator$ItemHolderInfo");
     }
 
     ViewInfoStore() {
@@ -85,29 +146,6 @@ class ViewInfoStore {
 
     ItemHolderInfo popFromPostLayout(ViewHolder vh) {
         return popFromLayoutStep(vh, 8);
-    }
-
-    private ItemHolderInfo popFromLayoutStep(ViewHolder vh, int flag) {
-        ItemHolderInfo itemHolderInfo = null;
-        int index = this.mLayoutHolderMap.indexOfKey(vh);
-        if (index >= 0) {
-            InfoRecord record = (InfoRecord) this.mLayoutHolderMap.valueAt(index);
-            if (!(record == null || (record.flags & flag) == 0)) {
-                record.flags &= flag ^ -1;
-                if (flag == 4) {
-                    itemHolderInfo = record.preInfo;
-                } else if (flag == 8) {
-                    itemHolderInfo = record.postInfo;
-                } else {
-                    throw new IllegalArgumentException("Must provide flag PRE or POST");
-                }
-                if ((record.flags & 12) == 0) {
-                    this.mLayoutHolderMap.removeAt(index);
-                    InfoRecord.recycle(record);
-                }
-            }
-        }
-        return itemHolderInfo;
     }
 
     void addToOldChangeHolders(long key, ViewHolder holder) {
@@ -179,7 +217,8 @@ class ViewInfoStore {
                 callback.processDisappeared(viewHolder, record.preInfo, null);
             } else if ((record.flags & 8) != 0) {
                 callback.processAppeared(viewHolder, record.preInfo, record.postInfo);
-            } else if ((record.flags & 2) != 0) {
+            } else {
+                int i = record.flags;
             }
             InfoRecord.recycle(record);
         }

@@ -57,6 +57,9 @@ public class MovieFragmentHeaderBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        return "MovieFragmentHeaderBox{sequenceNumber=" + this.sequenceNumber + '}';
+        StringBuilder stringBuilder = new StringBuilder("MovieFragmentHeaderBox{sequenceNumber=");
+        stringBuilder.append(this.sequenceNumber);
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 }

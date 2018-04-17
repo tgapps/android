@@ -19,7 +19,8 @@ public class DecoderSpecificInfo extends BaseDescriptor {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("DecoderSpecificInfo");
-        sb.append("{bytes=").append(this.bytes == null ? "null" : Hex.encodeHex(this.bytes));
+        sb.append("{bytes=");
+        sb.append(this.bytes == null ? "null" : Hex.encodeHex(this.bytes));
         sb.append('}');
         return sb.toString();
     }
@@ -28,11 +29,13 @@ public class DecoderSpecificInfo extends BaseDescriptor {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (Arrays.equals(this.bytes, ((DecoderSpecificInfo) o).bytes)) {
-            return true;
+        if (o != null) {
+            if (getClass() == o.getClass()) {
+                if (Arrays.equals(this.bytes, ((DecoderSpecificInfo) o).bytes)) {
+                    return true;
+                }
+                return false;
+            }
         }
         return false;
     }

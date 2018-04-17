@@ -76,18 +76,19 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
     }
 
     public PhotoViewerCaptionEnterView(Context context, SizeNotifierFrameLayoutPhoto parent, View window) {
+        Context context2 = context;
         super(context);
         setBackgroundColor(Theme.ACTION_BAR_PHOTO_VIEWER_COLOR);
         setFocusable(true);
         setFocusableInTouchMode(true);
         this.windowView = window;
         this.sizeNotifierLayout = parent;
-        LinearLayout textFieldContainer = new LinearLayout(context);
+        LinearLayout textFieldContainer = new LinearLayout(context2);
         textFieldContainer.setOrientation(0);
         addView(textFieldContainer, LayoutHelper.createFrame(-1, -2.0f, 51, 2.0f, 0.0f, 0.0f, 0.0f));
-        FrameLayout frameLayout = new FrameLayout(context);
+        FrameLayout frameLayout = new FrameLayout(context2);
         textFieldContainer.addView(frameLayout, LayoutHelper.createLinear(0, -2, 1.0f));
-        this.emojiButton = new ImageView(context);
+        this.emojiButton = new ImageView(context2);
         this.emojiButton.setImageResource(R.drawable.ic_smile_w);
         this.emojiButton.setScaleType(ScaleType.CENTER_INSIDE);
         this.emojiButton.setPadding(AndroidUtilities.dp(4.0f), AndroidUtilities.dp(1.0f), 0, 0);
@@ -101,7 +102,7 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                 }
             }
         });
-        this.messageEditText = new EditTextCaption(context) {
+        this.messageEditText = new EditTextCaption(context2) {
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
                 try {
                     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -111,8 +112,8 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                 }
             }
         };
-        if (VERSION.SDK_INT >= 23 && this.windowView != null) {
-            this.messageEditText.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
+        if (VERSION.SDK_INT >= 23 && r0.windowView != null) {
+            r0.messageEditText.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
                 public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                     PhotoViewerCaptionEnterView.this.currentActionMode = mode;
                     return true;
@@ -135,7 +136,7 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                     }
                 }
             });
-            this.messageEditText.setCustomInsertionActionModeCallback(new ActionMode.Callback() {
+            r0.messageEditText.setCustomInsertionActionModeCallback(new ActionMode.Callback() {
                 public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                     PhotoViewerCaptionEnterView.this.currentActionMode = mode;
                     return true;
@@ -159,46 +160,45 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                 }
             });
         }
-        this.messageEditText.setHint(LocaleController.getString("AddCaption", R.string.AddCaption));
-        this.messageEditText.setImeOptions(268435456);
-        this.messageEditText.setInputType(this.messageEditText.getInputType() | MessagesController.UPDATE_MASK_CHAT_ADMINS);
-        this.messageEditText.setMaxLines(4);
-        this.messageEditText.setHorizontallyScrolling(false);
-        this.messageEditText.setTextSize(1, 18.0f);
-        this.messageEditText.setGravity(80);
-        this.messageEditText.setPadding(0, AndroidUtilities.dp(11.0f), 0, AndroidUtilities.dp(12.0f));
-        this.messageEditText.setBackgroundDrawable(null);
-        this.messageEditText.setCursorColor(-1);
-        this.messageEditText.setCursorSize(AndroidUtilities.dp(20.0f));
-        this.messageEditText.setTextColor(-1);
-        this.messageEditText.setHintTextColor(-1291845633);
-        this.messageEditText.setFilters(new InputFilter[]{new LengthFilter(Callback.DEFAULT_DRAG_ANIMATION_DURATION)});
-        frameLayout.addView(this.messageEditText, LayoutHelper.createFrame(-1, -2.0f, 83, 52.0f, 0.0f, 6.0f, 0.0f));
-        this.messageEditText.setOnKeyListener(new OnKeyListener() {
+        r0.messageEditText.setHint(LocaleController.getString("AddCaption", R.string.AddCaption));
+        r0.messageEditText.setImeOptions(268435456);
+        r0.messageEditText.setInputType(r0.messageEditText.getInputType() | MessagesController.UPDATE_MASK_CHAT_ADMINS);
+        r0.messageEditText.setMaxLines(4);
+        r0.messageEditText.setHorizontallyScrolling(false);
+        r0.messageEditText.setTextSize(1, 18.0f);
+        r0.messageEditText.setGravity(80);
+        r0.messageEditText.setPadding(0, AndroidUtilities.dp(11.0f), 0, AndroidUtilities.dp(12.0f));
+        r0.messageEditText.setBackgroundDrawable(null);
+        r0.messageEditText.setCursorColor(-1);
+        r0.messageEditText.setCursorSize(AndroidUtilities.dp(20.0f));
+        r0.messageEditText.setTextColor(-1);
+        r0.messageEditText.setHintTextColor(-1291845633);
+        r0.messageEditText.setFilters(new InputFilter[]{new LengthFilter(Callback.DEFAULT_DRAG_ANIMATION_DURATION)});
+        frameLayout.addView(r0.messageEditText, LayoutHelper.createFrame(-1, -2.0f, 83, 52.0f, 0.0f, 6.0f, 0.0f));
+        r0.messageEditText.setOnKeyListener(new OnKeyListener() {
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
                 if (i == 4) {
                     if (PhotoViewerCaptionEnterView.this.windowView != null && PhotoViewerCaptionEnterView.this.hideActionMode()) {
                         return true;
                     }
                     if (!PhotoViewerCaptionEnterView.this.keyboardVisible && PhotoViewerCaptionEnterView.this.isPopupShowing()) {
-                        if (keyEvent.getAction() != 1) {
-                            return true;
+                        if (keyEvent.getAction() == 1) {
+                            PhotoViewerCaptionEnterView.this.showPopup(0);
                         }
-                        PhotoViewerCaptionEnterView.this.showPopup(0);
                         return true;
                     }
                 }
                 return false;
             }
         });
-        this.messageEditText.setOnClickListener(new OnClickListener() {
+        r0.messageEditText.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
                 if (PhotoViewerCaptionEnterView.this.isPopupShowing()) {
                     PhotoViewerCaptionEnterView.this.showPopup(AndroidUtilities.usingHardwareInput ? 0 : 2);
                 }
             }
         });
-        this.messageEditText.addTextChangedListener(new TextWatcher() {
+        r0.messageEditText.addTextChangedListener(new TextWatcher() {
             boolean processChange = false;
 
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -226,7 +226,7 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                 }
             }
         });
-        ImageView doneButton = new ImageView(context);
+        ImageView doneButton = new ImageView(context2);
         doneButton.setScaleType(ScaleType.CENTER);
         doneButton.setImageResource(R.drawable.ic_done);
         textFieldContainer.addView(doneButton, LayoutHelper.createLinear(48, 48, 80));
@@ -325,15 +325,14 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
     }
 
     public int getSelectionLength() {
-        int i = 0;
         if (this.messageEditText == null) {
-            return i;
+            return 0;
         }
         try {
             return this.messageEditText.getSelectionEnd() - this.messageEditText.getSelectionStart();
         } catch (Throwable e) {
             FileLog.e(e);
-            return i;
+            return 0;
         }
     }
 
@@ -366,13 +365,14 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                             PhotoViewerCaptionEnterView.this.innerTextChange = true;
                             CharSequence localCharSequence = Emoji.replaceEmoji(symbol, PhotoViewerCaptionEnterView.this.messageEditText.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
                             PhotoViewerCaptionEnterView.this.messageEditText.setText(PhotoViewerCaptionEnterView.this.messageEditText.getText().insert(i, localCharSequence));
-                            int j = i + localCharSequence.length();
+                            int j = localCharSequence.length() + i;
                             PhotoViewerCaptionEnterView.this.messageEditText.setSelection(j, j);
                         } catch (Throwable e) {
                             FileLog.e(e);
-                        } finally {
+                        } catch (Throwable th) {
                             PhotoViewerCaptionEnterView.this.innerTextChange = false;
                         }
+                        PhotoViewerCaptionEnterView.this.innerTextChange = false;
                     }
                 }
 
@@ -503,7 +503,6 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                 this.sizeNotifierLayout.requestLayout();
                 this.emojiButton.setImageResource(R.drawable.ic_keyboard_w);
                 onWindowSizeChanged();
-                return;
             }
             return;
         }
@@ -538,10 +537,11 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
         try {
             currentSelection = this.messageEditText.getSelectionStart();
         } catch (Throwable e) {
-            currentSelection = this.messageEditText.length();
+            int currentSelection2 = this.messageEditText.length();
             FileLog.e(e);
+            currentSelection = currentSelection2;
         }
-        MotionEvent event = MotionEvent.obtain(0, 0, 0, 0.0f, 0.0f, 0);
+        MotionEvent event = MotionEvent.obtain(null, 0, 0, 0.0f, 0.0f, 0);
         this.messageEditText.onTouchEvent(event);
         event.recycle();
         event = MotionEvent.obtain(0, 0, 1, 0.0f, 0.0f, 0);

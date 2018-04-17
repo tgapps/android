@@ -3,23 +3,23 @@ package com.google.android.gms.common.data;
 import java.util.Iterator;
 
 public abstract class AbstractDataBuffer<T> implements DataBuffer<T> {
-    protected final DataHolder zzfqt;
+    protected final DataHolder mDataHolder;
 
     protected AbstractDataBuffer(DataHolder dataHolder) {
-        this.zzfqt = dataHolder;
+        this.mDataHolder = dataHolder;
     }
 
     public int getCount() {
-        return this.zzfqt == null ? 0 : this.zzfqt.zzfwg;
+        return this.mDataHolder == null ? 0 : this.mDataHolder.getCount();
     }
 
     public Iterator<T> iterator() {
-        return new zzb(this);
+        return new DataBufferIterator(this);
     }
 
     public void release() {
-        if (this.zzfqt != null) {
-            this.zzfqt.close();
+        if (this.mDataHolder != null) {
+            this.mDataHolder.close();
         }
     }
 }

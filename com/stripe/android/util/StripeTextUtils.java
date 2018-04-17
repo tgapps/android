@@ -33,7 +33,12 @@ public class StripeTextUtils {
     }
 
     public static boolean isBlank(String value) {
-        return value == null || value.trim().length() == 0;
+        if (value != null) {
+            if (value.trim().length() != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static String asCardBrand(String possibleCardType) {

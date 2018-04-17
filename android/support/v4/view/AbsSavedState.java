@@ -34,10 +34,7 @@ public abstract class AbsSavedState implements Parcelable {
         if (superState == null) {
             throw new IllegalArgumentException("superState must not be null");
         }
-        if (superState == EMPTY_STATE) {
-            superState = null;
-        }
-        this.mSuperState = superState;
+        this.mSuperState = superState != EMPTY_STATE ? superState : null;
     }
 
     protected AbsSavedState(Parcel source) {
@@ -46,10 +43,7 @@ public abstract class AbsSavedState implements Parcelable {
 
     protected AbsSavedState(Parcel source, ClassLoader loader) {
         Parcelable superState = source.readParcelable(loader);
-        if (superState == null) {
-            superState = EMPTY_STATE;
-        }
-        this.mSuperState = superState;
+        this.mSuperState = superState != null ? superState : EMPTY_STATE;
     }
 
     public final Parcelable getSuperState() {

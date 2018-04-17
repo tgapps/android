@@ -35,7 +35,7 @@ public class LazyList<E> extends AbstractList<E> {
 
     public Iterator<E> iterator() {
         return new Iterator<E>() {
-            int pos = 0;
+            int pos = null;
 
             public boolean hasNext() {
                 return this.pos < LazyList.this.underlying.size() || LazyList.this.elementSource.hasNext();

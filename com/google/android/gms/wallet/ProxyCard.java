@@ -2,30 +2,30 @@ package com.google.android.gms.wallet;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
 @Deprecated
-public final class ProxyCard extends zzbfm {
+public final class ProxyCard extends AbstractSafeParcelable {
     public static final Creator<ProxyCard> CREATOR = new zzak();
-    private String zzldn;
-    private String zzldo;
-    private int zzldp;
-    private int zzldq;
+    private String zzeh;
+    private String zzei;
+    private int zzej;
+    private int zzek;
 
     public ProxyCard(String str, String str2, int i, int i2) {
-        this.zzldn = str;
-        this.zzldo = str2;
-        this.zzldp = i;
-        this.zzldq = i2;
+        this.zzeh = str;
+        this.zzei = str2;
+        this.zzej = i;
+        this.zzek = i2;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 2, this.zzldn, false);
-        zzbfp.zza(parcel, 3, this.zzldo, false);
-        zzbfp.zzc(parcel, 4, this.zzldp);
-        zzbfp.zzc(parcel, 5, this.zzldq);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, this.zzeh, false);
+        SafeParcelWriter.writeString(parcel, 3, this.zzei, false);
+        SafeParcelWriter.writeInt(parcel, 4, this.zzej);
+        SafeParcelWriter.writeInt(parcel, 5, this.zzek);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

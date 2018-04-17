@@ -1,15 +1,12 @@
 package org.telegram.ui.Components;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.text.TextPaint;
 import android.view.MotionEvent;
 import android.view.View;
-import java.util.Locale;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.ui.Components.PhotoFilterView.CurvesToolValue;
 import org.telegram.ui.Components.PhotoFilterView.CurvesValue;
@@ -42,6 +39,264 @@ public class PhotoFilterCurvesControl extends View {
 
     public interface PhotoFilterCurvesControlDelegate {
         void valueChanged();
+    }
+
+    @android.annotation.SuppressLint({"DrawAllocation"})
+    protected void onDraw(android.graphics.Canvas r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.PhotoFilterCurvesControl.onDraw(android.graphics.Canvas):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r11.actualArea;
+        r0 = r0.width;
+        r1 = 1084227584; // 0x40a00000 float:5.0 double:5.356796015E-315;
+        r0 = r0 / r1;
+        r1 = 0;
+        r2 = r1;
+    L_0x0009:
+        r3 = 4;
+        if (r2 >= r3) goto L_0x0035;
+    L_0x000c:
+        r3 = r11.actualArea;
+        r3 = r3.x;
+        r3 = r3 + r0;
+        r4 = (float) r2;
+        r4 = r4 * r0;
+        r6 = r3 + r4;
+        r3 = r11.actualArea;
+        r7 = r3.y;
+        r3 = r11.actualArea;
+        r3 = r3.x;
+        r3 = r3 + r0;
+        r4 = (float) r2;
+        r4 = r4 * r0;
+        r8 = r3 + r4;
+        r3 = r11.actualArea;
+        r3 = r3.y;
+        r4 = r11.actualArea;
+        r4 = r4.height;
+        r9 = r3 + r4;
+        r10 = r11.paint;
+        r5 = r12;
+        r5.drawLine(r6, r7, r8, r9, r10);
+        r2 = r2 + 1;
+        goto L_0x0009;
+    L_0x0035:
+        r2 = r11.actualArea;
+        r4 = r2.x;
+        r2 = r11.actualArea;
+        r2 = r2.y;
+        r3 = r11.actualArea;
+        r3 = r3.height;
+        r5 = r2 + r3;
+        r2 = r11.actualArea;
+        r2 = r2.x;
+        r3 = r11.actualArea;
+        r3 = r3.width;
+        r6 = r2 + r3;
+        r2 = r11.actualArea;
+        r7 = r2.y;
+        r8 = r11.paintDash;
+        r3 = r12;
+        r3.drawLine(r4, r5, r6, r7, r8);
+        r2 = 0;
+        r3 = r11.curveValue;
+        r3 = r3.activeType;
+        switch(r3) {
+            case 0: goto L_0x0087;
+            case 1: goto L_0x007a;
+            case 2: goto L_0x006d;
+            case 3: goto L_0x0060;
+            default: goto L_0x005f;
+        };
+    L_0x005f:
+        goto L_0x0092;
+    L_0x0060:
+        r3 = r11.paintCurve;
+        r4 = -13404165; // 0xffffffffff3377fb float:-2.3855479E38 double:NaN;
+        r3.setColor(r4);
+        r3 = r11.curveValue;
+        r2 = r3.blueCurve;
+        goto L_0x0092;
+    L_0x006d:
+        r3 = r11.paintCurve;
+        r4 = -15667555; // 0xffffffffff10ee9d float:-1.9264778E38 double:NaN;
+        r3.setColor(r4);
+        r3 = r11.curveValue;
+        r2 = r3.greenCurve;
+        goto L_0x0092;
+    L_0x007a:
+        r3 = r11.paintCurve;
+        r4 = -1229492; // 0xffffffffffed3d4c float:NaN double:NaN;
+        r3.setColor(r4);
+        r3 = r11.curveValue;
+        r2 = r3.redCurve;
+        goto L_0x0092;
+    L_0x0087:
+        r3 = r11.paintCurve;
+        r4 = -1;
+        r3.setColor(r4);
+        r3 = r11.curveValue;
+        r2 = r3.luminanceCurve;
+    L_0x0092:
+        r3 = r1;
+        r4 = 5;
+        r5 = 1;
+        if (r3 >= r4) goto L_0x0131;
+    L_0x0097:
+        r4 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
+        switch(r3) {
+            case 0: goto L_0x00ef;
+            case 1: goto L_0x00db;
+            case 2: goto L_0x00c7;
+            case 3: goto L_0x00b3;
+            case 4: goto L_0x009f;
+            default: goto L_0x009c;
+        };
+    L_0x009c:
+        r4 = "";
+        goto L_0x0103;
+    L_0x009f:
+        r6 = java.util.Locale.US;
+        r7 = "%.2f";
+        r5 = new java.lang.Object[r5];
+        r8 = r2.whitesLevel;
+        r8 = r8 / r4;
+        r4 = java.lang.Float.valueOf(r8);
+        r5[r1] = r4;
+        r4 = java.lang.String.format(r6, r7, r5);
+        goto L_0x0103;
+    L_0x00b3:
+        r6 = java.util.Locale.US;
+        r7 = "%.2f";
+        r5 = new java.lang.Object[r5];
+        r8 = r2.highlightsLevel;
+        r8 = r8 / r4;
+        r4 = java.lang.Float.valueOf(r8);
+        r5[r1] = r4;
+        r4 = java.lang.String.format(r6, r7, r5);
+        goto L_0x0103;
+    L_0x00c7:
+        r6 = java.util.Locale.US;
+        r7 = "%.2f";
+        r5 = new java.lang.Object[r5];
+        r8 = r2.midtonesLevel;
+        r8 = r8 / r4;
+        r4 = java.lang.Float.valueOf(r8);
+        r5[r1] = r4;
+        r4 = java.lang.String.format(r6, r7, r5);
+        goto L_0x0103;
+    L_0x00db:
+        r6 = java.util.Locale.US;
+        r7 = "%.2f";
+        r5 = new java.lang.Object[r5];
+        r8 = r2.shadowsLevel;
+        r8 = r8 / r4;
+        r4 = java.lang.Float.valueOf(r8);
+        r5[r1] = r4;
+        r4 = java.lang.String.format(r6, r7, r5);
+        goto L_0x0103;
+    L_0x00ef:
+        r6 = java.util.Locale.US;
+        r7 = "%.2f";
+        r5 = new java.lang.Object[r5];
+        r8 = r2.blacksLevel;
+        r8 = r8 / r4;
+        r4 = java.lang.Float.valueOf(r8);
+        r5[r1] = r4;
+        r4 = java.lang.String.format(r6, r7, r5);
+        r5 = r11.textPaint;
+        r5 = r5.measureText(r4);
+        r6 = r11.actualArea;
+        r6 = r6.x;
+        r7 = r0 - r5;
+        r8 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
+        r7 = r7 / r8;
+        r6 = r6 + r7;
+        r7 = (float) r3;
+        r7 = r7 * r0;
+        r6 = r6 + r7;
+        r7 = r11.actualArea;
+        r7 = r7.y;
+        r8 = r11.actualArea;
+        r8 = r8.height;
+        r7 = r7 + r8;
+        r8 = 1082130432; // 0x40800000 float:4.0 double:5.34643471E-315;
+        r8 = org.telegram.messenger.AndroidUtilities.dp(r8);
+        r8 = (float) r8;
+        r7 = r7 - r8;
+        r8 = r11.textPaint;
+        r12.drawText(r4, r6, r7, r8);
+        r3 = r3 + 1;
+        goto L_0x0093;
+    L_0x0131:
+        r3 = r2.interpolateCurve();
+        r11.invalidate();
+        r4 = r11.path;
+        r4.reset();
+        r4 = r3.length;
+        r4 = r4 / 2;
+        if (r1 >= r4) goto L_0x0191;
+        r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
+        if (r1 != 0) goto L_0x016b;
+        r6 = r11.path;
+        r7 = r11.actualArea;
+        r7 = r7.x;
+        r8 = r1 * 2;
+        r8 = r3[r8];
+        r9 = r11.actualArea;
+        r9 = r9.width;
+        r8 = r8 * r9;
+        r7 = r7 + r8;
+        r8 = r11.actualArea;
+        r8 = r8.y;
+        r9 = r1 * 2;
+        r9 = r9 + r5;
+        r9 = r3[r9];
+        r4 = r4 - r9;
+        r9 = r11.actualArea;
+        r9 = r9.height;
+        r4 = r4 * r9;
+        r8 = r8 + r4;
+        r6.moveTo(r7, r8);
+        goto L_0x018e;
+        r6 = r11.path;
+        r7 = r11.actualArea;
+        r7 = r7.x;
+        r8 = r1 * 2;
+        r8 = r3[r8];
+        r9 = r11.actualArea;
+        r9 = r9.width;
+        r8 = r8 * r9;
+        r7 = r7 + r8;
+        r8 = r11.actualArea;
+        r8 = r8.y;
+        r9 = r1 * 2;
+        r9 = r9 + r5;
+        r9 = r3[r9];
+        r4 = r4 - r9;
+        r9 = r11.actualArea;
+        r9 = r9.height;
+        r4 = r4 * r9;
+        r8 = r8 + r4;
+        r6.lineTo(r7, r8);
+        r1 = r1 + 1;
+        goto L_0x013e;
+        r1 = r11.path;
+        r4 = r11.paintCurve;
+        r12.drawPath(r1, r4);
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.PhotoFilterCurvesControl.onDraw(android.graphics.Canvas):void");
     }
 
     public PhotoFilterCurvesControl(Context context, CurvesToolValue value) {
@@ -94,8 +349,8 @@ public class PhotoFilterCurvesControl extends View {
                     this.checkForMoving = false;
                     if (this.isMoving) {
                         handlePan(1, event);
-                        break;
                     }
+                    break;
                 }
                 break;
             case 1:
@@ -112,6 +367,8 @@ public class PhotoFilterCurvesControl extends View {
                     handlePan(2, event);
                     break;
                 }
+                break;
+            default:
                 break;
         }
         return true;
@@ -140,6 +397,8 @@ public class PhotoFilterCurvesControl extends View {
                     case 3:
                         curveValue = this.curveValue.blueCurve;
                         break;
+                    default:
+                        break;
                 }
                 switch (this.activeSegment) {
                     case 1:
@@ -156,6 +415,8 @@ public class PhotoFilterCurvesControl extends View {
                         break;
                     case 5:
                         curveValue.whitesLevel = Math.max(0.0f, Math.min(100.0f, curveValue.whitesLevel + delta));
+                        break;
+                    default:
                         break;
                 }
                 invalidate();
@@ -185,72 +446,5 @@ public class PhotoFilterCurvesControl extends View {
         if (this.activeSegment != 0) {
             this.activeSegment = 0;
         }
-    }
-
-    @SuppressLint({"DrawAllocation"})
-    protected void onDraw(Canvas canvas) {
-        Canvas canvas2;
-        int a;
-        float segmentWidth = this.actualArea.width / 5.0f;
-        for (int i = 0; i < 4; i++) {
-            canvas2 = canvas;
-            canvas2.drawLine((((float) i) * segmentWidth) + (this.actualArea.x + segmentWidth), this.actualArea.y, (((float) i) * segmentWidth) + (this.actualArea.x + segmentWidth), this.actualArea.height + this.actualArea.y, this.paint);
-        }
-        canvas2 = canvas;
-        canvas2.drawLine(this.actualArea.x, this.actualArea.height + this.actualArea.y, this.actualArea.width + this.actualArea.x, this.actualArea.y, this.paintDash);
-        CurvesValue curvesValue = null;
-        switch (this.curveValue.activeType) {
-            case 0:
-                this.paintCurve.setColor(-1);
-                curvesValue = this.curveValue.luminanceCurve;
-                break;
-            case 1:
-                this.paintCurve.setColor(-1229492);
-                curvesValue = this.curveValue.redCurve;
-                break;
-            case 2:
-                this.paintCurve.setColor(-15667555);
-                curvesValue = this.curveValue.greenCurve;
-                break;
-            case 3:
-                this.paintCurve.setColor(-13404165);
-                curvesValue = this.curveValue.blueCurve;
-                break;
-        }
-        for (a = 0; a < 5; a++) {
-            String str;
-            switch (a) {
-                case 0:
-                    str = String.format(Locale.US, "%.2f", new Object[]{Float.valueOf(curvesValue.blacksLevel / 100.0f)});
-                    break;
-                case 1:
-                    str = String.format(Locale.US, "%.2f", new Object[]{Float.valueOf(curvesValue.shadowsLevel / 100.0f)});
-                    break;
-                case 2:
-                    str = String.format(Locale.US, "%.2f", new Object[]{Float.valueOf(curvesValue.midtonesLevel / 100.0f)});
-                    break;
-                case 3:
-                    str = String.format(Locale.US, "%.2f", new Object[]{Float.valueOf(curvesValue.highlightsLevel / 100.0f)});
-                    break;
-                case 4:
-                    str = String.format(Locale.US, "%.2f", new Object[]{Float.valueOf(curvesValue.whitesLevel / 100.0f)});
-                    break;
-                default:
-                    str = TtmlNode.ANONYMOUS_REGION_ID;
-                    break;
-            }
-            canvas.drawText(str, (this.actualArea.x + ((segmentWidth - this.textPaint.measureText(str)) / 2.0f)) + (((float) a) * segmentWidth), (this.actualArea.y + this.actualArea.height) - ((float) AndroidUtilities.dp(4.0f)), this.textPaint);
-        }
-        float[] points = curvesValue.interpolateCurve();
-        invalidate();
-        this.path.reset();
-        for (a = 0; a < points.length / 2; a++) {
-            if (a == 0) {
-                this.path.moveTo(this.actualArea.x + (points[a * 2] * this.actualArea.width), this.actualArea.y + ((1.0f - points[(a * 2) + 1]) * this.actualArea.height));
-            } else {
-                this.path.lineTo(this.actualArea.x + (points[a * 2] * this.actualArea.width), this.actualArea.y + ((1.0f - points[(a * 2) + 1]) * this.actualArea.height));
-            }
-        }
-        canvas.drawPath(this.path, this.paintCurve);
     }
 }

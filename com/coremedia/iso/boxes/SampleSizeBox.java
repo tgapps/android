@@ -79,7 +79,7 @@ public class SampleSizeBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) ((this.sampleSize == 0 ? this.sampleSizes.length * 4 : 0) + 12);
+        return (long) (12 + (this.sampleSize == 0 ? this.sampleSizes.length * 4 : 0));
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -109,6 +109,11 @@ public class SampleSizeBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_6, this, this));
-        return "SampleSizeBox[sampleSize=" + getSampleSize() + ";sampleCount=" + getSampleCount() + "]";
+        StringBuilder stringBuilder = new StringBuilder("SampleSizeBox[sampleSize=");
+        stringBuilder.append(getSampleSize());
+        stringBuilder.append(";sampleCount=");
+        stringBuilder.append(getSampleCount());
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 }

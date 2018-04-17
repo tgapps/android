@@ -50,6 +50,9 @@ public class SoundMediaHeaderBox extends AbstractMediaHeaderBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_1, this, this));
-        return "SoundMediaHeaderBox[balance=" + getBalance() + "]";
+        StringBuilder stringBuilder = new StringBuilder("SoundMediaHeaderBox[balance=");
+        stringBuilder.append(getBalance());
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 }

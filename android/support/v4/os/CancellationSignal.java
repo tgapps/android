@@ -16,61 +16,77 @@ public final class CancellationSignal {
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public void cancel() {
         /*
-        r4 = this;
-        monitor-enter(r4);
-        r2 = r4.mIsCanceled;	 Catch:{ all -> 0x0030 }
-        if (r2 == 0) goto L_0x0007;
-    L_0x0005:
-        monitor-exit(r4);	 Catch:{ all -> 0x0030 }
+        r6 = this;
+        monitor-enter(r6);
+        r0 = 0;
+        r1 = r6.mIsCanceled;	 Catch:{ all -> 0x0048 }
+        if (r1 == 0) goto L_0x0008;
     L_0x0006:
+        monitor-exit(r6);	 Catch:{ all -> 0x0048 }
         return;
-    L_0x0007:
-        r2 = 1;
-        r4.mIsCanceled = r2;	 Catch:{ all -> 0x0030 }
-        r2 = 1;
-        r4.mCancelInProgress = r2;	 Catch:{ all -> 0x0030 }
-        r0 = r4.mOnCancelListener;	 Catch:{ all -> 0x0030 }
-        r1 = r4.mCancellationSignalObj;	 Catch:{ all -> 0x0030 }
-        monitor-exit(r4);	 Catch:{ all -> 0x0030 }
-        if (r0 == 0) goto L_0x0017;
-    L_0x0014:
-        r0.onCancel();	 Catch:{ all -> 0x0033 }
-    L_0x0017:
-        if (r1 == 0) goto L_0x0024;
-    L_0x0019:
-        r2 = android.os.Build.VERSION.SDK_INT;	 Catch:{ all -> 0x0033 }
-        r3 = 16;
-        if (r2 < r3) goto L_0x0024;
-    L_0x001f:
-        r1 = (android.os.CancellationSignal) r1;	 Catch:{ all -> 0x0033 }
-        r1.cancel();	 Catch:{ all -> 0x0033 }
-    L_0x0024:
-        monitor-enter(r4);
+    L_0x0008:
+        r1 = 1;
+        r6.mIsCanceled = r1;	 Catch:{ all -> 0x0048 }
+        r6.mCancelInProgress = r1;	 Catch:{ all -> 0x0048 }
+        r1 = r6.mOnCancelListener;	 Catch:{ all -> 0x0048 }
+        r2 = r6.mCancellationSignalObj;	 Catch:{ all -> 0x0042 }
+        r0 = r2;
+        monitor-exit(r6);	 Catch:{ all -> 0x0042 }
         r2 = 0;
-        r4.mCancelInProgress = r2;	 Catch:{ all -> 0x002d }
-        r4.notifyAll();	 Catch:{ all -> 0x002d }
-        monitor-exit(r4);	 Catch:{ all -> 0x002d }
-        goto L_0x0006;
-    L_0x002d:
-        r2 = move-exception;
-        monitor-exit(r4);	 Catch:{ all -> 0x002d }
-        throw r2;
-    L_0x0030:
-        r2 = move-exception;
-        monitor-exit(r4);	 Catch:{ all -> 0x0030 }
-        throw r2;
+        if (r1 == 0) goto L_0x001c;
+    L_0x0016:
+        r1.onCancel();	 Catch:{ all -> 0x001a }
+        goto L_0x001c;
+    L_0x001a:
+        r3 = move-exception;
+        goto L_0x002b;
+    L_0x001c:
+        if (r0 == 0) goto L_0x0036;
+    L_0x001e:
+        r3 = android.os.Build.VERSION.SDK_INT;	 Catch:{ all -> 0x001a }
+        r4 = 16;
+        if (r3 < r4) goto L_0x0036;
+    L_0x0024:
+        r3 = r0;
+        r3 = (android.os.CancellationSignal) r3;	 Catch:{ all -> 0x001a }
+        r3.cancel();	 Catch:{ all -> 0x001a }
+        goto L_0x0036;
+    L_0x002b:
+        monitor-enter(r6);
+        r6.mCancelInProgress = r2;	 Catch:{ all -> 0x0033 }
+        r6.notifyAll();	 Catch:{ all -> 0x0033 }
+        monitor-exit(r6);	 Catch:{ all -> 0x0033 }
+        throw r3;
     L_0x0033:
         r2 = move-exception;
-        monitor-enter(r4);
-        r3 = 0;
-        r4.mCancelInProgress = r3;	 Catch:{ all -> 0x003d }
-        r4.notifyAll();	 Catch:{ all -> 0x003d }
-        monitor-exit(r4);	 Catch:{ all -> 0x003d }
+        monitor-exit(r6);	 Catch:{ all -> 0x0033 }
         throw r2;
-    L_0x003d:
+    L_0x0036:
+        monitor-enter(r6);
+        r6.mCancelInProgress = r2;	 Catch:{ all -> 0x003f }
+        r6.notifyAll();	 Catch:{ all -> 0x003f }
+        monitor-exit(r6);	 Catch:{ all -> 0x003f }
+        return;
+    L_0x003f:
         r2 = move-exception;
-        monitor-exit(r4);	 Catch:{ all -> 0x003d }
+        monitor-exit(r6);	 Catch:{ all -> 0x003f }
         throw r2;
+    L_0x0042:
+        r2 = move-exception;
+        r5 = r2;
+        r2 = r0;
+        r0 = r1;
+        r1 = r5;
+        goto L_0x004a;
+    L_0x0048:
+        r1 = move-exception;
+        r2 = r0;
+    L_0x004a:
+        monitor-exit(r6);	 Catch:{ all -> 0x004c }
+        throw r1;
+    L_0x004c:
+        r1 = move-exception;
+        goto L_0x004a;
         */
         throw new UnsupportedOperationException("Method not decompiled: android.support.v4.os.CancellationSignal.cancel():void");
     }

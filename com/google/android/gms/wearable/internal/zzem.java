@@ -8,6 +8,8 @@ import java.util.List;
 public interface zzem extends IInterface {
     void onConnectedNodes(List<zzfo> list) throws RemoteException;
 
+    void zza(DataHolder dataHolder) throws RemoteException;
+
     void zza(zzah com_google_android_gms_wearable_internal_zzah) throws RemoteException;
 
     void zza(zzaw com_google_android_gms_wearable_internal_zzaw) throws RemoteException;
@@ -19,8 +21,6 @@ public interface zzem extends IInterface {
     void zza(zzi com_google_android_gms_wearable_internal_zzi) throws RemoteException;
 
     void zza(zzl com_google_android_gms_wearable_internal_zzl) throws RemoteException;
-
-    void zzas(DataHolder dataHolder) throws RemoteException;
 
     void zzb(zzfo com_google_android_gms_wearable_internal_zzfo) throws RemoteException;
 }

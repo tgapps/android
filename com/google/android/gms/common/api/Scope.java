@@ -2,20 +2,20 @@ package com.google.android.gms.common.api;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.ReflectedParcelable;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class Scope extends zzbfm implements ReflectedParcelable {
-    public static final Creator<Scope> CREATOR = new zzf();
-    private int zzeck;
-    private final String zzfnh;
+public final class Scope extends AbstractSafeParcelable implements ReflectedParcelable {
+    public static final Creator<Scope> CREATOR = new zzd();
+    private final int zzal;
+    private final String zzdp;
 
     Scope(int i, String str) {
-        zzbq.zzh(str, "scopeUri must not be null or empty");
-        this.zzeck = i;
-        this.zzfnh = str;
+        Preconditions.checkNotEmpty(str, "scopeUri must not be null or empty");
+        this.zzal = i;
+        this.zzdp = str;
     }
 
     public Scope(String str) {
@@ -23,21 +23,25 @@ public final class Scope extends zzbfm implements ReflectedParcelable {
     }
 
     public final boolean equals(Object obj) {
-        return this == obj ? true : !(obj instanceof Scope) ? false : this.zzfnh.equals(((Scope) obj).zzfnh);
+        return this == obj ? true : !(obj instanceof Scope) ? false : this.zzdp.equals(((Scope) obj).zzdp);
+    }
+
+    public final String getScopeUri() {
+        return this.zzdp;
     }
 
     public final int hashCode() {
-        return this.zzfnh.hashCode();
+        return this.zzdp.hashCode();
     }
 
     public final String toString() {
-        return this.zzfnh;
+        return this.zzdp;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 1, this.zzeck);
-        zzbfp.zza(parcel, 2, this.zzfnh, false);
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.zzal);
+        SafeParcelWriter.writeString(parcel, 2, getScopeUri(), false);
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

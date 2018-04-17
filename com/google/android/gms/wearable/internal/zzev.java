@@ -1,30 +1,30 @@
 package com.google.android.gms.wearable.internal;
 
 import android.os.RemoteException;
-import com.google.android.gms.common.api.Api.zzb;
+import com.google.android.gms.common.api.Api.AnyClient;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.wearable.MessageApi.SendMessageResult;
 
 final class zzev extends zzn<SendMessageResult> {
-    private /* synthetic */ String val$action;
-    private /* synthetic */ byte[] zzkrx;
-    private /* synthetic */ String zzliv;
+    private final /* synthetic */ String val$action;
+    private final /* synthetic */ String zzcb;
+    private final /* synthetic */ byte[] zzee;
 
     zzev(zzeu com_google_android_gms_wearable_internal_zzeu, GoogleApiClient googleApiClient, String str, String str2, byte[] bArr) {
-        this.zzliv = str;
+        this.zzcb = str;
         this.val$action = str2;
-        this.zzkrx = bArr;
+        this.zzee = bArr;
         super(googleApiClient);
     }
 
-    protected final /* synthetic */ void zza(zzb com_google_android_gms_common_api_Api_zzb) throws RemoteException {
-        zzhg com_google_android_gms_wearable_internal_zzhg = (zzhg) com_google_android_gms_common_api_Api_zzb;
-        ((zzep) com_google_android_gms_wearable_internal_zzhg.zzakn()).zza(new zzhe(this), this.zzliv, this.val$action, this.zzkrx);
+    protected final /* synthetic */ Result createFailedResult(Status status) {
+        return new zzey(status, -1);
     }
 
-    protected final /* synthetic */ Result zzb(Status status) {
-        return new zzey(status, -1);
+    protected final /* synthetic */ void doExecute(AnyClient anyClient) throws RemoteException {
+        zzhg com_google_android_gms_wearable_internal_zzhg = (zzhg) anyClient;
+        ((zzep) com_google_android_gms_wearable_internal_zzhg.getService()).zza(new zzhe(this), this.zzcb, this.val$action, this.zzee);
     }
 }

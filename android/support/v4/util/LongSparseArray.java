@@ -30,10 +30,9 @@ public class LongSparseArray<E> implements Cloneable {
             clone = (LongSparseArray) super.clone();
             clone.mKeys = (long[]) this.mKeys.clone();
             clone.mValues = (Object[]) this.mValues.clone();
-            return clone;
         } catch (CloneNotSupportedException e) {
-            return clone;
         }
+        return clone;
     }
 
     public E get(long key) {
@@ -42,7 +41,12 @@ public class LongSparseArray<E> implements Cloneable {
 
     public E get(long key, E valueIfKeyNotFound) {
         int i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
-        return (i < 0 || this.mValues[i] == DELETED) ? valueIfKeyNotFound : this.mValues[i];
+        if (i >= 0) {
+            if (this.mValues[i] != DELETED) {
+                return this.mValues[i];
+            }
+        }
+        return valueIfKeyNotFound;
     }
 
     public void removeAt(int index) {
@@ -54,9 +58,9 @@ public class LongSparseArray<E> implements Cloneable {
 
     private void gc() {
         int n = this.mSize;
-        int o = 0;
         long[] keys = this.mKeys;
         Object[] values = this.mValues;
+        int o = 0;
         for (int i = 0; i < n; i++) {
             Object val = values[i];
             if (val != DELETED) {
@@ -76,34 +80,34 @@ public class LongSparseArray<E> implements Cloneable {
         int i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
         if (i >= 0) {
             this.mValues[i] = value;
-            return;
+        } else {
+            i ^= -1;
+            if (i >= this.mSize || this.mValues[i] != DELETED) {
+                if (this.mGarbage && this.mSize >= this.mKeys.length) {
+                    gc();
+                    i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key) ^ -1;
+                }
+                if (this.mSize >= this.mKeys.length) {
+                    int n = ContainerHelpers.idealLongArraySize(this.mSize + 1);
+                    long[] nkeys = new long[n];
+                    Object[] nvalues = new Object[n];
+                    System.arraycopy(this.mKeys, 0, nkeys, 0, this.mKeys.length);
+                    System.arraycopy(this.mValues, 0, nvalues, 0, this.mValues.length);
+                    this.mKeys = nkeys;
+                    this.mValues = nvalues;
+                }
+                if (this.mSize - i != 0) {
+                    System.arraycopy(this.mKeys, i, this.mKeys, i + 1, this.mSize - i);
+                    System.arraycopy(this.mValues, i, this.mValues, i + 1, this.mSize - i);
+                }
+                this.mKeys[i] = key;
+                this.mValues[i] = value;
+                this.mSize++;
+            } else {
+                this.mKeys[i] = key;
+                this.mValues[i] = value;
+            }
         }
-        i ^= -1;
-        if (i >= this.mSize || this.mValues[i] != DELETED) {
-            if (this.mGarbage && this.mSize >= this.mKeys.length) {
-                gc();
-                i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key) ^ -1;
-            }
-            if (this.mSize >= this.mKeys.length) {
-                int n = ContainerHelpers.idealLongArraySize(this.mSize + 1);
-                long[] nkeys = new long[n];
-                Object[] nvalues = new Object[n];
-                System.arraycopy(this.mKeys, 0, nkeys, 0, this.mKeys.length);
-                System.arraycopy(this.mValues, 0, nvalues, 0, this.mValues.length);
-                this.mKeys = nkeys;
-                this.mValues = nvalues;
-            }
-            if (this.mSize - i != 0) {
-                System.arraycopy(this.mKeys, i, this.mKeys, i + 1, this.mSize - i);
-                System.arraycopy(this.mValues, i, this.mValues, i + 1, this.mSize - i);
-            }
-            this.mKeys[i] = key;
-            this.mValues[i] = value;
-            this.mSize++;
-            return;
-        }
-        this.mKeys[i] = key;
-        this.mValues[i] = value;
     }
 
     public int size() {

@@ -5,23 +5,23 @@ import com.google.android.gms.wearable.Node;
 import java.util.Set;
 
 public final class zzw implements CapabilityInfo {
-    private final String mName;
-    private final Set<Node> zzlio;
+    private final String name;
+    private final Set<Node> zzbt;
 
     public zzw(CapabilityInfo capabilityInfo) {
         this(capabilityInfo.getName(), capabilityInfo.getNodes());
     }
 
     private zzw(String str, Set<Node> set) {
-        this.mName = str;
-        this.zzlio = set;
+        this.name = str;
+        this.zzbt = set;
     }
 
     public final String getName() {
-        return this.mName;
+        return this.name;
     }
 
     public final Set<Node> getNodes() {
-        return this.zzlio;
+        return this.zzbt;
     }
 }

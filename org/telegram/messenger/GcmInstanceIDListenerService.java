@@ -1,17 +1,45 @@
 package org.telegram.messenger;
 
-import android.content.Intent;
-import com.google.android.gms.iid.InstanceIDListenerService;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.FirebaseInstanceIdService;
 
-public class GcmInstanceIDListenerService extends InstanceIDListenerService {
+public class GcmInstanceIDListenerService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
-        AndroidUtilities.runOnUIThread(new Runnable() {
+        try {
+            final String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                public void run() {
+                    if (BuildVars.LOGS_ENABLED) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.append("Refreshed token: ");
+                        stringBuilder.append(refreshedToken);
+                        FileLog.d(stringBuilder.toString());
+                    }
+                    ApplicationLoader.postInitApplication();
+                    GcmInstanceIDListenerService.sendRegistrationToServer(refreshedToken);
+                }
+            });
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
+    public static void sendRegistrationToServer(final String token) {
+        Utilities.stageQueue.postRunnable(new Runnable() {
             public void run() {
-                ApplicationLoader.postInitApplication();
-                try {
-                    GcmInstanceIDListenerService.this.startService(new Intent(ApplicationLoader.applicationContext, GcmRegistrationIntentService.class));
-                } catch (Throwable e) {
-                    FileLog.e(e);
+                SharedConfig.pushString = token;
+                for (int a = 0; a < 3; a++) {
+                    UserConfig userConfig = UserConfig.getInstance(a);
+                    userConfig.registeredForPush = false;
+                    userConfig.saveConfig(false);
+                    if (userConfig.getClientUserId() != 0) {
+                        final int currentAccount = a;
+                        AndroidUtilities.runOnUIThread(new Runnable() {
+                            public void run() {
+                                MessagesController.getInstance(currentAccount).registerForPush(token);
+                            }
+                        });
+                    }
                 }
             }
         });

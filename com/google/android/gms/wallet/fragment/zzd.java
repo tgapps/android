@@ -2,38 +2,38 @@ package com.google.android.gms.wallet.fragment;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.wallet.MaskedWallet;
 import com.google.android.gms.wallet.MaskedWalletRequest;
 
 public final class zzd implements Creator<WalletFragmentInitParams> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int zzd = zzbfn.zzd(parcel);
-        int i = -1;
-        MaskedWalletRequest maskedWalletRequest = null;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
         MaskedWallet maskedWallet = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        int i = -1;
+        MaskedWalletRequest maskedWalletRequest = maskedWallet;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = zzbfn.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    maskedWalletRequest = (MaskedWalletRequest) zzbfn.zza(parcel, readInt, MaskedWalletRequest.CREATOR);
+                    maskedWalletRequest = (MaskedWalletRequest) SafeParcelReader.createParcelable(parcel, readHeader, MaskedWalletRequest.CREATOR);
                     break;
                 case 4:
-                    i = zzbfn.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 5:
-                    maskedWallet = (MaskedWallet) zzbfn.zza(parcel, readInt, MaskedWallet.CREATOR);
+                    maskedWallet = (MaskedWallet) SafeParcelReader.createParcelable(parcel, readHeader, MaskedWallet.CREATOR);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new WalletFragmentInitParams(str, maskedWalletRequest, i, maskedWallet);
     }
 

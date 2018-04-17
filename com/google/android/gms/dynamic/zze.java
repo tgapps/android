@@ -1,31 +1,25 @@
 package com.google.android.gms.dynamic;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 
-final class zze implements zzi {
-    private /* synthetic */ ViewGroup val$container;
-    private /* synthetic */ Bundle zzail;
-    private /* synthetic */ zza zzgwh;
-    private /* synthetic */ FrameLayout zzgwj;
-    private /* synthetic */ LayoutInflater zzgwk;
+final class zze implements OnClickListener {
+    private final /* synthetic */ Context val$context;
+    private final /* synthetic */ Intent zzabl;
 
-    zze(zza com_google_android_gms_dynamic_zza, FrameLayout frameLayout, LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        this.zzgwh = com_google_android_gms_dynamic_zza;
-        this.zzgwj = frameLayout;
-        this.zzgwk = layoutInflater;
-        this.val$container = viewGroup;
-        this.zzail = bundle;
+    zze(Context context, Intent intent) {
+        this.val$context = context;
+        this.zzabl = intent;
     }
 
-    public final int getState() {
-        return 2;
-    }
-
-    public final void zzb(LifecycleDelegate lifecycleDelegate) {
-        this.zzgwj.removeAllViews();
-        this.zzgwj.addView(this.zzgwh.zzgwd.onCreateView(this.zzgwk, this.val$container, this.zzail));
+    public final void onClick(View view) {
+        try {
+            this.val$context.startActivity(this.zzabl);
+        } catch (Throwable e) {
+            Log.e("DeferredLifecycleHelper", "Failed to start resolution intent", e);
+        }
     }
 }

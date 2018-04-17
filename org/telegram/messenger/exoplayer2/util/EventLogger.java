@@ -11,7 +11,6 @@ import org.telegram.messenger.exoplayer2.ExoPlaybackException;
 import org.telegram.messenger.exoplayer2.Format;
 import org.telegram.messenger.exoplayer2.PlaybackParameters;
 import org.telegram.messenger.exoplayer2.Player.EventListener;
-import org.telegram.messenger.exoplayer2.Timeline;
 import org.telegram.messenger.exoplayer2.Timeline.Period;
 import org.telegram.messenger.exoplayer2.Timeline.Window;
 import org.telegram.messenger.exoplayer2.audio.AudioRendererEventListener;
@@ -49,6 +48,108 @@ public class EventLogger implements EventListener, AudioRendererEventListener, D
     private final MappingTrackSelector trackSelector;
     private final Window window = new Window();
 
+    public void onTimelineChanged(org.telegram.messenger.exoplayer2.Timeline r1, java.lang.Object r2, int r3) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.util.EventLogger.onTimelineChanged(org.telegram.messenger.exoplayer2.Timeline, java.lang.Object, int):void
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r9.getPeriodCount();
+        r1 = r9.getWindowCount();
+        r2 = "EventLogger";
+        r3 = new java.lang.StringBuilder;
+        r3.<init>();
+        r4 = "timelineChanged [periodCount=";
+        r3.append(r4);
+        r3.append(r0);
+        r4 = ", windowCount=";
+        r3.append(r4);
+        r3.append(r1);
+        r4 = ", reason=";
+        r3.append(r4);
+        r4 = getTimelineChangeReasonString(r11);
+        r3.append(r4);
+        r3 = r3.toString();
+        android.util.Log.d(r2, r3);
+        r2 = 0;
+        r3 = r2;
+    L_0x0034:
+        r4 = 3;
+        r5 = java.lang.Math.min(r0, r4);
+        if (r3 >= r5) goto L_0x0068;
+    L_0x003b:
+        r4 = r8.period;
+        r9.getPeriod(r3, r4);
+        r4 = "EventLogger";
+        r5 = new java.lang.StringBuilder;
+        r5.<init>();
+        r6 = "  period [";
+        r5.append(r6);
+        r6 = r8.period;
+        r6 = r6.getDurationMs();
+        r6 = getTimeString(r6);
+        r5.append(r6);
+        r6 = "]";
+        r5.append(r6);
+        r5 = r5.toString();
+        android.util.Log.d(r4, r5);
+        r3 = r3 + 1;
+        goto L_0x0034;
+    L_0x0068:
+        if (r0 <= r4) goto L_0x0071;
+    L_0x006a:
+        r3 = "EventLogger";
+        r5 = "  ...";
+        android.util.Log.d(r3, r5);
+        r3 = java.lang.Math.min(r1, r4);
+        if (r2 >= r3) goto L_0x00bd;
+        r3 = r8.window;
+        r9.getWindow(r2, r3);
+        r3 = "EventLogger";
+        r5 = new java.lang.StringBuilder;
+        r5.<init>();
+        r6 = "  window [";
+        r5.append(r6);
+        r6 = r8.window;
+        r6 = r6.getDurationMs();
+        r6 = getTimeString(r6);
+        r5.append(r6);
+        r6 = ", ";
+        r5.append(r6);
+        r6 = r8.window;
+        r6 = r6.isSeekable;
+        r5.append(r6);
+        r6 = ", ";
+        r5.append(r6);
+        r6 = r8.window;
+        r6 = r6.isDynamic;
+        r5.append(r6);
+        r6 = "]";
+        r5.append(r6);
+        r5 = r5.toString();
+        android.util.Log.d(r3, r5);
+        r2 = r2 + 1;
+        goto L_0x0072;
+        if (r1 <= r4) goto L_0x00c6;
+        r2 = "EventLogger";
+        r3 = "  ...";
+        android.util.Log.d(r2, r3);
+        r2 = "EventLogger";
+        r3 = "]";
+        android.util.Log.d(r2, r3);
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.util.EventLogger.onTimelineChanged(org.telegram.messenger.exoplayer2.Timeline, java.lang.Object, int):void");
+    }
+
     static {
         TIME_FORMAT.setMinimumFractionDigits(2);
         TIME_FORMAT.setMaximumFractionDigits(2);
@@ -60,53 +161,69 @@ public class EventLogger implements EventListener, AudioRendererEventListener, D
     }
 
     public void onLoadingChanged(boolean isLoading) {
-        Log.d(TAG, "loading [" + isLoading + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("loading [");
+        stringBuilder.append(isLoading);
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onPlayerStateChanged(boolean playWhenReady, int state) {
-        Log.d(TAG, "state [" + getSessionTimeString() + ", " + playWhenReady + ", " + getStateString(state) + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("state [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append(", ");
+        stringBuilder.append(playWhenReady);
+        stringBuilder.append(", ");
+        stringBuilder.append(getStateString(state));
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onRepeatModeChanged(int repeatMode) {
-        Log.d(TAG, "repeatMode [" + getRepeatModeString(repeatMode) + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("repeatMode [");
+        stringBuilder.append(getRepeatModeString(repeatMode));
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-        Log.d(TAG, "shuffleModeEnabled [" + shuffleModeEnabled + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("shuffleModeEnabled [");
+        stringBuilder.append(shuffleModeEnabled);
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onPositionDiscontinuity(int reason) {
-        Log.d(TAG, "positionDiscontinuity [" + getDiscontinuityReasonString(reason) + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("positionDiscontinuity [");
+        stringBuilder.append(getDiscontinuityReasonString(reason));
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-        Log.d(TAG, "playbackParameters " + String.format("[speed=%.2f, pitch=%.2f]", new Object[]{Float.valueOf(playbackParameters.speed), Float.valueOf(playbackParameters.pitch)}));
-    }
-
-    public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
-        int i;
-        int periodCount = timeline.getPeriodCount();
-        int windowCount = timeline.getWindowCount();
-        Log.d(TAG, "timelineChanged [periodCount=" + periodCount + ", windowCount=" + windowCount + ", reason=" + getTimelineChangeReasonString(reason));
-        for (i = 0; i < Math.min(periodCount, 3); i++) {
-            timeline.getPeriod(i, this.period);
-            Log.d(TAG, "  period [" + getTimeString(this.period.getDurationMs()) + "]");
-        }
-        if (periodCount > 3) {
-            Log.d(TAG, "  ...");
-        }
-        for (i = 0; i < Math.min(windowCount, 3); i++) {
-            timeline.getWindow(i, this.window);
-            Log.d(TAG, "  window [" + getTimeString(this.window.getDurationMs()) + ", " + this.window.isSeekable + ", " + this.window.isDynamic + "]");
-        }
-        if (windowCount > 3) {
-            Log.d(TAG, "  ...");
-        }
-        Log.d(TAG, "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("playbackParameters ");
+        stringBuilder.append(String.format("[speed=%.2f, pitch=%.2f]", new Object[]{Float.valueOf(playbackParameters.speed), Float.valueOf(playbackParameters.pitch)}));
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onPlayerError(ExoPlaybackException e) {
-        Log.e(TAG, "playerFailed [" + getSessionTimeString() + "]", e);
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("playerFailed [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append("]");
+        Log.e(str, stringBuilder.toString(), e);
     }
 
     public void onTracksChanged(TrackGroupArray ignored, TrackSelectionArray trackSelections) {
@@ -118,24 +235,46 @@ public class EventLogger implements EventListener, AudioRendererEventListener, D
         int groupIndex;
         Log.d(TAG, "Tracks [");
         for (int rendererIndex = 0; rendererIndex < mappedTrackInfo.length; rendererIndex++) {
-            TrackGroup trackGroup;
-            int trackIndex;
             TrackGroupArray rendererTrackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
             TrackSelection trackSelection = trackSelections.get(rendererIndex);
             if (rendererTrackGroups.length > 0) {
-                Log.d(TAG, "  Renderer:" + rendererIndex + " [");
+                String str = TAG;
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("  Renderer:");
+                stringBuilder.append(rendererIndex);
+                stringBuilder.append(" [");
+                Log.d(str, stringBuilder.toString());
                 for (groupIndex = 0; groupIndex < rendererTrackGroups.length; groupIndex++) {
-                    trackGroup = rendererTrackGroups.get(groupIndex);
-                    Log.d(TAG, "    Group:" + groupIndex + ", adaptive_supported=" + getAdaptiveSupportString(trackGroup.length, mappedTrackInfo.getAdaptiveSupport(rendererIndex, groupIndex, false)) + " [");
-                    for (trackIndex = 0; trackIndex < trackGroup.length; trackIndex++) {
+                    TrackGroup trackGroup = rendererTrackGroups.get(groupIndex);
+                    String adaptiveSupport = getAdaptiveSupportString(trackGroup.length, mappedTrackInfo.getAdaptiveSupport(rendererIndex, groupIndex, false));
+                    String str2 = TAG;
+                    StringBuilder stringBuilder2 = new StringBuilder();
+                    stringBuilder2.append("    Group:");
+                    stringBuilder2.append(groupIndex);
+                    stringBuilder2.append(", adaptive_supported=");
+                    stringBuilder2.append(adaptiveSupport);
+                    stringBuilder2.append(" [");
+                    Log.d(str2, stringBuilder2.toString());
+                    for (int trackIndex = 0; trackIndex < trackGroup.length; trackIndex++) {
                         String status = getTrackStatusString(trackSelection, trackGroup, trackIndex);
-                        Log.d(TAG, "      " + status + " Track:" + trackIndex + ", " + Format.toLogString(trackGroup.getFormat(trackIndex)) + ", supported=" + getFormatSupportString(mappedTrackInfo.getTrackFormatSupport(rendererIndex, groupIndex, trackIndex)));
+                        String formatSupport = getFormatSupportString(mappedTrackInfo.getTrackFormatSupport(rendererIndex, groupIndex, trackIndex));
+                        String str3 = TAG;
+                        StringBuilder stringBuilder3 = new StringBuilder();
+                        stringBuilder3.append("      ");
+                        stringBuilder3.append(status);
+                        stringBuilder3.append(" Track:");
+                        stringBuilder3.append(trackIndex);
+                        stringBuilder3.append(", ");
+                        stringBuilder3.append(Format.toLogString(trackGroup.getFormat(trackIndex)));
+                        stringBuilder3.append(", supported=");
+                        stringBuilder3.append(formatSupport);
+                        Log.d(str3, stringBuilder3.toString());
                     }
                     Log.d(TAG, "    ]");
                 }
                 if (trackSelection != null) {
-                    for (int selectionIndex = 0; selectionIndex < trackSelection.length(); selectionIndex++) {
-                        Metadata metadata = trackSelection.getFormat(selectionIndex).metadata;
+                    for (groupIndex = 0; groupIndex < trackSelection.length(); groupIndex++) {
+                        Metadata metadata = trackSelection.getFormat(groupIndex).metadata;
                         if (metadata != null) {
                             Log.d(TAG, "    Metadata [");
                             printMetadata(metadata, "      ");
@@ -147,15 +286,32 @@ public class EventLogger implements EventListener, AudioRendererEventListener, D
                 Log.d(TAG, "  ]");
             }
         }
+        TrackSelectionArray trackSelectionArray = trackSelections;
         TrackGroupArray unassociatedTrackGroups = mappedTrackInfo.getUnassociatedTrackGroups();
         if (unassociatedTrackGroups.length > 0) {
             Log.d(TAG, "  Renderer:None [");
-            for (groupIndex = 0; groupIndex < unassociatedTrackGroups.length; groupIndex++) {
-                Log.d(TAG, "    Group:" + groupIndex + " [");
-                trackGroup = unassociatedTrackGroups.get(groupIndex);
-                for (trackIndex = 0; trackIndex < trackGroup.length; trackIndex++) {
-                    status = getTrackStatusString(false);
-                    Log.d(TAG, "      " + status + " Track:" + trackIndex + ", " + Format.toLogString(trackGroup.getFormat(trackIndex)) + ", supported=" + getFormatSupportString(0));
+            for (int groupIndex2 = 0; groupIndex2 < unassociatedTrackGroups.length; groupIndex2++) {
+                String str4 = TAG;
+                StringBuilder stringBuilder4 = new StringBuilder();
+                stringBuilder4.append("    Group:");
+                stringBuilder4.append(groupIndex2);
+                stringBuilder4.append(" [");
+                Log.d(str4, stringBuilder4.toString());
+                TrackGroup trackGroup2 = unassociatedTrackGroups.get(groupIndex2);
+                for (groupIndex = 0; groupIndex < trackGroup2.length; groupIndex++) {
+                    String status2 = getTrackStatusString(false);
+                    adaptiveSupport = getFormatSupportString(0);
+                    str2 = TAG;
+                    stringBuilder2 = new StringBuilder();
+                    stringBuilder2.append("      ");
+                    stringBuilder2.append(status2);
+                    stringBuilder2.append(" Track:");
+                    stringBuilder2.append(groupIndex);
+                    stringBuilder2.append(", ");
+                    stringBuilder2.append(Format.toLogString(trackGroup2.getFormat(groupIndex)));
+                    stringBuilder2.append(", supported=");
+                    stringBuilder2.append(adaptiveSupport);
+                    Log.d(str2, stringBuilder2.toString());
                 }
                 Log.d(TAG, "    ]");
             }
@@ -175,55 +331,135 @@ public class EventLogger implements EventListener, AudioRendererEventListener, D
     }
 
     public void onAudioEnabled(DecoderCounters counters) {
-        Log.d(TAG, "audioEnabled [" + getSessionTimeString() + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("audioEnabled [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onAudioSessionId(int audioSessionId) {
-        Log.d(TAG, "audioSessionId [" + audioSessionId + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("audioSessionId [");
+        stringBuilder.append(audioSessionId);
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onAudioDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
-        Log.d(TAG, "audioDecoderInitialized [" + getSessionTimeString() + ", " + decoderName + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("audioDecoderInitialized [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append(", ");
+        stringBuilder.append(decoderName);
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onAudioInputFormatChanged(Format format) {
-        Log.d(TAG, "audioFormatChanged [" + getSessionTimeString() + ", " + Format.toLogString(format) + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("audioFormatChanged [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append(", ");
+        stringBuilder.append(Format.toLogString(format));
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onAudioDisabled(DecoderCounters counters) {
-        Log.d(TAG, "audioDisabled [" + getSessionTimeString() + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("audioDisabled [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onAudioSinkUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
-        printInternalError("audioTrackUnderrun [" + bufferSize + ", " + bufferSizeMs + ", " + elapsedSinceLastFeedMs + "]", null);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("audioTrackUnderrun [");
+        stringBuilder.append(bufferSize);
+        stringBuilder.append(", ");
+        stringBuilder.append(bufferSizeMs);
+        stringBuilder.append(", ");
+        stringBuilder.append(elapsedSinceLastFeedMs);
+        stringBuilder.append("]");
+        printInternalError(stringBuilder.toString(), null);
     }
 
     public void onVideoEnabled(DecoderCounters counters) {
-        Log.d(TAG, "videoEnabled [" + getSessionTimeString() + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("videoEnabled [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onVideoDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
-        Log.d(TAG, "videoDecoderInitialized [" + getSessionTimeString() + ", " + decoderName + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("videoDecoderInitialized [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append(", ");
+        stringBuilder.append(decoderName);
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onVideoInputFormatChanged(Format format) {
-        Log.d(TAG, "videoFormatChanged [" + getSessionTimeString() + ", " + Format.toLogString(format) + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("videoFormatChanged [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append(", ");
+        stringBuilder.append(Format.toLogString(format));
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onVideoDisabled(DecoderCounters counters) {
-        Log.d(TAG, "videoDisabled [" + getSessionTimeString() + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("videoDisabled [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onDroppedFrames(int count, long elapsed) {
-        Log.d(TAG, "droppedFrames [" + getSessionTimeString() + ", " + count + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("droppedFrames [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append(", ");
+        stringBuilder.append(count);
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-        Log.d(TAG, "videoSizeChanged [" + width + ", " + height + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("videoSizeChanged [");
+        stringBuilder.append(width);
+        stringBuilder.append(", ");
+        stringBuilder.append(height);
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onRenderedFirstFrame(Surface surface) {
-        Log.d(TAG, "renderedFirstFrame [" + surface + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("renderedFirstFrame [");
+        stringBuilder.append(surface);
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onDrmSessionManagerError(Exception e) {
@@ -231,15 +467,30 @@ public class EventLogger implements EventListener, AudioRendererEventListener, D
     }
 
     public void onDrmKeysRestored() {
-        Log.d(TAG, "drmKeysRestored [" + getSessionTimeString() + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("drmKeysRestored [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onDrmKeysRemoved() {
-        Log.d(TAG, "drmKeysRemoved [" + getSessionTimeString() + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("drmKeysRemoved [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onDrmKeysLoaded() {
-        Log.d(TAG, "drmKeysLoaded [" + getSessionTimeString() + "]");
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("drmKeysLoaded [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append("]");
+        Log.d(str, stringBuilder.toString());
     }
 
     public void onLoadStarted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat, int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs) {
@@ -272,38 +523,84 @@ public class EventLogger implements EventListener, AudioRendererEventListener, D
     }
 
     private void printInternalError(String type, Exception e) {
-        Log.e(TAG, "internalError [" + getSessionTimeString() + ", " + type + "]", e);
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("internalError [");
+        stringBuilder.append(getSessionTimeString());
+        stringBuilder.append(", ");
+        stringBuilder.append(type);
+        stringBuilder.append("]");
+        Log.e(str, stringBuilder.toString(), e);
     }
 
     private void printMetadata(Metadata metadata, String prefix) {
         for (int i = 0; i < metadata.length(); i++) {
             Entry entry = metadata.get(i);
+            String str;
+            StringBuilder stringBuilder;
             if (entry instanceof TextInformationFrame) {
                 TextInformationFrame textInformationFrame = (TextInformationFrame) entry;
-                Log.d(TAG, prefix + String.format("%s: value=%s", new Object[]{textInformationFrame.id, textInformationFrame.value}));
+                str = TAG;
+                stringBuilder = new StringBuilder();
+                stringBuilder.append(prefix);
+                stringBuilder.append(String.format("%s: value=%s", new Object[]{textInformationFrame.id, textInformationFrame.value}));
+                Log.d(str, stringBuilder.toString());
             } else if (entry instanceof UrlLinkFrame) {
                 UrlLinkFrame urlLinkFrame = (UrlLinkFrame) entry;
-                Log.d(TAG, prefix + String.format("%s: url=%s", new Object[]{urlLinkFrame.id, urlLinkFrame.url}));
+                str = TAG;
+                stringBuilder = new StringBuilder();
+                stringBuilder.append(prefix);
+                stringBuilder.append(String.format("%s: url=%s", new Object[]{urlLinkFrame.id, urlLinkFrame.url}));
+                Log.d(str, stringBuilder.toString());
             } else if (entry instanceof PrivFrame) {
                 PrivFrame privFrame = (PrivFrame) entry;
-                Log.d(TAG, prefix + String.format("%s: owner=%s", new Object[]{privFrame.id, privFrame.owner}));
+                str = TAG;
+                stringBuilder = new StringBuilder();
+                stringBuilder.append(prefix);
+                stringBuilder.append(String.format("%s: owner=%s", new Object[]{privFrame.id, privFrame.owner}));
+                Log.d(str, stringBuilder.toString());
             } else if (entry instanceof GeobFrame) {
                 GeobFrame geobFrame = (GeobFrame) entry;
-                Log.d(TAG, prefix + String.format("%s: mimeType=%s, filename=%s, description=%s", new Object[]{geobFrame.id, geobFrame.mimeType, geobFrame.filename, geobFrame.description}));
+                r7 = TAG;
+                r8 = new StringBuilder();
+                r8.append(prefix);
+                r8.append(String.format("%s: mimeType=%s, filename=%s, description=%s", new Object[]{geobFrame.id, geobFrame.mimeType, geobFrame.filename, geobFrame.description}));
+                Log.d(r7, r8.toString());
             } else if (entry instanceof ApicFrame) {
                 ApicFrame apicFrame = (ApicFrame) entry;
-                Log.d(TAG, prefix + String.format("%s: mimeType=%s, description=%s", new Object[]{apicFrame.id, apicFrame.mimeType, apicFrame.description}));
+                r7 = TAG;
+                r8 = new StringBuilder();
+                r8.append(prefix);
+                r8.append(String.format("%s: mimeType=%s, description=%s", new Object[]{apicFrame.id, apicFrame.mimeType, apicFrame.description}));
+                Log.d(r7, r8.toString());
             } else if (entry instanceof CommentFrame) {
                 CommentFrame commentFrame = (CommentFrame) entry;
-                Log.d(TAG, prefix + String.format("%s: language=%s, description=%s", new Object[]{commentFrame.id, commentFrame.language, commentFrame.description}));
+                r7 = TAG;
+                r8 = new StringBuilder();
+                r8.append(prefix);
+                r8.append(String.format("%s: language=%s, description=%s", new Object[]{commentFrame.id, commentFrame.language, commentFrame.description}));
+                Log.d(r7, r8.toString());
             } else if (entry instanceof Id3Frame) {
                 Id3Frame id3Frame = (Id3Frame) entry;
-                Log.d(TAG, prefix + String.format("%s", new Object[]{id3Frame.id}));
+                r4 = TAG;
+                StringBuilder stringBuilder2 = new StringBuilder();
+                stringBuilder2.append(prefix);
+                stringBuilder2.append(String.format("%s", new Object[]{id3Frame.id}));
+                Log.d(r4, stringBuilder2.toString());
             } else if (entry instanceof EventMessage) {
                 EventMessage eventMessage = (EventMessage) entry;
-                Log.d(TAG, prefix + String.format("EMSG: scheme=%s, id=%d, value=%s", new Object[]{eventMessage.schemeIdUri, Long.valueOf(eventMessage.id), eventMessage.value}));
+                r7 = TAG;
+                r8 = new StringBuilder();
+                r8.append(prefix);
+                r8.append(String.format("EMSG: scheme=%s, id=%d, value=%s", new Object[]{eventMessage.schemeIdUri, Long.valueOf(eventMessage.id), eventMessage.value}));
+                Log.d(r7, r8.toString());
             } else if (entry instanceof SpliceCommand) {
-                Log.d(TAG, prefix + String.format("SCTE-35 splice command: type=%s.", new Object[]{entry.getClass().getSimpleName()}));
+                String description = String.format("SCTE-35 splice command: type=%s.", new Object[]{entry.getClass().getSimpleName()});
+                r4 = TAG;
+                StringBuilder stringBuilder3 = new StringBuilder();
+                stringBuilder3.append(prefix);
+                stringBuilder3.append(description);
+                Log.d(r4, stringBuilder3.toString());
             }
         }
     }
@@ -352,16 +649,16 @@ public class EventLogger implements EventListener, AudioRendererEventListener, D
         if (trackCount < 2) {
             return "N/A";
         }
-        switch (adaptiveSupport) {
-            case 0:
-                return "NO";
-            case 8:
-                return "YES_NOT_SEAMLESS";
-            case 16:
-                return "YES";
-            default:
-                return "?";
+        if (adaptiveSupport == 0) {
+            return "NO";
         }
+        if (adaptiveSupport == 8) {
+            return "YES_NOT_SEAMLESS";
+        }
+        if (adaptiveSupport != 16) {
+            return "?";
+        }
+        return "YES";
     }
 
     private static String getTrackStatusString(TrackSelection selection, TrackGroup group, int trackIndex) {

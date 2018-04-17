@@ -34,7 +34,7 @@ public class StaticChunkOffsetBox extends ChunkOffsetBox {
     }
 
     protected long getContentSize() {
-        return (long) ((this.chunkOffsets.length * 4) + 8);
+        return (long) (8 + (this.chunkOffsets.length * 4));
     }
 
     public void setChunkOffsets(long[] chunkOffsets) {

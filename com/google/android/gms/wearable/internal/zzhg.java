@@ -10,13 +10,13 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Looper;
 import android.util.Log;
+import com.google.android.gms.common.GoogleApiAvailabilityLight;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.internal.zzab;
-import com.google.android.gms.common.internal.zzbq;
-import com.google.android.gms.common.internal.zzj;
-import com.google.android.gms.common.internal.zzr;
-import com.google.android.gms.common.zzf;
+import com.google.android.gms.common.internal.BaseGmsClient.ConnectionProgressReportCallbacks;
+import com.google.android.gms.common.internal.ClientSettings;
+import com.google.android.gms.common.internal.GmsClient;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.wearable.CapabilityApi.CapabilityListener;
 import com.google.android.gms.wearable.ChannelApi.ChannelListener;
 import com.google.android.gms.wearable.DataApi.DataListener;
@@ -25,89 +25,67 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.telegram.messenger.exoplayer2.C;
 
-public final class zzhg extends zzab<zzep> {
-    private final ExecutorService zzieo;
-    private final zzer<Object> zzllh;
-    private final zzer<Object> zzlli;
-    private final zzer<ChannelListener> zzllj;
-    private final zzer<DataListener> zzllk;
-    private final zzer<MessageListener> zzlll;
-    private final zzer<Object> zzllm;
-    private final zzer<Object> zzlln;
-    private final zzer<CapabilityListener> zzllo;
-    private final zzhp zzllp;
+public final class zzhg extends GmsClient<zzep> {
+    private final ExecutorService zzew;
+    private final zzer<Object> zzex;
+    private final zzer<Object> zzey;
+    private final zzer<ChannelListener> zzez;
+    private final zzer<DataListener> zzfa;
+    private final zzer<MessageListener> zzfb;
+    private final zzer<Object> zzfc;
+    private final zzer<Object> zzfd;
+    private final zzer<CapabilityListener> zzfe;
+    private final zzhp zzff;
 
-    public zzhg(Context context, Looper looper, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener, zzr com_google_android_gms_common_internal_zzr) {
-        this(context, looper, connectionCallbacks, onConnectionFailedListener, com_google_android_gms_common_internal_zzr, Executors.newCachedThreadPool(), zzhp.zzep(context));
+    public zzhg(Context context, Looper looper, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener, ClientSettings clientSettings) {
+        this(context, looper, connectionCallbacks, onConnectionFailedListener, clientSettings, Executors.newCachedThreadPool(), zzhp.zza(context));
     }
 
-    private zzhg(Context context, Looper looper, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener, zzr com_google_android_gms_common_internal_zzr, ExecutorService executorService, zzhp com_google_android_gms_wearable_internal_zzhp) {
-        super(context, looper, 14, com_google_android_gms_common_internal_zzr, connectionCallbacks, onConnectionFailedListener);
-        this.zzllh = new zzer();
-        this.zzlli = new zzer();
-        this.zzllj = new zzer();
-        this.zzllk = new zzer();
-        this.zzlll = new zzer();
-        this.zzllm = new zzer();
-        this.zzlln = new zzer();
-        this.zzllo = new zzer();
-        this.zzieo = (ExecutorService) zzbq.checkNotNull(executorService);
-        this.zzllp = com_google_android_gms_wearable_internal_zzhp;
+    private zzhg(Context context, Looper looper, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener, ClientSettings clientSettings, ExecutorService executorService, zzhp com_google_android_gms_wearable_internal_zzhp) {
+        super(context, looper, 14, clientSettings, connectionCallbacks, onConnectionFailedListener);
+        this.zzex = new zzer();
+        this.zzey = new zzer();
+        this.zzez = new zzer();
+        this.zzfa = new zzer();
+        this.zzfb = new zzer();
+        this.zzfc = new zzer();
+        this.zzfd = new zzer();
+        this.zzfe = new zzer();
+        this.zzew = (ExecutorService) Preconditions.checkNotNull(executorService);
+        this.zzff = com_google_android_gms_wearable_internal_zzhp;
     }
 
-    protected final void zza(int i, IBinder iBinder, Bundle bundle, int i2) {
-        if (Log.isLoggable("WearableClient", 2)) {
-            Log.d("WearableClient", "onPostInitHandler: statusCode " + i);
-        }
-        if (i == 0) {
-            this.zzllh.zzbr(iBinder);
-            this.zzlli.zzbr(iBinder);
-            this.zzllj.zzbr(iBinder);
-            this.zzllk.zzbr(iBinder);
-            this.zzlll.zzbr(iBinder);
-            this.zzllm.zzbr(iBinder);
-            this.zzlln.zzbr(iBinder);
-            this.zzllo.zzbr(iBinder);
-        }
-        super.zza(i, iBinder, bundle, i2);
-    }
-
-    public final void zza(zzj com_google_android_gms_common_internal_zzj) {
-        int i = 0;
-        if (!zzagg()) {
+    public final void connect(ConnectionProgressReportCallbacks connectionProgressReportCallbacks) {
+        if (!requiresGooglePlayServices()) {
             try {
                 Bundle bundle = getContext().getPackageManager().getApplicationInfo("com.google.android.wearable.app.cn", 128).metaData;
-                if (bundle != null) {
-                    i = bundle.getInt("com.google.android.wearable.api.version", 0);
-                }
-                if (i < zzf.GOOGLE_PLAY_SERVICES_VERSION_CODE) {
-                    Log.w("WearableClient", "Android Wear out of date. Requires API version " + zzf.GOOGLE_PLAY_SERVICES_VERSION_CODE + " but found " + i);
+                int i = bundle != null ? bundle.getInt("com.google.android.wearable.api.version", 0) : 0;
+                if (i < GoogleApiAvailabilityLight.GOOGLE_PLAY_SERVICES_VERSION_CODE) {
+                    int i2 = GoogleApiAvailabilityLight.GOOGLE_PLAY_SERVICES_VERSION_CODE;
+                    StringBuilder stringBuilder = new StringBuilder(86);
+                    stringBuilder.append("The Wear OS app is out of date. Requires API version ");
+                    stringBuilder.append(i2);
+                    stringBuilder.append(" but found ");
+                    stringBuilder.append(i);
+                    Log.w("WearableClient", stringBuilder.toString());
                     Context context = getContext();
                     Context context2 = getContext();
                     Intent intent = new Intent("com.google.android.wearable.app.cn.UPDATE_ANDROID_WEAR").setPackage("com.google.android.wearable.app.cn");
                     if (context2.getPackageManager().resolveActivity(intent, C.DEFAULT_BUFFER_SEGMENT_SIZE) == null) {
                         intent = new Intent("android.intent.action.VIEW", Uri.parse("market://details").buildUpon().appendQueryParameter(TtmlNode.ATTR_ID, "com.google.android.wearable.app.cn").build());
                     }
-                    zza(com_google_android_gms_common_internal_zzj, 6, PendingIntent.getActivity(context, 0, intent, 0));
+                    triggerNotAvailable(connectionProgressReportCallbacks, 6, PendingIntent.getActivity(context, 0, intent, 0));
                     return;
                 }
             } catch (NameNotFoundException e) {
-                zza(com_google_android_gms_common_internal_zzj, 16, null);
+                triggerNotAvailable(connectionProgressReportCallbacks, 16, null);
                 return;
             }
         }
-        super.zza(com_google_android_gms_common_internal_zzj);
+        super.connect(connectionProgressReportCallbacks);
     }
 
-    public final boolean zzagg() {
-        return !this.zzllp.zznz("com.google.android.wearable.app.cn");
-    }
-
-    protected final String zzakh() {
-        return this.zzllp.zznz("com.google.android.wearable.app.cn") ? "com.google.android.wearable.app.cn" : "com.google.android.gms";
-    }
-
-    protected final /* synthetic */ IInterface zzd(IBinder iBinder) {
+    protected final /* synthetic */ IInterface createServiceInterface(IBinder iBinder) {
         if (iBinder == null) {
             return null;
         }
@@ -115,11 +93,43 @@ public final class zzhg extends zzab<zzep> {
         return queryLocalInterface instanceof zzep ? (zzep) queryLocalInterface : new zzeq(iBinder);
     }
 
-    protected final String zzhi() {
+    public final int getMinApkVersion() {
+        return 12451000;
+    }
+
+    protected final String getServiceDescriptor() {
+        return "com.google.android.gms.wearable.internal.IWearableService";
+    }
+
+    protected final String getStartServiceAction() {
         return "com.google.android.gms.wearable.BIND";
     }
 
-    protected final String zzhj() {
-        return "com.google.android.gms.wearable.internal.IWearableService";
+    protected final String getStartServicePackage() {
+        return this.zzff.zze("com.google.android.wearable.app.cn") ? "com.google.android.wearable.app.cn" : "com.google.android.gms";
+    }
+
+    protected final void onPostInitHandler(int i, IBinder iBinder, Bundle bundle, int i2) {
+        if (Log.isLoggable("WearableClient", 2)) {
+            StringBuilder stringBuilder = new StringBuilder(41);
+            stringBuilder.append("onPostInitHandler: statusCode ");
+            stringBuilder.append(i);
+            Log.v("WearableClient", stringBuilder.toString());
+        }
+        if (i == 0) {
+            this.zzex.zza(iBinder);
+            this.zzey.zza(iBinder);
+            this.zzez.zza(iBinder);
+            this.zzfa.zza(iBinder);
+            this.zzfb.zza(iBinder);
+            this.zzfc.zza(iBinder);
+            this.zzfd.zza(iBinder);
+            this.zzfe.zza(iBinder);
+        }
+        super.onPostInitHandler(i, iBinder, bundle, i2);
+    }
+
+    public final boolean requiresGooglePlayServices() {
+        return !this.zzff.zze("com.google.android.wearable.app.cn");
     }
 }

@@ -1,28 +1,28 @@
 package com.google.android.gms.dynamite;
 
 import android.content.Context;
-import com.google.android.gms.dynamite.DynamiteModule.zzc;
-import com.google.android.gms.dynamite.DynamiteModule.zzd;
+import com.google.android.gms.dynamite.DynamiteModule.LoadingException;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.IVersions;
+import com.google.android.gms.dynamite.DynamiteModule.VersionPolicy.SelectionResult;
 
-final class zzg implements zzd {
+final class zzg implements VersionPolicy {
     zzg() {
     }
 
-    public final zzj zza(Context context, String str, zzi com_google_android_gms_dynamite_zzi) throws zzc {
-        zzj com_google_android_gms_dynamite_zzj = new zzj();
-        com_google_android_gms_dynamite_zzj.zzgxg = com_google_android_gms_dynamite_zzi.zzab(context, str);
-        if (com_google_android_gms_dynamite_zzj.zzgxg != 0) {
-            com_google_android_gms_dynamite_zzj.zzgxh = com_google_android_gms_dynamite_zzi.zzc(context, str, false);
+    public final SelectionResult selectModule(Context context, String str, IVersions iVersions) throws LoadingException {
+        SelectionResult selectionResult = new SelectionResult();
+        selectionResult.localVersion = iVersions.getLocalVersion(context, str);
+        selectionResult.remoteVersion = selectionResult.localVersion != 0 ? iVersions.getRemoteVersion(context, str, false) : iVersions.getRemoteVersion(context, str, true);
+        if (selectionResult.localVersion == 0 && selectionResult.remoteVersion == 0) {
+            selectionResult.selection = 0;
+            return selectionResult;
+        } else if (selectionResult.remoteVersion >= selectionResult.localVersion) {
+            selectionResult.selection = 1;
+            return selectionResult;
         } else {
-            com_google_android_gms_dynamite_zzj.zzgxh = com_google_android_gms_dynamite_zzi.zzc(context, str, true);
+            selectionResult.selection = -1;
+            return selectionResult;
         }
-        if (com_google_android_gms_dynamite_zzj.zzgxg == 0 && com_google_android_gms_dynamite_zzj.zzgxh == 0) {
-            com_google_android_gms_dynamite_zzj.zzgxi = 0;
-        } else if (com_google_android_gms_dynamite_zzj.zzgxh >= com_google_android_gms_dynamite_zzj.zzgxg) {
-            com_google_android_gms_dynamite_zzj.zzgxi = 1;
-        } else {
-            com_google_android_gms_dynamite_zzj.zzgxi = -1;
-        }
-        return com_google_android_gms_dynamite_zzj;
     }
 }

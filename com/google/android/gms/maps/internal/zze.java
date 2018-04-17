@@ -4,14 +4,13 @@ import android.os.IInterface;
 import android.os.RemoteException;
 import com.google.android.gms.dynamic.IObjectWrapper;
 import com.google.android.gms.maps.GoogleMapOptions;
-import com.google.android.gms.maps.model.internal.zza;
 
 public interface zze extends IInterface {
     IMapViewDelegate zza(IObjectWrapper iObjectWrapper, GoogleMapOptions googleMapOptions) throws RemoteException;
 
-    ICameraUpdateFactoryDelegate zzawc() throws RemoteException;
+    void zza(IObjectWrapper iObjectWrapper, int i) throws RemoteException;
 
-    zza zzawd() throws RemoteException;
+    ICameraUpdateFactoryDelegate zzd() throws RemoteException;
 
-    void zzi(IObjectWrapper iObjectWrapper, int i) throws RemoteException;
+    com.google.android.gms.internal.maps.zze zze() throws RemoteException;
 }

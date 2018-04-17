@@ -2,33 +2,33 @@ package com.google.android.gms.wearable.internal;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzj implements Creator<zzi> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         byte b = (byte) 0;
-        int zzd = zzbfn.zzd(parcel);
         String str = null;
         byte b2 = (byte) 0;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    b2 = zzbfn.zze(parcel, readInt);
+                    b = SafeParcelReader.readByte(parcel, readHeader);
                     break;
                 case 3:
-                    b = zzbfn.zze(parcel, readInt);
+                    b2 = SafeParcelReader.readByte(parcel, readHeader);
                     break;
                 case 4:
-                    str = zzbfn.zzq(parcel, readInt);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new zzi(b2, b, str);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new zzi(b, b2, str);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

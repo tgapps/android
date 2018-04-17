@@ -1,19 +1,20 @@
 package com.google.android.gms.flags.impl;
 
 import android.content.SharedPreferences;
-import android.util.Log;
-import com.google.android.gms.internal.zzcbc;
+import java.util.concurrent.Callable;
 
-public final class zzb extends zza<Boolean> {
-    public static Boolean zza(SharedPreferences sharedPreferences, String str, Boolean bool) {
-        try {
-            return (Boolean) zzcbc.zzb(new zzc(sharedPreferences, str, bool));
-        } catch (Exception e) {
-            String str2 = "FlagDataUtils";
-            String str3 = "Flag value not available, returning default: ";
-            String valueOf = String.valueOf(e.getMessage());
-            Log.w(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
-            return bool;
-        }
+final class zzb implements Callable<Integer> {
+    private final /* synthetic */ SharedPreferences zzacl;
+    private final /* synthetic */ String zzacm;
+    private final /* synthetic */ Integer zzacp;
+
+    zzb(SharedPreferences sharedPreferences, String str, Integer num) {
+        this.zzacl = sharedPreferences;
+        this.zzacm = str;
+        this.zzacp = num;
+    }
+
+    public final /* synthetic */ Object call() throws Exception {
+        return Integer.valueOf(this.zzacl.getInt(this.zzacm, this.zzacp.intValue()));
     }
 }

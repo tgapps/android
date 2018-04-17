@@ -6,63 +6,72 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
+import com.google.android.gms.common.util.concurrent.NamedThreadFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class zzb extends Service {
-    private final Object mLock = new Object();
-    final ExecutorService zzieo = Executors.newSingleThreadExecutor();
-    private Binder zziep;
-    private int zzieq;
-    private int zzier = 0;
+    private final Object lock;
+    final ExecutorService zzall;
+    private Binder zzbpo;
+    private int zzbpp;
+    private int zzbpq;
 
-    private final void zzh(Intent intent) {
+    public zzb() {
+        String str = "Firebase-";
+        String valueOf = String.valueOf(getClass().getSimpleName());
+        this.zzall = Executors.newSingleThreadExecutor(new NamedThreadFactory(valueOf.length() != 0 ? str.concat(valueOf) : new String(str)));
+        this.lock = new Object();
+        this.zzbpq = 0;
+    }
+
+    private final void zze(Intent intent) {
         if (intent != null) {
             WakefulBroadcastReceiver.completeWakefulIntent(intent);
         }
-        synchronized (this.mLock) {
-            this.zzier--;
-            if (this.zzier == 0) {
-                stopSelfResult(this.zzieq);
+        synchronized (this.lock) {
+            this.zzbpq--;
+            if (this.zzbpq == 0) {
+                stopSelfResult(this.zzbpp);
             }
         }
     }
-
-    public abstract void handleIntent(Intent intent);
 
     public final synchronized IBinder onBind(Intent intent) {
         if (Log.isLoggable("EnhancedIntentService", 3)) {
             Log.d("EnhancedIntentService", "Service received bind request");
         }
-        if (this.zziep == null) {
-            this.zziep = new zzf(this);
+        if (this.zzbpo == null) {
+            this.zzbpo = new zzf(this);
         }
-        return this.zziep;
+        return this.zzbpo;
     }
 
     public final int onStartCommand(Intent intent, int i, int i2) {
-        synchronized (this.mLock) {
-            this.zzieq = i2;
-            this.zzier++;
+        synchronized (this.lock) {
+            this.zzbpp = i2;
+            this.zzbpq++;
         }
-        Intent zzp = zzp(intent);
-        if (zzp == null) {
-            zzh(intent);
+        Intent zzf = zzf(intent);
+        if (zzf == null) {
+            zze(intent);
             return 2;
-        } else if (zzq(zzp)) {
-            zzh(intent);
+        } else if (zzg(zzf)) {
+            zze(intent);
             return 2;
         } else {
-            this.zzieo.execute(new zzc(this, zzp, intent));
+            this.zzall.execute(new zzc(this, zzf, intent));
             return 3;
         }
     }
 
-    protected Intent zzp(Intent intent) {
+    protected Intent zzf(Intent intent) {
         return intent;
     }
 
-    public boolean zzq(Intent intent) {
+    public boolean zzg(Intent intent) {
         return false;
     }
+
+    public abstract void zzh(Intent intent);
 }

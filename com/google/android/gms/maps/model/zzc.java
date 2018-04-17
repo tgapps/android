@@ -2,58 +2,59 @@ package com.google.android.gms.maps.model;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfn;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import java.util.List;
 
 public final class zzc implements Creator<CircleOptions> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        List list = null;
+        Parcel parcel2 = parcel;
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         float f = 0.0f;
-        boolean z = false;
-        int zzd = zzbfn.zzd(parcel);
-        double d = 0.0d;
-        boolean z2 = false;
-        int i = 0;
-        int i2 = 0;
-        float f2 = 0.0f;
+        float f2 = f;
         LatLng latLng = null;
-        while (parcel.dataPosition() < zzd) {
-            int readInt = parcel.readInt();
-            switch (65535 & readInt) {
+        List list = latLng;
+        int i = 0;
+        int i2 = i;
+        boolean z = i2;
+        boolean z2 = z;
+        double d = 0.0d;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    latLng = (LatLng) zzbfn.zza(parcel, readInt, LatLng.CREATOR);
+                    latLng = (LatLng) SafeParcelReader.createParcelable(parcel2, readHeader, LatLng.CREATOR);
                     break;
                 case 3:
-                    d = zzbfn.zzn(parcel, readInt);
+                    d = SafeParcelReader.readDouble(parcel2, readHeader);
                     break;
                 case 4:
-                    f2 = zzbfn.zzl(parcel, readInt);
+                    f = SafeParcelReader.readFloat(parcel2, readHeader);
                     break;
                 case 5:
-                    i2 = zzbfn.zzg(parcel, readInt);
+                    i = SafeParcelReader.readInt(parcel2, readHeader);
                     break;
                 case 6:
-                    i = zzbfn.zzg(parcel, readInt);
+                    i2 = SafeParcelReader.readInt(parcel2, readHeader);
                     break;
                 case 7:
-                    f = zzbfn.zzl(parcel, readInt);
+                    f2 = SafeParcelReader.readFloat(parcel2, readHeader);
                     break;
                 case 8:
-                    z2 = zzbfn.zzc(parcel, readInt);
+                    z = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 9:
-                    z = zzbfn.zzc(parcel, readInt);
+                    z2 = SafeParcelReader.readBoolean(parcel2, readHeader);
                     break;
                 case 10:
-                    list = zzbfn.zzc(parcel, readInt, PatternItem.CREATOR);
+                    list = SafeParcelReader.createTypedList(parcel2, readHeader, PatternItem.CREATOR);
                     break;
                 default:
-                    zzbfn.zzb(parcel, readInt);
+                    SafeParcelReader.skipUnknownField(parcel2, readHeader);
                     break;
             }
         }
-        zzbfn.zzaf(parcel, zzd);
-        return new CircleOptions(latLng, d, f2, i2, i, f, z2, z, list);
+        SafeParcelReader.ensureAtEnd(parcel2, validateObjectHeader);
+        return new CircleOptions(latLng, d, f, i, i2, f2, z, z2, list);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

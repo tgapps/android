@@ -1,32 +1,34 @@
 package com.google.android.gms.wearable.internal;
 
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.common.internal.zzbq;
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.wearable.Channel.GetOutputStreamResult;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.Nullable;
 
 final class zzbh implements GetOutputStreamResult {
-    private final Status mStatus;
-    private final OutputStream zzljk;
+    private final OutputStream zzcu;
+    private final Status zzp;
 
-    zzbh(Status status, OutputStream outputStream) {
-        this.mStatus = (Status) zzbq.checkNotNull(status);
-        this.zzljk = outputStream;
+    zzbh(Status status, @Nullable OutputStream outputStream) {
+        this.zzp = (Status) Preconditions.checkNotNull(status);
+        this.zzcu = outputStream;
     }
 
+    @Nullable
     public final OutputStream getOutputStream() {
-        return this.zzljk;
+        return this.zzcu;
     }
 
     public final Status getStatus() {
-        return this.mStatus;
+        return this.zzp;
     }
 
     public final void release() {
-        if (this.zzljk != null) {
+        if (this.zzcu != null) {
             try {
-                this.zzljk.close();
+                this.zzcu.close();
             } catch (IOException e) {
             }
         }

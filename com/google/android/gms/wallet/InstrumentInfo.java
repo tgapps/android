@@ -2,48 +2,48 @@ package com.google.android.gms.wallet;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class InstrumentInfo extends zzbfm {
+public final class InstrumentInfo extends AbstractSafeParcelable {
     public static final Creator<InstrumentInfo> CREATOR = new zzp();
-    private String zzlaw;
-    private String zzlax;
-    private int zzlay;
+    private int zzag;
+    private String zzbs;
+    private String zzbt;
 
     private InstrumentInfo() {
     }
 
     public InstrumentInfo(String str, String str2, int i) {
-        this.zzlaw = str;
-        this.zzlax = str2;
-        this.zzlay = i;
+        this.zzbs = str;
+        this.zzbt = str2;
+        this.zzag = i;
     }
 
     public final int getCardClass() {
-        switch (this.zzlay) {
+        switch (this.zzag) {
             case 1:
             case 2:
             case 3:
-                return this.zzlay;
+                return this.zzag;
             default:
                 return 0;
         }
     }
 
     public final String getInstrumentDetails() {
-        return this.zzlax;
+        return this.zzbt;
     }
 
     public final String getInstrumentType() {
-        return this.zzlaw;
+        return this.zzbs;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zza(parcel, 2, getInstrumentType(), false);
-        zzbfp.zza(parcel, 3, getInstrumentDetails(), false);
-        zzbfp.zzc(parcel, 4, getCardClass());
-        zzbfp.zzai(parcel, zze);
+        i = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, getInstrumentType(), false);
+        SafeParcelWriter.writeString(parcel, 3, getInstrumentDetails(), false);
+        SafeParcelWriter.writeInt(parcel, 4, getCardClass());
+        SafeParcelWriter.finishObjectHeader(parcel, i);
     }
 }

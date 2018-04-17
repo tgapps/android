@@ -1,26 +1,29 @@
 package com.google.android.gms.vision;
 
 import android.util.SparseArray;
+import javax.annotation.concurrent.GuardedBy;
 
 public final class zzc {
     private static final Object sLock = new Object();
-    private static int zzkwg = 0;
-    private SparseArray<Integer> zzkwh = new SparseArray();
-    private SparseArray<Integer> zzkwi = new SparseArray();
+    @GuardedBy("sLock")
+    private static int zzas = 0;
+    @GuardedBy("sLock")
+    private SparseArray<Integer> zzat = new SparseArray();
+    @GuardedBy("sLock")
+    private SparseArray<Integer> zzau = new SparseArray();
 
-    public final int zzex(int i) {
-        int intValue;
+    public final int zzb(int i) {
         synchronized (sLock) {
-            Integer num = (Integer) this.zzkwh.get(i);
+            Integer num = (Integer) this.zzat.get(i);
             if (num != null) {
-                intValue = num.intValue();
-            } else {
-                intValue = zzkwg;
-                zzkwg++;
-                this.zzkwh.append(i, Integer.valueOf(intValue));
-                this.zzkwi.append(intValue, Integer.valueOf(i));
+                i = num.intValue();
+                return i;
             }
+            int i2 = zzas;
+            zzas++;
+            this.zzat.append(i, Integer.valueOf(i2));
+            this.zzau.append(i2, Integer.valueOf(i));
+            return i2;
         }
-        return intValue;
     }
 }

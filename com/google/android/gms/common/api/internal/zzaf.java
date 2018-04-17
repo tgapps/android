@@ -1,18 +1,43 @@
 package com.google.android.gms.common.api.internal;
 
-import com.google.android.gms.common.api.PendingResult.zza;
-import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 
-final class zzaf implements zza {
-    private /* synthetic */ BasePendingResult zzfqq;
-    private /* synthetic */ zzae zzfqr;
+public class zzaf extends GoogleApiClient {
+    private final String zzhe;
 
-    zzaf(zzae com_google_android_gms_common_api_internal_zzae, BasePendingResult basePendingResult) {
-        this.zzfqr = com_google_android_gms_common_api_internal_zzae;
-        this.zzfqq = basePendingResult;
+    public zzaf(String str) {
+        this.zzhe = str;
     }
 
-    public final void zzr(Status status) {
-        this.zzfqr.zzfqo.remove(this.zzfqq);
+    public ConnectionResult blockingConnect() {
+        throw new UnsupportedOperationException(this.zzhe);
+    }
+
+    public void connect() {
+        throw new UnsupportedOperationException(this.zzhe);
+    }
+
+    public void disconnect() {
+        throw new UnsupportedOperationException(this.zzhe);
+    }
+
+    public void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
+        throw new UnsupportedOperationException(this.zzhe);
+    }
+
+    public boolean isConnected() {
+        throw new UnsupportedOperationException(this.zzhe);
+    }
+
+    public void registerConnectionFailedListener(OnConnectionFailedListener onConnectionFailedListener) {
+        throw new UnsupportedOperationException(this.zzhe);
+    }
+
+    public void unregisterConnectionFailedListener(OnConnectionFailedListener onConnectionFailedListener) {
+        throw new UnsupportedOperationException(this.zzhe);
     }
 }

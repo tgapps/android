@@ -1,23 +1,15 @@
 package com.google.android.gms.common.api.internal;
 
-abstract class zzbj {
-    private final zzbh zzfsv;
+import com.google.android.gms.common.api.internal.GoogleApiManager.zza;
 
-    protected zzbj(zzbh com_google_android_gms_common_api_internal_zzbh) {
-        this.zzfsv = com_google_android_gms_common_api_internal_zzbh;
+final class zzbj implements Runnable {
+    private final /* synthetic */ zza zzkk;
+
+    zzbj(zza com_google_android_gms_common_api_internal_GoogleApiManager_zza) {
+        this.zzkk = com_google_android_gms_common_api_internal_GoogleApiManager_zza;
     }
 
-    protected abstract void zzaib();
-
-    public final void zzc(zzbi com_google_android_gms_common_api_internal_zzbi) {
-        com_google_android_gms_common_api_internal_zzbi.zzfps.lock();
-        try {
-            if (com_google_android_gms_common_api_internal_zzbi.zzfsr == this.zzfsv) {
-                zzaib();
-                com_google_android_gms_common_api_internal_zzbi.zzfps.unlock();
-            }
-        } finally {
-            com_google_android_gms_common_api_internal_zzbi.zzfps.unlock();
-        }
+    public final void run() {
+        this.zzkk.zzbk();
     }
 }

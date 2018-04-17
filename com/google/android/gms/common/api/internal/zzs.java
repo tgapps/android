@@ -1,10 +1,14 @@
 package com.google.android.gms.common.api.internal;
 
-final class zzs extends ThreadLocal<Boolean> {
-    zzs() {
-    }
+final class zzs implements Runnable {
+    private final /* synthetic */ zzr zzgc;
 
-    protected final /* synthetic */ Object initialValue() {
-        return Boolean.valueOf(false);
+    public final void run() {
+        this.zzgc.zzga.lock();
+        try {
+            this.zzgc.zzaa();
+        } finally {
+            this.zzgc.zzga.unlock();
+        }
     }
 }

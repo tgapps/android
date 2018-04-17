@@ -134,15 +134,20 @@ public class MediaHeaderBox extends AbstractFullBox {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_10, this, this));
         StringBuilder result = new StringBuilder();
         result.append("MediaHeaderBox[");
-        result.append("creationTime=").append(getCreationTime());
+        result.append("creationTime=");
+        result.append(getCreationTime());
         result.append(";");
-        result.append("modificationTime=").append(getModificationTime());
+        result.append("modificationTime=");
+        result.append(getModificationTime());
         result.append(";");
-        result.append("timescale=").append(getTimescale());
+        result.append("timescale=");
+        result.append(getTimescale());
         result.append(";");
-        result.append("duration=").append(getDuration());
+        result.append("duration=");
+        result.append(getDuration());
         result.append(";");
-        result.append("language=").append(getLanguage());
+        result.append("language=");
+        result.append(getLanguage());
         result.append("]");
         return result.toString();
     }

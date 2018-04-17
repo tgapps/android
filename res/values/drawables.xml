@@ -469,6 +469,10 @@
     <drawable name="foursquare">res/drawable-hdpi-v4/foursquare.png</drawable>
     <drawable name="foursquare">res/drawable-xhdpi-v4/foursquare.png</drawable>
     <drawable name="foursquare">res/drawable-xxhdpi-v4/foursquare.png</drawable>
+    <drawable name="go_to_message">res/drawable-mdpi-v4/go_to_message.png</drawable>
+    <drawable name="go_to_message">res/drawable-hdpi-v4/go_to_message.png</drawable>
+    <drawable name="go_to_message">res/drawable-xhdpi-v4/go_to_message.png</drawable>
+    <drawable name="go_to_message">res/drawable-xxhdpi-v4/go_to_message.png</drawable>
     <drawable name="googleg_disabled_color_18">res/drawable-mdpi-v4/googleg_disabled_color_18.png</drawable>
     <drawable name="googleg_disabled_color_18">res/drawable-hdpi-v4/googleg_disabled_color_18.png</drawable>
     <drawable name="googleg_disabled_color_18">res/drawable-xhdpi-v4/googleg_disabled_color_18.png</drawable>

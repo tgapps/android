@@ -76,6 +76,14 @@
         <item>0</item>
         <item>1</item>
     </attr>
+    <attr name="coordinatorLayoutStyle">
+        <item>1</item>
+    </attr>
+    <attr name="customThemeStyle">
+        <item>65536</item>
+        <item>2</item>
+        <item>1</item>
+    </attr>
     <attr name="environment">
         <item>65536</item>
         <item>1</item>
@@ -132,6 +140,9 @@
         <item>1</item>
         <item>0</item>
     </attr>
+    <attr name="keylines">
+        <item>1</item>
+    </attr>
     <attr name="latLngBoundsNorthEastLatitude">
         <item>32</item>
     </attr>
@@ -143,6 +154,53 @@
     </attr>
     <attr name="latLngBoundsSouthWestLongitude">
         <item>32</item>
+    </attr>
+    <attr name="layout_anchor">
+        <item>1</item>
+    </attr>
+    <attr name="layout_anchorGravity">
+        <item>131072</item>
+        <item>80</item>
+        <item>17</item>
+        <item>1</item>
+        <item>16</item>
+        <item>8</item>
+        <item>128</item>
+        <item>8388613</item>
+        <item>119</item>
+        <item>7</item>
+        <item>112</item>
+        <item>3</item>
+        <item>5</item>
+        <item>8388611</item>
+        <item>48</item>
+    </attr>
+    <attr name="layout_behavior">
+        <item>2</item>
+    </attr>
+    <attr name="layout_dodgeInsetEdges">
+        <item>131072</item>
+        <item>119</item>
+        <item>80</item>
+        <item>8388613</item>
+        <item>3</item>
+        <item>0</item>
+        <item>5</item>
+        <item>8388611</item>
+        <item>48</item>
+    </attr>
+    <attr name="layout_insetEdge">
+        <item>65536</item>
+        <item>80</item>
+        <item>8388613</item>
+        <item>3</item>
+        <item>0</item>
+        <item>5</item>
+        <item>8388611</item>
+        <item>48</item>
+    </attr>
+    <attr name="layout_keyline">
+        <item>4</item>
     </attr>
     <attr name="liteMode">
         <item>8</item>
@@ -183,6 +241,9 @@
     </attr>
     <attr name="scopeUris">
         <item>3</item>
+    </attr>
+    <attr name="statusBarBackground">
+        <item>17</item>
     </attr>
     <attr name="toolbarTextColorStyle">
         <item>65536</item>

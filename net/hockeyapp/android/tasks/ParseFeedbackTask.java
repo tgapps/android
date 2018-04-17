@@ -40,14 +40,12 @@ public class ParseFeedbackTask extends AsyncTask<Void, Void, FeedbackResponse> {
             return null;
         }
         FeedbackResponse response = FeedbackParser.getInstance().parseFeedbackResponse(this.mFeedbackResponse);
-        if (response == null || response.getFeedback() == null) {
-            return response;
+        if (!(response == null || response.getFeedback() == null)) {
+            ArrayList<FeedbackMessage> messages = response.getFeedback().getMessages();
+            if (!(messages == null || messages.isEmpty())) {
+                checkForNewAnswers(messages);
+            }
         }
-        ArrayList<FeedbackMessage> messages = response.getFeedback().getMessages();
-        if (messages == null || messages.isEmpty()) {
-            return response;
-        }
-        checkForNewAnswers(messages);
         return response;
     }
 
@@ -97,6 +95,6 @@ public class ParseFeedbackTask extends AsyncTask<Void, Void, FeedbackResponse> {
         intent.setFlags(805306368);
         intent.setClass(context, activityClass);
         intent.putExtra(UpdateFragment.FRAGMENT_URL, urlString);
-        Util.sendNotification(context, 2, Util.createNotification(context, PendingIntent.getActivity(context, 0, intent, 1073741824), context.getString(R.string.hockeyapp_feedback_notification_title), context.getString(R.string.hockeyapp_feedback_new_answer_notification_message), iconId, "net.hockeyapp.android.NOTIFICATION"), "net.hockeyapp.android.NOTIFICATION", context.getString(R.string.hockeyapp_feedback_notification_channel));
+        Util.sendNotification(context, 2, Util.createNotification(context, PendingIntent.getActivity(context, null, intent, 1073741824), context.getString(R.string.hockeyapp_feedback_notification_title), context.getString(R.string.hockeyapp_feedback_new_answer_notification_message), iconId, "net.hockeyapp.android.NOTIFICATION"), "net.hockeyapp.android.NOTIFICATION", context.getString(R.string.hockeyapp_feedback_notification_channel));
     }
 }

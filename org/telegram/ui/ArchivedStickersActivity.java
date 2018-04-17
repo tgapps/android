@@ -77,7 +77,11 @@ public class ArchivedStickersActivity extends BaseFragment implements Notificati
                 ArchivedStickerSetCell cell = holder.itemView;
                 cell.setTag(Integer.valueOf(position));
                 StickerSetCovered stickerSet = (StickerSetCovered) ArchivedStickersActivity.this.sets.get(position);
-                cell.setStickersSet(stickerSet, position != ArchivedStickersActivity.this.sets.size() + -1);
+                boolean z = true;
+                if (position == ArchivedStickersActivity.this.sets.size() - 1) {
+                    z = false;
+                }
+                cell.setStickersSet(stickerSet, z);
                 cell.setChecked(DataQuery.getInstance(ArchivedStickersActivity.this.currentAccount).isStickerPackInstalled(stickerSet.set.id));
             }
         }
@@ -108,6 +112,8 @@ public class ArchivedStickersActivity extends BaseFragment implements Notificati
                 case 2:
                     view = new TextInfoPrivacyCell(this.mContext);
                     view.setBackgroundDrawable(Theme.getThemedDrawable(this.mContext, R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
+                    break;
+                default:
                     break;
             }
             view.setLayoutParams(new LayoutParams(-1, -2));
@@ -252,44 +258,43 @@ public class ArchivedStickersActivity extends BaseFragment implements Notificati
     }
 
     private void getStickers() {
-        if (!this.loadingStickers && !this.endReached) {
-            this.loadingStickers = true;
-            if (!(this.emptyView == null || this.firstLoaded)) {
-                this.emptyView.showProgress();
-            }
-            if (this.listAdapter != null) {
-                this.listAdapter.notifyDataSetChanged();
-            }
-            TL_messages_getArchivedStickers req = new TL_messages_getArchivedStickers();
-            req.offset_id = this.sets.isEmpty() ? 0 : ((StickerSetCovered) this.sets.get(this.sets.size() - 1)).set.id;
-            req.limit = 15;
-            req.masks = this.currentType == 1;
-            ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
-                public void run(final TLObject response, final TL_error error) {
-                    AndroidUtilities.runOnUIThread(new Runnable() {
-                        public void run() {
-                            if (error == null) {
-                                boolean z;
-                                TL_messages_archivedStickers res = response;
-                                ArchivedStickersActivity.this.sets.addAll(res.sets);
-                                ArchivedStickersActivity archivedStickersActivity = ArchivedStickersActivity.this;
-                                if (res.sets.size() != 15) {
-                                    z = true;
-                                } else {
-                                    z = false;
-                                }
-                                archivedStickersActivity.endReached = z;
-                                ArchivedStickersActivity.this.loadingStickers = false;
-                                ArchivedStickersActivity.this.firstLoaded = true;
-                                if (ArchivedStickersActivity.this.emptyView != null) {
-                                    ArchivedStickersActivity.this.emptyView.showTextView();
-                                }
-                                ArchivedStickersActivity.this.updateRows();
-                            }
-                        }
-                    });
+        if (!this.loadingStickers) {
+            if (!this.endReached) {
+                boolean z = true;
+                this.loadingStickers = true;
+                if (!(this.emptyView == null || this.firstLoaded)) {
+                    this.emptyView.showProgress();
                 }
-            }), this.classGuid);
+                if (this.listAdapter != null) {
+                    this.listAdapter.notifyDataSetChanged();
+                }
+                TL_messages_getArchivedStickers req = new TL_messages_getArchivedStickers();
+                req.offset_id = this.sets.isEmpty() ? 0 : ((StickerSetCovered) this.sets.get(this.sets.size() - 1)).set.id;
+                req.limit = 15;
+                if (this.currentType != 1) {
+                    z = false;
+                }
+                req.masks = z;
+                ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
+                    public void run(final TLObject response, final TL_error error) {
+                        AndroidUtilities.runOnUIThread(new Runnable() {
+                            public void run() {
+                                if (error == null) {
+                                    TL_messages_archivedStickers res = response;
+                                    ArchivedStickersActivity.this.sets.addAll(res.sets);
+                                    ArchivedStickersActivity.this.endReached = res.sets.size() != 15;
+                                    ArchivedStickersActivity.this.loadingStickers = false;
+                                    ArchivedStickersActivity.this.firstLoaded = true;
+                                    if (ArchivedStickersActivity.this.emptyView != null) {
+                                        ArchivedStickersActivity.this.emptyView.showTextView();
+                                    }
+                                    ArchivedStickersActivity.this.updateRows();
+                                }
+                            }
+                        });
+                    }
+                }), this.classGuid);
+            }
         }
     }
 

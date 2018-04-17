@@ -2,41 +2,41 @@ package com.google.android.gms.wallet;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.internal.zzbfm;
-import com.google.android.gms.internal.zzbfp;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 import com.google.android.gms.wallet.wobs.CommonWalletObject;
 
-public final class OfferWalletObject extends zzbfm {
+public final class OfferWalletObject extends AbstractSafeParcelable {
     public static final Creator<OfferWalletObject> CREATOR = new zzab();
-    private final int zzeck;
-    CommonWalletObject zzlan;
-    String zzlct;
-    String zzwc;
+    private final int versionCode;
+    CommonWalletObject zzbj;
+    String zzce;
+    String zzdq;
 
     OfferWalletObject() {
-        this.zzeck = 3;
+        this.versionCode = 3;
     }
 
     OfferWalletObject(int i, String str, String str2, CommonWalletObject commonWalletObject) {
-        this.zzeck = i;
-        this.zzlct = str2;
+        this.versionCode = i;
+        this.zzdq = str2;
         if (i < 3) {
-            this.zzlan = CommonWalletObject.zzbkb().zznm(str).zzbkc();
+            this.zzbj = CommonWalletObject.zze().zza(str).zzf();
         } else {
-            this.zzlan = commonWalletObject;
+            this.zzbj = commonWalletObject;
         }
     }
 
     public final int getVersionCode() {
-        return this.zzeck;
+        return this.versionCode;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        int zze = zzbfp.zze(parcel);
-        zzbfp.zzc(parcel, 1, getVersionCode());
-        zzbfp.zza(parcel, 2, this.zzwc, false);
-        zzbfp.zza(parcel, 3, this.zzlct, false);
-        zzbfp.zza(parcel, 4, this.zzlan, i, false);
-        zzbfp.zzai(parcel, zze);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, getVersionCode());
+        SafeParcelWriter.writeString(parcel, 2, this.zzce, false);
+        SafeParcelWriter.writeString(parcel, 3, this.zzdq, false);
+        SafeParcelWriter.writeParcelable(parcel, 4, this.zzbj, i, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

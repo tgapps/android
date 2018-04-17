@@ -9,6 +9,7 @@ import android.view.WindowInsets;
 import android.view.WindowManager;
 import java.lang.reflect.Field;
 import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ViewCompat {
     static final ViewCompatBaseImpl IMPL;
@@ -20,6 +21,7 @@ public class ViewCompat {
         private static boolean sMinHeightFieldFetched;
         private static Field sMinWidthField;
         private static boolean sMinWidthFieldFetched;
+        private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
         WeakHashMap<View, Object> mViewPropertyAnimatorCompatMap = null;
 
         ViewCompatBaseImpl() {
@@ -30,7 +32,7 @@ public class ViewCompat {
         }
 
         public boolean hasAccessibilityDelegate(View v) {
-            boolean z = true;
+            boolean z = false;
             if (sAccessibilityDelegateCheckFailed) {
                 return false;
             }
@@ -44,8 +46,8 @@ public class ViewCompat {
                 }
             }
             try {
-                if (sAccessibilityDelegateField.get(v) == null) {
-                    z = false;
+                if (sAccessibilityDelegateField.get(v) != null) {
+                    z = true;
                 }
                 return z;
             } catch (Throwable th2) {

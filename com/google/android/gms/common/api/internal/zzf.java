@@ -1,31 +1,47 @@
 package com.google.android.gms.common.api.internal;
 
+import android.os.DeadObjectException;
 import android.os.RemoteException;
+import com.google.android.gms.common.Feature;
+import com.google.android.gms.common.api.Api.AnyClient;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.api.internal.GoogleApiManager.zza;
 import com.google.android.gms.tasks.TaskCompletionSource;
 
-public final class zzf extends zzb<Boolean> {
-    private zzck<?> zzfnu;
+public final class zzf<ResultT> extends zzb {
+    private final TaskCompletionSource<ResultT> zzdu;
+    private final TaskApiCall<AnyClient, ResultT> zzdy;
+    private final StatusExceptionMapper zzdz;
 
-    public zzf(zzck<?> com_google_android_gms_common_api_internal_zzck_, TaskCompletionSource<Boolean> taskCompletionSource) {
-        super(4, taskCompletionSource);
-        this.zzfnu = com_google_android_gms_common_api_internal_zzck_;
+    public final Feature[] getRequiredFeatures() {
+        return this.zzdy.zzca();
     }
 
-    public final /* bridge */ /* synthetic */ void zza(zzae com_google_android_gms_common_api_internal_zzae, boolean z) {
+    public final boolean shouldAutoResolveMissingFeatures() {
+        return this.zzdy.shouldAutoResolveMissingFeatures();
     }
 
-    public final void zzb(zzbo<?> com_google_android_gms_common_api_internal_zzbo_) throws RemoteException {
-        zzcr com_google_android_gms_common_api_internal_zzcr = (zzcr) com_google_android_gms_common_api_internal_zzbo_.zzaiy().remove(this.zzfnu);
-        if (com_google_android_gms_common_api_internal_zzcr != null) {
-            com_google_android_gms_common_api_internal_zzcr.zzfnr.zzc(com_google_android_gms_common_api_internal_zzbo_.zzahp(), this.zzedx);
-            com_google_android_gms_common_api_internal_zzcr.zzfnq.zzajp();
-            return;
+    public final void zza(Status status) {
+        this.zzdu.trySetException(this.zzdz.getException(status));
+    }
+
+    public final void zza(zza<?> com_google_android_gms_common_api_internal_GoogleApiManager_zza_) throws DeadObjectException {
+        try {
+            this.zzdy.doExecute(com_google_android_gms_common_api_internal_GoogleApiManager_zza_.zzae(), this.zzdu);
+        } catch (DeadObjectException e) {
+            throw e;
+        } catch (RemoteException e2) {
+            zza(zzb.zza(e2));
+        } catch (RuntimeException e3) {
+            zza(e3);
         }
-        this.zzedx.trySetResult(Boolean.valueOf(false));
     }
 
-    public final /* bridge */ /* synthetic */ void zzs(Status status) {
-        super.zzs(status);
+    public final void zza(zzaa com_google_android_gms_common_api_internal_zzaa, boolean z) {
+        com_google_android_gms_common_api_internal_zzaa.zza(this.zzdu, z);
+    }
+
+    public final void zza(RuntimeException runtimeException) {
+        this.zzdu.trySetException(runtimeException);
     }
 }

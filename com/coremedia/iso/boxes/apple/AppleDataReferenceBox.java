@@ -36,7 +36,7 @@ public class AppleDataReferenceBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (this.dataReferenceSize + 12);
+        return (long) (12 + this.dataReferenceSize);
     }
 
     public void _parseDetails(ByteBuffer content) {

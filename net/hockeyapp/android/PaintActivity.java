@@ -33,25 +33,27 @@ public class PaintActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle extras = getIntent().getExtras();
-        if (extras == null || extras.getParcelable("imageUri") == null) {
-            HockeyLog.error("Can't set up PaintActivity as image extra was not provided!");
-            return;
-        }
-        this.mImageUri = (Uri) extras.getParcelable("imageUri");
-        AsyncTaskUtils.execute(new AsyncTask<Void, Object, Integer>() {
-            protected Integer doInBackground(Void... voids) {
-                return Integer.valueOf(ImageUtils.determineOrientation(PaintActivity.this, PaintActivity.this.mImageUri));
-            }
+        if (extras != null) {
+            if (extras.getParcelable("imageUri") != null) {
+                this.mImageUri = (Uri) extras.getParcelable("imageUri");
+                AsyncTaskUtils.execute(new AsyncTask<Void, Object, Integer>() {
+                    protected Integer doInBackground(Void... voids) {
+                        return Integer.valueOf(ImageUtils.determineOrientation(PaintActivity.this, PaintActivity.this.mImageUri));
+                    }
 
-            protected void onPostExecute(Integer desiredOrientation) {
-                PaintActivity.this.setRequestedOrientation(desiredOrientation.intValue());
-                if ((PaintActivity.this.getResources().getDisplayMetrics().widthPixels > PaintActivity.this.getResources().getDisplayMetrics().heightPixels ? 0 : 1) != desiredOrientation.intValue()) {
-                    HockeyLog.debug("Image loading skipped because activity will be destroyed for orientation change.");
-                } else {
-                    PaintActivity.this.showPaintView();
-                }
+                    protected void onPostExecute(Integer desiredOrientation) {
+                        PaintActivity.this.setRequestedOrientation(desiredOrientation.intValue());
+                        if ((PaintActivity.this.getResources().getDisplayMetrics().widthPixels > PaintActivity.this.getResources().getDisplayMetrics().heightPixels ? 0 : 1) != desiredOrientation.intValue()) {
+                            HockeyLog.debug("Image loading skipped because activity will be destroyed for orientation change.");
+                        } else {
+                            PaintActivity.this.showPaintView();
+                        }
+                    }
+                });
+                return;
             }
-        });
+        }
+        HockeyLog.error("Can't set up PaintActivity as image extra was not provided!");
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -134,10 +136,18 @@ public class PaintActivity extends Activity {
                     return Boolean.valueOf(false);
                 }
                 String imageName = PaintActivity.this.determineFilename(PaintActivity.this.mImageUri, PaintActivity.this.mImageUri.getLastPathSegment());
-                this.result = new File(hockeyAppCache, imageName + ".jpg");
+                String filename = new StringBuilder();
+                filename.append(imageName);
+                filename.append(".jpg");
+                this.result = new File(hockeyAppCache, filename.toString());
                 int suffix = 1;
                 while (this.result.exists()) {
-                    this.result = new File(hockeyAppCache, imageName + "_" + suffix + ".jpg");
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append(imageName);
+                    stringBuilder.append("_");
+                    stringBuilder.append(suffix);
+                    stringBuilder.append(".jpg");
+                    this.result = new File(hockeyAppCache, stringBuilder.toString());
                     suffix++;
                 }
                 try {

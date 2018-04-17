@@ -13,176 +13,211 @@ import android.os.Build.VERSION;
 import android.os.StrictMode;
 import android.os.StrictMode.VmPolicy;
 import android.os.StrictMode.VmPolicy.Builder;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.UUID;
 import net.hockeyapp.android.R;
 import net.hockeyapp.android.listeners.DownloadFileListener;
-import net.hockeyapp.android.utils.HockeyLog;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 
 @SuppressLint({"StaticFieldLeak"})
 public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
     protected Context mContext;
     protected File mDirectory;
-    private String mDownloadErrorMessage;
-    protected String mFilename = (UUID.randomUUID() + ".apk");
+    private String mDownloadErrorMessage = null;
+    protected String mFilename;
     protected DownloadFileListener mNotifier;
     protected ProgressDialog mProgressDialog;
     protected String mUrlString;
 
+    protected java.lang.Long doInBackground(java.lang.Void... r1) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: net.hockeyapp.android.tasks.DownloadFileTask.doInBackground(java.lang.Void[]):java.lang.Long
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r1 = r20;
+        r2 = 0;
+        r3 = 0;
+        r4 = 0;
+        r6 = new java.net.URL;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r7 = r20.getURLString();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r6.<init>(r7);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r7 = 6;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r7 = r1.createConnection(r6, r7);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r7.connect();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r8 = r7.getContentLength();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r9 = r7.getContentType();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        if (r9 == 0) goto L_0x0042;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+    L_0x0021:
+        r10 = "text";	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r10 = r9.contains(r10);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        if (r10 == 0) goto L_0x0042;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+    L_0x0029:
+        r10 = "The requested download does not appear to be a file.";	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r1.mDownloadErrorMessage = r10;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r10 = java.lang.Long.valueOf(r4);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        if (r3 == 0) goto L_0x0039;
+    L_0x0033:
+        r3.close();	 Catch:{ IOException -> 0x0037 }
+        goto L_0x0039;	 Catch:{ IOException -> 0x0037 }
+    L_0x0037:
+        r0 = move-exception;	 Catch:{ IOException -> 0x0037 }
+        goto L_0x003f;	 Catch:{ IOException -> 0x0037 }
+    L_0x0039:
+        if (r2 == 0) goto L_0x0040;	 Catch:{ IOException -> 0x0037 }
+    L_0x003b:
+        r2.close();	 Catch:{ IOException -> 0x0037 }
+        goto L_0x0040;
+    L_0x003f:
+        goto L_0x0041;
+        return r10;
+    L_0x0042:
+        r10 = r1.mDirectory;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r10 = r10.mkdirs();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        if (r10 != 0) goto L_0x006f;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r11 = r1.mDirectory;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r11 = r11.exists();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        if (r11 != 0) goto L_0x006f;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r11 = new java.io.IOException;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12 = new java.lang.StringBuilder;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12.<init>();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = "Could not create the dir(s):";	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12.append(r13);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = r1.mDirectory;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = r13.getAbsolutePath();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12.append(r13);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12 = r12.toString();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r11.<init>(r12);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        throw r11;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r11 = new java.io.File;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12 = r1.mDirectory;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = r1.mFilename;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r11.<init>(r12, r13);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12 = new java.io.BufferedInputStream;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = r7.getInputStream();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12.<init>(r13);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r2 = r12;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12 = new java.io.FileOutputStream;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12.<init>(r11);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r3 = r12;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12 = 1024; // 0x400 float:1.435E-42 double:5.06E-321;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r12 = new byte[r12];	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = r4;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r15 = r2.read(r12);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r16 = r15;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r4 = -1;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        if (r15 == r4) goto L_0x00c5;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r17 = r6;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r4 = r16;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r5 = (long) r4;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r18 = r9;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r19 = r10;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r9 = r13 + r5;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r5 = 1;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r5 = new java.lang.Integer[r5];	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r6 = (float) r9;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r6 = r6 * r13;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = (float) r8;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r6 = r6 / r13;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r6 = java.lang.Math.round(r6);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r6 = java.lang.Integer.valueOf(r6);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = 0;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r5[r13] = r6;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r1.publishProgress(r5);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r3.write(r12, r13, r4);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r13 = r9;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r6 = r17;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r9 = r18;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r10 = r19;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r4 = 0;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        goto L_0x008d;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r17 = r6;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r18 = r9;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r19 = r10;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r4 = r16;	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r3.flush();	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        r5 = java.lang.Long.valueOf(r13);	 Catch:{ IOException -> 0x00e9, all -> 0x00e5 }
+        if (r3 == 0) goto L_0x00dc;
+        r3.close();	 Catch:{ IOException -> 0x00da }
+        goto L_0x00dc;	 Catch:{ IOException -> 0x00da }
+    L_0x00da:
+        r0 = move-exception;	 Catch:{ IOException -> 0x00da }
+        goto L_0x00e2;	 Catch:{ IOException -> 0x00da }
+        if (r2 == 0) goto L_0x00e3;	 Catch:{ IOException -> 0x00da }
+        r2.close();	 Catch:{ IOException -> 0x00da }
+        goto L_0x00e3;
+        goto L_0x00e4;
+        return r5;
+    L_0x00e5:
+        r0 = move-exception;
+        r4 = r2;
+        r2 = r0;
+        goto L_0x011b;
+    L_0x00e9:
+        r0 = move-exception;
+        r4 = r2;
+        r2 = r0;
+        r5 = new java.lang.StringBuilder;	 Catch:{ all -> 0x0119 }
+        r5.<init>();	 Catch:{ all -> 0x0119 }
+        r6 = "Failed to download ";	 Catch:{ all -> 0x0119 }
+        r5.append(r6);	 Catch:{ all -> 0x0119 }
+        r6 = r1.mUrlString;	 Catch:{ all -> 0x0119 }
+        r5.append(r6);	 Catch:{ all -> 0x0119 }
+        r5 = r5.toString();	 Catch:{ all -> 0x0119 }
+        net.hockeyapp.android.utils.HockeyLog.error(r5, r2);	 Catch:{ all -> 0x0119 }
+        r5 = 0;	 Catch:{ all -> 0x0119 }
+        r5 = java.lang.Long.valueOf(r5);	 Catch:{ all -> 0x0119 }
+        if (r3 == 0) goto L_0x0110;
+        r3.close();	 Catch:{ IOException -> 0x010e }
+        goto L_0x0110;	 Catch:{ IOException -> 0x010e }
+    L_0x010e:
+        r0 = move-exception;	 Catch:{ IOException -> 0x010e }
+        goto L_0x0116;	 Catch:{ IOException -> 0x010e }
+        if (r4 == 0) goto L_0x0117;	 Catch:{ IOException -> 0x010e }
+        r4.close();	 Catch:{ IOException -> 0x010e }
+        goto L_0x0117;
+        goto L_0x0118;
+        return r5;
+    L_0x0119:
+        r0 = move-exception;
+        goto L_0x00e7;
+        if (r3 == 0) goto L_0x0123;
+        r3.close();	 Catch:{ IOException -> 0x0121 }
+        goto L_0x0123;	 Catch:{ IOException -> 0x0121 }
+    L_0x0121:
+        r0 = move-exception;	 Catch:{ IOException -> 0x0121 }
+        goto L_0x0129;	 Catch:{ IOException -> 0x0121 }
+        if (r4 == 0) goto L_0x012a;	 Catch:{ IOException -> 0x0121 }
+        r4.close();	 Catch:{ IOException -> 0x0121 }
+        goto L_0x012a;
+        throw r2;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.tasks.DownloadFileTask.doInBackground(java.lang.Void[]):java.lang.Long");
+    }
+
     public DownloadFileTask(Context context, String urlString, DownloadFileListener notifier) {
         this.mContext = context;
         this.mUrlString = urlString;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(UUID.randomUUID());
+        stringBuilder.append(".apk");
+        this.mFilename = stringBuilder.toString();
         this.mDirectory = new File(context.getExternalFilesDir(null), "Download");
         this.mNotifier = notifier;
-        this.mDownloadErrorMessage = null;
-    }
-
-    protected Long doInBackground(Void... args) {
-        Throwable e;
-        Long valueOf;
-        Throwable th;
-        InputStream input = null;
-        OutputStream output = null;
-        URLConnection connection = createConnection(new URL(getURLString()), 6);
-        connection.connect();
-        int lengthOfFile = connection.getContentLength();
-        String contentType = connection.getContentType();
-        if (contentType == null || !contentType.contains(MimeTypes.BASE_TYPE_TEXT)) {
-            try {
-                if (this.mDirectory.mkdirs() || this.mDirectory.exists()) {
-                    OutputStream output2;
-                    File file = new File(this.mDirectory, this.mFilename);
-                    InputStream input2 = new BufferedInputStream(connection.getInputStream());
-                    try {
-                        output2 = new FileOutputStream(file);
-                    } catch (IOException e2) {
-                        e = e2;
-                        input = input2;
-                        try {
-                            HockeyLog.error("Failed to download " + this.mUrlString, e);
-                            valueOf = Long.valueOf(0);
-                            if (output != null) {
-                                try {
-                                    output.close();
-                                } catch (IOException e3) {
-                                }
-                            }
-                            if (input != null) {
-                                input.close();
-                            }
-                            return valueOf;
-                        } catch (Throwable th2) {
-                            th = th2;
-                            if (output != null) {
-                                try {
-                                    output.close();
-                                } catch (IOException e4) {
-                                    throw th;
-                                }
-                            }
-                            if (input != null) {
-                                input.close();
-                            }
-                            throw th;
-                        }
-                    } catch (Throwable th3) {
-                        th = th3;
-                        input = input2;
-                        if (output != null) {
-                            output.close();
-                        }
-                        if (input != null) {
-                            input.close();
-                        }
-                        throw th;
-                    }
-                    try {
-                        byte[] data = new byte[1024];
-                        long total = 0;
-                        while (true) {
-                            int count = input2.read(data);
-                            if (count == -1) {
-                                break;
-                            }
-                            total += (long) count;
-                            publishProgress(new Integer[]{Integer.valueOf(Math.round((((float) total) * 100.0f) / ((float) lengthOfFile)))});
-                            output2.write(data, 0, count);
-                        }
-                        output2.flush();
-                        valueOf = Long.valueOf(total);
-                        if (output2 != null) {
-                            try {
-                                output2.close();
-                            } catch (IOException e5) {
-                            }
-                        }
-                        if (input2 != null) {
-                            input2.close();
-                        }
-                        output = output2;
-                        input = input2;
-                    } catch (IOException e6) {
-                        e = e6;
-                        output = output2;
-                        input = input2;
-                        HockeyLog.error("Failed to download " + this.mUrlString, e);
-                        valueOf = Long.valueOf(0);
-                        if (output != null) {
-                            output.close();
-                        }
-                        if (input != null) {
-                            input.close();
-                        }
-                        return valueOf;
-                    } catch (Throwable th4) {
-                        th = th4;
-                        output = output2;
-                        input = input2;
-                        if (output != null) {
-                            output.close();
-                        }
-                        if (input != null) {
-                            input.close();
-                        }
-                        throw th;
-                    }
-                    return valueOf;
-                }
-                throw new IOException("Could not create the dir(s):" + this.mDirectory.getAbsolutePath());
-            } catch (IOException e7) {
-                e = e7;
-                HockeyLog.error("Failed to download " + this.mUrlString, e);
-                valueOf = Long.valueOf(0);
-                if (output != null) {
-                    output.close();
-                }
-                if (input != null) {
-                    input.close();
-                }
-                return valueOf;
-            }
-        }
-        this.mDownloadErrorMessage = "The requested download does not appear to be a file.";
-        valueOf = Long.valueOf(0);
-        if (output != null) {
-            try {
-                output.close();
-            } catch (IOException e8) {
-            }
-        }
-        if (input != null) {
-            input.close();
-        }
-        return valueOf;
     }
 
     protected void setConnectionProperties(HttpURLConnection connection) {
@@ -198,11 +233,11 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
             return connection;
         }
         URL movedUrl = new URL(connection.getHeaderField("Location"));
-        if (url.getProtocol().equals(movedUrl.getProtocol())) {
-            return connection;
+        if (!url.getProtocol().equals(movedUrl.getProtocol())) {
+            connection.disconnect();
+            return createConnection(movedUrl, remainingRedirects - 1);
         }
-        connection.disconnect();
-        return createConnection(movedUrl, remainingRedirects - 1);
+        return connection;
     }
 
     protected void onProgressUpdate(Integer... args) {
@@ -239,7 +274,6 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
             this.mContext.startActivity(intent);
             if (oldVmPolicy != null) {
                 StrictMode.setVmPolicy(oldVmPolicy);
-                return;
             }
             return;
         }
@@ -269,6 +303,9 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
     }
 
     protected String getURLString() {
-        return this.mUrlString + "&type=apk";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(this.mUrlString);
+        stringBuilder.append("&type=apk");
+        return stringBuilder.toString();
     }
 }

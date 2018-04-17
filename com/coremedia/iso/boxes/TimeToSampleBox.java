@@ -16,7 +16,7 @@ import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.reflect.Factory;
 
 public class TimeToSampleBox extends AbstractFullBox {
-    static final /* synthetic */ boolean $assertionsDisabled;
+    static final /* synthetic */ boolean $assertionsDisabled = false;
     public static final String TYPE = "stts";
     private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
     private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
@@ -50,7 +50,12 @@ public class TimeToSampleBox extends AbstractFullBox {
         }
 
         public String toString() {
-            return "Entry{count=" + this.count + ", delta=" + this.delta + '}';
+            StringBuilder stringBuilder = new StringBuilder("Entry{count=");
+            stringBuilder.append(this.count);
+            stringBuilder.append(", delta=");
+            stringBuilder.append(this.delta);
+            stringBuilder.append('}');
+            return stringBuilder.toString();
         }
     }
 
@@ -62,14 +67,7 @@ public class TimeToSampleBox extends AbstractFullBox {
     }
 
     static {
-        boolean z;
         ajc$preClinit();
-        if (TimeToSampleBox.class.desiredAssertionStatus()) {
-            z = false;
-        } else {
-            z = true;
-        }
-        $assertionsDisabled = z;
     }
 
     public TimeToSampleBox() {
@@ -77,7 +75,7 @@ public class TimeToSampleBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) ((this.entries.size() * 8) + 8);
+        return (long) (8 + (this.entries.size() * 8));
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -110,91 +108,41 @@ public class TimeToSampleBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        return "TimeToSampleBox[entryCount=" + this.entries.size() + "]";
+        StringBuilder stringBuilder = new StringBuilder("TimeToSampleBox[entryCount=");
+        stringBuilder.append(this.entries.size());
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public static synchronized long[] blowupTimeToSamples(java.util.List<com.coremedia.iso.boxes.TimeToSampleBox.Entry> r18) {
-        /*
-        r12 = com.coremedia.iso.boxes.TimeToSampleBox.class;
-        monitor-enter(r12);
-        r9 = cache;	 Catch:{ all -> 0x0036 }
-        r0 = r18;
-        r2 = r9.get(r0);	 Catch:{ all -> 0x0036 }
-        r2 = (java.lang.ref.SoftReference) r2;	 Catch:{ all -> 0x0036 }
-        if (r2 == 0) goto L_0x0019;
-    L_0x000f:
-        r3 = r2.get();	 Catch:{ all -> 0x0036 }
-        r3 = (long[]) r3;	 Catch:{ all -> 0x0036 }
-        if (r3 == 0) goto L_0x0019;
-    L_0x0017:
-        monitor-exit(r12);
-        return r3;
-    L_0x0019:
-        r10 = 0;
-        r9 = r18.iterator();	 Catch:{ all -> 0x0036 }
-    L_0x001f:
-        r13 = r9.hasNext();	 Catch:{ all -> 0x0036 }
-        if (r13 != 0) goto L_0x0039;
-    L_0x0025:
-        r9 = $assertionsDisabled;	 Catch:{ all -> 0x0036 }
-        if (r9 != 0) goto L_0x0045;
-    L_0x0029:
-        r14 = 2147483647; // 0x7fffffff float:NaN double:1.060997895E-314;
-        r9 = (r10 > r14 ? 1 : (r10 == r14 ? 0 : -1));
-        if (r9 <= 0) goto L_0x0045;
-    L_0x0030:
-        r9 = new java.lang.AssertionError;	 Catch:{ all -> 0x0036 }
-        r9.<init>();	 Catch:{ all -> 0x0036 }
-        throw r9;	 Catch:{ all -> 0x0036 }
-    L_0x0036:
-        r9 = move-exception;
-        monitor-exit(r12);
-        throw r9;
-    L_0x0039:
-        r7 = r9.next();	 Catch:{ all -> 0x0036 }
-        r7 = (com.coremedia.iso.boxes.TimeToSampleBox.Entry) r7;	 Catch:{ all -> 0x0036 }
-        r14 = r7.getCount();	 Catch:{ all -> 0x0036 }
-        r10 = r10 + r14;
-        goto L_0x001f;
-    L_0x0045:
-        r9 = (int) r10;	 Catch:{ all -> 0x0036 }
-        r6 = new long[r9];	 Catch:{ all -> 0x0036 }
-        r4 = 0;
-        r9 = r18.iterator();	 Catch:{ all -> 0x0036 }
-    L_0x004d:
-        r13 = r9.hasNext();	 Catch:{ all -> 0x0036 }
-        if (r13 != 0) goto L_0x0061;
-    L_0x0053:
-        r9 = cache;	 Catch:{ all -> 0x0036 }
-        r13 = new java.lang.ref.SoftReference;	 Catch:{ all -> 0x0036 }
-        r13.<init>(r6);	 Catch:{ all -> 0x0036 }
-        r0 = r18;
-        r9.put(r0, r13);	 Catch:{ all -> 0x0036 }
-        r3 = r6;
-        goto L_0x0017;
-    L_0x0061:
-        r7 = r9.next();	 Catch:{ all -> 0x0036 }
-        r7 = (com.coremedia.iso.boxes.TimeToSampleBox.Entry) r7;	 Catch:{ all -> 0x0036 }
-        r8 = 0;
-        r5 = r4;
-    L_0x0069:
-        r14 = (long) r8;	 Catch:{ all -> 0x0036 }
-        r16 = r7.getCount();	 Catch:{ all -> 0x0036 }
-        r13 = (r14 > r16 ? 1 : (r14 == r16 ? 0 : -1));
-        if (r13 < 0) goto L_0x0074;
-    L_0x0072:
-        r4 = r5;
-        goto L_0x004d;
-    L_0x0074:
-        r4 = r5 + 1;
-        r14 = r7.getDelta();	 Catch:{ all -> 0x0036 }
-        r6[r5] = r14;	 Catch:{ all -> 0x0036 }
-        r8 = r8 + 1;
-        r5 = r4;
-        goto L_0x0069;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.coremedia.iso.boxes.TimeToSampleBox.blowupTimeToSamples(java.util.List):long[]");
+    public static synchronized long[] blowupTimeToSamples(List<Entry> entries) {
+        synchronized (TimeToSampleBox.class) {
+            long[] jArr;
+            SoftReference softReference = (SoftReference) cache.get(entries);
+            SoftReference cacheEntry = softReference;
+            if (softReference != null) {
+                jArr = (long[]) cacheEntry.get();
+                long[] cacheVal = jArr;
+                if (jArr != null) {
+                    return cacheVal;
+                }
+            }
+            long numOfSamples = 0;
+            for (Entry entry : entries) {
+                numOfSamples += entry.getCount();
+            }
+            jArr = new long[((int) numOfSamples)];
+            int current = 0;
+            for (Entry entry2 : entries) {
+                int i = 0;
+                while (((long) i) < entry2.getCount()) {
+                    int current2 = current + 1;
+                    jArr[current] = entry2.getDelta();
+                    i++;
+                    current = current2;
+                }
+            }
+            cache.put(entries, new SoftReference(jArr));
+            return jArr;
+        }
     }
 }

@@ -1,43 +1,13 @@
 package com.google.android.gms.common.api.internal;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
+final class zzak implements Runnable {
+    private final /* synthetic */ zzaj zzhv;
 
-public class zzak extends GoogleApiClient {
-    private final String zzfqu;
-
-    public zzak(String str) {
-        this.zzfqu = str;
+    zzak(zzaj com_google_android_gms_common_api_internal_zzaj) {
+        this.zzhv = com_google_android_gms_common_api_internal_zzaj;
     }
 
-    public ConnectionResult blockingConnect() {
-        throw new UnsupportedOperationException(this.zzfqu);
-    }
-
-    public void connect() {
-        throw new UnsupportedOperationException(this.zzfqu);
-    }
-
-    public void disconnect() {
-        throw new UnsupportedOperationException(this.zzfqu);
-    }
-
-    public void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
-        throw new UnsupportedOperationException(this.zzfqu);
-    }
-
-    public boolean isConnected() {
-        throw new UnsupportedOperationException(this.zzfqu);
-    }
-
-    public void registerConnectionFailedListener(OnConnectionFailedListener onConnectionFailedListener) {
-        throw new UnsupportedOperationException(this.zzfqu);
-    }
-
-    public void unregisterConnectionFailedListener(OnConnectionFailedListener onConnectionFailedListener) {
-        throw new UnsupportedOperationException(this.zzfqu);
+    public final void run() {
+        this.zzhv.zzgk.cancelAvailabilityErrorNotifications(this.zzhv.mContext);
     }
 }

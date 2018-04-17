@@ -119,43 +119,59 @@ public final class MimeTypes {
             return null;
         }
         codec = codec.trim();
-        if (codec.startsWith(VisualSampleEntry.TYPE3) || codec.startsWith(VisualSampleEntry.TYPE4)) {
-            return "video/avc";
+        if (!codec.startsWith(VisualSampleEntry.TYPE3)) {
+            if (!codec.startsWith(VisualSampleEntry.TYPE4)) {
+                if (!codec.startsWith(VisualSampleEntry.TYPE7)) {
+                    if (!codec.startsWith(VisualSampleEntry.TYPE6)) {
+                        if (!codec.startsWith("vp9")) {
+                            if (!codec.startsWith("vp09")) {
+                                if (!codec.startsWith("vp8")) {
+                                    if (!codec.startsWith("vp08")) {
+                                        if (codec.startsWith(AudioSampleEntry.TYPE3)) {
+                                            return AUDIO_AAC;
+                                        }
+                                        if (!codec.startsWith(AudioSampleEntry.TYPE8)) {
+                                            if (!codec.startsWith("dac3")) {
+                                                if (!codec.startsWith(AudioSampleEntry.TYPE9)) {
+                                                    if (!codec.startsWith("dec3")) {
+                                                        if (codec.startsWith("ec+3")) {
+                                                            return AUDIO_E_AC3_JOC;
+                                                        }
+                                                        if (!codec.startsWith("dtsc")) {
+                                                            if (!codec.startsWith(AudioSampleEntry.TYPE13)) {
+                                                                if (!codec.startsWith(AudioSampleEntry.TYPE12)) {
+                                                                    if (!codec.startsWith(AudioSampleEntry.TYPE11)) {
+                                                                        if (codec.startsWith("opus")) {
+                                                                            return AUDIO_OPUS;
+                                                                        }
+                                                                        if (codec.startsWith("vorbis")) {
+                                                                            return AUDIO_VORBIS;
+                                                                        }
+                                                                        return null;
+                                                                    }
+                                                                }
+                                                                return AUDIO_DTS_HD;
+                                                            }
+                                                        }
+                                                        return AUDIO_DTS;
+                                                    }
+                                                }
+                                                return AUDIO_E_AC3;
+                                            }
+                                        }
+                                        return AUDIO_AC3;
+                                    }
+                                }
+                                return VIDEO_VP8;
+                            }
+                        }
+                        return VIDEO_VP9;
+                    }
+                }
+                return VIDEO_H265;
+            }
         }
-        if (codec.startsWith(VisualSampleEntry.TYPE7) || codec.startsWith(VisualSampleEntry.TYPE6)) {
-            return VIDEO_H265;
-        }
-        if (codec.startsWith("vp9") || codec.startsWith("vp09")) {
-            return VIDEO_VP9;
-        }
-        if (codec.startsWith("vp8") || codec.startsWith("vp08")) {
-            return VIDEO_VP8;
-        }
-        if (codec.startsWith(AudioSampleEntry.TYPE3)) {
-            return AUDIO_AAC;
-        }
-        if (codec.startsWith(AudioSampleEntry.TYPE8) || codec.startsWith("dac3")) {
-            return AUDIO_AC3;
-        }
-        if (codec.startsWith(AudioSampleEntry.TYPE9) || codec.startsWith("dec3")) {
-            return AUDIO_E_AC3;
-        }
-        if (codec.startsWith("ec+3")) {
-            return AUDIO_E_AC3_JOC;
-        }
-        if (codec.startsWith("dtsc") || codec.startsWith(AudioSampleEntry.TYPE13)) {
-            return AUDIO_DTS;
-        }
-        if (codec.startsWith(AudioSampleEntry.TYPE12) || codec.startsWith(AudioSampleEntry.TYPE11)) {
-            return AUDIO_DTS_HD;
-        }
-        if (codec.startsWith("opus")) {
-            return AUDIO_OPUS;
-        }
-        if (codec.startsWith("vorbis")) {
-            return AUDIO_VORBIS;
-        }
-        return null;
+        return "video/avc";
     }
 
     public static int getTrackType(String mimeType) {
@@ -168,70 +184,109 @@ public final class MimeTypes {
         if (isVideo(mimeType)) {
             return 2;
         }
-        if (isText(mimeType) || APPLICATION_CEA608.equals(mimeType) || APPLICATION_CEA708.equals(mimeType) || APPLICATION_MP4CEA608.equals(mimeType) || APPLICATION_SUBRIP.equals(mimeType) || APPLICATION_TTML.equals(mimeType) || APPLICATION_TX3G.equals(mimeType) || APPLICATION_MP4VTT.equals(mimeType) || APPLICATION_RAWCC.equals(mimeType) || APPLICATION_VOBSUB.equals(mimeType) || APPLICATION_PGS.equals(mimeType) || APPLICATION_DVBSUBS.equals(mimeType)) {
-            return 3;
+        if (!(isText(mimeType) || APPLICATION_CEA608.equals(mimeType) || APPLICATION_CEA708.equals(mimeType) || APPLICATION_MP4CEA608.equals(mimeType) || APPLICATION_SUBRIP.equals(mimeType) || APPLICATION_TTML.equals(mimeType) || APPLICATION_TX3G.equals(mimeType) || APPLICATION_MP4VTT.equals(mimeType) || APPLICATION_RAWCC.equals(mimeType) || APPLICATION_VOBSUB.equals(mimeType) || APPLICATION_PGS.equals(mimeType))) {
+            if (!APPLICATION_DVBSUBS.equals(mimeType)) {
+                if (!(APPLICATION_ID3.equals(mimeType) || APPLICATION_EMSG.equals(mimeType) || APPLICATION_SCTE35.equals(mimeType))) {
+                    if (!APPLICATION_CAMERA_MOTION.equals(mimeType)) {
+                        return -1;
+                    }
+                }
+                return 4;
+            }
         }
-        if (APPLICATION_ID3.equals(mimeType) || APPLICATION_EMSG.equals(mimeType) || APPLICATION_SCTE35.equals(mimeType) || APPLICATION_CAMERA_MOTION.equals(mimeType)) {
-            return 4;
-        }
-        return -1;
+        return 3;
     }
 
-    public static int getEncoding(String mimeType) {
-        int i = -1;
-        switch (mimeType.hashCode()) {
-            case -2123537834:
-                if (mimeType.equals(AUDIO_E_AC3_JOC)) {
-                    i = 2;
-                    break;
-                }
-                break;
-            case -1095064472:
-                if (mimeType.equals(AUDIO_DTS)) {
-                    i = 3;
-                    break;
-                }
-                break;
-            case 187078296:
-                if (mimeType.equals(AUDIO_AC3)) {
-                    i = 0;
-                    break;
-                }
-                break;
-            case 1504578661:
-                if (mimeType.equals(AUDIO_E_AC3)) {
-                    i = 1;
-                    break;
-                }
-                break;
-            case 1505942594:
-                if (mimeType.equals(AUDIO_DTS_HD)) {
-                    i = 4;
-                    break;
-                }
-                break;
-            case 1556697186:
-                if (mimeType.equals(AUDIO_TRUEHD)) {
-                    i = 5;
-                    break;
-                }
-                break;
-        }
-        switch (i) {
-            case 0:
-                return 5;
-            case 1:
-            case 2:
-                return 6;
-            case 3:
-                return 7;
-            case 4:
-                return 8;
-            case 5:
-                return 14;
-            default:
-                return 0;
-        }
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static int getEncoding(java.lang.String r3) {
+        /*
+        r0 = r3.hashCode();
+        r1 = 0;
+        r2 = 5;
+        switch(r0) {
+            case -2123537834: goto L_0x003c;
+            case -1095064472: goto L_0x0032;
+            case 187078296: goto L_0x0028;
+            case 1504578661: goto L_0x001e;
+            case 1505942594: goto L_0x0014;
+            case 1556697186: goto L_0x000a;
+            default: goto L_0x0009;
+        };
+    L_0x0009:
+        goto L_0x0046;
+    L_0x000a:
+        r0 = "audio/true-hd";
+        r0 = r3.equals(r0);
+        if (r0 == 0) goto L_0x0046;
+    L_0x0012:
+        r0 = r2;
+        goto L_0x0047;
+    L_0x0014:
+        r0 = "audio/vnd.dts.hd";
+        r0 = r3.equals(r0);
+        if (r0 == 0) goto L_0x0046;
+    L_0x001c:
+        r0 = 4;
+        goto L_0x0047;
+    L_0x001e:
+        r0 = "audio/eac3";
+        r0 = r3.equals(r0);
+        if (r0 == 0) goto L_0x0046;
+    L_0x0026:
+        r0 = 1;
+        goto L_0x0047;
+    L_0x0028:
+        r0 = "audio/ac3";
+        r0 = r3.equals(r0);
+        if (r0 == 0) goto L_0x0046;
+    L_0x0030:
+        r0 = r1;
+        goto L_0x0047;
+    L_0x0032:
+        r0 = "audio/vnd.dts";
+        r0 = r3.equals(r0);
+        if (r0 == 0) goto L_0x0046;
+    L_0x003a:
+        r0 = 3;
+        goto L_0x0047;
+    L_0x003c:
+        r0 = "audio/eac3-joc";
+        r0 = r3.equals(r0);
+        if (r0 == 0) goto L_0x0046;
+    L_0x0044:
+        r0 = 2;
+        goto L_0x0047;
+    L_0x0046:
+        r0 = -1;
+    L_0x0047:
+        switch(r0) {
+            case 0: goto L_0x0055;
+            case 1: goto L_0x0053;
+            case 2: goto L_0x0053;
+            case 3: goto L_0x0051;
+            case 4: goto L_0x004e;
+            case 5: goto L_0x004b;
+            default: goto L_0x004a;
+        };
+    L_0x004a:
+        return r1;
+    L_0x004b:
+        r0 = 14;
+        return r0;
+    L_0x004e:
+        r0 = 8;
+        return r0;
+    L_0x0051:
+        r0 = 7;
+        return r0;
+    L_0x0053:
+        r0 = 6;
+        return r0;
+    L_0x0055:
+        return r2;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.util.MimeTypes.getEncoding(java.lang.String):int");
     }
 
     public static int getTrackTypeOfCodec(String codec) {
@@ -246,6 +301,9 @@ public final class MimeTypes {
         if (indexOfSlash != -1) {
             return mimeType.substring(0, indexOfSlash);
         }
-        throw new IllegalArgumentException("Invalid mime type: " + mimeType);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Invalid mime type: ");
+        stringBuilder.append(mimeType);
+        throw new IllegalArgumentException(stringBuilder.toString());
     }
 }

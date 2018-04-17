@@ -68,36 +68,60 @@ public abstract class SearchActionVerificationClientService extends IntentServic
     }
 
     protected final void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            long startTime = System.nanoTime();
-            while (!isConnected() && System.nanoTime() - startTime < this.mConnectionTimeout * 1000000) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException exception) {
-                    if (this.DBG) {
-                        Log.d(TAG, "Unexpected InterruptedException: " + exception);
-                    }
+        if (intent == null) {
+            if (this.DBG) {
+                Log.d(TAG, "Unable to verify null intent");
+            }
+            return;
+        }
+        long startTime = System.nanoTime();
+        while (!isConnected() && System.nanoTime() - startTime < this.mConnectionTimeout * 1000000) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException exception) {
+                if (this.DBG) {
+                    String str = TAG;
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append("Unexpected InterruptedException: ");
+                    stringBuilder.append(exception);
+                    Log.d(str, stringBuilder.toString());
                 }
             }
-            if (!isConnected()) {
-                Log.e(TAG, "VerificationService is not connected, unable to check intent: " + intent);
-            } else if (intent.hasExtra(EXTRA_INTENT)) {
-                Intent extraIntent = (Intent) intent.getParcelableExtra(EXTRA_INTENT);
-                if (this.DBG) {
-                    logIntentWithExtras(extraIntent);
-                }
-                try {
-                    Log.i(TAG, "API version: " + this.mIRemoteService.getVersion());
-                    Bundle options = new Bundle();
-                    performAction(extraIntent, this.mIRemoteService.isSearchAction(extraIntent, options), options);
-                } catch (RemoteException exception2) {
-                    Log.e(TAG, "Remote exception: " + exception2.getMessage());
-                }
-            } else if (this.DBG) {
-                Log.d(TAG, "No extra, nothing to check: " + intent);
+        }
+        String str2;
+        StringBuilder stringBuilder2;
+        if (!isConnected()) {
+            str2 = TAG;
+            stringBuilder2 = new StringBuilder();
+            stringBuilder2.append("VerificationService is not connected, unable to check intent: ");
+            stringBuilder2.append(intent);
+            Log.e(str2, stringBuilder2.toString());
+        } else if (intent.hasExtra(EXTRA_INTENT)) {
+            Intent extraIntent = (Intent) intent.getParcelableExtra(EXTRA_INTENT);
+            if (this.DBG) {
+                logIntentWithExtras(extraIntent);
+            }
+            try {
+                str = TAG;
+                stringBuilder = new StringBuilder();
+                stringBuilder.append("API version: ");
+                stringBuilder.append(this.mIRemoteService.getVersion());
+                Log.i(str, stringBuilder.toString());
+                Bundle options = new Bundle();
+                performAction(extraIntent, this.mIRemoteService.isSearchAction(extraIntent, options), options);
+            } catch (RemoteException exception2) {
+                String str3 = TAG;
+                StringBuilder stringBuilder3 = new StringBuilder();
+                stringBuilder3.append("Remote exception: ");
+                stringBuilder3.append(exception2.getMessage());
+                Log.e(str3, stringBuilder3.toString());
             }
         } else if (this.DBG) {
-            Log.d(TAG, "Unable to verify null intent");
+            str2 = TAG;
+            stringBuilder2 = new StringBuilder();
+            stringBuilder2.append("No extra, nothing to check: ");
+            stringBuilder2.append(intent);
+            Log.d(str2, stringBuilder2.toString());
         }
     }
 
@@ -120,7 +144,11 @@ public abstract class SearchActionVerificationClientService extends IntentServic
 
     private static void logIntentWithExtras(Intent intent) {
         Log.d(TAG, "Intent:");
-        Log.d(TAG, "\t" + intent);
+        String str = TAG;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\t");
+        stringBuilder.append(intent);
+        Log.d(str, stringBuilder.toString());
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             Log.d(TAG, "Extras:");

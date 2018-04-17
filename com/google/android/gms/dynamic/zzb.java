@@ -1,21 +1,26 @@
 package com.google.android.gms.dynamic;
 
-import java.util.Iterator;
+import android.app.Activity;
+import android.os.Bundle;
 
-final class zzb implements zzo<T> {
-    private /* synthetic */ zza zzgwh;
+final class zzb implements zza {
+    private final /* synthetic */ Activity val$activity;
+    private final /* synthetic */ DeferredLifecycleHelper zzabg;
+    private final /* synthetic */ Bundle zzabh;
+    private final /* synthetic */ Bundle zzabi;
 
-    zzb(zza com_google_android_gms_dynamic_zza) {
-        this.zzgwh = com_google_android_gms_dynamic_zza;
+    zzb(DeferredLifecycleHelper deferredLifecycleHelper, Activity activity, Bundle bundle, Bundle bundle2) {
+        this.zzabg = deferredLifecycleHelper;
+        this.val$activity = activity;
+        this.zzabh = bundle;
+        this.zzabi = bundle2;
     }
 
-    public final void zza(T t) {
-        this.zzgwh.zzgwd = t;
-        Iterator it = this.zzgwh.zzgwf.iterator();
-        while (it.hasNext()) {
-            ((zzi) it.next()).zzb(this.zzgwh.zzgwd);
-        }
-        this.zzgwh.zzgwf.clear();
-        this.zzgwh.zzgwe = null;
+    public final int getState() {
+        return 0;
+    }
+
+    public final void zza(LifecycleDelegate lifecycleDelegate) {
+        this.zzabg.zzabc.onInflate(this.val$activity, this.zzabh, this.zzabi);
     }
 }

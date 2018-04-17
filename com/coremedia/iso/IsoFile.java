@@ -71,6 +71,9 @@ public class IsoFile extends BasicContainer implements Closeable {
     }
 
     public String toString() {
-        return "model(" + this.dataSource.toString() + ")";
+        StringBuilder stringBuilder = new StringBuilder("model(");
+        stringBuilder.append(this.dataSource.toString());
+        stringBuilder.append(")");
+        return stringBuilder.toString();
     }
 }

@@ -1,14 +1,14 @@
 package com.google.android.gms.common.api;
 
-import com.google.android.gms.common.internal.zzbq;
+import com.google.android.gms.common.internal.Preconditions;
 
 public class BooleanResult implements Result {
     private final Status mStatus;
-    private final boolean zzfmd;
+    private final boolean zzck;
 
     public BooleanResult(Status status, boolean z) {
-        this.mStatus = (Status) zzbq.checkNotNull(status, "Status must not be null");
-        this.zzfmd = z;
+        this.mStatus = (Status) Preconditions.checkNotNull(status, "Status must not be null");
+        this.zzck = z;
     }
 
     public final boolean equals(Object obj) {
@@ -19,7 +19,7 @@ public class BooleanResult implements Result {
             return false;
         }
         BooleanResult booleanResult = (BooleanResult) obj;
-        return this.mStatus.equals(booleanResult.mStatus) && this.zzfmd == booleanResult.zzfmd;
+        return this.mStatus.equals(booleanResult.mStatus) && this.zzck == booleanResult.zzck;
     }
 
     public Status getStatus() {
@@ -27,10 +27,10 @@ public class BooleanResult implements Result {
     }
 
     public boolean getValue() {
-        return this.zzfmd;
+        return this.zzck;
     }
 
     public final int hashCode() {
-        return (this.zzfmd ? 1 : 0) + ((this.mStatus.hashCode() + 527) * 31);
+        return ((527 + this.mStatus.hashCode()) * 31) + this.zzck;
     }
 }

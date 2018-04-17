@@ -5,15 +5,15 @@ import com.google.android.gms.maps.internal.IUiSettingsDelegate;
 import com.google.android.gms.maps.model.RuntimeRemoteException;
 
 public final class UiSettings {
-    private final IUiSettingsDelegate zziua;
+    private final IUiSettingsDelegate zzci;
 
     UiSettings(IUiSettingsDelegate iUiSettingsDelegate) {
-        this.zziua = iUiSettingsDelegate;
+        this.zzci = iUiSettingsDelegate;
     }
 
     public final void setCompassEnabled(boolean z) {
         try {
-            this.zziua.setCompassEnabled(z);
+            this.zzci.setCompassEnabled(z);
         } catch (RemoteException e) {
             throw new RuntimeRemoteException(e);
         }
@@ -21,7 +21,7 @@ public final class UiSettings {
 
     public final void setMyLocationButtonEnabled(boolean z) {
         try {
-            this.zziua.setMyLocationButtonEnabled(z);
+            this.zzci.setMyLocationButtonEnabled(z);
         } catch (RemoteException e) {
             throw new RuntimeRemoteException(e);
         }
@@ -29,7 +29,7 @@ public final class UiSettings {
 
     public final void setZoomControlsEnabled(boolean z) {
         try {
-            this.zziua.setZoomControlsEnabled(z);
+            this.zzci.setZoomControlsEnabled(z);
         } catch (RemoteException e) {
             throw new RuntimeRemoteException(e);
         }

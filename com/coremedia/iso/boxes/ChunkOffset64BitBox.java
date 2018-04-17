@@ -39,7 +39,7 @@ public class ChunkOffset64BitBox extends ChunkOffsetBox {
     }
 
     protected long getContentSize() {
-        return (long) ((this.chunkOffsets.length * 8) + 8);
+        return (long) (8 + (this.chunkOffsets.length * 8));
     }
 
     public void _parseDetails(ByteBuffer content) {

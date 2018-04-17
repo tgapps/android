@@ -55,7 +55,8 @@ public class TrackReferenceTypeBox extends AbstractBox {
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_1, this, this));
         StringBuilder buffer = new StringBuilder();
-        buffer.append("TrackReferenceTypeBox[type=").append(getType());
+        buffer.append("TrackReferenceTypeBox[type=");
+        buffer.append(getType());
         for (int i = 0; i < this.trackIds.length; i++) {
             buffer.append(";trackId");
             buffer.append(i);

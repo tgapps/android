@@ -1,25 +1,25 @@
 package com.google.android.gms.tasks;
 
 public class TaskCompletionSource<TResult> {
-    private final zzn<TResult> zzkul = new zzn();
+    private final zzu<TResult> zzafh = new zzu();
 
     public Task<TResult> getTask() {
-        return this.zzkul;
+        return this.zzafh;
     }
 
     public void setException(Exception exception) {
-        this.zzkul.setException(exception);
+        this.zzafh.setException(exception);
     }
 
     public void setResult(TResult tResult) {
-        this.zzkul.setResult(tResult);
+        this.zzafh.setResult(tResult);
     }
 
     public boolean trySetException(Exception exception) {
-        return this.zzkul.trySetException(exception);
+        return this.zzafh.trySetException(exception);
     }
 
     public boolean trySetResult(TResult tResult) {
-        return this.zzkul.trySetResult(tResult);
+        return this.zzafh.trySetResult(tResult);
     }
 }

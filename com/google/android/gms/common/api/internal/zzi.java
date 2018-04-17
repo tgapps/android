@@ -5,56 +5,59 @@ import android.util.SparseArray;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.internal.zzbq;
+import com.google.android.gms.common.internal.Preconditions;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
-public class zzi extends zzo {
-    private final SparseArray<zza> zzfnx = new SparseArray();
+public class zzi extends zzk {
+    private final SparseArray<zza> zzed = new SparseArray();
 
-    class zza implements OnConnectionFailedListener {
-        public final int zzfny;
-        public final GoogleApiClient zzfnz;
-        public final OnConnectionFailedListener zzfoa;
-        private /* synthetic */ zzi zzfob;
+    private class zza implements OnConnectionFailedListener {
+        public final int zzee;
+        public final GoogleApiClient zzef;
+        public final OnConnectionFailedListener zzeg;
+        private final /* synthetic */ zzi zzeh;
 
         public zza(zzi com_google_android_gms_common_api_internal_zzi, int i, GoogleApiClient googleApiClient, OnConnectionFailedListener onConnectionFailedListener) {
-            this.zzfob = com_google_android_gms_common_api_internal_zzi;
-            this.zzfny = i;
-            this.zzfnz = googleApiClient;
-            this.zzfoa = onConnectionFailedListener;
+            this.zzeh = com_google_android_gms_common_api_internal_zzi;
+            this.zzee = i;
+            this.zzef = googleApiClient;
+            this.zzeg = onConnectionFailedListener;
             googleApiClient.registerConnectionFailedListener(this);
         }
 
         public final void onConnectionFailed(ConnectionResult connectionResult) {
             String valueOf = String.valueOf(connectionResult);
-            Log.d("AutoManageHelper", new StringBuilder(String.valueOf(valueOf).length() + 27).append("beginFailureResolution for ").append(valueOf).toString());
-            this.zzfob.zzb(connectionResult, this.zzfny);
+            StringBuilder stringBuilder = new StringBuilder(27 + String.valueOf(valueOf).length());
+            stringBuilder.append("beginFailureResolution for ");
+            stringBuilder.append(valueOf);
+            Log.d("AutoManageHelper", stringBuilder.toString());
+            this.zzeh.zzb(connectionResult, this.zzee);
         }
     }
 
-    private zzi(zzcf com_google_android_gms_common_api_internal_zzcf) {
-        super(com_google_android_gms_common_api_internal_zzcf);
-        this.zzfud.zza("AutoManageHelper", (LifecycleCallback) this);
+    private zzi(LifecycleFragment lifecycleFragment) {
+        super(lifecycleFragment);
+        this.mLifecycleFragment.addCallback("AutoManageHelper", this);
     }
 
-    public static zzi zza(zzce com_google_android_gms_common_api_internal_zzce) {
-        zzcf zzb = LifecycleCallback.zzb(com_google_android_gms_common_api_internal_zzce);
-        zzi com_google_android_gms_common_api_internal_zzi = (zzi) zzb.zza("AutoManageHelper", zzi.class);
-        return com_google_android_gms_common_api_internal_zzi != null ? com_google_android_gms_common_api_internal_zzi : new zzi(zzb);
+    public static zzi zza(LifecycleActivity lifecycleActivity) {
+        LifecycleFragment fragment = LifecycleCallback.getFragment(lifecycleActivity);
+        zzi com_google_android_gms_common_api_internal_zzi = (zzi) fragment.getCallbackOrNull("AutoManageHelper", zzi.class);
+        return com_google_android_gms_common_api_internal_zzi != null ? com_google_android_gms_common_api_internal_zzi : new zzi(fragment);
     }
 
-    private final zza zzbs(int i) {
-        return this.zzfnx.size() <= i ? null : (zza) this.zzfnx.get(this.zzfnx.keyAt(i));
+    private final zza zzd(int i) {
+        return this.zzed.size() <= i ? null : (zza) this.zzed.get(this.zzed.keyAt(i));
     }
 
     public final void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
-        for (int i = 0; i < this.zzfnx.size(); i++) {
-            zza zzbs = zzbs(i);
-            if (zzbs != null) {
-                printWriter.append(str).append("GoogleApiClient #").print(zzbs.zzfny);
+        for (int i = 0; i < this.zzed.size(); i++) {
+            zza zzd = zzd(i);
+            if (zzd != null) {
+                printWriter.append(str).append("GoogleApiClient #").print(zzd.zzee);
                 printWriter.println(":");
-                zzbs.zzfnz.dump(String.valueOf(str).concat("  "), fileDescriptor, printWriter, strArr);
+                zzd.zzef.dump(String.valueOf(str).concat("  "), fileDescriptor, printWriter, strArr);
             }
         }
     }
@@ -62,39 +65,58 @@ public class zzi extends zzo {
     public final void onStart() {
         super.onStart();
         boolean z = this.mStarted;
-        String valueOf = String.valueOf(this.zzfnx);
-        Log.d("AutoManageHelper", new StringBuilder(String.valueOf(valueOf).length() + 14).append("onStart ").append(z).append(" ").append(valueOf).toString());
-        if (this.zzfol.get() == null) {
-            for (int i = 0; i < this.zzfnx.size(); i++) {
-                zza zzbs = zzbs(i);
-                if (zzbs != null) {
-                    zzbs.zzfnz.connect();
+        String valueOf = String.valueOf(this.zzed);
+        StringBuilder stringBuilder = new StringBuilder(14 + String.valueOf(valueOf).length());
+        stringBuilder.append("onStart ");
+        stringBuilder.append(z);
+        stringBuilder.append(" ");
+        stringBuilder.append(valueOf);
+        Log.d("AutoManageHelper", stringBuilder.toString());
+        if (this.zzer.get() == null) {
+            for (int i = 0; i < this.zzed.size(); i++) {
+                zza zzd = zzd(i);
+                if (zzd != null) {
+                    zzd.zzef.connect();
                 }
             }
         }
     }
 
-    public final void onStop() {
+    public void onStop() {
         super.onStop();
-        for (int i = 0; i < this.zzfnx.size(); i++) {
-            zza zzbs = zzbs(i);
-            if (zzbs != null) {
-                zzbs.zzfnz.disconnect();
+        for (int i = 0; i < this.zzed.size(); i++) {
+            zza zzd = zzd(i);
+            if (zzd != null) {
+                zzd.zzef.disconnect();
             }
         }
     }
 
     public final void zza(int i, GoogleApiClient googleApiClient, OnConnectionFailedListener onConnectionFailedListener) {
-        zzbq.checkNotNull(googleApiClient, "GoogleApiClient instance cannot be null");
-        zzbq.zza(this.zzfnx.indexOfKey(i) < 0, "Already managing a GoogleApiClient with id " + i);
-        zzp com_google_android_gms_common_api_internal_zzp = (zzp) this.zzfol.get();
-        boolean z = this.mStarted;
-        String valueOf = String.valueOf(com_google_android_gms_common_api_internal_zzp);
-        Log.d("AutoManageHelper", new StringBuilder(String.valueOf(valueOf).length() + 49).append("starting AutoManage for client ").append(i).append(" ").append(z).append(" ").append(valueOf).toString());
-        this.zzfnx.put(i, new zza(this, i, googleApiClient, onConnectionFailedListener));
-        if (this.mStarted && com_google_android_gms_common_api_internal_zzp == null) {
+        Preconditions.checkNotNull(googleApiClient, "GoogleApiClient instance cannot be null");
+        boolean z = this.zzed.indexOfKey(i) < 0;
+        StringBuilder stringBuilder = new StringBuilder(54);
+        stringBuilder.append("Already managing a GoogleApiClient with id ");
+        stringBuilder.append(i);
+        Preconditions.checkState(z, stringBuilder.toString());
+        zzl com_google_android_gms_common_api_internal_zzl = (zzl) this.zzer.get();
+        boolean z2 = this.mStarted;
+        String valueOf = String.valueOf(com_google_android_gms_common_api_internal_zzl);
+        StringBuilder stringBuilder2 = new StringBuilder(49 + String.valueOf(valueOf).length());
+        stringBuilder2.append("starting AutoManage for client ");
+        stringBuilder2.append(i);
+        stringBuilder2.append(" ");
+        stringBuilder2.append(z2);
+        stringBuilder2.append(" ");
+        stringBuilder2.append(valueOf);
+        Log.d("AutoManageHelper", stringBuilder2.toString());
+        this.zzed.put(i, new zza(this, i, googleApiClient, onConnectionFailedListener));
+        if (this.mStarted && com_google_android_gms_common_api_internal_zzl == null) {
             String valueOf2 = String.valueOf(googleApiClient);
-            Log.d("AutoManageHelper", new StringBuilder(String.valueOf(valueOf2).length() + 11).append("connecting ").append(valueOf2).toString());
+            StringBuilder stringBuilder3 = new StringBuilder(11 + String.valueOf(valueOf2).length());
+            stringBuilder3.append("connecting ");
+            stringBuilder3.append(valueOf2);
+            Log.d("AutoManageHelper", stringBuilder3.toString());
             googleApiClient.connect();
         }
     }
@@ -105,31 +127,31 @@ public class zzi extends zzo {
             Log.wtf("AutoManageHelper", "AutoManageLifecycleHelper received onErrorResolutionFailed callback but no failing client ID is set", new Exception());
             return;
         }
-        zza com_google_android_gms_common_api_internal_zzi_zza = (zza) this.zzfnx.get(i);
+        zza com_google_android_gms_common_api_internal_zzi_zza = (zza) this.zzed.get(i);
         if (com_google_android_gms_common_api_internal_zzi_zza != null) {
-            zzbr(i);
-            OnConnectionFailedListener onConnectionFailedListener = com_google_android_gms_common_api_internal_zzi_zza.zzfoa;
+            zzc(i);
+            OnConnectionFailedListener onConnectionFailedListener = com_google_android_gms_common_api_internal_zzi_zza.zzeg;
             if (onConnectionFailedListener != null) {
                 onConnectionFailedListener.onConnectionFailed(connectionResult);
             }
         }
     }
 
-    protected final void zzagz() {
-        for (int i = 0; i < this.zzfnx.size(); i++) {
-            zza zzbs = zzbs(i);
-            if (zzbs != null) {
-                zzbs.zzfnz.connect();
-            }
+    public final void zzc(int i) {
+        zza com_google_android_gms_common_api_internal_zzi_zza = (zza) this.zzed.get(i);
+        this.zzed.remove(i);
+        if (com_google_android_gms_common_api_internal_zzi_zza != null) {
+            com_google_android_gms_common_api_internal_zzi_zza.zzef.unregisterConnectionFailedListener(com_google_android_gms_common_api_internal_zzi_zza);
+            com_google_android_gms_common_api_internal_zzi_zza.zzef.disconnect();
         }
     }
 
-    public final void zzbr(int i) {
-        zza com_google_android_gms_common_api_internal_zzi_zza = (zza) this.zzfnx.get(i);
-        this.zzfnx.remove(i);
-        if (com_google_android_gms_common_api_internal_zzi_zza != null) {
-            com_google_android_gms_common_api_internal_zzi_zza.zzfnz.unregisterConnectionFailedListener(com_google_android_gms_common_api_internal_zzi_zza);
-            com_google_android_gms_common_api_internal_zzi_zza.zzfnz.disconnect();
+    protected final void zzr() {
+        for (int i = 0; i < this.zzed.size(); i++) {
+            zza zzd = zzd(i);
+            if (zzd != null) {
+                zzd.zzef.connect();
+            }
         }
     }
 }

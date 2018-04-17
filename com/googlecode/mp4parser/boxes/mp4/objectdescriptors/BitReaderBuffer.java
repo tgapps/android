@@ -19,11 +19,7 @@ public class BitReaderBuffer {
     public int readBits(int i) {
         int rc;
         byte b = this.buffer.get(this.initialPos + (this.position / 8));
-        if (b < (byte) 0) {
-            int v = b + 256;
-        } else {
-            byte v2 = b;
-        }
+        int v = b < (byte) 0 ? b + 256 : b;
         int left = 8 - (this.position % 8);
         if (i <= left) {
             rc = ((v << (this.position % 8)) & 255) >> ((this.position % 8) + (left - i));

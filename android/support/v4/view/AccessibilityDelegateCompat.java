@@ -107,7 +107,7 @@ public class AccessibilityDelegateCompat {
         }
 
         public AccessibilityNodeProviderCompat getAccessibilityNodeProvider(AccessibilityDelegate delegate, View host) {
-            AccessibilityNodeProvider provider = delegate.getAccessibilityNodeProvider(host);
+            Object provider = delegate.getAccessibilityNodeProvider(host);
             if (provider != null) {
                 return new AccessibilityNodeProviderCompat(provider);
             }

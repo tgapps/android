@@ -1,15 +1,100 @@
 package org.telegram.messenger.support.widget;
 
-import android.graphics.PointF;
 import android.view.View;
 import org.telegram.messenger.support.widget.RecyclerView.LayoutManager;
-import org.telegram.messenger.support.widget.RecyclerView.SmoothScroller.ScrollVectorProvider;
 import org.telegram.tgnet.ConnectionsManager;
 
 public class LinearSnapHelper extends SnapHelper {
     private static final float INVALID_DISTANCE = 1.0f;
     private OrientationHelper mHorizontalHelper;
     private OrientationHelper mVerticalHelper;
+
+    public int findTargetSnapPosition(org.telegram.messenger.support.widget.RecyclerView.LayoutManager r1, int r2, int r3) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.LinearSnapHelper.findTargetSnapPosition(org.telegram.messenger.support.widget.RecyclerView$LayoutManager, int, int):int
+	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
+	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
+	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+Caused by: java.lang.NullPointerException
+*/
+        /*
+        r0 = this;
+        r0 = r11 instanceof org.telegram.messenger.support.widget.RecyclerView.SmoothScroller.ScrollVectorProvider;
+        r1 = -1;
+        if (r0 != 0) goto L_0x0006;
+    L_0x0005:
+        return r1;
+    L_0x0006:
+        r0 = r11.getItemCount();
+        if (r0 != 0) goto L_0x000d;
+    L_0x000c:
+        return r1;
+    L_0x000d:
+        r2 = r10.findSnapView(r11);
+        if (r2 != 0) goto L_0x0014;
+    L_0x0013:
+        return r1;
+    L_0x0014:
+        r3 = r11.getPosition(r2);
+        if (r3 != r1) goto L_0x001b;
+    L_0x001a:
+        return r1;
+    L_0x001b:
+        r4 = r11;
+        r4 = (org.telegram.messenger.support.widget.RecyclerView.SmoothScroller.ScrollVectorProvider) r4;
+        r5 = r0 + -1;
+        r5 = r4.computeScrollVectorForPosition(r5);
+        if (r5 != 0) goto L_0x0027;
+    L_0x0026:
+        return r1;
+    L_0x0027:
+        r6 = r11.canScrollHorizontally();
+        r7 = 0;
+        r8 = 0;
+        if (r6 == 0) goto L_0x0040;
+    L_0x0030:
+        r6 = r10.getHorizontalHelper(r11);
+        r6 = r10.estimateNextPositionDiffForFling(r11, r6, r12, r8);
+        r9 = r5.x;
+        r9 = (r9 > r7 ? 1 : (r9 == r7 ? 0 : -1));
+        if (r9 >= 0) goto L_0x0041;
+    L_0x003e:
+        r6 = -r6;
+        goto L_0x0041;
+    L_0x0040:
+        r6 = r8;
+    L_0x0041:
+        r9 = r11.canScrollVertically();
+        if (r9 == 0) goto L_0x0058;
+    L_0x0048:
+        r9 = r10.getVerticalHelper(r11);
+        r8 = r10.estimateNextPositionDiffForFling(r11, r9, r8, r13);
+        r9 = r5.y;
+        r7 = (r9 > r7 ? 1 : (r9 == r7 ? 0 : -1));
+        if (r7 >= 0) goto L_0x0059;
+        r8 = -r8;
+        goto L_0x0059;
+        r7 = r8;
+        r8 = r11.canScrollVertically();
+        if (r8 == 0) goto L_0x0062;
+        r8 = r7;
+        goto L_0x0063;
+        r8 = r6;
+        if (r8 != 0) goto L_0x0066;
+        return r1;
+        r1 = r3 + r8;
+        if (r1 >= 0) goto L_0x006b;
+        r1 = 0;
+        if (r1 < r0) goto L_0x006f;
+        r1 = r0 + -1;
+        return r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.LinearSnapHelper.findTargetSnapPosition(org.telegram.messenger.support.widget.RecyclerView$LayoutManager, int, int):int");
+    }
 
     public int[] calculateDistanceToFinalSnap(LayoutManager layoutManager, View targetView) {
         int[] out = new int[2];
@@ -24,63 +109,6 @@ public class LinearSnapHelper extends SnapHelper {
             out[1] = 0;
         }
         return out;
-    }
-
-    public int findTargetSnapPosition(LayoutManager layoutManager, int velocityX, int velocityY) {
-        if (!(layoutManager instanceof ScrollVectorProvider)) {
-            return -1;
-        }
-        int itemCount = layoutManager.getItemCount();
-        if (itemCount == 0) {
-            return -1;
-        }
-        View currentView = findSnapView(layoutManager);
-        if (currentView == null) {
-            return -1;
-        }
-        int currentPosition = layoutManager.getPosition(currentView);
-        if (currentPosition == -1) {
-            return -1;
-        }
-        PointF vectorForEnd = ((ScrollVectorProvider) layoutManager).computeScrollVectorForPosition(itemCount - 1);
-        if (vectorForEnd == null) {
-            return -1;
-        }
-        int hDeltaJump;
-        int vDeltaJump;
-        int deltaJump;
-        if (layoutManager.canScrollHorizontally()) {
-            hDeltaJump = estimateNextPositionDiffForFling(layoutManager, getHorizontalHelper(layoutManager), velocityX, 0);
-            if (vectorForEnd.x < 0.0f) {
-                hDeltaJump = -hDeltaJump;
-            }
-        } else {
-            hDeltaJump = 0;
-        }
-        if (layoutManager.canScrollVertically()) {
-            vDeltaJump = estimateNextPositionDiffForFling(layoutManager, getVerticalHelper(layoutManager), 0, velocityY);
-            if (vectorForEnd.y < 0.0f) {
-                vDeltaJump = -vDeltaJump;
-            }
-        } else {
-            vDeltaJump = 0;
-        }
-        if (layoutManager.canScrollVertically()) {
-            deltaJump = vDeltaJump;
-        } else {
-            deltaJump = hDeltaJump;
-        }
-        if (deltaJump == 0) {
-            return -1;
-        }
-        int targetPos = currentPosition + deltaJump;
-        if (targetPos < 0) {
-            targetPos = 0;
-        }
-        if (targetPos >= itemCount) {
-            return itemCount - 1;
-        }
-        return targetPos;
     }
 
     public View findSnapView(LayoutManager layoutManager) {
@@ -160,14 +188,16 @@ public class LinearSnapHelper extends SnapHelper {
                 }
             }
         }
-        if (minPosView == null || maxPosView == null) {
-            return INVALID_DISTANCE;
+        if (minPosView != null) {
+            if (maxPosView != null) {
+                pos = Math.max(helper.getDecoratedEnd(minPosView), helper.getDecoratedEnd(maxPosView)) - Math.min(helper.getDecoratedStart(minPosView), helper.getDecoratedStart(maxPosView));
+                if (pos == 0) {
+                    return INVALID_DISTANCE;
+                }
+                return (INVALID_DISTANCE * ((float) pos)) / ((float) ((maxPos - minPos) + 1));
+            }
         }
-        int distance = Math.max(helper.getDecoratedEnd(minPosView), helper.getDecoratedEnd(maxPosView)) - Math.min(helper.getDecoratedStart(minPosView), helper.getDecoratedStart(maxPosView));
-        if (distance == 0) {
-            return INVALID_DISTANCE;
-        }
-        return (INVALID_DISTANCE * ((float) distance)) / ((float) ((maxPos - minPos) + 1));
+        return INVALID_DISTANCE;
     }
 
     private OrientationHelper getVerticalHelper(LayoutManager layoutManager) {
