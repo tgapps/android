@@ -15,9 +15,9 @@ import java.util.List;
 
 public final class zzc {
     private static Object zza(zzabo com_google_android_gms_internal_measurement_zzabo, String str, zzb com_google_firebase_messaging_zzb) {
-        Object newInstance;
         Throwable e;
         Object obj = null;
+        Object newInstance;
         try {
             Class cls = Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty");
             Bundle zzw = zzw(com_google_android_gms_internal_measurement_zzabo.zzcag, com_google_android_gms_internal_measurement_zzabo.zzcah);

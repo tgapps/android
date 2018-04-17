@@ -473,6 +473,7 @@ public class ArticleViewer implements OnDoubleTapListener, OnGestureListener, No
         }
 
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            CharSequence text;
             int width = MeasureSpec.getSize(widthMeasureSpec);
             int height = 0;
             if (this.currentBlock == null) {
@@ -480,7 +481,6 @@ public class ArticleViewer implements OnDoubleTapListener, OnGestureListener, No
             } else if (r1.lastCreatedWidth != width) {
                 Spannable spannableAuthor;
                 MetricAffectingSpan[] spans;
-                CharSequence text;
                 CharSequence text2;
                 int idx;
                 Spannable spannable;
@@ -494,29 +494,29 @@ public class ArticleViewer implements OnDoubleTapListener, OnGestureListener, No
                     spans = null;
                 }
                 if (r1.currentBlock.published_date != 0 && !TextUtils.isEmpty(author)) {
-                    text = LocaleController.formatString("ArticleDateByAuthor", R.string.ArticleDateByAuthor, LocaleController.getInstance().chatFullDate.format(((long) r1.currentBlock.published_date) * 1000), author);
+                    text2 = LocaleController.formatString("ArticleDateByAuthor", R.string.ArticleDateByAuthor, LocaleController.getInstance().chatFullDate.format(((long) r1.currentBlock.published_date) * 1000), author);
                 } else if (TextUtils.isEmpty(author)) {
-                    text = LocaleController.getInstance().chatFullDate.format(((long) r1.currentBlock.published_date) * 1000);
-                    text2 = text;
+                    text2 = LocaleController.getInstance().chatFullDate.format(((long) r1.currentBlock.published_date) * 1000);
+                    text = text2;
                     if (spans != null) {
                         try {
                             if (spans.length > 0) {
-                                idx = TextUtils.indexOf(text2, author);
+                                idx = TextUtils.indexOf(text, author);
                                 if (idx != -1) {
-                                    spannable = Factory.getInstance().newSpannable(text2);
-                                    text2 = spannable;
+                                    spannable = Factory.getInstance().newSpannable(text);
+                                    text = spannable;
                                     for (a = 0; a < spans.length; a++) {
                                         spannable.setSpan(spans[a], spannableAuthor.getSpanStart(spans[a]) + idx, spannableAuthor.getSpanEnd(spans[a]) + idx, 33);
                                     }
                                 }
                             }
                         } catch (Throwable e) {
-                            text = text2;
+                            text2 = text;
                             FileLog.e(e);
                         }
                     }
-                    text = text2;
-                    r1.textLayout = ArticleViewer.this.createLayoutForText(text, null, width - AndroidUtilities.dp(36.0f), r1.currentBlock);
+                    text2 = text;
+                    r1.textLayout = ArticleViewer.this.createLayoutForText(text2, null, width - AndroidUtilities.dp(36.0f), r1.currentBlock);
                     if (r1.textLayout != null) {
                         height = 0 + (AndroidUtilities.dp(16.0f) + r1.textLayout.getHeight());
                         if (ArticleViewer.this.isRtl != 1) {
@@ -526,23 +526,23 @@ public class ArticleViewer implements OnDoubleTapListener, OnGestureListener, No
                         }
                     }
                 } else {
-                    text = LocaleController.formatString("ArticleByAuthor", R.string.ArticleByAuthor, author);
+                    text2 = LocaleController.formatString("ArticleByAuthor", R.string.ArticleByAuthor, author);
                 }
-                text2 = text;
+                text = text2;
                 if (spans != null) {
                     if (spans.length > 0) {
-                        idx = TextUtils.indexOf(text2, author);
+                        idx = TextUtils.indexOf(text, author);
                         if (idx != -1) {
-                            spannable = Factory.getInstance().newSpannable(text2);
-                            text2 = spannable;
+                            spannable = Factory.getInstance().newSpannable(text);
+                            text = spannable;
                             for (a = 0; a < spans.length; a++) {
                                 spannable.setSpan(spans[a], spannableAuthor.getSpanStart(spans[a]) + idx, spannableAuthor.getSpanEnd(spans[a]) + idx, 33);
                             }
                         }
                     }
                 }
-                text = text2;
-                r1.textLayout = ArticleViewer.this.createLayoutForText(text, null, width - AndroidUtilities.dp(36.0f), r1.currentBlock);
+                text2 = text;
+                r1.textLayout = ArticleViewer.this.createLayoutForText(text2, null, width - AndroidUtilities.dp(36.0f), r1.currentBlock);
                 if (r1.textLayout != null) {
                     height = 0 + (AndroidUtilities.dp(16.0f) + r1.textLayout.getHeight());
                     if (ArticleViewer.this.isRtl != 1) {
@@ -6976,7 +6976,6 @@ Caused by: java.lang.NullPointerException
     }
 
     private boolean checkLayoutForLinks(MotionEvent event, View parentView, StaticLayout layout, int layoutX, int layoutY) {
-        boolean z;
         Throwable e;
         ArticleViewer articleViewer = this;
         View view = parentView;
@@ -6986,6 +6985,7 @@ Caused by: java.lang.NullPointerException
         if (view != null) {
             if (staticLayout != null) {
                 boolean removeLink;
+                boolean z;
                 int x = (int) event.getX();
                 int y = (int) event.getY();
                 boolean removeLink2 = false;

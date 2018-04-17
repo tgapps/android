@@ -252,10 +252,10 @@ Caused by: java.lang.NullPointerException
     }
 
     private void maybeLoadInitData() throws IOException, InterruptedException {
+        DefaultExtractorInput input;
         if (!this.initLoadCompleted) {
             if (this.initDataSpec != null) {
                 DataSpec initSegmentDataSpec = this.initDataSpec.subrange((long) this.initSegmentBytesLoaded);
-                DefaultExtractorInput input;
                 try {
                     input = new DefaultExtractorInput(this.initDataSource, initSegmentDataSpec.absoluteStreamPosition, this.initDataSource.open(initSegmentDataSpec));
                     int result = 0;

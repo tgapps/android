@@ -111,11 +111,11 @@ final class zzac implements Runnable {
     }
 
     private final boolean zzte() {
-        String zzsh;
         zzab zzsg = this.zzbse.zzsg();
         if (zzsg != null && !zzsg.zzff(this.zzbqn.zzsv())) {
             return true;
         }
+        String zzsh;
         try {
             zzsh = this.zzbse.zzsh();
             if (zzsh == null) {

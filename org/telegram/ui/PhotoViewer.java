@@ -11637,27 +11637,29 @@ Caused by: java.lang.NullPointerException
         DispatchQueue dispatchQueue = Utilities.globalQueue;
         Runnable anonymousClass82 = new Runnable() {
             public void run() {
+                TrackHeaderBox trackHeaderBox;
                 long sampleSizes;
                 Throwable e;
-                Throwable isAvc;
+                boolean isAvc;
+                IsoFile isoFile;
+                List<Box> boxes;
+                Throwable isAvc2;
+                TrackHeaderBox trackHeaderBox2;
                 Throwable e2;
+                final boolean isAvcFinal;
                 if (PhotoViewer.this.currentLoadingVideoRunnable == r1) {
-                    TrackHeaderBox trackHeaderBox;
-                    TrackHeaderBox trackHeaderBox2;
-                    final boolean isAvcFinal;
-                    boolean isAvc2 = true;
-                    boolean isAvc3;
+                    boolean isAvc3 = true;
                     try {
-                        IsoFile isoFile = new IsoFile(videoPath);
-                        List<Box> boxes = Path.getPaths(isoFile, "/moov/trak/");
-                        if (Path.getPath(isoFile, "/moov/trak/mdia/minf/stbl/stsd/mp4a/") == null && BuildVars.LOGS_ENABLED) {
+                        IsoFile isoFile2 = new IsoFile(videoPath);
+                        List<Box> boxes2 = Path.getPaths(isoFile2, "/moov/trak/");
+                        if (Path.getPath(isoFile2, "/moov/trak/mdia/minf/stbl/stsd/mp4a/") == null && BuildVars.LOGS_ENABLED) {
                             FileLog.d("video hasn't mp4a atom");
                         }
-                        if (Path.getPath(isoFile, "/moov/trak/mdia/minf/stbl/stsd/avc1/") == null) {
+                        if (Path.getPath(isoFile2, "/moov/trak/mdia/minf/stbl/stsd/avc1/") == null) {
                             if (BuildVars.LOGS_ENABLED) {
                                 FileLog.d("video hasn't avc1 atom");
                             }
-                            isAvc2 = false;
+                            isAvc3 = false;
                         }
                         try {
                             long j = 0;
@@ -11665,12 +11667,10 @@ Caused by: java.lang.NullPointerException
                             PhotoViewer.this.videoFramesSize = 0;
                             trackHeaderBox = null;
                             TrackHeaderBox trackHeaderBox3 = null;
-                            while (trackHeaderBox3 < boxes.size()) {
+                            while (trackHeaderBox3 < boxes2.size()) {
                                 try {
                                     if (PhotoViewer.this.currentLoadingVideoRunnable == r1) {
-                                        IsoFile isoFile2;
-                                        List<Box> boxes2;
-                                        TrackBox trackBox = (TrackBox) ((Box) boxes.get(trackHeaderBox3));
+                                        TrackBox trackBox = (TrackBox) ((Box) boxes2.get(trackHeaderBox3));
                                         long trackBitrate = j;
                                         try {
                                             MediaBox mediaBox = trackBox.getMediaBox();
@@ -11689,39 +11689,39 @@ Caused by: java.lang.NullPointerException
                                                         }
                                                     } catch (Exception e3) {
                                                         e = e3;
-                                                        isAvc3 = isAvc2;
-                                                        isoFile2 = isoFile;
-                                                        boxes2 = boxes;
+                                                        isAvc = isAvc3;
+                                                        isoFile = isoFile2;
+                                                        boxes = boxes2;
                                                     }
                                                 } catch (Throwable e4) {
-                                                    isAvc3 = isAvc2;
-                                                    isoFile2 = isoFile;
-                                                    boxes2 = boxes;
-                                                    isAvc = e4;
+                                                    isAvc = isAvc3;
+                                                    isoFile = isoFile2;
+                                                    boxes = boxes2;
+                                                    isAvc2 = e4;
                                                 }
                                             }
-                                            isAvc3 = isAvc2;
-                                            isoFile2 = isoFile;
+                                            isAvc = isAvc3;
+                                            isoFile = isoFile2;
                                             MediaHeaderBox mediaHeaderBox2 = mediaHeaderBox;
                                             try {
-                                                boxes2 = boxes;
+                                                boxes = boxes2;
                                                 try {
                                                     PhotoViewer.this.videoDuration = ((float) mediaHeaderBox2.getDuration()) / ((float) mediaHeaderBox2.getTimescale());
                                                     trackBitrate = (long) ((int) (((float) (true * sampleSizes)) / PhotoViewer.this.videoDuration));
                                                 } catch (Exception e5) {
                                                     e4 = e5;
-                                                    isAvc = e4;
+                                                    isAvc2 = e4;
                                                     try {
-                                                        FileLog.e(isAvc);
+                                                        FileLog.e(isAvc2);
                                                         if (PhotoViewer.this.currentLoadingVideoRunnable == r1) {
-                                                            isAvc2 = trackBox.getTrackHeaderBox();
-                                                            if (isAvc2.getWidth() != 0.0d) {
+                                                            isAvc3 = trackBox.getTrackHeaderBox();
+                                                            if (isAvc3.getWidth() != 0.0d) {
                                                             }
                                                             PhotoViewer.this.audioFramesSize = PhotoViewer.this.audioFramesSize + sampleSizes;
                                                             trackHeaderBox3++;
-                                                            isoFile = isoFile2;
-                                                            isAvc2 = isAvc3;
-                                                            boxes = boxes2;
+                                                            isoFile2 = isoFile;
+                                                            isAvc3 = isAvc;
+                                                            boxes2 = boxes;
                                                             j = 0;
                                                         } else {
                                                             return;
@@ -11731,50 +11731,50 @@ Caused by: java.lang.NullPointerException
                                                     }
                                                 }
                                             } catch (Throwable e42) {
-                                                boxes2 = boxes;
-                                                isAvc = e42;
-                                                FileLog.e(isAvc);
+                                                boxes = boxes2;
+                                                isAvc2 = e42;
+                                                FileLog.e(isAvc2);
                                                 if (PhotoViewer.this.currentLoadingVideoRunnable == r1) {
-                                                    isAvc2 = trackBox.getTrackHeaderBox();
-                                                    if (isAvc2.getWidth() != 0.0d) {
+                                                    isAvc3 = trackBox.getTrackHeaderBox();
+                                                    if (isAvc3.getWidth() != 0.0d) {
                                                     }
                                                     PhotoViewer.this.audioFramesSize = PhotoViewer.this.audioFramesSize + sampleSizes;
                                                     trackHeaderBox3++;
-                                                    isoFile = isoFile2;
-                                                    isAvc2 = isAvc3;
-                                                    boxes = boxes2;
+                                                    isoFile2 = isoFile;
+                                                    isAvc3 = isAvc;
+                                                    boxes2 = boxes;
                                                     j = 0;
                                                 } else {
                                                     return;
                                                 }
                                             }
                                         } catch (Throwable e422) {
-                                            isAvc3 = isAvc2;
-                                            isoFile2 = isoFile;
-                                            boxes2 = boxes;
-                                            isAvc = e422;
+                                            isAvc = isAvc3;
+                                            isoFile = isoFile2;
+                                            boxes = boxes2;
+                                            isAvc2 = e422;
                                             sampleSizes = 0;
-                                            FileLog.e(isAvc);
+                                            FileLog.e(isAvc2);
                                             if (PhotoViewer.this.currentLoadingVideoRunnable == r1) {
-                                                isAvc2 = trackBox.getTrackHeaderBox();
-                                                if (isAvc2.getWidth() != 0.0d) {
+                                                isAvc3 = trackBox.getTrackHeaderBox();
+                                                if (isAvc3.getWidth() != 0.0d) {
                                                 }
                                                 PhotoViewer.this.audioFramesSize = PhotoViewer.this.audioFramesSize + sampleSizes;
                                                 trackHeaderBox3++;
-                                                isoFile = isoFile2;
-                                                isAvc2 = isAvc3;
-                                                boxes = boxes2;
+                                                isoFile2 = isoFile;
+                                                isAvc3 = isAvc;
+                                                boxes2 = boxes;
                                                 j = 0;
                                             } else {
                                                 return;
                                             }
                                         }
                                         if (PhotoViewer.this.currentLoadingVideoRunnable == r1) {
-                                            isAvc2 = trackBox.getTrackHeaderBox();
-                                            if (isAvc2.getWidth() != 0.0d || isAvc2.getHeight() == 0.0d) {
+                                            isAvc3 = trackBox.getTrackHeaderBox();
+                                            if (isAvc3.getWidth() != 0.0d || isAvc3.getHeight() == 0.0d) {
                                                 PhotoViewer.this.audioFramesSize = PhotoViewer.this.audioFramesSize + sampleSizes;
-                                            } else if (trackHeaderBox == null || trackHeaderBox.getWidth() < isAvc2.getWidth() || trackHeaderBox.getHeight() < isAvc2.getHeight()) {
-                                                trackHeaderBox2 = isAvc2;
+                                            } else if (trackHeaderBox == null || trackHeaderBox.getWidth() < isAvc3.getWidth() || trackHeaderBox.getHeight() < isAvc3.getHeight()) {
+                                                trackHeaderBox2 = isAvc3;
                                                 try {
                                                     PhotoViewer.this.originalBitrate = PhotoViewer.this.bitrate = (int) ((trackBitrate / 100000) * 100000);
                                                     if (PhotoViewer.this.bitrate > 900000) {
@@ -11788,9 +11788,9 @@ Caused by: java.lang.NullPointerException
                                                 }
                                             }
                                             trackHeaderBox3++;
-                                            isoFile = isoFile2;
-                                            isAvc2 = isAvc3;
-                                            boxes = boxes2;
+                                            isoFile2 = isoFile;
+                                            isAvc3 = isAvc;
+                                            boxes2 = boxes;
                                             j = 0;
                                         } else {
                                             return;
@@ -11799,24 +11799,24 @@ Caused by: java.lang.NullPointerException
                                     return;
                                 } catch (Exception e7) {
                                     e4222 = e7;
-                                    isAvc3 = isAvc2;
+                                    isAvc = isAvc3;
                                 }
                             }
-                            isAvc3 = isAvc2;
+                            isAvc = isAvc3;
                         } catch (Exception e8) {
                             e4222 = e8;
-                            isAvc3 = isAvc2;
+                            isAvc = isAvc3;
                             trackHeaderBox = null;
                             e2 = e4222;
                             FileLog.e(e2);
-                            isAvc2 = false;
+                            isAvc3 = false;
                             if (trackHeaderBox == null) {
                                 if (BuildVars.LOGS_ENABLED) {
                                     FileLog.d("video hasn't trackHeaderBox atom");
                                 }
-                                isAvc2 = false;
+                                isAvc3 = false;
                             }
-                            isAvcFinal = isAvc2;
+                            isAvcFinal = isAvc3;
                             trackHeaderBox2 = trackHeaderBox;
                             if (PhotoViewer.this.currentLoadingVideoRunnable != r1) {
                                 PhotoViewer.this.currentLoadingVideoRunnable = null;
@@ -12075,17 +12075,17 @@ Caused by: java.lang.NullPointerException
                     } catch (Exception e9) {
                         e4222 = e9;
                         trackHeaderBox = null;
-                        isAvc3 = true;
+                        isAvc = true;
                         e2 = e4222;
                         FileLog.e(e2);
-                        isAvc2 = false;
+                        isAvc3 = false;
                         if (trackHeaderBox == null) {
                             if (BuildVars.LOGS_ENABLED) {
                                 FileLog.d("video hasn't trackHeaderBox atom");
                             }
-                            isAvc2 = false;
+                            isAvc3 = false;
                         }
-                        isAvcFinal = isAvc2;
+                        isAvcFinal = isAvc3;
                         trackHeaderBox2 = trackHeaderBox;
                         if (PhotoViewer.this.currentLoadingVideoRunnable != r1) {
                             PhotoViewer.this.currentLoadingVideoRunnable = null;
@@ -12096,9 +12096,9 @@ Caused by: java.lang.NullPointerException
                         if (BuildVars.LOGS_ENABLED) {
                             FileLog.d("video hasn't trackHeaderBox atom");
                         }
-                        isAvc2 = false;
+                        isAvc3 = false;
                     }
-                    isAvcFinal = isAvc2;
+                    isAvcFinal = isAvc3;
                     trackHeaderBox2 = trackHeaderBox;
                     if (PhotoViewer.this.currentLoadingVideoRunnable != r1) {
                         PhotoViewer.this.currentLoadingVideoRunnable = null;

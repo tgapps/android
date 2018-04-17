@@ -10057,6 +10057,7 @@ Caused by: java.lang.NullPointerException
                     return;
                 }
                 int a;
+                Integer value;
                 int i;
                 LongSparseArray<TL_dialog> new_dialogs_dict = new LongSparseArray();
                 LongSparseArray<MessageObject> new_dialogMessage = new LongSparseArray();
@@ -10168,7 +10169,6 @@ Caused by: java.lang.NullPointerException
                 ArrayList<TL_dialog> dialogsToReload = new ArrayList();
                 a = 0;
                 while (a < org_telegram_tgnet_TLRPC_messages_Dialogs.dialogs.size()) {
-                    Integer value;
                     TL_dialog d = (TL_dialog) org_telegram_tgnet_TLRPC_messages_Dialogs.dialogs.get(a);
                     if (d.id == 0 && d.peer != null) {
                         if (d.peer.user_id != 0) {

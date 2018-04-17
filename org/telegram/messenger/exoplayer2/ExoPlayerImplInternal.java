@@ -855,10 +855,9 @@ Caused by: java.lang.NullPointerException
         MediaPeriodId periodId;
         long periodPositionUs;
         long contentPositionUs;
-        Timeline timeline;
         Throwable th;
         SeekPosition seekPosition2 = seekPosition;
-        Timeline timeline2 = this.playbackInfo.timeline;
+        Timeline timeline = this.playbackInfo.timeline;
         this.playbackInfoUpdate.incrementPendingOperationAcks(1);
         Pair<Integer, Long> resolvedSeekPosition = resolveSeekPosition(seekPosition2, true);
         if (resolvedSeekPosition == null) {
@@ -882,30 +881,31 @@ Caused by: java.lang.NullPointerException
                 periodId = periodId2;
             }
         }
-        int timeline3;
+        int timeline2;
+        Timeline timeline3;
         try {
             if (r1.mediaSource == null) {
-                timeline3 = 2;
-            } else if (timeline2 == null) {
-                timeline = timeline2;
-                timeline3 = 2;
+                timeline2 = 2;
+            } else if (timeline == null) {
+                timeline3 = timeline;
+                timeline2 = 2;
             } else if (periodPositionUs == C.TIME_UNSET) {
                 try {
                     setState(4);
                     resetInternal(false, true, false);
-                    timeline = timeline2;
-                    timeline3 = 2;
+                    timeline3 = timeline;
+                    timeline2 = 2;
                     r1.playbackInfo = r1.playbackInfo.fromNewPosition(periodId, periodPositionUs, contentPositionUs);
                     if (seekPositionAdjusted) {
-                        r1.playbackInfoUpdate.setPositionDiscontinuity(timeline3);
+                        r1.playbackInfoUpdate.setPositionDiscontinuity(timeline2);
                     }
                 } catch (Throwable th2) {
                     th = th2;
-                    timeline = timeline2;
-                    timeline3 = 2;
+                    timeline3 = timeline;
+                    timeline2 = 2;
                     r1.playbackInfo = r1.playbackInfo.fromNewPosition(periodId, periodPositionUs, contentPositionUs);
                     if (seekPositionAdjusted) {
-                        r1.playbackInfoUpdate.setPositionDiscontinuity(timeline3);
+                        r1.playbackInfoUpdate.setPositionDiscontinuity(timeline2);
                     }
                     throw th;
                 }
@@ -918,17 +918,17 @@ Caused by: java.lang.NullPointerException
                         newPeriodPositionUs2 = playingPeriodHolder.mediaPeriod.getAdjustedSeekPositionUs(newPeriodPositionUs2, r1.seekParameters);
                     }
                     if (C.usToMs(newPeriodPositionUs2) == C.usToMs(r1.playbackInfo.positionUs)) {
-                        timeline3 = 2;
+                        timeline2 = 2;
                         r1.playbackInfo = r1.playbackInfo.fromNewPosition(periodId, r1.playbackInfo.positionUs, contentPositionUs);
                         if (seekPositionAdjusted) {
-                            r1.playbackInfoUpdate.setPositionDiscontinuity(timeline3);
+                            r1.playbackInfoUpdate.setPositionDiscontinuity(timeline2);
                         }
                         return;
                     }
                     newPeriodPositionUs = newPeriodPositionUs2;
-                    timeline3 = 2;
+                    timeline2 = 2;
                 } else {
-                    timeline3 = 2;
+                    timeline2 = 2;
                     newPeriodPositionUs = newPeriodPositionUs2;
                 }
                 try {
@@ -937,13 +937,13 @@ Caused by: java.lang.NullPointerException
                     periodPositionUs = newPeriodPositionUs3;
                     r1.playbackInfo = r1.playbackInfo.fromNewPosition(periodId, periodPositionUs, contentPositionUs);
                     if (seekPositionAdjusted) {
-                        r1.playbackInfoUpdate.setPositionDiscontinuity(timeline3);
+                        r1.playbackInfoUpdate.setPositionDiscontinuity(timeline2);
                     }
                 } catch (Throwable th22) {
                     th = th22;
                     r1.playbackInfo = r1.playbackInfo.fromNewPosition(periodId, periodPositionUs, contentPositionUs);
                     if (seekPositionAdjusted) {
-                        r1.playbackInfoUpdate.setPositionDiscontinuity(timeline3);
+                        r1.playbackInfoUpdate.setPositionDiscontinuity(timeline2);
                     }
                     throw th;
                 }
@@ -951,15 +951,15 @@ Caused by: java.lang.NullPointerException
             r1.pendingInitialSeekPosition = seekPosition2;
             r1.playbackInfo = r1.playbackInfo.fromNewPosition(periodId, periodPositionUs, contentPositionUs);
             if (seekPositionAdjusted) {
-                r1.playbackInfoUpdate.setPositionDiscontinuity(timeline3);
+                r1.playbackInfoUpdate.setPositionDiscontinuity(timeline2);
             }
         } catch (Throwable th222) {
-            timeline = timeline2;
-            timeline3 = 2;
+            timeline3 = timeline;
+            timeline2 = 2;
             th = th222;
             r1.playbackInfo = r1.playbackInfo.fromNewPosition(periodId, periodPositionUs, contentPositionUs);
             if (seekPositionAdjusted) {
-                r1.playbackInfoUpdate.setPositionDiscontinuity(timeline3);
+                r1.playbackInfoUpdate.setPositionDiscontinuity(timeline2);
             }
             throw th;
         }

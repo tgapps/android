@@ -829,7 +829,6 @@ Caused by: java.lang.NullPointerException
     }
 
     private HashMap<String, Contact> readContactsFromPhoneBook() {
-        ContactsController contactsController;
         Throwable e;
         Throwable th;
         if (!UserConfig.getInstance(this.currentAccount).syncContacts) {
@@ -840,6 +839,7 @@ Caused by: java.lang.NullPointerException
         } else if (hasContactsPermission()) {
             Cursor pCur = null;
             HashMap<String, Contact> contactsMap = null;
+            ContactsController contactsController;
             ContactsController contactsController2;
             try {
                 String accountType;

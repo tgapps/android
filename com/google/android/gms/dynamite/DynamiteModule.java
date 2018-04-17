@@ -96,8 +96,8 @@ public final class DynamiteModule {
     }
 
     public static int getLocalVersion(Context context, String str) {
-        StringBuilder stringBuilder;
         String valueOf;
+        StringBuilder stringBuilder;
         try {
             ClassLoader classLoader = context.getApplicationContext().getClassLoader();
             stringBuilder = new StringBuilder(61 + String.valueOf(str).length());
@@ -506,8 +506,8 @@ public final class DynamiteModule {
     }
 
     private static int zzb(Context context, String str, boolean z) throws LoadingException {
-        Throwable e;
         Cursor queryForDynamiteModule;
+        Throwable e;
         try {
             queryForDynamiteModule = queryForDynamiteModule(context, str, z);
             if (queryForDynamiteModule != null) {

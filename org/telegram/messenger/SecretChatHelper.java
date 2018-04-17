@@ -1570,12 +1570,13 @@ public class SecretChatHelper {
     }
 
     protected ArrayList<Message> decryptMessage(EncryptedMessage message) {
+        EncryptedChat encryptedChat;
         Throwable e;
         EncryptedMessage encryptedMessage = message;
         EncryptedChat chat = MessagesController.getInstance(this.currentAccount).getEncryptedChatDB(encryptedMessage.chat_id, true);
         if (chat == null) {
         } else if (chat instanceof TL_encryptedChatDiscarded) {
-            r3 = chat;
+            encryptedChat = chat;
         } else {
             try {
                 NativeByteBuffer is = new NativeByteBuffer(encryptedMessage.bytes.length);
@@ -1589,7 +1590,7 @@ public class SecretChatHelper {
                         keyToDecrypt = chat.auth_key;
                     } catch (Throwable e2) {
                         e = e2;
-                        r3 = chat;
+                        encryptedChat = chat;
                         FileLog.e(e);
                         return null;
                     }
@@ -1649,7 +1650,7 @@ public class SecretChatHelper {
                             }
                             j = fingerprint;
                             is2 = is;
-                            r3 = chat;
+                            encryptedChat = chat;
                             return null;
                         }
                         j = fingerprint;
@@ -1757,7 +1758,7 @@ public class SecretChatHelper {
                         } else if (((TL_decryptedMessageService) object2).action instanceof TL_decryptedMessageActionNotifyLayer) {
                             object = object2;
                         } else {
-                            EncryptedChat encryptedChat = chat;
+                            EncryptedChat encryptedChat2 = chat;
                         }
                         return null;
                     }
@@ -1784,7 +1785,7 @@ public class SecretChatHelper {
                 }
                 return null;
             } catch (Throwable e222) {
-                r3 = chat;
+                encryptedChat = chat;
                 e = e222;
                 FileLog.e(e);
                 return null;

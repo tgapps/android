@@ -1705,6 +1705,7 @@ Caused by: java.lang.NullPointerException
         int indexOf;
         int index;
         int idx;
+        String query;
         SpannableStringBuilder builder = new SpannableStringBuilder();
         String wholeString = name;
         if (wholeString != null) {
@@ -1731,7 +1732,6 @@ Caused by: java.lang.NullPointerException
                     if (indexOf != -1) {
                         break;
                     }
-                    String query;
                     indexOf = 1;
                     idx = index - (index != 0 ? 0 : 1);
                     int length = q.length();

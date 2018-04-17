@@ -90,50 +90,50 @@ public class MP3Info extends AudioInfo {
     }
 
     MP3Frame readFirstFrame(MP3Input data, StopReadCondition stopCondition) throws IOException {
+        byte b;
         MP3Input mP3Input = data;
         StopReadCondition stopReadCondition = stopCondition;
         int b0 = 0;
-        byte b = (byte) -1;
+        byte b2 = (byte) -1;
         byte b1 = stopReadCondition.stopRead(mP3Input) ? (byte) -1 : data.read();
-        while (b1 != b) {
+        while (b1 != b2) {
             byte b02;
             if (b0 == 255 && (b1 & 224) == 224) {
                 mP3Input.mark(2);
-                byte b2 = stopReadCondition.stopRead(mP3Input) ? b : data.read();
-                if (b2 == b) {
+                byte b22 = stopReadCondition.stopRead(mP3Input) ? b2 : data.read();
+                if (b22 == b2) {
                     break;
                 }
-                byte b3 = stopReadCondition.stopRead(mP3Input) ? b : data.read();
-                if (b3 == b) {
+                byte b3 = stopReadCondition.stopRead(mP3Input) ? b2 : data.read();
+                if (b3 == b2) {
                     break;
                 }
                 Header header = null;
                 try {
-                    header = new Header(b1, b2, b3);
+                    header = new Header(b1, b22, b3);
                 } catch (MP3Exception e) {
                 }
                 if (header != null) {
                     data.reset();
                     mP3Input.mark(header.getFrameSize() + 2);
                     byte[] frameBytes = new byte[header.getFrameSize()];
-                    frameBytes[0] = b;
+                    frameBytes[0] = b2;
                     frameBytes[1] = (byte) b1;
                     try {
                         mP3Input.readFully(frameBytes, 2, frameBytes.length - 2);
                         MP3Frame frame = new MP3Frame(header, frameBytes);
                         if (!frame.isChecksumError()) {
-                            byte nextB0 = stopReadCondition.stopRead(mP3Input) ? b : data.read();
-                            byte nextB1 = stopReadCondition.stopRead(mP3Input) ? b : data.read();
-                            if (nextB0 != b) {
-                                if (nextB1 != b) {
+                            byte nextB0 = stopReadCondition.stopRead(mP3Input) ? b2 : data.read();
+                            byte nextB1 = stopReadCondition.stopRead(mP3Input) ? b2 : data.read();
+                            if (nextB0 != b2) {
+                                if (nextB1 != b2) {
                                     if (nextB0 == (byte) -1 && (nextB1 & 254) == (b1 & 254)) {
-                                        byte nextB2 = stopReadCondition.stopRead(mP3Input) ? b : data.read();
-                                        byte nextB3 = stopReadCondition.stopRead(mP3Input) ? b : data.read();
-                                        byte b4;
-                                        if (nextB2 == b) {
-                                            b4 = nextB2;
-                                        } else if (nextB3 == b) {
-                                            b4 = nextB2;
+                                        byte nextB2 = stopReadCondition.stopRead(mP3Input) ? b2 : data.read();
+                                        byte nextB3 = stopReadCondition.stopRead(mP3Input) ? b2 : data.read();
+                                        if (nextB2 == b2) {
+                                            b = nextB2;
+                                        } else if (nextB3 == b2) {
+                                            b = nextB2;
                                         } else {
                                             try {
                                                 if (new Header(nextB1, nextB2, nextB3).isCompatible(header)) {
@@ -145,11 +145,11 @@ public class MP3Info extends AudioInfo {
                                                     }
                                                 }
                                             } catch (MP3Exception e3) {
-                                                b4 = nextB2;
+                                                b = nextB2;
                                                 data.reset();
                                                 b02 = b1;
                                                 b1 = stopReadCondition.stopRead(mP3Input) ? data.read() : (byte) -1;
-                                                b = (byte) -1;
+                                                b2 = (byte) -1;
                                             }
                                         }
                                         return frame;
@@ -167,7 +167,7 @@ public class MP3Info extends AudioInfo {
             if (stopReadCondition.stopRead(mP3Input)) {
             }
             b1 = stopReadCondition.stopRead(mP3Input) ? data.read() : (byte) -1;
-            b = (byte) -1;
+            b2 = (byte) -1;
         }
         return null;
     }

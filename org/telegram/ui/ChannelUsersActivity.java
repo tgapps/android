@@ -826,13 +826,13 @@ Caused by: java.lang.NullPointerException
             User user;
             Throwable e;
             String u;
-            ManageChatUserCell userCell;
+            int idx;
             SearchAdapter searchAdapter = this;
             ViewHolder viewHolder = holder;
             int position2 = position;
             switch (holder.getItemViewType()) {
                 case 0:
-                    int idx;
+                    ManageChatUserCell userCell;
                     TLObject object = getItem(position2);
                     if (object instanceof User) {
                         user = (User) object;

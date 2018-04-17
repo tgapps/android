@@ -268,11 +268,11 @@ public class WebviewActivity extends BaseFragment {
     }
 
     public static void openGameInBrowser(String urlStr, MessageObject messageObject, Activity parentActivity, String short_name, String username) {
+        String str;
         Throwable e;
         Activity activity;
         MessageObject messageObject2 = messageObject;
         String url = urlStr;
-        String str;
         try {
             StringBuilder stringBuilder;
             SharedPreferences sharedPreferences = ApplicationLoader.applicationContext.getSharedPreferences("botshare", 0);

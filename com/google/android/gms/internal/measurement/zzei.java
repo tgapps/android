@@ -490,7 +490,6 @@ final class zzei extends zzhk {
     }
 
     public final zzej zza(long j, String str, boolean z, boolean z2, boolean z3, boolean z4, boolean z5) {
-        Cursor query;
         Object obj;
         Cursor cursor;
         Throwable th;
@@ -499,6 +498,7 @@ final class zzei extends zzhk {
         zzch();
         String[] strArr = new String[]{str};
         zzej com_google_android_gms_internal_measurement_zzej = new zzej();
+        Cursor query;
         try {
             SQLiteDatabase writableDatabase = getWritableDatabase();
             String[] strArr2 = new String[]{str};
@@ -863,11 +863,11 @@ final class zzei extends zzhk {
     }
 
     public final String zzab(long j) {
+        Cursor rawQuery;
         Object e;
         Throwable th;
         zzab();
         zzch();
-        Cursor rawQuery;
         try {
             rawQuery = getWritableDatabase().rawQuery("select app_id from apps where app_id in (select distinct app_id from raw_events) and config_fetched_time < ? order by failed_config_fetch_time limit 1;", new String[]{String.valueOf(j)});
             try {
@@ -918,6 +918,7 @@ final class zzei extends zzhk {
     }
 
     public final zzeb zzax(String str) {
+        Cursor query;
         SQLiteException e;
         Cursor cursor;
         Object obj;
@@ -928,7 +929,6 @@ final class zzei extends zzhk {
         Preconditions.checkNotEmpty(str);
         zzab();
         zzch();
-        Cursor query;
         try {
             r5 = new String[25];
             boolean z = true;
@@ -1212,6 +1212,7 @@ final class zzei extends zzhk {
     }
 
     public final List<Pair<zzkl, Long>> zzb(String str, int i, int i2) {
+        List<Pair<zzkl, Long>> emptyList;
         Object obj;
         Throwable th;
         int i3 = i2;
@@ -1222,7 +1223,6 @@ final class zzei extends zzhk {
         Preconditions.checkNotEmpty(str);
         Cursor cursor = null;
         Cursor query;
-        List<Pair<zzkl, Long>> emptyList;
         try {
             query = getWritableDatabase().query("queue", new String[]{"rowid", DataSchemeDataSource.SCHEME_DATA, "retry_count"}, "app_id=?", new String[]{str}, null, null, "rowid", String.valueOf(i));
             try {
@@ -1292,12 +1292,12 @@ final class zzei extends zzhk {
     }
 
     final Map<Integer, zzkm> zzba(String str) {
+        Cursor query;
         Object e;
         Throwable th;
         zzch();
         zzab();
         Preconditions.checkNotEmpty(str);
-        Cursor query;
         try {
             query = getWritableDatabase().query("audience_filter_values", new String[]{"audience_id", "current_results"}, "app_id=?", new String[]{str}, null, null, null);
             if (query.moveToFirst()) {
@@ -1518,7 +1518,6 @@ final class zzei extends zzhk {
     }
 
     public final zzju zzg(String str, String str2) {
-        Cursor query;
         SQLiteException e;
         Object obj;
         Throwable th;
@@ -1529,6 +1528,7 @@ final class zzei extends zzhk {
         Preconditions.checkNotEmpty(str2);
         zzab();
         zzch();
+        Cursor query;
         try {
             query = getWritableDatabase().query("user_attributes", new String[]{"set_timestamp", "value", TtmlNode.ATTR_TTS_ORIGIN}, "app_id=? and name=?", new String[]{str, str3}, null, null, null);
             try {
@@ -1610,9 +1610,9 @@ final class zzei extends zzhk {
     }
 
     public final String zzhn() {
+        Cursor rawQuery;
         Object e;
         Throwable th;
-        Cursor rawQuery;
         try {
             rawQuery = getWritableDatabase().rawQuery("select app_id from queue order by has_realtime desc, rowid asc limit 1;", null);
             try {

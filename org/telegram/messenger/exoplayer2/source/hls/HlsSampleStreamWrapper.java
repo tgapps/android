@@ -881,11 +881,11 @@ Error: java.lang.IndexOutOfBoundsException: bitIndex < 0: -1
     }
 
     private void buildTracks() {
-        int trackType;
         int extractorTrackCount = this.sampleQueues.length;
         int primaryExtractorTrackIndex = -1;
         int primaryExtractorTrackType = 0;
         for (int i = 0; i < extractorTrackCount; i++) {
+            int trackType;
             String sampleMimeType = this.sampleQueues[i].getUpstreamFormat().sampleMimeType;
             if (MimeTypes.isVideo(sampleMimeType)) {
                 trackType = 3;

@@ -2877,15 +2877,15 @@ Caused by: java.lang.NullPointerException
             public void run() {
                 Throwable e;
                 boolean topReached;
-                Throwable e2;
                 messages_Messages res;
+                Throwable e2;
                 AnonymousClass39 anonymousClass39 = this;
                 messages_Messages res2 = new TL_messages_messages();
-                messages_Messages res3;
                 try {
                     ArrayList<Integer> arrayList;
                     ArrayList<Integer> arrayList2;
                     SQLiteCursor cursor;
+                    messages_Messages res3;
                     ArrayList<Integer> usersToLoad;
                     ArrayList<Integer> chatsToLoad;
                     boolean topReached2;
@@ -2906,26 +2906,26 @@ Caused by: java.lang.NullPointerException
                                 } catch (Exception e3) {
                                     e = e3;
                                     topReached = false;
-                                    res3 = res2;
+                                    res = res2;
                                     e2 = e;
                                     try {
-                                        res3.messages.clear();
-                                        res3.chats.clear();
-                                        res3.users.clear();
+                                        res.messages.clear();
+                                        res.chats.clear();
+                                        res.users.clear();
                                         FileLog.e(e2);
-                                        DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                                        DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                                     } catch (Throwable th) {
                                         e = th;
                                         e2 = e;
-                                        DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                                        DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                                         throw e2;
                                     }
                                 } catch (Throwable th2) {
                                     e = th2;
                                     topReached = false;
-                                    res3 = res2;
+                                    res = res2;
                                     e2 = e;
-                                    DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                                    DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                                     throw e2;
                                 }
                             }
@@ -2968,32 +2968,32 @@ Caused by: java.lang.NullPointerException
                                             }
                                         } catch (Throwable e4) {
                                             e2 = e4;
-                                            res3 = res2;
-                                            res3.messages.clear();
-                                            res3.chats.clear();
-                                            res3.users.clear();
+                                            res = res2;
+                                            res.messages.clear();
+                                            res.chats.clear();
+                                            res.users.clear();
                                             FileLog.e(e2);
-                                            DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                                            DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                                         } catch (Throwable e42) {
                                             e2 = e42;
-                                            res3 = res2;
-                                            DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                                            res = res2;
+                                            DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                                             throw e2;
                                         }
                                     }
                                     cursor2.dispose();
                                 } catch (Throwable e422) {
                                     e2 = e422;
-                                    res3 = res2;
-                                    res3.messages.clear();
-                                    res3.chats.clear();
-                                    res3.users.clear();
+                                    res = res2;
+                                    res.messages.clear();
+                                    res.chats.clear();
+                                    res.users.clear();
                                     FileLog.e(e2);
-                                    DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                                    DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                                 } catch (Throwable e4222) {
                                     e2 = e4222;
-                                    res3 = res2;
-                                    DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                                    res = res2;
+                                    DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                                     throw e2;
                                 }
                             }
@@ -3018,7 +3018,7 @@ Caused by: java.lang.NullPointerException
                                     Locale locale2 = Locale.US;
                                     String str2 = "SELECT data, mid FROM media_v2 WHERE uid = %d AND mid > 0 AND mid < %d AND mid >= %d AND type = %d ORDER BY date DESC, mid DESC LIMIT %d";
                                     Object[] objArr2 = new Object[5];
-                                    res = res2;
+                                    res3 = res2;
                                     try {
                                         objArr2[0] = Long.valueOf(j);
                                         objArr2[1] = Long.valueOf(messageMaxId);
@@ -3028,14 +3028,14 @@ Caused by: java.lang.NullPointerException
                                         cursor = database.queryFinalized(String.format(locale2, str2, objArr2), new Object[0]);
                                     } catch (Throwable e42222) {
                                         e2 = e42222;
-                                        res3 = res;
+                                        res = res3;
                                     } catch (Throwable e422222) {
                                         e2 = e422222;
-                                        res3 = res;
+                                        res = res3;
                                     }
                                 } else {
                                     SQLiteCursor sQLiteCursor = cursor;
-                                    res = res2;
+                                    res3 = res2;
                                     r4 = new Object[4];
                                     r4[0] = Long.valueOf(j);
                                     r4[1] = Long.valueOf(messageMaxId);
@@ -3045,7 +3045,7 @@ Caused by: java.lang.NullPointerException
                                 }
                             } else {
                                 TL_messages_messages res4;
-                                res = res2;
+                                res3 = res2;
                                 r14 = new Object[2];
                                 long holeMessageId3 = 0;
                                 r14[0] = Long.valueOf(j);
@@ -3069,22 +3069,22 @@ Caused by: java.lang.NullPointerException
                         } catch (Throwable e4222222) {
                             topReached = false;
                             e2 = e4222222;
-                            res3 = res2;
-                            res3.messages.clear();
-                            res3.chats.clear();
-                            res3.users.clear();
+                            res = res2;
+                            res.messages.clear();
+                            res.chats.clear();
+                            res.users.clear();
                             FileLog.e(e2);
-                            DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                            DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                         } catch (Throwable e42222222) {
                             topReached = false;
                             e2 = e42222222;
-                            res3 = res2;
-                            DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                            res = res2;
+                            DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                             throw e2;
                         }
                     }
                     topReached = false;
-                    res = res2;
+                    res3 = res2;
                     arrayList = usersToLoad2;
                     arrayList2 = chatsToLoad2;
                     z = true;
@@ -3095,17 +3095,17 @@ Caused by: java.lang.NullPointerException
                             cursor = database.queryFinalized(String.format(Locale.US, "SELECT m.data, m.mid, r.random_id FROM media_v2 as m LEFT JOIN randoms as r ON r.mid = m.mid WHERE m.uid = %d AND type = %d ORDER BY m.mid ASC LIMIT %d", new Object[]{Long.valueOf(j), Integer.valueOf(i3), Integer.valueOf(countToLoad)}), new Object[0]);
                         }
                     } catch (Throwable e422222222) {
-                        res3 = res;
+                        res = res3;
                         e2 = e422222222;
-                        res3.messages.clear();
-                        res3.chats.clear();
-                        res3.users.clear();
+                        res.messages.clear();
+                        res.chats.clear();
+                        res.users.clear();
                         FileLog.e(e2);
-                        DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                        DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                     } catch (Throwable e4222222222) {
-                        res3 = res;
+                        res = res3;
                         e2 = e4222222222;
-                        DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                        DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                         throw e2;
                     }
                     while (cursor.next()) {
@@ -3119,9 +3119,9 @@ Caused by: java.lang.NullPointerException
                             if (((int) j) == 0) {
                                 message.random_id = cursor.longValue(2);
                             }
-                            res3 = res;
+                            res = res3;
                             try {
-                                res3.messages.add(message);
+                                res.messages.add(message);
                                 if (message.from_id > 0) {
                                     usersToLoad = arrayList;
                                     if (!usersToLoad.contains(Integer.valueOf(message.from_id))) {
@@ -3141,57 +3141,57 @@ Caused by: java.lang.NullPointerException
                         } else {
                             usersToLoad = arrayList;
                             chatsToLoad = arrayList2;
-                            res3 = res;
+                            res = res3;
                         }
                         arrayList = usersToLoad;
                         arrayList2 = chatsToLoad;
-                        res = res3;
+                        res3 = res;
                     }
                     usersToLoad = arrayList;
                     chatsToLoad = arrayList2;
-                    res3 = res;
+                    res = res3;
                     cursor.dispose();
                     if (!usersToLoad.isEmpty()) {
-                        MessagesStorage.getInstance(DataQuery.this.currentAccount).getUsersInternal(TextUtils.join(",", usersToLoad), res3.users);
+                        MessagesStorage.getInstance(DataQuery.this.currentAccount).getUsersInternal(TextUtils.join(",", usersToLoad), res.users);
                     }
                     if (!chatsToLoad.isEmpty()) {
-                        MessagesStorage.getInstance(DataQuery.this.currentAccount).getChatsInternal(TextUtils.join(",", chatsToLoad), res3.chats);
+                        MessagesStorage.getInstance(DataQuery.this.currentAccount).getChatsInternal(TextUtils.join(",", chatsToLoad), res.chats);
                     }
-                    if (res3.messages.size() > i) {
+                    if (res.messages.size() > i) {
                         try {
-                            res3.messages.remove(res3.messages.size() - 1);
+                            res.messages.remove(res.messages.size() - 1);
                             topReached2 = false;
                         } catch (Throwable e42222222222) {
                             e2 = e42222222222;
                             topReached = false;
-                            res3.messages.clear();
-                            res3.chats.clear();
-                            res3.users.clear();
+                            res.messages.clear();
+                            res.chats.clear();
+                            res.users.clear();
                             FileLog.e(e2);
-                            DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                            DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                         } catch (Throwable e422222222222) {
                             e2 = e422222222222;
                             topReached = false;
-                            DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                            DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                             throw e2;
                         }
                     }
                     topReached2 = z;
-                    DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached2);
+                    DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached2);
                 } catch (Throwable e4222222222222) {
                     topReached = false;
-                    res3 = res2;
+                    res = res2;
                     e2 = e4222222222222;
-                    res3.messages.clear();
-                    res3.chats.clear();
-                    res3.users.clear();
+                    res.messages.clear();
+                    res.chats.clear();
+                    res.users.clear();
                     FileLog.e(e2);
-                    DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                    DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                 } catch (Throwable e42222222222222) {
                     topReached = false;
-                    res3 = res2;
+                    res = res2;
                     e2 = e42222222222222;
-                    DataQuery.this.processLoadedMedia(res3, j, i, i2, i3, true, i4, z, topReached);
+                    DataQuery.this.processLoadedMedia(res, j, i, i2, i3, true, i4, z, topReached);
                     throw e2;
                 }
             }
@@ -4223,18 +4223,17 @@ Caused by: java.lang.NullPointerException
     }
 
     public void installShortcut(long did) {
-        int i;
-        int i2;
         String name;
         StringBuilder stringBuilder;
         Builder pinShortcutInfo;
+        Intent addIntent;
         Throwable th;
-        FileLocation fileLocation;
-        boolean z;
         Bitmap bitmap;
         DataQuery dataQuery = this;
         long j = did;
         try {
+            int i;
+            int i2;
             Intent shortcutIntent = createIntrnalShortcutIntent(did);
             int lower_id = (int) j;
             int high_id = (int) (j >> 32);
@@ -4257,7 +4256,8 @@ Caused by: java.lang.NullPointerException
                 return;
             }
             if (user != null || chat != null) {
-                Intent addIntent;
+                FileLocation fileLocation;
+                boolean z;
                 Bitmap result;
                 Canvas canvas;
                 Drawable drawable;

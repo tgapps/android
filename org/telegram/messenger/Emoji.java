@@ -474,7 +474,6 @@ Caused by: java.lang.NullPointerException
 
     public static CharSequence replaceEmoji(CharSequence cs, FontMetricsInt fontMetrics, int size, boolean createNew, int[] emojiOnly) {
         Throwable e;
-        int emojiCount;
         CharSequence charSequence = cs;
         if (!(SharedConfig.useSystemEmoji || charSequence == null)) {
             if (cs.length() != 0) {
@@ -492,13 +491,14 @@ Caused by: java.lang.NullPointerException
                 int length = cs.length();
                 boolean doneEmoji = false;
                 int[] emojiOnly2 = emojiOnly;
-                int emojiCount2 = 0;
+                int emojiCount = 0;
                 long buf = 0;
                 int i = 0;
                 while (i < length) {
                     long j;
                     char c2;
                     int a;
+                    int emojiCount2;
                     char c = charSequence.charAt(i);
                     if ((c >= '?' && c <= '?') || (buf != 0 && (buf & -4294967296L) == 0 && (buf & 65535) == 55356 && c >= '?' && c <= '?')) {
                         if (startIndex == -1) {
@@ -626,7 +626,7 @@ Caused by: java.lang.NullPointerException
                             j = buf;
                             try {
                                 s.setSpan(new EmojiSpan(drawable, 0, size, fontMetrics), startIndex, startIndex + startLength, 33);
-                                emojiCount2++;
+                                emojiCount++;
                             } catch (Throwable e2222) {
                                 e = e2222;
                             }
@@ -639,25 +639,25 @@ Caused by: java.lang.NullPointerException
                         a = 0;
                         emojiCode.setLength(0);
                         doneEmoji = false;
-                        emojiCount = emojiCount2;
+                        emojiCount2 = emojiCount;
                     } else {
                         j = buf;
                         a = 0;
                         buf = size;
-                        emojiCount = emojiCount2;
+                        emojiCount2 = emojiCount;
                     }
                     try {
-                        if (VERSION.SDK_INT < 23 && emojiCount >= 50) {
-                            emojiCount2 = emojiCount;
+                        if (VERSION.SDK_INT < 23 && emojiCount2 >= 50) {
+                            emojiCount = emojiCount2;
                             break;
                         }
                         i++;
                         int i3 = a;
-                        emojiCount2 = emojiCount;
+                        emojiCount = emojiCount2;
                         buf = j;
                     } catch (Throwable e22222) {
                         e = e22222;
-                        emojiCount2 = emojiCount;
+                        emojiCount = emojiCount2;
                     }
                 }
                 buf = size;
@@ -741,11 +741,11 @@ Caused by: java.lang.NullPointerException
     }
 
     public static void loadRecentEmoji() {
-        String[] args;
         Throwable e;
+        SharedPreferences preferences;
+        String str;
         if (!recentEmojiLoaded) {
-            SharedPreferences preferences;
-            String str;
+            String[] args;
             String[] args2;
             int a;
             recentEmojiLoaded = true;

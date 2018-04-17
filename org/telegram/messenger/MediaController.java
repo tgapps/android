@@ -189,8 +189,6 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     private Runnable recordRunnable = new Runnable() {
         public void run() {
             Throwable e;
-            boolean flush;
-            final ByteBuffer finalBuffer;
             if (MediaController.this.audioRecorder != null) {
                 ByteBuffer buffer;
                 if (MediaController.this.recordBuffers.isEmpty()) {
@@ -205,6 +203,8 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
                 if (len > 0) {
                     double sum;
                     double sum2;
+                    boolean flush;
+                    final ByteBuffer finalBuffer;
                     buffer.limit(len);
                     try {
                         float sampleStep;

@@ -21,6 +21,7 @@ public final class zzabb {
     }
 
     private static int zza(CharSequence charSequence) {
+        StringBuilder stringBuilder;
         int length = charSequence.length();
         int i = 0;
         int i2 = 0;
@@ -29,7 +30,6 @@ public final class zzabb {
         }
         int i3 = length;
         while (i2 < length) {
-            StringBuilder stringBuilder;
             char charAt = charSequence.charAt(i2);
             if (charAt < 'ࠀ') {
                 i3 += (127 - charAt) >>> 31;

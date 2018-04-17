@@ -1237,6 +1237,7 @@ Caused by: java.lang.NullPointerException
 
     public boolean start(FileStreamLoadOperation stream, int streamOffset) {
         Throwable e;
+        Range alreadyStarted;
         final FileStreamLoadOperation fileStreamLoadOperation = stream;
         final int i = streamOffset;
         if (this.currentDownloadChunkSize == 0) {
@@ -1244,7 +1245,7 @@ Caused by: java.lang.NullPointerException
             int i2 = r1.totalBytesCount;
             r1.currentMaxDownloadRequests = 4;
         }
-        final boolean alreadyStarted = r1.state != 0;
+        final boolean alreadyStarted2 = r1.state != 0;
         boolean wasPaused = r1.paused;
         r1.paused = false;
         if (fileStreamLoadOperation != null) {
@@ -1255,19 +1256,19 @@ Caused by: java.lang.NullPointerException
                     }
                     FileLoadOperation.this.streamStartOffset = (i / FileLoadOperation.this.currentDownloadChunkSize) * FileLoadOperation.this.currentDownloadChunkSize;
                     FileLoadOperation.this.streamListeners.add(fileStreamLoadOperation);
-                    if (alreadyStarted) {
+                    if (alreadyStarted2) {
                         FileLoadOperation.this.startDownloadRequest();
                     }
                 }
             });
-        } else if (wasPaused && alreadyStarted) {
+        } else if (wasPaused && alreadyStarted2) {
             Utilities.stageQueue.postRunnable(new Runnable() {
                 public void run() {
                     FileLoadOperation.this.startDownloadRequest();
                 }
             });
         }
-        if (alreadyStarted) {
+        if (alreadyStarted2) {
             return wasPaused;
         }
         if (r1.location == null && r1.webLocation == null) {
@@ -1324,11 +1325,11 @@ Caused by: java.lang.NullPointerException
             boolean z;
             if (r1.datacenter_id == 0) {
                 z = false;
-                alreadyStarted = true;
+                alreadyStarted2 = true;
             } else if (r1.location.id == 0) {
-                boolean z2 = alreadyStarted;
+                boolean z2 = alreadyStarted2;
                 z = false;
-                alreadyStarted = true;
+                alreadyStarted2 = true;
             } else if (r1.encryptFile) {
                 stringBuilder = new StringBuilder();
                 stringBuilder.append(r1.datacenter_id);
@@ -1381,7 +1382,7 @@ Caused by: java.lang.NullPointerException
                     fileNameParts = stringBuilder.toString();
                 }
             }
-            onFail(alreadyStarted, z);
+            onFail(alreadyStarted2, z);
             return z;
         } else {
             if (!(r1.datacenter_id == Integer.MIN_VALUE || r1.location.volume_id == -2147483648L)) {
@@ -1458,16 +1459,15 @@ Caused by: java.lang.NullPointerException
             r1.started = true;
             try {
                 onFinishLoadingFile(false);
-                alreadyStarted = true;
+                alreadyStarted2 = true;
             } catch (Exception e2) {
-                alreadyStarted = true;
+                alreadyStarted2 = true;
                 onFail(true, 0);
             }
         } else {
             long len;
             long totalDownloadedLen;
             int size;
-            Range alreadyStarted2;
             StringBuilder stringBuilder3;
             r1.cacheFileTemp = new File(r1.tempPath, fileNameTemp);
             boolean newKeyGenerated = false;
@@ -1515,12 +1515,12 @@ Caused by: java.lang.NullPointerException
                             while (a < count) {
                                 int start = r1.filePartsStream.readInt();
                                 int end = r1.filePartsStream.readInt();
-                                z2 = alreadyStarted;
+                                z2 = alreadyStarted2;
                                 try {
                                     r1.notLoadedBytesRanges.add(new Range(start, end));
                                     r1.notRequestedBytesRanges.add(new Range(start, end));
                                     a++;
-                                    alreadyStarted = z2;
+                                    alreadyStarted2 = z2;
                                     i = streamOffset;
                                 } catch (Throwable e322) {
                                     e = e322;
@@ -1529,7 +1529,7 @@ Caused by: java.lang.NullPointerException
                         }
                     }
                 } catch (Throwable e3222) {
-                    z2 = alreadyStarted;
+                    z2 = alreadyStarted2;
                     e = e3222;
                     FileLog.e(e);
                     if (r1.cacheFileTemp.exists()) {
@@ -1541,9 +1541,9 @@ Caused by: java.lang.NullPointerException
                         totalDownloadedLen = r1.cacheFileTemp.length();
                         if (fileNameIv != null) {
                         }
-                        alreadyStarted = (((int) r1.cacheFileTemp.length()) / r1.currentDownloadChunkSize) * r1.currentDownloadChunkSize;
-                        r1.downloadedBytes = alreadyStarted;
-                        r1.requestedBytesCount = alreadyStarted;
+                        alreadyStarted2 = (((int) r1.cacheFileTemp.length()) / r1.currentDownloadChunkSize) * r1.currentDownloadChunkSize;
+                        r1.downloadedBytes = alreadyStarted2;
+                        r1.requestedBytesCount = alreadyStarted2;
                         r1.notLoadedBytesRanges.add(new Range(r1.downloadedBytes, r1.totalBytesCount));
                         r1.notRequestedBytesRanges.add(new Range(r1.downloadedBytes, r1.totalBytesCount));
                     }
@@ -1551,8 +1551,8 @@ Caused by: java.lang.NullPointerException
                         r1.downloadedBytes = r1.totalBytesCount;
                         size = r1.notLoadedBytesRanges.size();
                         for (i = 0; i < size; i++) {
-                            alreadyStarted2 = (Range) r1.notLoadedBytesRanges.get(i);
-                            r1.downloadedBytes -= alreadyStarted2.end - alreadyStarted2.start;
+                            alreadyStarted = (Range) r1.notLoadedBytesRanges.get(i);
+                            r1.downloadedBytes -= alreadyStarted.end - alreadyStarted.start;
                         }
                     }
                     if (BuildVars.LOGS_ENABLED) {
@@ -1599,8 +1599,8 @@ Caused by: java.lang.NullPointerException
                                 }
                             }
                         });
-                        alreadyStarted = true;
-                        return alreadyStarted;
+                        alreadyStarted2 = true;
+                        return alreadyStarted2;
                     }
                     onFail(true, 0);
                     return false;
@@ -1616,9 +1616,9 @@ Caused by: java.lang.NullPointerException
             } else {
                 totalDownloadedLen = r1.cacheFileTemp.length();
                 if (fileNameIv != null || totalDownloadedLen % ((long) r1.currentDownloadChunkSize) == 0) {
-                    alreadyStarted = (((int) r1.cacheFileTemp.length()) / r1.currentDownloadChunkSize) * r1.currentDownloadChunkSize;
-                    r1.downloadedBytes = alreadyStarted;
-                    r1.requestedBytesCount = alreadyStarted;
+                    alreadyStarted2 = (((int) r1.cacheFileTemp.length()) / r1.currentDownloadChunkSize) * r1.currentDownloadChunkSize;
+                    r1.downloadedBytes = alreadyStarted2;
+                    r1.requestedBytesCount = alreadyStarted2;
                 } else {
                     r1.downloadedBytes = 0;
                     r1.requestedBytesCount = 0;
@@ -1632,8 +1632,8 @@ Caused by: java.lang.NullPointerException
                 r1.downloadedBytes = r1.totalBytesCount;
                 size = r1.notLoadedBytesRanges.size();
                 for (i = 0; i < size; i++) {
-                    alreadyStarted2 = (Range) r1.notLoadedBytesRanges.get(i);
-                    r1.downloadedBytes -= alreadyStarted2.end - alreadyStarted2.start;
+                    alreadyStarted = (Range) r1.notLoadedBytesRanges.get(i);
+                    r1.downloadedBytes -= alreadyStarted.end - alreadyStarted.start;
                 }
             }
             if (BuildVars.LOGS_ENABLED) {
@@ -1675,9 +1675,9 @@ Caused by: java.lang.NullPointerException
             }
             r1.started = true;
             Utilities.stageQueue.postRunnable(/* anonymous class already generated */);
-            alreadyStarted = true;
+            alreadyStarted2 = true;
         }
-        return alreadyStarted;
+        return alreadyStarted2;
     }
 
     public boolean isPaused() {

@@ -133,7 +133,7 @@ public class StatsController {
                     for (i2 = 
 /*
 Method generation error in method: org.telegram.messenger.StatsController.<init>(int):void
-jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i2' int) = (r4_1 'i2' int), (r4_24 'i2' int) binds: {(r4_1 'i2' int)=B:7:0x009d, (r4_24 'i2' int)=B:16:0x012a} in method: org.telegram.messenger.StatsController.<init>(int):void
+jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r4_2 'i2' int) = (r4_1 'i2' int), (r4_24 'i2' int) binds: {(r4_24 'i2' int)=B:16:0x012a, (r4_1 'i2' int)=B:7:0x009d} in method: org.telegram.messenger.StatsController.<init>(int):void
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.RegionGen.makeLoop(RegionGen.java:184)
 	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:61)

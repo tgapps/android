@@ -18696,6 +18696,7 @@ Caused by: java.lang.NullPointerException
 
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
         Throwable e;
+        Cursor c;
         ChatActivity chatActivity = this;
         int i = requestCode;
         Intent intent = data;
@@ -18759,7 +18760,6 @@ Caused by: java.lang.NullPointerException
                         if (intent != null) {
                             if (data.getData() != null) {
                                 Uri uri2 = data.getData();
-                                Cursor c;
                                 try {
                                     c = getParentActivity().getContentResolver().query(uri2, new String[]{"display_name", "data1"}, null, null, null);
                                     if (c != null) {

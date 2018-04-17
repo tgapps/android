@@ -531,7 +531,6 @@ Caused by: java.lang.NullPointerException
 
     @SuppressLint({"DrawAllocation"})
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        boolean z;
         Throwable e;
         char c;
         char c2;
@@ -541,6 +540,7 @@ Caused by: java.lang.NullPointerException
         ArrayList<PhotoSize> photoThumbs;
         Throwable e2;
         String ext;
+        int viewWidth;
         int w;
         int h;
         DocumentAttribute attribute;
@@ -548,7 +548,8 @@ Caused by: java.lang.NullPointerException
         int dp;
         String currentPhotoFilterThumb;
         String currentPhotoFilter;
-        String format;
+        int x;
+        int y;
         this.drawLinkImageView = false;
         this.descriptionLayout = null;
         this.titleLayout = null;
@@ -559,12 +560,11 @@ Caused by: java.lang.NullPointerException
             setMeasuredDimension(AndroidUtilities.dp(100.0f), AndroidUtilities.dp(100.0f));
             return;
         }
-        int viewWidth;
+        boolean z;
+        String format;
         StringBuilder stringBuilder;
         float f;
-        int x;
         int x2;
-        int y;
         double lat;
         Object[] objArr;
         double lon;
@@ -716,14 +716,14 @@ Caused by: java.lang.NullPointerException
                                                     dp = AndroidUtilities.dp(52.0f);
                                                     if (LocaleController.isRTL) {
                                                         f = 8.0f;
-                                                        x = AndroidUtilities.dp(8.0f);
+                                                        x2 = AndroidUtilities.dp(8.0f);
                                                     } else {
                                                         f = 8.0f;
-                                                        x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                                        x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                                     }
-                                                    r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                                    r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                                    r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                                    r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                                 } else {
                                                     viewWidth2 = viewWidth;
                                                     dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -731,9 +731,9 @@ Caused by: java.lang.NullPointerException
                                                         dp = AndroidUtilities.dp(100.0f);
                                                     }
                                                     setMeasuredDimension(viewWidth2, dp);
-                                                    x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                                    x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                                     y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                                    r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                                    r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                                     r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                                 }
                                             }
@@ -825,14 +825,14 @@ Caused by: java.lang.NullPointerException
                                             dp = AndroidUtilities.dp(52.0f);
                                             if (LocaleController.isRTL) {
                                                 f = 8.0f;
-                                                x = AndroidUtilities.dp(8.0f);
+                                                x2 = AndroidUtilities.dp(8.0f);
                                             } else {
                                                 f = 8.0f;
-                                                x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                                x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                             }
-                                            r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                            r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                            r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                            r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                         } else {
                                             viewWidth2 = viewWidth;
                                             dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -840,9 +840,9 @@ Caused by: java.lang.NullPointerException
                                                 dp = AndroidUtilities.dp(100.0f);
                                             }
                                             setMeasuredDimension(viewWidth2, dp);
-                                            x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                            x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                             y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                            r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                            r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                             r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                         }
                                     }
@@ -924,9 +924,9 @@ Caused by: java.lang.NullPointerException
                                             dp = AndroidUtilities.dp(100.0f);
                                         }
                                         setMeasuredDimension(viewWidth2, dp);
-                                        x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                        x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                         y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                        r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                        r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                         r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                     } else {
                                         viewWidth2 = 0;
@@ -937,14 +937,14 @@ Caused by: java.lang.NullPointerException
                                         dp = AndroidUtilities.dp(52.0f);
                                         if (LocaleController.isRTL) {
                                             f = 8.0f;
-                                            x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                            x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                         } else {
                                             f = 8.0f;
-                                            x = AndroidUtilities.dp(8.0f);
+                                            x2 = AndroidUtilities.dp(8.0f);
                                         }
-                                        r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                        r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                        r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                        r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                     }
                                 }
                             } catch (Throwable e322) {
@@ -1059,14 +1059,14 @@ Caused by: java.lang.NullPointerException
                                                 dp = AndroidUtilities.dp(52.0f);
                                                 if (LocaleController.isRTL) {
                                                     f = 8.0f;
-                                                    x = AndroidUtilities.dp(8.0f);
+                                                    x2 = AndroidUtilities.dp(8.0f);
                                                 } else {
                                                     f = 8.0f;
-                                                    x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                                    x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                                 }
-                                                r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                                r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                                r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                                r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                             } else {
                                                 viewWidth2 = viewWidth;
                                                 dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -1074,9 +1074,9 @@ Caused by: java.lang.NullPointerException
                                                     dp = AndroidUtilities.dp(100.0f);
                                                 }
                                                 setMeasuredDimension(viewWidth2, dp);
-                                                x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                                x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                                 y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                                r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                                r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                                 r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                             }
                                         }
@@ -1166,9 +1166,9 @@ Caused by: java.lang.NullPointerException
                                             dp = AndroidUtilities.dp(100.0f);
                                         }
                                         setMeasuredDimension(viewWidth2, dp);
-                                        x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                        x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                         y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                        r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                        r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                         r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                     } else {
                                         viewWidth2 = 0;
@@ -1179,14 +1179,14 @@ Caused by: java.lang.NullPointerException
                                         dp = AndroidUtilities.dp(52.0f);
                                         if (LocaleController.isRTL) {
                                             f = 8.0f;
-                                            x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                            x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                         } else {
                                             f = 8.0f;
-                                            x = AndroidUtilities.dp(8.0f);
+                                            x2 = AndroidUtilities.dp(8.0f);
                                         }
-                                        r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                        r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                        r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                        r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                     }
                                 }
                                 viewWidth = viewWidth2;
@@ -1269,14 +1269,14 @@ Caused by: java.lang.NullPointerException
                                     dp = AndroidUtilities.dp(52.0f);
                                     if (LocaleController.isRTL) {
                                         f = 8.0f;
-                                        x = AndroidUtilities.dp(8.0f);
+                                        x2 = AndroidUtilities.dp(8.0f);
                                     } else {
                                         f = 8.0f;
-                                        x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                        x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                     }
-                                    r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                    r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                    r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                    r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                 } else {
                                     viewWidth2 = viewWidth;
                                     dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -1284,9 +1284,9 @@ Caused by: java.lang.NullPointerException
                                         dp = AndroidUtilities.dp(100.0f);
                                     }
                                     setMeasuredDimension(viewWidth2, dp);
-                                    x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                    x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                     y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                    r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                    r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                     r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                 }
                             }
@@ -1396,9 +1396,9 @@ Caused by: java.lang.NullPointerException
                                                 dp = AndroidUtilities.dp(100.0f);
                                             }
                                             setMeasuredDimension(viewWidth2, dp);
-                                            x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                            x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                             y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                            r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                            r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                             r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                         } else {
                                             viewWidth2 = 0;
@@ -1409,14 +1409,14 @@ Caused by: java.lang.NullPointerException
                                             dp = AndroidUtilities.dp(52.0f);
                                             if (LocaleController.isRTL) {
                                                 f = 8.0f;
-                                                x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                                x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                             } else {
                                                 f = 8.0f;
-                                                x = AndroidUtilities.dp(8.0f);
+                                                x2 = AndroidUtilities.dp(8.0f);
                                             }
-                                            r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                            r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                            r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                            r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                         }
                                     }
                                 }
@@ -1507,14 +1507,14 @@ Caused by: java.lang.NullPointerException
                                     dp = AndroidUtilities.dp(52.0f);
                                     if (LocaleController.isRTL) {
                                         f = 8.0f;
-                                        x = AndroidUtilities.dp(8.0f);
+                                        x2 = AndroidUtilities.dp(8.0f);
                                     } else {
                                         f = 8.0f;
-                                        x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                        x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                     }
-                                    r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                    r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                    r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                    r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                 } else {
                                     viewWidth2 = viewWidth;
                                     dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -1522,9 +1522,9 @@ Caused by: java.lang.NullPointerException
                                         dp = AndroidUtilities.dp(100.0f);
                                     }
                                     setMeasuredDimension(viewWidth2, dp);
-                                    x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                    x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                     y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                    r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                    r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                     r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                 }
                             }
@@ -1606,9 +1606,9 @@ Caused by: java.lang.NullPointerException
                                     dp = AndroidUtilities.dp(100.0f);
                                 }
                                 setMeasuredDimension(viewWidth2, dp);
-                                x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                 y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                 r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                             } else {
                                 viewWidth2 = 0;
@@ -1619,14 +1619,14 @@ Caused by: java.lang.NullPointerException
                                 dp = AndroidUtilities.dp(52.0f);
                                 if (LocaleController.isRTL) {
                                     f = 8.0f;
-                                    x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                    x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                 } else {
                                     f = 8.0f;
-                                    x = AndroidUtilities.dp(8.0f);
+                                    x2 = AndroidUtilities.dp(8.0f);
                                 }
-                                r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                             }
                         }
                         photoThumbs = photoThumbs3;
@@ -1738,14 +1738,14 @@ Caused by: java.lang.NullPointerException
                                         dp = AndroidUtilities.dp(52.0f);
                                         if (LocaleController.isRTL) {
                                             f = 8.0f;
-                                            x = AndroidUtilities.dp(8.0f);
+                                            x2 = AndroidUtilities.dp(8.0f);
                                         } else {
                                             f = 8.0f;
-                                            x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                            x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                         }
-                                        r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                        r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                        r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                        r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                     } else {
                                         viewWidth2 = viewWidth;
                                         dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -1753,9 +1753,9 @@ Caused by: java.lang.NullPointerException
                                             dp = AndroidUtilities.dp(100.0f);
                                         }
                                         setMeasuredDimension(viewWidth2, dp);
-                                        x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                        x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                         y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                        r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                        r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                         r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                     }
                                 }
@@ -1845,9 +1845,9 @@ Caused by: java.lang.NullPointerException
                                     dp = AndroidUtilities.dp(100.0f);
                                 }
                                 setMeasuredDimension(viewWidth2, dp);
-                                x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                 y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                 r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                             } else {
                                 viewWidth2 = 0;
@@ -1858,14 +1858,14 @@ Caused by: java.lang.NullPointerException
                                 dp = AndroidUtilities.dp(52.0f);
                                 if (LocaleController.isRTL) {
                                     f = 8.0f;
-                                    x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                    x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                 } else {
                                     f = 8.0f;
-                                    x = AndroidUtilities.dp(8.0f);
+                                    x2 = AndroidUtilities.dp(8.0f);
                                 }
-                                r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                             }
                         }
                         viewWidth = viewWidth2;
@@ -1948,14 +1948,14 @@ Caused by: java.lang.NullPointerException
                             dp = AndroidUtilities.dp(52.0f);
                             if (LocaleController.isRTL) {
                                 f = 8.0f;
-                                x = AndroidUtilities.dp(8.0f);
+                                x2 = AndroidUtilities.dp(8.0f);
                             } else {
                                 f = 8.0f;
-                                x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                             }
-                            r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                            r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                            r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                            r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                         } else {
                             viewWidth2 = viewWidth;
                             dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -1963,9 +1963,9 @@ Caused by: java.lang.NullPointerException
                                 dp = AndroidUtilities.dp(100.0f);
                             }
                             setMeasuredDimension(viewWidth2, dp);
-                            x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                            x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                             y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                            r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                            r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                             r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                         }
                     }
@@ -2088,9 +2088,9 @@ Caused by: java.lang.NullPointerException
                                             dp = AndroidUtilities.dp(100.0f);
                                         }
                                         setMeasuredDimension(viewWidth2, dp);
-                                        x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                        x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                         y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                        r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                        r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                         r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                     } else {
                                         viewWidth2 = 0;
@@ -2101,14 +2101,14 @@ Caused by: java.lang.NullPointerException
                                         dp = AndroidUtilities.dp(52.0f);
                                         if (LocaleController.isRTL) {
                                             f = 8.0f;
-                                            x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                            x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                         } else {
                                             f = 8.0f;
-                                            x = AndroidUtilities.dp(8.0f);
+                                            x2 = AndroidUtilities.dp(8.0f);
                                         }
-                                        r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                        r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                        r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                        r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                     }
                                 }
                             }
@@ -2199,14 +2199,14 @@ Caused by: java.lang.NullPointerException
                                 dp = AndroidUtilities.dp(52.0f);
                                 if (LocaleController.isRTL) {
                                     f = 8.0f;
-                                    x = AndroidUtilities.dp(8.0f);
+                                    x2 = AndroidUtilities.dp(8.0f);
                                 } else {
                                     f = 8.0f;
-                                    x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                    x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                 }
-                                r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                             } else {
                                 viewWidth2 = viewWidth;
                                 dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -2214,9 +2214,9 @@ Caused by: java.lang.NullPointerException
                                     dp = AndroidUtilities.dp(100.0f);
                                 }
                                 setMeasuredDimension(viewWidth2, dp);
-                                x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                 y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                 r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                             }
                         }
@@ -2298,9 +2298,9 @@ Caused by: java.lang.NullPointerException
                                 dp = AndroidUtilities.dp(100.0f);
                             }
                             setMeasuredDimension(viewWidth2, dp);
-                            x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                            x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                             y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                            r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                            r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                             r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                         } else {
                             viewWidth2 = 0;
@@ -2311,14 +2311,14 @@ Caused by: java.lang.NullPointerException
                             dp = AndroidUtilities.dp(52.0f);
                             if (LocaleController.isRTL) {
                                 f = 8.0f;
-                                x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                             } else {
                                 f = 8.0f;
-                                x = AndroidUtilities.dp(8.0f);
+                                x2 = AndroidUtilities.dp(8.0f);
                             }
-                            r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                            r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                            r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                            r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                         }
                     }
                     photoThumbs = photoThumbs3;
@@ -2430,14 +2430,14 @@ Caused by: java.lang.NullPointerException
                                     dp = AndroidUtilities.dp(52.0f);
                                     if (LocaleController.isRTL) {
                                         f = 8.0f;
-                                        x = AndroidUtilities.dp(8.0f);
+                                        x2 = AndroidUtilities.dp(8.0f);
                                     } else {
                                         f = 8.0f;
-                                        x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                        x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                     }
-                                    r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                    r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                    r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                    r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                 } else {
                                     viewWidth2 = viewWidth;
                                     dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -2445,9 +2445,9 @@ Caused by: java.lang.NullPointerException
                                         dp = AndroidUtilities.dp(100.0f);
                                     }
                                     setMeasuredDimension(viewWidth2, dp);
-                                    x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                    x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                     y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                    r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                    r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                     r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                 }
                             }
@@ -2537,9 +2537,9 @@ Caused by: java.lang.NullPointerException
                                 dp = AndroidUtilities.dp(100.0f);
                             }
                             setMeasuredDimension(viewWidth2, dp);
-                            x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                            x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                             y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                            r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                            r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                             r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                         } else {
                             viewWidth2 = 0;
@@ -2550,14 +2550,14 @@ Caused by: java.lang.NullPointerException
                             dp = AndroidUtilities.dp(52.0f);
                             if (LocaleController.isRTL) {
                                 f = 8.0f;
-                                x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                             } else {
                                 f = 8.0f;
-                                x = AndroidUtilities.dp(8.0f);
+                                x2 = AndroidUtilities.dp(8.0f);
                             }
-                            r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                            r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                            r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                            r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                         }
                     }
                     viewWidth = viewWidth2;
@@ -2640,14 +2640,14 @@ Caused by: java.lang.NullPointerException
                         dp = AndroidUtilities.dp(52.0f);
                         if (LocaleController.isRTL) {
                             f = 8.0f;
-                            x = AndroidUtilities.dp(8.0f);
+                            x2 = AndroidUtilities.dp(8.0f);
                         } else {
                             f = 8.0f;
-                            x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                            x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                         }
-                        r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                        r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                        r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                        r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                     } else {
                         viewWidth2 = viewWidth;
                         dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -2655,9 +2655,9 @@ Caused by: java.lang.NullPointerException
                             dp = AndroidUtilities.dp(100.0f);
                         }
                         setMeasuredDimension(viewWidth2, dp);
-                        x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                        x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                         y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                        r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                        r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                         r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                     }
                 }
@@ -2791,9 +2791,9 @@ Caused by: java.lang.NullPointerException
                                         dp = AndroidUtilities.dp(100.0f);
                                     }
                                     setMeasuredDimension(viewWidth2, dp);
-                                    x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                                    x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                                     y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                                    r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                                    r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                                     r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                                 } else {
                                     viewWidth2 = 0;
@@ -2810,15 +2810,15 @@ Caused by: java.lang.NullPointerException
                                     dp = AndroidUtilities.dp(52.0f);
                                     if (LocaleController.isRTL) {
                                         f = 8.0f;
-                                        x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                        x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                                     } else {
                                         f = 8.0f;
-                                        x = AndroidUtilities.dp(8.0f);
+                                        x2 = AndroidUtilities.dp(8.0f);
                                     }
-                                    r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                                    r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
+                                    r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                                    r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
                                     if (r1.documentAttachType == 3 || r1.documentAttachType == 5) {
-                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                                     }
                                 }
                             }
@@ -2910,14 +2910,14 @@ Caused by: java.lang.NullPointerException
                             dp = AndroidUtilities.dp(52.0f);
                             if (LocaleController.isRTL) {
                                 f = 8.0f;
-                                x = AndroidUtilities.dp(8.0f);
+                                x2 = AndroidUtilities.dp(8.0f);
                             } else {
                                 f = 8.0f;
-                                x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                                x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                             }
-                            r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                            r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                            r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                            r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                         } else {
                             viewWidth2 = viewWidth;
                             dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -2925,9 +2925,9 @@ Caused by: java.lang.NullPointerException
                                 dp = AndroidUtilities.dp(100.0f);
                             }
                             setMeasuredDimension(viewWidth2, dp);
-                            x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                            x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                             y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                            r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                            r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                             r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                         }
                     }
@@ -3010,9 +3010,9 @@ Caused by: java.lang.NullPointerException
                         dp = AndroidUtilities.dp(100.0f);
                     }
                     setMeasuredDimension(viewWidth2, dp);
-                    x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                    x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                     y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                    r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                    r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                     r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                 } else {
                     viewWidth2 = 0;
@@ -3023,14 +3023,14 @@ Caused by: java.lang.NullPointerException
                     dp = AndroidUtilities.dp(52.0f);
                     if (LocaleController.isRTL) {
                         f = 8.0f;
-                        x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                        x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                     } else {
                         f = 8.0f;
-                        x = AndroidUtilities.dp(8.0f);
+                        x2 = AndroidUtilities.dp(8.0f);
                     }
-                    r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                    r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                    r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                    r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                    r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                 }
             }
         }
@@ -3143,14 +3143,14 @@ Caused by: java.lang.NullPointerException
                         dp = AndroidUtilities.dp(52.0f);
                         if (LocaleController.isRTL) {
                             f = 8.0f;
-                            x = AndroidUtilities.dp(8.0f);
+                            x2 = AndroidUtilities.dp(8.0f);
                         } else {
                             f = 8.0f;
-                            x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                            x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                         }
-                        r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                        r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                        r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                        r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                        r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
                     } else {
                         viewWidth2 = viewWidth;
                         dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -3158,9 +3158,9 @@ Caused by: java.lang.NullPointerException
                             dp = AndroidUtilities.dp(100.0f);
                         }
                         setMeasuredDimension(viewWidth2, dp);
-                        x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                        x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                         y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                        r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                        r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                         r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
                     }
                 }
@@ -3250,9 +3250,9 @@ Caused by: java.lang.NullPointerException
                     dp = AndroidUtilities.dp(100.0f);
                 }
                 setMeasuredDimension(viewWidth2, dp);
-                x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+                x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
                 y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-                r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+                r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
                 r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
             } else {
                 viewWidth2 = 0;
@@ -3263,14 +3263,14 @@ Caused by: java.lang.NullPointerException
                 dp = AndroidUtilities.dp(52.0f);
                 if (LocaleController.isRTL) {
                     f = 8.0f;
-                    x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                    x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
                 } else {
                     f = 8.0f;
-                    x = AndroidUtilities.dp(8.0f);
+                    x2 = AndroidUtilities.dp(8.0f);
                 }
-                r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-                r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+                r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+                r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+                r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
             }
         }
         viewWidth = viewWidth2;
@@ -3353,14 +3353,14 @@ Caused by: java.lang.NullPointerException
             dp = AndroidUtilities.dp(52.0f);
             if (LocaleController.isRTL) {
                 f = 8.0f;
-                x = AndroidUtilities.dp(8.0f);
+                x2 = AndroidUtilities.dp(8.0f);
             } else {
                 f = 8.0f;
-                x = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
+                x2 = (MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(8.0f)) - dp;
             }
-            r1.letterDrawable.setBounds(x, AndroidUtilities.dp(f), x + dp, AndroidUtilities.dp(60.0f));
-            r1.linkImageView.setImageCoords(x, AndroidUtilities.dp(f), dp, dp);
-            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x, AndroidUtilities.dp(56.0f));
+            r1.letterDrawable.setBounds(x2, AndroidUtilities.dp(f), x2 + dp, AndroidUtilities.dp(60.0f));
+            r1.linkImageView.setImageCoords(x2, AndroidUtilities.dp(f), dp, dp);
+            r1.radialProgress.setProgressRect(AndroidUtilities.dp(4.0f) + x2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(48.0f) + x2, AndroidUtilities.dp(56.0f));
         } else {
             viewWidth2 = viewWidth;
             dp = MeasureSpec.getSize(heightMeasureSpec);
@@ -3368,9 +3368,9 @@ Caused by: java.lang.NullPointerException
                 dp = AndroidUtilities.dp(100.0f);
             }
             setMeasuredDimension(viewWidth2, dp);
-            x2 = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
+            x = (viewWidth2 - AndroidUtilities.dp(24.0f)) / 2;
             y = (dp - AndroidUtilities.dp(24.0f)) / 2;
-            r1.radialProgress.setProgressRect(x2, y, AndroidUtilities.dp(24.0f) + x2, AndroidUtilities.dp(24.0f) + y);
+            r1.radialProgress.setProgressRect(x, y, AndroidUtilities.dp(24.0f) + x, AndroidUtilities.dp(24.0f) + y);
             r1.linkImageView.setImageCoords(0, 0, viewWidth2, dp);
         }
     }
