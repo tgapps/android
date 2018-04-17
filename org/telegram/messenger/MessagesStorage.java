@@ -11836,7 +11836,7 @@ Caused by: java.lang.NullPointerException
     public TLObject getSentFile(String path, int type) {
         TLObject tLObject = null;
         if (path != null) {
-            if (!path.endsWith("attheme")) {
+            if (!path.toLowerCase().endsWith("attheme")) {
                 CountDownLatch countDownLatch = new CountDownLatch(1);
                 ArrayList<TLObject> result = new ArrayList();
                 final String str = path;
@@ -12872,7 +12872,6 @@ Caused by: java.lang.NullPointerException
         LongSparseArray<Integer> mentionCounts;
         LongSparseArray<Integer> mediaTypes;
         LongSparseArray<Long> messagesMediaIdsMap;
-        Throwable e;
         int a;
         SparseArray<LongSparseArray<Integer>> sparseArray;
         int a2;
@@ -12991,7 +12990,8 @@ Caused by: java.lang.NullPointerException
                         }
                         cursor2.dispose();
                         dialogsReadMax.put(lastMessage.dialog_id, currentMaxId);
-                    } catch (Throwable e2) {
+                    } catch (Throwable e) {
+                        Throwable e2;
                         Throwable e3 = e2;
                         messagesStorage = this;
                     }
@@ -15683,10 +15683,10 @@ Caused by: java.lang.NullPointerException
     }
 
     private void putDialogsInternal(messages_Dialogs dialogs, boolean check) {
+        MessagesStorage messagesStorage;
         Throwable e;
         Throwable e2;
         messages_Dialogs org_telegram_tgnet_TLRPC_messages_Dialogs = dialogs;
-        MessagesStorage messagesStorage;
         messages_Dialogs org_telegram_tgnet_TLRPC_messages_Dialogs2;
         MessagesStorage new_dialogMessage;
         try {

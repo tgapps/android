@@ -269,6 +269,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         public int setPhotoChecked(int index, VideoEditedInfo videoEditedInfo) {
             int num;
             ArrayList<SearchImage> array;
+            int num2;
             boolean add = true;
             int i = -1;
             if (PhotoPickerActivity.this.selectedAlbum != null) {
@@ -288,7 +289,6 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                 }
                 return -1;
             }
-            int num2;
             if (PhotoPickerActivity.this.searchResult.isEmpty() && PhotoPickerActivity.this.lastSearchString == null) {
                 array = PhotoPickerActivity.this.recentImages;
             } else {

@@ -575,6 +575,7 @@ public class GridLayoutManager extends LinearLayoutManager {
         }
         int size;
         float maxSizeInOther;
+        int horizontalInsets;
         int otherDirSpecMode2;
         int i;
         int count2 = count;
@@ -626,7 +627,6 @@ public class GridLayoutManager extends LinearLayoutManager {
         }
         pos = 0;
         while (pos < count2) {
-            int horizontalInsets;
             View view3 = r6.mSet[pos];
             if (r6.mOrientationHelper.getDecoratedMeasurement(view3) != count) {
                 int wSpec;

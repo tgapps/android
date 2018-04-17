@@ -52,7 +52,6 @@ public class WearDataLayerListenerService extends WearableListenerService {
     }
 
     public void onChannelOpened(Channel ch) {
-        DataInputStream in;
         Channel channel = ch;
         GoogleApiClient apiClient = new Builder(this).addApi(Wearable.API).build();
         if (apiClient.blockingConnect().isSuccess()) {
@@ -63,6 +62,7 @@ public class WearDataLayerListenerService extends WearableListenerService {
                 stringBuilder.append(path);
                 FileLog.d(stringBuilder.toString());
             }
+            DataInputStream in;
             DataOutputStream out;
             try {
                 final File photo;

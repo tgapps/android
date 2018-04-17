@@ -1237,7 +1237,6 @@ Caused by: java.lang.NullPointerException
 
     public boolean start(FileStreamLoadOperation stream, int streamOffset) {
         Throwable e;
-        long totalDownloadedLen;
         final FileStreamLoadOperation fileStreamLoadOperation = stream;
         final int i = streamOffset;
         if (this.currentDownloadChunkSize == 0) {
@@ -1466,6 +1465,7 @@ Caused by: java.lang.NullPointerException
             }
         } else {
             long len;
+            long totalDownloadedLen;
             int size;
             Range alreadyStarted2;
             StringBuilder stringBuilder3;

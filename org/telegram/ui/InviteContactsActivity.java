@@ -102,6 +102,7 @@ public class InviteContactsActivity extends BaseFragment implements OnClickListe
         }
 
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            int x;
             SpansContainer spansContainer = this;
             int count = getChildCount();
             int width = MeasureSpec.getSize(widthMeasureSpec);
@@ -114,7 +115,6 @@ public class InviteContactsActivity extends BaseFragment implements OnClickListe
             y = 0;
             int a = 0;
             while (a < count) {
-                int x;
                 View child = getChildAt(a);
                 if (child instanceof GroupCreateSpan) {
                     child.measure(MeasureSpec.makeMeasureSpec(width, Integer.MIN_VALUE), MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(32.0f), 1073741824));

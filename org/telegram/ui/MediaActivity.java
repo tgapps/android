@@ -1349,7 +1349,7 @@ Caused by: java.lang.NullPointerException
     L_0x0123:
         r5.setChecked(r7, r8);
     L_0x0126:
-        goto L_0x0379;
+        goto L_0x037d;
     L_0x0128:
         r9 = r23;
         r4 = r1.selectedMode;
@@ -1370,7 +1370,7 @@ Caused by: java.lang.NullPointerException
         r15 = r4;
         r17 = r6;
         r10.openPhoto(r11, r12, r13, r15, r17);
-        goto L_0x0379;
+        goto L_0x037d;
     L_0x0157:
         r4 = r1.selectedMode;
         if (r4 == r8) goto L_0x01a1;
@@ -1382,7 +1382,7 @@ Caused by: java.lang.NullPointerException
     L_0x0160:
         r4 = r1.selectedMode;
         r5 = 3;
-        if (r4 != r5) goto L_0x0379;
+        if (r4 != r5) goto L_0x037d;
     L_0x0165:
         r4 = r3.messageOwner;	 Catch:{ Exception -> 0x019a }
         r4 = r4.media;	 Catch:{ Exception -> 0x019a }
@@ -1418,20 +1418,20 @@ Caused by: java.lang.NullPointerException
         r6 = r19.getParentActivity();	 Catch:{ Exception -> 0x019a }
         org.telegram.messenger.browser.Browser.openUrl(r6, r5);	 Catch:{ Exception -> 0x019a }
     L_0x0198:
-        goto L_0x0379;
+        goto L_0x037d;
     L_0x019a:
         r0 = move-exception;
         r4 = r0;
         org.telegram.messenger.FileLog.e(r4);
-        goto L_0x0379;
+        goto L_0x037d;
     L_0x01a1:
         r4 = r2 instanceof org.telegram.ui.Cells.SharedDocumentCell;
-        if (r4 == 0) goto L_0x0379;
+        if (r4 == 0) goto L_0x037d;
     L_0x01a5:
         r4 = r2;
         r4 = (org.telegram.ui.Cells.SharedDocumentCell) r4;
         r5 = r4.isLoaded();
-        if (r5 == 0) goto L_0x0348;
+        if (r5 == 0) goto L_0x034c;
     L_0x01ae:
         r5 = r22.isMusic();
         if (r5 == 0) goto L_0x01c9;
@@ -1482,27 +1482,28 @@ Caused by: java.lang.NullPointerException
         r11 = r3.messageOwner;
         r5 = org.telegram.messenger.FileLoader.getPathToMessage(r11);
     L_0x0205:
-        if (r5 == 0) goto L_0x0347;
+        if (r5 == 0) goto L_0x034b;
     L_0x0207:
         r11 = r5.exists();
-        if (r11 == 0) goto L_0x0347;
+        if (r11 == 0) goto L_0x034b;
     L_0x020d:
         r11 = r5.getName();
+        r11 = r11.toLowerCase();
         r12 = "attheme";
         r11 = r11.endsWith(r12);
         r12 = 2131494028; // 0x7f0c048c float:1.8611553E38 double:1.0530979736E-314;
         r13 = 2131492981; // 0x7f0c0075 float:1.860943E38 double:1.0530974563E-314;
-        if (r11 == 0) goto L_0x0262;
-    L_0x021f:
+        if (r11 == 0) goto L_0x0266;
+    L_0x0223:
         r7 = r22.getDocumentName();
         r7 = org.telegram.ui.ActionBar.Theme.applyThemeFile(r5, r7, r8);
-        if (r7 == 0) goto L_0x0232;
-    L_0x0229:
+        if (r7 == 0) goto L_0x0236;
+    L_0x022d:
         r6 = new org.telegram.ui.ThemePreviewActivity;
         r6.<init>(r5, r7);
         r1.presentFragment(r6);
-        goto L_0x0260;
-    L_0x0232:
+        goto L_0x0264;
+    L_0x0236:
         r8 = new org.telegram.ui.ActionBar.AlertDialog$Builder;
         r11 = r19.getParentActivity();
         r8.<init>(r11);
@@ -1518,104 +1519,104 @@ Caused by: java.lang.NullPointerException
         r8.setPositiveButton(r11, r6);
         r6 = r8.create();
         r1.showDialog(r6);
-    L_0x0260:
-        goto L_0x0347;
-    L_0x0262:
+    L_0x0264:
+        goto L_0x034b;
+    L_0x0266:
         r11 = r6;
-        r14 = new android.content.Intent;	 Catch:{ Exception -> 0x02fd }
-        r15 = "android.intent.action.VIEW";	 Catch:{ Exception -> 0x02fd }
-        r14.<init>(r15);	 Catch:{ Exception -> 0x02fd }
-        r14.setFlags(r8);	 Catch:{ Exception -> 0x02fd }
-        r15 = android.webkit.MimeTypeMap.getSingleton();	 Catch:{ Exception -> 0x02fd }
-        r7 = 46;	 Catch:{ Exception -> 0x02fd }
-        r7 = r10.lastIndexOf(r7);	 Catch:{ Exception -> 0x02fd }
-        r8 = -1;	 Catch:{ Exception -> 0x02fd }
-        if (r7 == r8) goto L_0x029b;	 Catch:{ Exception -> 0x02fd }
-    L_0x027a:
-        r8 = r7 + 1;	 Catch:{ Exception -> 0x02fd }
-        r8 = r10.substring(r8);	 Catch:{ Exception -> 0x02fd }
-        r6 = r8.toLowerCase();	 Catch:{ Exception -> 0x02fd }
-        r6 = r15.getMimeTypeFromExtension(r6);	 Catch:{ Exception -> 0x02fd }
-        r11 = r6;	 Catch:{ Exception -> 0x02fd }
-        if (r11 != 0) goto L_0x029b;	 Catch:{ Exception -> 0x02fd }
-    L_0x028b:
-        r6 = r22.getDocument();	 Catch:{ Exception -> 0x02fd }
-        r6 = r6.mime_type;	 Catch:{ Exception -> 0x02fd }
-        r11 = r6;	 Catch:{ Exception -> 0x02fd }
-        if (r11 == 0) goto L_0x029a;	 Catch:{ Exception -> 0x02fd }
-    L_0x0294:
-        r6 = r11.length();	 Catch:{ Exception -> 0x02fd }
-        if (r6 != 0) goto L_0x029b;	 Catch:{ Exception -> 0x02fd }
-    L_0x029a:
-        r11 = 0;	 Catch:{ Exception -> 0x02fd }
-    L_0x029b:
-        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x02fd }
-        r8 = 24;	 Catch:{ Exception -> 0x02fd }
-        if (r6 < r8) goto L_0x02b5;	 Catch:{ Exception -> 0x02fd }
-    L_0x02a1:
-        r6 = r19.getParentActivity();	 Catch:{ Exception -> 0x02fd }
-        r12 = "org.telegram.messenger.beta.provider";	 Catch:{ Exception -> 0x02fd }
-        r6 = android.support.v4.content.FileProvider.getUriForFile(r6, r12, r5);	 Catch:{ Exception -> 0x02fd }
-        if (r11 == 0) goto L_0x02af;	 Catch:{ Exception -> 0x02fd }
-    L_0x02ad:
-        r12 = r11;	 Catch:{ Exception -> 0x02fd }
-        goto L_0x02b1;	 Catch:{ Exception -> 0x02fd }
-    L_0x02af:
-        r12 = "text/plain";	 Catch:{ Exception -> 0x02fd }
+        r14 = new android.content.Intent;	 Catch:{ Exception -> 0x0301 }
+        r15 = "android.intent.action.VIEW";	 Catch:{ Exception -> 0x0301 }
+        r14.<init>(r15);	 Catch:{ Exception -> 0x0301 }
+        r14.setFlags(r8);	 Catch:{ Exception -> 0x0301 }
+        r15 = android.webkit.MimeTypeMap.getSingleton();	 Catch:{ Exception -> 0x0301 }
+        r7 = 46;	 Catch:{ Exception -> 0x0301 }
+        r7 = r10.lastIndexOf(r7);	 Catch:{ Exception -> 0x0301 }
+        r8 = -1;	 Catch:{ Exception -> 0x0301 }
+        if (r7 == r8) goto L_0x029f;	 Catch:{ Exception -> 0x0301 }
+    L_0x027e:
+        r8 = r7 + 1;	 Catch:{ Exception -> 0x0301 }
+        r8 = r10.substring(r8);	 Catch:{ Exception -> 0x0301 }
+        r6 = r8.toLowerCase();	 Catch:{ Exception -> 0x0301 }
+        r6 = r15.getMimeTypeFromExtension(r6);	 Catch:{ Exception -> 0x0301 }
+        r11 = r6;	 Catch:{ Exception -> 0x0301 }
+        if (r11 != 0) goto L_0x029f;	 Catch:{ Exception -> 0x0301 }
+    L_0x028f:
+        r6 = r22.getDocument();	 Catch:{ Exception -> 0x0301 }
+        r6 = r6.mime_type;	 Catch:{ Exception -> 0x0301 }
+        r11 = r6;	 Catch:{ Exception -> 0x0301 }
+        if (r11 == 0) goto L_0x029e;	 Catch:{ Exception -> 0x0301 }
+    L_0x0298:
+        r6 = r11.length();	 Catch:{ Exception -> 0x0301 }
+        if (r6 != 0) goto L_0x029f;	 Catch:{ Exception -> 0x0301 }
+    L_0x029e:
+        r11 = 0;	 Catch:{ Exception -> 0x0301 }
+    L_0x029f:
+        r6 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0301 }
+        r8 = 24;	 Catch:{ Exception -> 0x0301 }
+        if (r6 < r8) goto L_0x02b9;	 Catch:{ Exception -> 0x0301 }
+    L_0x02a5:
+        r6 = r19.getParentActivity();	 Catch:{ Exception -> 0x0301 }
+        r12 = "org.telegram.messenger.beta.provider";	 Catch:{ Exception -> 0x0301 }
+        r6 = android.support.v4.content.FileProvider.getUriForFile(r6, r12, r5);	 Catch:{ Exception -> 0x0301 }
+        if (r11 == 0) goto L_0x02b3;	 Catch:{ Exception -> 0x0301 }
     L_0x02b1:
-        r14.setDataAndType(r6, r12);	 Catch:{ Exception -> 0x02fd }
-        goto L_0x02c2;	 Catch:{ Exception -> 0x02fd }
+        r12 = r11;	 Catch:{ Exception -> 0x0301 }
+        goto L_0x02b5;	 Catch:{ Exception -> 0x0301 }
+    L_0x02b3:
+        r12 = "text/plain";	 Catch:{ Exception -> 0x0301 }
     L_0x02b5:
-        r6 = android.net.Uri.fromFile(r5);	 Catch:{ Exception -> 0x02fd }
-        if (r11 == 0) goto L_0x02bd;	 Catch:{ Exception -> 0x02fd }
-    L_0x02bb:
-        r12 = r11;	 Catch:{ Exception -> 0x02fd }
-        goto L_0x02bf;	 Catch:{ Exception -> 0x02fd }
-    L_0x02bd:
-        r12 = "text/plain";	 Catch:{ Exception -> 0x02fd }
+        r14.setDataAndType(r6, r12);	 Catch:{ Exception -> 0x0301 }
+        goto L_0x02c6;	 Catch:{ Exception -> 0x0301 }
+    L_0x02b9:
+        r6 = android.net.Uri.fromFile(r5);	 Catch:{ Exception -> 0x0301 }
+        if (r11 == 0) goto L_0x02c1;	 Catch:{ Exception -> 0x0301 }
     L_0x02bf:
-        r14.setDataAndType(r6, r12);	 Catch:{ Exception -> 0x02fd }
-    L_0x02c2:
-        r6 = 500; // 0x1f4 float:7.0E-43 double:2.47E-321;
-        if (r11 == 0) goto L_0x02f5;
+        r12 = r11;	 Catch:{ Exception -> 0x0301 }
+        goto L_0x02c3;	 Catch:{ Exception -> 0x0301 }
+    L_0x02c1:
+        r12 = "text/plain";	 Catch:{ Exception -> 0x0301 }
+    L_0x02c3:
+        r14.setDataAndType(r6, r12);	 Catch:{ Exception -> 0x0301 }
     L_0x02c6:
-        r12 = r19.getParentActivity();	 Catch:{ Exception -> 0x02ce }
-        r12.startActivityForResult(r14, r6);	 Catch:{ Exception -> 0x02ce }
-    L_0x02cd:
-        goto L_0x02fc;
-    L_0x02ce:
+        r6 = 500; // 0x1f4 float:7.0E-43 double:2.47E-321;
+        if (r11 == 0) goto L_0x02f9;
+    L_0x02ca:
+        r12 = r19.getParentActivity();	 Catch:{ Exception -> 0x02d2 }
+        r12.startActivityForResult(r14, r6);	 Catch:{ Exception -> 0x02d2 }
+    L_0x02d1:
+        goto L_0x0300;
+    L_0x02d2:
         r0 = move-exception;
         r12 = r0;
-        r13 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x02fd }
-        if (r13 < r8) goto L_0x02e4;	 Catch:{ Exception -> 0x02fd }
-    L_0x02d4:
-        r8 = r19.getParentActivity();	 Catch:{ Exception -> 0x02fd }
-        r13 = "org.telegram.messenger.beta.provider";	 Catch:{ Exception -> 0x02fd }
-        r8 = android.support.v4.content.FileProvider.getUriForFile(r8, r13, r5);	 Catch:{ Exception -> 0x02fd }
-        r13 = "text/plain";	 Catch:{ Exception -> 0x02fd }
-        r14.setDataAndType(r8, r13);	 Catch:{ Exception -> 0x02fd }
-        goto L_0x02ed;	 Catch:{ Exception -> 0x02fd }
-    L_0x02e4:
-        r8 = android.net.Uri.fromFile(r5);	 Catch:{ Exception -> 0x02fd }
-        r13 = "text/plain";	 Catch:{ Exception -> 0x02fd }
-        r14.setDataAndType(r8, r13);	 Catch:{ Exception -> 0x02fd }
-    L_0x02ed:
-        r8 = r19.getParentActivity();	 Catch:{ Exception -> 0x02fd }
-        r8.startActivityForResult(r14, r6);	 Catch:{ Exception -> 0x02fd }
-        goto L_0x02cd;	 Catch:{ Exception -> 0x02fd }
-    L_0x02f5:
-        r8 = r19.getParentActivity();	 Catch:{ Exception -> 0x02fd }
-        r8.startActivityForResult(r14, r6);	 Catch:{ Exception -> 0x02fd }
-    L_0x02fc:
-        goto L_0x0347;
-    L_0x02fd:
+        r13 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0301 }
+        if (r13 < r8) goto L_0x02e8;	 Catch:{ Exception -> 0x0301 }
+    L_0x02d8:
+        r8 = r19.getParentActivity();	 Catch:{ Exception -> 0x0301 }
+        r13 = "org.telegram.messenger.beta.provider";	 Catch:{ Exception -> 0x0301 }
+        r8 = android.support.v4.content.FileProvider.getUriForFile(r8, r13, r5);	 Catch:{ Exception -> 0x0301 }
+        r13 = "text/plain";	 Catch:{ Exception -> 0x0301 }
+        r14.setDataAndType(r8, r13);	 Catch:{ Exception -> 0x0301 }
+        goto L_0x02f1;	 Catch:{ Exception -> 0x0301 }
+    L_0x02e8:
+        r8 = android.net.Uri.fromFile(r5);	 Catch:{ Exception -> 0x0301 }
+        r13 = "text/plain";	 Catch:{ Exception -> 0x0301 }
+        r14.setDataAndType(r8, r13);	 Catch:{ Exception -> 0x0301 }
+    L_0x02f1:
+        r8 = r19.getParentActivity();	 Catch:{ Exception -> 0x0301 }
+        r8.startActivityForResult(r14, r6);	 Catch:{ Exception -> 0x0301 }
+        goto L_0x02d1;	 Catch:{ Exception -> 0x0301 }
+    L_0x02f9:
+        r8 = r19.getParentActivity();	 Catch:{ Exception -> 0x0301 }
+        r8.startActivityForResult(r14, r6);	 Catch:{ Exception -> 0x0301 }
+    L_0x0300:
+        goto L_0x034b;
+    L_0x0301:
         r0 = move-exception;
         r6 = r0;
         r7 = r19.getParentActivity();
-        if (r7 != 0) goto L_0x0306;
-    L_0x0305:
+        if (r7 != 0) goto L_0x030a;
+    L_0x0309:
         return;
-    L_0x0306:
+    L_0x030a:
         r7 = new org.telegram.ui.ActionBar.AlertDialog$Builder;
         r8 = r19.getParentActivity();
         r7.<init>(r8);
@@ -1640,11 +1641,11 @@ Caused by: java.lang.NullPointerException
         r7.setMessage(r8);
         r8 = r7.create();
         r1.showDialog(r8);
-    L_0x0347:
-        goto L_0x0378;
-    L_0x0348:
+    L_0x034b:
+        goto L_0x037c;
+    L_0x034c:
         r5 = r4.isLoading();
-        if (r5 != 0) goto L_0x0364;
+        if (r5 != 0) goto L_0x0368;
         r5 = r1.currentAccount;
         r5 = org.telegram.messenger.FileLoader.getInstance(r5);
         r6 = r4.getMessage();
@@ -1652,14 +1653,14 @@ Caused by: java.lang.NullPointerException
         r7 = 0;
         r5.loadFile(r6, r7, r7);
         r4.updateFileExistIcon();
-        goto L_0x0378;
+        goto L_0x037c;
         r5 = r1.currentAccount;
         r5 = org.telegram.messenger.FileLoader.getInstance(r5);
         r6 = r4.getMessage();
         r6 = r6.getDocument();
         r5.cancelLoadFile(r6);
         r4.updateFileExistIcon();
-    L_0x0379:
+    L_0x037d:
         return;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.MediaActivity.onItemClick(int, android.view.View, org.telegram.messenger.MessageObject, int):void");

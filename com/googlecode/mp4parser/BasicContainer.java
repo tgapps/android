@@ -198,11 +198,11 @@ public class BasicContainer implements Container, Closeable, Iterator<Box> {
 
     public ByteBuffer getByteBuffer(long rangeStart, long size) throws IOException {
         long j = size;
-        BasicContainer basicContainer;
         if (this.dataSource != null) {
             ByteBuffer map;
-            synchronized (basicContainer.dataSource) {
+            synchronized (r1.dataSource) {
                 try {
+                    BasicContainer basicContainer;
                     map = basicContainer.dataSource.map(basicContainer.startPosition + rangeStart, j);
                 } catch (Throwable th) {
                     Throwable th2 = th;

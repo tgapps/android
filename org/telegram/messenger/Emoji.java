@@ -474,6 +474,7 @@ Caused by: java.lang.NullPointerException
 
     public static CharSequence replaceEmoji(CharSequence cs, FontMetricsInt fontMetrics, int size, boolean createNew, int[] emojiOnly) {
         Throwable e;
+        int emojiCount;
         CharSequence charSequence = cs;
         if (!(SharedConfig.useSystemEmoji || charSequence == null)) {
             if (cs.length() != 0) {
@@ -491,14 +492,13 @@ Caused by: java.lang.NullPointerException
                 int length = cs.length();
                 boolean doneEmoji = false;
                 int[] emojiOnly2 = emojiOnly;
-                int emojiCount = 0;
+                int emojiCount2 = 0;
                 long buf = 0;
                 int i = 0;
                 while (i < length) {
                     long j;
                     char c2;
                     int a;
-                    int emojiCount2;
                     char c = charSequence.charAt(i);
                     if ((c >= '?' && c <= '?') || (buf != 0 && (buf & -4294967296L) == 0 && (buf & 65535) == 55356 && c >= '?' && c <= '?')) {
                         if (startIndex == -1) {
@@ -626,7 +626,7 @@ Caused by: java.lang.NullPointerException
                             j = buf;
                             try {
                                 s.setSpan(new EmojiSpan(drawable, 0, size, fontMetrics), startIndex, startIndex + startLength, 33);
-                                emojiCount++;
+                                emojiCount2++;
                             } catch (Throwable e2222) {
                                 e = e2222;
                             }
@@ -639,25 +639,25 @@ Caused by: java.lang.NullPointerException
                         a = 0;
                         emojiCode.setLength(0);
                         doneEmoji = false;
-                        emojiCount2 = emojiCount;
+                        emojiCount = emojiCount2;
                     } else {
                         j = buf;
                         a = 0;
                         buf = size;
-                        emojiCount2 = emojiCount;
+                        emojiCount = emojiCount2;
                     }
                     try {
-                        if (VERSION.SDK_INT < 23 && emojiCount2 >= 50) {
-                            emojiCount = emojiCount2;
+                        if (VERSION.SDK_INT < 23 && emojiCount >= 50) {
+                            emojiCount2 = emojiCount;
                             break;
                         }
                         i++;
                         int i3 = a;
-                        emojiCount = emojiCount2;
+                        emojiCount2 = emojiCount;
                         buf = j;
                     } catch (Throwable e22222) {
                         e = e22222;
-                        emojiCount = emojiCount2;
+                        emojiCount2 = emojiCount;
                     }
                 }
                 buf = size;
@@ -741,11 +741,11 @@ Caused by: java.lang.NullPointerException
     }
 
     public static void loadRecentEmoji() {
-        Throwable e;
-        SharedPreferences preferences;
-        String str;
         String[] args;
+        Throwable e;
         if (!recentEmojiLoaded) {
+            SharedPreferences preferences;
+            String str;
             String[] args2;
             int a;
             recentEmojiLoaded = true;
@@ -759,11 +759,11 @@ Caused by: java.lang.NullPointerException
                     if (str2 != null) {
                         try {
                             if (str2.length() > 0) {
-                                args2 = str2.split(",");
-                                int length = args2.length;
+                                args = str2.split(",");
+                                int length = args.length;
                                 int i = 0;
                                 while (i < length) {
-                                    String[] args22 = args2[i].split("=");
+                                    String[] args22 = args[i].split("=");
                                     long value = Utilities.parseLong(args22[0]).longValue();
                                     StringBuilder string = new StringBuilder();
                                     SharedPreferences preferences3 = preferences2;
@@ -795,10 +795,10 @@ Caused by: java.lang.NullPointerException
                             e = e22;
                             FileLog.e(e);
                             str = preferences.getString(TtmlNode.ATTR_TTS_COLOR, TtmlNode.ANONYMOUS_REGION_ID);
-                            args = str.split(",");
-                            for (String arg : args) {
-                                args2 = arg.split("=");
-                                emojiColor.put(args2[0], args2[1]);
+                            args2 = str.split(",");
+                            for (String arg : args2) {
+                                args = arg.split("=");
+                                emojiColor.put(args[0], args[1]);
                             }
                         }
                     }
@@ -810,10 +810,10 @@ Caused by: java.lang.NullPointerException
                         e = e222;
                         FileLog.e(e);
                         str = preferences.getString(TtmlNode.ATTR_TTS_COLOR, TtmlNode.ANONYMOUS_REGION_ID);
-                        args = str.split(",");
-                        while (a < args.length) {
-                            args2 = arg.split("=");
-                            emojiColor.put(args2[0], args2[1]);
+                        args2 = str.split(",");
+                        while (a < args2.length) {
+                            args = arg.split("=");
+                            emojiColor.put(args[0], args[1]);
                         }
                     }
                 }
@@ -839,19 +839,19 @@ Caused by: java.lang.NullPointerException
                 e = e2222;
                 FileLog.e(e);
                 str = preferences.getString(TtmlNode.ATTR_TTS_COLOR, TtmlNode.ANONYMOUS_REGION_ID);
-                args = str.split(",");
-                while (a < args.length) {
-                    args2 = arg.split("=");
-                    emojiColor.put(args2[0], args2[1]);
+                args2 = str.split(",");
+                while (a < args2.length) {
+                    args = arg.split("=");
+                    emojiColor.put(args[0], args[1]);
                 }
             }
             try {
                 str = preferences.getString(TtmlNode.ATTR_TTS_COLOR, TtmlNode.ANONYMOUS_REGION_ID);
                 if (str != null && str.length() > 0) {
-                    args = str.split(",");
-                    while (a < args.length) {
-                        args2 = arg.split("=");
-                        emojiColor.put(args2[0], args2[1]);
+                    args2 = str.split(",");
+                    while (a < args2.length) {
+                        args = arg.split("=");
+                        emojiColor.put(args[0], args[1]);
                     }
                 }
             } catch (Throwable e22222) {

@@ -3102,7 +3102,6 @@ public class LoginActivity extends BaseFragment {
 
     public void setPage(int page, boolean animated, Bundle params, boolean back) {
         int i;
-        final SlideView newView;
         if (page != 3) {
             if (page != 8) {
                 if (page == 0) {
@@ -3127,6 +3126,7 @@ public class LoginActivity extends BaseFragment {
                     this.views[page].onShow();
                     return;
                 }
+                final SlideView newView;
                 final SlideView outView = this.views[this.currentViewNum];
                 newView = this.views[page];
                 this.currentViewNum = page;

@@ -30,12 +30,12 @@ public class ProcessUtils {
 
     @Nullable
     private static String zzl(int i) {
+        Closeable zzm;
         Throwable th;
         Closeable closeable = null;
         if (i <= 0) {
             return null;
         }
-        Closeable zzm;
         try {
             StringBuilder stringBuilder = new StringBuilder(25);
             stringBuilder.append("/proc/");

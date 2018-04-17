@@ -6976,6 +6976,7 @@ Caused by: java.lang.NullPointerException
     }
 
     private boolean checkLayoutForLinks(MotionEvent event, View parentView, StaticLayout layout, int layoutX, int layoutY) {
+        boolean z;
         Throwable e;
         ArticleViewer articleViewer = this;
         View view = parentView;
@@ -6985,7 +6986,6 @@ Caused by: java.lang.NullPointerException
         if (view != null) {
             if (staticLayout != null) {
                 boolean removeLink;
-                boolean z;
                 int x = (int) event.getX();
                 int y = (int) event.getY();
                 boolean removeLink2 = false;

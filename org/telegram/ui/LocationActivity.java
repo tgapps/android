@@ -666,10 +666,9 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
     }
 
     private Bitmap createUserBitmap(LiveLocation liveLocation) {
-        Bitmap result;
         Throwable e;
         LiveLocation liveLocation2 = liveLocation;
-        Bitmap result2 = null;
+        Bitmap result = null;
         FileLocation photo = null;
         try {
             if (liveLocation2.user != null && liveLocation2.user.photo != null) {
@@ -677,10 +676,11 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             } else if (!(liveLocation2.chat == null || liveLocation2.chat.photo == null)) {
                 photo = liveLocation2.chat.photo.photo_small;
             }
-            result2 = Bitmap.createBitmap(AndroidUtilities.dp(62.0f), AndroidUtilities.dp(76.0f), Config.ARGB_8888);
+            result = Bitmap.createBitmap(AndroidUtilities.dp(62.0f), AndroidUtilities.dp(76.0f), Config.ARGB_8888);
+            Bitmap result2;
             try {
-                result2.eraseColor(0);
-                Canvas canvas = new Canvas(result2);
+                result.eraseColor(0);
+                Canvas canvas = new Canvas(result);
                 Drawable drawable = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.livepin);
                 drawable.setBounds(0, 0, AndroidUtilities.dp(62.0f), AndroidUtilities.dp(76.0f));
                 drawable.draw(canvas);
@@ -697,20 +697,20 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                         matrix.postScale(scale, scale);
                         roundPaint.setShader(shader);
                         shader.setLocalMatrix(matrix);
-                        result = result2;
+                        result2 = result;
                         try {
                             bitmapRect.set((float) AndroidUtilities.dp(5.0f), (float) AndroidUtilities.dp(5.0f), (float) AndroidUtilities.dp(57.0f), (float) AndroidUtilities.dp(57.0f));
                             canvas.drawRoundRect(bitmapRect, (float) AndroidUtilities.dp(26.0f), (float) AndroidUtilities.dp(26.0f), roundPaint);
                         } catch (Throwable th) {
                             e = th;
-                            result2 = result;
+                            result = result2;
                             FileLog.e(e);
-                            return result2;
+                            return result;
                         }
                     }
-                    result = result2;
+                    result2 = result;
                 } else {
-                    result = result2;
+                    result2 = result;
                     AvatarDrawable avatarDrawable = new AvatarDrawable();
                     if (liveLocation2.user != null) {
                         avatarDrawable.setInfo(liveLocation2.user);
@@ -726,17 +726,17 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                     canvas.setBitmap(null);
                 } catch (Exception e2) {
                 }
-                return result;
+                return result2;
             } catch (Throwable th2) {
-                result = result2;
+                result2 = result;
                 e = th2;
                 FileLog.e(e);
-                return result2;
+                return result;
             }
         } catch (Throwable th22) {
             e = th22;
             FileLog.e(e);
-            return result2;
+            return result;
         }
     }
 

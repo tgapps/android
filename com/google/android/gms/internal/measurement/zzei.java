@@ -490,6 +490,7 @@ final class zzei extends zzhk {
     }
 
     public final zzej zza(long j, String str, boolean z, boolean z2, boolean z3, boolean z4, boolean z5) {
+        Cursor query;
         Object obj;
         Cursor cursor;
         Throwable th;
@@ -498,7 +499,6 @@ final class zzei extends zzhk {
         zzch();
         String[] strArr = new String[]{str};
         zzej com_google_android_gms_internal_measurement_zzej = new zzej();
-        Cursor query;
         try {
             SQLiteDatabase writableDatabase = getWritableDatabase();
             String[] strArr2 = new String[]{str};
@@ -1154,12 +1154,12 @@ final class zzei extends zzhk {
     }
 
     public final byte[] zzaz(String str) {
+        Cursor query;
         Object e;
         Throwable th;
         Preconditions.checkNotEmpty(str);
         zzab();
         zzch();
-        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"remote_config"}, "app_id=?", new String[]{str}, null, null, null);
             try {
@@ -1518,6 +1518,7 @@ final class zzei extends zzhk {
     }
 
     public final zzju zzg(String str, String str2) {
+        Cursor query;
         SQLiteException e;
         Object obj;
         Throwable th;
@@ -1528,7 +1529,6 @@ final class zzei extends zzhk {
         Preconditions.checkNotEmpty(str2);
         zzab();
         zzch();
-        Cursor query;
         try {
             query = getWritableDatabase().query("user_attributes", new String[]{"set_timestamp", "value", TtmlNode.ATTR_TTS_ORIGIN}, "app_id=? and name=?", new String[]{str, str3}, null, null, null);
             try {

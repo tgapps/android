@@ -557,11 +557,11 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
         }
 
         private void interpretExpression(String expr, HashMap<String, String> localVars, int allowRecursion) throws Exception {
-            String func;
             expr = expr.trim();
             if (!TextUtils.isEmpty(expr)) {
                 int parens_count;
                 String remaining_expr;
+                String func;
                 String index;
                 int a = 0;
                 if (expr.charAt(0) == '(') {
@@ -2616,10 +2616,11 @@ Caused by: java.lang.NullPointerException
 
     public boolean loadVideo(String url, Photo thumb, String originalUrl, boolean autoplay) {
         String str;
-        String t;
         Throwable e;
         Throwable youtubeId;
         Matcher matcher;
+        Matcher matcher2;
+        String id;
         PhotoSize photoSize;
         YoutubeVideoTask task;
         VimeoVideoTask task2;
@@ -2645,8 +2646,7 @@ Caused by: java.lang.NullPointerException
         } else if (str2.endsWith(".mp4")) {
             mp4File = str2;
         } else {
-            Matcher matcher2;
-            String id;
+            String t;
             if (originalUrl != null) {
                 try {
                     Uri uri = Uri.parse(originalUrl);
@@ -2660,10 +2660,10 @@ Caused by: java.lang.NullPointerException
                             youtubeId = e;
                             try {
                                 FileLog.e(youtubeId);
-                                matcher2 = youtubeIdRegex.matcher(str2);
+                                matcher = youtubeIdRegex.matcher(str2);
                                 t = null;
-                                if (matcher2.find()) {
-                                    t = matcher2.group(1);
+                                if (matcher.find()) {
+                                    t = matcher.group(1);
                                 }
                                 if (t != null) {
                                     str = t;
@@ -2674,10 +2674,10 @@ Caused by: java.lang.NullPointerException
                             youtubeId2 = str;
                             if (youtubeId2 == null) {
                                 try {
-                                    matcher = vimeoIdRegex.matcher(str2);
+                                    matcher2 = vimeoIdRegex.matcher(str2);
                                     id = null;
-                                    if (matcher.find()) {
-                                        id = matcher.group(3);
+                                    if (matcher2.find()) {
+                                        id = matcher2.group(3);
                                     }
                                     if (id != null) {
                                         vimeoId = id;
@@ -2688,10 +2688,10 @@ Caused by: java.lang.NullPointerException
                             }
                             if (vimeoId == null) {
                                 try {
-                                    matcher = aparatIdRegex.matcher(str2);
+                                    matcher2 = aparatIdRegex.matcher(str2);
                                     id = null;
-                                    if (matcher.find()) {
-                                        id = matcher.group(1);
+                                    if (matcher2.find()) {
+                                        id = matcher2.group(1);
                                     }
                                     if (id != null) {
                                         aparatId = id;
@@ -2702,10 +2702,10 @@ Caused by: java.lang.NullPointerException
                             }
                             if (aparatId == null) {
                                 try {
-                                    matcher = twitchClipIdRegex.matcher(str2);
+                                    matcher2 = twitchClipIdRegex.matcher(str2);
                                     id = null;
-                                    if (matcher.find()) {
-                                        id = matcher.group(1);
+                                    if (matcher2.find()) {
+                                        id = matcher2.group(1);
                                     }
                                     if (id != null) {
                                         twitchClipId = id;
@@ -2716,10 +2716,10 @@ Caused by: java.lang.NullPointerException
                             }
                             if (twitchClipId == null) {
                                 try {
-                                    matcher = twitchStreamIdRegex.matcher(str2);
+                                    matcher2 = twitchStreamIdRegex.matcher(str2);
                                     id = null;
-                                    if (matcher.find()) {
-                                        id = matcher.group(1);
+                                    if (matcher2.find()) {
+                                        id = matcher2.group(1);
                                     }
                                     if (id != null) {
                                         twitchStreamId = id;
@@ -2730,10 +2730,10 @@ Caused by: java.lang.NullPointerException
                             }
                             if (twitchStreamId == null) {
                                 try {
-                                    matcher = coubIdRegex.matcher(str2);
+                                    matcher2 = coubIdRegex.matcher(str2);
                                     id = null;
-                                    if (matcher.find()) {
-                                        id = matcher.group(1);
+                                    if (matcher2.find()) {
+                                        id = matcher2.group(1);
                                     }
                                     if (id != null) {
                                         coubId = id;
@@ -2842,60 +2842,60 @@ Caused by: java.lang.NullPointerException
                             e322222 = e4;
                             youtubeId = e322222;
                             FileLog.e(youtubeId);
-                            matcher2 = youtubeIdRegex.matcher(str2);
+                            matcher = youtubeIdRegex.matcher(str2);
                             t = null;
-                            if (matcher2.find()) {
-                                t = matcher2.group(1);
+                            if (matcher.find()) {
+                                t = matcher.group(1);
                             }
                             if (t != null) {
                                 str = t;
                             }
                             youtubeId2 = str;
                             if (youtubeId2 == null) {
-                                matcher = vimeoIdRegex.matcher(str2);
+                                matcher2 = vimeoIdRegex.matcher(str2);
                                 id = null;
-                                if (matcher.find()) {
-                                    id = matcher.group(3);
+                                if (matcher2.find()) {
+                                    id = matcher2.group(3);
                                 }
                                 if (id != null) {
                                     vimeoId = id;
                                 }
                             }
                             if (vimeoId == null) {
-                                matcher = aparatIdRegex.matcher(str2);
+                                matcher2 = aparatIdRegex.matcher(str2);
                                 id = null;
-                                if (matcher.find()) {
-                                    id = matcher.group(1);
+                                if (matcher2.find()) {
+                                    id = matcher2.group(1);
                                 }
                                 if (id != null) {
                                     aparatId = id;
                                 }
                             }
                             if (aparatId == null) {
-                                matcher = twitchClipIdRegex.matcher(str2);
+                                matcher2 = twitchClipIdRegex.matcher(str2);
                                 id = null;
-                                if (matcher.find()) {
-                                    id = matcher.group(1);
+                                if (matcher2.find()) {
+                                    id = matcher2.group(1);
                                 }
                                 if (id != null) {
                                     twitchClipId = id;
                                 }
                             }
                             if (twitchClipId == null) {
-                                matcher = twitchStreamIdRegex.matcher(str2);
+                                matcher2 = twitchStreamIdRegex.matcher(str2);
                                 id = null;
-                                if (matcher.find()) {
-                                    id = matcher.group(1);
+                                if (matcher2.find()) {
+                                    id = matcher2.group(1);
                                 }
                                 if (id != null) {
                                     twitchStreamId = id;
                                 }
                             }
                             if (twitchStreamId == null) {
-                                matcher = coubIdRegex.matcher(str2);
+                                matcher2 = coubIdRegex.matcher(str2);
                                 id = null;
-                                if (matcher.find()) {
-                                    id = matcher.group(1);
+                                if (matcher2.find()) {
+                                    id = matcher2.group(1);
                                 }
                                 if (id != null) {
                                     coubId = id;
@@ -3001,60 +3001,60 @@ Caused by: java.lang.NullPointerException
                     str = null;
                     youtubeId = e3222222;
                     FileLog.e(youtubeId);
-                    matcher2 = youtubeIdRegex.matcher(str2);
+                    matcher = youtubeIdRegex.matcher(str2);
                     t = null;
-                    if (matcher2.find()) {
-                        t = matcher2.group(1);
+                    if (matcher.find()) {
+                        t = matcher.group(1);
                     }
                     if (t != null) {
                         str = t;
                     }
                     youtubeId2 = str;
                     if (youtubeId2 == null) {
-                        matcher = vimeoIdRegex.matcher(str2);
+                        matcher2 = vimeoIdRegex.matcher(str2);
                         id = null;
-                        if (matcher.find()) {
-                            id = matcher.group(3);
+                        if (matcher2.find()) {
+                            id = matcher2.group(3);
                         }
                         if (id != null) {
                             vimeoId = id;
                         }
                     }
                     if (vimeoId == null) {
-                        matcher = aparatIdRegex.matcher(str2);
+                        matcher2 = aparatIdRegex.matcher(str2);
                         id = null;
-                        if (matcher.find()) {
-                            id = matcher.group(1);
+                        if (matcher2.find()) {
+                            id = matcher2.group(1);
                         }
                         if (id != null) {
                             aparatId = id;
                         }
                     }
                     if (aparatId == null) {
-                        matcher = twitchClipIdRegex.matcher(str2);
+                        matcher2 = twitchClipIdRegex.matcher(str2);
                         id = null;
-                        if (matcher.find()) {
-                            id = matcher.group(1);
+                        if (matcher2.find()) {
+                            id = matcher2.group(1);
                         }
                         if (id != null) {
                             twitchClipId = id;
                         }
                     }
                     if (twitchClipId == null) {
-                        matcher = twitchStreamIdRegex.matcher(str2);
+                        matcher2 = twitchStreamIdRegex.matcher(str2);
                         id = null;
-                        if (matcher.find()) {
-                            id = matcher.group(1);
+                        if (matcher2.find()) {
+                            id = matcher2.group(1);
                         }
                         if (id != null) {
                             twitchStreamId = id;
                         }
                     }
                     if (twitchStreamId == null) {
-                        matcher = coubIdRegex.matcher(str2);
+                        matcher2 = coubIdRegex.matcher(str2);
                         id = null;
-                        if (matcher.find()) {
-                            id = matcher.group(1);
+                        if (matcher2.find()) {
+                            id = matcher2.group(1);
                         }
                         if (id != null) {
                             coubId = id;
@@ -3154,60 +3154,60 @@ Caused by: java.lang.NullPointerException
                 }
             }
             str = null;
-            matcher2 = youtubeIdRegex.matcher(str2);
+            matcher = youtubeIdRegex.matcher(str2);
             t = null;
-            if (matcher2.find()) {
-                t = matcher2.group(1);
+            if (matcher.find()) {
+                t = matcher.group(1);
             }
             if (t != null) {
                 str = t;
             }
             youtubeId2 = str;
             if (youtubeId2 == null) {
-                matcher = vimeoIdRegex.matcher(str2);
+                matcher2 = vimeoIdRegex.matcher(str2);
                 id = null;
-                if (matcher.find()) {
-                    id = matcher.group(3);
+                if (matcher2.find()) {
+                    id = matcher2.group(3);
                 }
                 if (id != null) {
                     vimeoId = id;
                 }
             }
             if (vimeoId == null) {
-                matcher = aparatIdRegex.matcher(str2);
+                matcher2 = aparatIdRegex.matcher(str2);
                 id = null;
-                if (matcher.find()) {
-                    id = matcher.group(1);
+                if (matcher2.find()) {
+                    id = matcher2.group(1);
                 }
                 if (id != null) {
                     aparatId = id;
                 }
             }
             if (aparatId == null) {
-                matcher = twitchClipIdRegex.matcher(str2);
+                matcher2 = twitchClipIdRegex.matcher(str2);
                 id = null;
-                if (matcher.find()) {
-                    id = matcher.group(1);
+                if (matcher2.find()) {
+                    id = matcher2.group(1);
                 }
                 if (id != null) {
                     twitchClipId = id;
                 }
             }
             if (twitchClipId == null) {
-                matcher = twitchStreamIdRegex.matcher(str2);
+                matcher2 = twitchStreamIdRegex.matcher(str2);
                 id = null;
-                if (matcher.find()) {
-                    id = matcher.group(1);
+                if (matcher2.find()) {
+                    id = matcher2.group(1);
                 }
                 if (id != null) {
                     twitchStreamId = id;
                 }
             }
             if (twitchStreamId == null) {
-                matcher = coubIdRegex.matcher(str2);
+                matcher2 = coubIdRegex.matcher(str2);
                 id = null;
-                if (matcher.find()) {
-                    id = matcher.group(1);
+                if (matcher2.find()) {
+                    id = matcher2.group(1);
                 }
                 if (id != null) {
                     coubId = id;

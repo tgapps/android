@@ -479,7 +479,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                                             return;
                                         }
                                     } else if (message.type == 9 || message.type == 0) {
-                                        if (message.getDocumentName().endsWith("attheme")) {
+                                        if (message.getDocumentName().toLowerCase().endsWith("attheme")) {
                                             File f2;
                                             f = null;
                                             if (!(message.messageOwner.attachPath == null || message.messageOwner.attachPath.length() == 0)) {
@@ -797,17 +797,17 @@ Caused by: java.lang.NullPointerException
     L_0x000a:
         r1 = r7.type;
         r3 = 10;
-        if (r1 == r3) goto L_0x0109;
+        if (r1 == r3) goto L_0x010d;
     L_0x0010:
         r1 = r7.type;
         r4 = 11;
-        if (r1 == r4) goto L_0x0109;
+        if (r1 == r4) goto L_0x010d;
     L_0x0016:
         r1 = r7.type;
         r4 = 16;
         if (r1 != r4) goto L_0x001e;
     L_0x001c:
-        goto L_0x0109;
+        goto L_0x010d;
     L_0x001e:
         r0 = r7.isVoice();
         r1 = 2;
@@ -842,7 +842,7 @@ Caused by: java.lang.NullPointerException
     L_0x0056:
         return r3;
     L_0x0057:
-        goto L_0x0108;
+        goto L_0x010c;
     L_0x0059:
         r0 = r7.isRoundVideo();
         if (r0 == 0) goto L_0x0069;
@@ -877,7 +877,7 @@ Caused by: java.lang.NullPointerException
         return r0;
     L_0x008d:
         r0 = r7.isMediaEmpty();
-        if (r0 == 0) goto L_0x0108;
+        if (r0 == 0) goto L_0x010c;
     L_0x0093:
         r0 = 3;
         return r0;
@@ -910,40 +910,41 @@ Caused by: java.lang.NullPointerException
     L_0x00c4:
         r0 = 1;
     L_0x00c5:
-        if (r0 == 0) goto L_0x0107;
+        if (r0 == 0) goto L_0x010b;
     L_0x00c7:
         r1 = r7.getDocument();
-        if (r1 == 0) goto L_0x0105;
+        if (r1 == 0) goto L_0x0109;
         r1 = r7.getDocument();
         r1 = r1.mime_type;
-        if (r1 == 0) goto L_0x0105;
+        if (r1 == 0) goto L_0x0109;
         r4 = r7.getDocumentName();
+        r4 = r4.toLowerCase();
         r5 = "attheme";
         r4 = r4.endsWith(r5);
-        if (r4 == 0) goto L_0x00e2;
+        if (r4 == 0) goto L_0x00e6;
         return r3;
         r3 = "/xml";
         r3 = r1.endsWith(r3);
-        if (r3 == 0) goto L_0x00ec;
+        if (r3 == 0) goto L_0x00f0;
         r2 = 5;
         return r2;
         r3 = "/png";
         r3 = r1.endsWith(r3);
-        if (r3 != 0) goto L_0x0104;
+        if (r3 != 0) goto L_0x0108;
         r3 = "/jpg";
         r3 = r1.endsWith(r3);
-        if (r3 != 0) goto L_0x0104;
+        if (r3 != 0) goto L_0x0108;
         r3 = "/jpeg";
         r3 = r1.endsWith(r3);
-        if (r3 == 0) goto L_0x0105;
+        if (r3 == 0) goto L_0x0109;
         return r2;
         r1 = 4;
         return r1;
-    L_0x0108:
+    L_0x010c:
         return r1;
-    L_0x0109:
+    L_0x010d:
         r1 = r7.getId();
-        if (r1 != 0) goto L_0x0110;
+        if (r1 != 0) goto L_0x0114;
         return r0;
         r0 = 1;
         return r0;
@@ -2133,7 +2134,7 @@ Caused by: java.lang.NullPointerException
                         }
                     }
                     if (locFile != null) {
-                        if (!locFile.getName().endsWith("attheme")) {
+                        if (!locFile.getName().toLowerCase().endsWith("attheme")) {
                             if (!LocaleController.getInstance().applyLanguageFile(locFile, this.currentAccount)) {
                                 if (getParentActivity() != null) {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());

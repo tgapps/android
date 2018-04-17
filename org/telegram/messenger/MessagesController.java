@@ -8465,12 +8465,14 @@ Caused by: java.lang.NullPointerException
                                 TL_messages_peerDialogs res = (TL_messages_peerDialogs) response;
                                 if (!res.dialogs.isEmpty()) {
                                     TL_dialog dialog = (TL_dialog) res.dialogs.get(0);
-                                    TL_messages_dialogs dialogs = new TL_messages_dialogs();
-                                    dialogs.chats = res.chats;
-                                    dialogs.users = res.users;
-                                    dialogs.dialogs = res.dialogs;
-                                    dialogs.messages = res.messages;
-                                    MessagesStorage.getInstance(MessagesController.this.currentAccount).putDialogs(dialogs, false);
+                                    if (dialog.top_message != 0) {
+                                        TL_messages_dialogs dialogs = new TL_messages_dialogs();
+                                        dialogs.chats = res.chats;
+                                        dialogs.users = res.users;
+                                        dialogs.dialogs = res.dialogs;
+                                        dialogs.messages = res.messages;
+                                        MessagesStorage.getInstance(MessagesController.this.currentAccount).putDialogs(dialogs, false);
+                                    }
                                     MessagesController messagesController = MessagesController.this;
                                     long j = j3;
                                     int i = i8;
@@ -8487,7 +8489,8 @@ Caused by: java.lang.NullPointerException
                                     int i11 = lower_part3;
                                     int i12 = i6;
                                     int i13 = i7;
-                                    messagesController.loadMessagesInternal(j, i, i2, i3, false, i4, i5, i12, i13, z, i8, i9, i10, i11, z5, dialog.unread_mentions_count, false);
+                                    boolean z2 = z;
+                                    messagesController.loadMessagesInternal(j, i, i2, i3, false, i4, i5, i12, i13, z2, i8, i9, i10, i11, z5, dialog.unread_mentions_count, false);
                                 }
                             }
                         }
@@ -10054,7 +10057,6 @@ Caused by: java.lang.NullPointerException
                     return;
                 }
                 int a;
-                Integer value;
                 int i;
                 LongSparseArray<TL_dialog> new_dialogs_dict = new LongSparseArray();
                 LongSparseArray<MessageObject> new_dialogMessage = new LongSparseArray();
@@ -10166,6 +10168,7 @@ Caused by: java.lang.NullPointerException
                 ArrayList<TL_dialog> dialogsToReload = new ArrayList();
                 a = 0;
                 while (a < org_telegram_tgnet_TLRPC_messages_Dialogs.dialogs.size()) {
+                    Integer value;
                     TL_dialog d = (TL_dialog) org_telegram_tgnet_TLRPC_messages_Dialogs.dialogs.get(a);
                     if (d.id == 0 && d.peer != null) {
                         if (d.peer.user_id != 0) {

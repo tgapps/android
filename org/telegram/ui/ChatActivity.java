@@ -1352,7 +1352,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                                                 ChatActivity.this.presentFragment(fragment);
                                             }
                                         } else if (message.type == 9 || message.type == 0) {
-                                            if (message.getDocumentName().endsWith("attheme")) {
+                                            if (message.getDocumentName().toLowerCase().endsWith("attheme")) {
                                                 File f2;
                                                 f = null;
                                                 if (!(message.messageOwner.attachPath == null || message.messageOwner.attachPath.length() == 0)) {
@@ -4091,7 +4091,7 @@ Caused by: java.lang.NullPointerException
         r13 = 6;
         r14 = 0;
         r16 = 2;
-        if (r3 != 0) goto L_0x014d;
+        if (r3 != 0) goto L_0x0151;
     L_0x001e:
         r3 = r0.isBroadcast;
         if (r3 == 0) goto L_0x0030;
@@ -4136,16 +4136,16 @@ Caused by: java.lang.NullPointerException
         return r2;
     L_0x0057:
         r10 = r1.type;
-        if (r10 == r12) goto L_0x0144;
+        if (r10 == r12) goto L_0x0148;
     L_0x005b:
         r10 = r1.type;
-        if (r10 == r9) goto L_0x0144;
+        if (r10 == r9) goto L_0x0148;
     L_0x005f:
         r9 = r1.type;
         r10 = 16;
         if (r9 != r10) goto L_0x0067;
     L_0x0065:
-        goto L_0x0144;
+        goto L_0x0148;
     L_0x0067:
         r2 = r19.isVoice();
         if (r2 == 0) goto L_0x006e;
@@ -4212,7 +4212,7 @@ Caused by: java.lang.NullPointerException
         return r7;
     L_0x00d1:
         r2 = r19.isMediaEmpty();
-        if (r2 == 0) goto L_0x0143;
+        if (r2 == 0) goto L_0x0147;
     L_0x00d7:
         return r6;
     L_0x00d8:
@@ -4240,131 +4240,132 @@ Caused by: java.lang.NullPointerException
     L_0x0101:
         r2 = 1;
     L_0x0102:
-        if (r2 == 0) goto L_0x0142;
+        if (r2 == 0) goto L_0x0146;
     L_0x0104:
         r6 = r19.getDocument();
-        if (r6 == 0) goto L_0x0141;
+        if (r6 == 0) goto L_0x0145;
         r6 = r19.getDocument();
         r6 = r6.mime_type;
-        if (r6 == 0) goto L_0x0141;
+        if (r6 == 0) goto L_0x0145;
         r7 = r19.getDocumentName();
+        r7 = r7.toLowerCase();
         r8 = "attheme";
         r7 = r7.endsWith(r8);
-        if (r7 == 0) goto L_0x011f;
+        if (r7 == 0) goto L_0x0123;
         return r12;
         r7 = "/xml";
         r7 = r6.endsWith(r7);
-        if (r7 == 0) goto L_0x0128;
+        if (r7 == 0) goto L_0x012c;
         return r5;
         r5 = "/png";
         r5 = r6.endsWith(r5);
-        if (r5 != 0) goto L_0x0140;
+        if (r5 != 0) goto L_0x0144;
         r5 = "/jpg";
         r5 = r6.endsWith(r5);
-        if (r5 != 0) goto L_0x0140;
+        if (r5 != 0) goto L_0x0144;
         r5 = "/jpeg";
         r5 = r6.endsWith(r5);
-        if (r5 == 0) goto L_0x0141;
+        if (r5 == 0) goto L_0x0145;
         return r13;
         return r4;
-    L_0x0143:
+    L_0x0147:
         return r16;
-    L_0x0144:
+    L_0x0148:
         r4 = r19.getId();
-        if (r4 != 0) goto L_0x014b;
+        if (r4 != 0) goto L_0x014f;
         return r2;
         r2 = 1;
         return r2;
-    L_0x014d:
+    L_0x0151:
         r3 = r19.isSending();
-        if (r3 == 0) goto L_0x0154;
+        if (r3 == 0) goto L_0x0158;
         return r2;
         r3 = r1.type;
-        if (r3 != r13) goto L_0x0159;
+        if (r3 != r13) goto L_0x015d;
         return r2;
         r3 = r19.isSendError();
-        if (r3 == 0) goto L_0x0167;
+        if (r3 == 0) goto L_0x016b;
         r2 = r19.isMediaEmpty();
-        if (r2 != 0) goto L_0x0166;
+        if (r2 != 0) goto L_0x016a;
         return r14;
         return r10;
         r3 = r1.type;
-        if (r3 == r12) goto L_0x020f;
+        if (r3 == r12) goto L_0x0213;
         r3 = r1.type;
-        if (r3 != r9) goto L_0x0171;
-        goto L_0x020f;
+        if (r3 != r9) goto L_0x0175;
+        goto L_0x0213;
         r2 = r19.isVoice();
-        if (r2 == 0) goto L_0x0178;
+        if (r2 == 0) goto L_0x017c;
         return r16;
         r2 = r19.isSticker();
-        if (r2 == 0) goto L_0x0197;
+        if (r2 == 0) goto L_0x019b;
         r2 = r19.getInputStickerSet();
         r3 = r2 instanceof org.telegram.tgnet.TLRPC.TL_inputStickerSetShortName;
-        if (r3 == 0) goto L_0x0195;
+        if (r3 == 0) goto L_0x0199;
         r3 = r0.currentAccount;
         r3 = org.telegram.messenger.DataQuery.getInstance(r3);
         r4 = r2.short_name;
         r3 = r3.isStickerPackInstalled(r4);
-        if (r3 != 0) goto L_0x0195;
+        if (r3 != 0) goto L_0x0199;
         return r11;
-        goto L_0x020e;
+        goto L_0x0212;
         r2 = r19.isRoundVideo();
-        if (r2 != 0) goto L_0x0202;
+        if (r2 != 0) goto L_0x0206;
         r2 = r1.messageOwner;
         r2 = r2.media;
         r2 = r2 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaPhoto;
-        if (r2 != 0) goto L_0x01b7;
+        if (r2 != 0) goto L_0x01bb;
         r2 = r19.getDocument();
-        if (r2 != 0) goto L_0x01b7;
+        if (r2 != 0) goto L_0x01bb;
         r2 = r19.isMusic();
-        if (r2 != 0) goto L_0x01b7;
+        if (r2 != 0) goto L_0x01bb;
         r2 = r19.isVideo();
-        if (r2 == 0) goto L_0x0202;
+        if (r2 == 0) goto L_0x0206;
         r2 = 0;
         r3 = r1.messageOwner;
         r3 = r3.attachPath;
         r3 = android.text.TextUtils.isEmpty(r3);
-        if (r3 != 0) goto L_0x01d2;
+        if (r3 != 0) goto L_0x01d6;
         r3 = new java.io.File;
         r6 = r1.messageOwner;
         r6 = r6.attachPath;
         r3.<init>(r6);
         r6 = r3.exists();
-        if (r6 == 0) goto L_0x01d2;
+        if (r6 == 0) goto L_0x01d6;
         r2 = 1;
-        if (r2 != 0) goto L_0x01e1;
+        if (r2 != 0) goto L_0x01e5;
         r3 = r1.messageOwner;
         r3 = org.telegram.messenger.FileLoader.getPathToMessage(r3);
         r6 = r3.exists();
-        if (r6 == 0) goto L_0x01e1;
+        if (r6 == 0) goto L_0x01e5;
         r2 = 1;
-        if (r2 == 0) goto L_0x0201;
+        if (r2 == 0) goto L_0x0205;
         r3 = r19.getDocument();
-        if (r3 == 0) goto L_0x01fa;
+        if (r3 == 0) goto L_0x01fe;
         r3 = r19.getDocument();
         r3 = r3.mime_type;
-        if (r3 == 0) goto L_0x01fa;
+        if (r3 == 0) goto L_0x01fe;
         r6 = "text/xml";
         r6 = r3.endsWith(r6);
-        if (r6 == 0) goto L_0x01fa;
+        if (r6 == 0) goto L_0x01fe;
         return r5;
         r3 = r1.messageOwner;
         r3 = r3.ttl;
-        if (r3 > 0) goto L_0x0201;
+        if (r3 > 0) goto L_0x0205;
         return r4;
-        goto L_0x020e;
+        goto L_0x0212;
         r2 = r1.type;
-        if (r2 != r8) goto L_0x0207;
+        if (r2 != r8) goto L_0x020b;
         return r7;
         r2 = r19.isMediaEmpty();
-        if (r2 == 0) goto L_0x020e;
+        if (r2 == 0) goto L_0x0212;
         return r6;
         return r16;
         r3 = r19.getId();
-        if (r3 == 0) goto L_0x021e;
+        if (r3 == 0) goto L_0x0222;
         r3 = r19.isSending();
-        if (r3 == 0) goto L_0x021c;
-        goto L_0x021e;
+        if (r3 == 0) goto L_0x0220;
+        goto L_0x0222;
         r2 = 1;
         return r2;
         return r2;
@@ -20048,7 +20049,7 @@ Caused by: java.lang.NullPointerException
                             }
                         }
                         if (locFile != null) {
-                            if (!locFile.getName().endsWith("attheme")) {
+                            if (!locFile.getName().toLowerCase().endsWith("attheme")) {
                                 if (!LocaleController.getInstance().applyLanguageFile(locFile, r7.currentAccount)) {
                                     if (getParentActivity() != null) {
                                         AlertDialog.Builder builder2 = new AlertDialog.Builder(getParentActivity());

@@ -14,9 +14,9 @@ public class AccountAccessor extends Stub {
     private Account zzs;
 
     public static Account getAccountBinderSafe(IAccountAccessor iAccountAccessor) {
+        Account account;
         if (iAccountAccessor != null) {
             long clearCallingIdentity = Binder.clearCallingIdentity();
-            Account account;
             try {
                 account = iAccountAccessor.getAccount();
                 return account;

@@ -5731,28 +5731,33 @@ Caused by: java.lang.NullPointerException
 
     @SuppressLint({"InlinedApi"})
     private void showExtraNotifications(NotificationCompat.Builder notificationBuilder, boolean notifyAboutLast, String summary) {
-        JSONArray serializedNotifications;
-        int rowsMid;
-        JSONArray serializedMsgs;
-        String name;
-        User user;
-        NotificationCompat.Builder builder;
-        Integer num;
-        String str;
-        JSONObject jSONObject;
-        JSONArray builder2;
-        NotificationsController notificationsController = this;
-        Notification mainNotification = notificationBuilder.build();
-        if (VERSION.SDK_INT < 18) {
-            notificationManager.notify(notificationsController.notificationId, mainNotification);
-            return;
-        }
-        int a;
         ArrayList<Long> sortedDialogs;
         LongSparseArray<ArrayList<MessageObject>> messagesByDialogs;
         LongSparseArray<Integer> oldIdsWear;
+        Notification mainNotification;
+        JSONArray serializedNotifications;
+        int b;
         JSONArray serializedNotifications2;
         ArrayList<AnonymousClass1NotificationHolder> holders;
+        int max_date;
+        boolean[] zArr;
+        JSONArray serializedMsgs;
+        String name;
+        NotificationCompat.Builder showWhen;
+        User user;
+        Integer internalId;
+        User user2;
+        NotificationCompat.Builder builder;
+        Integer num;
+        String str;
+        JSONArray builder2;
+        NotificationsController notificationsController = this;
+        Notification mainNotification2 = notificationBuilder.build();
+        if (VERSION.SDK_INT < 18) {
+            notificationManager.notify(notificationsController.notificationId, mainNotification2);
+            return;
+        }
+        int a;
         int i;
         int a2;
         ArrayList<Long> sortedDialogs2 = new ArrayList();
@@ -5776,25 +5781,23 @@ Caused by: java.lang.NullPointerException
         if (WearDataLayerListenerService.isWatchConnected()) {
             serializedNotifications3 = new JSONArray();
         }
-        int b = 0;
+        int b2 = 0;
         int size = sortedDialogs2.size();
-        while (b < size) {
-            Notification mainNotification2;
-            int b2;
-            long dialog_id2 = ((Long) sortedDialogs2.get(b)).longValue();
+        while (b2 < size) {
+            long dialog_id2 = ((Long) sortedDialogs2.get(b2)).longValue();
             ArrayList<MessageObject> messageObjects = (ArrayList) messagesByDialogs2.get(dialog_id2);
             int max_id = ((MessageObject) messageObjects.get(i2)).getId();
             int lowerId = (int) dialog_id2;
             sortedDialogs = sortedDialogs2;
             messagesByDialogs = messagesByDialogs2;
             int highId = (int) (dialog_id2 >> 32);
-            Integer internalId = (Integer) oldIdsWear2.get(dialog_id2);
-            if (internalId != null) {
+            Integer internalId2 = (Integer) oldIdsWear2.get(dialog_id2);
+            if (internalId2 != null) {
                 oldIdsWear2.remove(dialog_id2);
             } else if (lowerId != 0) {
-                internalId = Integer.valueOf(lowerId);
+                internalId2 = Integer.valueOf(lowerId);
             } else {
-                internalId = Integer.valueOf(highId);
+                internalId2 = Integer.valueOf(highId);
             }
             JSONObject serializedChat = null;
             if (serializedNotifications3 != null) {
@@ -5804,7 +5807,7 @@ Caused by: java.lang.NullPointerException
             int size2 = size;
             size = lastMessageObject.messageOwner.date;
             Chat chat = null;
-            User user2 = null;
+            User user3 = null;
             boolean isChannel = false;
             boolean isSupergroup = false;
             FileLocation fileLocation = null;
@@ -5812,18 +5815,17 @@ Caused by: java.lang.NullPointerException
             boolean z;
             MessageObject messageObject2;
             String name2;
-            User user3;
+            User user4;
             boolean z2;
             FileLocation photoPath;
             ArrayList<AnonymousClass1NotificationHolder> holders3;
             JSONObject serializedChat2;
             int highId2;
-            int max_date;
             Intent msgHeardIntent;
-            User user4;
+            User user5;
             PendingIntent msgHeardPendingIntent;
             Intent intent;
-            Integer internalId2;
+            Integer internalId3;
             PendingIntent pendingIntent;
             boolean canReply;
             Action action;
@@ -5837,13 +5839,13 @@ Caused by: java.lang.NullPointerException
             boolean[] isText;
             JSONArray serializedMsgs2;
             ArrayList<TL_keyboardButtonRow> rows;
+            int rowsMid;
             ArrayList<TL_keyboardButtonRow> rows2;
             ArrayList<TL_keyboardButtonRow> rows3;
             MessageObject messageObject3;
             String name3;
             ArrayList<MessageObject> messageObjects2;
             String message;
-            boolean[] zArr;
             Action action2;
             int i3;
             StringBuilder stringBuilder;
@@ -5861,7 +5863,6 @@ Caused by: java.lang.NullPointerException
             WearableExtender summaryExtender;
             long date;
             int max_id2;
-            NotificationCompat.Builder showWhen;
             String str2;
             Notification unreadConvBuilder;
             File file;
@@ -5872,26 +5873,25 @@ Caused by: java.lang.NullPointerException
             long j;
             int i4;
             ArrayList<TL_keyboardButtonRow> arrayList2;
-            User user5;
-            Integer internalId3;
+            JSONObject jSONObject;
             boolean z3;
             MessagingStyle messagingStyle3;
             if (lowerId != 0) {
                 z = true;
                 if (lowerId > 0) {
-                    mainNotification2 = mainNotification;
-                    mainNotification = MessagesController.getInstance(notificationsController.currentAccount).getUser(Integer.valueOf(lowerId));
-                    if (mainNotification != null) {
-                        String name4 = UserObject.getUserName(mainNotification);
-                        if (mainNotification.photo == null || mainNotification.photo.photo_small == null) {
+                    mainNotification = mainNotification2;
+                    mainNotification2 = MessagesController.getInstance(notificationsController.currentAccount).getUser(Integer.valueOf(lowerId));
+                    if (mainNotification2 != null) {
+                        String name4 = UserObject.getUserName(mainNotification2);
+                        if (mainNotification2.photo == null || mainNotification2.photo.photo_small == null) {
                             serializedNotifications = serializedNotifications3;
-                            b2 = b;
+                            b = b2;
                         } else {
                             serializedNotifications = serializedNotifications3;
-                            b2 = b;
-                            if (!(mainNotification.photo.photo_small.volume_id == null || mainNotification.photo.photo_small.local_id == 0)) {
+                            b = b2;
+                            if (!(mainNotification2.photo.photo_small.volume_id == null || mainNotification2.photo.photo_small.local_id == 0)) {
                                 messageObject2 = lastMessageObject;
-                                fileLocation = mainNotification.photo.photo_small;
+                                fileLocation = mainNotification2.photo.photo_small;
                                 name2 = name4;
                             }
                         }
@@ -5900,61 +5900,61 @@ Caused by: java.lang.NullPointerException
                         name2 = lastMessageObject.localName;
                         messageObject2 = lastMessageObject;
                         serializedNotifications = serializedNotifications3;
-                        b2 = b;
+                        b = b2;
                     } else {
                         serializedNotifications2 = serializedNotifications3;
-                        b2 = b;
+                        b = b2;
                         holders = holders2;
-                        b = b2 + 1;
+                        b2 = b + 1;
                         holders2 = holders;
                         messagesByDialogs2 = messagesByDialogs;
                         size = size2;
                         oldIdsWear2 = oldIdsWear;
-                        mainNotification = mainNotification2;
+                        mainNotification2 = mainNotification;
                         i2 = 0;
                         serializedNotifications3 = serializedNotifications2;
                         sortedDialogs2 = sortedDialogs;
                     }
-                    user3 = mainNotification;
-                    mainNotification = serializedChat;
+                    user4 = mainNotification2;
+                    mainNotification2 = serializedChat;
                 } else {
-                    mainNotification2 = mainNotification;
+                    mainNotification = mainNotification2;
                     serializedNotifications = serializedNotifications3;
-                    b2 = b;
-                    mainNotification = MessagesController.getInstance(notificationsController.currentAccount).getChat(Integer.valueOf(-lowerId));
-                    if (mainNotification != null) {
+                    b = b2;
+                    mainNotification2 = MessagesController.getInstance(notificationsController.currentAccount).getChat(Integer.valueOf(-lowerId));
+                    if (mainNotification2 != null) {
                         boolean isSupergroup2;
-                        boolean isSupergroup3 = mainNotification.megagroup;
-                        z2 = ChatObject.isChannel(mainNotification) && !mainNotification.megagroup;
+                        boolean isSupergroup3 = mainNotification2.megagroup;
+                        z2 = ChatObject.isChannel(mainNotification2) && !mainNotification2.megagroup;
                         isChannel = z2;
-                        serializedNotifications3 = mainNotification.title;
-                        if (mainNotification.photo == null || mainNotification.photo.photo_small == null) {
+                        serializedNotifications3 = mainNotification2.title;
+                        if (mainNotification2.photo == null || mainNotification2.photo.photo_small == null) {
                             isSupergroup2 = isSupergroup3;
                         } else {
                             messageObject2 = lastMessageObject;
                             isSupergroup2 = isSupergroup3;
-                            if (!(mainNotification.photo.photo_small.volume_id == null || mainNotification.photo.photo_small.local_id == null)) {
-                                chat = mainNotification;
-                                fileLocation = mainNotification.photo.photo_small;
+                            if (!(mainNotification2.photo.photo_small.volume_id == null || mainNotification2.photo.photo_small.local_id == null)) {
+                                chat = mainNotification2;
+                                fileLocation = mainNotification2.photo.photo_small;
                                 name2 = serializedNotifications3;
-                                mainNotification = serializedChat;
-                                user3 = null;
+                                mainNotification2 = serializedChat;
+                                user4 = null;
                                 isSupergroup = isSupergroup2;
                             }
                         }
-                        chat = mainNotification;
+                        chat = mainNotification2;
                         name2 = serializedNotifications3;
-                        mainNotification = serializedChat;
-                        user3 = null;
+                        mainNotification2 = serializedChat;
+                        user4 = null;
                         isSupergroup = isSupergroup2;
                     } else if (lastMessageObject.isFcmMessage()) {
                         isSupergroup = lastMessageObject.isMegagroup();
                         name2 = lastMessageObject.localName;
-                        chat = mainNotification;
+                        chat = mainNotification2;
                         messageObject2 = lastMessageObject;
                         isChannel = lastMessageObject.localChannel;
-                        mainNotification = serializedChat;
-                        user3 = user2;
+                        mainNotification2 = serializedChat;
+                        user4 = user3;
                     }
                 }
                 if (!AndroidUtilities.needShowPasscode(false)) {
@@ -5963,9 +5963,9 @@ Caused by: java.lang.NullPointerException
                     photoPath = fileLocation;
                     z2 = z;
                     holders3 = holders2;
-                    serializedChat2 = mainNotification;
+                    serializedChat2 = mainNotification2;
                     highId2 = highId;
-                    mainNotification = new UnreadConversation.Builder(name2).setLatestTimestamp(((long) size) * 1000);
+                    mainNotification2 = new UnreadConversation.Builder(name2).setLatestTimestamp(((long) size) * 1000);
                     max_date = size;
                     msgHeardIntent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
                     msgHeardIntent.addFlags(32);
@@ -5973,13 +5973,13 @@ Caused by: java.lang.NullPointerException
                     msgHeardIntent.putExtra("dialog_id", dialog_id2);
                     msgHeardIntent.putExtra("max_id", max_id);
                     msgHeardIntent.putExtra("currentAccount", notificationsController.currentAccount);
-                    user4 = user3;
-                    msgHeardPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), msgHeardIntent, 134217728);
-                    mainNotification.setReadPendingIntent(msgHeardPendingIntent);
+                    user5 = user4;
+                    msgHeardPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId2.intValue(), msgHeardIntent, 134217728);
+                    mainNotification2.setReadPendingIntent(msgHeardPendingIntent);
                     if (isChannel) {
                         if (!isSupergroup) {
                             intent = msgHeardIntent;
-                            internalId2 = internalId;
+                            internalId3 = internalId2;
                             pendingIntent = msgHeardPendingIntent;
                             canReply = z2;
                             action = null;
@@ -6050,7 +6050,7 @@ Caused by: java.lang.NullPointerException
                                         text.append("\n\n");
                                     }
                                     text.append(wearReplyAction);
-                                    mainNotification.addMessage(wearReplyAction);
+                                    mainNotification2.addMessage(wearReplyAction);
                                     nameToReplace = name2;
                                     messagingStyle2.addMessage(wearReplyAction, ((long) messageObject3.messageOwner.date) * 1000, null);
                                     if (serializedMsgs2 != null) {
@@ -6202,7 +6202,7 @@ Caused by: java.lang.NullPointerException
                             text = new StringBuilder();
                             text.append(TtmlNode.ANONYMOUS_REGION_ID);
                             text.append(Long.MAX_VALUE - date);
-                            showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification.build())).setCategory("msg");
+                            showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification2.build())).setCategory("msg");
                             if (notificationsController.pushDialogs.size() == 1 || TextUtils.isEmpty(summary)) {
                                 str2 = summary;
                             } else {
@@ -6212,14 +6212,14 @@ Caused by: java.lang.NullPointerException
                                 showWhen.setLocalOnly(true);
                             }
                             if (photoPath2 != null) {
-                                unreadConvBuilder = mainNotification;
-                                mainNotification = photoPath2;
-                                messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification, null, "50_50");
+                                unreadConvBuilder = mainNotification2;
+                                mainNotification2 = photoPath2;
+                                messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification2, null, "50_50");
                                 if (messagingStyle2 != null) {
                                     showWhen.setLargeIcon(messagingStyle2.getBitmap());
                                 } else {
                                     try {
-                                        file = FileLoader.getPathToAttach(mainNotification, true);
+                                        file = FileLoader.getPathToAttach(mainNotification2, true);
                                         if (file.exists()) {
                                             scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
                                             img = messagingStyle2;
@@ -6239,18 +6239,18 @@ Caused by: java.lang.NullPointerException
                                                 arrayList2 = rows3;
                                                 if (chat == null) {
                                                 }
-                                                user5 = user4;
+                                                user = user5;
                                                 if (VERSION.SDK_INT >= 26) {
                                                     showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                                                 }
-                                                internalId3 = internalId2;
+                                                internalId = internalId3;
                                                 holders = holders3;
-                                                holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                                                notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                                                holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                                                notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                                                 if (serializedChat2 != null) {
-                                                    user = user5;
+                                                    user2 = user;
                                                     builder = showWhen;
-                                                    num = internalId3;
+                                                    num = internalId;
                                                     str = name;
                                                     serializedNotifications2 = serializedNotifications;
                                                     jSONObject = serializedChat2;
@@ -6265,20 +6265,20 @@ Caused by: java.lang.NullPointerException
                                                             jSONObject.put("reply", canReply);
                                                             jSONObject.put("name", name);
                                                         } catch (JSONException e3) {
-                                                            user = user5;
+                                                            user2 = user;
                                                             builder = showWhen;
-                                                            num = internalId3;
+                                                            num = internalId;
                                                             str = name;
                                                             serializedNotifications2 = serializedNotifications;
                                                             size = max_date;
                                                             builder2 = serializedMsgs;
                                                             max_id = max_id2;
-                                                            b = b2 + 1;
+                                                            b2 = b + 1;
                                                             holders2 = holders;
                                                             messagesByDialogs2 = messagesByDialogs;
                                                             size = size2;
                                                             oldIdsWear2 = oldIdsWear;
-                                                            mainNotification = mainNotification2;
+                                                            mainNotification2 = mainNotification;
                                                             i2 = 0;
                                                             serializedNotifications3 = serializedNotifications2;
                                                             sortedDialogs2 = sortedDialogs;
@@ -6289,61 +6289,61 @@ Caused by: java.lang.NullPointerException
                                                                 jSONObject.put("max_date", max_date);
                                                                 try {
                                                                     jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                                                                    if (mainNotification != null) {
-                                                                        num = internalId3;
+                                                                    if (mainNotification2 != null) {
+                                                                        num = internalId;
                                                                         str = name;
                                                                     } else {
                                                                         try {
-                                                                            user5 = "photo";
+                                                                            user = "photo";
                                                                             text = new StringBuilder();
                                                                             try {
-                                                                                text.append(mainNotification.dc_id);
+                                                                                text.append(mainNotification2.dc_id);
                                                                                 text.append("_");
                                                                                 try {
-                                                                                    text.append(mainNotification.volume_id);
+                                                                                    text.append(mainNotification2.volume_id);
                                                                                     text.append("_");
-                                                                                    text.append(mainNotification.secret);
-                                                                                    jSONObject.put(user5, text.toString());
+                                                                                    text.append(mainNotification2.secret);
+                                                                                    jSONObject.put(user, text.toString());
                                                                                 } catch (JSONException e4) {
                                                                                     serializedNotifications2 = serializedNotifications;
                                                                                     builder2 = serializedMsgs;
-                                                                                    b = b2 + 1;
+                                                                                    b2 = b + 1;
                                                                                     holders2 = holders;
                                                                                     messagesByDialogs2 = messagesByDialogs;
                                                                                     size = size2;
                                                                                     oldIdsWear2 = oldIdsWear;
-                                                                                    mainNotification = mainNotification2;
+                                                                                    mainNotification2 = mainNotification;
                                                                                     i2 = 0;
                                                                                     serializedNotifications3 = serializedNotifications2;
                                                                                     sortedDialogs2 = sortedDialogs;
                                                                                 }
                                                                             } catch (JSONException e5) {
-                                                                                num = internalId3;
+                                                                                num = internalId;
                                                                                 str = name;
                                                                                 serializedNotifications2 = serializedNotifications;
                                                                                 builder2 = serializedMsgs;
-                                                                                b = b2 + 1;
+                                                                                b2 = b + 1;
                                                                                 holders2 = holders;
                                                                                 messagesByDialogs2 = messagesByDialogs;
                                                                                 size = size2;
                                                                                 oldIdsWear2 = oldIdsWear;
-                                                                                mainNotification = mainNotification2;
+                                                                                mainNotification2 = mainNotification;
                                                                                 i2 = 0;
                                                                                 serializedNotifications3 = serializedNotifications2;
                                                                                 sortedDialogs2 = sortedDialogs;
                                                                             }
                                                                         } catch (JSONException e6) {
                                                                             builder = showWhen;
-                                                                            num = internalId3;
+                                                                            num = internalId;
                                                                             str = name;
                                                                             serializedNotifications2 = serializedNotifications;
                                                                             builder2 = serializedMsgs;
-                                                                            b = b2 + 1;
+                                                                            b2 = b + 1;
                                                                             holders2 = holders;
                                                                             messagesByDialogs2 = messagesByDialogs;
                                                                             size = size2;
                                                                             oldIdsWear2 = oldIdsWear;
-                                                                            mainNotification = mainNotification2;
+                                                                            mainNotification2 = mainNotification;
                                                                             i2 = 0;
                                                                             serializedNotifications3 = serializedNotifications2;
                                                                             sortedDialogs2 = sortedDialogs;
@@ -6356,12 +6356,12 @@ Caused by: java.lang.NullPointerException
                                                                         } catch (JSONException e7) {
                                                                             builder2 = serializedMsgs;
                                                                             serializedNotifications2 = serializedNotifications;
-                                                                            b = b2 + 1;
+                                                                            b2 = b + 1;
                                                                             holders2 = holders;
                                                                             messagesByDialogs2 = messagesByDialogs;
                                                                             size = size2;
                                                                             oldIdsWear2 = oldIdsWear;
-                                                                            mainNotification = mainNotification2;
+                                                                            mainNotification2 = mainNotification;
                                                                             i2 = 0;
                                                                             serializedNotifications3 = serializedNotifications2;
                                                                             sortedDialogs2 = sortedDialogs;
@@ -6370,12 +6370,12 @@ Caused by: java.lang.NullPointerException
                                                                             jSONObject.put("msgs", serializedMsgs);
                                                                         } catch (JSONException e8) {
                                                                             serializedNotifications2 = serializedNotifications;
-                                                                            b = b2 + 1;
+                                                                            b2 = b + 1;
                                                                             holders2 = holders;
                                                                             messagesByDialogs2 = messagesByDialogs;
                                                                             size = size2;
                                                                             oldIdsWear2 = oldIdsWear;
-                                                                            mainNotification = mainNotification2;
+                                                                            mainNotification2 = mainNotification;
                                                                             i2 = 0;
                                                                             serializedNotifications3 = serializedNotifications2;
                                                                             sortedDialogs2 = sortedDialogs;
@@ -6394,51 +6394,51 @@ Caused by: java.lang.NullPointerException
                                                                     serializedNotifications2 = serializedNotifications;
                                                                 } catch (JSONException e9) {
                                                                     builder = showWhen;
-                                                                    num = internalId3;
+                                                                    num = internalId;
                                                                     str = name;
                                                                     serializedNotifications2 = serializedNotifications;
                                                                     builder2 = serializedMsgs;
-                                                                    b = b2 + 1;
+                                                                    b2 = b + 1;
                                                                     holders2 = holders;
                                                                     messagesByDialogs2 = messagesByDialogs;
                                                                     size = size2;
                                                                     oldIdsWear2 = oldIdsWear;
-                                                                    mainNotification = mainNotification2;
+                                                                    mainNotification2 = mainNotification;
                                                                     i2 = 0;
                                                                     serializedNotifications3 = serializedNotifications2;
                                                                     sortedDialogs2 = sortedDialogs;
                                                                 }
                                                             } catch (JSONException e10) {
-                                                                user = user5;
+                                                                user2 = user;
                                                                 builder = showWhen;
-                                                                num = internalId3;
+                                                                num = internalId;
                                                                 str = name;
                                                                 serializedNotifications2 = serializedNotifications;
                                                                 builder2 = serializedMsgs;
-                                                                b = b2 + 1;
+                                                                b2 = b + 1;
                                                                 holders2 = holders;
                                                                 messagesByDialogs2 = messagesByDialogs;
                                                                 size = size2;
                                                                 oldIdsWear2 = oldIdsWear;
-                                                                mainNotification = mainNotification2;
+                                                                mainNotification2 = mainNotification;
                                                                 i2 = 0;
                                                                 serializedNotifications3 = serializedNotifications2;
                                                                 sortedDialogs2 = sortedDialogs;
                                                             }
                                                         } catch (JSONException e11) {
-                                                            user = user5;
+                                                            user2 = user;
                                                             builder = showWhen;
-                                                            num = internalId3;
+                                                            num = internalId;
                                                             str = name;
                                                             serializedNotifications2 = serializedNotifications;
                                                             size = max_date;
                                                             builder2 = serializedMsgs;
-                                                            b = b2 + 1;
+                                                            b2 = b + 1;
                                                             holders2 = holders;
                                                             messagesByDialogs2 = messagesByDialogs;
                                                             size = size2;
                                                             oldIdsWear2 = oldIdsWear;
-                                                            mainNotification = mainNotification2;
+                                                            mainNotification2 = mainNotification;
                                                             i2 = 0;
                                                             serializedNotifications3 = serializedNotifications2;
                                                             sortedDialogs2 = sortedDialogs;
@@ -6446,20 +6446,20 @@ Caused by: java.lang.NullPointerException
                                                         try {
                                                             serializedNotifications2.put(jSONObject);
                                                         } catch (JSONException e12) {
-                                                            b = b2 + 1;
+                                                            b2 = b + 1;
                                                             holders2 = holders;
                                                             messagesByDialogs2 = messagesByDialogs;
                                                             size = size2;
                                                             oldIdsWear2 = oldIdsWear;
-                                                            mainNotification = mainNotification2;
+                                                            mainNotification2 = mainNotification;
                                                             i2 = 0;
                                                             serializedNotifications3 = serializedNotifications2;
                                                             sortedDialogs2 = sortedDialogs;
                                                         }
                                                     } catch (JSONException e13) {
-                                                        user = user5;
+                                                        user2 = user;
                                                         builder = showWhen;
-                                                        num = internalId3;
+                                                        num = internalId;
                                                         str = name;
                                                         serializedNotifications2 = serializedNotifications;
                                                         jSONObject = serializedChat2;
@@ -6467,23 +6467,23 @@ Caused by: java.lang.NullPointerException
                                                         z3 = canReply;
                                                         builder2 = serializedMsgs;
                                                         max_id = max_id2;
-                                                        b = b2 + 1;
+                                                        b2 = b + 1;
                                                         holders2 = holders;
                                                         messagesByDialogs2 = messagesByDialogs;
                                                         size = size2;
                                                         oldIdsWear2 = oldIdsWear;
-                                                        mainNotification = mainNotification2;
+                                                        mainNotification2 = mainNotification;
                                                         i2 = 0;
                                                         serializedNotifications3 = serializedNotifications2;
                                                         sortedDialogs2 = sortedDialogs;
                                                     }
                                                 }
-                                                b = b2 + 1;
+                                                b2 = b + 1;
                                                 holders2 = holders;
                                                 messagesByDialogs2 = messagesByDialogs;
                                                 size = size2;
                                                 oldIdsWear2 = oldIdsWear;
-                                                mainNotification = mainNotification2;
+                                                mainNotification2 = mainNotification;
                                                 i2 = 0;
                                                 serializedNotifications3 = serializedNotifications2;
                                                 sortedDialogs2 = sortedDialogs;
@@ -6501,14 +6501,14 @@ Caused by: java.lang.NullPointerException
                                         arrayList2 = rows3;
                                         if (chat == null) {
                                         }
-                                        user5 = user4;
+                                        user = user5;
                                         if (VERSION.SDK_INT >= 26) {
                                             showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                                         }
-                                        internalId3 = internalId2;
+                                        internalId = internalId3;
                                         holders = holders3;
-                                        holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                                        holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                                         if (serializedChat2 != null) {
                                             jSONObject = serializedChat2;
                                             jSONObject.put("reply", canReply);
@@ -6516,17 +6516,17 @@ Caused by: java.lang.NullPointerException
                                             jSONObject.put("max_id", max_id2);
                                             jSONObject.put("max_date", max_date);
                                             jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                                            if (mainNotification != null) {
-                                                user5 = "photo";
+                                            if (mainNotification2 != null) {
+                                                user = "photo";
                                                 text = new StringBuilder();
-                                                text.append(mainNotification.dc_id);
+                                                text.append(mainNotification2.dc_id);
                                                 text.append("_");
-                                                text.append(mainNotification.volume_id);
+                                                text.append(mainNotification2.volume_id);
                                                 text.append("_");
-                                                text.append(mainNotification.secret);
-                                                jSONObject.put(user5, text.toString());
+                                                text.append(mainNotification2.secret);
+                                                jSONObject.put(user, text.toString());
                                             } else {
-                                                num = internalId3;
+                                                num = internalId;
                                                 str = name;
                                             }
                                             if (serializedMsgs != null) {
@@ -6547,9 +6547,9 @@ Caused by: java.lang.NullPointerException
                                             serializedNotifications2 = serializedNotifications;
                                             serializedNotifications2.put(jSONObject);
                                         } else {
-                                            user = user5;
+                                            user2 = user;
                                             builder = showWhen;
-                                            num = internalId3;
+                                            num = internalId;
                                             str = name;
                                             serializedNotifications2 = serializedNotifications;
                                             jSONObject = serializedChat2;
@@ -6558,21 +6558,21 @@ Caused by: java.lang.NullPointerException
                                             builder2 = serializedMsgs;
                                             max_id = max_id2;
                                         }
-                                        b = b2 + 1;
+                                        b2 = b + 1;
                                         holders2 = holders;
                                         messagesByDialogs2 = messagesByDialogs;
                                         size = size2;
                                         oldIdsWear2 = oldIdsWear;
-                                        mainNotification = mainNotification2;
+                                        mainNotification2 = mainNotification;
                                         i2 = 0;
                                         serializedNotifications3 = serializedNotifications2;
                                         sortedDialogs2 = sortedDialogs;
                                     }
                                 }
                             } else {
-                                unreadConvBuilder = mainNotification;
+                                unreadConvBuilder = mainNotification2;
                                 messagingStyle3 = messagingStyle2;
-                                mainNotification = photoPath2;
+                                mainNotification2 = photoPath2;
                             }
                             if (AndroidUtilities.needShowPasscode(false) || SharedConfig.isWaitingForPasscodeEnter || rows3 == null) {
                                 wearableExtender2 = wearableExtender;
@@ -6637,24 +6637,24 @@ Caused by: java.lang.NullPointerException
                                 j = date;
                                 i4 = rowsMid;
                             }
-                            if (chat == null || user4 == null) {
-                                user5 = user4;
+                            if (chat == null || user5 == null) {
+                                user = user5;
                             } else {
-                                user5 = user4;
-                                if (user5.phone != null && user5.phone.length() > 0) {
+                                user = user5;
+                                if (user.phone != null && user.phone.length() > 0) {
                                     text = new StringBuilder();
                                     text.append("tel:+");
-                                    text.append(user5.phone);
+                                    text.append(user.phone);
                                     showWhen.addPerson(text.toString());
                                 }
                             }
                             if (VERSION.SDK_INT >= 26) {
                                 showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                             }
-                            internalId3 = internalId2;
+                            internalId = internalId3;
                             holders = holders3;
-                            holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                            notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                            holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                            notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                             if (serializedChat2 != null) {
                                 jSONObject = serializedChat2;
                                 jSONObject.put("reply", canReply);
@@ -6662,17 +6662,17 @@ Caused by: java.lang.NullPointerException
                                 jSONObject.put("max_id", max_id2);
                                 jSONObject.put("max_date", max_date);
                                 jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                                if (mainNotification != null) {
-                                    user5 = "photo";
+                                if (mainNotification2 != null) {
+                                    user = "photo";
                                     text = new StringBuilder();
-                                    text.append(mainNotification.dc_id);
+                                    text.append(mainNotification2.dc_id);
                                     text.append("_");
-                                    text.append(mainNotification.volume_id);
+                                    text.append(mainNotification2.volume_id);
                                     text.append("_");
-                                    text.append(mainNotification.secret);
-                                    jSONObject.put(user5, text.toString());
+                                    text.append(mainNotification2.secret);
+                                    jSONObject.put(user, text.toString());
                                 } else {
-                                    num = internalId3;
+                                    num = internalId;
                                     str = name;
                                 }
                                 if (serializedMsgs != null) {
@@ -6693,9 +6693,9 @@ Caused by: java.lang.NullPointerException
                                 serializedNotifications2 = serializedNotifications;
                                 serializedNotifications2.put(jSONObject);
                             } else {
-                                user = user5;
+                                user2 = user;
                                 builder = showWhen;
-                                num = internalId3;
+                                num = internalId;
                                 str = name;
                                 serializedNotifications2 = serializedNotifications;
                                 jSONObject = serializedChat2;
@@ -6704,19 +6704,19 @@ Caused by: java.lang.NullPointerException
                                 builder2 = serializedMsgs;
                                 max_id = max_id2;
                             }
-                            b = b2 + 1;
+                            b2 = b + 1;
                             holders2 = holders;
                             messagesByDialogs2 = messagesByDialogs;
                             size = size2;
                             oldIdsWear2 = oldIdsWear;
-                            mainNotification = mainNotification2;
+                            mainNotification2 = mainNotification;
                             i2 = 0;
                             serializedNotifications3 = serializedNotifications2;
                             sortedDialogs2 = sortedDialogs;
                         }
                     }
                     if (z2 || SharedConfig.isWaitingForPasscodeEnter) {
-                        internalId2 = internalId;
+                        internalId3 = internalId2;
                         pendingIntent = msgHeardPendingIntent;
                         canReply = z2;
                         action = null;
@@ -6784,7 +6784,7 @@ Caused by: java.lang.NullPointerException
                                     text.append("\n\n");
                                 }
                                 text.append(wearReplyAction);
-                                mainNotification.addMessage(wearReplyAction);
+                                mainNotification2.addMessage(wearReplyAction);
                                 nameToReplace = name2;
                                 messagingStyle2.addMessage(wearReplyAction, ((long) messageObject3.messageOwner.date) * 1000, null);
                                 if (serializedMsgs2 != null) {
@@ -6909,7 +6909,7 @@ Caused by: java.lang.NullPointerException
                         text = new StringBuilder();
                         text.append(TtmlNode.ANONYMOUS_REGION_ID);
                         text.append(Long.MAX_VALUE - date);
-                        showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification.build())).setCategory("msg");
+                        showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification2.build())).setCategory("msg");
                         if (notificationsController.pushDialogs.size() == 1) {
                         }
                         str2 = summary;
@@ -6917,15 +6917,15 @@ Caused by: java.lang.NullPointerException
                             showWhen.setLocalOnly(true);
                         }
                         if (photoPath2 != null) {
-                            unreadConvBuilder = mainNotification;
+                            unreadConvBuilder = mainNotification2;
                             messagingStyle3 = messagingStyle2;
-                            mainNotification = photoPath2;
+                            mainNotification2 = photoPath2;
                         } else {
-                            unreadConvBuilder = mainNotification;
-                            mainNotification = photoPath2;
-                            messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification, null, "50_50");
+                            unreadConvBuilder = mainNotification2;
+                            mainNotification2 = photoPath2;
+                            messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification2, null, "50_50");
                             if (messagingStyle2 != null) {
-                                file = FileLoader.getPathToAttach(mainNotification, true);
+                                file = FileLoader.getPathToAttach(mainNotification2, true);
                                 if (file.exists()) {
                                     img = messagingStyle2;
                                 } else {
@@ -6952,18 +6952,18 @@ Caused by: java.lang.NullPointerException
                         arrayList2 = rows3;
                         if (chat == null) {
                         }
-                        user5 = user4;
+                        user = user5;
                         if (VERSION.SDK_INT >= 26) {
                             showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                         }
-                        internalId3 = internalId2;
+                        internalId = internalId3;
                         holders = holders3;
-                        holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                        holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                         if (serializedChat2 != null) {
-                            user = user5;
+                            user2 = user;
                             builder = showWhen;
-                            num = internalId3;
+                            num = internalId;
                             str = name;
                             serializedNotifications2 = serializedNotifications;
                             jSONObject = serializedChat2;
@@ -6978,18 +6978,18 @@ Caused by: java.lang.NullPointerException
                             jSONObject.put("max_id", max_id2);
                             jSONObject.put("max_date", max_date);
                             jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                            if (mainNotification != null) {
-                                num = internalId3;
+                            if (mainNotification2 != null) {
+                                num = internalId;
                                 str = name;
                             } else {
-                                user5 = "photo";
+                                user = "photo";
                                 text = new StringBuilder();
-                                text.append(mainNotification.dc_id);
+                                text.append(mainNotification2.dc_id);
                                 text.append("_");
-                                text.append(mainNotification.volume_id);
+                                text.append(mainNotification2.volume_id);
                                 text.append("_");
-                                text.append(mainNotification.secret);
-                                jSONObject.put(user5, text.toString());
+                                text.append(mainNotification2.secret);
+                                jSONObject.put(user, text.toString());
                             }
                             if (serializedMsgs != null) {
                                 builder2 = serializedMsgs;
@@ -7009,12 +7009,12 @@ Caused by: java.lang.NullPointerException
                             serializedNotifications2 = serializedNotifications;
                             serializedNotifications2.put(jSONObject);
                         }
-                        b = b2 + 1;
+                        b2 = b + 1;
                         holders2 = holders;
                         messagesByDialogs2 = messagesByDialogs;
                         size = size2;
                         oldIdsWear2 = oldIdsWear;
-                        mainNotification = mainNotification2;
+                        mainNotification2 = mainNotification;
                         i2 = 0;
                         serializedNotifications3 = serializedNotifications2;
                         sortedDialogs2 = sortedDialogs;
@@ -7027,25 +7027,25 @@ Caused by: java.lang.NullPointerException
                         msgHeardIntent.putExtra("max_id", max_id);
                         msgHeardIntent.putExtra("currentAccount", notificationsController.currentAccount);
                         action = null;
-                        PendingIntent msgReplyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), msgHeardIntent, 134217728);
+                        PendingIntent msgReplyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId2.intValue(), msgHeardIntent, 134217728);
                         Intent msgReplyIntent = msgHeardIntent;
                         RemoteInput remoteInputAuto = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
-                        mainNotification.setReplyAction(msgReplyPendingIntent, remoteInputAuto);
+                        mainNotification2.setReplyAction(msgReplyPendingIntent, remoteInputAuto);
                         msgHeardIntent = new Intent(ApplicationLoader.applicationContext, WearReplyReceiver.class);
                         msgHeardIntent.putExtra("dialog_id", dialog_id2);
                         msgHeardIntent.putExtra("max_id", max_id);
                         msgHeardIntent.putExtra("currentAccount", notificationsController.currentAccount);
-                        msgReplyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), msgHeardIntent, 134217728);
+                        msgReplyPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId2.intValue(), msgHeardIntent, 134217728);
                         Intent replyIntent = msgHeardIntent;
                         msgHeardIntent = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
                         if (lowerId < 0) {
                             canReply = z2;
                             name = LocaleController.formatString("ReplyToGroup", R.string.ReplyToGroup, name2);
-                            internalId2 = internalId;
+                            internalId3 = internalId2;
                             z4 = true;
                         } else {
                             canReply = z2;
-                            internalId2 = internalId;
+                            internalId3 = internalId2;
                             z4 = true;
                             name = LocaleController.formatString("ReplyToUser", R.string.ReplyToUser, name2);
                         }
@@ -7117,7 +7117,7 @@ Caused by: java.lang.NullPointerException
                                     text.append("\n\n");
                                 }
                                 text.append(wearReplyAction);
-                                mainNotification.addMessage(wearReplyAction);
+                                mainNotification2.addMessage(wearReplyAction);
                                 nameToReplace = name2;
                                 messagingStyle2.addMessage(wearReplyAction, ((long) messageObject3.messageOwner.date) * 1000, null);
                                 if (serializedMsgs2 != null) {
@@ -7238,7 +7238,7 @@ Caused by: java.lang.NullPointerException
                         text = new StringBuilder();
                         text.append(TtmlNode.ANONYMOUS_REGION_ID);
                         text.append(Long.MAX_VALUE - date);
-                        showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification.build())).setCategory("msg");
+                        showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification2.build())).setCategory("msg");
                         if (notificationsController.pushDialogs.size() == 1) {
                         }
                         str2 = summary;
@@ -7246,13 +7246,13 @@ Caused by: java.lang.NullPointerException
                             showWhen.setLocalOnly(true);
                         }
                         if (photoPath2 != null) {
-                            unreadConvBuilder = mainNotification;
-                            mainNotification = photoPath2;
-                            messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification, null, "50_50");
+                            unreadConvBuilder = mainNotification2;
+                            mainNotification2 = photoPath2;
+                            messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification2, null, "50_50");
                             if (messagingStyle2 != null) {
                                 showWhen.setLargeIcon(messagingStyle2.getBitmap());
                             } else {
-                                file = FileLoader.getPathToAttach(mainNotification, true);
+                                file = FileLoader.getPathToAttach(mainNotification2, true);
                                 if (file.exists()) {
                                     scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
                                     img = messagingStyle2;
@@ -7269,9 +7269,9 @@ Caused by: java.lang.NullPointerException
                                 }
                             }
                         } else {
-                            unreadConvBuilder = mainNotification;
+                            unreadConvBuilder = mainNotification2;
                             messagingStyle3 = messagingStyle2;
-                            mainNotification = photoPath2;
+                            mainNotification2 = photoPath2;
                         }
                         if (AndroidUtilities.needShowPasscode(false)) {
                         }
@@ -7281,14 +7281,14 @@ Caused by: java.lang.NullPointerException
                         arrayList2 = rows3;
                         if (chat == null) {
                         }
-                        user5 = user4;
+                        user = user5;
                         if (VERSION.SDK_INT >= 26) {
                             showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                         }
-                        internalId3 = internalId2;
+                        internalId = internalId3;
                         holders = holders3;
-                        holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                        holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                         if (serializedChat2 != null) {
                             jSONObject = serializedChat2;
                             jSONObject.put("reply", canReply);
@@ -7296,17 +7296,17 @@ Caused by: java.lang.NullPointerException
                             jSONObject.put("max_id", max_id2);
                             jSONObject.put("max_date", max_date);
                             jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                            if (mainNotification != null) {
-                                user5 = "photo";
+                            if (mainNotification2 != null) {
+                                user = "photo";
                                 text = new StringBuilder();
-                                text.append(mainNotification.dc_id);
+                                text.append(mainNotification2.dc_id);
                                 text.append("_");
-                                text.append(mainNotification.volume_id);
+                                text.append(mainNotification2.volume_id);
                                 text.append("_");
-                                text.append(mainNotification.secret);
-                                jSONObject.put(user5, text.toString());
+                                text.append(mainNotification2.secret);
+                                jSONObject.put(user, text.toString());
                             } else {
-                                num = internalId3;
+                                num = internalId;
                                 str = name;
                             }
                             if (serializedMsgs != null) {
@@ -7327,9 +7327,9 @@ Caused by: java.lang.NullPointerException
                             serializedNotifications2 = serializedNotifications;
                             serializedNotifications2.put(jSONObject);
                         } else {
-                            user = user5;
+                            user2 = user;
                             builder = showWhen;
-                            num = internalId3;
+                            num = internalId;
                             str = name;
                             serializedNotifications2 = serializedNotifications;
                             jSONObject = serializedChat2;
@@ -7338,12 +7338,12 @@ Caused by: java.lang.NullPointerException
                             builder2 = serializedMsgs;
                             max_id = max_id2;
                         }
-                        b = b2 + 1;
+                        b2 = b + 1;
                         holders2 = holders;
                         messagesByDialogs2 = messagesByDialogs;
                         size = size2;
                         oldIdsWear2 = oldIdsWear;
-                        mainNotification = mainNotification2;
+                        mainNotification2 = mainNotification;
                         i2 = 0;
                         serializedNotifications3 = serializedNotifications2;
                         sortedDialogs2 = sortedDialogs;
@@ -7355,9 +7355,9 @@ Caused by: java.lang.NullPointerException
                 photoPath = fileLocation;
                 z2 = z;
                 holders3 = holders2;
-                serializedChat2 = mainNotification;
+                serializedChat2 = mainNotification2;
                 highId2 = highId;
-                mainNotification = new UnreadConversation.Builder(name2).setLatestTimestamp(((long) size) * 1000);
+                mainNotification2 = new UnreadConversation.Builder(name2).setLatestTimestamp(((long) size) * 1000);
                 max_date = size;
                 msgHeardIntent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
                 msgHeardIntent.addFlags(32);
@@ -7365,13 +7365,13 @@ Caused by: java.lang.NullPointerException
                 msgHeardIntent.putExtra("dialog_id", dialog_id2);
                 msgHeardIntent.putExtra("max_id", max_id);
                 msgHeardIntent.putExtra("currentAccount", notificationsController.currentAccount);
-                user4 = user3;
-                msgHeardPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), msgHeardIntent, 134217728);
-                mainNotification.setReadPendingIntent(msgHeardPendingIntent);
+                user5 = user4;
+                msgHeardPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId2.intValue(), msgHeardIntent, 134217728);
+                mainNotification2.setReadPendingIntent(msgHeardPendingIntent);
                 if (isChannel) {
                     if (!isSupergroup) {
                         intent = msgHeardIntent;
-                        internalId2 = internalId;
+                        internalId3 = internalId2;
                         pendingIntent = msgHeardPendingIntent;
                         canReply = z2;
                         action = null;
@@ -7439,7 +7439,7 @@ Caused by: java.lang.NullPointerException
                                     text.append("\n\n");
                                 }
                                 text.append(wearReplyAction);
-                                mainNotification.addMessage(wearReplyAction);
+                                mainNotification2.addMessage(wearReplyAction);
                                 nameToReplace = name2;
                                 messagingStyle2.addMessage(wearReplyAction, ((long) messageObject3.messageOwner.date) * 1000, null);
                                 if (serializedMsgs2 != null) {
@@ -7564,7 +7564,7 @@ Caused by: java.lang.NullPointerException
                         text = new StringBuilder();
                         text.append(TtmlNode.ANONYMOUS_REGION_ID);
                         text.append(Long.MAX_VALUE - date);
-                        showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification.build())).setCategory("msg");
+                        showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification2.build())).setCategory("msg");
                         if (notificationsController.pushDialogs.size() == 1) {
                         }
                         str2 = summary;
@@ -7572,15 +7572,15 @@ Caused by: java.lang.NullPointerException
                             showWhen.setLocalOnly(true);
                         }
                         if (photoPath2 != null) {
-                            unreadConvBuilder = mainNotification;
+                            unreadConvBuilder = mainNotification2;
                             messagingStyle3 = messagingStyle2;
-                            mainNotification = photoPath2;
+                            mainNotification2 = photoPath2;
                         } else {
-                            unreadConvBuilder = mainNotification;
-                            mainNotification = photoPath2;
-                            messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification, null, "50_50");
+                            unreadConvBuilder = mainNotification2;
+                            mainNotification2 = photoPath2;
+                            messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification2, null, "50_50");
                             if (messagingStyle2 != null) {
-                                file = FileLoader.getPathToAttach(mainNotification, true);
+                                file = FileLoader.getPathToAttach(mainNotification2, true);
                                 if (file.exists()) {
                                     img = messagingStyle2;
                                 } else {
@@ -7607,18 +7607,18 @@ Caused by: java.lang.NullPointerException
                         arrayList2 = rows3;
                         if (chat == null) {
                         }
-                        user5 = user4;
+                        user = user5;
                         if (VERSION.SDK_INT >= 26) {
                             showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                         }
-                        internalId3 = internalId2;
+                        internalId = internalId3;
                         holders = holders3;
-                        holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                        holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                         if (serializedChat2 != null) {
-                            user = user5;
+                            user2 = user;
                             builder = showWhen;
-                            num = internalId3;
+                            num = internalId;
                             str = name;
                             serializedNotifications2 = serializedNotifications;
                             jSONObject = serializedChat2;
@@ -7633,18 +7633,18 @@ Caused by: java.lang.NullPointerException
                             jSONObject.put("max_id", max_id2);
                             jSONObject.put("max_date", max_date);
                             jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                            if (mainNotification != null) {
-                                num = internalId3;
+                            if (mainNotification2 != null) {
+                                num = internalId;
                                 str = name;
                             } else {
-                                user5 = "photo";
+                                user = "photo";
                                 text = new StringBuilder();
-                                text.append(mainNotification.dc_id);
+                                text.append(mainNotification2.dc_id);
                                 text.append("_");
-                                text.append(mainNotification.volume_id);
+                                text.append(mainNotification2.volume_id);
                                 text.append("_");
-                                text.append(mainNotification.secret);
-                                jSONObject.put(user5, text.toString());
+                                text.append(mainNotification2.secret);
+                                jSONObject.put(user, text.toString());
                             }
                             if (serializedMsgs != null) {
                                 builder2 = serializedMsgs;
@@ -7664,12 +7664,12 @@ Caused by: java.lang.NullPointerException
                             serializedNotifications2 = serializedNotifications;
                             serializedNotifications2.put(jSONObject);
                         }
-                        b = b2 + 1;
+                        b2 = b + 1;
                         holders2 = holders;
                         messagesByDialogs2 = messagesByDialogs;
                         size = size2;
                         oldIdsWear2 = oldIdsWear;
-                        mainNotification = mainNotification2;
+                        mainNotification2 = mainNotification;
                         i2 = 0;
                         serializedNotifications3 = serializedNotifications2;
                         sortedDialogs2 = sortedDialogs;
@@ -7677,7 +7677,7 @@ Caused by: java.lang.NullPointerException
                 }
                 if (z2) {
                 }
-                internalId2 = internalId;
+                internalId3 = internalId2;
                 pendingIntent = msgHeardPendingIntent;
                 canReply = z2;
                 action = null;
@@ -7749,7 +7749,7 @@ Caused by: java.lang.NullPointerException
                             text.append("\n\n");
                         }
                         text.append(wearReplyAction);
-                        mainNotification.addMessage(wearReplyAction);
+                        mainNotification2.addMessage(wearReplyAction);
                         nameToReplace = name2;
                         messagingStyle2.addMessage(wearReplyAction, ((long) messageObject3.messageOwner.date) * 1000, null);
                         if (serializedMsgs2 != null) {
@@ -7870,7 +7870,7 @@ Caused by: java.lang.NullPointerException
                 text = new StringBuilder();
                 text.append(TtmlNode.ANONYMOUS_REGION_ID);
                 text.append(Long.MAX_VALUE - date);
-                showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification.build())).setCategory("msg");
+                showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification2.build())).setCategory("msg");
                 if (notificationsController.pushDialogs.size() == 1) {
                 }
                 str2 = summary;
@@ -7878,13 +7878,13 @@ Caused by: java.lang.NullPointerException
                     showWhen.setLocalOnly(true);
                 }
                 if (photoPath2 != null) {
-                    unreadConvBuilder = mainNotification;
-                    mainNotification = photoPath2;
-                    messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification, null, "50_50");
+                    unreadConvBuilder = mainNotification2;
+                    mainNotification2 = photoPath2;
+                    messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification2, null, "50_50");
                     if (messagingStyle2 != null) {
                         showWhen.setLargeIcon(messagingStyle2.getBitmap());
                     } else {
-                        file = FileLoader.getPathToAttach(mainNotification, true);
+                        file = FileLoader.getPathToAttach(mainNotification2, true);
                         if (file.exists()) {
                             scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
                             img = messagingStyle2;
@@ -7901,9 +7901,9 @@ Caused by: java.lang.NullPointerException
                         }
                     }
                 } else {
-                    unreadConvBuilder = mainNotification;
+                    unreadConvBuilder = mainNotification2;
                     messagingStyle3 = messagingStyle2;
-                    mainNotification = photoPath2;
+                    mainNotification2 = photoPath2;
                 }
                 if (AndroidUtilities.needShowPasscode(false)) {
                 }
@@ -7913,14 +7913,14 @@ Caused by: java.lang.NullPointerException
                 arrayList2 = rows3;
                 if (chat == null) {
                 }
-                user5 = user4;
+                user = user5;
                 if (VERSION.SDK_INT >= 26) {
                     showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                 }
-                internalId3 = internalId2;
+                internalId = internalId3;
                 holders = holders3;
-                holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                 if (serializedChat2 != null) {
                     jSONObject = serializedChat2;
                     jSONObject.put("reply", canReply);
@@ -7928,17 +7928,17 @@ Caused by: java.lang.NullPointerException
                     jSONObject.put("max_id", max_id2);
                     jSONObject.put("max_date", max_date);
                     jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                    if (mainNotification != null) {
-                        user5 = "photo";
+                    if (mainNotification2 != null) {
+                        user = "photo";
                         text = new StringBuilder();
-                        text.append(mainNotification.dc_id);
+                        text.append(mainNotification2.dc_id);
                         text.append("_");
-                        text.append(mainNotification.volume_id);
+                        text.append(mainNotification2.volume_id);
                         text.append("_");
-                        text.append(mainNotification.secret);
-                        jSONObject.put(user5, text.toString());
+                        text.append(mainNotification2.secret);
+                        jSONObject.put(user, text.toString());
                     } else {
-                        num = internalId3;
+                        num = internalId;
                         str = name;
                     }
                     if (serializedMsgs != null) {
@@ -7959,9 +7959,9 @@ Caused by: java.lang.NullPointerException
                     serializedNotifications2 = serializedNotifications;
                     serializedNotifications2.put(jSONObject);
                 } else {
-                    user = user5;
+                    user2 = user;
                     builder = showWhen;
-                    num = internalId3;
+                    num = internalId;
                     str = name;
                     serializedNotifications2 = serializedNotifications;
                     jSONObject = serializedChat2;
@@ -7970,39 +7970,39 @@ Caused by: java.lang.NullPointerException
                     builder2 = serializedMsgs;
                     max_id = max_id2;
                 }
-                b = b2 + 1;
+                b2 = b + 1;
                 holders2 = holders;
                 messagesByDialogs2 = messagesByDialogs;
                 size = size2;
                 oldIdsWear2 = oldIdsWear;
-                mainNotification = mainNotification2;
+                mainNotification2 = mainNotification;
                 i2 = 0;
                 serializedNotifications3 = serializedNotifications2;
                 sortedDialogs2 = sortedDialogs;
             } else {
-                mainNotification2 = mainNotification;
+                mainNotification = mainNotification2;
                 messageObject2 = lastMessageObject;
                 serializedNotifications = serializedNotifications3;
-                b2 = b;
+                b = b2;
                 z = false;
-                mainNotification = MessagesController.getInstance(notificationsController.currentAccount).getEncryptedChat(Integer.valueOf(highId));
-                if (mainNotification != null) {
-                    user2 = MessagesController.getInstance(notificationsController.currentAccount).getUser(Integer.valueOf(mainNotification.user_id));
-                    if (user2 != null) {
+                mainNotification2 = MessagesController.getInstance(notificationsController.currentAccount).getEncryptedChat(Integer.valueOf(highId));
+                if (mainNotification2 != null) {
+                    user3 = MessagesController.getInstance(notificationsController.currentAccount).getUser(Integer.valueOf(mainNotification2.user_id));
+                    if (user3 != null) {
                         name2 = LocaleController.getString("SecretChatName", R.string.SecretChatName);
                         fileLocation = null;
                         serializedChat = null;
-                        mainNotification = serializedChat;
-                        user3 = user2;
+                        mainNotification2 = serializedChat;
+                        user4 = user3;
                         if (AndroidUtilities.needShowPasscode(false)) {
                             if (SharedConfig.isWaitingForPasscodeEnter) {
                             }
                             photoPath = fileLocation;
                             z2 = z;
                             holders3 = holders2;
-                            serializedChat2 = mainNotification;
+                            serializedChat2 = mainNotification2;
                             highId2 = highId;
-                            mainNotification = new UnreadConversation.Builder(name2).setLatestTimestamp(((long) size) * 1000);
+                            mainNotification2 = new UnreadConversation.Builder(name2).setLatestTimestamp(((long) size) * 1000);
                             max_date = size;
                             msgHeardIntent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
                             msgHeardIntent.addFlags(32);
@@ -8010,13 +8010,13 @@ Caused by: java.lang.NullPointerException
                             msgHeardIntent.putExtra("dialog_id", dialog_id2);
                             msgHeardIntent.putExtra("max_id", max_id);
                             msgHeardIntent.putExtra("currentAccount", notificationsController.currentAccount);
-                            user4 = user3;
-                            msgHeardPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), msgHeardIntent, 134217728);
-                            mainNotification.setReadPendingIntent(msgHeardPendingIntent);
+                            user5 = user4;
+                            msgHeardPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId2.intValue(), msgHeardIntent, 134217728);
+                            mainNotification2.setReadPendingIntent(msgHeardPendingIntent);
                             if (isChannel) {
                                 if (!isSupergroup) {
                                     intent = msgHeardIntent;
-                                    internalId2 = internalId;
+                                    internalId3 = internalId2;
                                     pendingIntent = msgHeardPendingIntent;
                                     canReply = z2;
                                     action = null;
@@ -8084,7 +8084,7 @@ Caused by: java.lang.NullPointerException
                                                 text.append("\n\n");
                                             }
                                             text.append(wearReplyAction);
-                                            mainNotification.addMessage(wearReplyAction);
+                                            mainNotification2.addMessage(wearReplyAction);
                                             nameToReplace = name2;
                                             messagingStyle2.addMessage(wearReplyAction, ((long) messageObject3.messageOwner.date) * 1000, null);
                                             if (serializedMsgs2 != null) {
@@ -8209,7 +8209,7 @@ Caused by: java.lang.NullPointerException
                                     text = new StringBuilder();
                                     text.append(TtmlNode.ANONYMOUS_REGION_ID);
                                     text.append(Long.MAX_VALUE - date);
-                                    showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification.build())).setCategory("msg");
+                                    showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification2.build())).setCategory("msg");
                                     if (notificationsController.pushDialogs.size() == 1) {
                                     }
                                     str2 = summary;
@@ -8217,15 +8217,15 @@ Caused by: java.lang.NullPointerException
                                         showWhen.setLocalOnly(true);
                                     }
                                     if (photoPath2 != null) {
-                                        unreadConvBuilder = mainNotification;
+                                        unreadConvBuilder = mainNotification2;
                                         messagingStyle3 = messagingStyle2;
-                                        mainNotification = photoPath2;
+                                        mainNotification2 = photoPath2;
                                     } else {
-                                        unreadConvBuilder = mainNotification;
-                                        mainNotification = photoPath2;
-                                        messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification, null, "50_50");
+                                        unreadConvBuilder = mainNotification2;
+                                        mainNotification2 = photoPath2;
+                                        messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification2, null, "50_50");
                                         if (messagingStyle2 != null) {
-                                            file = FileLoader.getPathToAttach(mainNotification, true);
+                                            file = FileLoader.getPathToAttach(mainNotification2, true);
                                             if (file.exists()) {
                                                 img = messagingStyle2;
                                             } else {
@@ -8252,18 +8252,18 @@ Caused by: java.lang.NullPointerException
                                     arrayList2 = rows3;
                                     if (chat == null) {
                                     }
-                                    user5 = user4;
+                                    user = user5;
                                     if (VERSION.SDK_INT >= 26) {
                                         showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                                     }
-                                    internalId3 = internalId2;
+                                    internalId = internalId3;
                                     holders = holders3;
-                                    holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                                    notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                                    holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                                    notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                                     if (serializedChat2 != null) {
-                                        user = user5;
+                                        user2 = user;
                                         builder = showWhen;
-                                        num = internalId3;
+                                        num = internalId;
                                         str = name;
                                         serializedNotifications2 = serializedNotifications;
                                         jSONObject = serializedChat2;
@@ -8278,18 +8278,18 @@ Caused by: java.lang.NullPointerException
                                         jSONObject.put("max_id", max_id2);
                                         jSONObject.put("max_date", max_date);
                                         jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                                        if (mainNotification != null) {
-                                            num = internalId3;
+                                        if (mainNotification2 != null) {
+                                            num = internalId;
                                             str = name;
                                         } else {
-                                            user5 = "photo";
+                                            user = "photo";
                                             text = new StringBuilder();
-                                            text.append(mainNotification.dc_id);
+                                            text.append(mainNotification2.dc_id);
                                             text.append("_");
-                                            text.append(mainNotification.volume_id);
+                                            text.append(mainNotification2.volume_id);
                                             text.append("_");
-                                            text.append(mainNotification.secret);
-                                            jSONObject.put(user5, text.toString());
+                                            text.append(mainNotification2.secret);
+                                            jSONObject.put(user, text.toString());
                                         }
                                         if (serializedMsgs != null) {
                                             builder2 = serializedMsgs;
@@ -8309,12 +8309,12 @@ Caused by: java.lang.NullPointerException
                                         serializedNotifications2 = serializedNotifications;
                                         serializedNotifications2.put(jSONObject);
                                     }
-                                    b = b2 + 1;
+                                    b2 = b + 1;
                                     holders2 = holders;
                                     messagesByDialogs2 = messagesByDialogs;
                                     size = size2;
                                     oldIdsWear2 = oldIdsWear;
-                                    mainNotification = mainNotification2;
+                                    mainNotification2 = mainNotification;
                                     i2 = 0;
                                     serializedNotifications3 = serializedNotifications2;
                                     sortedDialogs2 = sortedDialogs;
@@ -8322,7 +8322,7 @@ Caused by: java.lang.NullPointerException
                             }
                             if (z2) {
                             }
-                            internalId2 = internalId;
+                            internalId3 = internalId2;
                             pendingIntent = msgHeardPendingIntent;
                             canReply = z2;
                             action = null;
@@ -8394,7 +8394,7 @@ Caused by: java.lang.NullPointerException
                                         text.append("\n\n");
                                     }
                                     text.append(wearReplyAction);
-                                    mainNotification.addMessage(wearReplyAction);
+                                    mainNotification2.addMessage(wearReplyAction);
                                     nameToReplace = name2;
                                     messagingStyle2.addMessage(wearReplyAction, ((long) messageObject3.messageOwner.date) * 1000, null);
                                     if (serializedMsgs2 != null) {
@@ -8515,7 +8515,7 @@ Caused by: java.lang.NullPointerException
                             text = new StringBuilder();
                             text.append(TtmlNode.ANONYMOUS_REGION_ID);
                             text.append(Long.MAX_VALUE - date);
-                            showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification.build())).setCategory("msg");
+                            showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification2.build())).setCategory("msg");
                             if (notificationsController.pushDialogs.size() == 1) {
                             }
                             str2 = summary;
@@ -8523,13 +8523,13 @@ Caused by: java.lang.NullPointerException
                                 showWhen.setLocalOnly(true);
                             }
                             if (photoPath2 != null) {
-                                unreadConvBuilder = mainNotification;
-                                mainNotification = photoPath2;
-                                messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification, null, "50_50");
+                                unreadConvBuilder = mainNotification2;
+                                mainNotification2 = photoPath2;
+                                messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification2, null, "50_50");
                                 if (messagingStyle2 != null) {
                                     showWhen.setLargeIcon(messagingStyle2.getBitmap());
                                 } else {
-                                    file = FileLoader.getPathToAttach(mainNotification, true);
+                                    file = FileLoader.getPathToAttach(mainNotification2, true);
                                     if (file.exists()) {
                                         scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
                                         img = messagingStyle2;
@@ -8546,9 +8546,9 @@ Caused by: java.lang.NullPointerException
                                     }
                                 }
                             } else {
-                                unreadConvBuilder = mainNotification;
+                                unreadConvBuilder = mainNotification2;
                                 messagingStyle3 = messagingStyle2;
-                                mainNotification = photoPath2;
+                                mainNotification2 = photoPath2;
                             }
                             if (AndroidUtilities.needShowPasscode(false)) {
                             }
@@ -8558,14 +8558,14 @@ Caused by: java.lang.NullPointerException
                             arrayList2 = rows3;
                             if (chat == null) {
                             }
-                            user5 = user4;
+                            user = user5;
                             if (VERSION.SDK_INT >= 26) {
                                 showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                             }
-                            internalId3 = internalId2;
+                            internalId = internalId3;
                             holders = holders3;
-                            holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                            notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                            holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                            notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                             if (serializedChat2 != null) {
                                 jSONObject = serializedChat2;
                                 jSONObject.put("reply", canReply);
@@ -8573,17 +8573,17 @@ Caused by: java.lang.NullPointerException
                                 jSONObject.put("max_id", max_id2);
                                 jSONObject.put("max_date", max_date);
                                 jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                                if (mainNotification != null) {
-                                    user5 = "photo";
+                                if (mainNotification2 != null) {
+                                    user = "photo";
                                     text = new StringBuilder();
-                                    text.append(mainNotification.dc_id);
+                                    text.append(mainNotification2.dc_id);
                                     text.append("_");
-                                    text.append(mainNotification.volume_id);
+                                    text.append(mainNotification2.volume_id);
                                     text.append("_");
-                                    text.append(mainNotification.secret);
-                                    jSONObject.put(user5, text.toString());
+                                    text.append(mainNotification2.secret);
+                                    jSONObject.put(user, text.toString());
                                 } else {
-                                    num = internalId3;
+                                    num = internalId;
                                     str = name;
                                 }
                                 if (serializedMsgs != null) {
@@ -8604,9 +8604,9 @@ Caused by: java.lang.NullPointerException
                                 serializedNotifications2 = serializedNotifications;
                                 serializedNotifications2.put(jSONObject);
                             } else {
-                                user = user5;
+                                user2 = user;
                                 builder = showWhen;
-                                num = internalId3;
+                                num = internalId;
                                 str = name;
                                 serializedNotifications2 = serializedNotifications;
                                 jSONObject = serializedChat2;
@@ -8615,12 +8615,12 @@ Caused by: java.lang.NullPointerException
                                 builder2 = serializedMsgs;
                                 max_id = max_id2;
                             }
-                            b = b2 + 1;
+                            b2 = b + 1;
                             holders2 = holders;
                             messagesByDialogs2 = messagesByDialogs;
                             size = size2;
                             oldIdsWear2 = oldIdsWear;
-                            mainNotification = mainNotification2;
+                            mainNotification2 = mainNotification;
                             i2 = 0;
                             serializedNotifications3 = serializedNotifications2;
                             sortedDialogs2 = sortedDialogs;
@@ -8631,9 +8631,9 @@ Caused by: java.lang.NullPointerException
                         photoPath = fileLocation;
                         z2 = z;
                         holders3 = holders2;
-                        serializedChat2 = mainNotification;
+                        serializedChat2 = mainNotification2;
                         highId2 = highId;
-                        mainNotification = new UnreadConversation.Builder(name2).setLatestTimestamp(((long) size) * 1000);
+                        mainNotification2 = new UnreadConversation.Builder(name2).setLatestTimestamp(((long) size) * 1000);
                         max_date = size;
                         msgHeardIntent = new Intent(ApplicationLoader.applicationContext, AutoMessageHeardReceiver.class);
                         msgHeardIntent.addFlags(32);
@@ -8641,13 +8641,13 @@ Caused by: java.lang.NullPointerException
                         msgHeardIntent.putExtra("dialog_id", dialog_id2);
                         msgHeardIntent.putExtra("max_id", max_id);
                         msgHeardIntent.putExtra("currentAccount", notificationsController.currentAccount);
-                        user4 = user3;
-                        msgHeardPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId.intValue(), msgHeardIntent, 134217728);
-                        mainNotification.setReadPendingIntent(msgHeardPendingIntent);
+                        user5 = user4;
+                        msgHeardPendingIntent = PendingIntent.getBroadcast(ApplicationLoader.applicationContext, internalId2.intValue(), msgHeardIntent, 134217728);
+                        mainNotification2.setReadPendingIntent(msgHeardPendingIntent);
                         if (isChannel) {
                             if (!isSupergroup) {
                                 intent = msgHeardIntent;
-                                internalId2 = internalId;
+                                internalId3 = internalId2;
                                 pendingIntent = msgHeardPendingIntent;
                                 canReply = z2;
                                 action = null;
@@ -8715,7 +8715,7 @@ Caused by: java.lang.NullPointerException
                                             text.append("\n\n");
                                         }
                                         text.append(wearReplyAction);
-                                        mainNotification.addMessage(wearReplyAction);
+                                        mainNotification2.addMessage(wearReplyAction);
                                         nameToReplace = name2;
                                         messagingStyle2.addMessage(wearReplyAction, ((long) messageObject3.messageOwner.date) * 1000, null);
                                         if (serializedMsgs2 != null) {
@@ -8840,7 +8840,7 @@ Caused by: java.lang.NullPointerException
                                 text = new StringBuilder();
                                 text.append(TtmlNode.ANONYMOUS_REGION_ID);
                                 text.append(Long.MAX_VALUE - date);
-                                showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification.build())).setCategory("msg");
+                                showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification2.build())).setCategory("msg");
                                 if (notificationsController.pushDialogs.size() == 1) {
                                 }
                                 str2 = summary;
@@ -8848,15 +8848,15 @@ Caused by: java.lang.NullPointerException
                                     showWhen.setLocalOnly(true);
                                 }
                                 if (photoPath2 != null) {
-                                    unreadConvBuilder = mainNotification;
+                                    unreadConvBuilder = mainNotification2;
                                     messagingStyle3 = messagingStyle2;
-                                    mainNotification = photoPath2;
+                                    mainNotification2 = photoPath2;
                                 } else {
-                                    unreadConvBuilder = mainNotification;
-                                    mainNotification = photoPath2;
-                                    messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification, null, "50_50");
+                                    unreadConvBuilder = mainNotification2;
+                                    mainNotification2 = photoPath2;
+                                    messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification2, null, "50_50");
                                     if (messagingStyle2 != null) {
-                                        file = FileLoader.getPathToAttach(mainNotification, true);
+                                        file = FileLoader.getPathToAttach(mainNotification2, true);
                                         if (file.exists()) {
                                             img = messagingStyle2;
                                         } else {
@@ -8883,18 +8883,18 @@ Caused by: java.lang.NullPointerException
                                 arrayList2 = rows3;
                                 if (chat == null) {
                                 }
-                                user5 = user4;
+                                user = user5;
                                 if (VERSION.SDK_INT >= 26) {
                                     showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                                 }
-                                internalId3 = internalId2;
+                                internalId = internalId3;
                                 holders = holders3;
-                                holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                                notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                                holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                                notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                                 if (serializedChat2 != null) {
-                                    user = user5;
+                                    user2 = user;
                                     builder = showWhen;
-                                    num = internalId3;
+                                    num = internalId;
                                     str = name;
                                     serializedNotifications2 = serializedNotifications;
                                     jSONObject = serializedChat2;
@@ -8909,18 +8909,18 @@ Caused by: java.lang.NullPointerException
                                     jSONObject.put("max_id", max_id2);
                                     jSONObject.put("max_date", max_date);
                                     jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                                    if (mainNotification != null) {
-                                        num = internalId3;
+                                    if (mainNotification2 != null) {
+                                        num = internalId;
                                         str = name;
                                     } else {
-                                        user5 = "photo";
+                                        user = "photo";
                                         text = new StringBuilder();
-                                        text.append(mainNotification.dc_id);
+                                        text.append(mainNotification2.dc_id);
                                         text.append("_");
-                                        text.append(mainNotification.volume_id);
+                                        text.append(mainNotification2.volume_id);
                                         text.append("_");
-                                        text.append(mainNotification.secret);
-                                        jSONObject.put(user5, text.toString());
+                                        text.append(mainNotification2.secret);
+                                        jSONObject.put(user, text.toString());
                                     }
                                     if (serializedMsgs != null) {
                                         builder2 = serializedMsgs;
@@ -8940,12 +8940,12 @@ Caused by: java.lang.NullPointerException
                                     serializedNotifications2 = serializedNotifications;
                                     serializedNotifications2.put(jSONObject);
                                 }
-                                b = b2 + 1;
+                                b2 = b + 1;
                                 holders2 = holders;
                                 messagesByDialogs2 = messagesByDialogs;
                                 size = size2;
                                 oldIdsWear2 = oldIdsWear;
-                                mainNotification = mainNotification2;
+                                mainNotification2 = mainNotification;
                                 i2 = 0;
                                 serializedNotifications3 = serializedNotifications2;
                                 sortedDialogs2 = sortedDialogs;
@@ -8953,7 +8953,7 @@ Caused by: java.lang.NullPointerException
                         }
                         if (z2) {
                         }
-                        internalId2 = internalId;
+                        internalId3 = internalId2;
                         pendingIntent = msgHeardPendingIntent;
                         canReply = z2;
                         action = null;
@@ -9025,7 +9025,7 @@ Caused by: java.lang.NullPointerException
                                     text.append("\n\n");
                                 }
                                 text.append(wearReplyAction);
-                                mainNotification.addMessage(wearReplyAction);
+                                mainNotification2.addMessage(wearReplyAction);
                                 nameToReplace = name2;
                                 messagingStyle2.addMessage(wearReplyAction, ((long) messageObject3.messageOwner.date) * 1000, null);
                                 if (serializedMsgs2 != null) {
@@ -9146,7 +9146,7 @@ Caused by: java.lang.NullPointerException
                         text = new StringBuilder();
                         text.append(TtmlNode.ANONYMOUS_REGION_ID);
                         text.append(Long.MAX_VALUE - date);
-                        showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification.build())).setCategory("msg");
+                        showWhen = showWhen.setSortKey(text.toString()).extend(new CarExtender().setUnreadConversation(mainNotification2.build())).setCategory("msg");
                         if (notificationsController.pushDialogs.size() == 1) {
                         }
                         str2 = summary;
@@ -9154,13 +9154,13 @@ Caused by: java.lang.NullPointerException
                             showWhen.setLocalOnly(true);
                         }
                         if (photoPath2 != null) {
-                            unreadConvBuilder = mainNotification;
-                            mainNotification = photoPath2;
-                            messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification, null, "50_50");
+                            unreadConvBuilder = mainNotification2;
+                            mainNotification2 = photoPath2;
+                            messagingStyle2 = ImageLoader.getInstance().getImageFromMemory(mainNotification2, null, "50_50");
                             if (messagingStyle2 != null) {
                                 showWhen.setLargeIcon(messagingStyle2.getBitmap());
                             } else {
-                                file = FileLoader.getPathToAttach(mainNotification, true);
+                                file = FileLoader.getPathToAttach(mainNotification2, true);
                                 if (file.exists()) {
                                     scaleFactor = 160.0f / ((float) AndroidUtilities.dp(50.0f));
                                     img = messagingStyle2;
@@ -9177,9 +9177,9 @@ Caused by: java.lang.NullPointerException
                                 }
                             }
                         } else {
-                            unreadConvBuilder = mainNotification;
+                            unreadConvBuilder = mainNotification2;
                             messagingStyle3 = messagingStyle2;
-                            mainNotification = photoPath2;
+                            mainNotification2 = photoPath2;
                         }
                         if (AndroidUtilities.needShowPasscode(false)) {
                         }
@@ -9189,14 +9189,14 @@ Caused by: java.lang.NullPointerException
                         arrayList2 = rows3;
                         if (chat == null) {
                         }
-                        user5 = user4;
+                        user = user5;
                         if (VERSION.SDK_INT >= 26) {
                             showWhen.setChannelId(OTHER_NOTIFICATIONS_CHANNEL);
                         }
-                        internalId3 = internalId2;
+                        internalId = internalId3;
                         holders = holders3;
-                        holders.add(new AnonymousClass1NotificationHolder(internalId3.intValue(), showWhen.build()));
-                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId3);
+                        holders.add(new AnonymousClass1NotificationHolder(internalId.intValue(), showWhen.build()));
+                        notificationsController.wearNotificationsIds.put(dialog_id2, internalId);
                         if (serializedChat2 != null) {
                             jSONObject = serializedChat2;
                             jSONObject.put("reply", canReply);
@@ -9204,17 +9204,17 @@ Caused by: java.lang.NullPointerException
                             jSONObject.put("max_id", max_id2);
                             jSONObject.put("max_date", max_date);
                             jSONObject.put(TtmlNode.ATTR_ID, Math.abs(lowerId));
-                            if (mainNotification != null) {
-                                user5 = "photo";
+                            if (mainNotification2 != null) {
+                                user = "photo";
                                 text = new StringBuilder();
-                                text.append(mainNotification.dc_id);
+                                text.append(mainNotification2.dc_id);
                                 text.append("_");
-                                text.append(mainNotification.volume_id);
+                                text.append(mainNotification2.volume_id);
                                 text.append("_");
-                                text.append(mainNotification.secret);
-                                jSONObject.put(user5, text.toString());
+                                text.append(mainNotification2.secret);
+                                jSONObject.put(user, text.toString());
                             } else {
-                                num = internalId3;
+                                num = internalId;
                                 str = name;
                             }
                             if (serializedMsgs != null) {
@@ -9235,9 +9235,9 @@ Caused by: java.lang.NullPointerException
                             serializedNotifications2 = serializedNotifications;
                             serializedNotifications2.put(jSONObject);
                         } else {
-                            user = user5;
+                            user2 = user;
                             builder = showWhen;
-                            num = internalId3;
+                            num = internalId;
                             str = name;
                             serializedNotifications2 = serializedNotifications;
                             jSONObject = serializedChat2;
@@ -9246,12 +9246,12 @@ Caused by: java.lang.NullPointerException
                             builder2 = serializedMsgs;
                             max_id = max_id2;
                         }
-                        b = b2 + 1;
+                        b2 = b + 1;
                         holders2 = holders;
                         messagesByDialogs2 = messagesByDialogs;
                         size = size2;
                         oldIdsWear2 = oldIdsWear;
-                        mainNotification = mainNotification2;
+                        mainNotification2 = mainNotification;
                         i2 = 0;
                         serializedNotifications3 = serializedNotifications2;
                         sortedDialogs2 = sortedDialogs;
@@ -9260,12 +9260,12 @@ Caused by: java.lang.NullPointerException
             }
             holders = holders2;
             serializedNotifications2 = serializedNotifications;
-            b = b2 + 1;
+            b2 = b + 1;
             holders2 = holders;
             messagesByDialogs2 = messagesByDialogs;
             size = size2;
             oldIdsWear2 = oldIdsWear;
-            mainNotification = mainNotification2;
+            mainNotification2 = mainNotification;
             i2 = 0;
             serializedNotifications3 = serializedNotifications2;
             sortedDialogs2 = sortedDialogs;
@@ -9275,7 +9275,7 @@ Caused by: java.lang.NullPointerException
         oldIdsWear = oldIdsWear2;
         serializedNotifications2 = serializedNotifications3;
         holders = holders2;
-        notificationManager.notify(notificationsController.notificationId, mainNotification);
+        notificationManager.notify(notificationsController.notificationId, mainNotification2);
         i = holders.size();
         for (a2 = 0; a2 < i; a2++) {
             ((AnonymousClass1NotificationHolder) holders.get(a2)).call();

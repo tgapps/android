@@ -23,8 +23,8 @@ public final class zzfk extends zzhk {
     }
 
     private static byte[] zzb(HttpURLConnection httpURLConnection) throws IOException {
-        InputStream inputStream;
         Throwable th;
+        InputStream inputStream;
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             inputStream = httpURLConnection.getInputStream();

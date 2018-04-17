@@ -54,7 +54,6 @@ public class BotHelpCell extends View {
     }
 
     public void setText(String text) {
-        float f;
         Throwable e;
         BotHelpCell botHelpCell = this;
         String str = text;
@@ -63,6 +62,7 @@ public class BotHelpCell extends View {
                 if (str == null || botHelpCell.oldText == null || !str.equals(botHelpCell.oldText)) {
                     int maxWidth;
                     int a;
+                    float f;
                     botHelpCell.oldText = str;
                     setVisibility(0);
                     if (AndroidUtilities.isTablet()) {

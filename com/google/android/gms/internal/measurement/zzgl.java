@@ -2473,11 +2473,11 @@ public class zzgl {
     }
 
     public final void zzjw() {
-        String zzhn;
         String str;
         zzgf().zzab();
         zzch();
         this.zzann = true;
+        String zzhn;
         try {
             zzfi zzin;
             String str2;

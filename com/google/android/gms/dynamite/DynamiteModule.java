@@ -506,8 +506,8 @@ public final class DynamiteModule {
     }
 
     private static int zzb(Context context, String str, boolean z) throws LoadingException {
-        Cursor queryForDynamiteModule;
         Throwable e;
+        Cursor queryForDynamiteModule;
         try {
             queryForDynamiteModule = queryForDynamiteModule(context, str, z);
             if (queryForDynamiteModule != null) {

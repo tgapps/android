@@ -2848,7 +2848,7 @@ Caused by: java.lang.NullPointerException
 
     public static String getCurrentThemeName() {
         String text = currentDayTheme.getName();
-        if (text.endsWith(".attheme")) {
+        if (text.toLowerCase().endsWith(".attheme")) {
             return text.substring(0, text.lastIndexOf(46));
         }
         return text;
@@ -2859,7 +2859,7 @@ Caused by: java.lang.NullPointerException
             return TtmlNode.ANONYMOUS_REGION_ID;
         }
         String text = currentNightTheme.getName();
-        if (text.endsWith(".attheme")) {
+        if (text.toLowerCase().endsWith(".attheme")) {
             text = text.substring(0, text.lastIndexOf(46));
         }
         return text;
@@ -3024,8 +3024,8 @@ Caused by: java.lang.NullPointerException
     }
 
     public static File getAssetFile(String assetName) {
-        long size;
         File file = new File(ApplicationLoader.getFilesDirFixed(), assetName);
+        long size;
         try {
             InputStream stream = ApplicationLoader.applicationContext.getAssets().open(assetName);
             size = (long) stream.available();

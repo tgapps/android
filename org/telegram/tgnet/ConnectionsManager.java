@@ -489,7 +489,6 @@ Caused by: java.lang.NullPointerException
                                     buffer.writeBytes(bytes);
                                     ConnectionsManager.native_applyDnsConfig(FirebaseTask.this.currentAccount, buffer.address);
                                 } catch (Throwable e) {
-                                    ConnectionsManager.currentTask = null;
                                     FileLog.e(e);
                                 }
                             }
@@ -497,6 +496,17 @@ Caused by: java.lang.NullPointerException
                     }
                 });
             } catch (Throwable e) {
+                Utilities.stageQueue.postRunnable(new Runnable() {
+                    public void run() {
+                        if (BuildVars.LOGS_ENABLED) {
+                            FileLog.d("failed to get firebase result");
+                            FileLog.d("start azure task");
+                        }
+                        AzureLoadTask task = new AzureLoadTask(FirebaseTask.this.currentAccount);
+                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[]{null, null, null});
+                        ConnectionsManager.currentTask = task;
+                    }
+                });
                 FileLog.e(e);
             }
             return null;

@@ -602,6 +602,8 @@ Caused by: java.lang.NullPointerException
     }
 
     protected DashManifest parseMediaPresentationDescription(XmlPullParser xpp, String baseUrl) throws XmlPullParserException, IOException {
+        UtcTimingElement utcTimingElement;
+        Uri uri;
         DashManifestParser dashManifestParser;
         XmlPullParser xmlPullParser = xpp;
         long availabilityStartTime = parseDateTime(xmlPullParser, "availabilityStartTime", C.TIME_UNSET);
@@ -625,8 +627,6 @@ Caused by: java.lang.NullPointerException
             String typeString2;
             boolean seenFirstBaseUrl2;
             String baseUrl3;
-            UtcTimingElement utcTimingElement;
-            Uri uri;
             boolean seenEarlyAccessPeriod2;
             xpp.next();
             long nextPeriodStartMs2;

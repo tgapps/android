@@ -301,7 +301,6 @@ public class SearchAdapter extends SelectionAdapter {
     }
 
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Object username;
         SearchAdapter searchAdapter = this;
         ViewHolder viewHolder = holder;
         int i = position;
@@ -319,7 +318,7 @@ public class SearchAdapter extends SelectionAdapter {
                 }
                 int id2 = id;
                 String un2 = un;
-                CharSequence username2 = null;
+                CharSequence username = null;
                 CharSequence name = null;
                 String charSequence;
                 if (i < searchAdapter.searchResult.size()) {
@@ -330,7 +329,7 @@ public class SearchAdapter extends SelectionAdapter {
                         stringBuilder.append("@");
                         stringBuilder.append(un2);
                         if (charSequence.startsWith(stringBuilder.toString())) {
-                            username2 = name;
+                            username = name;
                             name = null;
                         }
                     }
@@ -339,6 +338,7 @@ public class SearchAdapter extends SelectionAdapter {
                     if (charSequence.startsWith("@")) {
                         charSequence = charSequence.substring(1);
                     }
+                    Object username2;
                     try {
                         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
                         spannableStringBuilder.append("@");
@@ -354,13 +354,13 @@ public class SearchAdapter extends SelectionAdapter {
                             }
                             spannableStringBuilder.setSpan(new ForegroundColorSpan(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4)), index, index + indexOf, 33);
                         }
-                        username = spannableStringBuilder;
+                        username2 = spannableStringBuilder;
                     } catch (Throwable e) {
-                        username = un2;
+                        username2 = un2;
                         FileLog.e(e);
                     }
                 }
-                CharSequence username3 = username2;
+                CharSequence username3 = username;
                 CharSequence name2 = name;
                 if (searchAdapter.useUserCell) {
                     UserCell userCell = viewHolder.itemView;

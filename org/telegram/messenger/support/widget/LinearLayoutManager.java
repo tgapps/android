@@ -1245,11 +1245,11 @@ Caused by: java.lang.NullPointerException
     }
 
     public void collectInitialPrefetchPositions(int adapterItemCount, LayoutPrefetchRegistry layoutPrefetchRegistry) {
-        boolean fromEnd;
         int anchorPos;
         int targetPos;
-        int i;
         int direction = -1;
+        boolean fromEnd;
+        int i;
         if (this.mPendingSavedState == null || !this.mPendingSavedState.hasValidAnchor()) {
             resolveShouldLayoutReverse();
             fromEnd = this.mShouldReverseLayout;
