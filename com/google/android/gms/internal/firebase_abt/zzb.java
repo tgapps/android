@@ -30,7 +30,7 @@ public final class zzb {
     }
 
     public static int zzf(int i) {
-        return (i & -128) == 0 ? 1 : (i & -16384) == 0 ? 2 : (-2097152 & i) == 0 ? 3 : (i & -268435456) == 0 ? 4 : 5;
+        return (i & -128) == 0 ? 1 : (i & -16384) == 0 ? 2 : (-2097152 & i) == 0 ? 3 : (-268435456 & i) == 0 ? 4 : 5;
     }
 
     public final void zzc(byte[] bArr) throws IOException {

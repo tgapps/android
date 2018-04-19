@@ -110,28 +110,24 @@ public class FirebaseInstanceId {
         if (zzi == null) {
             throw new IOException("SERVICE_NOT_AVAILABLE");
         }
-        str2 = zzi.getString("registration_id");
-        if (str2 != null) {
-            return str2;
+        String string = zzi.getString("registration_id");
+        if (string == null) {
+            string = zzi.getString("unregistered");
+            if (string == null) {
+                string = zzi.getString("error");
+                if ("RST".equals(string)) {
+                    zzsk();
+                    throw new IOException("INSTANCE_ID_RESET");
+                } else if (string != null) {
+                    throw new IOException(string);
+                } else {
+                    String valueOf = String.valueOf(zzi);
+                    Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 21).append("Unexpected response: ").append(valueOf).toString(), new Throwable());
+                    throw new IOException("SERVICE_NOT_AVAILABLE");
+                }
+            }
         }
-        str2 = zzi.getString("unregistered");
-        if (str2 != null) {
-            return str2;
-        }
-        str2 = zzi.getString("error");
-        if ("RST".equals(str2)) {
-            zzsk();
-            throw new IOException("INSTANCE_ID_RESET");
-        } else if (str2 != null) {
-            throw new IOException(str2);
-        } else {
-            str = String.valueOf(zzi);
-            StringBuilder stringBuilder = new StringBuilder(21 + String.valueOf(str).length());
-            stringBuilder.append("Unexpected response: ");
-            stringBuilder.append(str);
-            Log.w("FirebaseInstanceId", stringBuilder.toString(), new Throwable());
-            throw new IOException("SERVICE_NOT_AVAILABLE");
-        }
+        return string;
     }
 
     private final void zzse() {
@@ -146,12 +142,7 @@ public class FirebaseInstanceId {
     }
 
     static boolean zzsj() {
-        if (!Log.isLoggable("FirebaseInstanceId", 3)) {
-            if (VERSION.SDK_INT != 23 || !Log.isLoggable("FirebaseInstanceId", 3)) {
-                return false;
-            }
-        }
-        return true;
+        return Log.isLoggable("FirebaseInstanceId", 3) || (VERSION.SDK_INT == 23 && Log.isLoggable("FirebaseInstanceId", 3));
     }
 
     private final boolean zzsm() {
@@ -208,9 +199,10 @@ public class FirebaseInstanceId {
             return zzj.zzbsb;
         }
         String zzb = zzb(str, str2, new Bundle());
-        if (zzb != null) {
-            zzbqk.zza(TtmlNode.ANONYMOUS_REGION_ID, str, str2, zzb, this.zzbqn.zzsv());
+        if (zzb == null) {
+            return zzb;
         }
+        zzbqk.zza(TtmlNode.ANONYMOUS_REGION_ID, str, str2, zzb, this.zzbqn.zzsv());
         return zzb;
     }
 
@@ -221,41 +213,35 @@ public class FirebaseInstanceId {
 
     final void zzew(String str) throws IOException {
         zzab zzsg = zzsg();
-        if (zzsg != null) {
-            if (!zzsg.zzff(this.zzbqn.zzsv())) {
-                Bundle bundle = new Bundle();
-                String str2 = "gcm.topic";
-                String valueOf = String.valueOf("/topics/");
-                String valueOf2 = String.valueOf(str);
-                bundle.putString(str2, valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
-                String str3 = zzsg.zzbsb;
-                str2 = String.valueOf("/topics/");
-                str = String.valueOf(str);
-                zzb(str3, str.length() != 0 ? str2.concat(str) : new String(str2), bundle);
-                return;
-            }
+        if (zzsg == null || zzsg.zzff(this.zzbqn.zzsv())) {
+            throw new IOException("token not available");
         }
-        throw new IOException("token not available");
+        Bundle bundle = new Bundle();
+        String str2 = "gcm.topic";
+        String valueOf = String.valueOf("/topics/");
+        String valueOf2 = String.valueOf(str);
+        bundle.putString(str2, valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
+        String str3 = zzsg.zzbsb;
+        str2 = String.valueOf("/topics/");
+        valueOf2 = String.valueOf(str);
+        zzb(str3, valueOf2.length() != 0 ? str2.concat(valueOf2) : new String(str2), bundle);
     }
 
     final void zzex(String str) throws IOException {
         zzab zzsg = zzsg();
-        if (zzsg != null) {
-            if (!zzsg.zzff(this.zzbqn.zzsv())) {
-                Bundle bundle = new Bundle();
-                String str2 = "gcm.topic";
-                String valueOf = String.valueOf("/topics/");
-                String valueOf2 = String.valueOf(str);
-                bundle.putString(str2, valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
-                bundle.putString("delete", "1");
-                String str3 = zzsg.zzbsb;
-                str2 = String.valueOf("/topics/");
-                str = String.valueOf(str);
-                zzb(str3, str.length() != 0 ? str2.concat(str) : new String(str2), bundle);
-                return;
-            }
+        if (zzsg == null || zzsg.zzff(this.zzbqn.zzsv())) {
+            throw new IOException("token not available");
         }
-        throw new IOException("token not available");
+        Bundle bundle = new Bundle();
+        String str2 = "gcm.topic";
+        String valueOf = String.valueOf("/topics/");
+        String valueOf2 = String.valueOf(str);
+        bundle.putString(str2, valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
+        bundle.putString("delete", "1");
+        String str3 = zzsg.zzbsb;
+        str2 = String.valueOf("/topics/");
+        valueOf2 = String.valueOf(str);
+        zzb(str3, valueOf2.length() != 0 ? str2.concat(valueOf2) : new String(str2), bundle);
     }
 
     final FirebaseApp zzsf() {

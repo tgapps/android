@@ -20,10 +20,10 @@ public final class zzfe extends zzhk {
     }
 
     private static String zza(String str, String[] strArr, String[] strArr2, AtomicReference<String[]> atomicReference) {
+        int i = 0;
         Preconditions.checkNotNull(strArr);
         Preconditions.checkNotNull(strArr2);
         Preconditions.checkNotNull(atomicReference);
-        int i = 0;
         Preconditions.checkArgument(strArr.length == strArr2.length);
         while (i < strArr.length) {
             if (zzjv.zzs(str, strArr[i])) {
@@ -90,8 +90,6 @@ public final class zzfe extends zzhk {
                         case 6:
                             obj = "IN_LIST";
                             break;
-                        default:
-                            break;
                     }
                     zza(stringBuilder, i2, "match_type", obj);
                 }
@@ -110,7 +108,7 @@ public final class zzfe extends zzhk {
                 zza(stringBuilder, i2);
                 stringBuilder.append("}\n");
             }
-            zza(stringBuilder, i2, "number_filter", com_google_android_gms_internal_measurement_zzka.zzarr);
+            zza(stringBuilder, i + 1, "number_filter", com_google_android_gms_internal_measurement_zzka.zzarr);
             zza(stringBuilder, i);
             stringBuilder.append("}\n");
         }
@@ -136,8 +134,6 @@ public final class zzfe extends zzhk {
                     case 4:
                         obj = "BETWEEN";
                         break;
-                    default:
-                        break;
                 }
                 zza(stringBuilder, i, "comparison_type", obj);
             }
@@ -152,46 +148,46 @@ public final class zzfe extends zzhk {
 
     private static void zza(StringBuilder stringBuilder, int i, String str, zzkm com_google_android_gms_internal_measurement_zzkm) {
         if (com_google_android_gms_internal_measurement_zzkm != null) {
-            long[] jArr;
             int i2;
+            int i3;
             zza(stringBuilder, 3);
             stringBuilder.append(str);
             stringBuilder.append(" {\n");
-            int i3 = 0;
             if (com_google_android_gms_internal_measurement_zzkm.zzaug != null) {
                 zza(stringBuilder, 4);
                 stringBuilder.append("results: ");
-                jArr = com_google_android_gms_internal_measurement_zzkm.zzaug;
+                long[] jArr = com_google_android_gms_internal_measurement_zzkm.zzaug;
                 int length = jArr.length;
                 i2 = 0;
-                int i4 = i2;
+                i3 = 0;
                 while (i2 < length) {
                     Long valueOf = Long.valueOf(jArr[i2]);
-                    int i5 = i4 + 1;
-                    if (i4 != 0) {
+                    int i4 = i3 + 1;
+                    if (i3 != 0) {
                         stringBuilder.append(", ");
                     }
                     stringBuilder.append(valueOf);
                     i2++;
-                    i4 = i5;
+                    i3 = i4;
                 }
                 stringBuilder.append('\n');
             }
             if (com_google_android_gms_internal_measurement_zzkm.zzauf != null) {
                 zza(stringBuilder, 4);
                 stringBuilder.append("status: ");
-                jArr = com_google_android_gms_internal_measurement_zzkm.zzauf;
-                int length2 = jArr.length;
-                int i6 = 0;
-                while (i3 < length2) {
-                    Long valueOf2 = Long.valueOf(jArr[i3]);
-                    i2 = i6 + 1;
-                    if (i6 != 0) {
+                long[] jArr2 = com_google_android_gms_internal_measurement_zzkm.zzauf;
+                int length2 = jArr2.length;
+                i2 = 0;
+                i3 = 0;
+                while (i2 < length2) {
+                    Long valueOf2 = Long.valueOf(jArr2[i2]);
+                    int i5 = i3 + 1;
+                    if (i3 != 0) {
                         stringBuilder.append(", ");
                     }
                     stringBuilder.append(valueOf2);
-                    i3++;
-                    i6 = i2;
+                    i2++;
+                    i3 = i5;
                 }
                 stringBuilder.append('\n');
             }
@@ -219,12 +215,12 @@ public final class zzfe extends zzhk {
     }
 
     protected final String zza(zzjz com_google_android_gms_internal_measurement_zzjz) {
+        int i = 0;
         if (com_google_android_gms_internal_measurement_zzjz == null) {
             return "null";
         }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\nevent_filter {\n");
-        int i = 0;
         zza(stringBuilder, 0, "filter_id", com_google_android_gms_internal_measurement_zzjz.zzark);
         zza(stringBuilder, 0, "event_name", zzbe(com_google_android_gms_internal_measurement_zzjz.zzarl));
         zza(stringBuilder, 1, "event_count_filter", com_google_android_gms_internal_measurement_zzjz.zzaro);
@@ -254,15 +250,11 @@ public final class zzfe extends zzhk {
     }
 
     protected final String zza(zzkk com_google_android_gms_internal_measurement_zzkk) {
-        zzfe com_google_android_gms_internal_measurement_zzfe = this;
-        zzkk com_google_android_gms_internal_measurement_zzkk2 = com_google_android_gms_internal_measurement_zzkk;
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\nbatch {\n");
-        if (com_google_android_gms_internal_measurement_zzkk2.zzata != null) {
-            for (zzkl com_google_android_gms_internal_measurement_zzkl : com_google_android_gms_internal_measurement_zzkk2.zzata) {
+        if (com_google_android_gms_internal_measurement_zzkk.zzata != null) {
+            for (zzkl com_google_android_gms_internal_measurement_zzkl : com_google_android_gms_internal_measurement_zzkk.zzata) {
                 if (!(com_google_android_gms_internal_measurement_zzkl == null || com_google_android_gms_internal_measurement_zzkl == null)) {
-                    int i;
-                    int i2 = 1;
                     zza(stringBuilder, 1);
                     stringBuilder.append("bundle {\n");
                     zza(stringBuilder, 1, "protocol_version", com_google_android_gms_internal_measurement_zzkl.zzatc);
@@ -332,10 +324,7 @@ public final class zzfe extends zzhk {
                     }
                     zzki[] com_google_android_gms_internal_measurement_zzkiArr = com_google_android_gms_internal_measurement_zzkl.zzatd;
                     if (com_google_android_gms_internal_measurement_zzkiArr != null) {
-                        int length = com_google_android_gms_internal_measurement_zzkiArr.length;
-                        i = 0;
-                        while (i < length) {
-                            zzki com_google_android_gms_internal_measurement_zzki = com_google_android_gms_internal_measurement_zzkiArr[i];
+                        for (zzki com_google_android_gms_internal_measurement_zzki : com_google_android_gms_internal_measurement_zzkiArr) {
                             if (com_google_android_gms_internal_measurement_zzki != null) {
                                 zza(stringBuilder, 2);
                                 stringBuilder.append("event {\n");
@@ -361,11 +350,9 @@ public final class zzfe extends zzhk {
                                 zza(stringBuilder, 2);
                                 stringBuilder.append("}\n");
                             }
-                            i++;
-                            i2 = 1;
                         }
                     }
-                    zza(stringBuilder, i2);
+                    zza(stringBuilder, 1);
                     stringBuilder.append("}\n");
                 }
             }
@@ -387,7 +374,11 @@ public final class zzfe extends zzhk {
         }
         StringBuilder stringBuilder = new StringBuilder();
         for (String str : bundle.keySet()) {
-            stringBuilder.append(stringBuilder.length() != 0 ? ", " : "Bundle[{");
+            if (stringBuilder.length() != 0) {
+                stringBuilder.append(", ");
+            } else {
+                stringBuilder.append("Bundle[{");
+            }
             stringBuilder.append(zzbf(str));
             stringBuilder.append("=");
             stringBuilder.append(bundle.get(str));
@@ -397,11 +388,11 @@ public final class zzfe extends zzhk {
     }
 
     protected final String zzbe(String str) {
-        return str == null ? null : !zzik() ? str : zza(str, Event.zzact, Event.zzacs, zzaij);
+        return str == null ? null : zzik() ? zza(str, Event.zzact, Event.zzacs, zzaij) : str;
     }
 
     protected final String zzbf(String str) {
-        return str == null ? null : !zzik() ? str : zza(str, Param.zzacv, Param.zzacu, zzaik);
+        return str == null ? null : zzik() ? zza(str, Param.zzacv, Param.zzacu, zzaik) : str;
     }
 
     protected final String zzbg(String str) {

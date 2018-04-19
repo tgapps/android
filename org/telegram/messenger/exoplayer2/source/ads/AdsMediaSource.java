@@ -74,7 +74,7 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
         }
 
         public void onAdClicked() {
-            if (!(this.released || AdsMediaSource.this.eventHandler == null || AdsMediaSource.this.eventListener == null)) {
+            if (!this.released && AdsMediaSource.this.eventHandler != null && AdsMediaSource.this.eventListener != null) {
                 AdsMediaSource.this.eventHandler.post(new Runnable() {
                     public void run() {
                         if (!ComponentListener.this.released) {
@@ -86,7 +86,7 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
         }
 
         public void onAdTapped() {
-            if (!(this.released || AdsMediaSource.this.eventHandler == null || AdsMediaSource.this.eventListener == null)) {
+            if (!this.released && AdsMediaSource.this.eventHandler != null && AdsMediaSource.this.eventListener != null) {
                 AdsMediaSource.this.eventHandler.post(new Runnable() {
                     public void run() {
                         if (!ComponentListener.this.released) {
@@ -100,7 +100,7 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
         public void onLoadError(final IOException error) {
             if (!this.released) {
                 Log.w(AdsMediaSource.TAG, "Ad load error", error);
-                if (!(AdsMediaSource.this.eventHandler == null || AdsMediaSource.this.eventListener == null)) {
+                if (AdsMediaSource.this.eventHandler != null && AdsMediaSource.this.eventListener != null) {
                     AdsMediaSource.this.eventHandler.post(new Runnable() {
                         public void run() {
                             if (!ComponentListener.this.released) {
@@ -184,9 +184,9 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
         List<DeferredMediaPeriod> mediaPeriods = (List) this.deferredMediaPeriodByAdMediaSource.get(mediaSource);
         if (mediaPeriods == null) {
             deferredMediaPeriod.createPeriod();
-        } else {
-            mediaPeriods.add(deferredMediaPeriod);
+            return deferredMediaPeriod;
         }
+        mediaPeriods.add(deferredMediaPeriod);
         return deferredMediaPeriod;
     }
 
@@ -243,7 +243,6 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
     }
 
     private void onAdSourceInfoRefreshed(MediaSource mediaSource, int adGroupIndex, int adIndexInAdGroup, Timeline timeline) {
-        int i = 0;
         boolean z = true;
         if (timeline.getPeriodCount() != 1) {
             z = false;
@@ -252,9 +251,8 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
         this.adDurationsUs[adGroupIndex][adIndexInAdGroup] = timeline.getPeriod(0, this.period).getDurationUs();
         if (this.deferredMediaPeriodByAdMediaSource.containsKey(mediaSource)) {
             List<DeferredMediaPeriod> mediaPeriods = (List) this.deferredMediaPeriodByAdMediaSource.get(mediaSource);
-            while (i < mediaPeriods.size()) {
+            for (int i = 0; i < mediaPeriods.size(); i++) {
                 ((DeferredMediaPeriod) mediaPeriods.get(i)).createPeriod();
-                i++;
             }
             this.deferredMediaPeriodByAdMediaSource.remove(mediaSource);
         }

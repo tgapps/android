@@ -19,30 +19,31 @@ public final class zzn {
 
     public static List<zzl> zzb(Context context) {
         AppMeasurement zza = zza(context);
-        if (zza == null) {
-            if (Log.isLoggable("FRCAnalytics", 3)) {
-                Log.d("FRCAnalytics", "Unable to get user properties: analytics library is missing.");
+        if (zza != null) {
+            Map userProperties;
+            try {
+                userProperties = zza.getUserProperties(false);
+            } catch (Throwable e) {
+                if (Log.isLoggable("FRCAnalytics", 3)) {
+                    Log.d("FRCAnalytics", "Unable to get user properties.", e);
+                }
+                userProperties = null;
             }
+            if (userProperties == null) {
+                return null;
+            }
+            List<zzl> arrayList = new ArrayList();
+            for (Entry entry : userProperties.entrySet()) {
+                if (entry.getValue() != null) {
+                    arrayList.add(new zzl((String) entry.getKey(), entry.getValue().toString()));
+                }
+            }
+            return arrayList;
+        } else if (!Log.isLoggable("FRCAnalytics", 3)) {
+            return null;
+        } else {
+            Log.d("FRCAnalytics", "Unable to get user properties: analytics library is missing.");
             return null;
         }
-        Map userProperties;
-        try {
-            userProperties = zza.getUserProperties(false);
-        } catch (Throwable e) {
-            if (Log.isLoggable("FRCAnalytics", 3)) {
-                Log.d("FRCAnalytics", "Unable to get user properties.", e);
-            }
-            userProperties = null;
-        }
-        if (userProperties == null) {
-            return null;
-        }
-        List<zzl> arrayList = new ArrayList();
-        for (Entry entry : userProperties.entrySet()) {
-            if (entry.getValue() != null) {
-                arrayList.add(new zzl((String) entry.getKey(), entry.getValue().toString()));
-            }
-        }
-        return arrayList;
     }
 }

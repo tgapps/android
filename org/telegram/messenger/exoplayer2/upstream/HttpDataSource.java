@@ -112,10 +112,7 @@ public interface HttpDataSource extends DataSource {
         public final String contentType;
 
         public InvalidContentTypeException(String contentType, DataSpec dataSpec) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Invalid content type: ");
-            stringBuilder.append(contentType);
-            super(stringBuilder.toString(), dataSpec, 1);
+            super("Invalid content type: " + contentType, dataSpec, 1);
             this.contentType = contentType;
         }
     }
@@ -125,10 +122,7 @@ public interface HttpDataSource extends DataSource {
         public final int responseCode;
 
         public InvalidResponseCodeException(int responseCode, Map<String, List<String>> headerFields, DataSpec dataSpec) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Response code: ");
-            stringBuilder.append(responseCode);
-            super(stringBuilder.toString(), dataSpec, 1);
+            super("Response code: " + responseCode, dataSpec, 1);
             this.responseCode = responseCode;
             this.headerFields = headerFields;
         }

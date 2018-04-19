@@ -11,39 +11,31 @@ final class zzhq implements Callable<String> {
     }
 
     public final /* synthetic */ Object call() throws Exception {
-        String zziw = this.zzaop.zzgh().zziw();
-        if (zziw != null) {
-            return zziw;
-        }
-        zzfi zzil;
-        String str;
-        zzhj zzfu = this.zzaop.zzfu();
-        String str2 = null;
-        if (zzfu.zzgf().zzjg()) {
-            zzil = zzfu.zzgg().zzil();
-            str = "Cannot retrieve app instance id from analytics worker thread";
-        } else {
-            zzfu.zzgf();
-            if (zzgg.isMainThread()) {
-                zzil = zzfu.zzgg().zzil();
-                str = "Cannot retrieve app instance id from main thread";
+        Object zziw = this.zzaop.zzgh().zziw();
+        if (zziw == null) {
+            zzhj zzfu = this.zzaop.zzfu();
+            if (zzfu.zzgf().zzjg()) {
+                zzfu.zzgg().zzil().log("Cannot retrieve app instance id from analytics worker thread");
+                zziw = null;
             } else {
-                long elapsedRealtime = zzfu.zzbt().elapsedRealtime();
-                String zzae = zzfu.zzae(120000);
-                long elapsedRealtime2 = zzfu.zzbt().elapsedRealtime() - elapsedRealtime;
-                str2 = (zzae != null || elapsedRealtime2 >= 120000) ? zzae : zzfu.zzae(120000 - elapsedRealtime2);
-                if (str2 != null) {
-                    throw new TimeoutException();
+                zzfu.zzgf();
+                if (zzgg.isMainThread()) {
+                    zzfu.zzgg().zzil().log("Cannot retrieve app instance id from main thread");
+                    zziw = null;
+                } else {
+                    long elapsedRealtime = zzfu.zzbt().elapsedRealtime();
+                    zziw = zzfu.zzae(120000);
+                    elapsedRealtime = zzfu.zzbt().elapsedRealtime() - elapsedRealtime;
+                    if (zziw == null && elapsedRealtime < 120000) {
+                        zziw = zzfu.zzae(120000 - elapsedRealtime);
+                    }
                 }
-                this.zzaop.zzgh().zzbm(str2);
-                return str2;
             }
+            if (zziw == null) {
+                throw new TimeoutException();
+            }
+            this.zzaop.zzgh().zzbm(zziw);
         }
-        zzil.log(str);
-        if (str2 != null) {
-            this.zzaop.zzgh().zzbm(str2);
-            return str2;
-        }
-        throw new TimeoutException();
+        return zziw;
     }
 }

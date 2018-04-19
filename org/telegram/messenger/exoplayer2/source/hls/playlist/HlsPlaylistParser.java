@@ -1,23 +1,22 @@
 package org.telegram.messenger.exoplayer2.source.hls.playlist;
 
-import android.net.Uri;
 import android.util.Base64;
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.telegram.messenger.exoplayer2.C;
+import org.telegram.messenger.exoplayer2.Format;
 import org.telegram.messenger.exoplayer2.ParserException;
 import org.telegram.messenger.exoplayer2.drm.DrmInitData;
 import org.telegram.messenger.exoplayer2.drm.DrmInitData.SchemeData;
-import org.telegram.messenger.exoplayer2.source.UnrecognizedInputFormatException;
+import org.telegram.messenger.exoplayer2.source.hls.playlist.HlsMasterPlaylist.HlsUrl;
 import org.telegram.messenger.exoplayer2.source.hls.playlist.HlsMediaPlaylist.Segment;
 import org.telegram.messenger.exoplayer2.upstream.ParsingLoadable.Parser;
 import org.telegram.messenger.exoplayer2.util.MimeTypes;
@@ -123,376 +122,118 @@ public final class HlsPlaylistParser implements Parser<HlsPlaylist> {
         }
     }
 
-    private static org.telegram.messenger.exoplayer2.source.hls.playlist.HlsMasterPlaylist parseMasterPlaylist(org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylistParser.LineIterator r1, java.lang.String r2) throws java.io.IOException {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylistParser.parseMasterPlaylist(org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylistParser$LineIterator, java.lang.String):org.telegram.messenger.exoplayer2.source.hls.playlist.HlsMasterPlaylist
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylist parse(android.net.Uri r6, java.io.InputStream r7) throws java.io.IOException {
         /*
-        r0 = new java.util.HashSet;
+        r5 = this;
+        r2 = new java.io.BufferedReader;
+        r3 = new java.io.InputStreamReader;
+        r3.<init>(r7);
+        r2.<init>(r3);
+        r0 = new java.util.ArrayDeque;
         r0.<init>();
-        r1 = new java.util.HashMap;
-        r1.<init>();
-        r2 = new java.util.ArrayList;
-        r2.<init>();
-        r3 = new java.util.ArrayList;
-        r3.<init>();
-        r11 = r3;
-        r3 = new java.util.ArrayList;
-        r3.<init>();
-        r12 = r3;
-        r3 = new java.util.ArrayList;
-        r3.<init>();
-        r13 = r3;
-        r3 = new java.util.ArrayList;
-        r3.<init>();
-        r14 = r3;
-        r3 = 0;
-        r4 = 0;
-        r6 = 0;
-        r15 = r6;
-        r6 = r35.hasNext();
-        if (r6 == 0) goto L_0x0127;
-    L_0x0031:
-        r6 = r35.next();
-        r9 = "#EXT";
-        r9 = r6.startsWith(r9);
-        if (r9 == 0) goto L_0x0040;
-    L_0x003d:
-        r14.add(r6);
-    L_0x0040:
-        r9 = "#EXT-X-MEDIA";
-        r9 = r6.startsWith(r9);
-        if (r9 == 0) goto L_0x0055;
-    L_0x0048:
-        r13.add(r6);
-        r31 = r0;
-        r27 = r3;
-        r28 = r4;
-        r26 = 0;
-        goto L_0x011e;
-    L_0x0055:
-        r9 = "#EXT-X-STREAM-INF";
-        r9 = r6.startsWith(r9);
-        if (r9 == 0) goto L_0x0116;
-    L_0x005d:
-        r9 = "CLOSED-CAPTIONS=NONE";
-        r9 = r6.contains(r9);
-        r9 = r9 | r15;
-        r10 = REGEX_BANDWIDTH;
-        r10 = parseIntAttr(r6, r10);
-        r15 = REGEX_AVERAGE_BANDWIDTH;
-        r15 = parseOptionalStringAttr(r6, r15);
-        if (r15 == 0) goto L_0x0076;
-    L_0x0072:
-        r10 = java.lang.Integer.parseInt(r15);
-    L_0x0076:
-        r7 = REGEX_CODECS;
-        r7 = parseOptionalStringAttr(r6, r7);
-        r8 = REGEX_RESOLUTION;
-        r8 = parseOptionalStringAttr(r6, r8);
-        if (r8 == 0) goto L_0x00a8;
-    L_0x0084:
-        r5 = "x";
-        r5 = r8.split(r5);
-        r27 = r3;
-        r26 = 0;
-        r3 = r5[r26];
-        r3 = java.lang.Integer.parseInt(r3);
-        r28 = r4;
-        r16 = 1;
-        r4 = r5[r16];
-        r4 = java.lang.Integer.parseInt(r4);
-        if (r3 <= 0) goto L_0x00a2;
-    L_0x00a0:
-        if (r4 > 0) goto L_0x00a4;
-    L_0x00a2:
-        r3 = -1;
-        r4 = -1;
-        r22 = r4;
-        goto L_0x00b1;
-    L_0x00a8:
-        r27 = r3;
-        r28 = r4;
-        r26 = 0;
-        r3 = -1;
-        r22 = -1;
-        r4 = -1082130432; // 0xffffffffbf800000 float:-1.0 double:NaN;
-        r5 = REGEX_FRAME_RATE;
-        r5 = parseOptionalStringAttr(r6, r5);
-        if (r5 == 0) goto L_0x00bf;
-        r4 = java.lang.Float.parseFloat(r5);
-        r29 = r5;
-        r5 = REGEX_AUDIO;
-        r5 = parseOptionalStringAttr(r6, r5);
-        if (r5 == 0) goto L_0x00d6;
-        if (r7 == 0) goto L_0x00d6;
-        r30 = r6;
-        r6 = 1;
-        r6 = org.telegram.messenger.exoplayer2.util.Util.getCodecsOfType(r7, r6);
-        r1.put(r5, r6);
-        goto L_0x00d8;
-        r30 = r6;
-        r6 = r35.next();
-        r16 = r0.add(r6);
-        if (r16 == 0) goto L_0x010b;
-        r31 = r0;
-        r0 = r2.size();
-        r16 = java.lang.Integer.toString(r0);
-        r17 = "application/x-mpegURL";
-        r18 = 0;
-        r24 = 0;
-        r25 = 0;
-        r19 = r7;
-        r20 = r10;
-        r21 = r3;
-        r23 = r4;
-        r0 = org.telegram.messenger.exoplayer2.Format.createVideoContainerFormat(r16, r17, r18, r19, r20, r21, r22, r23, r24, r25);
-        r32 = r3;
-        r3 = new org.telegram.messenger.exoplayer2.source.hls.playlist.HlsMasterPlaylist$HlsUrl;
-        r3.<init>(r6, r0);
-        r2.add(r3);
-        goto L_0x010d;
-        r31 = r0;
-        r6 = r9;
-        r3 = r27;
-        r4 = r28;
-        r0 = r31;
-        goto L_0x002a;
-    L_0x0116:
-        r31 = r0;
-        r27 = r3;
-        r28 = r4;
-        r26 = 0;
-    L_0x011e:
-        r6 = r15;
-        r3 = r27;
-        r4 = r28;
-        r0 = r31;
-        goto L_0x002a;
-    L_0x0127:
-        r31 = r0;
-        r27 = r3;
-        r28 = r4;
-        r6 = 1;
-        r26 = 0;
-        r0 = r26;
-        r3 = r13.size();
-        if (r0 >= r3) goto L_0x0245;
-        r3 = r13.get(r0);
-        r3 = (java.lang.String) r3;
-        r4 = parseSelectionFlags(r3);
-        r5 = REGEX_URI;
-        r5 = parseOptionalStringAttr(r3, r5);
-        r7 = REGEX_NAME;
-        r7 = parseStringAttr(r3, r7);
-        r8 = REGEX_LANGUAGE;
-        r8 = parseOptionalStringAttr(r3, r8);
-        r9 = REGEX_GROUP_ID;
-        r9 = parseOptionalStringAttr(r3, r9);
-        r10 = REGEX_TYPE;
-        r10 = parseStringAttr(r3, r10);
-        r6 = r10.hashCode();
-        r33 = r13;
-        r13 = -959297733; // 0xffffffffc6d2473b float:-26915.615 double:NaN;
-        r34 = r2;
-        r2 = 2;
-        if (r6 == r13) goto L_0x018e;
-        r13 = -333210994; // 0xffffffffec239a8e float:-7.911391E26 double:NaN;
-        if (r6 == r13) goto L_0x0184;
-        r13 = 62628790; // 0x3bba3b6 float:1.1028458E-36 double:3.09427336E-316;
-        if (r6 == r13) goto L_0x0179;
-        goto L_0x0198;
-        r6 = "AUDIO";
-        r6 = r10.equals(r6);
-        if (r6 == 0) goto L_0x0198;
-        r6 = r26;
-        goto L_0x0199;
-        r6 = "CLOSED-CAPTIONS";
-        r6 = r10.equals(r6);
-        if (r6 == 0) goto L_0x0198;
-        r6 = r2;
-        goto L_0x0199;
-        r6 = "SUBTITLES";
-        r6 = r10.equals(r6);
-        if (r6 == 0) goto L_0x0198;
-        r6 = 1;
-        goto L_0x0199;
-        r6 = -1;
-        switch(r6) {
-            case 0: goto L_0x0207;
-            case 1: goto L_0x01ec;
-            case 2: goto L_0x019e;
-            default: goto L_0x019c;
-        };
-        goto L_0x023c;
-        r6 = REGEX_INSTREAM_ID;
-        r6 = parseStringAttr(r3, r6);
-        r10 = "CC";
-        r10 = r6.startsWith(r10);
-        if (r10 == 0) goto L_0x01ba;
-        r10 = "application/cea-608";
-        r2 = r6.substring(r2);
-        r2 = java.lang.Integer.parseInt(r2);
-        r23 = r2;
-        r2 = r10;
-        goto L_0x01c7;
-        r2 = "application/cea-708";
-        r10 = 7;
-        r10 = r6.substring(r10);
-        r10 = java.lang.Integer.parseInt(r10);
-        r23 = r10;
-        if (r28 != 0) goto L_0x01d1;
-        r10 = new java.util.ArrayList;
-        r10.<init>();
-        r28 = r10;
-        goto L_0x01d3;
-        r10 = r28;
-        r17 = 0;
-        r19 = 0;
-        r20 = -1;
-        r16 = r7;
-        r18 = r2;
-        r21 = r4;
-        r22 = r8;
-        r13 = org.telegram.messenger.exoplayer2.Format.createTextContainerFormat(r16, r17, r18, r19, r20, r21, r22, r23);
-        r10.add(r13);
-        r28 = r10;
-        goto L_0x023c;
-        r17 = "application/x-mpegURL";
-        r18 = "text/vtt";
-        r19 = 0;
-        r20 = -1;
-        r16 = r7;
-        r21 = r4;
-        r22 = r8;
-        r2 = org.telegram.messenger.exoplayer2.Format.createTextContainerFormat(r16, r17, r18, r19, r20, r21, r22);
-        r6 = new org.telegram.messenger.exoplayer2.source.hls.playlist.HlsMasterPlaylist$HlsUrl;
-        r6.<init>(r5, r2);
-        r12.add(r6);
-        goto L_0x023c;
-        r2 = r1.get(r9);
-        r2 = (java.lang.String) r2;
-        if (r2 == 0) goto L_0x0216;
-        r6 = org.telegram.messenger.exoplayer2.util.MimeTypes.getMediaMimeType(r2);
-        r18 = r6;
-        goto L_0x0218;
-        r6 = 0;
-        goto L_0x0213;
-        r17 = "application/x-mpegURL";
-        r20 = -1;
-        r21 = -1;
-        r22 = -1;
-        r23 = 0;
-        r16 = r7;
-        r19 = r2;
-        r24 = r4;
-        r25 = r8;
-        r6 = org.telegram.messenger.exoplayer2.Format.createAudioContainerFormat(r16, r17, r18, r19, r20, r21, r22, r23, r24, r25);
-        if (r5 != 0) goto L_0x0233;
-        r27 = r6;
-        goto L_0x023c;
-        r10 = new org.telegram.messenger.exoplayer2.source.hls.playlist.HlsMasterPlaylist$HlsUrl;
-        r10.<init>(r5, r6);
-        r11.add(r10);
-        r0 = r0 + 1;
-        r13 = r33;
-        r2 = r34;
-        r6 = 1;
-        goto L_0x0132;
-        r34 = r2;
-        r33 = r13;
-        if (r15 == 0) goto L_0x0251;
-        r0 = java.util.Collections.emptyList();
-        r28 = r0;
-        r0 = new org.telegram.messenger.exoplayer2.source.hls.playlist.HlsMasterPlaylist;
-        r3 = r0;
-        r4 = r36;
-        r5 = r14;
-        r6 = r34;
-        r7 = r11;
-        r8 = r12;
-        r9 = r27;
-        r10 = r28;
-        r3.<init>(r4, r5, r6, r7, r8, r9, r10);
-        return r0;
+        r3 = checkPlaylistHeader(r2);	 Catch:{ all -> 0x001e }
+        if (r3 != 0) goto L_0x0023;
+    L_0x0015:
+        r3 = new org.telegram.messenger.exoplayer2.source.UnrecognizedInputFormatException;	 Catch:{ all -> 0x001e }
+        r4 = "Input does not start with the #EXTM3U header.";
+        r3.<init>(r4, r6);	 Catch:{ all -> 0x001e }
+        throw r3;	 Catch:{ all -> 0x001e }
+    L_0x001e:
+        r3 = move-exception;
+        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r2);
+        throw r3;
+    L_0x0023:
+        r1 = r2.readLine();	 Catch:{ all -> 0x001e }
+        if (r1 == 0) goto L_0x00b1;
+    L_0x0029:
+        r1 = r1.trim();	 Catch:{ all -> 0x001e }
+        r3 = r1.isEmpty();	 Catch:{ all -> 0x001e }
+        if (r3 != 0) goto L_0x0023;
+    L_0x0033:
+        r3 = "#EXT-X-STREAM-INF";
+        r3 = r1.startsWith(r3);	 Catch:{ all -> 0x001e }
+        if (r3 == 0) goto L_0x0050;
+    L_0x003c:
+        r0.add(r1);	 Catch:{ all -> 0x001e }
+        r3 = new org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylistParser$LineIterator;	 Catch:{ all -> 0x001e }
+        r3.<init>(r0, r2);	 Catch:{ all -> 0x001e }
+        r4 = r6.toString();	 Catch:{ all -> 0x001e }
+        r3 = parseMasterPlaylist(r3, r4);	 Catch:{ all -> 0x001e }
+        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r2);
+    L_0x004f:
+        return r3;
+    L_0x0050:
+        r3 = "#EXT-X-TARGETDURATION";
+        r3 = r1.startsWith(r3);	 Catch:{ all -> 0x001e }
+        if (r3 != 0) goto L_0x0098;
+    L_0x0059:
+        r3 = "#EXT-X-MEDIA-SEQUENCE";
+        r3 = r1.startsWith(r3);	 Catch:{ all -> 0x001e }
+        if (r3 != 0) goto L_0x0098;
+    L_0x0062:
+        r3 = "#EXTINF";
+        r3 = r1.startsWith(r3);	 Catch:{ all -> 0x001e }
+        if (r3 != 0) goto L_0x0098;
+    L_0x006b:
+        r3 = "#EXT-X-KEY";
+        r3 = r1.startsWith(r3);	 Catch:{ all -> 0x001e }
+        if (r3 != 0) goto L_0x0098;
+    L_0x0074:
+        r3 = "#EXT-X-BYTERANGE";
+        r3 = r1.startsWith(r3);	 Catch:{ all -> 0x001e }
+        if (r3 != 0) goto L_0x0098;
+    L_0x007d:
+        r3 = "#EXT-X-DISCONTINUITY";
+        r3 = r1.equals(r3);	 Catch:{ all -> 0x001e }
+        if (r3 != 0) goto L_0x0098;
+    L_0x0086:
+        r3 = "#EXT-X-DISCONTINUITY-SEQUENCE";
+        r3 = r1.equals(r3);	 Catch:{ all -> 0x001e }
+        if (r3 != 0) goto L_0x0098;
+    L_0x008f:
+        r3 = "#EXT-X-ENDLIST";
+        r3 = r1.equals(r3);	 Catch:{ all -> 0x001e }
+        if (r3 == 0) goto L_0x00ac;
+    L_0x0098:
+        r0.add(r1);	 Catch:{ all -> 0x001e }
+        r3 = new org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylistParser$LineIterator;	 Catch:{ all -> 0x001e }
+        r3.<init>(r0, r2);	 Catch:{ all -> 0x001e }
+        r4 = r6.toString();	 Catch:{ all -> 0x001e }
+        r3 = parseMediaPlaylist(r3, r4);	 Catch:{ all -> 0x001e }
+        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r2);
+        goto L_0x004f;
+    L_0x00ac:
+        r0.add(r1);	 Catch:{ all -> 0x001e }
+        goto L_0x0023;
+    L_0x00b1:
+        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r2);
+        r3 = new org.telegram.messenger.exoplayer2.ParserException;
+        r4 = "Failed to parse the playlist, could not identify any tags.";
+        r3.<init>(r4);
+        throw r3;
         */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylistParser.parseMasterPlaylist(org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylistParser$LineIterator, java.lang.String):org.telegram.messenger.exoplayer2.source.hls.playlist.HlsMasterPlaylist");
-    }
-
-    public HlsPlaylist parse(Uri uri, InputStream inputStream) throws IOException {
-        Closeable reader = new BufferedReader(new InputStreamReader(inputStream));
-        Queue<String> extraLines = new ArrayDeque();
-        try {
-            if (checkPlaylistHeader(reader)) {
-                String readLine;
-                HlsPlaylist startsWith;
-                while (true) {
-                    readLine = reader.readLine();
-                    String line = readLine;
-                    if (readLine != null) {
-                        readLine = line.trim();
-                        if (!readLine.isEmpty()) {
-                            startsWith = readLine.startsWith(TAG_STREAM_INF);
-                            if (startsWith == null) {
-                                if (readLine.startsWith(TAG_TARGET_DURATION) || readLine.startsWith(TAG_MEDIA_SEQUENCE) || readLine.startsWith(TAG_MEDIA_DURATION) || readLine.startsWith(TAG_KEY) || readLine.startsWith(TAG_BYTERANGE) || readLine.equals(TAG_DISCONTINUITY) || readLine.equals(TAG_DISCONTINUITY_SEQUENCE)) {
-                                    break;
-                                } else if (readLine.equals(TAG_ENDLIST)) {
-                                    break;
-                                } else {
-                                    extraLines.add(readLine);
-                                }
-                            } else {
-                                extraLines.add(readLine);
-                                startsWith = parseMasterPlaylist(new LineIterator(extraLines, reader), uri.toString());
-                                Util.closeQuietly(reader);
-                                return startsWith;
-                            }
-                        }
-                    } else {
-                        Util.closeQuietly(reader);
-                        throw new ParserException("Failed to parse the playlist, could not identify any tags.");
-                    }
-                }
-                extraLines.add(readLine);
-                startsWith = parseMediaPlaylist(new LineIterator(extraLines, reader), uri.toString());
-                return startsWith;
-            }
-            throw new UnrecognizedInputFormatException("Input does not start with the #EXTM3U header.", uri);
-        } finally {
-            Util.closeQuietly(reader);
-        }
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylistParser.parse(android.net.Uri, java.io.InputStream):org.telegram.messenger.exoplayer2.source.hls.playlist.HlsPlaylist");
     }
 
     private static boolean checkPlaylistHeader(BufferedReader reader) throws IOException {
         int last = reader.read();
         if (last == 239) {
-            if (reader.read() == 187) {
-                if (reader.read() == 191) {
-                    last = reader.read();
-                }
+            if (reader.read() != 187 || reader.read() != 191) {
+                return false;
             }
-            return false;
+            last = reader.read();
         }
         char last2 = skipIgnorableWhitespace(reader, true, last);
         int playlistHeaderLength = PLAYLIST_HEADER.length();
-        char last3 = last2;
-        for (last = 0; last < playlistHeaderLength; last++) {
-            if (last3 != PLAYLIST_HEADER.charAt(last)) {
+        for (int i = 0; i < playlistHeaderLength; i++) {
+            if (last2 != PLAYLIST_HEADER.charAt(i)) {
                 return false;
             }
-            last3 = reader.read();
+            last2 = reader.read();
         }
-        return Util.isLinebreak(skipIgnorableWhitespace(reader, false, last3));
+        return Util.isLinebreak(skipIgnorableWhitespace(reader, false, last2));
     }
 
     private static int skipIgnorableWhitespace(BufferedReader reader, boolean skipLinebreaks, int c) throws IOException {
@@ -502,48 +243,179 @@ Caused by: java.lang.NullPointerException
         return c;
     }
 
-    private static int parseSelectionFlags(String line) {
-        int i = 0;
-        int parseBooleanAttribute = parseBooleanAttribute(line, REGEX_DEFAULT, false) | (parseBooleanAttribute(line, REGEX_FORCED, false) ? 2 : 0);
-        if (parseBooleanAttribute(line, REGEX_AUTOSELECT, false)) {
-            i = 4;
+    private static HlsMasterPlaylist parseMasterPlaylist(LineIterator iterator, String baseUri) throws IOException {
+        HashSet<String> variantUrls = new HashSet();
+        HashMap<String, String> audioGroupIdToCodecs = new HashMap();
+        ArrayList<HlsUrl> variants = new ArrayList();
+        ArrayList<HlsUrl> audios = new ArrayList();
+        ArrayList<HlsUrl> subtitles = new ArrayList();
+        ArrayList<String> mediaTags = new ArrayList();
+        ArrayList<String> tags = new ArrayList();
+        Format muxedAudioFormat = null;
+        List<Format> muxedCaptionFormats = null;
+        boolean noClosedCaptions = false;
+        while (iterator.hasNext()) {
+            String codecs;
+            String line = iterator.next();
+            if (line.startsWith(TAG_PREFIX)) {
+                tags.add(line);
+            }
+            if (line.startsWith(TAG_MEDIA)) {
+                mediaTags.add(line);
+            } else {
+                if (line.startsWith(TAG_STREAM_INF)) {
+                    int width;
+                    int height;
+                    noClosedCaptions |= line.contains(ATTR_CLOSED_CAPTIONS_NONE);
+                    int bitrate = parseIntAttr(line, REGEX_BANDWIDTH);
+                    String averageBandwidthString = parseOptionalStringAttr(line, REGEX_AVERAGE_BANDWIDTH);
+                    if (averageBandwidthString != null) {
+                        bitrate = Integer.parseInt(averageBandwidthString);
+                    }
+                    codecs = parseOptionalStringAttr(line, REGEX_CODECS);
+                    String resolutionString = parseOptionalStringAttr(line, REGEX_RESOLUTION);
+                    if (resolutionString != null) {
+                        String[] widthAndHeight = resolutionString.split("x");
+                        width = Integer.parseInt(widthAndHeight[0]);
+                        height = Integer.parseInt(widthAndHeight[1]);
+                        if (width <= 0 || height <= 0) {
+                            width = -1;
+                            height = -1;
+                        }
+                    } else {
+                        width = -1;
+                        height = -1;
+                    }
+                    float frameRate = -1.0f;
+                    String frameRateString = parseOptionalStringAttr(line, REGEX_FRAME_RATE);
+                    if (frameRateString != null) {
+                        frameRate = Float.parseFloat(frameRateString);
+                    }
+                    String audioGroupId = parseOptionalStringAttr(line, REGEX_AUDIO);
+                    if (!(audioGroupId == null || codecs == null)) {
+                        audioGroupIdToCodecs.put(audioGroupId, Util.getCodecsOfType(codecs, 1));
+                    }
+                    line = iterator.next();
+                    if (variantUrls.add(line)) {
+                        variants.add(new HlsUrl(line, Format.createVideoContainerFormat(Integer.toString(variants.size()), MimeTypes.APPLICATION_M3U8, null, codecs, bitrate, width, height, frameRate, null, 0)));
+                    }
+                }
+            }
         }
-        return parseBooleanAttribute | i;
+        for (int i = 0; i < mediaTags.size(); i++) {
+            line = (String) mediaTags.get(i);
+            int selectionFlags = parseSelectionFlags(line);
+            String uri = parseOptionalStringAttr(line, REGEX_URI);
+            String id = parseStringAttr(line, REGEX_NAME);
+            String language = parseOptionalStringAttr(line, REGEX_LANGUAGE);
+            String groupId = parseOptionalStringAttr(line, REGEX_GROUP_ID);
+            String parseStringAttr = parseStringAttr(line, REGEX_TYPE);
+            Object obj = -1;
+            switch (parseStringAttr.hashCode()) {
+                case -959297733:
+                    if (parseStringAttr.equals(TYPE_SUBTITLES)) {
+                        obj = 1;
+                        break;
+                    }
+                    break;
+                case -333210994:
+                    if (parseStringAttr.equals(TYPE_CLOSED_CAPTIONS)) {
+                        obj = 2;
+                        break;
+                    }
+                    break;
+                case 62628790:
+                    if (parseStringAttr.equals(TYPE_AUDIO)) {
+                        obj = null;
+                        break;
+                    }
+                    break;
+            }
+            switch (obj) {
+                case null:
+                    codecs = (String) audioGroupIdToCodecs.get(groupId);
+                    Format format = Format.createAudioContainerFormat(id, MimeTypes.APPLICATION_M3U8, codecs != null ? MimeTypes.getMediaMimeType(codecs) : null, codecs, -1, -1, -1, null, selectionFlags, language);
+                    if (uri != null) {
+                        audios.add(new HlsUrl(uri, format));
+                        break;
+                    }
+                    muxedAudioFormat = format;
+                    break;
+                case 1:
+                    subtitles.add(new HlsUrl(uri, Format.createTextContainerFormat(id, MimeTypes.APPLICATION_M3U8, MimeTypes.TEXT_VTT, null, -1, selectionFlags, language)));
+                    break;
+                case 2:
+                    String mimeType;
+                    int accessibilityChannel;
+                    String instreamId = parseStringAttr(line, REGEX_INSTREAM_ID);
+                    if (instreamId.startsWith("CC")) {
+                        mimeType = MimeTypes.APPLICATION_CEA608;
+                        accessibilityChannel = Integer.parseInt(instreamId.substring(2));
+                    } else {
+                        mimeType = MimeTypes.APPLICATION_CEA708;
+                        accessibilityChannel = Integer.parseInt(instreamId.substring(7));
+                    }
+                    if (muxedCaptionFormats == null) {
+                        muxedCaptionFormats = new ArrayList();
+                    }
+                    muxedCaptionFormats.add(Format.createTextContainerFormat(id, null, mimeType, null, -1, selectionFlags, language, accessibilityChannel));
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (noClosedCaptions) {
+            muxedCaptionFormats = Collections.emptyList();
+        }
+        return new HlsMasterPlaylist(baseUri, tags, variants, audios, subtitles, muxedAudioFormat, muxedCaptionFormats);
+    }
+
+    private static int parseSelectionFlags(String line) {
+        int i;
+        int i2 = 0;
+        int i3 = parseBooleanAttribute(line, REGEX_DEFAULT, false) ? 1 : 0;
+        if (parseBooleanAttribute(line, REGEX_FORCED, false)) {
+            i = 2;
+        } else {
+            i = 0;
+        }
+        i3 |= i;
+        if (parseBooleanAttribute(line, REGEX_AUTOSELECT, false)) {
+            i2 = 4;
+        }
+        return i3 | i2;
     }
 
     private static HlsMediaPlaylist parseMediaPlaylist(LineIterator iterator, String baseUri) throws IOException {
-        boolean z;
-        int i;
         int playlistType = 0;
         long startOffsetUs = C.TIME_UNSET;
-        List<Segment> segments = new ArrayList();
-        List<String> tags = new ArrayList();
-        DrmInitData drmInitData = null;
+        int mediaSequence = 0;
+        int version = 1;
         long targetDurationUs = C.TIME_UNSET;
+        boolean hasIndependentSegmentsTag = false;
         boolean hasEndTag = false;
         Segment initializationSegment = null;
+        List<Segment> segments = new ArrayList();
+        List<String> tags = new ArrayList();
         long segmentDurationUs = 0;
         boolean hasDiscontinuitySequence = false;
         int playlistDiscontinuitySequence = 0;
         int relativeDiscontinuitySequence = 0;
+        long playlistStartTimeUs = 0;
         long segmentStartTimeUs = 0;
         long segmentByteRangeOffset = 0;
         long segmentByteRangeLength = -1;
         int segmentMediaSequence = 0;
         String encryptionKeyUri = null;
         String encryptionIV = null;
-        int version = 1;
-        boolean hasIndependentSegmentsTag = false;
-        int mediaSequence = 0;
-        long playlistStartTimeUs = 0;
+        DrmInitData drmInitData = null;
         while (iterator.hasNext()) {
             String line = iterator.next();
             if (line.startsWith(TAG_PREFIX)) {
                 tags.add(line);
             }
-            String playlistTypeString;
             if (line.startsWith(TAG_PLAYLIST_TYPE)) {
-                playlistTypeString = parseStringAttr(line, REGEX_PLAYLIST_TYPE);
+                String playlistTypeString = parseStringAttr(line, REGEX_PLAYLIST_TYPE);
                 if ("VOD".equals(playlistTypeString)) {
                     playlistType = 1;
                 } else if ("EVENT".equals(playlistTypeString)) {
@@ -551,154 +423,86 @@ Caused by: java.lang.NullPointerException
                 }
             } else if (line.startsWith(TAG_START)) {
                 startOffsetUs = (long) (parseDoubleAttr(line, REGEX_TIME_OFFSET) * 1000000.0d);
-            } else {
-                String uri;
-                if (line.startsWith(TAG_INIT_SEGMENT)) {
-                    uri = parseStringAttr(line, REGEX_URI);
-                    playlistTypeString = parseOptionalStringAttr(line, REGEX_ATTR_BYTERANGE);
-                    if (playlistTypeString != null) {
-                        z = hasIndependentSegmentsTag;
-                        hasIndependentSegmentsTag = playlistTypeString.split("@");
-                        segmentByteRangeLength = Long.parseLong(hasIndependentSegmentsTag[0]);
-                        i = version;
-                        if (hasIndependentSegmentsTag.length > 1) {
-                            segmentByteRangeOffset = Long.parseLong(hasIndependentSegmentsTag[1]);
-                        }
-                    } else {
-                        i = version;
-                        z = hasIndependentSegmentsTag;
-                        String str = playlistTypeString;
-                    }
-                    initializationSegment = new Segment(uri, segmentByteRangeOffset, segmentByteRangeLength);
-                    segmentByteRangeOffset = 0;
-                    segmentByteRangeLength = -1;
-                } else {
-                    i = version;
-                    z = hasIndependentSegmentsTag;
-                    if (line.startsWith(TAG_TARGET_DURATION)) {
-                        targetDurationUs = ((long) parseIntAttr(line, REGEX_TARGET_DURATION)) * C.MICROS_PER_SECOND;
-                    } else if (line.startsWith(TAG_MEDIA_SEQUENCE)) {
-                        mediaSequence = parseIntAttr(line, REGEX_MEDIA_SEQUENCE);
-                        segmentMediaSequence = mediaSequence;
-                    } else if (line.startsWith(TAG_VERSION)) {
-                        version = parseIntAttr(line, REGEX_VERSION);
-                        hasIndependentSegmentsTag = z;
-                    } else if (line.startsWith(TAG_MEDIA_DURATION)) {
-                        segmentDurationUs = (long) (parseDoubleAttr(line, REGEX_MEDIA_DURATION) * 4696837146684686336L);
-                    } else {
-                        int i2;
-                        if (line.startsWith(TAG_KEY)) {
-                            version = parseOptionalStringAttr(line, REGEX_METHOD);
-                            String keyFormat = parseOptionalStringAttr(line, REGEX_KEYFORMAT);
-                            String encryptionKeyUri2 = null;
-                            if (METHOD_NONE.equals(version)) {
-                                i2 = mediaSequence;
-                                encryptionIV = null;
-                                encryptionKeyUri = encryptionKeyUri2;
-                            } else {
-                                String encryptionIV2;
-                                playlistTypeString = parseOptionalStringAttr(line, REGEX_IV);
-                                String str2;
-                                if (KEYFORMAT_IDENTITY.equals(keyFormat)) {
-                                    i2 = mediaSequence;
-                                    str2 = keyFormat;
-                                    encryptionIV2 = playlistTypeString;
-                                } else if (keyFormat == null) {
-                                    i2 = mediaSequence;
-                                    str2 = keyFormat;
-                                    encryptionIV2 = playlistTypeString;
-                                } else if (version == 0 || parseWidevineSchemeData(line, keyFormat) == null) {
-                                    i2 = mediaSequence;
-                                    encryptionIV2 = playlistTypeString;
-                                    encryptionKeyUri = encryptionKeyUri2;
-                                    encryptionIV = encryptionIV2;
-                                } else {
-                                    encryptionIV2 = playlistTypeString;
-                                    if (!METHOD_SAMPLE_AES_CENC.equals(version)) {
-                                        if (!METHOD_SAMPLE_AES_CTR.equals(version)) {
-                                            playlistTypeString = C.CENC_TYPE_cbcs;
-                                            i2 = mediaSequence;
-                                            drmInitData = new DrmInitData(playlistTypeString, uri);
-                                            encryptionKeyUri = encryptionKeyUri2;
-                                            encryptionIV = encryptionIV2;
-                                        }
-                                    }
-                                    playlistTypeString = C.CENC_TYPE_cenc;
-                                    i2 = mediaSequence;
-                                    drmInitData = new DrmInitData(playlistTypeString, uri);
-                                    encryptionKeyUri = encryptionKeyUri2;
-                                    encryptionIV = encryptionIV2;
-                                }
-                                if (METHOD_AES_128.equals(version) != 0) {
-                                    encryptionKeyUri = parseStringAttr(line, REGEX_URI);
-                                    encryptionIV = encryptionIV2;
-                                }
-                                encryptionKeyUri = encryptionKeyUri2;
-                                encryptionIV = encryptionIV2;
-                            }
-                        } else {
-                            i2 = mediaSequence;
-                            if (line.startsWith(TAG_BYTERANGE) != 0) {
-                                String[] splitByteRange = parseStringAttr(line, REGEX_BYTERANGE).split("@");
-                                segmentByteRangeLength = Long.parseLong(splitByteRange[0]);
-                                if (splitByteRange.length > 1) {
-                                    segmentByteRangeOffset = Long.parseLong(splitByteRange[1]);
-                                }
-                            } else if (line.startsWith(TAG_DISCONTINUITY_SEQUENCE) != 0) {
-                                hasDiscontinuitySequence = true;
-                                playlistDiscontinuitySequence = Integer.parseInt(line.substring(line.indexOf(58) + 1));
-                            } else if (line.equals(TAG_DISCONTINUITY) != 0) {
-                                relativeDiscontinuitySequence++;
-                            } else if (line.startsWith(TAG_PROGRAM_DATE_TIME) != 0) {
-                                if (playlistStartTimeUs == 0) {
-                                    playlistStartTimeUs = C.msToUs(Util.parseXsDateTime(line.substring(line.indexOf(58) + 1))) - segmentStartTimeUs;
-                                }
-                            } else if (line.startsWith("#") == 0) {
-                                long segmentByteRangeOffset2;
-                                if (encryptionKeyUri == null) {
-                                    mediaSequence = 0;
-                                } else if (encryptionIV != null) {
-                                    mediaSequence = encryptionIV;
-                                } else {
-                                    mediaSequence = Integer.toHexString(segmentMediaSequence);
-                                }
-                                String segmentEncryptionIV = mediaSequence;
-                                segmentMediaSequence++;
-                                if (segmentByteRangeLength == -1) {
-                                    segmentByteRangeOffset2 = 0;
-                                } else {
-                                    segmentByteRangeOffset2 = segmentByteRangeOffset;
-                                }
-                                segments.add(new Segment(line, segmentDurationUs, relativeDiscontinuitySequence, segmentStartTimeUs, encryptionKeyUri, segmentEncryptionIV, segmentByteRangeOffset2, segmentByteRangeLength));
-                                long segmentStartTimeUs2 = segmentStartTimeUs + segmentDurationUs;
-                                segmentDurationUs = 0;
-                                if (segmentByteRangeLength != -1) {
-                                    segmentByteRangeOffset = segmentByteRangeOffset2 + segmentByteRangeLength;
-                                } else {
-                                    segmentByteRangeOffset = segmentByteRangeOffset2;
-                                }
-                                segmentByteRangeLength = -1;
-                                segmentStartTimeUs = segmentStartTimeUs2;
-                            } else if (line.equals(TAG_INDEPENDENT_SEGMENTS) != 0) {
-                                hasIndependentSegmentsTag = true;
-                                version = i;
-                                mediaSequence = i2;
-                            } else if (line.equals(TAG_ENDLIST) != 0) {
-                                hasEndTag = true;
-                            }
-                        }
-                        hasIndependentSegmentsTag = z;
-                        version = i;
-                        mediaSequence = i2;
+            } else if (line.startsWith(TAG_INIT_SEGMENT)) {
+                String uri = parseStringAttr(line, REGEX_URI);
+                String byteRange = parseOptionalStringAttr(line, REGEX_ATTR_BYTERANGE);
+                if (byteRange != null) {
+                    splitByteRange = byteRange.split("@");
+                    segmentByteRangeLength = Long.parseLong(splitByteRange[0]);
+                    if (splitByteRange.length > 1) {
+                        segmentByteRangeOffset = Long.parseLong(splitByteRange[1]);
                     }
                 }
-                hasIndependentSegmentsTag = z;
-                version = i;
+                initializationSegment = new Segment(uri, segmentByteRangeOffset, segmentByteRangeLength);
+                segmentByteRangeOffset = 0;
+                segmentByteRangeLength = -1;
+            } else if (line.startsWith(TAG_TARGET_DURATION)) {
+                targetDurationUs = ((long) parseIntAttr(line, REGEX_TARGET_DURATION)) * C.MICROS_PER_SECOND;
+            } else if (line.startsWith(TAG_MEDIA_SEQUENCE)) {
+                mediaSequence = parseIntAttr(line, REGEX_MEDIA_SEQUENCE);
+                segmentMediaSequence = mediaSequence;
+            } else if (line.startsWith(TAG_VERSION)) {
+                version = parseIntAttr(line, REGEX_VERSION);
+            } else if (line.startsWith(TAG_MEDIA_DURATION)) {
+                segmentDurationUs = (long) (parseDoubleAttr(line, REGEX_MEDIA_DURATION) * 1000000.0d);
+            } else if (line.startsWith(TAG_KEY)) {
+                String method = parseOptionalStringAttr(line, REGEX_METHOD);
+                String keyFormat = parseOptionalStringAttr(line, REGEX_KEYFORMAT);
+                encryptionKeyUri = null;
+                encryptionIV = null;
+                if (!METHOD_NONE.equals(method)) {
+                    encryptionIV = parseOptionalStringAttr(line, REGEX_IV);
+                    if (KEYFORMAT_IDENTITY.equals(keyFormat) || keyFormat == null) {
+                        if (METHOD_AES_128.equals(method)) {
+                            encryptionKeyUri = parseStringAttr(line, REGEX_URI);
+                        }
+                    } else if (!(method == null || parseWidevineSchemeData(line, keyFormat) == null)) {
+                        String str = (METHOD_SAMPLE_AES_CENC.equals(method) || METHOD_SAMPLE_AES_CTR.equals(method)) ? C.CENC_TYPE_cenc : C.CENC_TYPE_cbcs;
+                        DrmInitData drmInitData2 = new DrmInitData(str, schemeData);
+                    }
+                }
+            } else if (line.startsWith(TAG_BYTERANGE)) {
+                splitByteRange = parseStringAttr(line, REGEX_BYTERANGE).split("@");
+                segmentByteRangeLength = Long.parseLong(splitByteRange[0]);
+                if (splitByteRange.length > 1) {
+                    segmentByteRangeOffset = Long.parseLong(splitByteRange[1]);
+                }
+            } else if (line.startsWith(TAG_DISCONTINUITY_SEQUENCE)) {
+                hasDiscontinuitySequence = true;
+                playlistDiscontinuitySequence = Integer.parseInt(line.substring(line.indexOf(58) + 1));
+            } else if (line.equals(TAG_DISCONTINUITY)) {
+                relativeDiscontinuitySequence++;
+            } else if (line.startsWith(TAG_PROGRAM_DATE_TIME)) {
+                if (playlistStartTimeUs == 0) {
+                    playlistStartTimeUs = C.msToUs(Util.parseXsDateTime(line.substring(line.indexOf(58) + 1))) - segmentStartTimeUs;
+                }
+            } else if (!line.startsWith("#")) {
+                String segmentEncryptionIV;
+                if (encryptionKeyUri == null) {
+                    segmentEncryptionIV = null;
+                } else if (encryptionIV != null) {
+                    segmentEncryptionIV = encryptionIV;
+                } else {
+                    segmentEncryptionIV = Integer.toHexString(segmentMediaSequence);
+                }
+                segmentMediaSequence++;
+                if (segmentByteRangeLength == -1) {
+                    segmentByteRangeOffset = 0;
+                }
+                segments.add(new Segment(line, segmentDurationUs, relativeDiscontinuitySequence, segmentStartTimeUs, encryptionKeyUri, segmentEncryptionIV, segmentByteRangeOffset, segmentByteRangeLength));
+                segmentStartTimeUs += segmentDurationUs;
+                segmentDurationUs = 0;
+                if (segmentByteRangeLength != -1) {
+                    segmentByteRangeOffset += segmentByteRangeLength;
+                }
+                segmentByteRangeLength = -1;
+            } else if (line.equals(TAG_INDEPENDENT_SEGMENTS)) {
+                hasIndependentSegmentsTag = true;
+            } else if (line.equals(TAG_ENDLIST)) {
+                hasEndTag = true;
             }
         }
-        i = version;
-        z = hasIndependentSegmentsTag;
-        return new HlsMediaPlaylist(playlistType, baseUri, tags, startOffsetUs, playlistStartTimeUs, hasDiscontinuitySequence, playlistDiscontinuitySequence, mediaSequence, i, targetDurationUs, z, hasEndTag, playlistStartTimeUs != 0, drmInitData, initializationSegment, segments);
+        return new HlsMediaPlaylist(playlistType, baseUri, tags, startOffsetUs, playlistStartTimeUs, hasDiscontinuitySequence, playlistDiscontinuitySequence, mediaSequence, version, targetDurationUs, hasIndependentSegmentsTag, hasEndTag, playlistStartTimeUs != 0, drmInitData, initializationSegment, segments);
     }
 
     private static SchemeData parseWidevineSchemeData(String line, String keyFormat) throws ParserException {
@@ -734,12 +538,7 @@ Caused by: java.lang.NullPointerException
         if (matcher.find() && matcher.groupCount() == 1) {
             return matcher.group(1);
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Couldn't match ");
-        stringBuilder.append(pattern.pattern());
-        stringBuilder.append(" in ");
-        stringBuilder.append(line);
-        throw new ParserException(stringBuilder.toString());
+        throw new ParserException("Couldn't match " + pattern.pattern() + " in " + line);
     }
 
     private static boolean parseBooleanAttribute(String line, Pattern pattern, boolean defaultValue) {
@@ -751,13 +550,6 @@ Caused by: java.lang.NullPointerException
     }
 
     private static Pattern compileBooleanAttrPattern(String attribute) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(attribute);
-        stringBuilder.append("=(");
-        stringBuilder.append(BOOLEAN_FALSE);
-        stringBuilder.append("|");
-        stringBuilder.append(BOOLEAN_TRUE);
-        stringBuilder.append(")");
-        return Pattern.compile(stringBuilder.toString());
+        return Pattern.compile(attribute + "=(" + BOOLEAN_FALSE + "|" + BOOLEAN_TRUE + ")");
     }
 }

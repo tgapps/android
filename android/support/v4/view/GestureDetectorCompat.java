@@ -72,10 +72,7 @@ public final class GestureDetectorCompat {
                             return;
                         }
                     default:
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append("Unknown message ");
-                        stringBuilder.append(msg);
-                        throw new RuntimeException(stringBuilder.toString());
+                        throw new RuntimeException("Unknown message " + msg);
                 }
             }
         }
@@ -116,197 +113,166 @@ public final class GestureDetectorCompat {
 
         public boolean onTouchEvent(MotionEvent ev) {
             int i;
-            MotionEvent motionEvent = ev;
+            int div;
             int action = ev.getAction();
             if (this.mVelocityTracker == null) {
-                r0.mVelocityTracker = VelocityTracker.obtain();
+                this.mVelocityTracker = VelocityTracker.obtain();
             }
-            r0.mVelocityTracker.addMovement(motionEvent);
+            this.mVelocityTracker.addMovement(ev);
             boolean pointerUp = (action & 255) == 6;
             int skipIndex = pointerUp ? ev.getActionIndex() : -1;
-            int count = ev.getPointerCount();
-            float sumY = 0.0f;
             float sumX = 0.0f;
+            float sumY = 0.0f;
+            int count = ev.getPointerCount();
             for (i = 0; i < count; i++) {
                 if (skipIndex != i) {
-                    sumX += motionEvent.getX(i);
-                    sumY += motionEvent.getY(i);
+                    sumX += ev.getX(i);
+                    sumY += ev.getY(i);
                 }
             }
-            i = pointerUp ? count - 1 : count;
-            float focusX = sumX / ((float) i);
-            float focusY = sumY / ((float) i);
+            if (pointerUp) {
+                div = count - 1;
+            } else {
+                div = count;
+            }
+            float focusX = sumX / ((float) div);
+            float focusY = sumY / ((float) div);
             boolean handled = false;
-            boolean z;
-            int i2;
-            int pointerId;
-            float velocityX;
-            int distance;
             switch (action & 255) {
                 case 0:
-                    z = pointerUp;
-                    i2 = skipIndex;
-                    if (r0.mDoubleTapListener != null) {
-                        boolean hadTapMessage = r0.mHandler.hasMessages(3);
+                    if (this.mDoubleTapListener != null) {
+                        boolean hadTapMessage = this.mHandler.hasMessages(3);
                         if (hadTapMessage) {
-                            r0.mHandler.removeMessages(3);
+                            this.mHandler.removeMessages(3);
                         }
-                        if (r0.mCurrentDownEvent == null || r0.mPreviousUpEvent == null || !hadTapMessage || !isConsideredDoubleTap(r0.mCurrentDownEvent, r0.mPreviousUpEvent, motionEvent)) {
-                            r0.mHandler.sendEmptyMessageDelayed(3, (long) DOUBLE_TAP_TIMEOUT);
-                        } else {
-                            r0.mIsDoubleTapping = true;
-                            handled = (r0.mDoubleTapListener.onDoubleTap(r0.mCurrentDownEvent) | false) | r0.mDoubleTapListener.onDoubleTapEvent(motionEvent);
+                        if (!(this.mCurrentDownEvent == null || this.mPreviousUpEvent == null || !hadTapMessage)) {
+                            if (isConsideredDoubleTap(this.mCurrentDownEvent, this.mPreviousUpEvent, ev)) {
+                                this.mIsDoubleTapping = true;
+                                handled = (false | this.mDoubleTapListener.onDoubleTap(this.mCurrentDownEvent)) | this.mDoubleTapListener.onDoubleTapEvent(ev);
+                            }
                         }
+                        this.mHandler.sendEmptyMessageDelayed(3, (long) DOUBLE_TAP_TIMEOUT);
                     }
-                    r0.mLastFocusX = focusX;
-                    r0.mDownFocusX = focusX;
-                    r0.mLastFocusY = focusY;
-                    r0.mDownFocusY = focusY;
-                    if (r0.mCurrentDownEvent != null) {
-                        r0.mCurrentDownEvent.recycle();
+                    this.mLastFocusX = focusX;
+                    this.mDownFocusX = focusX;
+                    this.mLastFocusY = focusY;
+                    this.mDownFocusY = focusY;
+                    if (this.mCurrentDownEvent != null) {
+                        this.mCurrentDownEvent.recycle();
                     }
-                    r0.mCurrentDownEvent = MotionEvent.obtain(ev);
-                    r0.mAlwaysInTapRegion = true;
-                    r0.mAlwaysInBiggerTapRegion = true;
-                    r0.mStillDown = true;
-                    r0.mInLongPress = false;
-                    r0.mDeferConfirmSingleTap = false;
-                    if (r0.mIsLongpressEnabled) {
-                        r0.mHandler.removeMessages(2);
-                        r0.mHandler.sendEmptyMessageAtTime(2, (r0.mCurrentDownEvent.getDownTime() + ((long) TAP_TIMEOUT)) + ((long) LONGPRESS_TIMEOUT));
+                    this.mCurrentDownEvent = MotionEvent.obtain(ev);
+                    this.mAlwaysInTapRegion = true;
+                    this.mAlwaysInBiggerTapRegion = true;
+                    this.mStillDown = true;
+                    this.mInLongPress = false;
+                    this.mDeferConfirmSingleTap = false;
+                    if (this.mIsLongpressEnabled) {
+                        this.mHandler.removeMessages(2);
+                        this.mHandler.sendEmptyMessageAtTime(2, (this.mCurrentDownEvent.getDownTime() + ((long) TAP_TIMEOUT)) + ((long) LONGPRESS_TIMEOUT));
                     }
-                    r0.mHandler.sendEmptyMessageAtTime(1, r0.mCurrentDownEvent.getDownTime() + ((long) TAP_TIMEOUT));
-                    return handled | r0.mListener.onDown(motionEvent);
+                    this.mHandler.sendEmptyMessageAtTime(1, this.mCurrentDownEvent.getDownTime() + ((long) TAP_TIMEOUT));
+                    return handled | this.mListener.onDown(ev);
                 case 1:
-                    z = pointerUp;
-                    i2 = skipIndex;
-                    r0.mStillDown = false;
-                    action = MotionEvent.obtain(ev);
-                    if (r0.mIsDoubleTapping) {
-                        handled = false | r0.mDoubleTapListener.onDoubleTapEvent(motionEvent);
-                    } else if (r0.mInLongPress) {
-                        r0.mHandler.removeMessages(3);
-                        r0.mInLongPress = false;
-                    } else if (r0.mAlwaysInTapRegion) {
-                        handled = r0.mListener.onSingleTapUp(motionEvent);
-                        if (r0.mDeferConfirmSingleTap && r0.mDoubleTapListener != null) {
-                            r0.mDoubleTapListener.onSingleTapConfirmed(motionEvent);
+                    this.mStillDown = false;
+                    MotionEvent currentUpEvent = MotionEvent.obtain(ev);
+                    if (this.mIsDoubleTapping) {
+                        handled = false | this.mDoubleTapListener.onDoubleTapEvent(ev);
+                    } else if (this.mInLongPress) {
+                        this.mHandler.removeMessages(3);
+                        this.mInLongPress = false;
+                    } else if (this.mAlwaysInTapRegion) {
+                        handled = this.mListener.onSingleTapUp(ev);
+                        if (this.mDeferConfirmSingleTap && this.mDoubleTapListener != null) {
+                            this.mDoubleTapListener.onSingleTapConfirmed(ev);
                         }
                     } else {
-                        VelocityTracker velocityTracker = r0.mVelocityTracker;
-                        pointerId = motionEvent.getPointerId(0);
-                        velocityTracker.computeCurrentVelocity(1000, (float) r0.mMaximumFlingVelocity);
+                        VelocityTracker velocityTracker = this.mVelocityTracker;
+                        int pointerId = ev.getPointerId(0);
+                        velocityTracker.computeCurrentVelocity(1000, (float) this.mMaximumFlingVelocity);
                         float velocityY = velocityTracker.getYVelocity(pointerId);
-                        velocityX = velocityTracker.getXVelocity(pointerId);
-                        if (Math.abs(velocityY) > ((float) r0.mMinimumFlingVelocity) || Math.abs(velocityX) > ((float) r0.mMinimumFlingVelocity)) {
-                            handled = r0.mListener.onFling(r0.mCurrentDownEvent, motionEvent, velocityX, velocityY);
+                        float velocityX = velocityTracker.getXVelocity(pointerId);
+                        if (Math.abs(velocityY) > ((float) this.mMinimumFlingVelocity) || Math.abs(velocityX) > ((float) this.mMinimumFlingVelocity)) {
+                            handled = this.mListener.onFling(this.mCurrentDownEvent, ev, velocityX, velocityY);
                         }
                     }
-                    if (r0.mPreviousUpEvent != null) {
-                        r0.mPreviousUpEvent.recycle();
+                    if (this.mPreviousUpEvent != null) {
+                        this.mPreviousUpEvent.recycle();
                     }
-                    r0.mPreviousUpEvent = action;
-                    if (r0.mVelocityTracker != null) {
-                        r0.mVelocityTracker.recycle();
-                        r0.mVelocityTracker = null;
+                    this.mPreviousUpEvent = currentUpEvent;
+                    if (this.mVelocityTracker != null) {
+                        this.mVelocityTracker.recycle();
+                        this.mVelocityTracker = null;
                     }
-                    r0.mIsDoubleTapping = false;
-                    r0.mDeferConfirmSingleTap = false;
-                    r0.mHandler.removeMessages(1);
-                    r0.mHandler.removeMessages(2);
+                    this.mIsDoubleTapping = false;
+                    this.mDeferConfirmSingleTap = false;
+                    this.mHandler.removeMessages(1);
+                    this.mHandler.removeMessages(2);
                     return handled;
                 case 2:
-                    z = pointerUp;
-                    i2 = skipIndex;
-                    if (r0.mInLongPress != 0) {
+                    if (this.mInLongPress) {
                         return false;
                     }
-                    action = r0.mLastFocusX - focusX;
-                    pointerUp = r0.mLastFocusY - focusY;
-                    if (r0.mIsDoubleTapping) {
-                        return false | r0.mDoubleTapListener.onDoubleTapEvent(motionEvent);
+                    float scrollX = this.mLastFocusX - focusX;
+                    float scrollY = this.mLastFocusY - focusY;
+                    if (this.mIsDoubleTapping) {
+                        return false | this.mDoubleTapListener.onDoubleTapEvent(ev);
                     }
-                    if (r0.mAlwaysInTapRegion) {
-                        skipIndex = (int) (focusX - r0.mDownFocusX);
-                        int deltaY = (int) (focusY - r0.mDownFocusY);
-                        distance = (skipIndex * skipIndex) + (deltaY * deltaY);
-                        if (distance > r0.mTouchSlopSquare) {
-                            boolean handled2 = r0.mListener.onScroll(r0.mCurrentDownEvent, motionEvent, action, pointerUp);
-                            r0.mLastFocusX = focusX;
-                            r0.mLastFocusY = focusY;
-                            r0.mAlwaysInTapRegion = false;
-                            r0.mHandler.removeMessages(3);
-                            r0.mHandler.removeMessages(1);
-                            r0.mHandler.removeMessages(2);
-                            handled = handled2;
+                    if (this.mAlwaysInTapRegion) {
+                        int deltaX = (int) (focusX - this.mDownFocusX);
+                        int deltaY = (int) (focusY - this.mDownFocusY);
+                        int distance = (deltaX * deltaX) + (deltaY * deltaY);
+                        if (distance > this.mTouchSlopSquare) {
+                            handled = this.mListener.onScroll(this.mCurrentDownEvent, ev, scrollX, scrollY);
+                            this.mLastFocusX = focusX;
+                            this.mLastFocusY = focusY;
+                            this.mAlwaysInTapRegion = false;
+                            this.mHandler.removeMessages(3);
+                            this.mHandler.removeMessages(1);
+                            this.mHandler.removeMessages(2);
                         }
-                        if (distance > r0.mTouchSlopSquare) {
-                            r0.mAlwaysInBiggerTapRegion = false;
+                        if (distance <= this.mTouchSlopSquare) {
+                            return handled;
                         }
+                        this.mAlwaysInBiggerTapRegion = false;
                         return handled;
-                    } else if (Math.abs(action) < 1.0f && Math.abs(pointerUp) < 1.0f) {
+                    } else if (Math.abs(scrollX) < 1.0f && Math.abs(scrollY) < 1.0f) {
                         return false;
                     } else {
-                        handled = r0.mListener.onScroll(r0.mCurrentDownEvent, motionEvent, action, pointerUp);
-                        r0.mLastFocusX = focusX;
-                        r0.mLastFocusY = focusY;
+                        handled = this.mListener.onScroll(this.mCurrentDownEvent, ev, scrollX, scrollY);
+                        this.mLastFocusX = focusX;
+                        this.mLastFocusY = focusY;
                         return handled;
                     }
                 case 3:
-                    z = pointerUp;
-                    i2 = skipIndex;
                     cancel();
                     return false;
                 case 5:
-                    z = pointerUp;
-                    i2 = skipIndex;
-                    r0.mLastFocusX = focusX;
-                    r0.mDownFocusX = focusX;
-                    r0.mLastFocusY = focusY;
-                    r0.mDownFocusY = focusY;
+                    this.mLastFocusX = focusX;
+                    this.mDownFocusX = focusX;
+                    this.mLastFocusY = focusY;
+                    this.mDownFocusY = focusY;
                     cancelTaps();
                     return false;
                 case 6:
-                    r0.mLastFocusX = focusX;
-                    r0.mDownFocusX = focusX;
-                    r0.mLastFocusY = focusY;
-                    r0.mDownFocusY = focusY;
-                    r0.mVelocityTracker.computeCurrentVelocity(1000, (float) r0.mMaximumFlingVelocity);
-                    pointerId = ev.getActionIndex();
-                    distance = motionEvent.getPointerId(pointerId);
-                    float x1 = r0.mVelocityTracker.getXVelocity(distance);
-                    velocityX = r0.mVelocityTracker.getYVelocity(distance);
-                    int i3 = 0;
-                    while (true) {
-                        int action2 = action;
-                        action = i3;
-                        int upIndex;
-                        if (action < count) {
-                            if (action == pointerId) {
-                                z = pointerUp;
-                                i2 = skipIndex;
-                                upIndex = pointerId;
-                            } else {
-                                z = pointerUp;
-                                pointerUp = motionEvent.getPointerId(action);
-                                i2 = skipIndex;
-                                upIndex = pointerId;
-                                if ((r0.mVelocityTracker.getXVelocity(pointerUp) * x1) + (r0.mVelocityTracker.getYVelocity(pointerUp) * velocityX) < 0.0f) {
-                                    boolean id2 = pointerUp;
-                                    r0.mVelocityTracker.clear();
-                                }
+                    this.mLastFocusX = focusX;
+                    this.mDownFocusX = focusX;
+                    this.mLastFocusY = focusY;
+                    this.mDownFocusY = focusY;
+                    this.mVelocityTracker.computeCurrentVelocity(1000, (float) this.mMaximumFlingVelocity);
+                    int upIndex = ev.getActionIndex();
+                    int id1 = ev.getPointerId(upIndex);
+                    float x1 = this.mVelocityTracker.getXVelocity(id1);
+                    float y1 = this.mVelocityTracker.getYVelocity(id1);
+                    for (i = 0; i < count; i++) {
+                        if (i != upIndex) {
+                            int id2 = ev.getPointerId(i);
+                            if ((x1 * this.mVelocityTracker.getXVelocity(id2)) + (y1 * this.mVelocityTracker.getYVelocity(id2)) < 0.0f) {
+                                this.mVelocityTracker.clear();
+                                return false;
                             }
-                            i3 = action + 1;
-                            action = action2;
-                            pointerUp = z;
-                            skipIndex = i2;
-                            pointerId = upIndex;
-                        } else {
-                            i2 = skipIndex;
-                            upIndex = pointerId;
                         }
-                        return false;
                     }
+                    return false;
                 default:
                     return false;
             }
@@ -342,16 +308,15 @@ public final class GestureDetectorCompat {
         }
 
         private boolean isConsideredDoubleTap(MotionEvent firstDown, MotionEvent firstUp, MotionEvent secondDown) {
-            boolean z = false;
             if (!this.mAlwaysInBiggerTapRegion || secondDown.getEventTime() - firstUp.getEventTime() > ((long) DOUBLE_TAP_TIMEOUT)) {
                 return false;
             }
             int deltaX = ((int) firstDown.getX()) - ((int) secondDown.getX());
             int deltaY = ((int) firstDown.getY()) - ((int) secondDown.getY());
             if ((deltaX * deltaX) + (deltaY * deltaY) < this.mDoubleTapSlopSquare) {
-                z = true;
+                return true;
             }
-            return z;
+            return false;
         }
 
         void dispatchLongPress() {

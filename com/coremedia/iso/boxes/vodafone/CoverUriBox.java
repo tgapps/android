@@ -57,9 +57,6 @@ public class CoverUriBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        StringBuilder stringBuilder = new StringBuilder("CoverUriBox[coverUri=");
-        stringBuilder.append(getCoverUri());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "CoverUriBox[coverUri=" + getCoverUri() + "]";
     }
 }

@@ -55,10 +55,10 @@ public final class Cart extends AbstractSafeParcelable implements ReflectedParce
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, this.zzan, false);
         SafeParcelWriter.writeString(parcel, 3, this.zzao, false);
         SafeParcelWriter.writeTypedList(parcel, 4, this.zzap, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -3,107 +3,12 @@ package org.telegram.messenger.exoplayer2.util;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import org.telegram.messenger.exoplayer2.C;
+import org.telegram.messenger.exoplayer2.extractor.ts.PsExtractor;
 
 public final class ParsableByteArray {
     public byte[] data;
     private int limit;
     private int position;
-
-    public long readUtf8EncodedLong() {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.util.ParsableByteArray.readUtf8EncodedLong():long
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = 0;
-        r1 = r12.data;
-        r2 = r12.position;
-        r1 = r1[r2];
-        r1 = (long) r1;
-        r3 = 7;
-        r4 = r3;
-    L_0x000a:
-        r5 = 6;
-        r6 = 1;
-        if (r4 < 0) goto L_0x002c;
-    L_0x000e:
-        r7 = r6 << r4;
-        r7 = (long) r7;
-        r9 = r1 & r7;
-        r7 = 0;
-        r11 = (r9 > r7 ? 1 : (r9 == r7 ? 0 : -1));
-        if (r11 != 0) goto L_0x0029;
-    L_0x0019:
-        if (r4 >= r5) goto L_0x0025;
-    L_0x001b:
-        r7 = r6 << r4;
-        r7 = r7 - r6;
-        r7 = (long) r7;
-        r9 = r1 & r7;
-        r0 = 7 - r4;
-        r1 = r9;
-        goto L_0x002c;
-    L_0x0025:
-        if (r4 != r3) goto L_0x002c;
-    L_0x0027:
-        r0 = 1;
-        goto L_0x002c;
-    L_0x0029:
-        r4 = r4 + -1;
-        goto L_0x000a;
-    L_0x002c:
-        if (r0 != 0) goto L_0x0045;
-    L_0x002e:
-        r3 = new java.lang.NumberFormatException;
-        r4 = new java.lang.StringBuilder;
-        r4.<init>();
-        r5 = "Invalid UTF-8 sequence first byte: ";
-        r4.append(r5);
-        r4.append(r1);
-        r4 = r4.toString();
-        r3.<init>(r4);
-        throw r3;
-        r3 = r6;
-        if (r3 >= r0) goto L_0x0077;
-        r4 = r12.data;
-        r6 = r12.position;
-        r6 = r6 + r3;
-        r4 = r4[r6];
-        r6 = r4 & 192;
-        r7 = 128; // 0x80 float:1.794E-43 double:6.32E-322;
-        if (r6 == r7) goto L_0x006d;
-        r5 = new java.lang.NumberFormatException;
-        r6 = new java.lang.StringBuilder;
-        r6.<init>();
-        r7 = "Invalid UTF-8 sequence continuation byte: ";
-        r6.append(r7);
-        r6.append(r1);
-        r6 = r6.toString();
-        r5.<init>(r6);
-        throw r5;
-        r6 = r1 << r5;
-        r8 = r4 & 63;
-        r8 = (long) r8;
-        r1 = r6 | r8;
-        r6 = r3 + 1;
-        goto L_0x0046;
-        r3 = r12.position;
-        r3 = r3 + r0;
-        r12.position = r3;
-        return r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.util.ParsableByteArray.readUtf8EncodedLong():long");
-    }
 
     public ParsableByteArray(int limit) {
         this.data = new byte[limit];
@@ -309,15 +214,15 @@ Caused by: java.lang.NullPointerException
         byte[] bArr2 = this.data;
         int i2 = this.position;
         this.position = i2 + 1;
-        long j2 = j | ((((long) bArr2[i2]) & 255) << 16);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        long j3 = j2 | ((((long) bArr[i]) & 255) << 8);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        return j3 | (((long) bArr[i]) & 255);
+        j |= (((long) bArr2[i2]) & 255) << 16;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 8;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        return j | (((long) bArr2[i2]) & 255);
     }
 
     public long readLittleEndianUnsignedInt() {
@@ -325,18 +230,18 @@ Caused by: java.lang.NullPointerException
         int i = this.position;
         this.position = i + 1;
         long j = ((long) bArr[i]) & 255;
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        long j2 = j | ((((long) bArr[i]) & 255) << 8);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j = j2 | ((((long) bArr[i]) & 255) << 16);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        return j | ((((long) bArr[i]) & 255) << 24);
+        byte[] bArr2 = this.data;
+        int i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 8;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 16;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        return j | ((((long) bArr2[i2]) & 255) << 24);
     }
 
     public int readInt() {
@@ -385,31 +290,31 @@ Caused by: java.lang.NullPointerException
         byte[] bArr2 = this.data;
         int i2 = this.position;
         this.position = i2 + 1;
-        long j2 = j | ((((long) bArr2[i2]) & 255) << 48);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        long j3 = j2 | ((((long) bArr[i]) & 255) << 40);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j2 = j3 | ((((long) bArr[i]) & 255) << 32);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j3 = j2 | ((((long) bArr[i]) & 255) << 24);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j2 = j3 | ((((long) bArr[i]) & 255) << 16);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j3 = j2 | ((((long) bArr[i]) & 255) << 8);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        return j3 | (((long) bArr[i]) & 255);
+        j |= (((long) bArr2[i2]) & 255) << 48;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 40;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 32;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 24;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 16;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 8;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        return j | (((long) bArr2[i2]) & 255);
     }
 
     public long readLittleEndianLong() {
@@ -417,45 +322,45 @@ Caused by: java.lang.NullPointerException
         int i = this.position;
         this.position = i + 1;
         long j = ((long) bArr[i]) & 255;
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        long j2 = j | ((((long) bArr[i]) & 255) << 8);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j = j2 | ((((long) bArr[i]) & 255) << 16);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j2 = j | ((((long) bArr[i]) & 255) << 24);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j = j2 | ((((long) bArr[i]) & 255) << 32);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j2 = j | ((((long) bArr[i]) & 255) << 40);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        j = j2 | ((((long) bArr[i]) & 255) << 48);
-        bArr = this.data;
-        i = this.position;
-        this.position = i + 1;
-        return j | ((((long) bArr[i]) & 255) << 56);
+        byte[] bArr2 = this.data;
+        int i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 8;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 16;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 24;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 32;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 40;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        j |= (((long) bArr2[i2]) & 255) << 48;
+        bArr2 = this.data;
+        i2 = this.position;
+        this.position = i2 + 1;
+        return j | ((((long) bArr2[i2]) & 255) << 56);
     }
 
     public int readUnsignedFixedPoint1616() {
         byte[] bArr = this.data;
         int i = this.position;
         this.position = i + 1;
-        int result = (bArr[i] & 255) << 8;
+        int i2 = (bArr[i] & 255) << 8;
         byte[] bArr2 = this.data;
-        int i2 = this.position;
-        this.position = i2 + 1;
-        result |= bArr2[i2] & 255;
+        int i3 = this.position;
+        this.position = i3 + 1;
+        int result = i2 | (bArr2[i3] & 255);
         this.position += 2;
         return result;
     }
@@ -469,10 +374,7 @@ Caused by: java.lang.NullPointerException
         if (result >= 0) {
             return result;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Top bit not zero: ");
-        stringBuilder.append(result);
-        throw new IllegalStateException(stringBuilder.toString());
+        throw new IllegalStateException("Top bit not zero: " + result);
     }
 
     public int readLittleEndianUnsignedIntToInt() {
@@ -480,10 +382,7 @@ Caused by: java.lang.NullPointerException
         if (result >= 0) {
             return result;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Top bit not zero: ");
-        stringBuilder.append(result);
-        throw new IllegalStateException(stringBuilder.toString());
+        throw new IllegalStateException("Top bit not zero: " + result);
     }
 
     public long readUnsignedLongToLong() {
@@ -491,10 +390,7 @@ Caused by: java.lang.NullPointerException
         if (result >= 0) {
             return result;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Top bit not zero: ");
-        stringBuilder.append(result);
-        throw new IllegalStateException(stringBuilder.toString());
+        throw new IllegalStateException("Top bit not zero: " + result);
     }
 
     public float readFloat() {
@@ -539,9 +435,10 @@ Caused by: java.lang.NullPointerException
         }
         String string = new String(this.data, this.position, stringLimit - this.position);
         this.position = stringLimit;
-        if (this.position < this.limit) {
-            this.position++;
+        if (this.position >= this.limit) {
+            return string;
         }
+        this.position++;
         return string;
     }
 
@@ -567,9 +464,52 @@ Caused by: java.lang.NullPointerException
                 return line;
             }
         }
-        if (this.data[this.position] == (byte) 10) {
-            this.position++;
+        if (this.data[this.position] != (byte) 10) {
+            return line;
         }
+        this.position++;
         return line;
+    }
+
+    public long readUtf8EncodedLong() {
+        int i;
+        int x;
+        int length = 0;
+        long value = (long) this.data[this.position];
+        for (int j = 7; j >= 0; j--) {
+            if ((((long) (1 << j)) & value) == 0) {
+                if (j < 6) {
+                    value &= (long) ((1 << j) - 1);
+                    length = 7 - j;
+                } else if (j == 7) {
+                    length = 1;
+                }
+                if (length != 0) {
+                    throw new NumberFormatException("Invalid UTF-8 sequence first byte: " + value);
+                }
+                for (i = 1; i < length; i++) {
+                    x = this.data[this.position + i];
+                    if ((x & PsExtractor.AUDIO_STREAM) == 128) {
+                        throw new NumberFormatException("Invalid UTF-8 sequence continuation byte: " + value);
+                    }
+                    value = (value << 6) | ((long) (x & 63));
+                }
+                this.position += length;
+                return value;
+            }
+        }
+        if (length != 0) {
+            while (i < length) {
+                x = this.data[this.position + i];
+                if ((x & PsExtractor.AUDIO_STREAM) == 128) {
+                    value = (value << 6) | ((long) (x & 63));
+                } else {
+                    throw new NumberFormatException("Invalid UTF-8 sequence continuation byte: " + value);
+                }
+            }
+            this.position += length;
+            return value;
+        }
+        throw new NumberFormatException("Invalid UTF-8 sequence first byte: " + value);
     }
 }

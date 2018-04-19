@@ -9,37 +9,36 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public class DataHolderCreator implements Creator<DataHolder> {
     public DataHolder createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        Bundle bundle = null;
         int i = 0;
-        int i2 = i;
+        CursorWindow[] cursorWindowArr = null;
         String[] strArr = null;
-        CursorWindow[] cursorWindowArr = strArr;
-        Bundle bundle = cursorWindowArr;
+        int i2 = 0;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
-            int fieldId = SafeParcelReader.getFieldId(readHeader);
-            if (fieldId != 1000) {
-                switch (fieldId) {
-                    case 1:
-                        strArr = SafeParcelReader.createStringArray(parcel, readHeader);
-                        break;
-                    case 2:
-                        cursorWindowArr = (CursorWindow[]) SafeParcelReader.createTypedArray(parcel, readHeader, CursorWindow.CREATOR);
-                        break;
-                    case 3:
-                        i2 = SafeParcelReader.readInt(parcel, readHeader);
-                        break;
-                    case 4:
-                        bundle = SafeParcelReader.createBundle(parcel, readHeader);
-                        break;
-                    default:
-                        SafeParcelReader.skipUnknownField(parcel, readHeader);
-                        break;
-                }
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 1:
+                    strArr = SafeParcelReader.createStringArray(parcel, readHeader);
+                    break;
+                case 2:
+                    cursorWindowArr = (CursorWindow[]) SafeParcelReader.createTypedArray(parcel, readHeader, CursorWindow.CREATOR);
+                    break;
+                case 3:
+                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    break;
+                case 4:
+                    bundle = SafeParcelReader.createBundle(parcel, readHeader);
+                    break;
+                case 1000:
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
             }
-            i = SafeParcelReader.readInt(parcel, readHeader);
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        DataHolder dataHolder = new DataHolder(i, strArr, cursorWindowArr, i2, bundle);
+        DataHolder dataHolder = new DataHolder(i2, strArr, cursorWindowArr, i, bundle);
         dataHolder.validateContents();
         return dataHolder;
     }

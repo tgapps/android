@@ -17,7 +17,7 @@ public final class FirebaseOptions {
     private final String zzx;
 
     private FirebaseOptions(String str, String str2, String str3, String str4, String str5, String str6, String str7) {
-        Preconditions.checkState(Strings.isEmptyOrWhitespace(str) ^ 1, "ApplicationId must be set.");
+        Preconditions.checkState(!Strings.isEmptyOrWhitespace(str), "ApplicationId must be set.");
         this.zzs = str;
         this.zzr = str2;
         this.zzt = str3;

@@ -27,10 +27,6 @@ public abstract class ChunkOffsetBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_0, this, this));
-        StringBuilder stringBuilder = new StringBuilder(String.valueOf(getClass().getSimpleName()));
-        stringBuilder.append("[entryCount=");
-        stringBuilder.append(getChunkOffsets().length);
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return new StringBuilder(String.valueOf(getClass().getSimpleName())).append("[entryCount=").append(getChunkOffsets().length).append("]").toString();
     }
 }

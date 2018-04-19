@@ -1,6 +1,5 @@
 package org.telegram.messenger.exoplayer2.text.ssa;
 
-import android.text.TextUtils;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +10,7 @@ import org.telegram.messenger.exoplayer2.text.Cue;
 import org.telegram.messenger.exoplayer2.text.SimpleSubtitleDecoder;
 import org.telegram.messenger.exoplayer2.util.Assertions;
 import org.telegram.messenger.exoplayer2.util.LongArray;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.messenger.exoplayer2.util.ParsableByteArray;
-import org.telegram.messenger.exoplayer2.util.Util;
 
 public final class SsaDecoder extends SimpleSubtitleDecoder {
     private static final String DIALOGUE_LINE_PREFIX = "Dialogue: ";
@@ -59,9 +56,8 @@ public final class SsaDecoder extends SimpleSubtitleDecoder {
     private void parseHeader(ParsableByteArray data) {
         String currentLine;
         do {
-            String readLine = data.readLine();
-            currentLine = readLine;
-            if (readLine == null) {
+            currentLine = data.readLine();
+            if (currentLine == null) {
                 return;
             }
         } while (!currentLine.startsWith("[Events]"));
@@ -69,9 +65,8 @@ public final class SsaDecoder extends SimpleSubtitleDecoder {
 
     private void parseEventBody(ParsableByteArray data, List<Cue> cues, LongArray cueTimesUs) {
         while (true) {
-            String readLine = data.readLine();
-            String currentLine = readLine;
-            if (readLine == null) {
+            String currentLine = data.readLine();
+            if (currentLine == null) {
                 return;
             }
             if (!this.haveInitializationData && currentLine.startsWith(FORMAT_LINE_PREFIX)) {
@@ -82,112 +77,110 @@ public final class SsaDecoder extends SimpleSubtitleDecoder {
         }
     }
 
-    private void parseFormatLine(String formatLine) {
-        String[] values = TextUtils.split(formatLine.substring(FORMAT_LINE_PREFIX.length()), ",");
-        this.formatKeyCount = values.length;
-        this.formatStartIndex = -1;
-        this.formatEndIndex = -1;
-        this.formatTextIndex = -1;
-        for (int i = 0; i < this.formatKeyCount; i++) {
-            String key = Util.toLowerInvariant(values[i].trim());
-            int hashCode = key.hashCode();
-            if (hashCode != 100571) {
-                if (hashCode != 3556653) {
-                    if (hashCode == 109757538) {
-                        if (key.equals(TtmlNode.START)) {
-                            hashCode = 0;
-                            switch (hashCode) {
-                                case 0:
-                                    this.formatStartIndex = i;
-                                    break;
-                                case 1:
-                                    this.formatEndIndex = i;
-                                    break;
-                                case 2:
-                                    this.formatTextIndex = i;
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-                } else if (key.equals(MimeTypes.BASE_TYPE_TEXT)) {
-                    hashCode = 2;
-                    switch (hashCode) {
-                        case 0:
-                            this.formatStartIndex = i;
-                            break;
-                        case 1:
-                            this.formatEndIndex = i;
-                            break;
-                        case 2:
-                            this.formatTextIndex = i;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            } else if (key.equals(TtmlNode.END)) {
-                hashCode = 1;
-                switch (hashCode) {
-                    case 0:
-                        this.formatStartIndex = i;
-                        break;
-                    case 1:
-                        this.formatEndIndex = i;
-                        break;
-                    case 2:
-                        this.formatTextIndex = i;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            hashCode = -1;
-            switch (hashCode) {
-                case 0:
-                    this.formatStartIndex = i;
-                    break;
-                case 1:
-                    this.formatEndIndex = i;
-                    break;
-                case 2:
-                    this.formatTextIndex = i;
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (this.formatStartIndex == -1 || this.formatEndIndex == -1 || this.formatTextIndex == -1) {
-            this.formatKeyCount = 0;
-        }
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void parseFormatLine(java.lang.String r8) {
+        /*
+        r7 = this;
+        r4 = 0;
+        r5 = -1;
+        r3 = "Format: ";
+        r3 = r3.length();
+        r3 = r8.substring(r3);
+        r6 = ",";
+        r2 = android.text.TextUtils.split(r3, r6);
+        r3 = r2.length;
+        r7.formatKeyCount = r3;
+        r7.formatStartIndex = r5;
+        r7.formatEndIndex = r5;
+        r7.formatTextIndex = r5;
+        r0 = 0;
+    L_0x001e:
+        r3 = r7.formatKeyCount;
+        if (r0 >= r3) goto L_0x0064;
+    L_0x0022:
+        r3 = r2[r0];
+        r3 = r3.trim();
+        r1 = org.telegram.messenger.exoplayer2.util.Util.toLowerInvariant(r3);
+        r3 = r1.hashCode();
+        switch(r3) {
+            case 100571: goto L_0x0045;
+            case 3556653: goto L_0x0050;
+            case 109757538: goto L_0x003a;
+            default: goto L_0x0033;
+        };
+    L_0x0033:
+        r3 = r5;
+    L_0x0034:
+        switch(r3) {
+            case 0: goto L_0x005b;
+            case 1: goto L_0x005e;
+            case 2: goto L_0x0061;
+            default: goto L_0x0037;
+        };
+    L_0x0037:
+        r0 = r0 + 1;
+        goto L_0x001e;
+    L_0x003a:
+        r3 = "start";
+        r3 = r1.equals(r3);
+        if (r3 == 0) goto L_0x0033;
+    L_0x0043:
+        r3 = r4;
+        goto L_0x0034;
+    L_0x0045:
+        r3 = "end";
+        r3 = r1.equals(r3);
+        if (r3 == 0) goto L_0x0033;
+    L_0x004e:
+        r3 = 1;
+        goto L_0x0034;
+    L_0x0050:
+        r3 = "text";
+        r3 = r1.equals(r3);
+        if (r3 == 0) goto L_0x0033;
+    L_0x0059:
+        r3 = 2;
+        goto L_0x0034;
+    L_0x005b:
+        r7.formatStartIndex = r0;
+        goto L_0x0037;
+    L_0x005e:
+        r7.formatEndIndex = r0;
+        goto L_0x0037;
+    L_0x0061:
+        r7.formatTextIndex = r0;
+        goto L_0x0037;
+    L_0x0064:
+        r3 = r7.formatStartIndex;
+        if (r3 == r5) goto L_0x0070;
+    L_0x0068:
+        r3 = r7.formatEndIndex;
+        if (r3 == r5) goto L_0x0070;
+    L_0x006c:
+        r3 = r7.formatTextIndex;
+        if (r3 != r5) goto L_0x0072;
+    L_0x0070:
+        r7.formatKeyCount = r4;
+    L_0x0072:
+        return;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.text.ssa.SsaDecoder.parseFormatLine(java.lang.String):void");
     }
 
     private void parseDialogueLine(String dialogueLine, List<Cue> cues, LongArray cueTimesUs) {
         if (this.formatKeyCount == 0) {
-            String str = TAG;
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Skipping dialogue line before complete format: ");
-            stringBuilder.append(dialogueLine);
-            Log.w(str, stringBuilder.toString());
+            Log.w(TAG, "Skipping dialogue line before complete format: " + dialogueLine);
             return;
         }
         String[] lineValues = dialogueLine.substring(DIALOGUE_LINE_PREFIX.length()).split(",", this.formatKeyCount);
         if (lineValues.length != this.formatKeyCount) {
-            String str2 = TAG;
-            StringBuilder stringBuilder2 = new StringBuilder();
-            stringBuilder2.append("Skipping dialogue line with fewer columns than format: ");
-            stringBuilder2.append(dialogueLine);
-            Log.w(str2, stringBuilder2.toString());
+            Log.w(TAG, "Skipping dialogue line with fewer columns than format: " + dialogueLine);
             return;
         }
         long startTimeUs = parseTimecodeUs(lineValues[this.formatStartIndex]);
         if (startTimeUs == C.TIME_UNSET) {
-            String str3 = TAG;
-            StringBuilder stringBuilder3 = new StringBuilder();
-            stringBuilder3.append("Skipping invalid timing: ");
-            stringBuilder3.append(dialogueLine);
-            Log.w(str3, stringBuilder3.toString());
+            Log.w(TAG, "Skipping invalid timing: " + dialogueLine);
             return;
         }
         long endTimeUs = C.TIME_UNSET;
@@ -195,11 +188,7 @@ public final class SsaDecoder extends SimpleSubtitleDecoder {
         if (!endTimeString.trim().isEmpty()) {
             endTimeUs = parseTimecodeUs(endTimeString);
             if (endTimeUs == C.TIME_UNSET) {
-                str3 = TAG;
-                stringBuilder3 = new StringBuilder();
-                stringBuilder3.append("Skipping invalid timing: ");
-                stringBuilder3.append(dialogueLine);
-                Log.w(str3, stringBuilder3.toString());
+                Log.w(TAG, "Skipping invalid timing: " + dialogueLine);
                 return;
             }
         }

@@ -30,14 +30,16 @@ final class zzfo implements Runnable {
 
     public final void run() {
         HttpURLConnection zzb;
+        OutputStream outputStream;
+        Throwable e;
         Map map;
         int i;
+        HttpURLConnection httpURLConnection;
         Throwable th;
-        Throwable e;
-        zzgg zzgf;
-        Runnable com_google_android_gms_internal_measurement_zzfn;
+        Map map2;
+        OutputStream outputStream2;
         this.zzajo.zzfr();
-        OutputStream outputStream = null;
+        int i2 = 0;
         try {
             zzb = this.zzajo.zzb(this.url);
             try {
@@ -53,15 +55,15 @@ final class zzfo implements Runnable {
                     zzb.addRequestProperty("Content-Encoding", "gzip");
                     zzb.setFixedLengthStreamingMode(zza.length);
                     zzb.connect();
-                    OutputStream outputStream2 = zzb.getOutputStream();
+                    outputStream = zzb.getOutputStream();
                     try {
-                        outputStream2.write(zza);
-                        outputStream2.close();
-                    } catch (Throwable e2) {
+                        outputStream.write(zza);
+                        outputStream.close();
+                    } catch (IOException e2) {
+                        e = e2;
                         map = null;
                         i = 0;
-                        th = e2;
-                        outputStream = outputStream2;
+                        httpURLConnection = zzb;
                         if (outputStream != null) {
                             try {
                                 outputStream.close();
@@ -69,20 +71,17 @@ final class zzfo implements Runnable {
                                 this.zzajo.zzgg().zzil().zze("Error closing HTTP compressed POST connection output stream. appId", zzfg.zzbh(this.packageName), e3);
                             }
                         }
-                        if (zzb != null) {
-                            zzb.disconnect();
+                        if (httpURLConnection != null) {
+                            httpURLConnection.disconnect();
                         }
-                        zzgf = this.zzajo.zzgf();
-                        com_google_android_gms_internal_measurement_zzfn = new zzfn(this.packageName, this.zzajm, i, th, null, map);
-                        zzgf.zzc(r1);
+                        this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i, e, null, map));
                     } catch (Throwable th2) {
-                        e2 = th2;
-                        map = null;
-                        i = 0;
-                        outputStream = outputStream2;
-                        if (outputStream != null) {
+                        th = th2;
+                        map2 = null;
+                        outputStream2 = outputStream;
+                        if (outputStream2 != null) {
                             try {
-                                outputStream.close();
+                                outputStream2.close();
                             } catch (IOException e32) {
                                 this.zzajo.zzgg().zzil().zze("Error closing HTTP compressed POST connection output stream. appId", zzfg.zzbh(this.packageName), e32);
                             }
@@ -90,124 +89,95 @@ final class zzfo implements Runnable {
                         if (zzb != null) {
                             zzb.disconnect();
                         }
-                        this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i, null, null, map));
-                        throw e2;
+                        this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i2, null, null, map2));
+                        throw th;
                     }
                 }
-                i = zzb.getResponseCode();
+                i2 = zzb.getResponseCode();
+                map2 = zzb.getHeaderFields();
             } catch (IOException e4) {
-                e2 = e4;
+                e = e4;
                 map = null;
-                i = 0;
-                th = e2;
+                i = i2;
+                outputStream = null;
+                httpURLConnection = zzb;
                 if (outputStream != null) {
                     outputStream.close();
                 }
-                if (zzb != null) {
-                    zzb.disconnect();
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
                 }
-                zzgf = this.zzajo.zzgf();
-                com_google_android_gms_internal_measurement_zzfn = new zzfn(this.packageName, this.zzajm, i, th, null, map);
-                zzgf.zzc(r1);
+                this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i, e, null, map));
             } catch (Throwable th3) {
-                e2 = th3;
-                map = null;
-                i = 0;
-                if (outputStream != null) {
-                    outputStream.close();
+                th = th3;
+                map2 = null;
+                outputStream2 = null;
+                if (outputStream2 != null) {
+                    outputStream2.close();
                 }
                 if (zzb != null) {
                     zzb.disconnect();
                 }
-                this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i, null, null, map));
-                throw e2;
+                this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i2, null, null, map2));
+                throw th;
             }
             try {
-                map = zzb.getHeaderFields();
-                try {
-                    byte[] zza2 = zzfk.zzb(zzb);
-                    if (zzb != null) {
-                        zzb.disconnect();
-                    }
-                    zzgf = this.zzajo.zzgf();
-                    com_google_android_gms_internal_measurement_zzfn = new zzfn(this.packageName, this.zzajm, i, null, zza2, map);
-                } catch (IOException e5) {
-                    e2 = e5;
-                    th = e2;
-                    if (outputStream != null) {
-                        outputStream.close();
-                    }
-                    if (zzb != null) {
-                        zzb.disconnect();
-                    }
-                    zzgf = this.zzajo.zzgf();
-                    com_google_android_gms_internal_measurement_zzfn = new zzfn(this.packageName, this.zzajm, i, th, null, map);
-                    zzgf.zzc(r1);
-                } catch (Throwable th4) {
-                    e2 = th4;
-                    if (outputStream != null) {
-                        outputStream.close();
-                    }
-                    if (zzb != null) {
-                        zzb.disconnect();
-                    }
-                    this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i, null, null, map));
-                    throw e2;
+                byte[] zza2 = zzfk.zzb(zzb);
+                if (zzb != null) {
+                    zzb.disconnect();
                 }
-            } catch (IOException e6) {
-                e2 = e6;
-                map = null;
-                th = e2;
+                this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i2, null, zza2, map2));
+            } catch (IOException e5) {
+                e = e5;
+                map = map2;
+                i = i2;
+                outputStream = null;
+                httpURLConnection = zzb;
                 if (outputStream != null) {
                     outputStream.close();
+                }
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+                this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i, e, null, map));
+            } catch (Throwable th32) {
+                th = th32;
+                outputStream2 = null;
+                if (outputStream2 != null) {
+                    outputStream2.close();
                 }
                 if (zzb != null) {
                     zzb.disconnect();
                 }
-                zzgf = this.zzajo.zzgf();
-                com_google_android_gms_internal_measurement_zzfn = new zzfn(this.packageName, this.zzajm, i, th, null, map);
-                zzgf.zzc(r1);
-            } catch (Throwable th5) {
-                e2 = th5;
-                map = null;
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-                if (zzb != null) {
-                    zzb.disconnect();
-                }
-                this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i, null, null, map));
-                throw e2;
+                this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i2, null, null, map2));
+                throw th;
             }
-        } catch (IOException e7) {
-            e2 = e7;
-            zzb = null;
-            map = zzb;
+        } catch (IOException e6) {
+            e = e6;
+            map = null;
             i = 0;
-            th = e2;
+            outputStream = null;
+            httpURLConnection = null;
             if (outputStream != null) {
                 outputStream.close();
+            }
+            if (httpURLConnection != null) {
+                httpURLConnection.disconnect();
+            }
+            this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i, e, null, map));
+        } catch (Throwable th322) {
+            th = th322;
+            map2 = null;
+            outputStream2 = null;
+            zzb = null;
+            if (outputStream2 != null) {
+                outputStream2.close();
             }
             if (zzb != null) {
                 zzb.disconnect();
             }
-            zzgf = this.zzajo.zzgf();
-            com_google_android_gms_internal_measurement_zzfn = new zzfn(this.packageName, this.zzajm, i, th, null, map);
-            zzgf.zzc(r1);
-        } catch (Throwable th6) {
-            e2 = th6;
-            zzb = null;
-            map = zzb;
-            i = 0;
-            if (outputStream != null) {
-                outputStream.close();
-            }
-            if (zzb != null) {
-                zzb.disconnect();
-            }
-            this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i, null, null, map));
-            throw e2;
+            this.zzajo.zzgf().zzc(new zzfn(this.packageName, this.zzajm, i2, null, null, map2));
+            throw th;
         }
-        zzgf.zzc(r1);
     }
 }

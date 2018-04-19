@@ -44,26 +44,15 @@ public final class zzfo extends AbstractSafeParcelable implements Node {
         String str = this.zzbk;
         String str2 = this.zzdm;
         int i = this.zzen;
-        boolean z = this.zzeo;
-        StringBuilder stringBuilder = new StringBuilder((45 + String.valueOf(str).length()) + String.valueOf(str2).length());
-        stringBuilder.append("Node{");
-        stringBuilder.append(str);
-        stringBuilder.append(", id=");
-        stringBuilder.append(str2);
-        stringBuilder.append(", hops=");
-        stringBuilder.append(i);
-        stringBuilder.append(", isNearby=");
-        stringBuilder.append(z);
-        stringBuilder.append("}");
-        return stringBuilder.toString();
+        return new StringBuilder((String.valueOf(str).length() + 45) + String.valueOf(str2).length()).append("Node{").append(str).append(", id=").append(str2).append(", hops=").append(i).append(", isNearby=").append(this.zzeo).append("}").toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, getId(), false);
         SafeParcelWriter.writeString(parcel, 3, getDisplayName(), false);
         SafeParcelWriter.writeInt(parcel, 4, this.zzen);
         SafeParcelWriter.writeBoolean(parcel, 5, isNearby());
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -46,11 +46,12 @@ public class GooglePlayServicesUtilLight {
 
     @Deprecated
     public static int getApkVersion(Context context) {
+        int i = 0;
         try {
             return context.getPackageManager().getPackageInfo("com.google.android.gms", 0).versionCode;
         } catch (NameNotFoundException e) {
             Log.w("GooglePlayServicesUtil", "Google Play services is missing.");
-            return 0;
+            return i;
         }
     }
 
@@ -96,14 +97,7 @@ public class GooglePlayServicesUtilLight {
             if (googlePlayServicesVersion == 0) {
                 throw new IllegalStateException("A required meta-data tag in your app's AndroidManifest.xml does not exist.  You must have the following declaration within the <application> element:     <meta-data android:name=\"com.google.android.gms.version\" android:value=\"@integer/google_play_services_version\" />");
             } else if (googlePlayServicesVersion != GOOGLE_PLAY_SERVICES_VERSION_CODE) {
-                i = GOOGLE_PLAY_SERVICES_VERSION_CODE;
-                StringBuilder stringBuilder = new StringBuilder(320);
-                stringBuilder.append("The meta-data tag in your app's AndroidManifest.xml does not have the right value.  Expected ");
-                stringBuilder.append(i);
-                stringBuilder.append(" but found ");
-                stringBuilder.append(googlePlayServicesVersion);
-                stringBuilder.append(".  You must have the following declaration within the <application> element:     <meta-data android:name=\"com.google.android.gms.version\" android:value=\"@integer/google_play_services_version\" />");
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException("The meta-data tag in your app's AndroidManifest.xml does not have the right value.  Expected " + GOOGLE_PLAY_SERVICES_VERSION_CODE + " but found " + googlePlayServicesVersion + ".  You must have the following declaration within the <application> element:     <meta-data android:name=\"com.google.android.gms.version\" android:value=\"@integer/google_play_services_version\" />");
             }
         }
         boolean z = (DeviceProperties.isWearableWithoutPlayStore(context) || DeviceProperties.isIoT(context)) ? false : true;
@@ -155,17 +149,15 @@ public class GooglePlayServicesUtilLight {
 
     @Deprecated
     public static boolean isUserRecoverableError(int i) {
-        if (i != 9) {
-            switch (i) {
-                case 1:
-                case 2:
-                case 3:
-                    break;
-                default:
-                    return false;
-            }
+        switch (i) {
+            case 1:
+            case 2:
+            case 3:
+            case 9:
+                return true;
+            default:
+                return false;
         }
-        return true;
     }
 
     private static int zza(Context context, boolean z, int i) {
@@ -176,27 +168,21 @@ public class GooglePlayServicesUtilLight {
             try {
                 packageInfo = packageManager.getPackageInfo("com.android.vending", 8256);
             } catch (NameNotFoundException e) {
-                String str = "GooglePlayServicesUtil";
-                String str2 = "Google Play Store is missing.";
+                Log.w("GooglePlayServicesUtil", "Google Play Store is missing.");
+                return 9;
             }
         }
         try {
             PackageInfo packageInfo2 = packageManager.getPackageInfo("com.google.android.gms", 64);
             GoogleSignatureVerifier instance = GoogleSignatureVerifier.getInstance(context);
             if (!instance.isGooglePublicSignedPackage(packageInfo2, true)) {
-                str = "GooglePlayServicesUtil";
-                str2 = "Google Play services signature invalid.";
-            } else if (z && (!instance.isGooglePublicSignedPackage(r3, true) || !r3.signatures[0].equals(packageInfo2.signatures[0]))) {
-                str = "GooglePlayServicesUtil";
-                str2 = "Google Play Store signature invalid.";
+                Log.w("GooglePlayServicesUtil", "Google Play services signature invalid.");
+                return 9;
+            } else if (z && (!instance.isGooglePublicSignedPackage(r0, true) || !r0.signatures[0].equals(packageInfo2.signatures[0]))) {
+                Log.w("GooglePlayServicesUtil", "Google Play Store signature invalid.");
+                return 9;
             } else if (GmsVersionParser.parseBuildVersion(packageInfo2.versionCode) < GmsVersionParser.parseBuildVersion(i)) {
-                int i2 = packageInfo2.versionCode;
-                StringBuilder stringBuilder = new StringBuilder(77);
-                stringBuilder.append("Google Play services out of date.  Requires ");
-                stringBuilder.append(i);
-                stringBuilder.append(" but found ");
-                stringBuilder.append(i2);
-                Log.w("GooglePlayServicesUtil", stringBuilder.toString());
+                Log.w("GooglePlayServicesUtil", "Google Play services out of date.  Requires " + i + " but found " + packageInfo2.versionCode);
                 return 2;
             } else {
                 ApplicationInfo applicationInfo = packageInfo2.applicationInfo;
@@ -210,8 +196,6 @@ public class GooglePlayServicesUtilLight {
                 }
                 return !applicationInfo.enabled ? 3 : 0;
             }
-            Log.w(str, str2);
-            return 9;
         } catch (NameNotFoundException e3) {
             Log.w("GooglePlayServicesUtil", "Google Play services is missing.");
             return 1;

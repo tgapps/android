@@ -17,9 +17,9 @@ public final class zzbk {
     public static final byte[] zzde = new byte[0];
 
     public static final int zzb(zzay com_google_android_gms_internal_config_zzay, int i) throws IOException {
+        int i2 = 1;
         int position = com_google_android_gms_internal_config_zzay.getPosition();
         com_google_android_gms_internal_config_zzay.zzh(i);
-        int i2 = 1;
         while (com_google_android_gms_internal_config_zzay.zzy() == i) {
             com_google_android_gms_internal_config_zzay.zzh(i);
             i2++;

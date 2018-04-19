@@ -44,10 +44,8 @@ public class TrickPlayBox extends AbstractFullBox {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Entry");
-            sb.append("{picType=");
-            sb.append(getPicType());
-            sb.append(",dependencyLevel=");
-            sb.append(getDependencyLevel());
+            sb.append("{picType=").append(getPicType());
+            sb.append(",dependencyLevel=").append(getDependencyLevel());
             sb.append('}');
             return sb.toString();
         }
@@ -79,7 +77,7 @@ public class TrickPlayBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (4 + this.entries.size());
+        return (long) (this.entries.size() + 4);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -100,8 +98,7 @@ public class TrickPlayBox extends AbstractFullBox {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
         StringBuilder sb = new StringBuilder();
         sb.append("TrickPlayBox");
-        sb.append("{entries=");
-        sb.append(this.entries);
+        sb.append("{entries=").append(this.entries);
         sb.append('}');
         return sb.toString();
     }

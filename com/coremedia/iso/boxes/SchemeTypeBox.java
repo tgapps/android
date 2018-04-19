@@ -12,7 +12,7 @@ import org.aspectj.runtime.internal.Conversions;
 import org.aspectj.runtime.reflect.Factory;
 
 public class SchemeTypeBox extends AbstractFullBox {
-    static final /* synthetic */ boolean $assertionsDisabled = false;
+    static final /* synthetic */ boolean $assertionsDisabled = (!SchemeTypeBox.class.desiredAssertionStatus());
     public static final String TYPE = "schm";
     private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
     private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
@@ -61,7 +61,11 @@ public class SchemeTypeBox extends AbstractFullBox {
 
     public void setSchemeType(String schemeType) {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_3, (Object) this, (Object) this, (Object) schemeType));
-        this.schemeType = schemeType;
+        if ($assertionsDisabled || (schemeType != null && schemeType.length() == 4)) {
+            this.schemeType = schemeType;
+            return;
+        }
+        throw new AssertionError("SchemeType may not be null or not 4 bytes long");
     }
 
     public void setSchemeVersion(int schemeVersion) {
@@ -75,7 +79,7 @@ public class SchemeTypeBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (12 + ((getFlags() & 1) == 1 ? Utf8.utf8StringLengthInBytes(this.schemeUri) + 1 : 0));
+        return (long) (((getFlags() & 1) == 1 ? Utf8.utf8StringLengthInBytes(this.schemeUri) + 1 : 0) + 12);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -100,15 +104,9 @@ public class SchemeTypeBox extends AbstractFullBox {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_6, this, this));
         StringBuilder buffer = new StringBuilder();
         buffer.append("Schema Type Box[");
-        buffer.append("schemeUri=");
-        buffer.append(this.schemeUri);
-        buffer.append("; ");
-        buffer.append("schemeType=");
-        buffer.append(this.schemeType);
-        buffer.append("; ");
-        buffer.append("schemeVersion=");
-        buffer.append(this.schemeVersion);
-        buffer.append("; ");
+        buffer.append("schemeUri=").append(this.schemeUri).append("; ");
+        buffer.append("schemeType=").append(this.schemeType).append("; ");
+        buffer.append("schemeVersion=").append(this.schemeVersion).append("; ");
         buffer.append("]");
         return buffer.toString();
     }

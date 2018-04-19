@@ -17,7 +17,7 @@ public class UndoStore {
     }
 
     public boolean canUndo() {
-        return this.operations.isEmpty() ^ 1;
+        return !this.operations.isEmpty();
     }
 
     public void setDelegate(UndoStoreDelegate undoStoreDelegate) {

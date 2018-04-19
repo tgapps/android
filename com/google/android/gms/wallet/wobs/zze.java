@@ -9,17 +9,17 @@ import java.util.ArrayList;
 public final class zze implements Creator<LabelValueRow> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        String str = null;
         ArrayList newArrayList = ArrayUtils.newArrayList();
+        String str = null;
         String str2 = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = SafeParcelReader.createString(parcel, readHeader);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
                     newArrayList = SafeParcelReader.createTypedList(parcel, readHeader, LabelValue.CREATOR);
@@ -30,7 +30,7 @@ public final class zze implements Creator<LabelValueRow> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new LabelValueRow(str, str2, newArrayList);
+        return new LabelValueRow(str2, str, newArrayList);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

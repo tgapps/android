@@ -59,14 +59,12 @@ public final class zzw implements zzbp {
 
     public zzw(Context context, Lock lock, Looper looper, GoogleApiAvailabilityLight googleApiAvailabilityLight, Map<AnyClientKey<?>, Client> map, ClientSettings clientSettings, Map<Api<?>, Boolean> map2, AbstractClientBuilder<? extends SignInClient, SignInOptions> abstractClientBuilder, ArrayList<zzp> arrayList, zzav com_google_android_gms_common_api_internal_zzav, boolean z) {
         this.zzga = lock;
-        Looper looper2 = looper;
-        this.zzcn = looper2;
+        this.zzcn = looper;
         this.zzgl = lock.newCondition();
         this.zzgk = googleApiAvailabilityLight;
         this.zzgj = com_google_android_gms_common_api_internal_zzav;
         this.zzgi = map2;
-        ClientSettings clientSettings2 = clientSettings;
-        this.zzgf = clientSettings2;
+        this.zzgf = clientSettings;
         this.zzgm = z;
         Map hashMap = new HashMap();
         for (Api api : map2.keySet()) {
@@ -92,35 +90,31 @@ public final class zzw implements zzbp {
             Api api2 = (Api) hashMap.get(entry.getKey());
             Client client = (Client) entry.getValue();
             if (client.requiresGooglePlayServices()) {
-                if (((Boolean) r0.zzgi.get(api2)).booleanValue()) {
-                    obj5 = obj3;
-                    obj6 = obj4;
+                obj5 = 1;
+                if (((Boolean) this.zzgi.get(api2)).booleanValue()) {
+                    obj6 = obj3;
+                    obj7 = obj4;
                 } else {
-                    obj5 = obj3;
-                    obj6 = 1;
+                    obj6 = obj3;
+                    obj7 = 1;
                 }
-                obj7 = 1;
             } else {
-                obj7 = obj2;
-                obj6 = obj4;
-                obj5 = null;
+                obj5 = obj2;
+                obj6 = null;
+                obj7 = obj4;
             }
-            zzv com_google_android_gms_common_api_internal_zzv = r1;
-            Client client2 = client;
-            Entry entry2 = entry;
-            zzv com_google_android_gms_common_api_internal_zzv2 = new zzv(context, api2, looper2, client, (zzp) hashMap2.get(api2), clientSettings2, abstractClientBuilder);
-            r0.zzgg.put((AnyClientKey) entry2.getKey(), com_google_android_gms_common_api_internal_zzv);
-            if (client2.requiresSignIn()) {
-                r0.zzgh.put((AnyClientKey) entry2.getKey(), com_google_android_gms_common_api_internal_zzv);
+            zzv com_google_android_gms_common_api_internal_zzv = new zzv(context, api2, looper, client, (zzp) hashMap2.get(api2), clientSettings, abstractClientBuilder);
+            this.zzgg.put((AnyClientKey) entry.getKey(), com_google_android_gms_common_api_internal_zzv);
+            if (client.requiresSignIn()) {
+                this.zzgh.put((AnyClientKey) entry.getKey(), com_google_android_gms_common_api_internal_zzv);
             }
-            obj4 = obj6;
-            obj3 = obj5;
-            obj2 = obj7;
-            looper2 = looper;
+            obj2 = obj5;
+            obj3 = obj6;
+            obj4 = obj7;
         }
         boolean z2 = obj2 != null && obj3 == null && obj4 == null;
-        r0.zzgn = z2;
-        r0.zzcq = GoogleApiManager.zzbf();
+        this.zzgn = z2;
+        this.zzcq = GoogleApiManager.zzbf();
     }
 
     private final ConnectionResult zza(AnyClientKey<?> anyClientKey) {
@@ -169,9 +163,9 @@ public final class zzw implements zzbp {
 
     @GuardedBy("mLock")
     private final ConnectionResult zzai() {
-        ConnectionResult connectionResult = null;
         int i = 0;
-        int i2 = i;
+        ConnectionResult connectionResult = null;
+        int i2 = 0;
         ConnectionResult connectionResult2 = null;
         for (zzv com_google_android_gms_common_api_internal_zzv : this.zzgg.values()) {
             Api api = com_google_android_gms_common_api_internal_zzv.getApi();
@@ -180,20 +174,22 @@ public final class zzw implements zzbp {
                 int priority;
                 if (connectionResult3.getErrorCode() == 4 && this.zzgm) {
                     priority = api.zzj().getPriority();
-                    if (connectionResult2 == null || i2 > priority) {
-                        connectionResult2 = connectionResult3;
-                        i2 = priority;
+                    if (connectionResult == null || i > priority) {
+                        i = priority;
+                        connectionResult = connectionResult3;
                     }
                 } else {
                     priority = api.zzj().getPriority();
-                    if (connectionResult == null || i > priority) {
-                        connectionResult = connectionResult3;
-                        i = priority;
+                    if (connectionResult2 != null && i2 <= priority) {
+                        priority = i2;
+                        connectionResult3 = connectionResult2;
                     }
+                    i2 = priority;
+                    connectionResult2 = connectionResult3;
                 }
             }
         }
-        return (connectionResult == null || connectionResult2 == null || i <= i2) ? connectionResult : connectionResult2;
+        return (connectionResult2 == null || connectionResult == null || i2 <= i) ? connectionResult2 : connectionResult;
     }
 
     private final <T extends ApiMethodImpl<? extends Result, ? extends AnyClient>> boolean zzb(T t) {
@@ -231,9 +227,9 @@ public final class zzw implements zzbp {
                 this.zzgt = null;
                 this.zzcq.zzr();
                 this.zzcq.zza(this.zzgg.values()).addOnCompleteListener(new HandlerExecutor(this.zzcn), new zzy());
+                this.zzga.unlock();
             }
-            this.zzga.unlock();
-        } catch (Throwable th) {
+        } finally {
             this.zzga.unlock();
         }
     }

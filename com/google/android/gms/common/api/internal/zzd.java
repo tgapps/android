@@ -34,10 +34,6 @@ public final class zzd<A extends ApiMethodImpl<? extends Result, AnyClient>> ext
     public final void zza(RuntimeException runtimeException) {
         String simpleName = runtimeException.getClass().getSimpleName();
         String localizedMessage = runtimeException.getLocalizedMessage();
-        StringBuilder stringBuilder = new StringBuilder((2 + String.valueOf(simpleName).length()) + String.valueOf(localizedMessage).length());
-        stringBuilder.append(simpleName);
-        stringBuilder.append(": ");
-        stringBuilder.append(localizedMessage);
-        this.zzdv.setFailedResult(new Status(10, stringBuilder.toString()));
+        this.zzdv.setFailedResult(new Status(10, new StringBuilder((String.valueOf(simpleName).length() + 2) + String.valueOf(localizedMessage).length()).append(simpleName).append(": ").append(localizedMessage).toString()));
     }
 }

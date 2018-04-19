@@ -20,37 +20,25 @@ final class zzfh implements Runnable {
     public final void run() {
         zzhk zzgh = this.zzajc.zzacr.zzgh();
         if (zzgh.isInitialized()) {
-            char c;
             if (this.zzajc.zzaim == '\u0000') {
-                zzfg com_google_android_gms_internal_measurement_zzfg;
                 if (this.zzajc.zzgi().zzds()) {
-                    com_google_android_gms_internal_measurement_zzfg = this.zzajc;
-                    c = 'C';
+                    this.zzajc.zzaim = 'C';
                 } else {
-                    com_google_android_gms_internal_measurement_zzfg = this.zzajc;
-                    c = 'c';
+                    this.zzajc.zzaim = 'c';
                 }
-                com_google_android_gms_internal_measurement_zzfg.zzaim = c;
             }
             if (this.zzajc.zzadp < 0) {
                 this.zzajc.zzadp = 12451;
             }
             char charAt = "01VDIWEA?".charAt(this.zzaix);
-            c = this.zzajc.zzaim;
+            char zza = this.zzajc.zzaim;
             long zzb = this.zzajc.zzadp;
-            String zza = zzfg.zza(true, this.zzaiy, this.zzaiz, this.zzaja, this.zzajb);
-            StringBuilder stringBuilder = new StringBuilder(24 + String.valueOf(zza).length());
-            stringBuilder.append("2");
-            stringBuilder.append(charAt);
-            stringBuilder.append(c);
-            stringBuilder.append(zzb);
-            stringBuilder.append(":");
-            stringBuilder.append(zza);
-            String stringBuilder2 = stringBuilder.toString();
-            if (stringBuilder2.length() > 1024) {
-                stringBuilder2 = this.zzaiy.substring(0, 1024);
+            String zza2 = zzfg.zza(true, this.zzaiy, this.zzaiz, this.zzaja, this.zzajb);
+            String stringBuilder = new StringBuilder(String.valueOf(zza2).length() + 24).append("2").append(charAt).append(zza).append(zzb).append(":").append(zza2).toString();
+            if (stringBuilder.length() > 1024) {
+                stringBuilder = this.zzaiy.substring(0, 1024);
             }
-            zzgh.zzajs.zzc(stringBuilder2, 1);
+            zzgh.zzajs.zzc(stringBuilder, 1);
             return;
         }
         this.zzajc.zza(6, "Persisted config not initialized. Not logging error/warn");

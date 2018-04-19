@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -19,8 +18,11 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Matrix.ScaleToFit;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -34,10 +36,6 @@ import android.os.Build.VERSION;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.CallLog.Calls;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore.Audio;
-import android.provider.MediaStore.Images.Media;
-import android.provider.MediaStore.Video;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.EdgeEffectCompat;
@@ -62,6 +60,7 @@ import android.widget.ScrollView;
 import com.android.internal.telephony.ITelephony;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +78,7 @@ import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.UpdateManager;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
+import org.telegram.messenger.exoplayer2.source.ExtractorMediaSource;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.TL_document;
@@ -124,14 +123,16 @@ public class AndroidUtilities {
     private static boolean waitingForCall = false;
     private static boolean waitingForSms = false;
 
-    public static boolean copyFile(java.io.File r8, java.io.File r9) throws java.io.IOException {
+    public static void removeLoginPhoneCall(java.lang.String r10, boolean r11) {
         /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find block by offset: 0x0044 in list []
-	at jadx.core.utils.BlockUtils.getBlockByOffset(BlockUtils.java:42)
-	at jadx.core.dex.instructions.IfNode.initBlocks(IfNode.java:60)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinish.initBlocksInIfNodes(BlockFinish.java:48)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinish.visit(BlockFinish.java:33)
+Error: java.util.NoSuchElementException
+	at java.util.HashMap$HashIterator.nextEntry(HashMap.java:925)
+	at java.util.HashMap$KeyIterator.next(HashMap.java:956)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.applyRemove(BlockFinallyExtract.java:535)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.extractFinally(BlockFinallyExtract.java:175)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.processExceptionHandler(BlockFinallyExtract.java:79)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.visit(BlockFinallyExtract.java:51)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
 	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
 	at jadx.core.ProcessClass.process(ProcessClass.java:37)
@@ -140,385 +141,101 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find block by offs
 	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
 */
         /*
-        r0 = r9.exists();
-        if (r0 != 0) goto L_0x0009;
-    L_0x0006:
-        r9.createNewFile();
-    L_0x0009:
-        r0 = 0;
-        r1 = 0;
-        r2 = new java.io.FileInputStream;	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r2.<init>(r8);	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r0 = r2;	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r2 = new java.io.FileOutputStream;	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r2.<init>(r9);	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r1 = r2;	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r2 = r1.getChannel();	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r3 = r0.getChannel();	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r4 = 0;	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r6 = r0.getChannel();	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r6 = r6.size();	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r2.transferFrom(r3, r4, r6);	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        if (r0 == 0) goto L_0x0031;
-    L_0x002e:
-        r0.close();
-    L_0x0031:
-        if (r1 == 0) goto L_0x0036;
-    L_0x0033:
-        r1.close();
-    L_0x0036:
-        r2 = 1;
-        return r2;
-    L_0x0038:
-        r2 = move-exception;
-        goto L_0x004a;
-    L_0x003a:
-        r2 = move-exception;
-        org.telegram.messenger.FileLog.e(r2);	 Catch:{ Exception -> 0x003a, all -> 0x0038 }
-        r3 = 0;
-        if (r0 == 0) goto L_0x0044;
-    L_0x0041:
-        r0.close();
-    L_0x0044:
-        if (r1 == 0) goto L_0x0049;
-    L_0x0046:
-        r1.close();
-    L_0x0049:
-        return r3;
-    L_0x004a:
-        if (r0 == 0) goto L_0x004f;
-    L_0x004c:
-        r0.close();
-    L_0x004f:
-        if (r1 == 0) goto L_0x0054;
-    L_0x0051:
-        r1.close();
-    L_0x0054:
-        throw r2;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.AndroidUtilities.copyFile(java.io.File, java.io.File):boolean");
-    }
-
-    public static java.lang.String getDataColumn(android.content.Context r1, android.net.Uri r2, java.lang.String r3, java.lang.String[] r4) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.AndroidUtilities.getDataColumn(android.content.Context, android.net.Uri, java.lang.String, java.lang.String[]):java.lang.String
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = 0;
-        r1 = "_data";
-        r2 = 1;
-        r5 = new java.lang.String[r2];
-        r2 = "_data";
-        r3 = 0;
-        r5[r3] = r2;
-        r2 = 0;
-        r3 = r9.getContentResolver();	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r8 = 0;	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r4 = r10;	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r6 = r11;	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r7 = r12;	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r3 = r3.query(r4, r5, r6, r7, r8);	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r0 = r3;	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        if (r0 == 0) goto L_0x0052;	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-    L_0x001b:
-        r3 = r0.moveToFirst();	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        if (r3 == 0) goto L_0x0052;	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-    L_0x0021:
-        r3 = "_data";	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r3 = r0.getColumnIndexOrThrow(r3);	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r4 = r0.getString(r3);	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r6 = "content://";	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r6 = r4.startsWith(r6);	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        if (r6 != 0) goto L_0x004b;	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-    L_0x0033:
-        r6 = "/";	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r6 = r4.startsWith(r6);	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        if (r6 != 0) goto L_0x0044;	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r6 = "file://";	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        r6 = r4.startsWith(r6);	 Catch:{ Exception -> 0x005f, all -> 0x0058 }
-        if (r6 != 0) goto L_0x0044;
-        goto L_0x004b;
-        if (r0 == 0) goto L_0x004a;
-        r0.close();
-        return r4;
-        if (r0 == 0) goto L_0x0051;
-        r0.close();
-        return r2;
-    L_0x0052:
-        if (r0 == 0) goto L_0x0063;
-        r0.close();
-        goto L_0x0063;
-    L_0x0058:
-        r2 = move-exception;
-        if (r0 == 0) goto L_0x005e;
-        r0.close();
-        throw r2;
-    L_0x005f:
-        r3 = move-exception;
-        if (r0 == 0) goto L_0x0063;
-        goto L_0x0054;
-        return r2;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.AndroidUtilities.getDataColumn(android.content.Context, android.net.Uri, java.lang.String, java.lang.String[]):java.lang.String");
-    }
-
-    public static boolean handleProxyIntent(android.app.Activity r1, android.content.Intent r2) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.AndroidUtilities.handleProxyIntent(android.app.Activity, android.content.Intent):boolean
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = 0;
-        if (r12 != 0) goto L_0x0004;
-    L_0x0003:
-        return r0;
+        r0 = hasCallPermissions;
+        if (r0 != 0) goto L_0x0005;
     L_0x0004:
-        r1 = r12.getFlags();	 Catch:{ Exception -> 0x00ed }
-        r2 = 1048576; // 0x100000 float:1.469368E-39 double:5.180654E-318;	 Catch:{ Exception -> 0x00ed }
-        r1 = r1 & r2;	 Catch:{ Exception -> 0x00ed }
-        if (r1 == 0) goto L_0x000e;	 Catch:{ Exception -> 0x00ed }
-    L_0x000d:
-        return r0;	 Catch:{ Exception -> 0x00ed }
-    L_0x000e:
-        r1 = r12.getData();	 Catch:{ Exception -> 0x00ed }
-        if (r1 == 0) goto L_0x00ec;	 Catch:{ Exception -> 0x00ed }
-    L_0x0014:
-        r2 = 0;	 Catch:{ Exception -> 0x00ed }
-        r3 = 0;	 Catch:{ Exception -> 0x00ed }
-        r4 = 0;	 Catch:{ Exception -> 0x00ed }
-        r5 = 0;	 Catch:{ Exception -> 0x00ed }
-        r6 = r1.getScheme();	 Catch:{ Exception -> 0x00ed }
-        if (r6 == 0) goto L_0x00d1;	 Catch:{ Exception -> 0x00ed }
-    L_0x001e:
-        r7 = "http";	 Catch:{ Exception -> 0x00ed }
-        r7 = r6.equals(r7);	 Catch:{ Exception -> 0x00ed }
-        if (r7 != 0) goto L_0x007e;	 Catch:{ Exception -> 0x00ed }
-    L_0x0026:
-        r7 = "https";	 Catch:{ Exception -> 0x00ed }
-        r7 = r6.equals(r7);	 Catch:{ Exception -> 0x00ed }
-        if (r7 == 0) goto L_0x002f;	 Catch:{ Exception -> 0x00ed }
-    L_0x002e:
-        goto L_0x007e;	 Catch:{ Exception -> 0x00ed }
-    L_0x002f:
-        r7 = "tg";	 Catch:{ Exception -> 0x00ed }
-        r7 = r6.equals(r7);	 Catch:{ Exception -> 0x00ed }
-        if (r7 == 0) goto L_0x00d1;	 Catch:{ Exception -> 0x00ed }
-    L_0x0037:
-        r7 = r1.toString();	 Catch:{ Exception -> 0x00ed }
-        r8 = "tg:socks";	 Catch:{ Exception -> 0x00ed }
-        r8 = r7.startsWith(r8);	 Catch:{ Exception -> 0x00ed }
-        if (r8 != 0) goto L_0x004b;	 Catch:{ Exception -> 0x00ed }
-    L_0x0043:
-        r8 = "tg://socks";	 Catch:{ Exception -> 0x00ed }
-        r8 = r7.startsWith(r8);	 Catch:{ Exception -> 0x00ed }
-        if (r8 == 0) goto L_0x00d1;	 Catch:{ Exception -> 0x00ed }
-    L_0x004b:
-        r8 = "tg:proxy";	 Catch:{ Exception -> 0x00ed }
-        r9 = "tg://telegram.org";	 Catch:{ Exception -> 0x00ed }
-        r8 = r7.replace(r8, r9);	 Catch:{ Exception -> 0x00ed }
-        r9 = "tg://proxy";	 Catch:{ Exception -> 0x00ed }
-        r10 = "tg://telegram.org";	 Catch:{ Exception -> 0x00ed }
-        r8 = r8.replace(r9, r10);	 Catch:{ Exception -> 0x00ed }
-        r7 = r8;	 Catch:{ Exception -> 0x00ed }
-        r8 = android.net.Uri.parse(r7);	 Catch:{ Exception -> 0x00ed }
-        r1 = r8;	 Catch:{ Exception -> 0x00ed }
-        r8 = "server";	 Catch:{ Exception -> 0x00ed }
-        r8 = r1.getQueryParameter(r8);	 Catch:{ Exception -> 0x00ed }
-        r5 = r8;	 Catch:{ Exception -> 0x00ed }
-        r8 = "port";	 Catch:{ Exception -> 0x00ed }
-        r8 = r1.getQueryParameter(r8);	 Catch:{ Exception -> 0x00ed }
-        r4 = r8;	 Catch:{ Exception -> 0x00ed }
-        r8 = "user";	 Catch:{ Exception -> 0x00ed }
-        r8 = r1.getQueryParameter(r8);	 Catch:{ Exception -> 0x00ed }
-        r2 = r8;	 Catch:{ Exception -> 0x00ed }
-        r8 = "pass";	 Catch:{ Exception -> 0x00ed }
-        r8 = r1.getQueryParameter(r8);	 Catch:{ Exception -> 0x00ed }
-        r3 = r8;	 Catch:{ Exception -> 0x00ed }
-        goto L_0x00d1;	 Catch:{ Exception -> 0x00ed }
-    L_0x007e:
-        r7 = r1.getHost();	 Catch:{ Exception -> 0x00ed }
-        r7 = r7.toLowerCase();	 Catch:{ Exception -> 0x00ed }
-        r8 = "telegram.me";	 Catch:{ Exception -> 0x00ed }
-        r8 = r7.equals(r8);	 Catch:{ Exception -> 0x00ed }
-        if (r8 != 0) goto L_0x00a6;	 Catch:{ Exception -> 0x00ed }
-    L_0x008e:
-        r8 = "t.me";	 Catch:{ Exception -> 0x00ed }
-        r8 = r7.equals(r8);	 Catch:{ Exception -> 0x00ed }
-        if (r8 != 0) goto L_0x00a6;	 Catch:{ Exception -> 0x00ed }
-    L_0x0096:
-        r8 = "telegram.dog";	 Catch:{ Exception -> 0x00ed }
-        r8 = r7.equals(r8);	 Catch:{ Exception -> 0x00ed }
-        if (r8 != 0) goto L_0x00a6;	 Catch:{ Exception -> 0x00ed }
-    L_0x009e:
-        r8 = "telesco.pe";	 Catch:{ Exception -> 0x00ed }
-        r8 = r7.equals(r8);	 Catch:{ Exception -> 0x00ed }
-        if (r8 == 0) goto L_0x00d0;	 Catch:{ Exception -> 0x00ed }
-    L_0x00a6:
-        r8 = r1.getPath();	 Catch:{ Exception -> 0x00ed }
-        if (r8 == 0) goto L_0x00d0;	 Catch:{ Exception -> 0x00ed }
-        r9 = "/socks";	 Catch:{ Exception -> 0x00ed }
-        r9 = r8.startsWith(r9);	 Catch:{ Exception -> 0x00ed }
-        if (r9 == 0) goto L_0x00d0;	 Catch:{ Exception -> 0x00ed }
-        r9 = "server";	 Catch:{ Exception -> 0x00ed }
-        r9 = r1.getQueryParameter(r9);	 Catch:{ Exception -> 0x00ed }
-        r5 = r9;	 Catch:{ Exception -> 0x00ed }
-        r9 = "port";	 Catch:{ Exception -> 0x00ed }
-        r9 = r1.getQueryParameter(r9);	 Catch:{ Exception -> 0x00ed }
-        r4 = r9;	 Catch:{ Exception -> 0x00ed }
-        r9 = "user";	 Catch:{ Exception -> 0x00ed }
-        r9 = r1.getQueryParameter(r9);	 Catch:{ Exception -> 0x00ed }
-        r2 = r9;	 Catch:{ Exception -> 0x00ed }
-        r9 = "pass";	 Catch:{ Exception -> 0x00ed }
-        r9 = r1.getQueryParameter(r9);	 Catch:{ Exception -> 0x00ed }
-        r3 = r9;	 Catch:{ Exception -> 0x00ed }
-    L_0x00d1:
-        r7 = android.text.TextUtils.isEmpty(r5);	 Catch:{ Exception -> 0x00ed }
-        if (r7 != 0) goto L_0x00ec;	 Catch:{ Exception -> 0x00ed }
-        r7 = android.text.TextUtils.isEmpty(r4);	 Catch:{ Exception -> 0x00ed }
-        if (r7 != 0) goto L_0x00ec;	 Catch:{ Exception -> 0x00ed }
-        if (r2 != 0) goto L_0x00e2;	 Catch:{ Exception -> 0x00ed }
-        r7 = "";	 Catch:{ Exception -> 0x00ed }
-        r2 = r7;	 Catch:{ Exception -> 0x00ed }
-        if (r3 != 0) goto L_0x00e7;	 Catch:{ Exception -> 0x00ed }
-        r7 = "";	 Catch:{ Exception -> 0x00ed }
-        r3 = r7;	 Catch:{ Exception -> 0x00ed }
-        showProxyAlert(r11, r5, r4, r2, r3);	 Catch:{ Exception -> 0x00ed }
-        r0 = 1;
-        return r0;
-    L_0x00ec:
-        goto L_0x00ee;
-    L_0x00ed:
-        r1 = move-exception;
-        return r0;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.AndroidUtilities.handleProxyIntent(android.app.Activity, android.content.Intent):boolean");
-    }
-
-    public static void setRectToRect(android.graphics.Matrix r1, android.graphics.RectF r2, android.graphics.RectF r3, int r4, android.graphics.Matrix.ScaleToFit r5) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.AndroidUtilities.setRectToRect(android.graphics.Matrix, android.graphics.RectF, android.graphics.RectF, int, android.graphics.Matrix$ScaleToFit):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = 270; // 0x10e float:3.78E-43 double:1.334E-321;
-        r1 = 90;
-        if (r11 == r1) goto L_0x001c;
-    L_0x0006:
-        if (r11 != r0) goto L_0x0009;
-    L_0x0008:
-        goto L_0x001c;
-    L_0x0009:
-        r2 = r10.width();
-        r3 = r9.width();
-        r2 = r2 / r3;
-        r3 = r10.height();
-        r4 = r9.height();
-        r3 = r3 / r4;
-        goto L_0x002e;
-    L_0x001c:
-        r2 = r10.height();
-        r3 = r9.width();
-        r2 = r2 / r3;
-        r3 = r10.width();
-        r4 = r9.height();
-        r3 = r3 / r4;
-        r4 = android.graphics.Matrix.ScaleToFit.FILL;
-        if (r12 == r4) goto L_0x003a;
-        r4 = (r2 > r3 ? 1 : (r2 == r3 ? 0 : -1));
-        if (r4 <= 0) goto L_0x0039;
-        r2 = r3;
-        goto L_0x003a;
-        r3 = r2;
-        r4 = r9.left;
-        r4 = -r4;
-        r4 = r4 * r2;
-        r5 = r9.top;
-        r5 = -r5;
-        r5 = r5 * r3;
-        r6 = r10.left;
-        r7 = r10.top;
-        r8.setTranslate(r6, r7);
-        r6 = 0;
-        if (r11 != r1) goto L_0x005a;
-        r0 = 1119092736; // 0x42b40000 float:90.0 double:5.529052754E-315;
-        r8.preRotate(r0);
-        r0 = r10.width();
-        r0 = -r0;
-        r8.preTranslate(r6, r0);
-        goto L_0x0080;
-        r1 = 180; // 0xb4 float:2.52E-43 double:8.9E-322;
-        if (r11 != r1) goto L_0x0071;
-        r0 = 1127481344; // 0x43340000 float:180.0 double:5.570497984E-315;
-        r8.preRotate(r0);
-        r0 = r10.width();
-        r0 = -r0;
-        r1 = r10.height();
-        r1 = -r1;
-        r8.preTranslate(r0, r1);
-        goto L_0x0080;
-        if (r11 != r0) goto L_0x0080;
-        r0 = 1132920832; // 0x43870000 float:270.0 double:5.597372625E-315;
-        r8.preRotate(r0);
-        r0 = r10.height();
-        r0 = -r0;
-        r8.preTranslate(r0, r6);
-        r8.preScale(r2, r3);
-        r8.preTranslate(r4, r5);
         return;
+    L_0x0005:
+        r6 = 0;
+        r0 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r0 = r0.getContentResolver();	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r1 = android.provider.CallLog.Calls.CONTENT_URI;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r2 = 2;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r2 = new java.lang.String[r2];	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r3 = 0;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r4 = "_id";	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r2[r3] = r4;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r3 = 1;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r4 = "number";	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r2[r3] = r4;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r3 = "type IN (3,1,5)";	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r4 = 0;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r5 = "date DESC LIMIT 5";	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r6 = r0.query(r1, r2, r3, r4, r5);	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r9 = 0;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+    L_0x0029:
+        r0 = r6.moveToNext();	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        if (r0 == 0) goto L_0x005e;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+    L_0x002f:
+        r0 = 1;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r8 = r6.getString(r0);	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r0 = r8.contains(r10);	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        if (r0 != 0) goto L_0x0040;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+    L_0x003a:
+        r0 = r10.contains(r8);	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        if (r0 == 0) goto L_0x0029;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+    L_0x0040:
+        r9 = 1;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r0 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r0 = r0.getContentResolver();	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r1 = android.provider.CallLog.Calls.CONTENT_URI;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r2 = "_id = ? ";	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r3 = 1;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r3 = new java.lang.String[r3];	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r4 = 0;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r5 = 0;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r5 = r6.getInt(r5);	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r5 = java.lang.String.valueOf(r5);	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r3[r4] = r5;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        r0.delete(r1, r2, r3);	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+    L_0x005e:
+        if (r9 != 0) goto L_0x0066;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+    L_0x0060:
+        if (r11 == 0) goto L_0x0066;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+    L_0x0062:
+        r0 = 1;	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        registerLoginContentObserver(r0, r10);	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+    L_0x0066:
+        if (r6 == 0) goto L_0x0004;
+    L_0x0068:
+        r6.close();
+        goto L_0x0004;
+    L_0x006c:
+        r7 = move-exception;
+        org.telegram.messenger.FileLog.e(r7);	 Catch:{ Exception -> 0x006c, all -> 0x0076 }
+        if (r6 == 0) goto L_0x0004;
+    L_0x0072:
+        r6.close();
+        goto L_0x0004;
+    L_0x0076:
+        r0 = move-exception;
+        if (r6 == 0) goto L_0x007c;
+    L_0x0079:
+        r6.close();
+    L_0x007c:
+        throw r0;
         */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.AndroidUtilities.setRectToRect(android.graphics.Matrix, android.graphics.RectF, android.graphics.RectF, int, android.graphics.Matrix$ScaleToFit):void");
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.AndroidUtilities.removeLoginPhoneCall(java.lang.String, boolean):void");
     }
 
     static {
-        boolean z = false;
+        boolean z;
         WEB_URL = null;
         try {
             String GOOD_IRI_CHAR = "a-zA-Z0-9 -퟿豈-﷏ﷰ-￯";
-            Pattern IP_ADDRESS = Pattern.compile("((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9]))");
             String IRI = "[a-zA-Z0-9 -퟿豈-﷏ﷰ-￯]([a-zA-Z0-9 -퟿豈-﷏ﷰ-￯\\-]{0,61}[a-zA-Z0-9 -퟿豈-﷏ﷰ-￯]){0,1}";
             String GOOD_GTLD_CHAR = "a-zA-Z -퟿豈-﷏ﷰ-￯";
             String GTLD = "[a-zA-Z -퟿豈-﷏ﷰ-￯]{2,63}";
             String HOST_NAME = "([a-zA-Z0-9 -퟿豈-﷏ﷰ-￯]([a-zA-Z0-9 -퟿豈-﷏ﷰ-￯\\-]{0,61}[a-zA-Z0-9 -퟿豈-﷏ﷰ-￯]){0,1}\\.)+[a-zA-Z -퟿豈-﷏ﷰ-￯]{2,63}";
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("(([a-zA-Z0-9 -퟿豈-﷏ﷰ-￯]([a-zA-Z0-9 -퟿豈-﷏ﷰ-￯\\-]{0,61}[a-zA-Z0-9 -퟿豈-﷏ﷰ-￯]){0,1}\\.)+[a-zA-Z -퟿豈-﷏ﷰ-￯]{2,63}|");
-            stringBuilder.append(IP_ADDRESS);
-            stringBuilder.append(")");
-            Pattern DOMAIN_NAME = Pattern.compile(stringBuilder.toString());
-            StringBuilder stringBuilder2 = new StringBuilder();
-            stringBuilder2.append("((?:(http|https|Http|Https):\\/\\/(?:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,64}(?:\\:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,25})?\\@)?)?(?:");
-            stringBuilder2.append(DOMAIN_NAME);
-            stringBuilder2.append(")(?:\\:\\d{1,5})?)(\\/(?:(?:[");
-            stringBuilder2.append("a-zA-Z0-9 -퟿豈-﷏ﷰ-￯");
-            stringBuilder2.append("\\;\\/\\?\\:\\@\\&\\=\\#\\~\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_])|(?:\\%[a-fA-F0-9]{2}))*)?(?:\\b|$)");
-            WEB_URL = Pattern.compile(stringBuilder2.toString());
+            WEB_URL = Pattern.compile("((?:(http|https|Http|Https):\\/\\/(?:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,64}(?:\\:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,25})?\\@)?)?(?:" + Pattern.compile("(([a-zA-Z0-9 -퟿豈-﷏ﷰ-￯]([a-zA-Z0-9 -퟿豈-﷏ﷰ-￯\\-]{0,61}[a-zA-Z0-9 -퟿豈-﷏ﷰ-￯]){0,1}\\.)+[a-zA-Z -퟿豈-﷏ﷰ-￯]{2,63}|" + Pattern.compile("((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9]))") + ")") + ")(?:\\:\\d{1,5})?)(\\/(?:(?:[" + "a-zA-Z0-9 -퟿豈-﷏ﷰ-￯" + "\\;\\/\\?\\:\\@\\&\\=\\#\\~\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_])|(?:\\%[a-fA-F0-9]{2}))*)?(?:\\b|$)");
         } catch (Throwable e) {
             FileLog.e(e);
         }
         checkDisplaySize(ApplicationLoader.applicationContext, null);
         if (VERSION.SDK_INT >= 23) {
             z = true;
+        } else {
+            z = false;
         }
         hasCallPermissions = z;
     }
@@ -561,23 +278,16 @@ Caused by: java.lang.NullPointerException
         double max = (rf <= gf || rf <= bf) ? gf > bf ? gf : bf : rf;
         double min = (rf >= gf || rf >= bf) ? gf < bf ? gf : bf : rf;
         double d = max - min;
-        double s = 0.0d;
-        if (max != 0.0d) {
-            s = d / max;
-        }
+        double s = max == 0.0d ? 0.0d : d / max;
         if (max == min) {
             h = 0.0d;
-            double d2 = min;
         } else {
-            if (rf <= gf || rf <= bf) {
-                if (gf > bf) {
-                    h = ((bf - rf) / d) + 2.0d;
-                } else {
-                    h = ((rf - gf) / d) + 4.0d;
-                    h /= 6.0d;
-                }
-            } else {
+            if (rf > gf && rf > bf) {
                 h = ((gf - bf) / d) + ((double) (gf < bf ? 6 : 0));
+            } else if (gf > bf) {
+                h = ((bf - rf) / d) + 2.0d;
+            } else {
+                h = ((rf - gf) / d) + 4.0d;
             }
             h /= 6.0d;
         }
@@ -588,11 +298,11 @@ Caused by: java.lang.NullPointerException
         double r = 0.0d;
         double g = 0.0d;
         double b = 0.0d;
-        double i = (double) ((int) Math.floor(h * 6.0d));
+        double i = (double) ((int) Math.floor(6.0d * h));
         double f = (6.0d * h) - i;
-        double p = (1.0d - s) * v;
-        double q = (1.0d - (f * s)) * v;
-        double t = (1.0d - ((1.0d - f) * s)) * v;
+        double p = v * (1.0d - s);
+        double q = v * (1.0d - (f * s));
+        double t = v * (1.0d - ((1.0d - f) * s));
         switch (((int) i) % 6) {
             case 0:
                 r = v;
@@ -624,28 +334,20 @@ Caused by: java.lang.NullPointerException
                 g = p;
                 b = q;
                 break;
-            default:
-                break;
         }
-        return new int[]{(int) (r * 255.0d), (int) (g * 255.0d), (int) (b * 255.0d)};
+        return new int[]{(int) (255.0d * r), (int) (255.0d * g), (int) (255.0d * b)};
     }
 
     public static void requestAdjustResize(Activity activity, int classGuid) {
-        if (activity != null) {
-            if (!isTablet()) {
-                activity.getWindow().setSoftInputMode(16);
-                adjustOwnerClassGuid = classGuid;
-            }
+        if (activity != null && !isTablet()) {
+            activity.getWindow().setSoftInputMode(16);
+            adjustOwnerClassGuid = classGuid;
         }
     }
 
     public static void removeAdjustResize(Activity activity, int classGuid) {
-        if (activity != null) {
-            if (!isTablet()) {
-                if (adjustOwnerClassGuid == classGuid) {
-                    activity.getWindow().setSoftInputMode(32);
-                }
-            }
+        if (activity != null && !isTablet() && adjustOwnerClassGuid == classGuid) {
+            activity.getWindow().setSoftInputMode(32);
         }
     }
 
@@ -676,79 +378,71 @@ Caused by: java.lang.NullPointerException
 
     public static boolean isInternalUri(Uri uri) {
         String pathString = uri.getPath();
-        boolean z = false;
         if (pathString == null) {
             return false;
         }
+        String path;
         while (true) {
             String newPath = Utilities.readlink(pathString);
-            if (newPath == null) {
-                break;
-            } else if (newPath.equals(pathString)) {
-                break;
-            } else {
+            if (newPath != null && !newPath.equals(pathString)) {
                 pathString = newPath;
-            }
-        }
-        if (pathString != null) {
-            try {
-                newPath = new File(pathString).getCanonicalPath();
-                if (newPath != null) {
-                    pathString = newPath;
+            } else if (pathString != null) {
+                try {
+                    path = new File(pathString).getCanonicalPath();
+                    if (path != null) {
+                        pathString = path;
+                    }
+                } catch (Exception e) {
+                    pathString.replace("/./", "/");
                 }
-            } catch (Exception e) {
-                pathString.replace("/./", "/");
             }
         }
         if (pathString != null) {
-            newPath = pathString.toLowerCase();
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("/data/data/");
-            stringBuilder.append(ApplicationLoader.applicationContext.getPackageName());
-            stringBuilder.append("/files");
-            if (newPath.contains(stringBuilder.toString())) {
-                z = true;
+            path = new File(pathString).getCanonicalPath();
+            if (path != null) {
+                pathString = path;
             }
         }
-        return z;
+        if (pathString == null || !pathString.toLowerCase().contains("/data/data/" + ApplicationLoader.applicationContext.getPackageName() + "/files")) {
+            return false;
+        }
+        return true;
     }
 
     public static void lockOrientation(Activity activity) {
-        if (activity != null) {
-            if (prevOrientation == -10) {
-                try {
-                    prevOrientation = activity.getRequestedOrientation();
-                    WindowManager manager = (WindowManager) activity.getSystemService("window");
-                    if (!(manager == null || manager.getDefaultDisplay() == null)) {
-                        int rotation = manager.getDefaultDisplay().getRotation();
-                        int orientation = activity.getResources().getConfiguration().orientation;
-                        if (rotation == 3) {
-                            if (orientation == 1) {
-                                activity.setRequestedOrientation(1);
-                            } else {
-                                activity.setRequestedOrientation(8);
-                            }
-                        } else if (rotation == 1) {
-                            if (orientation == 1) {
-                                activity.setRequestedOrientation(9);
-                            } else {
-                                activity.setRequestedOrientation(0);
-                            }
-                        } else if (rotation == 0) {
-                            if (orientation == 2) {
-                                activity.setRequestedOrientation(0);
-                            } else {
-                                activity.setRequestedOrientation(1);
-                            }
-                        } else if (orientation == 2) {
-                            activity.setRequestedOrientation(8);
+        if (activity != null && prevOrientation == -10) {
+            try {
+                prevOrientation = activity.getRequestedOrientation();
+                WindowManager manager = (WindowManager) activity.getSystemService("window");
+                if (manager != null && manager.getDefaultDisplay() != null) {
+                    int rotation = manager.getDefaultDisplay().getRotation();
+                    int orientation = activity.getResources().getConfiguration().orientation;
+                    if (rotation == 3) {
+                        if (orientation == 1) {
+                            activity.setRequestedOrientation(1);
                         } else {
-                            activity.setRequestedOrientation(9);
+                            activity.setRequestedOrientation(8);
                         }
+                    } else if (rotation == 1) {
+                        if (orientation == 1) {
+                            activity.setRequestedOrientation(9);
+                        } else {
+                            activity.setRequestedOrientation(0);
+                        }
+                    } else if (rotation == 0) {
+                        if (orientation == 2) {
+                            activity.setRequestedOrientation(0);
+                        } else {
+                            activity.setRequestedOrientation(1);
+                        }
+                    } else if (orientation == 2) {
+                        activity.setRequestedOrientation(8);
+                    } else {
+                        activity.setRequestedOrientation(9);
                     }
-                } catch (Throwable e) {
-                    FileLog.e(e);
                 }
+            } catch (Throwable e) {
+                FileLog.e(e);
             }
         }
     }
@@ -774,14 +468,9 @@ Caused by: java.lang.NullPointerException
                     typefaceCache.put(assetPath, Typeface.createFromAsset(ApplicationLoader.applicationContext.getAssets(), assetPath));
                 } catch (Exception e) {
                     if (BuildVars.LOGS_ENABLED) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append("Could not get typeface '");
-                        stringBuilder.append(assetPath);
-                        stringBuilder.append("' because ");
-                        stringBuilder.append(e.getMessage());
-                        FileLog.e(stringBuilder.toString());
+                        FileLog.e("Could not get typeface '" + assetPath + "' because " + e.getMessage());
                     }
-                    return null;
+                    typeface = null;
                 }
             }
             typeface = (Typeface) typefaceCache.get(assetPath);
@@ -828,15 +517,15 @@ Caused by: java.lang.NullPointerException
     }
 
     public static boolean isKeyboardShowed(View view) {
-        if (view == null) {
-            return false;
+        boolean z = false;
+        if (view != null) {
+            try {
+                z = ((InputMethodManager) view.getContext().getSystemService("input_method")).isActive(view);
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
         }
-        try {
-            return ((InputMethodManager) view.getContext().getSystemService("input_method")).isActive(view);
-        } catch (Throwable e) {
-            FileLog.e(e);
-            return false;
-        }
+        return z;
     }
 
     public static void hideKeyboard(View view) {
@@ -875,10 +564,10 @@ Caused by: java.lang.NullPointerException
             if (file != null) {
                 return file;
             }
-            return new File(TtmlNode.ANONYMOUS_REGION_ID);
         } catch (Throwable e22) {
             FileLog.e(e22);
         }
+        return new File(TtmlNode.ANONYMOUS_REGION_ID);
     }
 
     public static int dp(float value) {
@@ -913,6 +602,7 @@ Caused by: java.lang.NullPointerException
     }
 
     public static void checkDisplaySize(Context context, Configuration newConfiguration) {
+        boolean z = true;
         try {
             int newSize;
             density = context.getResources().getDisplayMetrics().density;
@@ -920,7 +610,6 @@ Caused by: java.lang.NullPointerException
             if (configuration == null) {
                 configuration = context.getResources().getConfiguration();
             }
-            boolean z = true;
             if (configuration.keyboard == 1 || configuration.hardKeyboardHidden != 1) {
                 z = false;
             }
@@ -953,16 +642,7 @@ Caused by: java.lang.NullPointerException
                 }
             }
             if (BuildVars.LOGS_ENABLED) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("display size = ");
-                stringBuilder.append(displaySize.x);
-                stringBuilder.append(" ");
-                stringBuilder.append(displaySize.y);
-                stringBuilder.append(" ");
-                stringBuilder.append(displayMetrics.xdpi);
-                stringBuilder.append("x");
-                stringBuilder.append(displayMetrics.ydpi);
-                FileLog.e(stringBuilder.toString());
+                FileLog.e("display size = " + displaySize.x + " " + displaySize.y + " " + displayMetrics.xdpi + "x" + displayMetrics.ydpi);
             }
         } catch (Throwable e) {
             FileLog.e(e);
@@ -970,7 +650,7 @@ Caused by: java.lang.NullPointerException
     }
 
     public static float getPixelsInCM(float cm, boolean isX) {
-        return (cm / 2.54f) * (isX ? displayMetrics.xdpi : displayMetrics.ydpi);
+        return (isX ? displayMetrics.xdpi : displayMetrics.ydpi) * (cm / 2.54f);
     }
 
     public static long makeBroadcastId(int id) {
@@ -1021,21 +701,22 @@ Caused by: java.lang.NullPointerException
     }
 
     public static int getMinTabletSide() {
+        int leftSide;
         if (isSmallTablet()) {
             int smallSide = Math.min(displaySize.x, displaySize.y);
             int maxSide = Math.max(displaySize.x, displaySize.y);
-            int leftSide = (maxSide * 35) / 100;
+            leftSide = (maxSide * 35) / 100;
             if (leftSide < dp(320.0f)) {
                 leftSide = dp(320.0f);
             }
             return Math.min(smallSide, maxSide - leftSide);
         }
         smallSide = Math.min(displaySize.x, displaySize.y);
-        maxSide = (smallSide * 35) / 100;
-        if (maxSide < dp(320.0f)) {
-            maxSide = dp(320.0f);
+        leftSide = (smallSide * 35) / 100;
+        if (leftSide < dp(320.0f)) {
+            leftSide = dp(320.0f);
         }
-        return smallSide - maxSide;
+        return smallSide - leftSide;
     }
 
     public static int getPhotoSize() {
@@ -1052,9 +733,9 @@ Caused by: java.lang.NullPointerException
                 Method m = Class.forName(tm.getClass().getName()).getDeclaredMethod("getITelephony", new Class[0]);
                 m.setAccessible(true);
                 ITelephony telephonyService = (ITelephony) m.invoke(tm, new Object[0]);
-                ITelephony telephonyService2 = (ITelephony) m.invoke(tm, new Object[0]);
-                telephonyService2.silenceRinger();
-                telephonyService2.endCall();
+                telephonyService = (ITelephony) m.invoke(tm, new Object[0]);
+                telephonyService.silenceRinger();
+                telephonyService.endCall();
             } catch (Throwable e) {
                 FileLog.e(e);
             }
@@ -1062,114 +743,59 @@ Caused by: java.lang.NullPointerException
     }
 
     public static boolean checkPhonePattern(String pattern, String phone) {
-        if (!TextUtils.isEmpty(pattern)) {
-            if (!pattern.equals("*")) {
-                String[] args = pattern.split("\\*");
-                phone = PhoneFormat.stripExceptNumbers(phone);
-                int checkStart = 0;
-                for (String arg : args) {
-                    if (!TextUtils.isEmpty(arg)) {
-                        int indexOf = phone.indexOf(arg, checkStart);
-                        int checkStart2 = indexOf;
-                        if (indexOf == -1) {
-                            return false;
-                        }
-                        checkStart = checkStart2 + arg.length();
-                    }
+        if (TextUtils.isEmpty(pattern) || pattern.equals("*")) {
+            return true;
+        }
+        String[] args = pattern.split("\\*");
+        phone = PhoneFormat.stripExceptNumbers(phone);
+        int checkStart = 0;
+        for (String arg : args) {
+            if (!TextUtils.isEmpty(arg)) {
+                int index = phone.indexOf(arg, checkStart);
+                if (index == -1) {
+                    return false;
                 }
-                return true;
+                checkStart = index + arg.length();
             }
         }
         return true;
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public static java.lang.String obtainLoginPhoneCall(java.lang.String r12) {
-        /*
-        r0 = hasCallPermissions;
-        r1 = 0;
-        if (r0 != 0) goto L_0x0006;
-    L_0x0005:
-        return r1;
-    L_0x0006:
-        r0 = r1;
-        r2 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0074 }
-        r3 = r2.getContentResolver();	 Catch:{ Exception -> 0x0074 }
-        r4 = android.provider.CallLog.Calls.CONTENT_URI;	 Catch:{ Exception -> 0x0074 }
-        r2 = 2;
-        r5 = new java.lang.String[r2];	 Catch:{ Exception -> 0x0074 }
-        r2 = "number";
-        r9 = 0;
-        r5[r9] = r2;	 Catch:{ Exception -> 0x0074 }
-        r2 = "date";
-        r10 = 1;
-        r5[r10] = r2;	 Catch:{ Exception -> 0x0074 }
-        r6 = "type IN (3,1,5)";
-        r7 = 0;
-        r8 = "date DESC LIMIT 5";
-        r2 = r3.query(r4, r5, r6, r7, r8);	 Catch:{ Exception -> 0x0074 }
-        r0 = r2;
-    L_0x0026:
-        r2 = r0.moveToNext();	 Catch:{ Exception -> 0x0074 }
-        if (r2 == 0) goto L_0x006c;
-    L_0x002c:
-        r2 = r0.getString(r9);	 Catch:{ Exception -> 0x0074 }
-        r3 = r0.getLong(r10);	 Catch:{ Exception -> 0x0074 }
-        r5 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Exception -> 0x0074 }
-        if (r5 == 0) goto L_0x004c;
-    L_0x0038:
-        r5 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0074 }
-        r5.<init>();	 Catch:{ Exception -> 0x0074 }
-        r6 = "number = ";
-        r5.append(r6);	 Catch:{ Exception -> 0x0074 }
-        r5.append(r2);	 Catch:{ Exception -> 0x0074 }
-        r5 = r5.toString();	 Catch:{ Exception -> 0x0074 }
-        org.telegram.messenger.FileLog.e(r5);	 Catch:{ Exception -> 0x0074 }
-    L_0x004c:
-        r5 = java.lang.System.currentTimeMillis();	 Catch:{ Exception -> 0x0074 }
-        r7 = r5 - r3;
-        r5 = java.lang.Math.abs(r7);	 Catch:{ Exception -> 0x0074 }
-        r7 = 3600000; // 0x36ee80 float:5.044674E-39 double:1.7786363E-317;
-        r11 = (r5 > r7 ? 1 : (r5 == r7 ? 0 : -1));
-        if (r11 < 0) goto L_0x005e;
-    L_0x005d:
-        goto L_0x0026;
-    L_0x005e:
-        r5 = checkPhonePattern(r12, r2);	 Catch:{ Exception -> 0x0074 }
-        if (r5 == 0) goto L_0x006b;
-    L_0x0065:
-        if (r0 == 0) goto L_0x006a;
-    L_0x0067:
-        r0.close();
-    L_0x006a:
-        return r2;
-    L_0x006b:
-        goto L_0x0026;
-    L_0x006c:
-        if (r0 == 0) goto L_0x007b;
-    L_0x006e:
-        r0.close();
-        goto L_0x007b;
-    L_0x0072:
-        r1 = move-exception;
-        goto L_0x007c;
-    L_0x0074:
-        r2 = move-exception;
-        org.telegram.messenger.FileLog.e(r2);	 Catch:{ all -> 0x0072 }
-        if (r0 == 0) goto L_0x007b;
-    L_0x007a:
-        goto L_0x006e;
-    L_0x007b:
-        return r1;
-    L_0x007c:
-        if (r0 == 0) goto L_0x0081;
-    L_0x007e:
-        r0.close();
-    L_0x0081:
-        throw r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.AndroidUtilities.obtainLoginPhoneCall(java.lang.String):java.lang.String");
+    public static String obtainLoginPhoneCall(String pattern) {
+        if (!hasCallPermissions) {
+            return null;
+        }
+        Cursor cursor = null;
+        try {
+            cursor = ApplicationLoader.applicationContext.getContentResolver().query(Calls.CONTENT_URI, new String[]{"number", "date"}, "type IN (3,1,5)", null, "date DESC LIMIT 5");
+            while (cursor.moveToNext()) {
+                String number = cursor.getString(0);
+                long date = cursor.getLong(1);
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.e("number = " + number);
+                }
+                if (Math.abs(System.currentTimeMillis() - date) < 3600000 && checkPhonePattern(pattern, number)) {
+                    if (cursor == null) {
+                        return number;
+                    }
+                    cursor.close();
+                    return number;
+                }
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Throwable e) {
+            FileLog.e(e);
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Throwable th) {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return null;
     }
 
     private static void registerLoginContentObserver(boolean shouldRegister, final String number) {
@@ -1206,120 +832,33 @@ Caused by: java.lang.NullPointerException
             try {
                 ApplicationLoader.applicationContext.getContentResolver().unregisterContentObserver(callLogContentObserver);
             } catch (Exception e) {
-            } catch (Throwable th) {
+            } finally {
                 callLogContentObserver = null;
             }
-            callLogContentObserver = null;
         }
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public static void removeLoginPhoneCall(java.lang.String r10, boolean r11) {
-        /*
-        r0 = hasCallPermissions;
-        if (r0 != 0) goto L_0x0005;
-    L_0x0004:
-        return;
-    L_0x0005:
-        r0 = 0;
-        r1 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0068 }
-        r2 = r1.getContentResolver();	 Catch:{ Exception -> 0x0068 }
-        r3 = android.provider.CallLog.Calls.CONTENT_URI;	 Catch:{ Exception -> 0x0068 }
-        r1 = 2;
-        r4 = new java.lang.String[r1];	 Catch:{ Exception -> 0x0068 }
-        r1 = "_id";
-        r8 = 0;
-        r4[r8] = r1;	 Catch:{ Exception -> 0x0068 }
-        r1 = "number";
-        r9 = 1;
-        r4[r9] = r1;	 Catch:{ Exception -> 0x0068 }
-        r5 = "type IN (3,1,5)";
-        r6 = 0;
-        r7 = "date DESC LIMIT 5";
-        r1 = r2.query(r3, r4, r5, r6, r7);	 Catch:{ Exception -> 0x0068 }
-        r0 = r1;
-        r1 = r8;
-    L_0x0026:
-        r2 = r0.moveToNext();	 Catch:{ Exception -> 0x0068 }
-        if (r2 == 0) goto L_0x0059;
-    L_0x002c:
-        r2 = r0.getString(r9);	 Catch:{ Exception -> 0x0068 }
-        r3 = r2.contains(r10);	 Catch:{ Exception -> 0x0068 }
-        if (r3 != 0) goto L_0x003e;
-    L_0x0036:
-        r3 = r10.contains(r2);	 Catch:{ Exception -> 0x0068 }
-        if (r3 == 0) goto L_0x003d;
-    L_0x003c:
-        goto L_0x003e;
-    L_0x003d:
-        goto L_0x0026;
-    L_0x003e:
-        r1 = 1;
-        r3 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0068 }
-        r3 = r3.getContentResolver();	 Catch:{ Exception -> 0x0068 }
-        r4 = android.provider.CallLog.Calls.CONTENT_URI;	 Catch:{ Exception -> 0x0068 }
-        r5 = "_id = ? ";
-        r6 = new java.lang.String[r9];	 Catch:{ Exception -> 0x0068 }
-        r7 = r0.getInt(r8);	 Catch:{ Exception -> 0x0068 }
-        r7 = java.lang.String.valueOf(r7);	 Catch:{ Exception -> 0x0068 }
-        r6[r8] = r7;	 Catch:{ Exception -> 0x0068 }
-        r3.delete(r4, r5, r6);	 Catch:{ Exception -> 0x0068 }
-    L_0x0059:
-        if (r1 != 0) goto L_0x0060;
-    L_0x005b:
-        if (r11 == 0) goto L_0x0060;
-    L_0x005d:
-        registerLoginContentObserver(r9, r10);	 Catch:{ Exception -> 0x0068 }
-    L_0x0060:
-        if (r0 == 0) goto L_0x006f;
-    L_0x0062:
-        r0.close();
-        goto L_0x006f;
-    L_0x0066:
-        r1 = move-exception;
-        goto L_0x0070;
-    L_0x0068:
-        r1 = move-exception;
-        org.telegram.messenger.FileLog.e(r1);	 Catch:{ all -> 0x0066 }
-        if (r0 == 0) goto L_0x006f;
-    L_0x006e:
-        goto L_0x0062;
-    L_0x006f:
-        return;
-    L_0x0070:
-        if (r0 == 0) goto L_0x0075;
-    L_0x0072:
-        r0.close();
-    L_0x0075:
-        throw r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.AndroidUtilities.removeLoginPhoneCall(java.lang.String, boolean):void");
-    }
-
     public static int getViewInset(View view) {
-        if (!(view == null || VERSION.SDK_INT < 21 || view.getHeight() == displaySize.y)) {
-            if (view.getHeight() != displaySize.y - statusBarHeight) {
-                try {
-                    if (mAttachInfoField == null) {
-                        mAttachInfoField = View.class.getDeclaredField("mAttachInfo");
-                        mAttachInfoField.setAccessible(true);
-                    }
-                    Object mAttachInfo = mAttachInfoField.get(view);
-                    if (mAttachInfo == null) {
-                        return 0;
-                    }
+        int i = 0;
+        if (!(view == null || VERSION.SDK_INT < 21 || view.getHeight() == displaySize.y || view.getHeight() == displaySize.y - statusBarHeight)) {
+            try {
+                if (mAttachInfoField == null) {
+                    mAttachInfoField = View.class.getDeclaredField("mAttachInfo");
+                    mAttachInfoField.setAccessible(true);
+                }
+                Object mAttachInfo = mAttachInfoField.get(view);
+                if (mAttachInfo != null) {
                     if (mStableInsetsField == null) {
                         mStableInsetsField = mAttachInfo.getClass().getDeclaredField("mStableInsets");
                         mStableInsetsField.setAccessible(true);
                     }
-                    return ((Rect) mStableInsetsField.get(mAttachInfo)).bottom;
-                } catch (Throwable e) {
-                    FileLog.e(e);
+                    i = ((Rect) mStableInsetsField.get(mAttachInfo)).bottom;
                 }
+            } catch (Throwable e) {
+                FileLog.e(e);
             }
         }
-        return 0;
+        return i;
     }
 
     public static Point getRealScreenSize() {
@@ -1355,15 +894,12 @@ Caused by: java.lang.NullPointerException
     }
 
     public static CharSequence getTrimmedString(CharSequence src) {
-        if (src != null) {
-            if (src.length() != 0) {
-                while (src.length() > 0 && (src.charAt(0) == '\n' || src.charAt(0) == ' ')) {
-                    src = src.subSequence(1, src.length());
-                }
-                while (src.length() > 0 && (src.charAt(src.length() - 1) == '\n' || src.charAt(src.length() - 1) == ' ')) {
-                    src = src.subSequence(0, src.length() - 1);
-                }
-                return src;
+        if (!(src == null || src.length() == 0)) {
+            while (src.length() > 0 && (src.charAt(0) == '\n' || src.charAt(0) == ' ')) {
+                src = src.subSequence(1, src.length());
+            }
+            while (src.length() > 0 && (src.charAt(src.length() - 1) == '\n' || src.charAt(src.length() - 1) == ' ')) {
+                src = src.subSequence(0, src.length() - 1);
             }
         }
         return src;
@@ -1372,13 +908,14 @@ Caused by: java.lang.NullPointerException
     public static void setViewPagerEdgeEffectColor(ViewPager viewPager, int color) {
         if (VERSION.SDK_INT >= 21) {
             try {
+                EdgeEffect mEdgeEffect;
                 Field field = ViewPager.class.getDeclaredField("mLeftEdge");
                 field.setAccessible(true);
                 EdgeEffectCompat mLeftEdge = (EdgeEffectCompat) field.get(viewPager);
                 if (mLeftEdge != null) {
                     field = EdgeEffectCompat.class.getDeclaredField("mEdgeEffect");
                     field.setAccessible(true);
-                    EdgeEffect mEdgeEffect = (EdgeEffect) field.get(mLeftEdge);
+                    mEdgeEffect = (EdgeEffect) field.get(mLeftEdge);
                     if (mEdgeEffect != null) {
                         mEdgeEffect.setColor(color);
                     }
@@ -1389,9 +926,9 @@ Caused by: java.lang.NullPointerException
                 if (mRightEdge != null) {
                     field = EdgeEffectCompat.class.getDeclaredField("mEdgeEffect");
                     field.setAccessible(true);
-                    EdgeEffect mEdgeEffect2 = (EdgeEffect) field.get(mRightEdge);
-                    if (mEdgeEffect2 != null) {
-                        mEdgeEffect2.setColor(color);
+                    mEdgeEffect = (EdgeEffect) field.get(mRightEdge);
+                    if (mEdgeEffect != null) {
+                        mEdgeEffect.setColor(color);
                     }
                 }
             } catch (Throwable e) {
@@ -1423,21 +960,20 @@ Caused by: java.lang.NullPointerException
 
     @SuppressLint({"NewApi"})
     public static void clearDrawableAnimation(View view) {
-        if (VERSION.SDK_INT >= 21) {
-            if (view != null) {
-                Drawable drawable;
-                if (view instanceof ListView) {
-                    drawable = ((ListView) view).getSelector();
-                    if (drawable != null) {
-                        drawable.setState(StateSet.NOTHING);
-                    }
-                } else {
-                    drawable = view.getBackground();
-                    if (drawable != null) {
-                        drawable.setState(StateSet.NOTHING);
-                        drawable.jumpToCurrentState();
-                    }
+        if (VERSION.SDK_INT >= 21 && view != null) {
+            Drawable drawable;
+            if (view instanceof ListView) {
+                drawable = ((ListView) view).getSelector();
+                if (drawable != null) {
+                    drawable.setState(StateSet.NOTHING);
+                    return;
                 }
+                return;
+            }
+            drawable = view.getBackground();
+            if (drawable != null) {
+                drawable.setState(StateSet.NOTHING);
+                drawable.jumpToCurrentState();
             }
         }
     }
@@ -1451,60 +987,56 @@ Caused by: java.lang.NullPointerException
             int start;
             StringBuilder stringBuilder = new StringBuilder(str);
             if ((flag & 1) != 0) {
-                int indexOf;
                 while (true) {
-                    indexOf = stringBuilder.indexOf("<br>");
-                    start = indexOf;
-                    if (indexOf == -1) {
-                        break;
+                    start = stringBuilder.indexOf("<br>");
+                    if (start != -1) {
+                        stringBuilder.replace(start, start + 4, "\n");
+                    } else {
+                        while (true) {
+                            stringBuilder.replace(start, start + 5, "\n");
+                        }
                     }
-                    stringBuilder.replace(start, start + 4, "\n");
                 }
-                while (true) {
-                    indexOf = stringBuilder.indexOf("<br/>");
-                    start = indexOf;
-                    if (indexOf == -1) {
-                        break;
-                    }
-                    stringBuilder.replace(start, start + 5, "\n");
+                start = stringBuilder.indexOf("<br/>");
+                if (start == -1) {
+                    break;
                 }
+                stringBuilder.replace(start, start + 5, "\n");
             }
             ArrayList<Integer> bolds = new ArrayList();
             if ((flag & 2) != 0) {
-                int start2;
+                int end;
                 while (true) {
                     start = stringBuilder.indexOf("<b>");
-                    start2 = start;
                     if (start == -1) {
                         break;
                     }
-                    stringBuilder.replace(start2, start2 + 3, TtmlNode.ANONYMOUS_REGION_ID);
-                    start = stringBuilder.indexOf("</b>");
-                    if (start == -1) {
-                        start = stringBuilder.indexOf("<b>");
+                    stringBuilder.replace(start, start + 3, TtmlNode.ANONYMOUS_REGION_ID);
+                    end = stringBuilder.indexOf("</b>");
+                    if (end == -1) {
+                        end = stringBuilder.indexOf("<b>");
                     }
-                    stringBuilder.replace(start, start + 4, TtmlNode.ANONYMOUS_REGION_ID);
-                    bolds.add(Integer.valueOf(start2));
+                    stringBuilder.replace(end, end + 4, TtmlNode.ANONYMOUS_REGION_ID);
                     bolds.add(Integer.valueOf(start));
+                    bolds.add(Integer.valueOf(end));
                 }
                 while (true) {
                     start = stringBuilder.indexOf("**");
-                    start2 = start;
                     if (start == -1) {
                         break;
                     }
-                    stringBuilder.replace(start2, start2 + 2, TtmlNode.ANONYMOUS_REGION_ID);
-                    start = stringBuilder.indexOf("**");
-                    if (start >= 0) {
-                        stringBuilder.replace(start, start + 2, TtmlNode.ANONYMOUS_REGION_ID);
-                        bolds.add(Integer.valueOf(start2));
+                    stringBuilder.replace(start, start + 2, TtmlNode.ANONYMOUS_REGION_ID);
+                    end = stringBuilder.indexOf("**");
+                    if (end >= 0) {
+                        stringBuilder.replace(end, end + 2, TtmlNode.ANONYMOUS_REGION_ID);
                         bolds.add(Integer.valueOf(start));
+                        bolds.add(Integer.valueOf(end));
                     }
                 }
             }
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(stringBuilder);
-            for (start = 0; start < bolds.size() / 2; start++) {
-                spannableStringBuilder.setSpan(new TypefaceSpan(getTypeface("fonts/rmedium.ttf")), ((Integer) bolds.get(start * 2)).intValue(), ((Integer) bolds.get((start * 2) + 1)).intValue(), 33);
+            for (int a = 0; a < bolds.size() / 2; a++) {
+                spannableStringBuilder.setSpan(new TypefaceSpan(getTypeface("fonts/rmedium.ttf")), ((Integer) bolds.get(a * 2)).intValue(), ((Integer) bolds.get((a * 2) + 1)).intValue(), 33);
             }
             return spannableStringBuilder;
         } catch (Throwable e) {
@@ -1589,82 +1121,212 @@ Caused by: java.lang.NullPointerException
         if (VERSION.SDK_INT >= 23 && ApplicationLoader.applicationContext.checkSelfPermission("android.permission.READ_EXTERNAL_STORAGE") != 0) {
             return FileLoader.getDirectory(4);
         }
-        File storageDir = null;
         if ("mounted".equals(Environment.getExternalStorageState())) {
-            storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Telegram");
-            if (!(storageDir.mkdirs() || storageDir.exists())) {
-                if (BuildVars.LOGS_ENABLED) {
-                    FileLog.d("failed to create directory");
+            File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Telegram");
+            if (storageDir.mkdirs() || storageDir.exists()) {
+                return storageDir;
+            }
+            if (BuildVars.LOGS_ENABLED) {
+                FileLog.d("failed to create directory");
+            }
+            return null;
+        } else if (!BuildVars.LOGS_ENABLED) {
+            return null;
+        } else {
+            FileLog.d("External storage is not mounted READ/WRITE.");
+            return null;
+        }
+    }
+
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    @android.annotation.SuppressLint({"NewApi"})
+    public static java.lang.String getPath(android.net.Uri r14) {
+        /*
+        r9 = 0;
+        r12 = 1;
+        r10 = 0;
+        r11 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x0103 }
+        r13 = 19;
+        if (r11 < r13) goto L_0x0051;
+    L_0x0009:
+        r4 = r12;
+    L_0x000a:
+        if (r4 == 0) goto L_0x00d9;
+    L_0x000c:
+        r11 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0103 }
+        r11 = android.provider.DocumentsContract.isDocumentUri(r11, r14);	 Catch:{ Exception -> 0x0103 }
+        if (r11 == 0) goto L_0x00d9;
+    L_0x0014:
+        r11 = isExternalStorageDocument(r14);	 Catch:{ Exception -> 0x0103 }
+        if (r11 == 0) goto L_0x0053;
+    L_0x001a:
+        r1 = android.provider.DocumentsContract.getDocumentId(r14);	 Catch:{ Exception -> 0x0103 }
+        r10 = ":";
+        r7 = r1.split(r10);	 Catch:{ Exception -> 0x0103 }
+        r10 = 0;
+        r8 = r7[r10];	 Catch:{ Exception -> 0x0103 }
+        r10 = "primary";
+        r10 = r10.equalsIgnoreCase(r8);	 Catch:{ Exception -> 0x0103 }
+        if (r10 == 0) goto L_0x0050;
+    L_0x0031:
+        r10 = new java.lang.StringBuilder;	 Catch:{ Exception -> 0x0103 }
+        r10.<init>();	 Catch:{ Exception -> 0x0103 }
+        r11 = android.os.Environment.getExternalStorageDirectory();	 Catch:{ Exception -> 0x0103 }
+        r10 = r10.append(r11);	 Catch:{ Exception -> 0x0103 }
+        r11 = "/";
+        r10 = r10.append(r11);	 Catch:{ Exception -> 0x0103 }
+        r11 = 1;
+        r11 = r7[r11];	 Catch:{ Exception -> 0x0103 }
+        r10 = r10.append(r11);	 Catch:{ Exception -> 0x0103 }
+        r9 = r10.toString();	 Catch:{ Exception -> 0x0103 }
+    L_0x0050:
+        return r9;
+    L_0x0051:
+        r4 = r10;
+        goto L_0x000a;
+    L_0x0053:
+        r11 = isDownloadsDocument(r14);	 Catch:{ Exception -> 0x0103 }
+        if (r11 == 0) goto L_0x0079;
+    L_0x0059:
+        r3 = android.provider.DocumentsContract.getDocumentId(r14);	 Catch:{ Exception -> 0x0103 }
+        r10 = "content://downloads/public_downloads";
+        r10 = android.net.Uri.parse(r10);	 Catch:{ Exception -> 0x0103 }
+        r11 = java.lang.Long.valueOf(r3);	 Catch:{ Exception -> 0x0103 }
+        r12 = r11.longValue();	 Catch:{ Exception -> 0x0103 }
+        r0 = android.content.ContentUris.withAppendedId(r10, r12);	 Catch:{ Exception -> 0x0103 }
+        r10 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0103 }
+        r11 = 0;
+        r12 = 0;
+        r9 = getDataColumn(r10, r0, r11, r12);	 Catch:{ Exception -> 0x0103 }
+        goto L_0x0050;
+    L_0x0079:
+        r11 = isMediaDocument(r14);	 Catch:{ Exception -> 0x0103 }
+        if (r11 == 0) goto L_0x0050;
+    L_0x007f:
+        r1 = android.provider.DocumentsContract.getDocumentId(r14);	 Catch:{ Exception -> 0x0103 }
+        r11 = ":";
+        r7 = r1.split(r11);	 Catch:{ Exception -> 0x0103 }
+        r11 = 0;
+        r8 = r7[r11];	 Catch:{ Exception -> 0x0103 }
+        r0 = 0;
+        r11 = -1;
+        r13 = r8.hashCode();	 Catch:{ Exception -> 0x0103 }
+        switch(r13) {
+            case 93166550: goto L_0x00c5;
+            case 100313435: goto L_0x00b0;
+            case 112202875: goto L_0x00ba;
+            default: goto L_0x0096;
+        };	 Catch:{ Exception -> 0x0103 }
+    L_0x0096:
+        r10 = r11;
+    L_0x0097:
+        switch(r10) {
+            case 0: goto L_0x00d0;
+            case 1: goto L_0x00d3;
+            case 2: goto L_0x00d6;
+            default: goto L_0x009a;
+        };	 Catch:{ Exception -> 0x0103 }
+    L_0x009a:
+        r5 = "_id=?";
+        r10 = 1;
+        r6 = new java.lang.String[r10];	 Catch:{ Exception -> 0x0103 }
+        r10 = 0;
+        r11 = 1;
+        r11 = r7[r11];	 Catch:{ Exception -> 0x0103 }
+        r6[r10] = r11;	 Catch:{ Exception -> 0x0103 }
+        r10 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0103 }
+        r11 = "_id=?";
+        r9 = getDataColumn(r10, r0, r11, r6);	 Catch:{ Exception -> 0x0103 }
+        goto L_0x0050;
+    L_0x00b0:
+        r12 = "image";
+        r12 = r8.equals(r12);	 Catch:{ Exception -> 0x0103 }
+        if (r12 == 0) goto L_0x0096;
+    L_0x00b9:
+        goto L_0x0097;
+    L_0x00ba:
+        r10 = "video";
+        r10 = r8.equals(r10);	 Catch:{ Exception -> 0x0103 }
+        if (r10 == 0) goto L_0x0096;
+    L_0x00c3:
+        r10 = r12;
+        goto L_0x0097;
+    L_0x00c5:
+        r10 = "audio";
+        r10 = r8.equals(r10);	 Catch:{ Exception -> 0x0103 }
+        if (r10 == 0) goto L_0x0096;
+    L_0x00ce:
+        r10 = 2;
+        goto L_0x0097;
+    L_0x00d0:
+        r0 = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;	 Catch:{ Exception -> 0x0103 }
+        goto L_0x009a;
+    L_0x00d3:
+        r0 = android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI;	 Catch:{ Exception -> 0x0103 }
+        goto L_0x009a;
+    L_0x00d6:
+        r0 = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;	 Catch:{ Exception -> 0x0103 }
+        goto L_0x009a;
+    L_0x00d9:
+        r10 = "content";
+        r11 = r14.getScheme();	 Catch:{ Exception -> 0x0103 }
+        r10 = r10.equalsIgnoreCase(r11);	 Catch:{ Exception -> 0x0103 }
+        if (r10 == 0) goto L_0x00f0;
+    L_0x00e6:
+        r10 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0103 }
+        r11 = 0;
+        r12 = 0;
+        r9 = getDataColumn(r10, r14, r11, r12);	 Catch:{ Exception -> 0x0103 }
+        goto L_0x0050;
+    L_0x00f0:
+        r10 = "file";
+        r11 = r14.getScheme();	 Catch:{ Exception -> 0x0103 }
+        r10 = r10.equalsIgnoreCase(r11);	 Catch:{ Exception -> 0x0103 }
+        if (r10 == 0) goto L_0x0050;
+    L_0x00fd:
+        r9 = r14.getPath();	 Catch:{ Exception -> 0x0103 }
+        goto L_0x0050;
+    L_0x0103:
+        r2 = move-exception;
+        org.telegram.messenger.FileLog.e(r2);
+        goto L_0x0050;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.AndroidUtilities.getPath(android.net.Uri):java.lang.String");
+    }
+
+    public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
+        Cursor cursor = null;
+        String column = "_data";
+        try {
+            cursor = context.getContentResolver().query(uri, new String[]{"_data"}, selection, selectionArgs, null);
+            if (cursor == null || !cursor.moveToFirst()) {
+                if (cursor != null) {
+                    cursor.close();
                 }
                 return null;
             }
-        } else if (BuildVars.LOGS_ENABLED) {
-            FileLog.d("External storage is not mounted READ/WRITE.");
-        }
-        return storageDir;
-    }
-
-    @SuppressLint({"NewApi"})
-    public static String getPath(Uri uri) {
-        try {
-            if ((VERSION.SDK_INT >= 19) && DocumentsContract.isDocumentUri(ApplicationLoader.applicationContext, uri)) {
-                String[] split;
-                if (isExternalStorageDocument(uri)) {
-                    split = DocumentsContract.getDocumentId(uri).split(":");
-                    if ("primary".equalsIgnoreCase(split[0])) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append(Environment.getExternalStorageDirectory());
-                        stringBuilder.append("/");
-                        stringBuilder.append(split[1]);
-                        return stringBuilder.toString();
-                    }
-                } else if (isDownloadsDocument(uri)) {
-                    return getDataColumn(ApplicationLoader.applicationContext, ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(DocumentsContract.getDocumentId(uri)).longValue()), null, null);
-                } else if (isMediaDocument(uri)) {
-                    String type = DocumentsContract.getDocumentId(uri).split(":")[0];
-                    Uri contentUri = null;
-                    int i = -1;
-                    int hashCode = type.hashCode();
-                    if (hashCode != 93166550) {
-                        if (hashCode != 100313435) {
-                            if (hashCode == 112202875) {
-                                if (type.equals(MimeTypes.BASE_TYPE_VIDEO)) {
-                                    i = 1;
-                                }
-                            }
-                        } else if (type.equals("image")) {
-                            i = 0;
-                        }
-                    } else if (type.equals(MimeTypes.BASE_TYPE_AUDIO)) {
-                        i = 2;
-                    }
-                    switch (i) {
-                        case 0:
-                            contentUri = Media.EXTERNAL_CONTENT_URI;
-                            break;
-                        case 1:
-                            contentUri = Video.Media.EXTERNAL_CONTENT_URI;
-                            break;
-                        case 2:
-                            contentUri = Audio.Media.EXTERNAL_CONTENT_URI;
-                            break;
-                        default:
-                            break;
-                    }
-                    String selection = "_id=?";
-                    return getDataColumn(ApplicationLoader.applicationContext, contentUri, "_id=?", new String[]{split[1]});
+            String value = cursor.getString(cursor.getColumnIndexOrThrow("_data"));
+            if (value.startsWith("content://") || !(value.startsWith("/") || value.startsWith("file://"))) {
+                if (cursor != null) {
+                    cursor.close();
                 }
-            } else if ("content".equalsIgnoreCase(uri.getScheme())) {
-                return getDataColumn(ApplicationLoader.applicationContext, uri, null, null);
+                return null;
+            } else if (cursor == null) {
+                return value;
             } else {
-                if ("file".equalsIgnoreCase(uri.getScheme())) {
-                    return uri.getPath();
-                }
+                cursor.close();
+                return value;
             }
-        } catch (Throwable e) {
-            FileLog.e(e);
+        } catch (Exception e) {
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Throwable th) {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        return null;
     }
 
     public static boolean isExternalStorageDocument(Uri uri) {
@@ -1684,12 +1346,7 @@ Caused by: java.lang.NullPointerException
             File storageDir = getAlbumDir();
             Date date = new Date();
             date.setTime((System.currentTimeMillis() + ((long) Utilities.random.nextInt(1000))) + 1);
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(date);
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("IMG_");
-            stringBuilder.append(timeStamp);
-            stringBuilder.append(".jpg");
-            return new File(storageDir, stringBuilder.toString());
+            return new File(storageDir, "IMG_" + new SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(date) + ".jpg");
         } catch (Throwable e) {
             FileLog.e(e);
             return null;
@@ -1700,103 +1357,40 @@ Caused by: java.lang.NullPointerException
         if (name == null && name2 == null) {
             return TtmlNode.ANONYMOUS_REGION_ID;
         }
-        String lower;
-        int lastIndex;
-        int indexOf;
-        int index;
-        int idx;
-        String query;
-        SpannableStringBuilder builder = new SpannableStringBuilder();
+        CharSequence builder = new SpannableStringBuilder();
         String wholeString = name;
-        if (wholeString != null) {
-            if (wholeString.length() != 0) {
-                if (!(name2 == null || name2.length() == 0)) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append(wholeString);
-                    stringBuilder.append(" ");
-                    stringBuilder.append(name2);
-                    wholeString = stringBuilder.toString();
-                }
-                wholeString = wholeString.trim();
-                lower = new StringBuilder();
-                lower.append(" ");
-                lower.append(wholeString.toLowerCase());
-                lower = lower.toString();
-                lastIndex = 0;
-                while (true) {
-                    StringBuilder stringBuilder2 = new StringBuilder();
-                    stringBuilder2.append(" ");
-                    stringBuilder2.append(q);
-                    indexOf = lower.indexOf(stringBuilder2.toString(), lastIndex);
-                    index = indexOf;
-                    if (indexOf != -1) {
-                        break;
-                    }
-                    indexOf = 1;
-                    idx = index - (index != 0 ? 0 : 1);
-                    int length = q.length();
-                    if (index == 0) {
-                        indexOf = 0;
-                    }
-                    length = (length + indexOf) + idx;
-                    if (lastIndex == 0 && lastIndex != idx + 1) {
-                        builder.append(wholeString.substring(lastIndex, idx));
-                    } else if (lastIndex == 0 && idx != 0) {
-                        builder.append(wholeString.substring(0, idx));
-                    }
-                    query = wholeString.substring(idx, Math.min(wholeString.length(), length));
-                    if (query.startsWith(" ")) {
-                        builder.append(" ");
-                    }
-                    query = query.trim();
-                    int start = builder.length();
-                    builder.append(query);
-                    builder.setSpan(new ForegroundColorSpan(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4)), start, query.length() + start, 33);
-                    lastIndex = length;
-                }
-                if (lastIndex != -1 && lastIndex < wholeString.length()) {
-                    builder.append(wholeString.substring(lastIndex, wholeString.length()));
-                }
-                return builder;
-            }
+        if (wholeString == null || wholeString.length() == 0) {
+            wholeString = name2;
+        } else if (!(name2 == null || name2.length() == 0)) {
+            wholeString = wholeString + " " + name2;
         }
-        wholeString = name2;
         wholeString = wholeString.trim();
-        lower = new StringBuilder();
-        lower.append(" ");
-        lower.append(wholeString.toLowerCase());
-        lower = lower.toString();
-        lastIndex = 0;
+        String lower = " " + wholeString.toLowerCase();
+        int lastIndex = 0;
         while (true) {
-            StringBuilder stringBuilder22 = new StringBuilder();
-            stringBuilder22.append(" ");
-            stringBuilder22.append(q);
-            indexOf = lower.indexOf(stringBuilder22.toString(), lastIndex);
-            index = indexOf;
-            if (indexOf != -1) {
+            int index = lower.indexOf(" " + q, lastIndex);
+            if (index == -1) {
                 break;
             }
-            indexOf = 1;
-            if (index != 0) {
+            int idx = index - (index == 0 ? 0 : 1);
+            int end = ((index == 0 ? 0 : 1) + q.length()) + idx;
+            if (lastIndex != 0 && lastIndex != idx + 1) {
+                builder.append(wholeString.substring(lastIndex, idx));
+            } else if (lastIndex == 0 && idx != 0) {
+                builder.append(wholeString.substring(0, idx));
             }
-            idx = index - (index != 0 ? 0 : 1);
-            int length2 = q.length();
-            if (index == 0) {
-                indexOf = 0;
-            }
-            length2 = (length2 + indexOf) + idx;
-            if (lastIndex == 0) {
-            }
-            builder.append(wholeString.substring(0, idx));
-            query = wholeString.substring(idx, Math.min(wholeString.length(), length2));
+            String query = wholeString.substring(idx, Math.min(wholeString.length(), end));
             if (query.startsWith(" ")) {
                 builder.append(" ");
             }
             query = query.trim();
-            int start2 = builder.length();
+            int start = builder.length();
             builder.append(query);
-            builder.setSpan(new ForegroundColorSpan(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4)), start2, query.length() + start2, 33);
-            lastIndex = length2;
+            builder.setSpan(new ForegroundColorSpan(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4)), start, query.length() + start, 33);
+            lastIndex = end;
+        }
+        if (lastIndex == -1 || lastIndex >= wholeString.length()) {
+            return builder;
         }
         builder.append(wholeString.substring(lastIndex, wholeString.length()));
         return builder;
@@ -1807,12 +1401,7 @@ Caused by: java.lang.NullPointerException
             File storageDir = getAlbumDir();
             Date date = new Date();
             date.setTime((System.currentTimeMillis() + ((long) Utilities.random.nextInt(1000))) + 1);
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(date);
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("VID_");
-            stringBuilder.append(timeStamp);
-            stringBuilder.append(".mp4");
-            return new File(storageDir, stringBuilder.toString());
+            return new File(storageDir, "VID_" + new SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(date) + ".mp4");
         } catch (Throwable e) {
             FileLog.e(e);
             return null;
@@ -1832,49 +1421,145 @@ Caused by: java.lang.NullPointerException
     }
 
     public static byte[] decodeQuotedPrintable(byte[] bytes) {
-        if (bytes == null) {
-            return null;
-        }
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int i = 0;
-        while (i < bytes.length) {
-            int b = bytes[i];
-            if (b == 61) {
-                i++;
-                try {
-                    int u = Character.digit((char) bytes[i], 16);
+        byte[] bArr = null;
+        if (bytes != null) {
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            int i = 0;
+            while (i < bytes.length) {
+                int b = bytes[i];
+                if (b == 61) {
                     i++;
-                    buffer.write((char) ((u << 4) + Character.digit((char) bytes[i], 16)));
-                } catch (Throwable e) {
-                    FileLog.e(e);
-                    return null;
+                    try {
+                        int u = Character.digit((char) bytes[i], 16);
+                        i++;
+                        buffer.write((char) ((u << 4) + Character.digit((char) bytes[i], 16)));
+                    } catch (Throwable e) {
+                        FileLog.e(e);
+                    }
+                } else {
+                    buffer.write(b);
                 }
+                i++;
             }
-            buffer.write(b);
-            i++;
+            bArr = buffer.toByteArray();
+            try {
+                buffer.close();
+            } catch (Throwable e2) {
+                FileLog.e(e2);
+            }
         }
-        byte[] array = buffer.toByteArray();
-        try {
-            buffer.close();
-        } catch (Throwable e2) {
-            FileLog.e(e2);
-        }
-        return array;
+        return bArr;
     }
 
     public static boolean copyFile(InputStream sourceFile, File destFile) throws IOException {
         OutputStream out = new FileOutputStream(destFile);
         byte[] buf = new byte[4096];
         while (true) {
-            int read = sourceFile.read(buf);
-            int len = read;
-            if (read > 0) {
+            int len = sourceFile.read(buf);
+            if (len > 0) {
                 Thread.yield();
                 out.write(buf, 0, len);
             } else {
                 out.close();
                 return true;
             }
+        }
+    }
+
+    public static boolean copyFile(File sourceFile, File destFile) throws IOException {
+        Throwable e;
+        Throwable th;
+        if (!destFile.exists()) {
+            destFile.createNewFile();
+        }
+        FileInputStream source = null;
+        FileOutputStream destination = null;
+        try {
+            FileOutputStream destination2;
+            FileInputStream source2 = new FileInputStream(sourceFile);
+            try {
+                destination2 = new FileOutputStream(destFile);
+            } catch (Exception e2) {
+                e = e2;
+                source = source2;
+                try {
+                    FileLog.e(e);
+                    if (source != null) {
+                        source.close();
+                    }
+                    if (destination != null) {
+                        return false;
+                    }
+                    destination.close();
+                    return false;
+                } catch (Throwable th2) {
+                    th = th2;
+                    if (source != null) {
+                        source.close();
+                    }
+                    if (destination != null) {
+                        destination.close();
+                    }
+                    throw th;
+                }
+            } catch (Throwable th3) {
+                th = th3;
+                source = source2;
+                if (source != null) {
+                    source.close();
+                }
+                if (destination != null) {
+                    destination.close();
+                }
+                throw th;
+            }
+            try {
+                destination2.getChannel().transferFrom(source2.getChannel(), 0, source2.getChannel().size());
+                if (source2 != null) {
+                    source2.close();
+                }
+                if (destination2 != null) {
+                    destination2.close();
+                }
+                destination = destination2;
+                source = source2;
+                return true;
+            } catch (Exception e3) {
+                e = e3;
+                destination = destination2;
+                source = source2;
+                FileLog.e(e);
+                if (source != null) {
+                    source.close();
+                }
+                if (destination != null) {
+                    return false;
+                }
+                destination.close();
+                return false;
+            } catch (Throwable th4) {
+                th = th4;
+                destination = destination2;
+                source = source2;
+                if (source != null) {
+                    source.close();
+                }
+                if (destination != null) {
+                    destination.close();
+                }
+                throw th;
+            }
+        } catch (Exception e4) {
+            e = e4;
+            FileLog.e(e);
+            if (source != null) {
+                source.close();
+            }
+            if (destination != null) {
+                return false;
+            }
+            destination.close();
+            return false;
         }
     }
 
@@ -1919,6 +1604,7 @@ Caused by: java.lang.NullPointerException
                 if (realMimeType != null) {
                     try {
                         activity.startActivityForResult(intent, 500);
+                        return;
                     } catch (Exception e) {
                         if (VERSION.SDK_INT >= 24) {
                             intent.setDataAndType(FileProvider.getUriForFile(activity, "org.telegram.messenger.beta.provider", f), "text/plain");
@@ -1926,76 +1612,71 @@ Caused by: java.lang.NullPointerException
                             intent.setDataAndType(Uri.fromFile(f), "text/plain");
                         }
                         activity.startActivityForResult(intent, 500);
+                        return;
                     }
-                } else {
-                    activity.startActivityForResult(intent, 500);
                 }
-            } else {
-                Builder builder = new Builder((Context) activity);
-                builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
-                builder.setMessage(LocaleController.getString("ApkRestricted", R.string.ApkRestricted));
-                builder.setPositiveButton(LocaleController.getString("PermissionOpenSettings", R.string.PermissionOpenSettings), new OnClickListener() {
-                    @TargetApi(26)
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        try {
-                            Activity activity = activity;
-                            StringBuilder stringBuilder = new StringBuilder();
-                            stringBuilder.append("package:");
-                            stringBuilder.append(activity.getPackageName());
-                            activity.startActivity(new Intent("android.settings.MANAGE_UNKNOWN_APP_SOURCES", Uri.parse(stringBuilder.toString())));
-                        } catch (Throwable e) {
-                            FileLog.e(e);
-                        }
-                    }
-                });
-                builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
-                builder.show();
+                activity.startActivityForResult(intent, 500);
+                return;
             }
+            Builder builder = new Builder((Context) activity);
+            builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+            builder.setMessage(LocaleController.getString("ApkRestricted", R.string.ApkRestricted));
+            builder.setPositiveButton(LocaleController.getString("PermissionOpenSettings", R.string.PermissionOpenSettings), new OnClickListener() {
+                @TargetApi(26)
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    try {
+                        activity.startActivity(new Intent("android.settings.MANAGE_UNKNOWN_APP_SOURCES", Uri.parse("package:" + activity.getPackageName())));
+                    } catch (Throwable e) {
+                        FileLog.e(e);
+                    }
+                }
+            });
+            builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+            builder.show();
         }
     }
 
     public static void openForView(TLObject media, Activity activity) throws Exception {
-        if (media != null) {
-            if (activity != null) {
-                String fileName = FileLoader.getAttachFileName(media);
-                File f = FileLoader.getPathToAttach(media, true);
-                if (f != null && f.exists()) {
-                    String realMimeType = null;
-                    Intent intent = new Intent("android.intent.action.VIEW");
-                    intent.setFlags(1);
-                    MimeTypeMap myMime = MimeTypeMap.getSingleton();
-                    int idx = fileName.lastIndexOf(46);
-                    if (idx != -1) {
-                        realMimeType = myMime.getMimeTypeFromExtension(fileName.substring(idx + 1).toLowerCase());
-                        if (realMimeType == null) {
-                            if (media instanceof TL_document) {
-                                realMimeType = ((TL_document) media).mime_type;
-                            }
-                            if (realMimeType == null || realMimeType.length() == 0) {
-                                realMimeType = null;
-                            }
+        if (media != null && activity != null) {
+            String fileName = FileLoader.getAttachFileName(media);
+            File f = FileLoader.getPathToAttach(media, true);
+            if (f != null && f.exists()) {
+                String realMimeType = null;
+                Intent intent = new Intent("android.intent.action.VIEW");
+                intent.setFlags(1);
+                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                int idx = fileName.lastIndexOf(46);
+                if (idx != -1) {
+                    realMimeType = myMime.getMimeTypeFromExtension(fileName.substring(idx + 1).toLowerCase());
+                    if (realMimeType == null) {
+                        if (media instanceof TL_document) {
+                            realMimeType = ((TL_document) media).mime_type;
                         }
-                    }
-                    if (VERSION.SDK_INT >= 24) {
-                        intent.setDataAndType(FileProvider.getUriForFile(activity, "org.telegram.messenger.beta.provider", f), realMimeType != null ? realMimeType : "text/plain");
-                    } else {
-                        intent.setDataAndType(Uri.fromFile(f), realMimeType != null ? realMimeType : "text/plain");
-                    }
-                    if (realMimeType != null) {
-                        try {
-                            activity.startActivityForResult(intent, 500);
-                        } catch (Exception e) {
-                            if (VERSION.SDK_INT >= 24) {
-                                intent.setDataAndType(FileProvider.getUriForFile(activity, "org.telegram.messenger.beta.provider", f), "text/plain");
-                            } else {
-                                intent.setDataAndType(Uri.fromFile(f), "text/plain");
-                            }
-                            activity.startActivityForResult(intent, 500);
+                        if (realMimeType == null || realMimeType.length() == 0) {
+                            realMimeType = null;
                         }
-                    } else {
-                        activity.startActivityForResult(intent, 500);
                     }
                 }
+                if (VERSION.SDK_INT >= 24) {
+                    intent.setDataAndType(FileProvider.getUriForFile(activity, "org.telegram.messenger.beta.provider", f), realMimeType != null ? realMimeType : "text/plain");
+                } else {
+                    intent.setDataAndType(Uri.fromFile(f), realMimeType != null ? realMimeType : "text/plain");
+                }
+                if (realMimeType != null) {
+                    try {
+                        activity.startActivityForResult(intent, 500);
+                        return;
+                    } catch (Exception e) {
+                        if (VERSION.SDK_INT >= 24) {
+                            intent.setDataAndType(FileProvider.getUriForFile(activity, "org.telegram.messenger.beta.provider", f), "text/plain");
+                        } else {
+                            intent.setDataAndType(Uri.fromFile(f), "text/plain");
+                        }
+                        activity.startActivityForResult(intent, 500);
+                        return;
+                    }
+                }
+                activity.startActivityForResult(intent, 500);
             }
         }
     }
@@ -2004,33 +1685,110 @@ Caused by: java.lang.NullPointerException
         return Math.abs(((long) time) - (System.currentTimeMillis() / 1000)) > 157680000;
     }
 
+    public static void setRectToRect(Matrix matrix, RectF src, RectF dst, int rotation, ScaleToFit align) {
+        float sx;
+        float sy;
+        if (rotation == 90 || rotation == 270) {
+            sx = dst.height() / src.width();
+            sy = dst.width() / src.height();
+        } else {
+            sx = dst.width() / src.width();
+            sy = dst.height() / src.height();
+        }
+        if (align != ScaleToFit.FILL) {
+            if (sx > sy) {
+                sx = sy;
+            } else {
+                sy = sx;
+            }
+        }
+        float tx = (-src.left) * sx;
+        float ty = (-src.top) * sy;
+        matrix.setTranslate(dst.left, dst.top);
+        if (rotation == 90) {
+            matrix.preRotate(90.0f);
+            matrix.preTranslate(0.0f, -dst.width());
+        } else if (rotation == 180) {
+            matrix.preRotate(180.0f);
+            matrix.preTranslate(-dst.width(), -dst.height());
+        } else if (rotation == 270) {
+            matrix.preRotate(270.0f);
+            matrix.preTranslate(-dst.height(), 0.0f);
+        }
+        matrix.preScale(sx, sy);
+        matrix.preTranslate(tx, ty);
+    }
+
+    public static boolean handleProxyIntent(Activity activity, Intent intent) {
+        if (intent == null) {
+            return false;
+        }
+        try {
+            if ((intent.getFlags() & ExtractorMediaSource.DEFAULT_LOADING_CHECK_INTERVAL_BYTES) != 0) {
+                return false;
+            }
+            Uri data = intent.getData();
+            if (data == null) {
+                return false;
+            }
+            String user = null;
+            String password = null;
+            String port = null;
+            String address = null;
+            String scheme = data.getScheme();
+            if (scheme != null) {
+                if (scheme.equals("http") || scheme.equals("https")) {
+                    String host = data.getHost().toLowerCase();
+                    if (host.equals("telegram.me") || host.equals("t.me") || host.equals("telegram.dog") || host.equals("telesco.pe")) {
+                        String path = data.getPath();
+                        if (path != null && path.startsWith("/socks")) {
+                            address = data.getQueryParameter("server");
+                            port = data.getQueryParameter("port");
+                            user = data.getQueryParameter("user");
+                            password = data.getQueryParameter("pass");
+                        }
+                    }
+                } else if (scheme.equals("tg")) {
+                    String url = data.toString();
+                    if (url.startsWith("tg:socks") || url.startsWith("tg://socks")) {
+                        data = Uri.parse(url.replace("tg:proxy", "tg://telegram.org").replace("tg://proxy", "tg://telegram.org"));
+                        address = data.getQueryParameter("server");
+                        port = data.getQueryParameter("port");
+                        user = data.getQueryParameter("user");
+                        password = data.getQueryParameter("pass");
+                    }
+                }
+            }
+            if (TextUtils.isEmpty(address) || TextUtils.isEmpty(port)) {
+                return false;
+            }
+            if (user == null) {
+                user = TtmlNode.ANONYMOUS_REGION_ID;
+            }
+            if (password == null) {
+                password = TtmlNode.ANONYMOUS_REGION_ID;
+            }
+            showProxyAlert(activity, address, port, user, password);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static void showProxyAlert(Activity activity, final String address, final String port, final String user, final String password) {
         Builder builder = new Builder((Context) activity);
         builder.setTitle(LocaleController.getString("Proxy", R.string.Proxy));
         StringBuilder stringBuilder = new StringBuilder(LocaleController.getString("EnableProxyAlert", R.string.EnableProxyAlert));
         stringBuilder.append("\n\n");
-        stringBuilder.append(LocaleController.getString("UseProxyAddress", R.string.UseProxyAddress));
-        stringBuilder.append(": ");
-        stringBuilder.append(address);
-        stringBuilder.append("\n");
-        stringBuilder.append(LocaleController.getString("UseProxyPort", R.string.UseProxyPort));
-        stringBuilder.append(": ");
-        stringBuilder.append(port);
-        stringBuilder.append("\n");
+        stringBuilder.append(LocaleController.getString("UseProxyAddress", R.string.UseProxyAddress)).append(": ").append(address).append("\n");
+        stringBuilder.append(LocaleController.getString("UseProxyPort", R.string.UseProxyPort)).append(": ").append(port).append("\n");
         if (!TextUtils.isEmpty(user)) {
-            stringBuilder.append(LocaleController.getString("UseProxyUsername", R.string.UseProxyUsername));
-            stringBuilder.append(": ");
-            stringBuilder.append(user);
-            stringBuilder.append("\n");
+            stringBuilder.append(LocaleController.getString("UseProxyUsername", R.string.UseProxyUsername)).append(": ").append(user).append("\n");
         }
         if (!TextUtils.isEmpty(password)) {
-            stringBuilder.append(LocaleController.getString("UseProxyPassword", R.string.UseProxyPassword));
-            stringBuilder.append(": ");
-            stringBuilder.append(password);
-            stringBuilder.append("\n");
+            stringBuilder.append(LocaleController.getString("UseProxyPassword", R.string.UseProxyPassword)).append(": ").append(password).append("\n");
         }
-        stringBuilder.append("\n");
-        stringBuilder.append(LocaleController.getString("EnableProxyAlert2", R.string.EnableProxyAlert2));
+        stringBuilder.append("\n").append(LocaleController.getString("EnableProxyAlert2", R.string.EnableProxyAlert2));
         builder.setMessage(stringBuilder.toString());
         builder.setPositiveButton(LocaleController.getString("ConnectingToProxyEnable", R.string.ConnectingToProxyEnable), new OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {

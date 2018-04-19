@@ -41,7 +41,7 @@ public class XmlBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (4 + Utf8.utf8StringLengthInBytes(this.xml));
+        return (long) (Utf8.utf8StringLengthInBytes(this.xml) + 4);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -56,10 +56,6 @@ public class XmlBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        StringBuilder stringBuilder = new StringBuilder("XmlBox{xml='");
-        stringBuilder.append(this.xml);
-        stringBuilder.append('\'');
-        stringBuilder.append('}');
-        return stringBuilder.toString();
+        return "XmlBox{xml='" + this.xml + '\'' + '}';
     }
 }

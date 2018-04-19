@@ -25,13 +25,7 @@ public class NumberedThreadFactory implements ThreadFactory {
     public Thread newThread(Runnable runnable) {
         Thread newThread = this.zzaau.newThread(new zza(runnable, this.priority));
         String str = this.zzaav;
-        int andIncrement = this.zzaaw.getAndIncrement();
-        StringBuilder stringBuilder = new StringBuilder(13 + String.valueOf(str).length());
-        stringBuilder.append(str);
-        stringBuilder.append("[");
-        stringBuilder.append(andIncrement);
-        stringBuilder.append("]");
-        newThread.setName(stringBuilder.toString());
+        newThread.setName(new StringBuilder(String.valueOf(str).length() + 13).append(str).append("[").append(this.zzaaw.getAndIncrement()).append("]").toString());
         return newThread;
     }
 }

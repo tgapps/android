@@ -37,20 +37,16 @@ public final class zza extends zzj<zze> {
     }
 
     public final Face[] zzb(ByteBuffer byteBuffer, zzk com_google_android_gms_internal_vision_zzk) {
-        int i = 0;
         if (!isOperational()) {
             return new Face[0];
         }
         try {
             FaceParcel[] zzc = ((zze) zzh()).zzc(ObjectWrapper.wrap(byteBuffer), com_google_android_gms_internal_vision_zzk);
             Face[] faceArr = new Face[zzc.length];
-            int i2 = 0;
-            while (i2 < zzc.length) {
-                FaceParcel[] faceParcelArr;
-                Face[] faceArr2;
+            for (int i = 0; i < zzc.length; i++) {
                 Landmark[] landmarkArr;
-                FaceParcel faceParcel = zzc[i2];
-                int i3 = faceParcel.id;
+                FaceParcel faceParcel = zzc[i];
+                int i2 = faceParcel.id;
                 PointF pointF = new PointF(faceParcel.centerX, faceParcel.centerY);
                 float f = faceParcel.width;
                 float f2 = faceParcel.height;
@@ -58,31 +54,16 @@ public final class zza extends zzj<zze> {
                 float f4 = faceParcel.zzby;
                 LandmarkParcel[] landmarkParcelArr = faceParcel.zzbz;
                 if (landmarkParcelArr == null) {
-                    faceParcelArr = zzc;
-                    faceArr2 = faceArr;
-                    landmarkArr = new Landmark[i];
+                    landmarkArr = new Landmark[0];
                 } else {
-                    landmarkArr = new Landmark[landmarkParcelArr.length];
-                    int i4 = i;
-                    while (i4 < landmarkParcelArr.length) {
-                        LandmarkParcel landmarkParcel = landmarkParcelArr[i4];
-                        faceParcelArr = zzc;
-                        LandmarkParcel[] landmarkParcelArr2 = landmarkParcelArr;
-                        faceArr2 = faceArr;
-                        landmarkArr[i4] = new Landmark(new PointF(landmarkParcel.x, landmarkParcel.y), landmarkParcel.type);
-                        i4++;
-                        zzc = faceParcelArr;
-                        landmarkParcelArr = landmarkParcelArr2;
-                        faceArr = faceArr2;
+                    Landmark[] landmarkArr2 = new Landmark[landmarkParcelArr.length];
+                    for (int i3 = 0; i3 < landmarkParcelArr.length; i3++) {
+                        LandmarkParcel landmarkParcel = landmarkParcelArr[i3];
+                        landmarkArr2[i3] = new Landmark(new PointF(landmarkParcel.x, landmarkParcel.y), landmarkParcel.type);
                     }
-                    faceParcelArr = zzc;
-                    faceArr2 = faceArr;
+                    landmarkArr = landmarkArr2;
                 }
-                faceArr2[i2] = new Face(i3, pointF, f, f2, f3, f4, landmarkArr, faceParcel.zzca, faceParcel.zzcb, faceParcel.zzcc);
-                i2++;
-                zzc = faceParcelArr;
-                faceArr = faceArr2;
-                i = 0;
+                faceArr[i] = new Face(i2, pointF, f, f2, f3, f4, landmarkArr, faceParcel.zzca, faceParcel.zzcb, faceParcel.zzcc);
             }
             return faceArr;
         } catch (Throwable e) {

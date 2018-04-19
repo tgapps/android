@@ -28,16 +28,16 @@ public final class zzfb extends zzhk {
     }
 
     private final String zzgl() {
+        String str = null;
         zzab();
-        if (zzgi().zzd(this.zztd, zzew.zzaib) && !this.zzacr.isEnabled()) {
-            return null;
+        if (!zzgi().zzd(this.zztd, zzew.zzaib) || this.zzacr.isEnabled()) {
+            try {
+                str = FirebaseInstanceId.getInstance().getId();
+            } catch (IllegalStateException e) {
+                zzgg().zzin().log("Failed to retrieve Firebase Instance Id");
+            }
         }
-        try {
-            return FirebaseInstanceId.getInstance().getId();
-        } catch (IllegalStateException e) {
-            zzgg().zzin().log("Failed to retrieve Firebase Instance Id");
-            return null;
-        }
+        return str;
     }
 
     public final /* bridge */ /* synthetic */ Context getContext() {
@@ -59,8 +59,6 @@ public final class zzfb extends zzhk {
     }
 
     final zzec zzbd(String str) {
-        boolean z;
-        boolean booleanValue;
         zzab();
         String zzah = zzah();
         String gmpAppId = getGmpAppId();
@@ -72,39 +70,21 @@ public final class zzfb extends zzhk {
         zzch();
         zzab();
         if (this.zzaif == 0) {
-            r0.zzaif = r0.zzacr.zzgc().zzd(getContext(), getContext().getPackageName());
+            this.zzaif = this.zzacr.zzgc().zzd(getContext(), getContext().getPackageName());
         }
-        long j = r0.zzaif;
-        boolean isEnabled = r0.zzacr.isEnabled();
-        boolean z2 = true;
-        boolean z3 = zzgh().zzakm ^ 1;
+        long j = this.zzaif;
+        boolean isEnabled = this.zzacr.isEnabled();
+        boolean z = !zzgh().zzakm;
         String zzgl = zzgl();
         zzch();
-        long zzju = r0.zzacr.zzju();
+        long zzju = this.zzacr.zzju();
         int zzij = zzij();
         Boolean zzas = zzgi().zzas("google_analytics_adid_collection_enabled");
-        if (zzas != null) {
-            if (!zzas.booleanValue()) {
-                z = false;
-                booleanValue = Boolean.valueOf(z).booleanValue();
-                zzas = zzgi().zzas("google_analytics_ssaid_collection_enabled");
-                if (zzas != null) {
-                    if (zzas.booleanValue()) {
-                        z2 = false;
-                    }
-                }
-                return new zzec(zzah, gmpAppId, str2, zzii, str3, 12451, j, str, isEnabled, z3, zzgl, 0, zzju, zzij, booleanValue, Boolean.valueOf(z2).booleanValue(), zzgh().zzja());
-            }
-        }
-        z = true;
-        booleanValue = Boolean.valueOf(z).booleanValue();
+        boolean z2 = zzas == null || zzas.booleanValue();
+        boolean booleanValue = Boolean.valueOf(z2).booleanValue();
         zzas = zzgi().zzas("google_analytics_ssaid_collection_enabled");
-        if (zzas != null) {
-            if (zzas.booleanValue()) {
-                z2 = false;
-            }
-        }
-        return new zzec(zzah, gmpAppId, str2, zzii, str3, 12451, j, str, isEnabled, z3, zzgl, 0, zzju, zzij, booleanValue, Boolean.valueOf(z2).booleanValue(), zzgh().zzja());
+        z2 = zzas == null || zzas.booleanValue();
+        return new zzec(zzah, gmpAppId, str2, zzii, str3, 12451, j, str, isEnabled, z, zzgl, 0, zzju, zzij, booleanValue, Boolean.valueOf(z2).booleanValue(), zzgh().zzja());
     }
 
     public final /* bridge */ /* synthetic */ Clock zzbt() {
@@ -192,240 +172,95 @@ public final class zzfb extends zzhk {
     }
 
     protected final void zzig() {
-        String str;
-        Status initialize;
-        int i;
-        Boolean zzas;
-        zzfi zzip;
-        String str2 = "unknown";
+        int i = 1;
+        String str = "unknown";
+        String str2 = "Unknown";
+        int i2 = Integer.MIN_VALUE;
         String str3 = "Unknown";
-        String str4 = "Unknown";
         String packageName = getContext().getPackageName();
         PackageManager packageManager = getContext().getPackageManager();
-        int i2 = Integer.MIN_VALUE;
         if (packageManager == null) {
             zzgg().zzil().zzg("PackageManager is null, app identity information might be inaccurate. appId", zzfg.zzbh(packageName));
         } else {
             try {
-                str2 = packageManager.getInstallerPackageName(packageName);
+                str = packageManager.getInstallerPackageName(packageName);
             } catch (IllegalArgumentException e) {
                 zzgg().zzil().zzg("Error retrieving app installer package name. appId", zzfg.zzbh(packageName));
             }
-            if (str2 == null) {
-                str2 = "manual_install";
-            } else if ("com.android.vending".equals(str2)) {
-                str2 = TtmlNode.ANONYMOUS_REGION_ID;
+            if (str == null) {
+                str = "manual_install";
+            } else if ("com.android.vending".equals(str)) {
+                str = TtmlNode.ANONYMOUS_REGION_ID;
             }
             try {
                 PackageInfo packageInfo = packageManager.getPackageInfo(getContext().getPackageName(), 0);
                 if (packageInfo != null) {
                     CharSequence applicationLabel = packageManager.getApplicationLabel(packageInfo.applicationInfo);
                     if (!TextUtils.isEmpty(applicationLabel)) {
-                        str4 = applicationLabel.toString();
+                        str3 = applicationLabel.toString();
                     }
-                    str = packageInfo.versionName;
-                    try {
-                        i2 = packageInfo.versionCode;
-                        str3 = str;
-                    } catch (NameNotFoundException e2) {
-                        str3 = str;
-                        zzgg().zzil().zze("Error retrieving package info. appId, appName", zzfg.zzbh(packageName), str4);
-                        this.zztd = packageName;
-                        this.zzado = str2;
-                        this.zztc = str3;
-                        this.zzaie = i2;
-                        this.zztb = str4;
-                        this.zzaif = 0;
-                        initialize = GoogleServices.initialize(getContext());
-                        i = 1;
-                        if (initialize == null) {
-                        }
-                        if (i2 == 0) {
-                            if (initialize == null) {
-                                zzgg().zzil().log("GoogleService failed to initialize (no status)");
-                            } else {
-                                zzgg().zzil().zze("GoogleService failed to initialize, status", Integer.valueOf(initialize.getStatusCode()), initialize.getStatusMessage());
-                            }
-                        }
-                        if (i2 != 0) {
-                            zzas = zzgi().zzas("firebase_analytics_collection_enabled");
-                            if (zzgi().zzhi()) {
-                                zzip = zzgg().zzip();
-                                str = "Collection disabled with firebase_analytics_collection_deactivated=1";
-                            } else {
-                                if (zzas == null) {
-                                }
-                                if (zzas == null) {
-                                }
-                                zzgg().zzir().log("Collection enabled");
-                                this.zzadh = TtmlNode.ANONYMOUS_REGION_ID;
-                                this.zzads = 0;
-                                str2 = GoogleServices.getGoogleAppId();
-                                if (TextUtils.isEmpty(str2)) {
-                                    str2 = TtmlNode.ANONYMOUS_REGION_ID;
-                                }
-                                this.zzadh = str2;
-                                if (i != 0) {
-                                    zzgg().zzir().zze("App package, google app id", this.zztd, this.zzadh);
-                                }
-                                if (VERSION.SDK_INT < 16) {
-                                    this.zzaei = InstantApps.isInstantApp(getContext());
-                                } else {
-                                    this.zzaei = 0;
-                                }
-                            }
-                            zzip.log(str);
-                        }
-                        i = 0;
-                        this.zzadh = TtmlNode.ANONYMOUS_REGION_ID;
-                        this.zzads = 0;
-                        str2 = GoogleServices.getGoogleAppId();
-                        if (TextUtils.isEmpty(str2)) {
-                            str2 = TtmlNode.ANONYMOUS_REGION_ID;
-                        }
-                        this.zzadh = str2;
-                        if (i != 0) {
-                            zzgg().zzir().zze("App package, google app id", this.zztd, this.zzadh);
-                        }
-                        if (VERSION.SDK_INT < 16) {
-                            this.zzaei = 0;
-                        } else {
-                            this.zzaei = InstantApps.isInstantApp(getContext());
-                        }
-                    }
+                    str2 = packageInfo.versionName;
+                    i2 = packageInfo.versionCode;
                 }
-            } catch (NameNotFoundException e3) {
-                zzgg().zzil().zze("Error retrieving package info. appId, appName", zzfg.zzbh(packageName), str4);
-                this.zztd = packageName;
-                this.zzado = str2;
-                this.zztc = str3;
-                this.zzaie = i2;
-                this.zztb = str4;
-                this.zzaif = 0;
-                initialize = GoogleServices.initialize(getContext());
-                i = 1;
-                if (initialize == null) {
-                }
-                if (i2 == 0) {
-                    if (initialize == null) {
-                        zzgg().zzil().zze("GoogleService failed to initialize, status", Integer.valueOf(initialize.getStatusCode()), initialize.getStatusMessage());
-                    } else {
-                        zzgg().zzil().log("GoogleService failed to initialize (no status)");
-                    }
-                }
-                if (i2 != 0) {
-                    zzas = zzgi().zzas("firebase_analytics_collection_enabled");
-                    if (zzgi().zzhi()) {
-                        if (zzas == null) {
-                        }
-                        if (zzas == null) {
-                        }
-                        zzgg().zzir().log("Collection enabled");
-                        this.zzadh = TtmlNode.ANONYMOUS_REGION_ID;
-                        this.zzads = 0;
-                        str2 = GoogleServices.getGoogleAppId();
-                        if (TextUtils.isEmpty(str2)) {
-                            str2 = TtmlNode.ANONYMOUS_REGION_ID;
-                        }
-                        this.zzadh = str2;
-                        if (i != 0) {
-                            zzgg().zzir().zze("App package, google app id", this.zztd, this.zzadh);
-                        }
-                        if (VERSION.SDK_INT < 16) {
-                            this.zzaei = InstantApps.isInstantApp(getContext());
-                        } else {
-                            this.zzaei = 0;
-                        }
-                    }
-                    zzip = zzgg().zzip();
-                    str = "Collection disabled with firebase_analytics_collection_deactivated=1";
-                    zzip.log(str);
-                }
-                i = 0;
-                this.zzadh = TtmlNode.ANONYMOUS_REGION_ID;
-                this.zzads = 0;
-                str2 = GoogleServices.getGoogleAppId();
-                if (TextUtils.isEmpty(str2)) {
-                    str2 = TtmlNode.ANONYMOUS_REGION_ID;
-                }
-                this.zzadh = str2;
-                if (i != 0) {
-                    zzgg().zzir().zze("App package, google app id", this.zztd, this.zzadh);
-                }
-                if (VERSION.SDK_INT < 16) {
-                    this.zzaei = 0;
-                } else {
-                    this.zzaei = InstantApps.isInstantApp(getContext());
-                }
+            } catch (NameNotFoundException e2) {
+                zzgg().zzil().zze("Error retrieving package info. appId, appName", zzfg.zzbh(packageName), str3);
             }
         }
         this.zztd = packageName;
-        this.zzado = str2;
-        this.zztc = str3;
+        this.zzado = str;
+        this.zztc = str2;
         this.zzaie = i2;
-        this.zztb = str4;
+        this.zztb = str3;
         this.zzaif = 0;
-        initialize = GoogleServices.initialize(getContext());
-        i = 1;
-        i2 = (initialize == null && initialize.isSuccess()) ? 1 : 0;
-        if (i2 == 0) {
+        Status initialize = GoogleServices.initialize(getContext());
+        int i3 = (initialize == null || !initialize.isSuccess()) ? 0 : 1;
+        if (i3 == 0) {
             if (initialize == null) {
                 zzgg().zzil().log("GoogleService failed to initialize (no status)");
             } else {
                 zzgg().zzil().zze("GoogleService failed to initialize, status", Integer.valueOf(initialize.getStatusCode()), initialize.getStatusMessage());
             }
         }
-        if (i2 != 0) {
-            zzas = zzgi().zzas("firebase_analytics_collection_enabled");
+        if (i3 != 0) {
+            Boolean zzas = zzgi().zzas("firebase_analytics_collection_enabled");
             if (zzgi().zzhi()) {
-                zzip = zzgg().zzip();
-                str = "Collection disabled with firebase_analytics_collection_deactivated=1";
-            } else if (zzas == null && !zzas.booleanValue()) {
-                zzip = zzgg().zzip();
-                str = "Collection disabled with firebase_analytics_collection_enabled=0";
-            } else if (zzas == null || !GoogleServices.isMeasurementExplicitlyDisabled()) {
-                zzgg().zzir().log("Collection enabled");
-                this.zzadh = TtmlNode.ANONYMOUS_REGION_ID;
-                this.zzads = 0;
-                str2 = GoogleServices.getGoogleAppId();
-                if (TextUtils.isEmpty(str2)) {
-                    str2 = TtmlNode.ANONYMOUS_REGION_ID;
-                }
-                this.zzadh = str2;
-                if (i != 0) {
-                    zzgg().zzir().zze("App package, google app id", this.zztd, this.zzadh);
-                }
-                if (VERSION.SDK_INT < 16) {
-                    this.zzaei = InstantApps.isInstantApp(getContext());
-                } else {
-                    this.zzaei = 0;
-                }
+                zzgg().zzip().log("Collection disabled with firebase_analytics_collection_deactivated=1");
+                i3 = 0;
+            } else if (zzas != null && !zzas.booleanValue()) {
+                zzgg().zzip().log("Collection disabled with firebase_analytics_collection_enabled=0");
+                i3 = 0;
+            } else if (zzas == null && GoogleServices.isMeasurementExplicitlyDisabled()) {
+                zzgg().zzip().log("Collection disabled with google_app_measurement_enable=0");
+                i3 = 0;
             } else {
-                zzip = zzgg().zzip();
-                str = "Collection disabled with google_app_measurement_enable=0";
+                zzgg().zzir().log("Collection enabled");
+                i3 = 1;
             }
-            zzip.log(str);
+        } else {
+            i3 = 0;
         }
-        i = 0;
         this.zzadh = TtmlNode.ANONYMOUS_REGION_ID;
         this.zzads = 0;
         try {
-            str2 = GoogleServices.getGoogleAppId();
-            if (TextUtils.isEmpty(str2)) {
-                str2 = TtmlNode.ANONYMOUS_REGION_ID;
+            String googleAppId = GoogleServices.getGoogleAppId();
+            if (TextUtils.isEmpty(googleAppId)) {
+                googleAppId = TtmlNode.ANONYMOUS_REGION_ID;
             }
-            this.zzadh = str2;
-            if (i != 0) {
+            this.zzadh = googleAppId;
+            if (i3 != 0) {
                 zzgg().zzir().zze("App package, google app id", this.zztd, this.zzadh);
             }
-        } catch (IllegalStateException e4) {
-            zzgg().zzil().zze("getGoogleAppId or isMeasurementEnabled failed with exception. appId", zzfg.zzbh(packageName), e4);
+        } catch (IllegalStateException e3) {
+            zzgg().zzil().zze("getGoogleAppId or isMeasurementEnabled failed with exception. appId", zzfg.zzbh(packageName), e3);
         }
-        if (VERSION.SDK_INT < 16) {
-            this.zzaei = 0;
-        } else {
-            this.zzaei = InstantApps.isInstantApp(getContext());
+        if (VERSION.SDK_INT >= 16) {
+            if (!InstantApps.isInstantApp(getContext())) {
+                i = 0;
+            }
+            this.zzaei = i;
+            return;
         }
+        this.zzaei = 0;
     }
 
     final int zzii() {

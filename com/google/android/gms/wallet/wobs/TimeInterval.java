@@ -19,9 +19,9 @@ public final class TimeInterval extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeLong(parcel, 2, this.zzhb);
         SafeParcelWriter.writeLong(parcel, 3, this.zzhc);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

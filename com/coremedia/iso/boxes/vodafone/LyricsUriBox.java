@@ -57,9 +57,6 @@ public class LyricsUriBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        StringBuilder stringBuilder = new StringBuilder("LyricsUriBox[lyricsUri=");
-        stringBuilder.append(getLyricsUri());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "LyricsUriBox[lyricsUri=" + getLyricsUri() + "]";
     }
 }

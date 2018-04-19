@@ -65,228 +65,6 @@ public class Switch extends CompoundButton {
         }
     }
 
-    protected void onLayout(boolean r1, int r2, int r3, int r4, int r5) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.Switch.onLayout(boolean, int, int, int, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        super.onLayout(r8, r9, r10, r11, r12);
-        r0 = 1;
-        r7.wasLayout = r0;
-        r0 = 0;
-        r1 = 0;
-        r2 = r7.mThumbDrawable;
-        if (r2 == 0) goto L_0x0030;
-    L_0x000c:
-        r2 = r7.mTempRect;
-        r3 = r7.mTrackDrawable;
-        if (r3 == 0) goto L_0x0018;
-    L_0x0012:
-        r3 = r7.mTrackDrawable;
-        r3.getPadding(r2);
-        goto L_0x001b;
-    L_0x0018:
-        r2.setEmpty();
-    L_0x001b:
-        r3 = org.telegram.ui.Components.Switch.Insets.NONE;
-        r4 = r3.left;
-        r5 = r2.left;
-        r4 = r4 - r5;
-        r5 = 0;
-        r0 = java.lang.Math.max(r5, r4);
-        r4 = r3.right;
-        r6 = r2.right;
-        r4 = r4 - r6;
-        r1 = java.lang.Math.max(r5, r4);
-    L_0x0030:
-        r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x003f;
-    L_0x0034:
-        r2 = r7.getPaddingLeft();
-        r2 = r2 + r0;
-        r3 = r7.mSwitchWidth;
-        r3 = r3 + r2;
-        r3 = r3 - r0;
-        r3 = r3 - r1;
-        goto L_0x0050;
-    L_0x003f:
-        r2 = r7.getWidth();
-        r3 = r7.getPaddingRight();
-        r2 = r2 - r3;
-        r3 = r2 - r1;
-        r2 = r7.mSwitchWidth;
-        r2 = r3 - r2;
-        r2 = r2 + r0;
-        r2 = r2 + r1;
-    L_0x0050:
-        r4 = r7.getGravity();
-        r4 = r4 & 112;
-        r5 = 16;
-        if (r4 == r5) goto L_0x0075;
-    L_0x005a:
-        r5 = 80;
-        if (r4 == r5) goto L_0x0066;
-    L_0x005e:
-        r4 = r7.getPaddingTop();
-        r5 = r7.mSwitchHeight;
-        r5 = r5 + r4;
-        goto L_0x008e;
-    L_0x0066:
-        r4 = r7.getHeight();
-        r5 = r7.getPaddingBottom();
-        r5 = r4 - r5;
-        r4 = r7.mSwitchHeight;
-        r4 = r5 - r4;
-        goto L_0x008e;
-    L_0x0075:
-        r4 = r7.getPaddingTop();
-        r5 = r7.getHeight();
-        r4 = r4 + r5;
-        r5 = r7.getPaddingBottom();
-        r4 = r4 - r5;
-        r4 = r4 / 2;
-        r5 = r7.mSwitchHeight;
-        r5 = r5 / 2;
-        r4 = r4 - r5;
-        r5 = r7.mSwitchHeight;
-        r5 = r5 + r4;
-        r7.mSwitchLeft = r2;
-        r7.mSwitchTop = r4;
-        r7.mSwitchBottom = r5;
-        r7.mSwitchRight = r3;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Switch.onLayout(boolean, int, int, int, int):void");
-    }
-
-    public boolean onTouchEvent(android.view.MotionEvent r1) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.Switch.onTouchEvent(android.view.MotionEvent):boolean
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r9.mVelocityTracker;
-        r0.addMovement(r10);
-        r0 = r10.getActionMasked();
-        r1 = 2;
-        r2 = 1;
-        switch(r0) {
-            case 0: goto L_0x0095;
-            case 1: goto L_0x0081;
-            case 2: goto L_0x0010;
-            case 3: goto L_0x0081;
-            default: goto L_0x000e;
-        };
-    L_0x000e:
-        goto L_0x00af;
-    L_0x0010:
-        r3 = r9.mTouchMode;
-        switch(r3) {
-            case 0: goto L_0x007f;
-            case 1: goto L_0x004b;
-            case 2: goto L_0x0016;
-            default: goto L_0x0015;
-        };
-        goto L_0x0080;
-        r1 = r10.getX();
-        r3 = r9.getThumbScrollRange();
-        r4 = r9.mTouchX;
-        r4 = r1 - r4;
-        r5 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
-        r6 = 0;
-        if (r3 == 0) goto L_0x002b;
-        r7 = (float) r3;
-        r7 = r4 / r7;
-        goto L_0x0033;
-        r7 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r7 <= 0) goto L_0x0031;
-        r7 = r5;
-        goto L_0x0033;
-        r7 = -1082130432; // 0xffffffffbf800000 float:-1.0 double:NaN;
-        r8 = org.telegram.messenger.LocaleController.isRTL;
-        if (r8 == 0) goto L_0x0038;
-        r7 = -r7;
-        r8 = r9.thumbPosition;
-        r8 = r8 + r7;
-        r5 = constrain(r8, r6, r5);
-        r6 = r9.thumbPosition;
-        r6 = (r5 > r6 ? 1 : (r5 == r6 ? 0 : -1));
-        if (r6 == 0) goto L_0x004a;
-        r9.mTouchX = r1;
-        r9.setThumbPosition(r5);
-        return r2;
-        r3 = r10.getX();
-        r4 = r10.getY();
-        r5 = r9.mTouchX;
-        r5 = r3 - r5;
-        r5 = java.lang.Math.abs(r5);
-        r6 = r9.mTouchSlop;
-        r6 = (float) r6;
-        r5 = (r5 > r6 ? 1 : (r5 == r6 ? 0 : -1));
-        if (r5 > 0) goto L_0x0071;
-        r5 = r9.mTouchY;
-        r5 = r4 - r5;
-        r5 = java.lang.Math.abs(r5);
-        r6 = r9.mTouchSlop;
-        r6 = (float) r6;
-        r5 = (r5 > r6 ? 1 : (r5 == r6 ? 0 : -1));
-        if (r5 <= 0) goto L_0x0080;
-        r9.mTouchMode = r1;
-        r1 = r9.getParent();
-        r1.requestDisallowInterceptTouchEvent(r2);
-        r9.mTouchX = r3;
-        r9.mTouchY = r4;
-        return r2;
-        goto L_0x00af;
-    L_0x0081:
-        r3 = r9.mTouchMode;
-        if (r3 != r1) goto L_0x008c;
-        r9.stopDrag(r10);
-        super.onTouchEvent(r10);
-        return r2;
-        r1 = 0;
-        r9.mTouchMode = r1;
-        r1 = r9.mVelocityTracker;
-        r1.clear();
-        goto L_0x00af;
-    L_0x0095:
-        r1 = r10.getX();
-        r3 = r10.getY();
-        r4 = r9.isEnabled();
-        if (r4 == 0) goto L_0x00af;
-        r4 = r9.hitThumb(r1, r3);
-        if (r4 == 0) goto L_0x00af;
-        r9.mTouchMode = r2;
-        r9.mTouchX = r1;
-        r9.mTouchY = r3;
-    L_0x00af:
-        r1 = super.onTouchEvent(r10);
-        return r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Switch.onTouchEvent(android.view.MotionEvent):boolean");
-    }
-
     public static float constrain(float amount, float low, float high) {
         if (amount < low) {
             return low;
@@ -387,8 +165,8 @@ Caused by: java.lang.NullPointerException
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int thumbWidth;
         int thumbHeight;
+        int trackHeight;
         Rect padding = this.mTempRect;
-        int trackHeight = 0;
         if (this.mThumbDrawable != null) {
             this.mThumbDrawable.getPadding(padding);
             thumbWidth = (this.mThumbDrawable.getIntrinsicWidth() - padding.left) - padding.right;
@@ -403,6 +181,7 @@ Caused by: java.lang.NullPointerException
             trackHeight = this.mTrackDrawable.getIntrinsicHeight();
         } else {
             padding.setEmpty();
+            trackHeight = 0;
         }
         int paddingLeft = padding.left;
         int paddingRight = padding.right;
@@ -411,7 +190,7 @@ Caused by: java.lang.NullPointerException
             paddingLeft = Math.max(paddingLeft, inset.left);
             paddingRight = Math.max(paddingRight, inset.right);
         }
-        int switchWidth = Math.max(this.mSwitchMinWidth, ((2 * this.mThumbWidth) + paddingLeft) + paddingRight);
+        int switchWidth = Math.max(this.mSwitchMinWidth, ((this.mThumbWidth * 2) + paddingLeft) + paddingRight);
         int switchHeight = Math.max(trackHeight, thumbHeight);
         this.mSwitchWidth = switchWidth;
         this.mSwitchHeight = switchHeight;
@@ -428,6 +207,71 @@ Caused by: java.lang.NullPointerException
         return x > ((float) thumbLeft) && x < ((float) ((((this.mThumbWidth + thumbLeft) + this.mTempRect.left) + this.mTempRect.right) + this.mTouchSlop)) && y > ((float) (this.mSwitchTop - this.mTouchSlop)) && y < ((float) (this.mSwitchBottom + this.mTouchSlop));
     }
 
+    public boolean onTouchEvent(MotionEvent ev) {
+        this.mVelocityTracker.addMovement(ev);
+        float x;
+        float y;
+        switch (ev.getActionMasked()) {
+            case 0:
+                x = ev.getX();
+                y = ev.getY();
+                if (isEnabled() && hitThumb(x, y)) {
+                    this.mTouchMode = 1;
+                    this.mTouchX = x;
+                    this.mTouchY = y;
+                    break;
+                }
+            case 1:
+            case 3:
+                if (this.mTouchMode != 2) {
+                    this.mTouchMode = 0;
+                    this.mVelocityTracker.clear();
+                    break;
+                }
+                stopDrag(ev);
+                super.onTouchEvent(ev);
+                return true;
+            case 2:
+                switch (this.mTouchMode) {
+                    case 0:
+                        break;
+                    case 1:
+                        x = ev.getX();
+                        y = ev.getY();
+                        if (Math.abs(x - this.mTouchX) > ((float) this.mTouchSlop) || Math.abs(y - this.mTouchY) > ((float) this.mTouchSlop)) {
+                            this.mTouchMode = 2;
+                            getParent().requestDisallowInterceptTouchEvent(true);
+                            this.mTouchX = x;
+                            this.mTouchY = y;
+                            return true;
+                        }
+                    case 2:
+                        float dPos;
+                        x = ev.getX();
+                        int thumbScrollRange = getThumbScrollRange();
+                        float thumbScrollOffset = x - this.mTouchX;
+                        if (thumbScrollRange != 0) {
+                            dPos = thumbScrollOffset / ((float) thumbScrollRange);
+                        } else {
+                            dPos = thumbScrollOffset > 0.0f ? 1.0f : -1.0f;
+                        }
+                        if (LocaleController.isRTL) {
+                            dPos = -dPos;
+                        }
+                        float newPos = constrain(this.thumbPosition + dPos, 0.0f, 1.0f);
+                        if (newPos != this.thumbPosition) {
+                            this.mTouchX = x;
+                            setThumbPosition(newPos);
+                        }
+                        return true;
+                    default:
+                        break;
+                }
+                break;
+        }
+        return super.onTouchEvent(ev);
+    }
+
     private void cancelSuperTouch(MotionEvent ev) {
         MotionEvent cancel = MotionEvent.obtain(ev);
         cancel.setAction(3);
@@ -435,68 +279,32 @@ Caused by: java.lang.NullPointerException
         cancel.recycle();
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private void stopDrag(android.view.MotionEvent r7) {
-        /*
-        r6 = this;
-        r0 = 0;
-        r6.mTouchMode = r0;
-        r1 = r7.getAction();
-        r2 = 1;
-        if (r1 != r2) goto L_0x0012;
-    L_0x000a:
-        r1 = r6.isEnabled();
-        if (r1 == 0) goto L_0x0012;
-    L_0x0010:
-        r1 = r2;
-        goto L_0x0013;
-    L_0x0012:
-        r1 = r0;
-    L_0x0013:
-        if (r1 == 0) goto L_0x0044;
-    L_0x0015:
-        r3 = r6.mVelocityTracker;
-        r4 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
-        r3.computeCurrentVelocity(r4);
-        r3 = r6.mVelocityTracker;
-        r3 = r3.getXVelocity();
-        r4 = java.lang.Math.abs(r3);
-        r5 = r6.mMinFlingVelocity;
-        r5 = (float) r5;
-        r4 = (r4 > r5 ? 1 : (r4 == r5 ? 0 : -1));
-        if (r4 <= 0) goto L_0x003f;
-    L_0x002d:
-        r4 = org.telegram.messenger.LocaleController.isRTL;
-        r5 = 0;
-        if (r4 == 0) goto L_0x0039;
-    L_0x0032:
-        r4 = (r3 > r5 ? 1 : (r3 == r5 ? 0 : -1));
-        if (r4 >= 0) goto L_0x0038;
-    L_0x0036:
-        r0 = r2;
-        goto L_0x003e;
-    L_0x0038:
-        goto L_0x003e;
-    L_0x0039:
-        r4 = (r3 > r5 ? 1 : (r3 == r5 ? 0 : -1));
-        if (r4 <= 0) goto L_0x0038;
-    L_0x003d:
-        goto L_0x0036;
-    L_0x003e:
-        goto L_0x0043;
-    L_0x003f:
-        r0 = r6.getTargetCheckedState();
-    L_0x0043:
-        goto L_0x0048;
-    L_0x0044:
-        r0 = r6.isChecked();
-    L_0x0048:
-        r6.setChecked(r0);
-        r6.cancelSuperTouch(r7);
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Switch.stopDrag(android.view.MotionEvent):void");
+    private void stopDrag(MotionEvent ev) {
+        boolean commitChange;
+        boolean newState = true;
+        this.mTouchMode = 0;
+        if (ev.getAction() == 1 && isEnabled()) {
+            commitChange = true;
+        } else {
+            commitChange = false;
+        }
+        if (commitChange) {
+            this.mVelocityTracker.computeCurrentVelocity(1000);
+            float xvel = this.mVelocityTracker.getXVelocity();
+            if (Math.abs(xvel) <= ((float) this.mMinFlingVelocity)) {
+                newState = getTargetCheckedState();
+            } else if (LocaleController.isRTL) {
+                if (xvel >= 0.0f) {
+                    newState = false;
+                }
+            } else if (xvel <= 0.0f) {
+                newState = false;
+            }
+        } else {
+            newState = isChecked();
+        }
+        setChecked(newState);
+        cancelSuperTouch(ev);
     }
 
     private void animateThumbToCheckedState(boolean newCheckedState) {
@@ -527,7 +335,7 @@ Caused by: java.lang.NullPointerException
     }
 
     public void toggle() {
-        setChecked(isChecked() ^ 1);
+        setChecked(!isChecked());
     }
 
     protected void onAttachedToWindow() {
@@ -556,33 +364,77 @@ Caused by: java.lang.NullPointerException
             setThumbPosition(checked ? 1.0f : 0.0f);
         }
         if (this.mTrackDrawable != null) {
-            this.mTrackDrawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(checked ? Theme.key_switchTrackChecked : Theme.key_switchTrack), Mode.MULTIPLY));
+            this.mTrackDrawable.setColorFilter(new PorterDuffColorFilter(checked ? Theme.getColor(Theme.key_switchTrackChecked) : Theme.getColor(Theme.key_switchTrack), Mode.MULTIPLY));
         }
         if (this.mThumbDrawable != null) {
-            this.mThumbDrawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(checked ? Theme.key_switchThumbChecked : Theme.key_switchThumb), Mode.MULTIPLY));
+            this.mThumbDrawable.setColorFilter(new PorterDuffColorFilter(checked ? Theme.getColor(Theme.key_switchThumbChecked) : Theme.getColor(Theme.key_switchThumb), Mode.MULTIPLY));
         }
     }
 
     public void checkColorFilters() {
         if (this.mTrackDrawable != null) {
-            this.mTrackDrawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(isChecked() ? Theme.key_switchTrackChecked : Theme.key_switchTrack), Mode.MULTIPLY));
+            this.mTrackDrawable.setColorFilter(new PorterDuffColorFilter(isChecked() ? Theme.getColor(Theme.key_switchTrackChecked) : Theme.getColor(Theme.key_switchTrack), Mode.MULTIPLY));
         }
         if (this.mThumbDrawable != null) {
-            this.mThumbDrawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(isChecked() ? Theme.key_switchThumbChecked : Theme.key_switchThumb), Mode.MULTIPLY));
+            this.mThumbDrawable.setColorFilter(new PorterDuffColorFilter(isChecked() ? Theme.getColor(Theme.key_switchThumbChecked) : Theme.getColor(Theme.key_switchThumb), Mode.MULTIPLY));
         }
+    }
+
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        int switchLeft;
+        int switchRight;
+        int switchTop;
+        int switchBottom;
+        super.onLayout(changed, left, top, right, bottom);
+        this.wasLayout = true;
+        int opticalInsetLeft = 0;
+        int opticalInsetRight = 0;
+        if (this.mThumbDrawable != null) {
+            Rect trackPadding = this.mTempRect;
+            if (this.mTrackDrawable != null) {
+                this.mTrackDrawable.getPadding(trackPadding);
+            } else {
+                trackPadding.setEmpty();
+            }
+            Insets insets = Insets.NONE;
+            opticalInsetLeft = Math.max(0, insets.left - trackPadding.left);
+            opticalInsetRight = Math.max(0, insets.right - trackPadding.right);
+        }
+        if (LocaleController.isRTL) {
+            switchLeft = getPaddingLeft() + opticalInsetLeft;
+            switchRight = ((this.mSwitchWidth + switchLeft) - opticalInsetLeft) - opticalInsetRight;
+        } else {
+            switchRight = (getWidth() - getPaddingRight()) - opticalInsetRight;
+            switchLeft = ((switchRight - this.mSwitchWidth) + opticalInsetLeft) + opticalInsetRight;
+        }
+        switch (getGravity() & 112) {
+            case 16:
+                switchTop = (((getPaddingTop() + getHeight()) - getPaddingBottom()) / 2) - (this.mSwitchHeight / 2);
+                switchBottom = switchTop + this.mSwitchHeight;
+                break;
+            case 80:
+                switchBottom = getHeight() - getPaddingBottom();
+                switchTop = switchBottom - this.mSwitchHeight;
+                break;
+            default:
+                switchTop = getPaddingTop();
+                switchBottom = switchTop + this.mSwitchHeight;
+                break;
+        }
+        this.mSwitchLeft = switchLeft;
+        this.mSwitchTop = switchTop;
+        this.mSwitchBottom = switchBottom;
+        this.mSwitchRight = switchRight;
     }
 
     public void draw(Canvas c) {
         Insets thumbInsets;
-        int trackLeft;
-        int trackTop;
-        int trackRight;
         Rect padding = this.mTempRect;
         int switchLeft = this.mSwitchLeft;
         int switchTop = this.mSwitchTop;
         int switchRight = this.mSwitchRight;
         int switchBottom = this.mSwitchBottom;
-        int thumbInitialLeft = getThumbOffset() + switchLeft;
+        int thumbInitialLeft = switchLeft + getThumbOffset();
         if (this.mThumbDrawable != null) {
             thumbInsets = Insets.NONE;
         } else {
@@ -591,9 +443,9 @@ Caused by: java.lang.NullPointerException
         if (this.mTrackDrawable != null) {
             this.mTrackDrawable.getPadding(padding);
             thumbInitialLeft += padding.left;
-            trackLeft = switchLeft;
-            trackTop = switchTop;
-            trackRight = switchRight;
+            int trackLeft = switchLeft;
+            int trackTop = switchTop;
+            int trackRight = switchRight;
             int trackBottom = switchBottom;
             if (thumbInsets != Insets.NONE) {
                 if (thumbInsets.left > padding.left) {
@@ -613,19 +465,20 @@ Caused by: java.lang.NullPointerException
         }
         if (this.mThumbDrawable != null) {
             this.mThumbDrawable.getPadding(padding);
-            trackLeft = thumbInitialLeft - padding.left;
-            trackTop = (this.mThumbWidth + thumbInitialLeft) + padding.right;
-            trackRight = AndroidUtilities.density == 1.5f ? AndroidUtilities.dp(1.0f) : 0;
-            this.mThumbDrawable.setBounds(trackLeft, switchTop + trackRight, trackTop, switchBottom + trackRight);
+            int thumbLeft = thumbInitialLeft - padding.left;
+            int thumbRight = (this.mThumbWidth + thumbInitialLeft) + padding.right;
+            int offset = AndroidUtilities.density == 1.5f ? AndroidUtilities.dp(1.0f) : 0;
+            this.mThumbDrawable.setBounds(thumbLeft, switchTop + offset, thumbRight, switchBottom + offset);
             Drawable background = getBackground();
             if (background != null && VERSION.SDK_INT >= 21) {
-                background.setHotspotBounds(trackLeft, switchTop, trackTop, switchBottom);
+                background.setHotspotBounds(thumbLeft, switchTop, thumbRight, switchBottom);
             }
         }
         super.draw(c);
     }
 
     protected void onDraw(Canvas canvas) {
+        int saveCount;
         super.onDraw(canvas);
         Rect padding = this.mTempRect;
         Drawable trackDrawable = this.mTrackDrawable;
@@ -645,17 +498,17 @@ Caused by: java.lang.NullPointerException
                 thumbDrawable.copyBounds(padding);
                 padding.left += insets.left;
                 padding.right -= insets.right;
-                int saveCount = canvas.save();
+                saveCount = canvas.save();
                 canvas.clipRect(padding, Op.DIFFERENCE);
                 trackDrawable.draw(canvas);
                 canvas.restoreToCount(saveCount);
             }
         }
-        int saveCount2 = canvas.save();
+        saveCount = canvas.save();
         if (thumbDrawable != null) {
             thumbDrawable.draw(canvas);
         }
-        canvas.restoreToCount(saveCount2);
+        canvas.restoreToCount(saveCount);
     }
 
     public int getCompoundPaddingLeft() {
@@ -721,12 +574,7 @@ Caused by: java.lang.NullPointerException
     }
 
     protected boolean verifyDrawable(Drawable who) {
-        if (!(super.verifyDrawable(who) || who == this.mThumbDrawable)) {
-            if (who != this.mTrackDrawable) {
-                return false;
-            }
-        }
-        return true;
+        return super.verifyDrawable(who) || who == this.mThumbDrawable || who == this.mTrackDrawable;
     }
 
     public void jumpDrawablesToCurrentState() {

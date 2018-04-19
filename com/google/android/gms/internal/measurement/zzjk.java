@@ -17,8 +17,6 @@ public final class zzjk extends zzhk {
     }
 
     private final void zzaf(long j) {
-        zzem com_google_android_gms_internal_measurement_zzem;
-        long j2;
         zzab();
         zzkq();
         this.zzaqp.cancel();
@@ -30,13 +28,10 @@ public final class zzjk extends zzhk {
             zzgh().zzakl.set(0);
         }
         if (zzgh().zzakj.get()) {
-            com_google_android_gms_internal_measurement_zzem = this.zzaqp;
-            j2 = zzgh().zzakh.get();
+            this.zzaqp.zzh(Math.max(0, zzgh().zzakh.get() - zzgh().zzakl.get()));
         } else {
-            com_google_android_gms_internal_measurement_zzem = this.zzaqq;
-            j2 = 3600000;
+            this.zzaqq.zzh(Math.max(0, 3600000 - zzgh().zzakl.get()));
         }
-        com_google_android_gms_internal_measurement_zzem.zzh(Math.max(0, j2 - zzgh().zzakl.get()));
     }
 
     private final void zzag(long j) {

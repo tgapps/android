@@ -57,7 +57,7 @@ public class AuthorBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (7 + Utf8.utf8StringLengthInBytes(this.author));
+        return (long) (Utf8.utf8StringLengthInBytes(this.author) + 7);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -75,11 +75,6 @@ public class AuthorBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_4, this, this));
-        StringBuilder stringBuilder = new StringBuilder("AuthorBox[language=");
-        stringBuilder.append(getLanguage());
-        stringBuilder.append(";author=");
-        stringBuilder.append(getAuthor());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "AuthorBox[language=" + getLanguage() + ";author=" + getAuthor() + "]";
     }
 }

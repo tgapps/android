@@ -52,18 +52,18 @@ final class ColorCutQuantizer {
         }
 
         final int getColorCount() {
-            return (1 + this.mUpperIndex) - this.mLowerIndex;
+            return (this.mUpperIndex + 1) - this.mLowerIndex;
         }
 
         final void fitBox() {
             int[] colors = ColorCutQuantizer.this.mColors;
             int[] hist = ColorCutQuantizer.this.mHistogram;
-            int minRed = ConnectionsManager.DEFAULT_DATACENTER_ID;
             int minBlue = ConnectionsManager.DEFAULT_DATACENTER_ID;
             int minGreen = ConnectionsManager.DEFAULT_DATACENTER_ID;
-            int maxRed = Integer.MIN_VALUE;
+            int minRed = ConnectionsManager.DEFAULT_DATACENTER_ID;
             int maxBlue = Integer.MIN_VALUE;
             int maxGreen = Integer.MIN_VALUE;
+            int maxRed = Integer.MIN_VALUE;
             int count = 0;
             for (int i = this.mLowerIndex; i <= this.mUpperIndex; i++) {
                 int color = colors[i];
@@ -160,83 +160,27 @@ final class ColorCutQuantizer {
         }
     }
 
-    static void modifySignificantOctet(int[] r1, int r2, int r3, int r4) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: android.support.v7.graphics.ColorCutQuantizer.modifySignificantOctet(int[], int, int, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        switch(r5) {
-            case -3: goto L_0x003d;
-            case -2: goto L_0x0020;
-            case -1: goto L_0x0004;
-            default: goto L_0x0003;
-        };
-        goto L_0x003e;
-        r0 = r6;
-        if (r0 > r7) goto L_0x003e;
-        r1 = r4[r0];
-        r2 = quantizedBlue(r1);
-        r2 = r2 << 10;
-        r3 = quantizedGreen(r1);
-        r3 = r3 << 5;
-        r2 = r2 | r3;
-        r3 = quantizedRed(r1);
-        r2 = r2 | r3;
-        r4[r0] = r2;
-        r0 = r0 + 1;
-        goto L_0x0005;
-        r0 = r6;
-        if (r0 > r7) goto L_0x003c;
-        r1 = r4[r0];
-        r2 = quantizedGreen(r1);
-        r2 = r2 << 10;
-        r3 = quantizedRed(r1);
-        r3 = r3 << 5;
-        r2 = r2 | r3;
-        r3 = quantizedBlue(r1);
-        r2 = r2 | r3;
-        r4[r0] = r2;
-        r0 = r0 + 1;
-        goto L_0x0021;
-        goto L_0x003e;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: android.support.v7.graphics.ColorCutQuantizer.modifySignificantOctet(int[], int, int, int):void");
-    }
-
     ColorCutQuantizer(int[] pixels, int maxColors, Filter[] filters) {
-        int i;
-        int quantizedColor;
-        int color;
         this.mFilters = filters;
         int[] hist = new int[32768];
         this.mHistogram = hist;
-        int i2 = 0;
-        for (i = 0; i < pixels.length; i++) {
-            quantizedColor = quantizeFromRgb888(pixels[i]);
+        for (int i = 0; i < pixels.length; i++) {
+            int quantizedColor = quantizeFromRgb888(pixels[i]);
             pixels[i] = quantizedColor;
             hist[quantizedColor] = hist[quantizedColor] + 1;
         }
-        quantizedColor = 0;
-        i = 0;
-        while (i < hist.length) {
-            if (hist[i] > 0 && shouldIgnoreColor(i)) {
-                hist[i] = 0;
+        int distinctColorCount = 0;
+        int color = 0;
+        while (color < hist.length) {
+            if (hist[color] > 0 && shouldIgnoreColor(color)) {
+                hist[color] = 0;
             }
-            if (hist[i] > 0) {
-                quantizedColor++;
+            if (hist[color] > 0) {
+                distinctColorCount++;
             }
-            i++;
+            color++;
         }
-        int[] colors = new int[quantizedColor];
+        int[] colors = new int[distinctColorCount];
         this.mColors = colors;
         int distinctColorIndex = 0;
         for (color = 0; color < hist.length; color++) {
@@ -246,13 +190,10 @@ Caused by: java.lang.NullPointerException
                 distinctColorIndex = distinctColorIndex2;
             }
         }
-        if (quantizedColor <= maxColors) {
+        if (distinctColorCount <= maxColors) {
             this.mQuantizedColors = new ArrayList();
-            color = colors.length;
-            while (i2 < color) {
-                distinctColorIndex2 = colors[i2];
-                this.mQuantizedColors.add(new Swatch(approximateToRgb888(distinctColorIndex2), hist[distinctColorIndex2]));
-                i2++;
+            for (int color2 : colors) {
+                this.mQuantizedColors.add(new Swatch(approximateToRgb888(color2), hist[color2]));
             }
             return;
         }
@@ -291,6 +232,27 @@ Caused by: java.lang.NullPointerException
             }
         }
         return colors;
+    }
+
+    static void modifySignificantOctet(int[] a, int dimension, int lower, int upper) {
+        int i;
+        int color;
+        switch (dimension) {
+            case -2:
+                for (i = lower; i <= upper; i++) {
+                    color = a[i];
+                    a[i] = ((quantizedGreen(color) << 10) | (quantizedRed(color) << 5)) | quantizedBlue(color);
+                }
+                return;
+            case -1:
+                for (i = lower; i <= upper; i++) {
+                    color = a[i];
+                    a[i] = ((quantizedBlue(color) << 10) | (quantizedGreen(color) << 5)) | quantizedRed(color);
+                }
+                return;
+            default:
+                return;
+        }
     }
 
     private boolean shouldIgnoreColor(int color565) {
@@ -347,6 +309,6 @@ Caused by: java.lang.NullPointerException
         } else {
             newValue = value >> (currentWidth - targetWidth);
         }
-        return newValue & ((1 << targetWidth) - 1);
+        return ((1 << targetWidth) - 1) & newValue;
     }
 }

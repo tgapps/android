@@ -8,17 +8,17 @@ import java.util.ArrayList;
 public final class zzg implements Creator<Cart> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        String str = null;
         ArrayList arrayList = new ArrayList();
+        String str = null;
         String str2 = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = SafeParcelReader.createString(parcel, readHeader);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
                     arrayList = SafeParcelReader.createTypedList(parcel, readHeader, LineItem.CREATOR);
@@ -29,7 +29,7 @@ public final class zzg implements Creator<Cart> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new Cart(str, str2, arrayList);
+        return new Cart(str2, str, arrayList);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

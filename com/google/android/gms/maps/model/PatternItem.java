@@ -15,18 +15,11 @@ public class PatternItem extends AbstractSafeParcelable {
 
     public PatternItem(int i, Float f) {
         boolean z = true;
-        if (i != 1) {
-            if (f == null || f.floatValue() < 0.0f) {
-                z = false;
-            }
+        if (i != 1 && (f == null || f.floatValue() < 0.0f)) {
+            z = false;
         }
         String valueOf = String.valueOf(f);
-        StringBuilder stringBuilder = new StringBuilder(45 + String.valueOf(valueOf).length());
-        stringBuilder.append("Invalid PatternItem: type=");
-        stringBuilder.append(i);
-        stringBuilder.append(" length=");
-        stringBuilder.append(valueOf);
-        Preconditions.checkArgument(z, stringBuilder.toString());
+        Preconditions.checkArgument(z, new StringBuilder(String.valueOf(valueOf).length() + 45).append("Invalid PatternItem: type=").append(i).append(" length=").append(valueOf).toString());
         this.type = i;
         this.zzdu = f;
     }
@@ -49,19 +42,13 @@ public class PatternItem extends AbstractSafeParcelable {
     public String toString() {
         int i = this.type;
         String valueOf = String.valueOf(this.zzdu);
-        StringBuilder stringBuilder = new StringBuilder(39 + String.valueOf(valueOf).length());
-        stringBuilder.append("[PatternItem: type=");
-        stringBuilder.append(i);
-        stringBuilder.append(" length=");
-        stringBuilder.append(valueOf);
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return new StringBuilder(String.valueOf(valueOf).length() + 39).append("[PatternItem: type=").append(i).append(" length=").append(valueOf).append("]").toString();
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 2, this.type);
         SafeParcelWriter.writeFloatObject(parcel, 3, this.zzdu, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

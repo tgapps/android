@@ -8,17 +8,17 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public class AuthAccountResultCreator implements Creator<AuthAccountResult> {
     public AuthAccountResult createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        int i = 0;
         Intent intent = null;
+        int i = 0;
         int i2 = 0;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
-                    i2 = SafeParcelReader.readInt(parcel, readHeader);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
                     intent = (Intent) SafeParcelReader.createParcelable(parcel, readHeader, Intent.CREATOR);
@@ -29,7 +29,7 @@ public class AuthAccountResultCreator implements Creator<AuthAccountResult> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new AuthAccountResult(i, i2, intent);
+        return new AuthAccountResult(i2, i, intent);
     }
 
     public AuthAccountResult[] newArray(int i) {

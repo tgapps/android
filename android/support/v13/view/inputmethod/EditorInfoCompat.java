@@ -22,12 +22,15 @@ public final class EditorInfoCompat {
         String[] result;
         if (VERSION.SDK_INT >= 25) {
             result = editorInfo.contentMimeTypes;
-            return result != null ? result : EMPTY_STRING_ARRAY;
+            if (result != null) {
+                return result;
+            }
+            return EMPTY_STRING_ARRAY;
         } else if (editorInfo.extras == null) {
             return EMPTY_STRING_ARRAY;
         } else {
             result = editorInfo.extras.getStringArray("android.support.v13.view.inputmethod.EditorInfoCompat.CONTENT_MIME_TYPES");
-            return result != null ? result : EMPTY_STRING_ARRAY;
+            return result == null ? EMPTY_STRING_ARRAY : result;
         }
     }
 }

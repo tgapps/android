@@ -65,33 +65,29 @@ public final class DataHolder extends AbstractSafeParcelable implements Closeabl
         }
 
         public Builder withRow(HashMap<String, Object> hashMap) {
-            int intValue;
+            int i;
             Asserts.checkNotNull(hashMap);
-            if (this.zznv != null) {
+            if (this.zznv == null) {
+                i = -1;
+            } else {
                 Object obj = hashMap.get(this.zznv);
-                if (obj != null) {
+                if (obj == null) {
+                    i = -1;
+                } else {
                     Integer num = (Integer) this.zznw.get(obj);
                     if (num == null) {
                         this.zznw.put(obj, Integer.valueOf(this.zznu.size()));
+                        i = -1;
                     } else {
-                        intValue = num.intValue();
-                        if (intValue != -1) {
-                            this.zznu.add(hashMap);
-                        } else {
-                            this.zznu.remove(intValue);
-                            this.zznu.add(intValue, hashMap);
-                        }
-                        this.zznx = false;
-                        return this;
+                        i = num.intValue();
                     }
                 }
             }
-            intValue = -1;
-            if (intValue != -1) {
-                this.zznu.remove(intValue);
-                this.zznu.add(intValue, hashMap);
-            } else {
+            if (i == -1) {
                 this.zznu.add(hashMap);
+            } else {
+                this.zznu.remove(i);
+                this.zznu.add(i, hashMap);
             }
             this.zznx = false;
             return this;
@@ -134,22 +130,15 @@ public final class DataHolder extends AbstractSafeParcelable implements Closeabl
     }
 
     private final void zza(String str, int i) {
-        if (this.zznn != null) {
-            if (this.zznn.containsKey(str)) {
-                if (isClosed()) {
-                    throw new IllegalArgumentException("Buffer is closed.");
-                }
-                if (i >= 0) {
-                    if (i < this.zznr) {
-                        return;
-                    }
-                }
-                throw new CursorIndexOutOfBoundsException(i, this.zznr);
-            }
+        if (this.zznn == null || !this.zznn.containsKey(str)) {
+            String str2 = "No such column: ";
+            String valueOf = String.valueOf(str);
+            throw new IllegalArgumentException(valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2));
+        } else if (isClosed()) {
+            throw new IllegalArgumentException("Buffer is closed.");
+        } else if (i < 0 || i >= this.zznr) {
+            throw new CursorIndexOutOfBoundsException(i, this.zznr);
         }
-        String str2 = "No such column: ";
-        str = String.valueOf(str);
-        throw new IllegalArgumentException(str.length() != 0 ? str2.concat(str) : new String(str2));
     }
 
     private static CursorWindow[] zza(Builder builder, int i) {
@@ -157,193 +146,82 @@ public final class DataHolder extends AbstractSafeParcelable implements Closeabl
         if (builder.zznm.length == 0) {
             return new CursorWindow[0];
         }
-        List subList;
-        int size;
-        CursorWindow cursorWindow;
-        ArrayList arrayList;
-        int i3;
-        CursorWindow cursorWindow2;
-        int i4;
-        Map map;
-        boolean z;
-        int i5;
-        String str;
-        Object obj;
-        long longValue;
-        if (i >= 0) {
-            if (i < builder.zznu.size()) {
-                subList = builder.zznu.subList(0, i);
-                size = subList.size();
-                cursorWindow = new CursorWindow(false);
-                arrayList = new ArrayList();
-                arrayList.add(cursorWindow);
-                cursorWindow.setNumColumns(builder.zznm.length);
-                i3 = 0;
-                cursorWindow2 = cursorWindow;
-                i4 = i3;
-                while (i4 < size) {
-                    try {
-                        if (!cursorWindow2.allocRow()) {
-                            StringBuilder stringBuilder = new StringBuilder(72);
-                            stringBuilder.append("Allocating additional cursor window for large data set (row ");
-                            stringBuilder.append(i4);
-                            stringBuilder.append(")");
-                            Log.d("DataHolder", stringBuilder.toString());
-                            cursorWindow2 = new CursorWindow(false);
-                            cursorWindow2.setStartPosition(i4);
-                            cursorWindow2.setNumColumns(builder.zznm.length);
-                            arrayList.add(cursorWindow2);
-                            if (!cursorWindow2.allocRow()) {
-                                Log.e("DataHolder", "Unable to allocate row to hold data.");
-                                arrayList.remove(cursorWindow2);
-                                return (CursorWindow[]) arrayList.toArray(new CursorWindow[arrayList.size()]);
-                            }
-                        }
-                        map = (Map) subList.get(i4);
-                        z = true;
-                        for (i5 = 0; i5 < builder.zznm.length && z; i5++) {
-                            str = builder.zznm[i5];
-                            obj = map.get(str);
-                            if (obj == null) {
-                                z = cursorWindow2.putNull(i4, i5);
-                            } else if (obj instanceof String) {
-                                if (obj instanceof Long) {
-                                    longValue = ((Long) obj).longValue();
-                                } else if (obj instanceof Integer) {
-                                    z = cursorWindow2.putLong((long) ((Integer) obj).intValue(), i4, i5);
-                                } else if (obj instanceof Boolean) {
-                                    longValue = ((Boolean) obj).booleanValue() ? 1 : 0;
-                                } else if (obj instanceof byte[]) {
-                                    z = cursorWindow2.putBlob((byte[]) obj, i4, i5);
-                                } else if (obj instanceof Double) {
-                                    z = cursorWindow2.putDouble(((Double) obj).doubleValue(), i4, i5);
-                                } else if (obj instanceof Float) {
-                                    String valueOf = String.valueOf(obj);
-                                    StringBuilder stringBuilder2 = new StringBuilder((32 + String.valueOf(str).length()) + String.valueOf(valueOf).length());
-                                    stringBuilder2.append("Unsupported object for column ");
-                                    stringBuilder2.append(str);
-                                    stringBuilder2.append(": ");
-                                    stringBuilder2.append(valueOf);
-                                    throw new IllegalArgumentException(stringBuilder2.toString());
-                                } else {
-                                    z = cursorWindow2.putDouble((double) ((Float) obj).floatValue(), i4, i5);
-                                }
-                                z = cursorWindow2.putLong(longValue, i4, i5);
-                            } else {
-                                z = cursorWindow2.putString((String) obj, i4, i5);
-                            }
-                        }
-                        if (!z) {
-                            i3 = 0;
-                        } else if (i3 == 0) {
-                            throw new DataHolderException("Could not add the value to a new CursorWindow. The size of value may be larger than what a CursorWindow can handle.");
-                        } else {
-                            StringBuilder stringBuilder3 = new StringBuilder(74);
-                            stringBuilder3.append("Couldn't populate window data for row ");
-                            stringBuilder3.append(i4);
-                            stringBuilder3.append(" - allocating new window.");
-                            Log.d("DataHolder", stringBuilder3.toString());
-                            cursorWindow2.freeLastRow();
-                            cursorWindow2 = new CursorWindow(false);
-                            cursorWindow2.setStartPosition(i4);
-                            cursorWindow2.setNumColumns(builder.zznm.length);
-                            arrayList.add(cursorWindow2);
-                            i4--;
-                            i3 = 1;
-                        }
-                        i4++;
-                    } catch (RuntimeException e) {
-                        i = arrayList.size();
-                        while (i2 < i) {
-                            ((CursorWindow) arrayList.get(i2)).close();
-                            i2++;
-                        }
-                        throw e;
-                    }
-                }
-                return (CursorWindow[]) arrayList.toArray(new CursorWindow[arrayList.size()]);
-            }
-        }
-        subList = builder.zznu;
-        size = subList.size();
-        cursorWindow = new CursorWindow(false);
-        arrayList = new ArrayList();
+        List zzb = (i < 0 || i >= builder.zznu.size()) ? builder.zznu : builder.zznu.subList(0, i);
+        int size = zzb.size();
+        CursorWindow cursorWindow = new CursorWindow(false);
+        ArrayList arrayList = new ArrayList();
         arrayList.add(cursorWindow);
         cursorWindow.setNumColumns(builder.zznm.length);
-        i3 = 0;
-        cursorWindow2 = cursorWindow;
-        i4 = i3;
-        while (i4 < size) {
-            if (cursorWindow2.allocRow()) {
-                StringBuilder stringBuilder4 = new StringBuilder(72);
-                stringBuilder4.append("Allocating additional cursor window for large data set (row ");
-                stringBuilder4.append(i4);
-                stringBuilder4.append(")");
-                Log.d("DataHolder", stringBuilder4.toString());
-                cursorWindow2 = new CursorWindow(false);
-                cursorWindow2.setStartPosition(i4);
-                cursorWindow2.setNumColumns(builder.zznm.length);
-                arrayList.add(cursorWindow2);
-                if (cursorWindow2.allocRow()) {
-                    Log.e("DataHolder", "Unable to allocate row to hold data.");
-                    arrayList.remove(cursorWindow2);
-                    return (CursorWindow[]) arrayList.toArray(new CursorWindow[arrayList.size()]);
-                }
-            }
-            map = (Map) subList.get(i4);
-            z = true;
-            for (i5 = 0; i5 < builder.zznm.length; i5++) {
-                str = builder.zznm[i5];
-                obj = map.get(str);
-                if (obj == null) {
-                    z = cursorWindow2.putNull(i4, i5);
-                } else if (obj instanceof String) {
-                    if (obj instanceof Long) {
-                        longValue = ((Long) obj).longValue();
-                    } else if (obj instanceof Integer) {
-                        z = cursorWindow2.putLong((long) ((Integer) obj).intValue(), i4, i5);
-                    } else if (obj instanceof Boolean) {
-                        if (((Boolean) obj).booleanValue()) {
-                        }
-                    } else if (obj instanceof byte[]) {
-                        z = cursorWindow2.putBlob((byte[]) obj, i4, i5);
-                    } else if (obj instanceof Double) {
-                        z = cursorWindow2.putDouble(((Double) obj).doubleValue(), i4, i5);
-                    } else if (obj instanceof Float) {
-                        String valueOf2 = String.valueOf(obj);
-                        StringBuilder stringBuilder22 = new StringBuilder((32 + String.valueOf(str).length()) + String.valueOf(valueOf2).length());
-                        stringBuilder22.append("Unsupported object for column ");
-                        stringBuilder22.append(str);
-                        stringBuilder22.append(": ");
-                        stringBuilder22.append(valueOf2);
-                        throw new IllegalArgumentException(stringBuilder22.toString());
-                    } else {
-                        z = cursorWindow2.putDouble((double) ((Float) obj).floatValue(), i4, i5);
+        int i3 = 0;
+        int i4 = 0;
+        while (i3 < size) {
+            try {
+                int i5;
+                int i6;
+                if (!cursorWindow.allocRow()) {
+                    Log.d("DataHolder", "Allocating additional cursor window for large data set (row " + i3 + ")");
+                    cursorWindow = new CursorWindow(false);
+                    cursorWindow.setStartPosition(i3);
+                    cursorWindow.setNumColumns(builder.zznm.length);
+                    arrayList.add(cursorWindow);
+                    if (!cursorWindow.allocRow()) {
+                        Log.e("DataHolder", "Unable to allocate row to hold data.");
+                        arrayList.remove(cursorWindow);
+                        return (CursorWindow[]) arrayList.toArray(new CursorWindow[arrayList.size()]);
                     }
-                    z = cursorWindow2.putLong(longValue, i4, i5);
-                } else {
-                    z = cursorWindow2.putString((String) obj, i4, i5);
                 }
+                Map map = (Map) zzb.get(i3);
+                boolean z = true;
+                for (int i7 = 0; i7 < builder.zznm.length && z; i7++) {
+                    String str = builder.zznm[i7];
+                    Object obj = map.get(str);
+                    if (obj == null) {
+                        z = cursorWindow.putNull(i3, i7);
+                    } else if (obj instanceof String) {
+                        z = cursorWindow.putString((String) obj, i3, i7);
+                    } else if (obj instanceof Long) {
+                        z = cursorWindow.putLong(((Long) obj).longValue(), i3, i7);
+                    } else if (obj instanceof Integer) {
+                        z = cursorWindow.putLong((long) ((Integer) obj).intValue(), i3, i7);
+                    } else if (obj instanceof Boolean) {
+                        z = cursorWindow.putLong(((Boolean) obj).booleanValue() ? 1 : 0, i3, i7);
+                    } else if (obj instanceof byte[]) {
+                        z = cursorWindow.putBlob((byte[]) obj, i3, i7);
+                    } else if (obj instanceof Double) {
+                        z = cursorWindow.putDouble(((Double) obj).doubleValue(), i3, i7);
+                    } else if (obj instanceof Float) {
+                        z = cursorWindow.putDouble((double) ((Float) obj).floatValue(), i3, i7);
+                    } else {
+                        String valueOf = String.valueOf(obj);
+                        throw new IllegalArgumentException(new StringBuilder((String.valueOf(str).length() + 32) + String.valueOf(valueOf).length()).append("Unsupported object for column ").append(str).append(": ").append(valueOf).toString());
+                    }
+                }
+                if (z) {
+                    i5 = i3;
+                    i6 = 0;
+                } else if (i4 != 0) {
+                    throw new DataHolderException("Could not add the value to a new CursorWindow. The size of value may be larger than what a CursorWindow can handle.");
+                } else {
+                    Log.d("DataHolder", "Couldn't populate window data for row " + i3 + " - allocating new window.");
+                    cursorWindow.freeLastRow();
+                    cursorWindow = new CursorWindow(false);
+                    cursorWindow.setStartPosition(i3);
+                    cursorWindow.setNumColumns(builder.zznm.length);
+                    arrayList.add(cursorWindow);
+                    i5 = i3 - 1;
+                    i6 = 1;
+                }
+                i3 = i5 + 1;
+                i4 = i6;
+            } catch (RuntimeException e) {
+                RuntimeException runtimeException = e;
+                int size2 = arrayList.size();
+                while (i2 < size2) {
+                    ((CursorWindow) arrayList.get(i2)).close();
+                    i2++;
+                }
+                throw runtimeException;
             }
-            if (!z) {
-                i3 = 0;
-            } else if (i3 == 0) {
-                StringBuilder stringBuilder32 = new StringBuilder(74);
-                stringBuilder32.append("Couldn't populate window data for row ");
-                stringBuilder32.append(i4);
-                stringBuilder32.append(" - allocating new window.");
-                Log.d("DataHolder", stringBuilder32.toString());
-                cursorWindow2.freeLastRow();
-                cursorWindow2 = new CursorWindow(false);
-                cursorWindow2.setStartPosition(i4);
-                cursorWindow2.setNumColumns(builder.zznm.length);
-                arrayList.add(cursorWindow2);
-                i4--;
-                i3 = 1;
-            } else {
-                throw new DataHolderException("Could not add the value to a new CursorWindow. The size of value may be larger than what a CursorWindow can handle.");
-            }
-            i4++;
         }
         return (CursorWindow[]) arrayList.toArray(new CursorWindow[arrayList.size()]);
     }
@@ -364,11 +242,7 @@ public final class DataHolder extends AbstractSafeParcelable implements Closeabl
             if (this.zzns && this.zzno.length > 0 && !isClosed()) {
                 close();
                 String obj = toString();
-                StringBuilder stringBuilder = new StringBuilder(178 + String.valueOf(obj).length());
-                stringBuilder.append("Internal data leak within a DataBuffer object detected!  Be sure to explicitly call release() on all DataBuffer extending objects when you are done with them. (internal object: ");
-                stringBuilder.append(obj);
-                stringBuilder.append(")");
-                Log.e("DataBuffer", stringBuilder.toString());
+                Log.e("DataBuffer", new StringBuilder(String.valueOf(obj).length() + 178).append("Internal data leak within a DataBuffer object detected!  Be sure to explicitly call release() on all DataBuffer extending objects when you are done with them. (internal object: ").append(obj).append(")").toString());
             }
             super.finalize();
         } catch (Throwable th) {
@@ -428,18 +302,16 @@ public final class DataHolder extends AbstractSafeParcelable implements Closeabl
     public final void validateContents() {
         int i;
         this.zznn = new Bundle();
-        int i2 = 0;
         for (i = 0; i < this.zznm.length; i++) {
             this.zznn.putInt(this.zznm[i], i);
         }
         this.zznq = new int[this.zzno.length];
-        i = 0;
-        while (i2 < this.zzno.length) {
-            this.zznq[i2] = i;
-            i += this.zzno[i2].getNumRows() - (i - this.zzno[i2].getStartPosition());
-            i2++;
+        int i2 = 0;
+        for (i = 0; i < this.zzno.length; i++) {
+            this.zznq[i] = i2;
+            i2 += this.zzno[i].getNumRows() - (i2 - this.zzno[i].getStartPosition());
         }
-        this.zznr = i;
+        this.zznr = i2;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {

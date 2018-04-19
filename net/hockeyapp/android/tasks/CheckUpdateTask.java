@@ -14,6 +14,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 import net.hockeyapp.android.Constants;
 import net.hockeyapp.android.Tracking;
 import net.hockeyapp.android.UpdateManagerListener;
@@ -69,7 +70,13 @@ public class CheckUpdateTask extends AsyncTask<Void, String, JSONArray> {
     }
 
     protected JSONArray doInBackground(Void... args) {
-        Context context = this.weakContext != null ? (Context) this.weakContext.get() : null;
+        Context context;
+        Exception e;
+        if (this.weakContext != null) {
+            context = (Context) this.weakContext.get();
+        } else {
+            context = null;
+        }
         if (context == null) {
             return null;
         }
@@ -85,12 +92,20 @@ public class CheckUpdateTask extends AsyncTask<Void, String, JSONArray> {
             if (findNewVersion(context, json, versionCode)) {
                 return limitResponseSize(json);
             }
-            return null;
-        } catch (Exception e) {
+        } catch (IOException e2) {
+            e = e2;
             if (Util.isConnectedToNetwork(context)) {
                 HockeyLog.error("HockeyUpdate", "Could not fetch updates although connected to internet", e);
             }
+            return null;
+        } catch (JSONException e3) {
+            e = e3;
+            if (Util.isConnectedToNetwork(context)) {
+                HockeyLog.error("HockeyUpdate", "Could not fetch updates although connected to internet", e);
+            }
+            return null;
         }
+        return null;
     }
 
     protected URLConnection createConnection(URL url) throws IOException {
@@ -104,11 +119,23 @@ public class CheckUpdateTask extends AsyncTask<Void, String, JSONArray> {
         int index = 0;
         while (index < json.length()) {
             try {
+                boolean largerVersionCode;
                 JSONObject entry = json.getJSONObject(index);
-                boolean minRequirementsMet = true;
-                boolean largerVersionCode = entry.getInt("version") > versionCode;
-                boolean newerApkFile = entry.getInt("version") == versionCode && VersionHelper.isNewerThanLastUpdateTime(context, entry.getLong("timestamp"));
-                if (VersionHelper.compareVersionStrings(entry.getString("minimum_os_version"), VersionHelper.mapGoogleVersion(VERSION.RELEASE)) > 0) {
+                if (entry.getInt("version") > versionCode) {
+                    largerVersionCode = true;
+                } else {
+                    largerVersionCode = false;
+                }
+                boolean newerApkFile;
+                if (entry.getInt("version") == versionCode && VersionHelper.isNewerThanLastUpdateTime(context, entry.getLong("timestamp"))) {
+                    newerApkFile = true;
+                } else {
+                    newerApkFile = false;
+                }
+                boolean minRequirementsMet;
+                if (VersionHelper.compareVersionStrings(entry.getString("minimum_os_version"), VersionHelper.mapGoogleVersion(VERSION.RELEASE)) <= 0) {
+                    minRequirementsMet = true;
+                } else {
                     minRequirementsMet = false;
                 }
                 if ((largerVersionCode || newerApkFile) && minRequirementsMet) {
@@ -157,50 +184,90 @@ public class CheckUpdateTask extends AsyncTask<Void, String, JSONArray> {
     }
 
     private String getURLString(Context context, String format) {
+        Throwable e;
+        SharedPreferences prefs;
+        String auid;
+        String iuid;
         StringBuilder builder = new StringBuilder();
         builder.append(this.urlString);
         builder.append("api/2/apps/");
         builder.append(this.appIdentifier != null ? this.appIdentifier : context.getPackageName());
-        builder.append("?format=");
-        builder.append(format);
+        builder.append("?format=").append(format);
         String deviceIdentifier = null;
         try {
             deviceIdentifier = (String) Constants.getDeviceIdentifier().get();
-        } catch (Throwable e) {
+        } catch (InterruptedException e2) {
+            e = e2;
             HockeyLog.debug("Error get device identifier", e);
+            if (!TextUtils.isEmpty(deviceIdentifier)) {
+                builder.append("&udid=").append(encodeParam(deviceIdentifier));
+            }
+            prefs = context.getSharedPreferences("net.hockeyapp.android.login", 0);
+            auid = prefs.getString("auid", null);
+            if (!TextUtils.isEmpty(auid)) {
+                builder.append("&auid=").append(encodeParam(auid));
+            }
+            iuid = prefs.getString("iuid", null);
+            if (!TextUtils.isEmpty(iuid)) {
+                builder.append("&iuid=").append(encodeParam(iuid));
+            }
+            builder.append("&os=Android");
+            builder.append("&os_version=").append(encodeParam(Constants.ANDROID_VERSION));
+            builder.append("&device=").append(encodeParam(Constants.PHONE_MODEL));
+            builder.append("&oem=").append(encodeParam(Constants.PHONE_MANUFACTURER));
+            builder.append("&app_version=").append(encodeParam(Constants.APP_VERSION));
+            builder.append("&sdk=").append(encodeParam("HockeySDK"));
+            builder.append("&sdk_version=").append(encodeParam("5.0.4"));
+            builder.append("&lang=").append(encodeParam(Locale.getDefault().getLanguage()));
+            builder.append("&usage_time=").append(this.usageTime);
+            return builder.toString();
+        } catch (ExecutionException e3) {
+            e = e3;
+            HockeyLog.debug("Error get device identifier", e);
+            if (TextUtils.isEmpty(deviceIdentifier)) {
+                builder.append("&udid=").append(encodeParam(deviceIdentifier));
+            }
+            prefs = context.getSharedPreferences("net.hockeyapp.android.login", 0);
+            auid = prefs.getString("auid", null);
+            if (TextUtils.isEmpty(auid)) {
+                builder.append("&auid=").append(encodeParam(auid));
+            }
+            iuid = prefs.getString("iuid", null);
+            if (TextUtils.isEmpty(iuid)) {
+                builder.append("&iuid=").append(encodeParam(iuid));
+            }
+            builder.append("&os=Android");
+            builder.append("&os_version=").append(encodeParam(Constants.ANDROID_VERSION));
+            builder.append("&device=").append(encodeParam(Constants.PHONE_MODEL));
+            builder.append("&oem=").append(encodeParam(Constants.PHONE_MANUFACTURER));
+            builder.append("&app_version=").append(encodeParam(Constants.APP_VERSION));
+            builder.append("&sdk=").append(encodeParam("HockeySDK"));
+            builder.append("&sdk_version=").append(encodeParam("5.0.4"));
+            builder.append("&lang=").append(encodeParam(Locale.getDefault().getLanguage()));
+            builder.append("&usage_time=").append(this.usageTime);
+            return builder.toString();
         }
-        if (!TextUtils.isEmpty(deviceIdentifier)) {
-            builder.append("&udid=");
-            builder.append(encodeParam(deviceIdentifier));
+        if (TextUtils.isEmpty(deviceIdentifier)) {
+            builder.append("&udid=").append(encodeParam(deviceIdentifier));
         }
-        SharedPreferences prefs = context.getSharedPreferences("net.hockeyapp.android.login", 0);
-        String auid = prefs.getString("auid", null);
-        if (!TextUtils.isEmpty(auid)) {
-            builder.append("&auid=");
-            builder.append(encodeParam(auid));
+        prefs = context.getSharedPreferences("net.hockeyapp.android.login", 0);
+        auid = prefs.getString("auid", null);
+        if (TextUtils.isEmpty(auid)) {
+            builder.append("&auid=").append(encodeParam(auid));
         }
-        String iuid = prefs.getString("iuid", null);
-        if (!TextUtils.isEmpty(iuid)) {
-            builder.append("&iuid=");
-            builder.append(encodeParam(iuid));
+        iuid = prefs.getString("iuid", null);
+        if (TextUtils.isEmpty(iuid)) {
+            builder.append("&iuid=").append(encodeParam(iuid));
         }
         builder.append("&os=Android");
-        builder.append("&os_version=");
-        builder.append(encodeParam(Constants.ANDROID_VERSION));
-        builder.append("&device=");
-        builder.append(encodeParam(Constants.PHONE_MODEL));
-        builder.append("&oem=");
-        builder.append(encodeParam(Constants.PHONE_MANUFACTURER));
-        builder.append("&app_version=");
-        builder.append(encodeParam(Constants.APP_VERSION));
-        builder.append("&sdk=");
-        builder.append(encodeParam("HockeySDK"));
-        builder.append("&sdk_version=");
-        builder.append(encodeParam("5.0.4"));
-        builder.append("&lang=");
-        builder.append(encodeParam(Locale.getDefault().getLanguage()));
-        builder.append("&usage_time=");
-        builder.append(this.usageTime);
+        builder.append("&os_version=").append(encodeParam(Constants.ANDROID_VERSION));
+        builder.append("&device=").append(encodeParam(Constants.PHONE_MODEL));
+        builder.append("&oem=").append(encodeParam(Constants.PHONE_MANUFACTURER));
+        builder.append("&app_version=").append(encodeParam(Constants.APP_VERSION));
+        builder.append("&sdk=").append(encodeParam("HockeySDK"));
+        builder.append("&sdk_version=").append(encodeParam("5.0.4"));
+        builder.append("&lang=").append(encodeParam(Locale.getDefault().getLanguage()));
+        builder.append("&usage_time=").append(this.usageTime);
         return builder.toString();
     }
 

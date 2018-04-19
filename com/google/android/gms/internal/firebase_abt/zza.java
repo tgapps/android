@@ -19,9 +19,9 @@ public final class zza {
     private zza(byte[] bArr, int i, int i2) {
         this.buffer = bArr;
         this.zzh = i;
-        i2 += i;
-        this.zzj = i2;
-        this.zzi = i2;
+        int i3 = i + i2;
+        this.zzj = i3;
+        this.zzi = i3;
         this.zzl = i;
     }
 
@@ -75,7 +75,7 @@ public final class zza {
             throw zzi.zzl();
         } else {
             String str = new String(this.buffer, this.zzl, zzg, zzh.UTF_8);
-            this.zzl += zzg;
+            this.zzl = zzg + this.zzl;
             return str;
         }
     }
@@ -120,18 +120,9 @@ public final class zza {
 
     final void zzb(int i, int i2) {
         if (i > this.zzl - this.zzh) {
-            int i3 = this.zzl - this.zzh;
-            StringBuilder stringBuilder = new StringBuilder(50);
-            stringBuilder.append("Position ");
-            stringBuilder.append(i);
-            stringBuilder.append(" is beyond current ");
-            stringBuilder.append(i3);
-            throw new IllegalArgumentException(stringBuilder.toString());
+            throw new IllegalArgumentException("Position " + i + " is beyond current " + (this.zzl - this.zzh));
         } else if (i < 0) {
-            StringBuilder stringBuilder2 = new StringBuilder(24);
-            stringBuilder2.append("Bad position ");
-            stringBuilder2.append(i);
-            throw new IllegalArgumentException(stringBuilder2.toString());
+            throw new IllegalArgumentException("Bad position " + i);
         } else {
             this.zzl = this.zzh + i;
             this.zzm = 106;
@@ -194,16 +185,13 @@ public final class zza {
     }
 
     public final long zze() throws IOException {
-        int i = 0;
         long j = 0;
-        while (i < 64) {
+        for (int i = 0; i < 64; i += 7) {
             byte zzi = zzi();
-            long j2 = j | (((long) (zzi & 127)) << i);
+            j |= ((long) (zzi & 127)) << i;
             if ((zzi & 128) == 0) {
-                return j2;
+                return j;
             }
-            i += 7;
-            j = j2;
         }
         throw zzi.zzn();
     }
@@ -217,37 +205,32 @@ public final class zza {
         if (zzi >= (byte) 0) {
             return zzi;
         }
-        int i;
-        int i2 = zzi & 127;
+        int i = zzi & 127;
         byte zzi2 = zzi();
         if (zzi2 >= (byte) 0) {
-            i = zzi2 << 7;
-        } else {
-            i2 |= (zzi2 & 127) << 7;
-            zzi2 = zzi();
-            if (zzi2 >= (byte) 0) {
-                i = zzi2 << 14;
-            } else {
-                i2 |= (zzi2 & 127) << 14;
-                zzi2 = zzi();
-                if (zzi2 >= (byte) 0) {
-                    i = zzi2 << 21;
-                } else {
-                    i2 |= (zzi2 & 127) << 21;
-                    zzi2 = zzi();
-                    i2 |= zzi2 << 28;
-                    if (zzi2 >= (byte) 0) {
-                        return i2;
-                    }
-                    for (i = 0; i < 5; i++) {
-                        if (zzi() >= (byte) 0) {
-                            return i2;
-                        }
-                    }
-                    throw zzi.zzn();
-                }
+            return i | (zzi2 << 7);
+        }
+        i |= (zzi2 & 127) << 7;
+        zzi2 = zzi();
+        if (zzi2 >= (byte) 0) {
+            return i | (zzi2 << 14);
+        }
+        i |= (zzi2 & 127) << 14;
+        zzi2 = zzi();
+        if (zzi2 >= (byte) 0) {
+            return i | (zzi2 << 21);
+        }
+        i |= (zzi2 & 127) << 21;
+        zzi2 = zzi();
+        i |= zzi2 << 28;
+        if (zzi2 >= (byte) 0) {
+            return i;
+        }
+        for (int i2 = 0; i2 < 5; i2++) {
+            if (zzi() >= (byte) 0) {
+                return i;
             }
         }
-        return i2 | i;
+        throw zzi.zzn();
     }
 }

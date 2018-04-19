@@ -19,10 +19,10 @@ public final class zzge extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 2, this.statusCode);
         SafeParcelWriter.writeLong(parcel, 3, this.zzep);
         SafeParcelWriter.writeTypedList(parcel, 4, this.zzer, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -12,13 +12,13 @@ abstract class zzat implements Runnable {
         try {
             if (!Thread.interrupted()) {
                 zzaq();
+                this.zzhv.zzga.unlock();
             }
         } catch (RuntimeException e) {
             this.zzhv.zzhf.zzb(e);
-        } catch (Throwable th) {
+        } finally {
             this.zzhv.zzga.unlock();
         }
-        this.zzhv.zzga.unlock();
     }
 
     protected abstract void zzaq();

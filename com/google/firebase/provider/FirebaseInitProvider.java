@@ -32,16 +32,11 @@ public class FirebaseInitProvider extends ContentProvider {
     }
 
     public boolean onCreate() {
-        String str;
-        String str2;
         if (FirebaseApp.initializeApp(getContext()) == null) {
-            str = "FirebaseInitProvider";
-            str2 = "FirebaseApp initialization unsuccessful";
+            Log.i("FirebaseInitProvider", "FirebaseApp initialization unsuccessful");
         } else {
-            str = "FirebaseInitProvider";
-            str2 = "FirebaseApp initialization successful";
+            Log.i("FirebaseInitProvider", "FirebaseApp initialization successful");
         }
-        Log.i(str, str2);
         return false;
     }
 

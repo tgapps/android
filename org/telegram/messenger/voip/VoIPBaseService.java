@@ -43,6 +43,7 @@ import android.media.SoundPool;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -115,19 +116,22 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
     public static final int STATE_RECONNECTING = 5;
     public static final int STATE_WAIT_INIT = 1;
     public static final int STATE_WAIT_INIT_ACK = 2;
-    protected static final boolean USE_CONNECTION_SERVICE = false;
+    protected static final boolean USE_CONNECTION_SERVICE = isDeviceCompatibleWithConnectionServiceAPI();
     protected static VoIPBaseService sharedInstance;
     protected Runnable afterSoundRunnable = new Runnable() {
         public void run() {
             VoIPBaseService.this.soundPool.release();
-            if (VoIPBaseService.this.isBtHeadsetConnected) {
-                ((AudioManager) ApplicationLoader.applicationContext.getSystemService(MimeTypes.BASE_TYPE_AUDIO)).stopBluetoothSco();
+            if (!VoIPBaseService.USE_CONNECTION_SERVICE) {
+                if (VoIPBaseService.this.isBtHeadsetConnected) {
+                    ((AudioManager) ApplicationLoader.applicationContext.getSystemService(MimeTypes.BASE_TYPE_AUDIO)).stopBluetoothSco();
+                }
+                ((AudioManager) ApplicationLoader.applicationContext.getSystemService(MimeTypes.BASE_TYPE_AUDIO)).setSpeakerphoneOn(false);
             }
-            ((AudioManager) ApplicationLoader.applicationContext.getSystemService(MimeTypes.BASE_TYPE_AUDIO)).setSpeakerphoneOn(false);
         }
     };
     protected boolean audioConfigured;
     protected int audioRouteToSet = 2;
+    protected boolean bluetoothScoActive = false;
     protected BluetoothAdapter btAdapter;
     protected int callDiscardReason;
     protected VoIPController controller;
@@ -146,6 +150,7 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
     private Boolean mHasEarpiece = null;
     protected boolean micMute;
     protected boolean needPlayEndSound;
+    protected boolean needSwitchToBluetoothAfterScoActivates = false;
     protected Notification ongoingCallNotification;
     protected boolean playingSound;
     protected Stats prevStats = new Stats();
@@ -168,12 +173,37 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
             } else if ("android.net.conn.CONNECTIVITY_CHANGE".equals(intent.getAction())) {
                 VoIPBaseService.this.updateNetworkType();
             } else if ("android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED".equals(intent.getAction())) {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.e("bt headset state = " + intent.getIntExtra("android.bluetooth.profile.extra.STATE", 0));
+                }
                 voIPBaseService = VoIPBaseService.this;
                 if (intent.getIntExtra("android.bluetooth.profile.extra.STATE", 0) != 2) {
                     z = false;
                 }
                 voIPBaseService.updateBluetoothHeadsetState(z);
             } else if ("android.media.ACTION_SCO_AUDIO_STATE_UPDATED".equals(intent.getAction())) {
+                int state = intent.getIntExtra("android.media.extra.SCO_AUDIO_STATE", 0);
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.e("Bluetooth SCO state updated: " + state);
+                }
+                if (state == 0 && VoIPBaseService.this.isBtHeadsetConnected && (!VoIPBaseService.this.btAdapter.isEnabled() || VoIPBaseService.this.btAdapter.getProfileConnectionState(1) != 2)) {
+                    VoIPBaseService.this.updateBluetoothHeadsetState(false);
+                    return;
+                }
+                boolean z2;
+                VoIPBaseService voIPBaseService2 = VoIPBaseService.this;
+                if (state == 1) {
+                    z2 = true;
+                } else {
+                    z2 = false;
+                }
+                voIPBaseService2.bluetoothScoActive = z2;
+                if (VoIPBaseService.this.bluetoothScoActive && VoIPBaseService.this.needSwitchToBluetoothAfterScoActivates) {
+                    VoIPBaseService.this.needSwitchToBluetoothAfterScoActivates = false;
+                    AudioManager am = (AudioManager) VoIPBaseService.this.getSystemService(MimeTypes.BASE_TYPE_AUDIO);
+                    am.setSpeakerphoneOn(false);
+                    am.setBluetoothScoOn(true);
+                }
                 Iterator it = VoIPBaseService.this.stateListeners.iterator();
                 while (it.hasNext()) {
                     ((StateListener) it.next()).onAudioSettingsChanged();
@@ -211,10 +241,7 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
 
         public void onCallAudioStateChanged(CallAudioState state) {
             if (BuildVars.LOGS_ENABLED) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("ConnectionService call audio state changed: ");
-                stringBuilder.append(state);
-                FileLog.d(stringBuilder.toString());
+                FileLog.d("ConnectionService call audio state changed: " + state);
             }
             Iterator it = VoIPBaseService.this.stateListeners.iterator();
             while (it.hasNext()) {
@@ -247,20 +274,14 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
         public void onStateChanged(int state) {
             super.onStateChanged(state);
             if (BuildVars.LOGS_ENABLED) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("ConnectionService onStateChanged ");
-                stringBuilder.append(state);
-                FileLog.d(stringBuilder.toString());
+                FileLog.d("ConnectionService onStateChanged " + state);
             }
         }
 
         public void onCallEvent(String event, Bundle extras) {
             super.onCallEvent(event, extras);
             if (BuildVars.LOGS_ENABLED) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("ConnectionService onCallEvent ");
-                stringBuilder.append(event);
-                FileLog.d(stringBuilder.toString());
+                FileLog.d("ConnectionService onCallEvent " + event);
             }
         }
     }
@@ -274,100 +295,6 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
     }
 
     public abstract void acceptIncomingCall();
-
-    protected void configureDeviceForCall() {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.voip.VoIPBaseService.configureDeviceForCall():void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = 1;
-        r7.needPlayEndSound = r0;
-        r1 = "audio";
-        r1 = r7.getSystemService(r1);
-        r1 = (android.media.AudioManager) r1;
-        r2 = 3;
-        r1.setMode(r2);
-        r3 = 0;
-        r1.requestAudioFocus(r7, r3, r0);
-        r4 = r7.isBluetoothHeadsetConnected();
-        if (r4 == 0) goto L_0x003b;
-    L_0x0019:
-        r4 = r7.hasEarpiece();
-        if (r4 == 0) goto L_0x003b;
-    L_0x001f:
-        r4 = r7.audioRouteToSet;
-        switch(r4) {
-            case 0: goto L_0x0033;
-            case 1: goto L_0x002c;
-            case 2: goto L_0x0025;
-            default: goto L_0x0024;
-        };
-    L_0x0024:
-        goto L_0x003a;
-    L_0x0025:
-        r1.setBluetoothScoOn(r0);
-        r1.setSpeakerphoneOn(r3);
-        goto L_0x003a;
-    L_0x002c:
-        r1.setBluetoothScoOn(r3);
-        r1.setSpeakerphoneOn(r0);
-        goto L_0x003a;
-    L_0x0033:
-        r1.setBluetoothScoOn(r3);
-        r1.setSpeakerphoneOn(r3);
-    L_0x003a:
-        goto L_0x004c;
-    L_0x003b:
-        r3 = r7.isBluetoothHeadsetConnected();
-        if (r3 == 0) goto L_0x0047;
-    L_0x0041:
-        r3 = r7.speakerphoneStateToSet;
-        r1.setBluetoothScoOn(r3);
-        goto L_0x004c;
-    L_0x0047:
-        r3 = r7.speakerphoneStateToSet;
-        r1.setSpeakerphoneOn(r3);
-    L_0x004c:
-        r7.updateOutputGainControlState();
-        r7.audioConfigured = r0;
-        r0 = "sensor";
-        r0 = r7.getSystemService(r0);
-        r0 = (android.hardware.SensorManager) r0;
-        r3 = 8;
-        r3 = r0.getDefaultSensor(r3);
-        if (r3 == 0) goto L_0x0082;
-    L_0x0061:
-        r4 = "power";	 Catch:{ Exception -> 0x0077 }
-        r4 = r7.getSystemService(r4);	 Catch:{ Exception -> 0x0077 }
-        r4 = (android.os.PowerManager) r4;	 Catch:{ Exception -> 0x0077 }
-        r5 = 32;	 Catch:{ Exception -> 0x0077 }
-        r6 = "telegram-voip-prx";	 Catch:{ Exception -> 0x0077 }
-        r4 = r4.newWakeLock(r5, r6);	 Catch:{ Exception -> 0x0077 }
-        r7.proximityWakelock = r4;	 Catch:{ Exception -> 0x0077 }
-        r0.registerListener(r7, r3, r2);	 Catch:{ Exception -> 0x0077 }
-        goto L_0x0082;
-    L_0x0077:
-        r2 = move-exception;
-        r4 = org.telegram.messenger.BuildVars.LOGS_ENABLED;
-        if (r4 == 0) goto L_0x0083;
-        r4 = "Error initializing proximity sensor";
-        org.telegram.messenger.FileLog.e(r4, r2);
-        goto L_0x0083;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.voip.VoIPBaseService.configureDeviceForCall():void");
-    }
 
     public abstract void declineIncomingCall();
 
@@ -390,28 +317,34 @@ Caused by: java.lang.NullPointerException
     protected abstract void updateServerConfig();
 
     public boolean hasEarpiece() {
-        if (((TelephonyManager) getSystemService("phone")).getPhoneType() != 0) {
-            return true;
-        }
-        if (this.mHasEarpiece != null) {
-            return this.mHasEarpiece.booleanValue();
-        }
-        try {
-            AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
-            Method method = AudioManager.class.getMethod("getDevicesForStream", new Class[]{Integer.TYPE});
-            int earpieceFlag = AudioManager.class.getField("DEVICE_OUT_EARPIECE").getInt(0);
-            if ((((Integer) method.invoke(am, new Object[]{Integer.valueOf(0)})).intValue() & earpieceFlag) == earpieceFlag) {
+        if (!USE_CONNECTION_SERVICE || this.systemCallConnection == null || this.systemCallConnection.getCallAudioState() == null) {
+            if (((TelephonyManager) getSystemService("phone")).getPhoneType() != 0) {
+                return true;
+            }
+            if (this.mHasEarpiece != null) {
+                return this.mHasEarpiece.booleanValue();
+            }
+            try {
+                AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
+                Method method = AudioManager.class.getMethod("getDevicesForStream", new Class[]{Integer.TYPE});
+                int earpieceFlag = AudioManager.class.getField("DEVICE_OUT_EARPIECE").getInt(null);
+                if ((((Integer) method.invoke(am, new Object[]{Integer.valueOf(0)})).intValue() & earpieceFlag) == earpieceFlag) {
+                    this.mHasEarpiece = Boolean.TRUE;
+                } else {
+                    this.mHasEarpiece = Boolean.FALSE;
+                }
+            } catch (Throwable error) {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.e("Error while checking earpiece! ", error);
+                }
                 this.mHasEarpiece = Boolean.TRUE;
-            } else {
-                this.mHasEarpiece = Boolean.FALSE;
             }
-        } catch (Throwable error) {
-            if (BuildVars.LOGS_ENABLED) {
-                FileLog.e("Error while checking earpiece! ", error);
-            }
-            this.mHasEarpiece = Boolean.TRUE;
+            return this.mHasEarpiece.booleanValue();
+        } else if ((this.systemCallConnection.getCallAudioState().getSupportedRouteMask() & 5) != 0) {
+            return true;
+        } else {
+            return false;
         }
-        return this.mHasEarpiece.booleanValue();
     }
 
     protected int getStatsNetworkType() {
@@ -448,17 +381,23 @@ Caused by: java.lang.NullPointerException
 
     public void toggleSpeakerphoneOrShowRouteSheet(Activity activity) {
         if (isBluetoothHeadsetConnected() && hasEarpiece()) {
-            Builder bldr = new Builder(activity);
-            r3 = new CharSequence[3];
-            int i = 0;
-            r3[0] = LocaleController.getString("VoipAudioRoutingBluetooth", R.string.VoipAudioRoutingBluetooth);
-            r3[1] = LocaleController.getString("VoipAudioRoutingEarpiece", R.string.VoipAudioRoutingEarpiece);
-            r3[2] = LocaleController.getString("VoipAudioRoutingSpeaker", R.string.VoipAudioRoutingSpeaker);
-            BottomSheet sheet = bldr.setItems(r3, new int[]{R.drawable.ic_bluetooth_white_24dp, R.drawable.ic_phone_in_talk_white_24dp, R.drawable.ic_volume_up_white_24dp}, new OnClickListener() {
+            BottomSheet sheet = new Builder(activity).setItems(new CharSequence[]{LocaleController.getString("VoipAudioRoutingBluetooth", R.string.VoipAudioRoutingBluetooth), LocaleController.getString("VoipAudioRoutingEarpiece", R.string.VoipAudioRoutingEarpiece), LocaleController.getString("VoipAudioRoutingSpeaker", R.string.VoipAudioRoutingSpeaker)}, new int[]{R.drawable.ic_bluetooth_white_24dp, R.drawable.ic_phone_in_talk_white_24dp, R.drawable.ic_volume_up_white_24dp}, new OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     AudioManager am = (AudioManager) VoIPBaseService.this.getSystemService(MimeTypes.BASE_TYPE_AUDIO);
                     if (VoIPBaseService.getSharedInstance() != null) {
-                        if (!VoIPBaseService.this.audioConfigured) {
+                        if (VoIPBaseService.USE_CONNECTION_SERVICE && VoIPBaseService.this.systemCallConnection != null) {
+                            switch (which) {
+                                case 0:
+                                    VoIPBaseService.this.systemCallConnection.setAudioRoute(2);
+                                    break;
+                                case 1:
+                                    VoIPBaseService.this.systemCallConnection.setAudioRoute(5);
+                                    break;
+                                case 2:
+                                    VoIPBaseService.this.systemCallConnection.setAudioRoute(8);
+                                    break;
+                            }
+                        } else if (!VoIPBaseService.this.audioConfigured || VoIPBaseService.USE_CONNECTION_SERVICE) {
                             switch (which) {
                                 case 0:
                                     VoIPBaseService.this.audioRouteToSet = 2;
@@ -472,24 +411,34 @@ Caused by: java.lang.NullPointerException
                                 default:
                                     break;
                             }
+                        } else {
+                            switch (which) {
+                                case 0:
+                                    if (!VoIPBaseService.this.bluetoothScoActive) {
+                                        VoIPBaseService.this.needSwitchToBluetoothAfterScoActivates = true;
+                                        am.startBluetoothSco();
+                                        break;
+                                    }
+                                    am.setBluetoothScoOn(true);
+                                    am.setSpeakerphoneOn(false);
+                                    break;
+                                case 1:
+                                    if (VoIPBaseService.this.bluetoothScoActive) {
+                                        am.stopBluetoothSco();
+                                    }
+                                    am.setSpeakerphoneOn(false);
+                                    am.setBluetoothScoOn(false);
+                                    break;
+                                case 2:
+                                    if (VoIPBaseService.this.bluetoothScoActive) {
+                                        am.stopBluetoothSco();
+                                    }
+                                    am.setBluetoothScoOn(false);
+                                    am.setSpeakerphoneOn(true);
+                                    break;
+                            }
+                            VoIPBaseService.this.updateOutputGainControlState();
                         }
-                        switch (which) {
-                            case 0:
-                                am.setBluetoothScoOn(true);
-                                am.setSpeakerphoneOn(false);
-                                break;
-                            case 1:
-                                am.setBluetoothScoOn(false);
-                                am.setSpeakerphoneOn(false);
-                                break;
-                            case 2:
-                                am.setBluetoothScoOn(false);
-                                am.setSpeakerphoneOn(true);
-                                break;
-                            default:
-                                break;
-                        }
-                        VoIPBaseService.this.updateOutputGainControlState();
                         Iterator it = VoIPBaseService.this.stateListeners.iterator();
                         while (it.hasNext()) {
                             ((StateListener) it.next()).onAudioSettingsChanged();
@@ -500,26 +449,34 @@ Caused by: java.lang.NullPointerException
             sheet.setBackgroundColor(-13948117);
             sheet.show();
             ViewGroup container = sheet.getSheetContainer();
-            while (true) {
-                int i2 = i;
-                if (i2 < container.getChildCount()) {
-                    ((BottomSheetCell) container.getChildAt(i2)).setTextColor(-1);
-                    i = i2 + 1;
-                } else {
-                    return;
-                }
+            for (int i = 0; i < container.getChildCount(); i++) {
+                ((BottomSheetCell) container.getChildAt(i)).setTextColor(-1);
             }
+            return;
         }
-        if (this.audioConfigured) {
-            AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
-            if (hasEarpiece()) {
-                am.setSpeakerphoneOn(true ^ am.isSpeakerphoneOn());
+        if (!USE_CONNECTION_SERVICE || this.systemCallConnection == null || this.systemCallConnection.getCallAudioState() == null) {
+            if (!this.audioConfigured || USE_CONNECTION_SERVICE) {
+                this.speakerphoneStateToSet = !this.speakerphoneStateToSet;
             } else {
-                am.setBluetoothScoOn(true ^ am.isBluetoothScoOn());
+                AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
+                if (hasEarpiece()) {
+                    am.setSpeakerphoneOn(!am.isSpeakerphoneOn());
+                } else {
+                    am.setBluetoothScoOn(!am.isBluetoothScoOn());
+                }
+                updateOutputGainControlState();
             }
-            updateOutputGainControlState();
+        } else if (hasEarpiece()) {
+            int i2;
+            CallConnection callConnection = this.systemCallConnection;
+            if (this.systemCallConnection.getCallAudioState().getRoute() == 8) {
+                i2 = 5;
+            } else {
+                i2 = 8;
+            }
+            callConnection.setAudioRoute(i2);
         } else {
-            this.speakerphoneStateToSet ^= true;
+            this.systemCallConnection.setAudioRoute(this.systemCallConnection.getCallAudioState().getRoute() == 2 ? 5 : 2);
         }
         Iterator it = this.stateListeners.iterator();
         while (it.hasNext()) {
@@ -528,25 +485,52 @@ Caused by: java.lang.NullPointerException
     }
 
     public boolean isSpeakerphoneOn() {
-        if (!this.audioConfigured) {
+        if (USE_CONNECTION_SERVICE && this.systemCallConnection != null && this.systemCallConnection.getCallAudioState() != null) {
+            int route = this.systemCallConnection.getCallAudioState().getRoute();
+            if (hasEarpiece()) {
+                if (route == 8) {
+                    return true;
+                }
+                return false;
+            } else if (route != 2) {
+                return false;
+            } else {
+                return true;
+            }
+        } else if (!this.audioConfigured || USE_CONNECTION_SERVICE) {
             return this.speakerphoneStateToSet;
+        } else {
+            AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
+            return hasEarpiece() ? am.isSpeakerphoneOn() : am.isBluetoothScoOn();
         }
-        AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
-        return hasEarpiece() ? am.isSpeakerphoneOn() : am.isBluetoothScoOn();
     }
 
     public int getCurrentAudioRoute() {
-        if (!this.audioConfigured) {
+        if (USE_CONNECTION_SERVICE) {
+            if (!(this.systemCallConnection == null || this.systemCallConnection.getCallAudioState() == null)) {
+                switch (this.systemCallConnection.getCallAudioState().getRoute()) {
+                    case 1:
+                    case 4:
+                        return 0;
+                    case 2:
+                        return 2;
+                    case 8:
+                        return 1;
+                }
+            }
             return this.audioRouteToSet;
+        } else if (!this.audioConfigured) {
+            return this.audioRouteToSet;
+        } else {
+            AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
+            if (am.isBluetoothScoOn()) {
+                return 2;
+            }
+            if (am.isSpeakerphoneOn()) {
+                return 1;
+            }
+            return 0;
         }
-        AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
-        if (am.isBluetoothScoOn()) {
-            return 2;
-        }
-        if (am.isSpeakerphoneOn()) {
-            return 1;
-        }
-        return 0;
     }
 
     public String getDebugString() {
@@ -554,14 +538,12 @@ Caused by: java.lang.NullPointerException
     }
 
     public long getCallDuration() {
-        if (this.controllerStarted) {
-            if (this.controller != null) {
-                long callDuration = this.controller.getCallDuration();
-                this.lastKnownDuration = callDuration;
-                return callDuration;
-            }
+        if (!this.controllerStarted || this.controller == null) {
+            return this.lastKnownDuration;
         }
-        return this.lastKnownDuration;
+        long callDuration = this.controller.getCallDuration();
+        this.lastKnownDuration = callDuration;
+        return callDuration;
     }
 
     public static VoIPBaseService getSharedInstance() {
@@ -586,10 +568,7 @@ Caused by: java.lang.NullPointerException
         Notification.Builder builder = new Notification.Builder(this).setContentTitle(LocaleController.getString("VoipOutgoingCall", R.string.VoipOutgoingCall)).setContentText(name).setSmallIcon(R.drawable.notification).setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));
         if (VERSION.SDK_INT >= 16) {
             Intent endIntent = new Intent(this, VoIPActionsReceiver.class);
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(getPackageName());
-            stringBuilder.append(".END_CALL");
-            endIntent.setAction(stringBuilder.toString());
+            endIntent.setAction(getPackageName() + ".END_CALL");
             builder.addAction(R.drawable.ic_call_end_white_24dp, LocaleController.getString("VoipEndCall", R.string.VoipEndCall), PendingIntent.getBroadcast(this, 0, endIntent, 134217728));
             builder.setPriority(2);
         }
@@ -625,13 +604,12 @@ Caused by: java.lang.NullPointerException
     }
 
     protected void startRingtoneAndVibration(int chatID) {
-        int mode;
         SharedPreferences prefs = MessagesController.getNotificationsSettings(this.currentAccount);
         AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
         boolean needRing = am.getRingerMode() != 0;
         if (VERSION.SDK_INT >= 21) {
             try {
-                mode = Global.getInt(getContentResolver(), "zen_mode");
+                int mode = Global.getInt(getContentResolver(), "zen_mode");
                 if (needRing) {
                     needRing = mode == 0;
                 }
@@ -639,7 +617,10 @@ Caused by: java.lang.NullPointerException
             }
         }
         if (needRing) {
-            StringBuilder stringBuilder;
+            int vibrate;
+            if (!USE_CONNECTION_SERVICE) {
+                am.requestAudioFocus(this, 2, 1);
+            }
             this.ringtonePlayer = new MediaPlayer();
             this.ringtonePlayer.setOnPreparedListener(new OnPreparedListener() {
                 public void onPrepared(MediaPlayer mediaPlayer) {
@@ -650,14 +631,8 @@ Caused by: java.lang.NullPointerException
             this.ringtonePlayer.setAudioStreamType(2);
             try {
                 String notificationUri;
-                stringBuilder = new StringBuilder();
-                stringBuilder.append("custom_");
-                stringBuilder.append(chatID);
-                if (prefs.getBoolean(stringBuilder.toString(), false)) {
-                    stringBuilder = new StringBuilder();
-                    stringBuilder.append("ringtone_path_");
-                    stringBuilder.append(chatID);
-                    notificationUri = prefs.getString(stringBuilder.toString(), RingtoneManager.getDefaultUri(1).toString());
+                if (prefs.getBoolean("custom_" + chatID, false)) {
+                    notificationUri = prefs.getString("ringtone_path_" + chatID, RingtoneManager.getDefaultUri(1).toString());
                 } else {
                     notificationUri = prefs.getString("CallsRingtonePath", RingtoneManager.getDefaultUri(1).toString());
                 }
@@ -670,23 +645,17 @@ Caused by: java.lang.NullPointerException
                     this.ringtonePlayer = null;
                 }
             }
-            stringBuilder = new StringBuilder();
-            stringBuilder.append("custom_");
-            stringBuilder.append(chatID);
-            if (prefs.getBoolean(stringBuilder.toString(), false)) {
-                stringBuilder = new StringBuilder();
-                stringBuilder.append("calls_vibrate_");
-                stringBuilder.append(chatID);
-                mode = prefs.getInt(stringBuilder.toString(), 0);
+            if (prefs.getBoolean("custom_" + chatID, false)) {
+                vibrate = prefs.getInt("calls_vibrate_" + chatID, 0);
             } else {
-                mode = prefs.getInt("vibrate_calls", 0);
+                vibrate = prefs.getInt("vibrate_calls", 0);
             }
-            if ((mode != 2 && mode != 4 && (am.getRingerMode() == 1 || am.getRingerMode() == 2)) || (mode == 4 && am.getRingerMode() == 1)) {
+            if ((vibrate != 2 && vibrate != 4 && (am.getRingerMode() == 1 || am.getRingerMode() == 2)) || (vibrate == 4 && am.getRingerMode() == 1)) {
                 this.vibrator = (Vibrator) getSystemService("vibrator");
                 long duration = 700;
-                if (mode == 1) {
+                if (vibrate == 1) {
                     duration = 700 / 2;
-                } else if (mode == 3) {
+                } else if (vibrate == 3) {
                     duration = 700 * 2;
                 }
                 this.vibrator.vibrate(new long[]{0, duration, 500}, 0);
@@ -730,16 +699,19 @@ Caused by: java.lang.NullPointerException
         }
         this.cpuWakelock.release();
         AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
-        if (this.isBtHeadsetConnected && !this.playingSound) {
-            am.stopBluetoothSco();
-            am.setSpeakerphoneOn(false);
-        }
-        try {
-            am.setMode(0);
-        } catch (SecurityException x) {
-            if (BuildVars.LOGS_ENABLED) {
-                FileLog.e("Error setting audio more to normal", x);
+        if (!USE_CONNECTION_SERVICE) {
+            if (this.isBtHeadsetConnected && !this.playingSound) {
+                am.stopBluetoothSco();
+                am.setSpeakerphoneOn(false);
             }
+            try {
+                am.setMode(0);
+            } catch (SecurityException x) {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.e("Error setting audio more to normal", x);
+                }
+            }
+            am.abandonAudioFocus(this);
         }
         am.unregisterMediaButtonEventReceiver(new ComponentName(this, VoIPMediaButtonReceiver.class));
         if (this.haveAudioFocus) {
@@ -747,6 +719,9 @@ Caused by: java.lang.NullPointerException
         }
         if (!this.playingSound) {
             this.soundPool.release();
+        }
+        if (USE_CONNECTION_SERVICE && this.systemCallConnection != null) {
+            this.systemCallConnection.destroy();
         }
         ConnectionsManager.getInstance(this.currentAccount).setAppPaused(true, false);
         VoIPHelper.lastCallTime = System.currentTimeMillis();
@@ -784,14 +759,15 @@ Caused by: java.lang.NullPointerException
             this.btAdapter = am.isBluetoothScoAvailableOffCall() ? BluetoothAdapter.getDefaultAdapter() : null;
             IntentFilter filter = new IntentFilter();
             filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-            filter.addAction(ACTION_HEADSET_PLUG);
-            if (this.btAdapter != null) {
-                filter.addAction("android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED");
-                filter.addAction("android.media.ACTION_SCO_AUDIO_STATE_UPDATED");
+            if (!USE_CONNECTION_SERVICE) {
+                filter.addAction(ACTION_HEADSET_PLUG);
+                if (this.btAdapter != null) {
+                    filter.addAction("android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED");
+                    filter.addAction("android.media.ACTION_SCO_AUDIO_STATE_UPDATED");
+                }
+                filter.addAction("android.intent.action.PHONE_STATE");
             }
-            filter.addAction("android.intent.action.PHONE_STATE");
             registerReceiver(this.receiver, filter);
-            boolean z = false;
             this.soundPool = new SoundPool(1, 0, 0);
             this.spConnectingId = this.soundPool.load(this, R.raw.voip_connecting, 1);
             this.spRingbackID = this.soundPool.load(this, R.raw.voip_ringback, 1);
@@ -799,15 +775,14 @@ Caused by: java.lang.NullPointerException
             this.spEndId = this.soundPool.load(this, R.raw.voip_end, 1);
             this.spBusyId = this.soundPool.load(this, R.raw.voip_busy, 1);
             am.registerMediaButtonEventReceiver(new ComponentName(this, VoIPMediaButtonReceiver.class));
-            if (this.btAdapter != null && this.btAdapter.isEnabled()) {
-                int headsetState = this.btAdapter.getProfileConnectionState(1);
-                if (headsetState == 2) {
+            if (!USE_CONNECTION_SERVICE && this.btAdapter != null && this.btAdapter.isEnabled()) {
+                boolean z;
+                if (this.btAdapter.getProfileConnectionState(1) == 2) {
                     z = true;
+                } else {
+                    z = false;
                 }
                 updateBluetoothHeadsetState(z);
-                if (headsetState == 2) {
-                    am.setBluetoothScoOn(true);
-                }
                 Iterator it = this.stateListeners.iterator();
                 while (it.hasNext()) {
                     ((StateListener) it.next()).onAudioSettingsChanged();
@@ -823,15 +798,12 @@ Caused by: java.lang.NullPointerException
 
     protected void dispatchStateChanged(int state) {
         if (BuildVars.LOGS_ENABLED) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("== Call ");
-            stringBuilder.append(getCallID());
-            stringBuilder.append(" state changed to ");
-            stringBuilder.append(state);
-            stringBuilder.append(" ==");
-            FileLog.d(stringBuilder.toString());
+            FileLog.d("== Call " + getCallID() + " state changed to " + state + " ==");
         }
         this.currentState = state;
+        if (USE_CONNECTION_SERVICE && state == 3 && this.systemCallConnection != null) {
+            this.systemCallConnection.setActive();
+        }
         for (int a = 0; a < this.stateListeners.size(); a++) {
             ((StateListener) this.stateListeners.get(a)).onStateChanged(state);
         }
@@ -852,38 +824,103 @@ Caused by: java.lang.NullPointerException
         if (wifiRecvdDiff > 0) {
             StatsController.getInstance(this.currentAccount).incrementReceivedBytesCount(1, 0, wifiRecvdDiff);
         }
-        int i = 2;
         if (mobileSentDiff > 0) {
             StatsController instance = StatsController.getInstance(this.currentAccount);
-            int i2 = (this.lastNetInfo == null || !this.lastNetInfo.isRoaming()) ? 0 : 2;
-            instance.incrementSentBytesCount(i2, 0, mobileSentDiff);
+            int i = (this.lastNetInfo == null || !this.lastNetInfo.isRoaming()) ? 0 : 2;
+            instance.incrementSentBytesCount(i, 0, mobileSentDiff);
         }
         if (mobileRecvdDiff > 0) {
-            StatsController instance2 = StatsController.getInstance(this.currentAccount);
-            if (this.lastNetInfo == null || !this.lastNetInfo.isRoaming()) {
-                i = 0;
+            instance = StatsController.getInstance(this.currentAccount);
+            i = (this.lastNetInfo == null || !this.lastNetInfo.isRoaming()) ? 0 : 2;
+            instance.incrementReceivedBytesCount(i, 0, mobileRecvdDiff);
+        }
+    }
+
+    protected void configureDeviceForCall() {
+        int i = 5;
+        this.needPlayEndSound = true;
+        AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
+        if (USE_CONNECTION_SERVICE) {
+            if (isBluetoothHeadsetConnected() && hasEarpiece()) {
+                switch (this.audioRouteToSet) {
+                    case 0:
+                        this.systemCallConnection.setAudioRoute(5);
+                        break;
+                    case 1:
+                        this.systemCallConnection.setAudioRoute(8);
+                        break;
+                    case 2:
+                        this.systemCallConnection.setAudioRoute(2);
+                        break;
+                    default:
+                        break;
+                }
+            } else if (hasEarpiece()) {
+                CallConnection callConnection = this.systemCallConnection;
+                if (this.speakerphoneStateToSet) {
+                    i = 8;
+                }
+                callConnection.setAudioRoute(i);
+            } else {
+                CallConnection callConnection2 = this.systemCallConnection;
+                if (this.speakerphoneStateToSet) {
+                    i = 2;
+                }
+                callConnection2.setAudioRoute(i);
             }
-            instance2.incrementReceivedBytesCount(i, 0, mobileRecvdDiff);
+        } else {
+            am.setMode(3);
+            am.requestAudioFocus(this, 0, 1);
+            if (isBluetoothHeadsetConnected() && hasEarpiece()) {
+                switch (this.audioRouteToSet) {
+                    case 0:
+                        am.setBluetoothScoOn(false);
+                        am.setSpeakerphoneOn(false);
+                        break;
+                    case 1:
+                        am.setBluetoothScoOn(false);
+                        am.setSpeakerphoneOn(true);
+                        break;
+                    case 2:
+                        am.setBluetoothScoOn(true);
+                        am.setSpeakerphoneOn(false);
+                        break;
+                }
+            } else if (isBluetoothHeadsetConnected()) {
+                am.setBluetoothScoOn(this.speakerphoneStateToSet);
+            } else {
+                am.setSpeakerphoneOn(this.speakerphoneStateToSet);
+            }
+        }
+        updateOutputGainControlState();
+        this.audioConfigured = true;
+        SensorManager sm = (SensorManager) getSystemService("sensor");
+        Sensor proximity = sm.getDefaultSensor(8);
+        if (proximity != null) {
+            try {
+                this.proximityWakelock = ((PowerManager) getSystemService("power")).newWakeLock(32, "telegram-voip-prx");
+                sm.registerListener(this, proximity, 3);
+            } catch (Exception x) {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.e("Error initializing proximity sensor", x);
+                }
+            }
         }
     }
 
     @SuppressLint({"NewApi"})
     public void onSensorChanged(SensorEvent event) {
+        boolean newIsNear = true;
         if (event.sensor.getType() == 8) {
             AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
-            if (!(this.isHeadsetPlugged || am.isSpeakerphoneOn())) {
+            if (!this.isHeadsetPlugged && !am.isSpeakerphoneOn()) {
                 if (!isBluetoothHeadsetConnected() || !am.isBluetoothScoOn()) {
-                    boolean z = false;
-                    if (event.values[0] < Math.min(event.sensor.getMaximumRange(), 3.0f)) {
-                        z = true;
+                    if (event.values[0] >= Math.min(event.sensor.getMaximumRange(), 3.0f)) {
+                        newIsNear = false;
                     }
-                    boolean newIsNear = z;
                     if (newIsNear != this.isProximityNear) {
                         if (BuildVars.LOGS_ENABLED) {
-                            StringBuilder stringBuilder = new StringBuilder();
-                            stringBuilder.append("proximity ");
-                            stringBuilder.append(newIsNear);
-                            FileLog.d(stringBuilder.toString());
+                            FileLog.d("proximity " + newIsNear);
                         }
                         this.isProximityNear = newIsNear;
                         try {
@@ -905,7 +942,10 @@ Caused by: java.lang.NullPointerException
     }
 
     public boolean isBluetoothHeadsetConnected() {
-        return this.isBtHeadsetConnected;
+        if (!USE_CONNECTION_SERVICE || this.systemCallConnection == null || this.systemCallConnection.getCallAudioState() == null) {
+            return this.isBtHeadsetConnected;
+        }
+        return (this.systemCallConnection.getCallAudioState().getSupportedRouteMask() & 2) != 0;
     }
 
     public void onAudioFocusChange(int focusChange) {
@@ -918,14 +958,29 @@ Caused by: java.lang.NullPointerException
 
     protected void updateBluetoothHeadsetState(boolean connected) {
         if (connected != this.isBtHeadsetConnected) {
+            if (BuildVars.LOGS_ENABLED) {
+                FileLog.d("updateBluetoothHeadsetState: " + connected);
+            }
             this.isBtHeadsetConnected = connected;
-            AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
-            if (connected) {
-                am.startBluetoothSco();
+            final AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
+            if (!connected) {
+                this.bluetoothScoActive = false;
+            } else if (this.bluetoothScoActive) {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("SCO already active, setting audio routing");
+                }
                 am.setSpeakerphoneOn(false);
                 am.setBluetoothScoOn(true);
             } else {
-                am.stopBluetoothSco();
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("startBluetoothSco");
+                }
+                this.needSwitchToBluetoothAfterScoActivates = true;
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    public void run() {
+                        am.startBluetoothSco();
+                    }
+                }, 500);
             }
             Iterator it = this.stateListeners.iterator();
             while (it.hasNext()) {
@@ -947,45 +1002,42 @@ Caused by: java.lang.NullPointerException
         this.lastNetInfo = info;
         int type = 0;
         if (info != null) {
-            int type2 = info.getType();
-            if (type2 != 9) {
-                switch (type2) {
-                    case 0:
-                        switch (info.getSubtype()) {
-                            case 1:
-                                type = 1;
-                                break;
-                            case 2:
-                            case 7:
-                                type = 2;
-                                break;
-                            case 3:
-                            case 5:
-                                type = 3;
-                                break;
-                            case 6:
-                            case 8:
-                            case 9:
-                            case 10:
-                            case 12:
-                            case 15:
-                                type = 4;
-                                break;
-                            case 13:
-                                type = 5;
-                                break;
-                            default:
-                                type = 11;
-                                break;
-                        }
-                    case 1:
-                        type = 6;
-                        break;
-                    default:
-                        break;
-                }
+            switch (info.getType()) {
+                case 0:
+                    switch (info.getSubtype()) {
+                        case 1:
+                            type = 1;
+                            break;
+                        case 2:
+                        case 7:
+                            type = 2;
+                            break;
+                        case 3:
+                        case 5:
+                            type = 3;
+                            break;
+                        case 6:
+                        case 8:
+                        case 9:
+                        case 10:
+                        case 12:
+                        case 15:
+                            type = 4;
+                            break;
+                        case 13:
+                            type = 5;
+                            break;
+                        default:
+                            type = 11;
+                            break;
+                    }
+                case 1:
+                    type = 6;
+                    break;
+                case 9:
+                    type = 7;
+                    break;
             }
-            type = 7;
         }
         if (this.controller != null) {
             this.controller.setNetworkType(type);
@@ -1057,82 +1109,55 @@ Caused by: java.lang.NullPointerException
     }
 
     protected void showIncomingNotification(String name, CharSequence subText, TLObject userOrChat, List<User> list, int additionalMemberCount, Class<? extends Activity> activityOnClick) {
-        int i;
-        int i2;
-        String str = name;
-        CharSequence charSequence = subText;
         Intent intent = new Intent(this, activityOnClick);
         intent.addFlags(805306368);
-        Notification.Builder builder = new Notification.Builder(this).setContentTitle(LocaleController.getString("VoipInCallBranding", R.string.VoipInCallBranding)).setContentText(str).setSmallIcon(R.drawable.notification).setSubText(charSequence).setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));
+        Notification.Builder builder = new Notification.Builder(this).setContentTitle(LocaleController.getString("VoipInCallBranding", R.string.VoipInCallBranding)).setContentText(name).setSmallIcon(R.drawable.notification).setSubText(subText).setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));
         if (VERSION.SDK_INT >= 26) {
             SharedPreferences nprefs = MessagesController.getGlobalNotificationsSettings();
             int chanIndex = nprefs.getInt("calls_notification_channel", 0);
             NotificationManager nm = (NotificationManager) getSystemService("notification");
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("incoming_calls");
-            stringBuilder.append(chanIndex);
-            NotificationChannel existingChannel = nm.getNotificationChannel(stringBuilder.toString());
+            NotificationChannel existingChannel = nm.getNotificationChannel("incoming_calls" + chanIndex);
             boolean needCreate = true;
             if (existingChannel != null) {
-                if (existingChannel.getImportance() >= 4 && existingChannel.getSound() == null) {
-                    if (existingChannel.getVibrationPattern() == null) {
-                        needCreate = false;
-                    }
+                if (existingChannel.getImportance() >= 4 && existingChannel.getSound() == null && existingChannel.getVibrationPattern() == null) {
+                    needCreate = false;
+                } else {
+                    FileLog.d("User messed up the notification channel; deleting it and creating a proper one");
+                    nm.deleteNotificationChannel("incoming_calls" + chanIndex);
+                    chanIndex++;
+                    nprefs.edit().putInt("calls_notification_channel", chanIndex).commit();
                 }
-                FileLog.d("User messed up the notification channel; deleting it and creating a proper one");
-                StringBuilder stringBuilder2 = new StringBuilder();
-                stringBuilder2.append("incoming_calls");
-                stringBuilder2.append(chanIndex);
-                nm.deleteNotificationChannel(stringBuilder2.toString());
-                chanIndex++;
-                nprefs.edit().putInt("calls_notification_channel", chanIndex).commit();
             }
             if (needCreate) {
-                StringBuilder stringBuilder3 = new StringBuilder();
-                stringBuilder3.append("incoming_calls");
-                stringBuilder3.append(chanIndex);
-                NotificationChannel chan = new NotificationChannel(stringBuilder3.toString(), LocaleController.getString("IncomingCalls", R.string.IncomingCalls), 4);
+                NotificationChannel chan = new NotificationChannel("incoming_calls" + chanIndex, LocaleController.getString("IncomingCalls", R.string.IncomingCalls), 4);
                 chan.setSound(null, null);
                 chan.enableVibration(false);
                 chan.enableLights(false);
                 nm.createNotificationChannel(chan);
             }
-            StringBuilder stringBuilder4 = new StringBuilder();
-            stringBuilder4.append("incoming_calls");
-            stringBuilder4.append(chanIndex);
-            builder.setChannelId(stringBuilder4.toString());
+            builder.setChannelId("incoming_calls" + chanIndex);
         }
-        Intent endIntent = new Intent(r0, VoIPActionsReceiver.class);
-        StringBuilder stringBuilder5 = new StringBuilder();
-        stringBuilder5.append(getPackageName());
-        stringBuilder5.append(".DECLINE_CALL");
-        endIntent.setAction(stringBuilder5.toString());
+        Intent endIntent = new Intent(this, VoIPActionsReceiver.class);
+        endIntent.setAction(getPackageName() + ".DECLINE_CALL");
         endIntent.putExtra("call_id", getCallID());
         CharSequence endTitle = LocaleController.getString("VoipDeclineCall", R.string.VoipDeclineCall);
         if (VERSION.SDK_INT >= 24) {
-            endTitle = new SpannableString(endTitle);
-            i = 0;
-            ((SpannableString) endTitle).setSpan(new ForegroundColorSpan(-769226), 0, endTitle.length(), 0);
-        } else {
-            i = 0;
+            CharSequence endTitle2 = new SpannableString(endTitle);
+            ((SpannableString) endTitle2).setSpan(new ForegroundColorSpan(-769226), 0, endTitle2.length(), 0);
+            endTitle = endTitle2;
         }
-        PendingIntent endPendingIntent = PendingIntent.getBroadcast(r0, i, endIntent, 268435456);
+        PendingIntent endPendingIntent = PendingIntent.getBroadcast(this, 0, endIntent, 268435456);
         builder.addAction(R.drawable.ic_call_end_white_24dp, endTitle, endPendingIntent);
-        Intent answerIntent = new Intent(r0, VoIPActionsReceiver.class);
-        StringBuilder stringBuilder6 = new StringBuilder();
-        stringBuilder6.append(getPackageName());
-        stringBuilder6.append(".ANSWER_CALL");
-        answerIntent.setAction(stringBuilder6.toString());
+        Intent answerIntent = new Intent(this, VoIPActionsReceiver.class);
+        answerIntent.setAction(getPackageName() + ".ANSWER_CALL");
         answerIntent.putExtra("call_id", getCallID());
         CharSequence answerTitle = LocaleController.getString("VoipAnswerCall", R.string.VoipAnswerCall);
         if (VERSION.SDK_INT >= 24) {
-            answerTitle = new SpannableString(answerTitle);
-            i2 = 0;
-            ((SpannableString) answerTitle).setSpan(new ForegroundColorSpan(-16733696), 0, answerTitle.length(), 0);
-        } else {
-            i2 = 0;
+            CharSequence answerTitle2 = new SpannableString(answerTitle);
+            ((SpannableString) answerTitle2).setSpan(new ForegroundColorSpan(-16733696), 0, answerTitle2.length(), 0);
+            answerTitle = answerTitle2;
         }
-        PendingIntent answerPendingIntent = PendingIntent.getBroadcast(r0, i2, answerIntent, 268435456);
+        PendingIntent answerPendingIntent = PendingIntent.getBroadcast(this, 0, answerIntent, 268435456);
         builder.addAction(R.drawable.ic_call_white_24dp, answerTitle, answerPendingIntent);
         builder.setPriority(2);
         if (VERSION.SDK_INT >= 17) {
@@ -1142,41 +1167,29 @@ Caused by: java.lang.NullPointerException
             builder.setColor(-13851168);
             builder.setVibrate(new long[0]);
             builder.setCategory("call");
-            builder.setFullScreenIntent(PendingIntent.getActivity(r0, 0, intent, 0), true);
+            builder.setFullScreenIntent(PendingIntent.getActivity(this, 0, intent, 0), true);
         }
         Notification incomingNotification = builder.getNotification();
-        Notification.Builder builder2;
         if (VERSION.SDK_INT >= 21) {
             RemoteViews customView = new RemoteViews(getPackageName(), LocaleController.isRTL ? R.layout.call_notification_rtl : R.layout.call_notification);
-            customView.setTextViewText(R.id.name, str);
-            boolean subtitleVisible = true;
-            boolean subtitleVisible2;
+            customView.setTextViewText(R.id.name, name);
+            User self;
             if (TextUtils.isEmpty(subText)) {
                 customView.setViewVisibility(R.id.subtitle, 8);
                 if (UserConfig.getActivatedAccountsCount() > 1) {
-                    subtitleVisible = UserConfig.getInstance(r0.currentAccount).getCurrentUser();
-                    subtitleVisible2 = false;
-                    customView.setTextViewText(R.id.title, LocaleController.formatString("VoipInCallBrandingWithName", R.string.VoipInCallBrandingWithName, ContactsController.formatName(subtitleVisible.first_name, subtitleVisible.last_name)));
+                    self = UserConfig.getInstance(this.currentAccount).getCurrentUser();
+                    customView.setTextViewText(R.id.title, LocaleController.formatString("VoipInCallBrandingWithName", R.string.VoipInCallBrandingWithName, ContactsController.formatName(self.first_name, self.last_name)));
                 } else {
-                    subtitleVisible2 = false;
-                    Intent intent2 = intent;
                     customView.setTextViewText(R.id.title, LocaleController.getString("VoipInCallBranding", R.string.VoipInCallBranding));
                 }
-                builder2 = builder;
             } else {
                 if (UserConfig.getActivatedAccountsCount() > 1) {
-                    intent = UserConfig.getInstance(r0.currentAccount).getCurrentUser();
-                    Object[] objArr = new Object[1];
-                    objArr[0] = ContactsController.formatName(intent.first_name, intent.last_name);
-                    customView.setTextViewText(R.id.subtitle, LocaleController.formatString("VoipAnsweringAsAccount", R.string.VoipAnsweringAsAccount, objArr));
+                    self = UserConfig.getInstance(this.currentAccount).getCurrentUser();
+                    customView.setTextViewText(R.id.subtitle, LocaleController.formatString("VoipAnsweringAsAccount", R.string.VoipAnsweringAsAccount, ContactsController.formatName(self.first_name, self.last_name)));
                 } else {
-                    builder2 = builder;
                     customView.setViewVisibility(R.id.subtitle, 8);
-                    subtitleVisible = false;
                 }
-                boolean subtitleVisible3 = subtitleVisible;
-                customView.setTextViewText(R.id.title, charSequence);
-                subtitleVisible2 = subtitleVisible3;
+                customView.setTextViewText(R.id.title, subText);
             }
             customView.setTextViewText(R.id.answer_text, LocaleController.getString("VoipAnswerCall", R.string.VoipAnswerCall));
             customView.setTextViewText(R.id.decline_text, LocaleController.getString("VoipDeclineCall", R.string.VoipDeclineCall));
@@ -1185,21 +1198,13 @@ Caused by: java.lang.NullPointerException
             customView.setOnClickPendingIntent(R.id.decline_btn, endPendingIntent);
             incomingNotification.bigContentView = customView;
             incomingNotification.headsUpContentView = customView;
-        } else {
-            builder2 = builder;
-            TLObject intent3 = userOrChat;
         }
         startForeground(ID_INCOMING_CALL_NOTIFICATION, incomingNotification);
     }
 
     protected void callFailed(int errorCode) {
         try {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Call ");
-            stringBuilder.append(getCallID());
-            stringBuilder.append(" failed with error code ");
-            stringBuilder.append(errorCode);
-            throw new Exception(stringBuilder.toString());
+            throw new Exception("Call " + getCallID() + " failed with error code " + errorCode);
         } catch (Throwable x) {
             FileLog.e(x);
             this.lastError = errorCode;
@@ -1208,6 +1213,11 @@ Caused by: java.lang.NullPointerException
                 this.playingSound = true;
                 this.soundPool.play(this.spFailedID, 1.0f, 1.0f, 0, 0, 1.0f);
                 AndroidUtilities.runOnUIThread(this.afterSoundRunnable, 1000);
+            }
+            if (USE_CONNECTION_SERVICE && this.systemCallConnection != null) {
+                this.systemCallConnection.setDisconnected(new DisconnectCause(1));
+                this.systemCallConnection.destroy();
+                this.systemCallConnection = null;
             }
             stopSelf();
         }
@@ -1272,11 +1282,7 @@ Caused by: java.lang.NullPointerException
 
     protected void callEnded() {
         if (BuildVars.LOGS_ENABLED) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Call ");
-            stringBuilder.append(getCallID());
-            stringBuilder.append(" ended");
-            FileLog.d(stringBuilder.toString());
+            FileLog.d("Call " + getCallID() + " ended");
         }
         dispatchStateChanged(11);
         if (this.needPlayEndSound) {
@@ -1288,6 +1294,27 @@ Caused by: java.lang.NullPointerException
             AndroidUtilities.cancelRunOnUIThread(this.timeoutRunnable);
             this.timeoutRunnable = null;
         }
+        if (USE_CONNECTION_SERVICE && this.systemCallConnection != null) {
+            switch (this.callDiscardReason) {
+                case 1:
+                    this.systemCallConnection.setDisconnected(new DisconnectCause(this.isOutgoing ? 2 : 6));
+                    break;
+                case 2:
+                    this.systemCallConnection.setDisconnected(new DisconnectCause(1));
+                    break;
+                case 3:
+                    this.systemCallConnection.setDisconnected(new DisconnectCause(this.isOutgoing ? 4 : 5));
+                    break;
+                case 4:
+                    this.systemCallConnection.setDisconnected(new DisconnectCause(7));
+                    break;
+                default:
+                    this.systemCallConnection.setDisconnected(new DisconnectCause(3));
+                    break;
+            }
+            this.systemCallConnection.destroy();
+            this.systemCallConnection = null;
+        }
         stopSelf();
     }
 
@@ -1296,26 +1323,13 @@ Caused by: java.lang.NullPointerException
     }
 
     public void handleNotificationAction(Intent intent) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(getPackageName());
-        stringBuilder.append(".END_CALL");
-        if (stringBuilder.toString().equals(intent.getAction())) {
+        if ((getPackageName() + ".END_CALL").equals(intent.getAction())) {
             stopForeground(true);
             hangUp();
-            return;
-        }
-        stringBuilder = new StringBuilder();
-        stringBuilder.append(getPackageName());
-        stringBuilder.append(".DECLINE_CALL");
-        if (stringBuilder.toString().equals(intent.getAction())) {
+        } else if ((getPackageName() + ".DECLINE_CALL").equals(intent.getAction())) {
             stopForeground(true);
             declineIncomingCall(4, null);
-            return;
-        }
-        stringBuilder = new StringBuilder();
-        stringBuilder.append(getPackageName());
-        stringBuilder.append(".ANSWER_CALL");
-        if (stringBuilder.toString().equals(intent.getAction())) {
+        } else if ((getPackageName() + ".ANSWER_CALL").equals(intent.getAction())) {
             acceptIncomingCallFromNotification();
         }
     }
@@ -1326,12 +1340,14 @@ Caused by: java.lang.NullPointerException
             acceptIncomingCall();
             try {
                 PendingIntent.getActivity(this, 0, new Intent(this, getUIActivityClass()).addFlags(805306368), 0).send();
+                return;
             } catch (Exception x) {
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.e("Error starting incall activity", x);
+                    return;
                 }
+                return;
             }
-            return;
         }
         try {
             PendingIntent.getActivity(this, 0, new Intent(this, VoIPPermissionActivity.class).addFlags(268435456), 0).send();
@@ -1343,21 +1359,39 @@ Caused by: java.lang.NullPointerException
     }
 
     public void updateOutputGainControlState() {
-        if (this.controller != null) {
-            if (this.controllerStarted) {
-                AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
-                VoIPController voIPController = this.controller;
-                int i = 0;
-                boolean z = (!hasEarpiece() || am.isSpeakerphoneOn() || am.isBluetoothScoOn() || this.isHeadsetPlugged) ? false : true;
-                voIPController.setAudioOutputGainControlEnabled(z);
+        int i = 0;
+        int i2 = 1;
+        if (this.controller != null && this.controllerStarted) {
+            VoIPController voIPController;
+            if (USE_CONNECTION_SERVICE) {
+                boolean isEarpiece;
+                if (this.systemCallConnection.getCallAudioState().getRoute() == 1) {
+                    isEarpiece = true;
+                } else {
+                    isEarpiece = false;
+                }
+                this.controller.setAudioOutputGainControlEnabled(isEarpiece);
                 voIPController = this.controller;
-                if (!this.isHeadsetPlugged) {
-                    if (!hasEarpiece() || am.isSpeakerphoneOn() || am.isBluetoothScoOn() || this.isHeadsetPlugged) {
-                        i = 1;
-                    }
+                if (!isEarpiece) {
+                    i = 1;
                 }
                 voIPController.setEchoCancellationStrength(i);
+                return;
             }
+            boolean z;
+            AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
+            VoIPController voIPController2 = this.controller;
+            if (!hasEarpiece() || am.isSpeakerphoneOn() || am.isBluetoothScoOn() || this.isHeadsetPlugged) {
+                z = false;
+            } else {
+                z = true;
+            }
+            voIPController2.setAudioOutputGainControlEnabled(z);
+            voIPController = this.controller;
+            if (this.isHeadsetPlugged || !(!hasEarpiece() || am.isSpeakerphoneOn() || am.isBluetoothScoOn() || this.isHeadsetPlugged)) {
+                i2 = 0;
+            }
+            voIPController.setEchoCancellationStrength(i2);
         }
     }
 
@@ -1372,35 +1406,32 @@ Caused by: java.lang.NullPointerException
     }
 
     public static boolean isAnyKindOfCallActive() {
-        boolean z = false;
-        if (VoIPService.getSharedInstance() == null) {
+        if (VoIPService.getSharedInstance() == null || VoIPService.getSharedInstance().getCallState() == 15) {
             return false;
         }
-        if (VoIPService.getSharedInstance().getCallState() != 15) {
-            z = true;
-        }
-        return z;
+        return true;
     }
 
     protected boolean isFinished() {
-        if (this.currentState != 11) {
-            if (this.currentState != 4) {
-                return false;
-            }
-        }
-        return true;
+        return this.currentState == 11 || this.currentState == 4;
     }
 
     @TargetApi(26)
     protected PhoneAccountHandle addAccountToTelecomManager() {
         TelecomManager tm = (TelecomManager) getSystemService("telecom");
         User self = UserConfig.getInstance(this.currentAccount).getCurrentUser();
-        ComponentName componentName = new ComponentName(this, TelegramConnectionService.class);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(TtmlNode.ANONYMOUS_REGION_ID);
-        stringBuilder.append(self.id);
-        PhoneAccountHandle handle = new PhoneAccountHandle(componentName, stringBuilder.toString());
+        PhoneAccountHandle handle = new PhoneAccountHandle(new ComponentName(this, TelegramConnectionService.class), TtmlNode.ANONYMOUS_REGION_ID + self.id);
         tm.registerPhoneAccount(new PhoneAccount.Builder(handle, ContactsController.formatName(self.first_name, self.last_name)).setCapabilities(2048).setIcon(Icon.createWithResource(this, R.drawable.ic_launcher)).setHighlightColor(-13851168).addSupportedUriScheme("sip").build());
         return handle;
+    }
+
+    private static boolean isDeviceCompatibleWithConnectionServiceAPI() {
+        if (VERSION.SDK_INT < 26) {
+            return false;
+        }
+        if ("angler".equals(Build.PRODUCT) || "bullhead".equals(Build.PRODUCT) || "sailfish".equals(Build.PRODUCT) || "marlin".equals(Build.PRODUCT) || "walleye".equals(Build.PRODUCT) || "taimen".equals(Build.PRODUCT)) {
+            return true;
+        }
+        return false;
     }
 }

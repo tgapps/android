@@ -20,7 +20,6 @@ final class zzz implements OnCompleteListener<Map<zzh<?>, String>> {
     public final void onComplete(Task<Map<zzh<?>, String>> task) {
         this.zzgu.zzga.lock();
         try {
-            SignInConnectionListener signInConnectionListener;
             if (this.zzgu.zzgp) {
                 if (task.isSuccessful()) {
                     this.zzgu.zzgr = new ArrayMap(this.zzgu.zzgh.size());
@@ -32,16 +31,13 @@ final class zzz implements OnCompleteListener<Map<zzh<?>, String>> {
                     if (this.zzgu.zzgn) {
                         this.zzgu.zzgr = new ArrayMap(this.zzgu.zzgh.size());
                         for (zzv com_google_android_gms_common_api_internal_zzv : this.zzgu.zzgh.values()) {
-                            Map zzg;
                             zzh zzm2 = com_google_android_gms_common_api_internal_zzv.zzm();
-                            Object connectionResult = availabilityException.getConnectionResult(com_google_android_gms_common_api_internal_zzv);
-                            if (this.zzgu.zza(com_google_android_gms_common_api_internal_zzv, (ConnectionResult) connectionResult)) {
-                                zzg = this.zzgu.zzgr;
-                                connectionResult = new ConnectionResult(16);
+                            ConnectionResult connectionResult = availabilityException.getConnectionResult(com_google_android_gms_common_api_internal_zzv);
+                            if (this.zzgu.zza(com_google_android_gms_common_api_internal_zzv, connectionResult)) {
+                                this.zzgu.zzgr.put(zzm2, new ConnectionResult(16));
                             } else {
-                                zzg = this.zzgu.zzgr;
+                                this.zzgu.zzgr.put(zzm2, connectionResult);
                             }
-                            zzg.put(zzm2, connectionResult);
                         }
                     } else {
                         this.zzgu.zzgr = availabilityException.zzl();
@@ -58,11 +54,11 @@ final class zzz implements OnCompleteListener<Map<zzh<?>, String>> {
                         this.zzgu.zzgl.signalAll();
                     }
                 }
-                signInConnectionListener = this.zzgv;
-            } else {
-                signInConnectionListener = this.zzgv;
+                this.zzgv.onComplete();
+                this.zzgu.zzga.unlock();
+                return;
             }
-            signInConnectionListener.onComplete();
+            this.zzgv.onComplete();
         } finally {
             this.zzgu.zzga.unlock();
         }

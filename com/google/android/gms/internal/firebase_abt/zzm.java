@@ -17,14 +17,14 @@ public final class zzm {
     public static final byte[] zzao = new byte[0];
 
     public static final int zzb(zza com_google_android_gms_internal_firebase_abt_zza, int i) throws IOException {
-        i = com_google_android_gms_internal_firebase_abt_zza.getPosition();
-        com_google_android_gms_internal_firebase_abt_zza.zzb(106);
         int i2 = 1;
+        int position = com_google_android_gms_internal_firebase_abt_zza.getPosition();
+        com_google_android_gms_internal_firebase_abt_zza.zzb(106);
         while (com_google_android_gms_internal_firebase_abt_zza.zzd() == 106) {
             com_google_android_gms_internal_firebase_abt_zza.zzb(106);
             i2++;
         }
-        com_google_android_gms_internal_firebase_abt_zza.zzb(i, 106);
+        com_google_android_gms_internal_firebase_abt_zza.zzb(position, 106);
         return i2;
     }
 }

@@ -208,10 +208,11 @@ public class ViewPager extends ViewGroup {
         public int compare(View lhs, View rhs) {
             LayoutParams llp = (LayoutParams) lhs.getLayoutParams();
             LayoutParams rlp = (LayoutParams) rhs.getLayoutParams();
-            if (llp.isDecor == rlp.isDecor) {
+            if (llp.isDecor != rlp.isDecor) {
+                return llp.isDecor ? 1 : -1;
+            } else {
                 return llp.position - rlp.position;
             }
-            return llp.isDecor ? 1 : -1;
         }
     }
 
@@ -246,17 +247,21 @@ public class ViewPager extends ViewGroup {
             if (super.performAccessibilityAction(host, action, args)) {
                 return true;
             }
-            if (action != 4096) {
-                if (action != MessagesController.UPDATE_MASK_CHANNEL || !ViewPager.this.canScrollHorizontally(-1)) {
+            switch (action) {
+                case 4096:
+                    if (!ViewPager.this.canScrollHorizontally(1)) {
+                        return false;
+                    }
+                    ViewPager.this.setCurrentItem(ViewPager.this.mCurItem + 1);
+                    return true;
+                case MessagesController.UPDATE_MASK_CHANNEL /*8192*/:
+                    if (!ViewPager.this.canScrollHorizontally(-1)) {
+                        return false;
+                    }
+                    ViewPager.this.setCurrentItem(ViewPager.this.mCurItem - 1);
+                    return true;
+                default:
                     return false;
-                }
-                ViewPager.this.setCurrentItem(ViewPager.this.mCurItem - 1);
-                return true;
-            } else if (!ViewPager.this.canScrollHorizontally(1)) {
-                return false;
-            } else {
-                ViewPager.this.setCurrentItem(ViewPager.this.mCurItem + 1);
-                return true;
             }
         }
 
@@ -294,13 +299,7 @@ public class ViewPager extends ViewGroup {
         }
 
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("FragmentPager.SavedState{");
-            stringBuilder.append(Integer.toHexString(System.identityHashCode(this)));
-            stringBuilder.append(" position=");
-            stringBuilder.append(this.position);
-            stringBuilder.append("}");
-            return stringBuilder.toString();
+            return "FragmentPager.SavedState{" + Integer.toHexString(System.identityHashCode(this)) + " position=" + this.position + "}";
         }
 
         SavedState(Parcel in, ClassLoader loader) {
@@ -312,87 +311,6 @@ public class ViewPager extends ViewGroup {
             this.adapterState = in.readParcelable(loader);
             this.loader = loader;
         }
-    }
-
-    private void recomputeScrollPosition(int r1, int r2, int r3, int r4) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: android.support.v4.view.ViewPager.recomputeScrollPosition(int, int, int, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        if (r8 <= 0) goto L_0x004b;
-    L_0x0002:
-        r0 = r6.mItems;
-        r0 = r0.isEmpty();
-        if (r0 != 0) goto L_0x004b;
-    L_0x000a:
-        r0 = r6.mScroller;
-        r0 = r0.isFinished();
-        if (r0 != 0) goto L_0x0021;
-    L_0x0012:
-        r0 = r6.mScroller;
-        r1 = r6.getCurrentItem();
-        r2 = r6.getClientWidth();
-        r1 = r1 * r2;
-        r0.setFinalX(r1);
-        goto L_0x007d;
-    L_0x0021:
-        r0 = r6.getPaddingLeft();
-        r0 = r7 - r0;
-        r1 = r6.getPaddingRight();
-        r0 = r0 - r1;
-        r0 = r0 + r9;
-        r1 = r6.getPaddingLeft();
-        r1 = r8 - r1;
-        r2 = r6.getPaddingRight();
-        r1 = r1 - r2;
-        r1 = r1 + r10;
-        r2 = r6.getScrollX();
-        r3 = (float) r2;
-        r4 = (float) r1;
-        r3 = r3 / r4;
-        r4 = (float) r0;
-        r4 = r4 * r3;
-        r4 = (int) r4;
-        r5 = r6.getScrollY();
-        r6.scrollTo(r4, r5);
-        goto L_0x007d;
-    L_0x004b:
-        r0 = r6.mCurItem;
-        r0 = r6.infoForPosition(r0);
-        if (r0 == 0) goto L_0x005c;
-    L_0x0053:
-        r1 = r0.offset;
-        r2 = r6.mLastOffset;
-        r1 = java.lang.Math.min(r1, r2);
-        goto L_0x005d;
-    L_0x005c:
-        r1 = 0;
-        r2 = r6.getPaddingLeft();
-        r2 = r7 - r2;
-        r3 = r6.getPaddingRight();
-        r2 = r2 - r3;
-        r2 = (float) r2;
-        r2 = r2 * r1;
-        r2 = (int) r2;
-        r3 = r6.getScrollX();
-        if (r2 == r3) goto L_0x007d;
-        r3 = 0;
-        r6.completeScroll(r3);
-        r3 = r6.getScrollY();
-        r6.scrollTo(r2, r3);
-    L_0x007d:
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: android.support.v4.view.ViewPager.recomputeScrollPosition(int, int, int, int):void");
     }
 
     public ViewPager(Context context) {
@@ -470,10 +388,11 @@ Caused by: java.lang.NullPointerException
     }
 
     public void setAdapter(PagerAdapter adapter) {
+        int i;
         if (this.mAdapter != null) {
             this.mAdapter.setViewPagerObserver(null);
             this.mAdapter.startUpdate((ViewGroup) this);
-            for (int i = 0; i < this.mItems.size(); i++) {
+            for (i = 0; i < this.mItems.size(); i++) {
                 ItemInfo ii = (ItemInfo) this.mItems.get(i);
                 this.mAdapter.destroyItem((ViewGroup) this, ii.position, ii.object);
             }
@@ -509,8 +428,8 @@ Caused by: java.lang.NullPointerException
         }
         if (this.mAdapterChangeListeners != null && !this.mAdapterChangeListeners.isEmpty()) {
             int count = this.mAdapterChangeListeners.size();
-            for (int i2 = 0; i2 < count; i2++) {
-                ((OnAdapterChangeListener) this.mAdapterChangeListeners.get(i2)).onAdapterChanged(this, oldAdapter, adapter);
+            for (i = 0; i < count; i++) {
+                ((OnAdapterChangeListener) this.mAdapterChangeListeners.get(i)).onAdapterChanged(this, oldAdapter, adapter);
             }
         }
     }
@@ -548,8 +467,14 @@ Caused by: java.lang.NullPointerException
     }
 
     public void setCurrentItem(int item) {
+        boolean z;
         this.mPopulatePending = false;
-        setCurrentItemInternal(item, this.mFirstLayout ^ 1, false);
+        if (this.mFirstLayout) {
+            z = false;
+        } else {
+            z = true;
+        }
+        setCurrentItemInternal(item, z, false);
     }
 
     public void setCurrentItem(int item, boolean smoothScroll) {
@@ -566,41 +491,37 @@ Caused by: java.lang.NullPointerException
     }
 
     void setCurrentItemInternal(int item, boolean smoothScroll, boolean always, int velocity) {
-        if (this.mAdapter != null) {
-            if (this.mAdapter.getCount() > 0) {
-                if (always || this.mCurItem != item || this.mItems.size() == 0) {
-                    boolean dispatchSelected = true;
-                    if (item < 0) {
-                        item = 0;
-                    } else if (item >= this.mAdapter.getCount()) {
-                        item = this.mAdapter.getCount() - 1;
-                    }
-                    int pageLimit = this.mOffscreenPageLimit;
-                    if (item > this.mCurItem + pageLimit || item < this.mCurItem - pageLimit) {
-                        for (int i = 0; i < this.mItems.size(); i++) {
-                            ((ItemInfo) this.mItems.get(i)).scrolling = true;
-                        }
-                    }
-                    if (this.mCurItem == item) {
-                        dispatchSelected = false;
-                    }
-                    if (this.mFirstLayout) {
-                        this.mCurItem = item;
-                        if (dispatchSelected) {
-                            dispatchOnPageSelected(item);
-                        }
-                        requestLayout();
-                    } else {
-                        populate(item);
-                        scrollToItem(item, smoothScroll, velocity, dispatchSelected);
-                    }
-                    return;
+        boolean dispatchSelected = true;
+        if (this.mAdapter == null || this.mAdapter.getCount() <= 0) {
+            setScrollingCacheEnabled(false);
+        } else if (always || this.mCurItem != item || this.mItems.size() == 0) {
+            if (item < 0) {
+                item = 0;
+            } else if (item >= this.mAdapter.getCount()) {
+                item = this.mAdapter.getCount() - 1;
+            }
+            int pageLimit = this.mOffscreenPageLimit;
+            if (item > this.mCurItem + pageLimit || item < this.mCurItem - pageLimit) {
+                for (int i = 0; i < this.mItems.size(); i++) {
+                    ((ItemInfo) this.mItems.get(i)).scrolling = true;
                 }
-                setScrollingCacheEnabled(false);
+            }
+            if (this.mCurItem == item) {
+                dispatchSelected = false;
+            }
+            if (this.mFirstLayout) {
+                this.mCurItem = item;
+                if (dispatchSelected) {
+                    dispatchOnPageSelected(item);
+                }
+                requestLayout();
                 return;
             }
+            populate(item);
+            scrollToItem(item, smoothScroll, velocity, dispatchSelected);
+        } else {
+            setScrollingCacheEnabled(false);
         }
-        setScrollingCacheEnabled(false);
     }
 
     private void scrollToItem(int item, boolean smoothScroll, int velocity, boolean dispatchSelected) {
@@ -654,9 +575,20 @@ Caused by: java.lang.NullPointerException
     }
 
     public void setPageTransformer(boolean reverseDrawingOrder, PageTransformer transformer, int pageLayerType) {
+        boolean hasTransformer;
+        boolean z;
         int i = 1;
-        boolean hasTransformer = transformer != null;
-        boolean needsPopulate = hasTransformer != (this.mPageTransformer != null);
+        if (transformer != null) {
+            hasTransformer = true;
+        } else {
+            hasTransformer = false;
+        }
+        if (this.mPageTransformer != null) {
+            z = true;
+        } else {
+            z = false;
+        }
+        boolean needsPopulate = hasTransformer != z;
         this.mPageTransformer = transformer;
         setChildrenDrawingOrderEnabled(hasTransformer);
         if (hasTransformer) {
@@ -674,7 +606,13 @@ Caused by: java.lang.NullPointerException
     }
 
     protected int getChildDrawingOrder(int childCount, int i) {
-        return ((LayoutParams) ((View) this.mDrawingOrderedChildren.get(this.mDrawingOrder == 2 ? (childCount - 1) - i : i)).getLayoutParams()).childIndex;
+        int index;
+        if (this.mDrawingOrder == 2) {
+            index = (childCount - 1) - i;
+        } else {
+            index = i;
+        }
+        return ((LayoutParams) ((View) this.mDrawingOrderedChildren.get(index)).getLayoutParams()).childIndex;
     }
 
     OnPageChangeListener setInternalPageChangeListener(OnPageChangeListener listener) {
@@ -689,13 +627,7 @@ Caused by: java.lang.NullPointerException
 
     public void setOffscreenPageLimit(int limit) {
         if (limit < 1) {
-            String str = TAG;
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Requested offscreen page limit ");
-            stringBuilder.append(limit);
-            stringBuilder.append(" too small; defaulting to ");
-            stringBuilder.append(1);
-            Log.w(str, stringBuilder.toString());
+            Log.w(TAG, "Requested offscreen page limit " + limit + " too small; defaulting to " + 1);
             limit = 1;
         }
         if (limit != this.mOffscreenPageLimit) {
@@ -730,12 +662,7 @@ Caused by: java.lang.NullPointerException
     }
 
     protected boolean verifyDrawable(Drawable who) {
-        if (!super.verifyDrawable(who)) {
-            if (who != this.mMarginDrawable) {
-                return false;
-            }
-        }
-        return true;
+        return super.verifyDrawable(who) || who == this.mMarginDrawable;
     }
 
     protected void drawableStateChanged() {
@@ -755,16 +682,15 @@ Caused by: java.lang.NullPointerException
     }
 
     void smoothScrollTo(int x, int y, int velocity) {
-        ViewPager viewPager = this;
         if (getChildCount() == 0) {
             setScrollingCacheEnabled(false);
             return;
         }
         int sx;
-        boolean wasScrolling = (viewPager.mScroller == null || viewPager.mScroller.isFinished()) ? false : true;
+        boolean wasScrolling = (this.mScroller == null || this.mScroller.isFinished()) ? false : true;
         if (wasScrolling) {
-            sx = viewPager.mIsScrollStarted ? viewPager.mScroller.getCurrX() : viewPager.mScroller.getStartX();
-            viewPager.mScroller.abortAnimation();
+            sx = this.mIsScrollStarted ? this.mScroller.getCurrX() : this.mScroller.getStartX();
+            this.mScroller.abortAnimation();
             setScrollingCacheEnabled(false);
         } else {
             sx = getScrollX();
@@ -783,17 +709,16 @@ Caused by: java.lang.NullPointerException
         setScrollState(2);
         int width = getClientWidth();
         int halfWidth = width / 2;
-        float distanceRatio = Math.min(1.0f, (((float) Math.abs(dx)) * 1.0f) / ((float) width));
-        float distance = ((float) halfWidth) + (((float) halfWidth) * distanceInfluenceForSnapDuration(distanceRatio));
-        int velocity2 = Math.abs(velocity);
-        if (velocity2 > 0) {
-            duration = 4 * Math.round(1000.0f * Math.abs(distance / ((float) velocity2)));
+        float distance = ((float) halfWidth) + (((float) halfWidth) * distanceInfluenceForSnapDuration(Math.min(1.0f, (1.0f * ((float) Math.abs(dx))) / ((float) width))));
+        velocity = Math.abs(velocity);
+        if (velocity > 0) {
+            duration = Math.round(1000.0f * Math.abs(distance / ((float) velocity))) * 4;
         } else {
-            duration = (int) ((1.0f + (((float) Math.abs(dx)) / (((float) viewPager.mPageMargin) + (((float) width) * viewPager.mAdapter.getPageWidth(viewPager.mCurItem))))) * 100.0f);
+            duration = (int) ((1.0f + (((float) Math.abs(dx)) / (((float) this.mPageMargin) + (((float) width) * this.mAdapter.getPageWidth(this.mCurItem))))) * 100.0f);
         }
-        int duration2 = Math.min(duration, MAX_SETTLE_DURATION);
-        viewPager.mIsScrollStarted = false;
-        viewPager.mScroller.startScroll(sx, sy, dx, dy, duration2);
+        duration = Math.min(duration, MAX_SETTLE_DURATION);
+        this.mIsScrollStarted = false;
+        this.mScroller.startScroll(sx, sy, dx, dy, duration);
         ViewCompat.postInvalidateOnAnimation(this);
     }
 
@@ -802,23 +727,25 @@ Caused by: java.lang.NullPointerException
         ii.position = position;
         ii.object = this.mAdapter.instantiateItem((ViewGroup) this, position);
         ii.widthFactor = this.mAdapter.getPageWidth(position);
-        if (index >= 0) {
-            if (index < this.mItems.size()) {
-                this.mItems.add(index, ii);
-                return ii;
-            }
+        if (index < 0 || index >= this.mItems.size()) {
+            this.mItems.add(ii);
+        } else {
+            this.mItems.add(index, ii);
         }
-        this.mItems.add(ii);
         return ii;
     }
 
     void dataSetChanged() {
+        boolean needPopulate;
         int adapterCount = this.mAdapter.getCount();
         this.mExpectedAdapterCount = adapterCount;
-        boolean needPopulate = this.mItems.size() < (this.mOffscreenPageLimit * 2) + 1 && this.mItems.size() < adapterCount;
-        boolean isUpdating = false;
+        if (this.mItems.size() >= (this.mOffscreenPageLimit * 2) + 1 || this.mItems.size() >= adapterCount) {
+            needPopulate = false;
+        } else {
+            needPopulate = true;
+        }
         int newCurrItem = this.mCurItem;
-        boolean needPopulate2 = needPopulate;
+        boolean isUpdating = false;
         int i = 0;
         while (i < this.mItems.size()) {
             ItemInfo ii = (ItemInfo) this.mItems.get(i);
@@ -832,17 +759,17 @@ Caused by: java.lang.NullPointerException
                         isUpdating = true;
                     }
                     this.mAdapter.destroyItem((ViewGroup) this, ii.position, ii.object);
-                    needPopulate2 = true;
+                    needPopulate = true;
                     if (this.mCurItem == ii.position) {
                         newCurrItem = Math.max(0, Math.min(this.mCurItem, adapterCount - 1));
-                        needPopulate2 = true;
+                        needPopulate = true;
                     }
                 } else if (ii.position != newPos) {
                     if (ii.position == this.mCurItem) {
                         newCurrItem = newPos;
                     }
                     ii.position = newPos;
-                    needPopulate2 = true;
+                    needPopulate = true;
                 }
             }
             i++;
@@ -851,10 +778,10 @@ Caused by: java.lang.NullPointerException
             this.mAdapter.finishUpdate((ViewGroup) this);
         }
         Collections.sort(this.mItems, COMPARATOR);
-        if (needPopulate2) {
-            i = getChildCount();
-            for (int i2 = 0; i2 < i; i2++) {
-                LayoutParams lp = (LayoutParams) getChildAt(i2).getLayoutParams();
+        if (needPopulate) {
+            int childCount = getChildCount();
+            for (i = 0; i < childCount; i++) {
+                LayoutParams lp = (LayoutParams) getChildAt(i).getLayoutParams();
                 if (!lp.isDecor) {
                     lp.widthFactor = 0.0f;
                 }
@@ -869,277 +796,226 @@ Caused by: java.lang.NullPointerException
     }
 
     void populate(int newCurrentItem) {
-        int i = newCurrentItem;
         ItemInfo oldCurInfo = null;
-        if (this.mCurItem != i) {
-            oldCurInfo = infoForPosition(r1.mCurItem);
-            r1.mCurItem = i;
+        if (this.mCurItem != newCurrentItem) {
+            oldCurInfo = infoForPosition(this.mCurItem);
+            this.mCurItem = newCurrentItem;
         }
-        if (r1.mAdapter == null) {
+        if (this.mAdapter == null) {
             sortChildDrawingOrder();
-        } else if (r1.mPopulatePending) {
+        } else if (this.mPopulatePending) {
             sortChildDrawingOrder();
         } else if (getWindowToken() != null) {
-            r1.mAdapter.startUpdate(r1);
-            int pageLimit = r1.mOffscreenPageLimit;
-            int startPos = Math.max(0, r1.mCurItem - pageLimit);
-            int N = r1.mAdapter.getCount();
-            int endPos = Math.min(N - 1, r1.mCurItem + pageLimit);
-            if (N != r1.mExpectedAdapterCount) {
+            this.mAdapter.startUpdate((ViewGroup) this);
+            int pageLimit = this.mOffscreenPageLimit;
+            int startPos = Math.max(0, this.mCurItem - pageLimit);
+            int N = this.mAdapter.getCount();
+            int endPos = Math.min(N - 1, this.mCurItem + pageLimit);
+            if (N != this.mExpectedAdapterCount) {
                 String resName;
                 try {
                     resName = getResources().getResourceName(getId());
                 } catch (NotFoundException e) {
                     resName = Integer.toHexString(getId());
                 }
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("The application's PagerAdapter changed the adapter's contents without calling PagerAdapter#notifyDataSetChanged! Expected adapter item count: ");
-                stringBuilder.append(r1.mExpectedAdapterCount);
-                stringBuilder.append(", found: ");
-                stringBuilder.append(N);
-                stringBuilder.append(" Pager id: ");
-                stringBuilder.append(resName);
-                stringBuilder.append(" Pager class: ");
-                stringBuilder.append(getClass());
-                stringBuilder.append(" Problematic adapter: ");
-                stringBuilder.append(r1.mAdapter.getClass());
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException("The application's PagerAdapter changed the adapter's contents without calling PagerAdapter#notifyDataSetChanged! Expected adapter item count: " + this.mExpectedAdapterCount + ", found: " + N + " Pager id: " + resName + " Pager class: " + getClass() + " Problematic adapter: " + this.mAdapter.getClass());
             }
             ItemInfo ii;
             float extraWidthLeft;
             int itemIndex;
-            ItemInfo ii2;
             int clientWidth;
             float leftWidthNeeded;
             int pos;
-            float leftWidthNeeded2;
-            ItemInfo itemInfo;
+            float extraWidthRight;
             float rightWidthNeeded;
-            int ii3;
-            int pageLimit2;
-            int startPos2;
+            int childCount;
+            int i;
             View child;
             LayoutParams lp;
             View currentFocused;
-            ItemInfo ii4;
-            int i2;
-            View child2;
             ItemInfo curItem = null;
             int curIndex = 0;
-            while (curIndex < r1.mItems.size()) {
-                ii = (ItemInfo) r1.mItems.get(curIndex);
-                if (ii.position >= r1.mCurItem) {
-                    if (ii.position == r1.mCurItem) {
+            while (curIndex < this.mItems.size()) {
+                ii = (ItemInfo) this.mItems.get(curIndex);
+                if (ii.position >= this.mCurItem) {
+                    if (ii.position == this.mCurItem) {
                         curItem = ii;
                     }
                     if (curItem == null && N > 0) {
-                        curItem = addNewItem(r1.mCurItem, curIndex);
+                        curItem = addNewItem(this.mCurItem, curIndex);
                     }
-                    if (curItem == null) {
+                    if (curItem != null) {
                         extraWidthLeft = 0.0f;
                         itemIndex = curIndex - 1;
-                        ii2 = itemIndex < 0 ? (ItemInfo) r1.mItems.get(itemIndex) : null;
+                        ii = itemIndex < 0 ? (ItemInfo) this.mItems.get(itemIndex) : null;
                         clientWidth = getClientWidth();
-                        leftWidthNeeded = clientWidth > 0 ? 0.0f : (((float) getPaddingLeft()) / ((float) clientWidth)) + (2.0f - curItem.widthFactor);
-                        pos = r1.mCurItem - 1;
+                        if (clientWidth > 0) {
+                            leftWidthNeeded = 0.0f;
+                        } else {
+                            leftWidthNeeded = (2.0f - curItem.widthFactor) + (((float) getPaddingLeft()) / ((float) clientWidth));
+                        }
+                        pos = this.mCurItem - 1;
                         while (pos >= 0) {
                             if (extraWidthLeft >= leftWidthNeeded || pos >= startPos) {
-                                leftWidthNeeded2 = leftWidthNeeded;
-                                if (ii2 == null && pos == ii2.position) {
-                                    extraWidthLeft += ii2.widthFactor;
+                                if (ii == null && pos == ii.position) {
+                                    extraWidthLeft += ii.widthFactor;
                                     itemIndex--;
-                                    leftWidthNeeded = itemIndex >= 0 ? (ItemInfo) r1.mItems.get(itemIndex) : null;
+                                    ii = itemIndex >= 0 ? (ItemInfo) this.mItems.get(itemIndex) : null;
                                 } else {
                                     extraWidthLeft += addNewItem(pos, itemIndex + 1).widthFactor;
                                     curIndex++;
-                                    leftWidthNeeded = itemIndex < 0 ? (ItemInfo) r1.mItems.get(itemIndex) : null;
-                                    ii2 = leftWidthNeeded;
-                                    pos--;
-                                    leftWidthNeeded = leftWidthNeeded2;
+                                    ii = itemIndex < 0 ? (ItemInfo) this.mItems.get(itemIndex) : null;
                                 }
-                            } else if (ii2 == null) {
-                                leftWidthNeeded2 = leftWidthNeeded;
+                            } else if (ii == null) {
                                 break;
-                            } else if (pos != ii2.position || ii2.scrolling) {
-                                leftWidthNeeded2 = leftWidthNeeded;
-                                pos--;
-                                leftWidthNeeded = leftWidthNeeded2;
                             } else {
-                                r1.mItems.remove(itemIndex);
-                                leftWidthNeeded2 = leftWidthNeeded;
-                                r1.mAdapter.destroyItem(r1, pos, ii2.object);
-                                itemIndex--;
-                                curIndex--;
-                                leftWidthNeeded = itemIndex >= 0 ? (ItemInfo) r1.mItems.get(itemIndex) : null;
-                            }
-                            ii2 = leftWidthNeeded;
-                            pos--;
-                            leftWidthNeeded = leftWidthNeeded2;
-                        }
-                        leftWidthNeeded = curItem.widthFactor;
-                        pos = curIndex + 1;
-                        if (leftWidthNeeded >= 2.0f) {
-                            itemInfo = pos >= r1.mItems.size() ? (ItemInfo) r1.mItems.get(pos) : null;
-                            rightWidthNeeded = clientWidth > 0 ? 0.0f : (((float) getPaddingRight()) / ((float) clientWidth)) + 2.0f;
-                            ii3 = r1.mCurItem + 1;
-                            while (ii3 < N) {
-                                if (leftWidthNeeded >= rightWidthNeeded || ii3 <= endPos) {
-                                    pageLimit2 = pageLimit;
-                                    startPos2 = startPos;
-                                    if (itemInfo == null && ii3 == itemInfo.position) {
-                                        leftWidthNeeded += itemInfo.widthFactor;
-                                        pos++;
-                                        itemInfo = pos < r1.mItems.size() ? (ItemInfo) r1.mItems.get(pos) : 0;
+                                if (pos == ii.position && !ii.scrolling) {
+                                    this.mItems.remove(itemIndex);
+                                    this.mAdapter.destroyItem((ViewGroup) this, pos, ii.object);
+                                    itemIndex--;
+                                    curIndex--;
+                                    if (itemIndex >= 0) {
+                                        ii = (ItemInfo) this.mItems.get(itemIndex);
                                     } else {
-                                        pageLimit = addNewItem(ii3, pos);
-                                        pos++;
-                                        leftWidthNeeded += pageLimit.widthFactor;
-                                        itemInfo = pos >= r1.mItems.size() ? (ItemInfo) r1.mItems.get(pos) : null;
+                                        ii = null;
                                     }
-                                } else if (itemInfo == null) {
-                                    pageLimit2 = pageLimit;
-                                    startPos2 = startPos;
+                                }
+                            }
+                            pos--;
+                        }
+                        extraWidthRight = curItem.widthFactor;
+                        itemIndex = curIndex + 1;
+                        if (extraWidthRight < 2.0f) {
+                            ii = itemIndex >= this.mItems.size() ? (ItemInfo) this.mItems.get(itemIndex) : null;
+                            if (clientWidth > 0) {
+                                rightWidthNeeded = 0.0f;
+                            } else {
+                                rightWidthNeeded = (((float) getPaddingRight()) / ((float) clientWidth)) + 2.0f;
+                            }
+                            pos = this.mCurItem + 1;
+                            while (pos < N) {
+                                if (extraWidthRight >= rightWidthNeeded || pos <= endPos) {
+                                    if (ii == null && pos == ii.position) {
+                                        extraWidthRight += ii.widthFactor;
+                                        itemIndex++;
+                                        ii = itemIndex < this.mItems.size() ? (ItemInfo) this.mItems.get(itemIndex) : null;
+                                    } else {
+                                        itemIndex++;
+                                        extraWidthRight += addNewItem(pos, itemIndex).widthFactor;
+                                        ii = itemIndex >= this.mItems.size() ? (ItemInfo) this.mItems.get(itemIndex) : null;
+                                    }
+                                } else if (ii == null) {
                                     break;
                                 } else {
-                                    pageLimit2 = pageLimit;
-                                    if (ii3 == itemInfo.position && itemInfo.scrolling == 0) {
-                                        r1.mItems.remove(pos);
-                                        startPos2 = startPos;
-                                        r1.mAdapter.destroyItem(r1, ii3, itemInfo.object);
-                                        itemInfo = pos < r1.mItems.size() ? (ItemInfo) r1.mItems.get(pos) : 0;
-                                    } else {
-                                        startPos2 = startPos;
+                                    if (pos == ii.position && !ii.scrolling) {
+                                        this.mItems.remove(itemIndex);
+                                        this.mAdapter.destroyItem((ViewGroup) this, pos, ii.object);
+                                        if (itemIndex < this.mItems.size()) {
+                                            ii = (ItemInfo) this.mItems.get(itemIndex);
+                                        } else {
+                                            ii = null;
+                                        }
                                     }
                                 }
-                                ii3++;
-                                pageLimit = pageLimit2;
-                                startPos = startPos2;
+                                pos++;
                             }
-                            startPos2 = startPos;
-                        } else {
-                            pageLimit2 = pageLimit;
-                            startPos2 = startPos;
-                            itemInfo = ii2;
                         }
                         calculatePageOffsets(curItem, curIndex, oldCurInfo);
-                        r1.mAdapter.setPrimaryItem(r1, r1.mCurItem, curItem.object);
-                    } else {
-                        startPos2 = startPos;
+                        this.mAdapter.setPrimaryItem((ViewGroup) this, this.mCurItem, curItem.object);
                     }
-                    r1.mAdapter.finishUpdate(r1);
-                    i = getChildCount();
-                    for (pageLimit = 0; pageLimit < i; pageLimit++) {
-                        child = getChildAt(pageLimit);
+                    this.mAdapter.finishUpdate((ViewGroup) this);
+                    childCount = getChildCount();
+                    for (i = 0; i < childCount; i++) {
+                        child = getChildAt(i);
                         lp = (LayoutParams) child.getLayoutParams();
-                        lp.childIndex = pageLimit;
-                        if (!lp.isDecor) {
-                            if (lp.widthFactor == 0.0f) {
-                                ii = infoForChild(child);
-                                if (ii != null) {
-                                    lp.widthFactor = ii.widthFactor;
-                                    lp.position = ii.position;
-                                }
+                        lp.childIndex = i;
+                        if (!lp.isDecor && lp.widthFactor == 0.0f) {
+                            ii = infoForChild(child);
+                            if (ii != null) {
+                                lp.widthFactor = ii.widthFactor;
+                                lp.position = ii.position;
                             }
                         }
                     }
                     sortChildDrawingOrder();
                     if (hasFocus()) {
                         currentFocused = findFocus();
-                        ii4 = currentFocused == null ? infoForAnyChild(currentFocused) : null;
-                        if (ii4 == null || ii4.position != r1.mCurItem) {
-                            i2 = 0;
-                            while (true) {
-                                clientWidth = i2;
-                                if (clientWidth < getChildCount()) {
-                                    break;
+                        ii = currentFocused == null ? infoForAnyChild(currentFocused) : null;
+                        if (ii != null || ii.position != this.mCurItem) {
+                            while (i < getChildCount()) {
+                                child = getChildAt(i);
+                                ii = infoForChild(child);
+                                if (ii != null || ii.position != this.mCurItem || !child.requestFocus(2)) {
+                                } else {
+                                    return;
                                 }
-                                child2 = getChildAt(clientWidth);
-                                ii4 = infoForChild(child2);
-                                if (ii4 == null && ii4.position == r1.mCurItem && child2.requestFocus(2)) {
-                                    break;
-                                }
-                                i2 = clientWidth + 1;
                             }
                         }
+                        return;
                     }
                 }
                 curIndex++;
             }
-            curItem = addNewItem(r1.mCurItem, curIndex);
-            if (curItem == null) {
-                startPos2 = startPos;
-            } else {
+            curItem = addNewItem(this.mCurItem, curIndex);
+            if (curItem != null) {
                 extraWidthLeft = 0.0f;
                 itemIndex = curIndex - 1;
                 if (itemIndex < 0) {
                 }
                 clientWidth = getClientWidth();
                 if (clientWidth > 0) {
+                    leftWidthNeeded = (2.0f - curItem.widthFactor) + (((float) getPaddingLeft()) / ((float) clientWidth));
+                } else {
+                    leftWidthNeeded = 0.0f;
                 }
-                leftWidthNeeded = clientWidth > 0 ? 0.0f : (((float) getPaddingLeft()) / ((float) clientWidth)) + (2.0f - curItem.widthFactor);
-                pos = r1.mCurItem - 1;
+                pos = this.mCurItem - 1;
                 while (pos >= 0) {
                     if (extraWidthLeft >= leftWidthNeeded) {
                     }
-                    leftWidthNeeded2 = leftWidthNeeded;
-                    if (ii2 == null) {
+                    if (ii == null) {
                     }
                     extraWidthLeft += addNewItem(pos, itemIndex + 1).widthFactor;
                     curIndex++;
                     if (itemIndex < 0) {
                     }
-                    leftWidthNeeded = itemIndex < 0 ? (ItemInfo) r1.mItems.get(itemIndex) : null;
-                    ii2 = leftWidthNeeded;
                     pos--;
-                    leftWidthNeeded = leftWidthNeeded2;
                 }
-                leftWidthNeeded = curItem.widthFactor;
-                pos = curIndex + 1;
-                if (leftWidthNeeded >= 2.0f) {
-                    pageLimit2 = pageLimit;
-                    startPos2 = startPos;
-                    itemInfo = ii2;
-                } else {
-                    if (pos >= r1.mItems.size()) {
+                extraWidthRight = curItem.widthFactor;
+                itemIndex = curIndex + 1;
+                if (extraWidthRight < 2.0f) {
+                    if (itemIndex >= this.mItems.size()) {
                     }
                     if (clientWidth > 0) {
+                        rightWidthNeeded = (((float) getPaddingRight()) / ((float) clientWidth)) + 2.0f;
+                    } else {
+                        rightWidthNeeded = 0.0f;
                     }
-                    ii3 = r1.mCurItem + 1;
-                    while (ii3 < N) {
-                        if (leftWidthNeeded >= rightWidthNeeded) {
+                    pos = this.mCurItem + 1;
+                    while (pos < N) {
+                        if (extraWidthRight >= rightWidthNeeded) {
                         }
-                        pageLimit2 = pageLimit;
-                        startPos2 = startPos;
-                        if (itemInfo == null) {
+                        if (ii == null) {
                         }
-                        pageLimit = addNewItem(ii3, pos);
+                        itemIndex++;
+                        extraWidthRight += addNewItem(pos, itemIndex).widthFactor;
+                        if (itemIndex >= this.mItems.size()) {
+                        }
                         pos++;
-                        leftWidthNeeded += pageLimit.widthFactor;
-                        if (pos >= r1.mItems.size()) {
-                        }
-                        ii3++;
-                        pageLimit = pageLimit2;
-                        startPos = startPos2;
                     }
-                    startPos2 = startPos;
                 }
                 calculatePageOffsets(curItem, curIndex, oldCurInfo);
-                r1.mAdapter.setPrimaryItem(r1, r1.mCurItem, curItem.object);
+                this.mAdapter.setPrimaryItem((ViewGroup) this, this.mCurItem, curItem.object);
             }
-            r1.mAdapter.finishUpdate(r1);
-            i = getChildCount();
-            for (pageLimit = 0; pageLimit < i; pageLimit++) {
-                child = getChildAt(pageLimit);
+            this.mAdapter.finishUpdate((ViewGroup) this);
+            childCount = getChildCount();
+            for (i = 0; i < childCount; i++) {
+                child = getChildAt(i);
                 lp = (LayoutParams) child.getLayoutParams();
-                lp.childIndex = pageLimit;
-                if (!lp.isDecor) {
-                    if (lp.widthFactor == 0.0f) {
-                        ii = infoForChild(child);
-                        if (ii != null) {
-                            lp.widthFactor = ii.widthFactor;
-                            lp.position = ii.position;
-                        }
-                    }
+                lp.childIndex = i;
+                ii = infoForChild(child);
+                if (ii != null) {
+                    lp.widthFactor = ii.widthFactor;
+                    lp.position = ii.position;
                 }
             }
             sortChildDrawingOrder();
@@ -1147,18 +1023,13 @@ Caused by: java.lang.NullPointerException
                 currentFocused = findFocus();
                 if (currentFocused == null) {
                 }
-                ii4 = currentFocused == null ? infoForAnyChild(currentFocused) : null;
-                i2 = 0;
-                while (true) {
-                    clientWidth = i2;
-                    if (clientWidth < getChildCount()) {
-                        break;
+                if (ii != null) {
+                }
+                for (i = 0; i < getChildCount(); i++) {
+                    child = getChildAt(i);
+                    ii = infoForChild(child);
+                    if (ii != null) {
                     }
-                    child2 = getChildAt(clientWidth);
-                    ii4 = infoForChild(child2);
-                    if (ii4 == null) {
-                    }
-                    i2 = clientWidth + 1;
                 }
             }
         }
@@ -1180,16 +1051,15 @@ Caused by: java.lang.NullPointerException
     }
 
     private void calculatePageOffsets(ItemInfo curItem, int curIndex, ItemInfo oldCurInfo) {
-        int oldCurPosition;
-        int itemIndex;
         float offset;
+        int pos;
+        ItemInfo ii;
         int N = this.mAdapter.getCount();
         int width = getClientWidth();
         float marginOffset = width > 0 ? ((float) this.mPageMargin) / ((float) width) : 0.0f;
         if (oldCurInfo != null) {
-            oldCurPosition = oldCurInfo.position;
-            int pos;
-            ItemInfo ii;
+            int oldCurPosition = oldCurInfo.position;
+            int itemIndex;
             if (oldCurPosition < curItem.position) {
                 itemIndex = 0;
                 offset = (oldCurInfo.offset + oldCurInfo.widthFactor) + marginOffset;
@@ -1228,42 +1098,42 @@ Caused by: java.lang.NullPointerException
                 }
             }
         }
-        oldCurPosition = this.mItems.size();
-        float offset2 = curItem.offset;
-        int pos2 = curItem.position - 1;
+        int itemCount = this.mItems.size();
+        offset = curItem.offset;
+        pos = curItem.position - 1;
         this.mFirstOffset = curItem.position == 0 ? curItem.offset : -3.4028235E38f;
         this.mLastOffset = curItem.position == N + -1 ? (curItem.offset + curItem.widthFactor) - 1.0f : Float.MAX_VALUE;
         int i = curIndex - 1;
         while (i >= 0) {
-            ItemInfo ii2 = (ItemInfo) this.mItems.get(i);
-            while (pos2 > ii2.position) {
-                offset2 -= this.mAdapter.getPageWidth(pos2) + marginOffset;
-                pos2--;
+            ii = (ItemInfo) this.mItems.get(i);
+            while (pos > ii.position) {
+                offset -= this.mAdapter.getPageWidth(pos) + marginOffset;
+                pos--;
             }
-            offset2 -= ii2.widthFactor + marginOffset;
-            ii2.offset = offset2;
-            if (ii2.position == 0) {
-                this.mFirstOffset = offset2;
+            offset -= ii.widthFactor + marginOffset;
+            ii.offset = offset;
+            if (ii.position == 0) {
+                this.mFirstOffset = offset;
             }
             i--;
-            pos2--;
+            pos--;
         }
         offset = (curItem.offset + curItem.widthFactor) + marginOffset;
-        itemIndex = curItem.position + 1;
-        pos2 = curIndex + 1;
-        while (pos2 < oldCurPosition) {
-            ii2 = (ItemInfo) this.mItems.get(pos2);
-            while (itemIndex < ii2.position) {
-                offset += this.mAdapter.getPageWidth(itemIndex) + marginOffset;
-                itemIndex++;
+        pos = curItem.position + 1;
+        i = curIndex + 1;
+        while (i < itemCount) {
+            ii = (ItemInfo) this.mItems.get(i);
+            while (pos < ii.position) {
+                offset += this.mAdapter.getPageWidth(pos) + marginOffset;
+                pos++;
             }
-            if (ii2.position == N - 1) {
-                this.mLastOffset = (ii2.widthFactor + offset) - 1.0f;
+            if (ii.position == N - 1) {
+                this.mLastOffset = (ii.widthFactor + offset) - 1.0f;
             }
-            ii2.offset = offset;
-            offset += ii2.widthFactor + marginOffset;
-            pos2++;
-            itemIndex++;
+            ii.offset = offset;
+            offset += ii.widthFactor + marginOffset;
+            i++;
+            pos++;
         }
         this.mNeedCalculatePageOffsets = false;
     }
@@ -1284,11 +1154,11 @@ Caused by: java.lang.NullPointerException
             if (this.mAdapter != null) {
                 this.mAdapter.restoreState(ss.adapterState, ss.loader);
                 setCurrentItemInternal(ss.position, false, true);
-            } else {
-                this.mRestoredCurItem = ss.position;
-                this.mRestoredAdapterState = ss.adapterState;
-                this.mRestoredClassLoader = ss.loader;
+                return;
             }
+            this.mRestoredCurItem = ss.position;
+            this.mRestoredAdapterState = ss.adapterState;
+            this.mRestoredClassLoader = ss.loader;
             return;
         }
         super.onRestoreInstanceState(state);
@@ -1334,17 +1204,12 @@ Caused by: java.lang.NullPointerException
 
     ItemInfo infoForAnyChild(View child) {
         while (true) {
-            Object parent = child.getParent();
-            ViewParent parent2 = parent;
+            View parent = child.getParent();
             if (parent == this) {
                 return infoForChild(child);
             }
-            if (parent2 == null) {
-                break;
-            } else if (!(parent2 instanceof View)) {
-                break;
-            } else {
-                child = (View) parent2;
+            if (parent != null && (parent instanceof View)) {
+                child = parent;
             }
         }
         return null;
@@ -1366,407 +1231,67 @@ Caused by: java.lang.NullPointerException
     }
 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int widthSize;
-        int maxGutterSize;
+        int i;
+        LayoutParams lp;
         setMeasuredDimension(getDefaultSize(0, widthMeasureSpec), getDefaultSize(0, heightMeasureSpec));
         int measuredWidth = getMeasuredWidth();
-        int maxGutterSize2 = measuredWidth / 10;
-        this.mGutterSize = Math.min(maxGutterSize2, this.mDefaultGutterSize);
+        this.mGutterSize = Math.min(measuredWidth / 10, this.mDefaultGutterSize);
         int childWidthSize = (measuredWidth - getPaddingLeft()) - getPaddingRight();
         int childHeightSize = (getMeasuredHeight() - getPaddingTop()) - getPaddingBottom();
         int size = getChildCount();
-        int childHeightSize2 = childHeightSize;
-        childHeightSize = childWidthSize;
-        childWidthSize = 0;
-        while (childWidthSize < size) {
-            int measuredWidth2;
-            int heightMode;
-            View child = getChildAt(childWidthSize);
+        for (i = 0; i < size; i++) {
+            View child = getChildAt(i);
             if (child.getVisibility() != 8) {
-                LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                lp = (LayoutParams) child.getLayoutParams();
                 if (lp != null && lp.isDecor) {
-                    boolean consumeVertical;
-                    boolean z;
-                    boolean consumeHorizontal;
-                    int widthSize2;
-                    int heightSize;
                     int hgrav = lp.gravity & 7;
                     int vgrav = lp.gravity & 112;
                     int widthMode = Integer.MIN_VALUE;
-                    int heightMode2 = Integer.MIN_VALUE;
-                    if (vgrav != 48) {
-                        if (vgrav != 80) {
-                            consumeVertical = false;
-                            if (hgrav != 3) {
-                                if (hgrav == 5) {
-                                    z = false;
-                                    consumeHorizontal = z;
-                                    if (!consumeVertical) {
-                                        widthMode = 1073741824;
-                                    } else if (consumeHorizontal) {
-                                        heightMode2 = 1073741824;
-                                    }
-                                    widthSize2 = childHeightSize;
-                                    heightSize = childHeightSize2;
-                                    measuredWidth2 = measuredWidth;
-                                    if (lp.width != -2) {
-                                        widthMode = 1073741824;
-                                        if (lp.width != -1) {
-                                            widthSize = lp.width;
-                                            if (lp.height != -2) {
-                                                heightMode2 = 1073741824;
-                                                if (lp.height != -1) {
-                                                    measuredWidth = lp.height;
-                                                    heightMode = 1073741824;
-                                                    maxGutterSize = maxGutterSize2;
-                                                    child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                                    if (!consumeVertical) {
-                                                        childHeightSize2 -= child.getMeasuredHeight();
-                                                    } else if (!consumeHorizontal) {
-                                                        childHeightSize -= child.getMeasuredWidth();
-                                                    }
-                                                    childWidthSize++;
-                                                    measuredWidth = measuredWidth2;
-                                                    maxGutterSize2 = maxGutterSize;
-                                                    widthSize = widthMeasureSpec;
-                                                    heightMode = heightMeasureSpec;
-                                                }
-                                            }
-                                            heightMode = heightMode2;
-                                            measuredWidth = heightSize;
-                                            maxGutterSize = maxGutterSize2;
-                                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                            if (!consumeVertical) {
-                                                childHeightSize2 -= child.getMeasuredHeight();
-                                            } else if (!consumeHorizontal) {
-                                                childHeightSize -= child.getMeasuredWidth();
-                                            }
-                                            childWidthSize++;
-                                            measuredWidth = measuredWidth2;
-                                            maxGutterSize2 = maxGutterSize;
-                                            widthSize = widthMeasureSpec;
-                                            heightMode = heightMeasureSpec;
-                                        }
-                                    }
-                                    widthSize = widthSize2;
-                                    if (lp.height != -2) {
-                                        heightMode2 = 1073741824;
-                                        if (lp.height != -1) {
-                                            measuredWidth = lp.height;
-                                            heightMode = 1073741824;
-                                            maxGutterSize = maxGutterSize2;
-                                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                            if (!consumeVertical) {
-                                                childHeightSize2 -= child.getMeasuredHeight();
-                                            } else if (!consumeHorizontal) {
-                                                childHeightSize -= child.getMeasuredWidth();
-                                            }
-                                            childWidthSize++;
-                                            measuredWidth = measuredWidth2;
-                                            maxGutterSize2 = maxGutterSize;
-                                            widthSize = widthMeasureSpec;
-                                            heightMode = heightMeasureSpec;
-                                        }
-                                    }
-                                    heightMode = heightMode2;
-                                    measuredWidth = heightSize;
-                                    maxGutterSize = maxGutterSize2;
-                                    child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                    if (!consumeVertical) {
-                                        childHeightSize2 -= child.getMeasuredHeight();
-                                    } else if (!consumeHorizontal) {
-                                        childHeightSize -= child.getMeasuredWidth();
-                                    }
-                                    childWidthSize++;
-                                    measuredWidth = measuredWidth2;
-                                    maxGutterSize2 = maxGutterSize;
-                                    widthSize = widthMeasureSpec;
-                                    heightMode = heightMeasureSpec;
-                                }
-                            }
-                            z = true;
-                            consumeHorizontal = z;
-                            if (!consumeVertical) {
-                                widthMode = 1073741824;
-                            } else if (consumeHorizontal) {
-                                heightMode2 = 1073741824;
-                            }
-                            widthSize2 = childHeightSize;
-                            heightSize = childHeightSize2;
-                            measuredWidth2 = measuredWidth;
-                            if (lp.width != -2) {
-                                widthMode = 1073741824;
-                                if (lp.width != -1) {
-                                    widthSize = lp.width;
-                                    if (lp.height != -2) {
-                                        heightMode2 = 1073741824;
-                                        if (lp.height != -1) {
-                                            measuredWidth = lp.height;
-                                            heightMode = 1073741824;
-                                            maxGutterSize = maxGutterSize2;
-                                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                            if (!consumeVertical) {
-                                                childHeightSize2 -= child.getMeasuredHeight();
-                                            } else if (!consumeHorizontal) {
-                                                childHeightSize -= child.getMeasuredWidth();
-                                            }
-                                            childWidthSize++;
-                                            measuredWidth = measuredWidth2;
-                                            maxGutterSize2 = maxGutterSize;
-                                            widthSize = widthMeasureSpec;
-                                            heightMode = heightMeasureSpec;
-                                        }
-                                    }
-                                    heightMode = heightMode2;
-                                    measuredWidth = heightSize;
-                                    maxGutterSize = maxGutterSize2;
-                                    child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                    if (!consumeVertical) {
-                                        childHeightSize2 -= child.getMeasuredHeight();
-                                    } else if (!consumeHorizontal) {
-                                        childHeightSize -= child.getMeasuredWidth();
-                                    }
-                                    childWidthSize++;
-                                    measuredWidth = measuredWidth2;
-                                    maxGutterSize2 = maxGutterSize;
-                                    widthSize = widthMeasureSpec;
-                                    heightMode = heightMeasureSpec;
-                                }
-                            }
-                            widthSize = widthSize2;
-                            if (lp.height != -2) {
-                                heightMode2 = 1073741824;
-                                if (lp.height != -1) {
-                                    measuredWidth = lp.height;
-                                    heightMode = 1073741824;
-                                    maxGutterSize = maxGutterSize2;
-                                    child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                    if (!consumeVertical) {
-                                        childHeightSize2 -= child.getMeasuredHeight();
-                                    } else if (!consumeHorizontal) {
-                                        childHeightSize -= child.getMeasuredWidth();
-                                    }
-                                    childWidthSize++;
-                                    measuredWidth = measuredWidth2;
-                                    maxGutterSize2 = maxGutterSize;
-                                    widthSize = widthMeasureSpec;
-                                    heightMode = heightMeasureSpec;
-                                }
-                            }
-                            heightMode = heightMode2;
-                            measuredWidth = heightSize;
-                            maxGutterSize = maxGutterSize2;
-                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                            if (!consumeVertical) {
-                                childHeightSize2 -= child.getMeasuredHeight();
-                            } else if (!consumeHorizontal) {
-                                childHeightSize -= child.getMeasuredWidth();
-                            }
-                            childWidthSize++;
-                            measuredWidth = measuredWidth2;
-                            maxGutterSize2 = maxGutterSize;
-                            widthSize = widthMeasureSpec;
-                            heightMode = heightMeasureSpec;
-                        }
-                    }
-                    consumeVertical = true;
-                    if (hgrav != 3) {
-                        if (hgrav == 5) {
-                            z = false;
-                            consumeHorizontal = z;
-                            if (!consumeVertical) {
-                                widthMode = 1073741824;
-                            } else if (consumeHorizontal) {
-                                heightMode2 = 1073741824;
-                            }
-                            widthSize2 = childHeightSize;
-                            heightSize = childHeightSize2;
-                            measuredWidth2 = measuredWidth;
-                            if (lp.width != -2) {
-                                widthMode = 1073741824;
-                                if (lp.width != -1) {
-                                    widthSize = lp.width;
-                                    if (lp.height != -2) {
-                                        heightMode2 = 1073741824;
-                                        if (lp.height != -1) {
-                                            measuredWidth = lp.height;
-                                            heightMode = 1073741824;
-                                            maxGutterSize = maxGutterSize2;
-                                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                            if (!consumeVertical) {
-                                                childHeightSize2 -= child.getMeasuredHeight();
-                                            } else if (!consumeHorizontal) {
-                                                childHeightSize -= child.getMeasuredWidth();
-                                            }
-                                            childWidthSize++;
-                                            measuredWidth = measuredWidth2;
-                                            maxGutterSize2 = maxGutterSize;
-                                            widthSize = widthMeasureSpec;
-                                            heightMode = heightMeasureSpec;
-                                        }
-                                    }
-                                    heightMode = heightMode2;
-                                    measuredWidth = heightSize;
-                                    maxGutterSize = maxGutterSize2;
-                                    child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                    if (!consumeVertical) {
-                                        childHeightSize2 -= child.getMeasuredHeight();
-                                    } else if (!consumeHorizontal) {
-                                        childHeightSize -= child.getMeasuredWidth();
-                                    }
-                                    childWidthSize++;
-                                    measuredWidth = measuredWidth2;
-                                    maxGutterSize2 = maxGutterSize;
-                                    widthSize = widthMeasureSpec;
-                                    heightMode = heightMeasureSpec;
-                                }
-                            }
-                            widthSize = widthSize2;
-                            if (lp.height != -2) {
-                                heightMode2 = 1073741824;
-                                if (lp.height != -1) {
-                                    measuredWidth = lp.height;
-                                    heightMode = 1073741824;
-                                    maxGutterSize = maxGutterSize2;
-                                    child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                    if (!consumeVertical) {
-                                        childHeightSize2 -= child.getMeasuredHeight();
-                                    } else if (!consumeHorizontal) {
-                                        childHeightSize -= child.getMeasuredWidth();
-                                    }
-                                    childWidthSize++;
-                                    measuredWidth = measuredWidth2;
-                                    maxGutterSize2 = maxGutterSize;
-                                    widthSize = widthMeasureSpec;
-                                    heightMode = heightMeasureSpec;
-                                }
-                            }
-                            heightMode = heightMode2;
-                            measuredWidth = heightSize;
-                            maxGutterSize = maxGutterSize2;
-                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                            if (!consumeVertical) {
-                                childHeightSize2 -= child.getMeasuredHeight();
-                            } else if (!consumeHorizontal) {
-                                childHeightSize -= child.getMeasuredWidth();
-                            }
-                            childWidthSize++;
-                            measuredWidth = measuredWidth2;
-                            maxGutterSize2 = maxGutterSize;
-                            widthSize = widthMeasureSpec;
-                            heightMode = heightMeasureSpec;
-                        }
-                    }
-                    z = true;
-                    consumeHorizontal = z;
-                    if (!consumeVertical) {
+                    int heightMode = Integer.MIN_VALUE;
+                    boolean consumeVertical = vgrav == 48 || vgrav == 80;
+                    boolean consumeHorizontal = hgrav == 3 || hgrav == 5;
+                    if (consumeVertical) {
                         widthMode = 1073741824;
                     } else if (consumeHorizontal) {
-                        heightMode2 = 1073741824;
+                        heightMode = 1073741824;
                     }
-                    widthSize2 = childHeightSize;
-                    heightSize = childHeightSize2;
-                    measuredWidth2 = measuredWidth;
+                    int widthSize = childWidthSize;
+                    int heightSize = childHeightSize;
                     if (lp.width != -2) {
                         widthMode = 1073741824;
                         if (lp.width != -1) {
                             widthSize = lp.width;
-                            if (lp.height != -2) {
-                                heightMode2 = 1073741824;
-                                if (lp.height != -1) {
-                                    measuredWidth = lp.height;
-                                    heightMode = 1073741824;
-                                    maxGutterSize = maxGutterSize2;
-                                    child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                                    if (!consumeVertical) {
-                                        childHeightSize2 -= child.getMeasuredHeight();
-                                    } else if (!consumeHorizontal) {
-                                        childHeightSize -= child.getMeasuredWidth();
-                                    }
-                                    childWidthSize++;
-                                    measuredWidth = measuredWidth2;
-                                    maxGutterSize2 = maxGutterSize;
-                                    widthSize = widthMeasureSpec;
-                                    heightMode = heightMeasureSpec;
-                                }
-                            }
-                            heightMode = heightMode2;
-                            measuredWidth = heightSize;
-                            maxGutterSize = maxGutterSize2;
-                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                            if (!consumeVertical) {
-                                childHeightSize2 -= child.getMeasuredHeight();
-                            } else if (!consumeHorizontal) {
-                                childHeightSize -= child.getMeasuredWidth();
-                            }
-                            childWidthSize++;
-                            measuredWidth = measuredWidth2;
-                            maxGutterSize2 = maxGutterSize;
-                            widthSize = widthMeasureSpec;
-                            heightMode = heightMeasureSpec;
                         }
                     }
-                    widthSize = widthSize2;
                     if (lp.height != -2) {
-                        heightMode2 = 1073741824;
+                        heightMode = 1073741824;
                         if (lp.height != -1) {
-                            measuredWidth = lp.height;
-                            heightMode = 1073741824;
-                            maxGutterSize = maxGutterSize2;
-                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                            if (!consumeVertical) {
-                                childHeightSize2 -= child.getMeasuredHeight();
-                            } else if (!consumeHorizontal) {
-                                childHeightSize -= child.getMeasuredWidth();
-                            }
-                            childWidthSize++;
-                            measuredWidth = measuredWidth2;
-                            maxGutterSize2 = maxGutterSize;
-                            widthSize = widthMeasureSpec;
-                            heightMode = heightMeasureSpec;
+                            heightSize = lp.height;
                         }
                     }
-                    heightMode = heightMode2;
-                    measuredWidth = heightSize;
-                    maxGutterSize = maxGutterSize2;
-                    child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(measuredWidth, heightMode));
-                    if (!consumeVertical) {
-                        childHeightSize2 -= child.getMeasuredHeight();
-                    } else if (!consumeHorizontal) {
-                        childHeightSize -= child.getMeasuredWidth();
+                    child.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode), MeasureSpec.makeMeasureSpec(heightSize, heightMode));
+                    if (consumeVertical) {
+                        childHeightSize -= child.getMeasuredHeight();
+                    } else if (consumeHorizontal) {
+                        childWidthSize -= child.getMeasuredWidth();
                     }
-                    childWidthSize++;
-                    measuredWidth = measuredWidth2;
-                    maxGutterSize2 = maxGutterSize;
-                    widthSize = widthMeasureSpec;
-                    heightMode = heightMeasureSpec;
                 }
             }
-            measuredWidth2 = measuredWidth;
-            maxGutterSize = maxGutterSize2;
-            childWidthSize++;
-            measuredWidth = measuredWidth2;
-            maxGutterSize2 = maxGutterSize;
-            widthSize = widthMeasureSpec;
-            heightMode = heightMeasureSpec;
         }
-        maxGutterSize = maxGutterSize2;
-        r0.mChildWidthMeasureSpec = MeasureSpec.makeMeasureSpec(childHeightSize, 1073741824);
-        r0.mChildHeightMeasureSpec = MeasureSpec.makeMeasureSpec(childHeightSize2, 1073741824);
-        r0.mInLayout = true;
+        this.mChildWidthMeasureSpec = MeasureSpec.makeMeasureSpec(childWidthSize, 1073741824);
+        this.mChildHeightMeasureSpec = MeasureSpec.makeMeasureSpec(childHeightSize, 1073741824);
+        this.mInLayout = true;
         populate();
-        widthSize = 0;
-        r0.mInLayout = false;
-        measuredWidth = getChildCount();
-        while (widthSize < measuredWidth) {
-            View child2 = getChildAt(widthSize);
-            if (child2.getVisibility() != 8) {
-                LayoutParams lp2 = (LayoutParams) child2.getLayoutParams();
-                if (lp2 == null || !lp2.isDecor) {
-                    child2.measure(MeasureSpec.makeMeasureSpec((int) (((float) childHeightSize) * lp2.widthFactor), 1073741824), r0.mChildHeightMeasureSpec);
+        this.mInLayout = false;
+        size = getChildCount();
+        for (i = 0; i < size; i++) {
+            child = getChildAt(i);
+            if (child.getVisibility() != 8) {
+                lp = (LayoutParams) child.getLayoutParams();
+                if (lp == null || !lp.isDecor) {
+                    child.measure(MeasureSpec.makeMeasureSpec((int) (((float) childWidthSize) * lp.widthFactor), 1073741824), this.mChildHeightMeasureSpec);
                 }
             }
-            widthSize++;
         }
     }
 
@@ -1777,13 +1302,25 @@ Caused by: java.lang.NullPointerException
         }
     }
 
+    private void recomputeScrollPosition(int width, int oldWidth, int margin, int oldMargin) {
+        if (oldWidth <= 0 || this.mItems.isEmpty()) {
+            ItemInfo ii = infoForPosition(this.mCurItem);
+            int scrollPos = (int) (((float) ((width - getPaddingLeft()) - getPaddingRight())) * (ii != null ? Math.min(ii.offset, this.mLastOffset) : 0.0f));
+            if (scrollPos != getScrollX()) {
+                completeScroll(false);
+                scrollTo(scrollPos, getScrollY());
+            }
+        } else if (this.mScroller.isFinished()) {
+            scrollTo((int) (((float) (((width - getPaddingLeft()) - getPaddingRight()) + margin)) * (((float) getScrollX()) / ((float) (((oldWidth - getPaddingLeft()) - getPaddingRight()) + oldMargin)))), getScrollY());
+        } else {
+            this.mScroller.setFinalX(getCurrentItem() * getClientWidth());
+        }
+    }
+
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int hgrav;
-        int childLeft;
         int i;
-        int i2;
-        boolean z;
-        ViewPager viewPager = this;
+        int childLeft;
+        int childTop;
         int count = getChildCount();
         int width = r - l;
         int height = b - t;
@@ -1793,99 +1330,77 @@ Caused by: java.lang.NullPointerException
         int paddingBottom = getPaddingBottom();
         int scrollX = getScrollX();
         int decorCount = 0;
-        int paddingBottom2 = paddingBottom;
-        paddingBottom = paddingTop;
-        paddingTop = paddingLeft;
-        for (paddingLeft = 0; paddingLeft < count; paddingLeft++) {
-            View child = getChildAt(paddingLeft);
+        for (i = 0; i < count; i++) {
+            LayoutParams lp;
+            View child = getChildAt(i);
             if (child.getVisibility() != 8) {
-                LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                int childLeft2 = 0;
-                if (lp.isDecor != 0) {
-                    hgrav = lp.gravity & 7;
+                lp = (LayoutParams) child.getLayoutParams();
+                if (lp.isDecor) {
                     int vgrav = lp.gravity & 112;
-                    if (hgrav == 1) {
-                        childLeft = Math.max((width - child.getMeasuredWidth()) / 2, paddingTop);
-                    } else if (hgrav == 3) {
-                        childLeft = paddingTop;
-                        paddingTop += child.getMeasuredWidth();
-                    } else if (hgrav != 5) {
-                        childLeft = paddingTop;
-                    } else {
-                        childLeft = (width - paddingRight) - child.getMeasuredWidth();
-                        paddingRight += child.getMeasuredWidth();
+                    switch (lp.gravity & 7) {
+                        case 1:
+                            childLeft = Math.max((width - child.getMeasuredWidth()) / 2, paddingLeft);
+                            break;
+                        case 3:
+                            childLeft = paddingLeft;
+                            paddingLeft += child.getMeasuredWidth();
+                            break;
+                        case 5:
+                            childLeft = (width - paddingRight) - child.getMeasuredWidth();
+                            paddingRight += child.getMeasuredWidth();
+                            break;
+                        default:
+                            childLeft = paddingLeft;
+                            break;
                     }
-                    if (vgrav == 16) {
-                        hgrav = Math.max((height - child.getMeasuredHeight()) / 2, paddingBottom);
-                    } else if (vgrav == 48) {
-                        hgrav = paddingBottom;
-                        paddingBottom += child.getMeasuredHeight();
-                    } else if (vgrav != 80) {
-                        hgrav = paddingBottom;
-                    } else {
-                        hgrav = (height - paddingBottom2) - child.getMeasuredHeight();
-                        paddingBottom2 += child.getMeasuredHeight();
+                    switch (vgrav) {
+                        case 16:
+                            childTop = Math.max((height - child.getMeasuredHeight()) / 2, paddingTop);
+                            break;
+                        case 48:
+                            childTop = paddingTop;
+                            paddingTop += child.getMeasuredHeight();
+                            break;
+                        case 80:
+                            childTop = (height - paddingBottom) - child.getMeasuredHeight();
+                            paddingBottom += child.getMeasuredHeight();
+                            break;
+                        default:
+                            childTop = paddingTop;
+                            break;
                     }
                     childLeft += scrollX;
-                    child.layout(childLeft, hgrav, childLeft + child.getMeasuredWidth(), hgrav + child.getMeasuredHeight());
+                    child.layout(childLeft, childTop, child.getMeasuredWidth() + childLeft, child.getMeasuredHeight() + childTop);
                     decorCount++;
                 }
             }
         }
-        childLeft = (width - paddingTop) - paddingRight;
-        hgrav = 0;
-        while (hgrav < count) {
-            int count2;
-            View child2 = getChildAt(hgrav);
-            if (child2.getVisibility() != 8) {
-                LayoutParams lp2 = (LayoutParams) child2.getLayoutParams();
-                if (!lp2.isDecor) {
-                    ItemInfo infoForChild = infoForChild(child2);
-                    ItemInfo ii = infoForChild;
-                    if (infoForChild != null) {
-                        count2 = count;
-                        count = (int) (((float) childLeft) * ii.offset);
-                        int childLeft3 = paddingTop + count;
-                        int childTop = paddingBottom;
-                        int loff = count;
-                        if (lp2.needsMeasure != 0) {
-                            lp2.needsMeasure = false;
-                            i = childLeft;
-                            i2 = width;
-                            child2.measure(MeasureSpec.makeMeasureSpec((int) (((float) childLeft) * lp2.widthFactor), 1073741824), MeasureSpec.makeMeasureSpec((height - paddingBottom) - paddingBottom2, 1073741824));
-                        } else {
-                            i = childLeft;
-                            i2 = width;
+        int childWidth = (width - paddingLeft) - paddingRight;
+        for (i = 0; i < count; i++) {
+            child = getChildAt(i);
+            if (child.getVisibility() != 8) {
+                lp = (LayoutParams) child.getLayoutParams();
+                if (!lp.isDecor) {
+                    ItemInfo ii = infoForChild(child);
+                    if (ii != null) {
+                        childLeft = paddingLeft + ((int) (((float) childWidth) * ii.offset));
+                        childTop = paddingTop;
+                        if (lp.needsMeasure) {
+                            lp.needsMeasure = false;
+                            child.measure(MeasureSpec.makeMeasureSpec((int) (((float) childWidth) * lp.widthFactor), 1073741824), MeasureSpec.makeMeasureSpec((height - paddingTop) - paddingBottom, 1073741824));
                         }
-                        width = childTop;
-                        child2.layout(childLeft3, width, child2.getMeasuredWidth() + childLeft3, child2.getMeasuredHeight() + width);
-                        hgrav++;
-                        count = count2;
-                        childLeft = i;
-                        width = i2;
+                        child.layout(childLeft, childTop, child.getMeasuredWidth() + childLeft, child.getMeasuredHeight() + childTop);
                     }
                 }
             }
-            count2 = count;
-            i = childLeft;
-            i2 = width;
-            hgrav++;
-            count = count2;
-            childLeft = i;
-            width = i2;
         }
-        i = childLeft;
-        i2 = width;
-        viewPager.mTopPageBounds = paddingBottom;
-        viewPager.mBottomPageBounds = height - paddingBottom2;
-        viewPager.mDecorChildCount = decorCount;
-        if (viewPager.mFirstLayout) {
-            z = false;
-            scrollToItem(viewPager.mCurItem, false, 0, false);
-        } else {
-            z = false;
+        this.mTopPageBounds = paddingTop;
+        this.mBottomPageBounds = height - paddingBottom;
+        this.mDecorChildCount = decorCount;
+        if (this.mFirstLayout) {
+            scrollToItem(this.mCurItem, false, 0, false);
         }
-        viewPager.mFirstLayout = z;
+        this.mFirstLayout = false;
     }
 
     public void computeScroll() {
@@ -1912,7 +1427,7 @@ Caused by: java.lang.NullPointerException
         if (this.mItems.size() != 0) {
             ItemInfo ii = infoForCurrentScrollPosition();
             int width = getClientWidth();
-            int widthWithMargin = this.mPageMargin + width;
+            int widthWithMargin = width + this.mPageMargin;
             float marginOffset = ((float) this.mPageMargin) / ((float) width);
             int currentPage = ii.position;
             float pageOffset = ((((float) xpos) / ((float) width)) - ii.offset) / (ii.widthFactor + marginOffset);
@@ -1937,32 +1452,35 @@ Caused by: java.lang.NullPointerException
 
     protected void onPageScrolled(int position, float offset, int offsetPixels) {
         int scrollX;
-        int paddingLeft;
-        int i = 0;
+        int childCount;
+        int i;
+        View child;
         if (this.mDecorChildCount > 0) {
             scrollX = getScrollX();
-            paddingLeft = getPaddingLeft();
+            int paddingLeft = getPaddingLeft();
             int paddingRight = getPaddingRight();
             int width = getWidth();
-            int childCount = getChildCount();
-            int paddingRight2 = paddingRight;
-            paddingRight = paddingLeft;
-            for (paddingLeft = 0; paddingLeft < childCount; paddingLeft++) {
-                View child = getChildAt(paddingLeft);
+            childCount = getChildCount();
+            for (i = 0; i < childCount; i++) {
+                child = getChildAt(i);
                 LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 if (lp.isDecor) {
                     int childLeft;
-                    int hgrav = lp.gravity & 7;
-                    if (hgrav == 1) {
-                        childLeft = Math.max((width - child.getMeasuredWidth()) / 2, paddingRight);
-                    } else if (hgrav == 3) {
-                        childLeft = paddingRight;
-                        paddingRight += child.getWidth();
-                    } else if (hgrav != 5) {
-                        childLeft = paddingRight;
-                    } else {
-                        childLeft = (width - paddingRight2) - child.getMeasuredWidth();
-                        paddingRight2 += child.getMeasuredWidth();
+                    switch (lp.gravity & 7) {
+                        case 1:
+                            childLeft = Math.max((width - child.getMeasuredWidth()) / 2, paddingLeft);
+                            break;
+                        case 3:
+                            childLeft = paddingLeft;
+                            paddingLeft += child.getWidth();
+                            break;
+                        case 5:
+                            childLeft = (width - paddingRight) - child.getMeasuredWidth();
+                            paddingRight += child.getMeasuredWidth();
+                            break;
+                        default:
+                            childLeft = paddingLeft;
+                            break;
                     }
                     int childOffset = (childLeft + scrollX) - child.getLeft();
                     if (childOffset != 0) {
@@ -1972,18 +1490,17 @@ Caused by: java.lang.NullPointerException
             }
         }
         dispatchOnPageScrolled(position, offset, offsetPixels);
-        if (r0.mPageTransformer != null) {
+        if (this.mPageTransformer != null) {
             scrollX = getScrollX();
-            paddingLeft = getChildCount();
-            while (i < paddingLeft) {
-                View child2 = getChildAt(i);
-                if (!((LayoutParams) child2.getLayoutParams()).isDecor) {
-                    r0.mPageTransformer.transformPage(child2, ((float) (child2.getLeft() - scrollX)) / ((float) getClientWidth()));
+            childCount = getChildCount();
+            for (i = 0; i < childCount; i++) {
+                child = getChildAt(i);
+                if (!((LayoutParams) child.getLayoutParams()).isDecor) {
+                    this.mPageTransformer.transformPage(child, ((float) (child.getLeft() - scrollX)) / ((float) getClientWidth()));
                 }
-                i++;
             }
         }
-        r0.mCalledSuper = true;
+        this.mCalledSuper = true;
     }
 
     private void dispatchOnPageScrolled(int position, float offset, int offsetPixels) {
@@ -2041,10 +1558,19 @@ Caused by: java.lang.NullPointerException
     }
 
     private void completeScroll(boolean postEvents) {
-        boolean needPopulate = this.mScrollState == 2;
+        boolean needPopulate;
+        boolean wasScrolling = true;
+        if (this.mScrollState == 2) {
+            needPopulate = true;
+        } else {
+            needPopulate = false;
+        }
         if (needPopulate) {
             setScrollingCacheEnabled(false);
-            if (true ^ this.mScroller.isFinished()) {
+            if (this.mScroller.isFinished()) {
+                wasScrolling = false;
+            }
+            if (wasScrolling) {
                 this.mScroller.abortAnimation();
                 int oldX = getScrollX();
                 int oldY = getScrollY();
@@ -2059,15 +1585,14 @@ Caused by: java.lang.NullPointerException
             }
         }
         this.mPopulatePending = false;
-        boolean needPopulate2 = needPopulate;
         for (int i = 0; i < this.mItems.size(); i++) {
             ItemInfo ii = (ItemInfo) this.mItems.get(i);
             if (ii.scrolling) {
-                needPopulate2 = true;
+                needPopulate = true;
                 ii.scrolling = false;
             }
         }
-        if (!needPopulate2) {
+        if (!needPopulate) {
             return;
         }
         if (postEvents) {
@@ -2089,298 +1614,185 @@ Caused by: java.lang.NullPointerException
     }
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        View view = this;
-        MotionEvent motionEvent = ev;
         int action = ev.getAction() & 255;
-        if (action != 3) {
-            if (action != 1) {
-                if (action != 0) {
-                    if (view.mIsBeingDragged) {
-                        return true;
-                    }
-                    if (view.mIsUnableToDrag) {
-                        return false;
-                    }
-                }
-                if (action == 0) {
-                    float x = ev.getX();
-                    view.mInitialMotionX = x;
-                    view.mLastMotionX = x;
-                    x = ev.getY();
-                    view.mInitialMotionY = x;
-                    view.mLastMotionY = x;
-                    view.mActivePointerId = motionEvent.getPointerId(0);
-                    view.mIsUnableToDrag = false;
-                    view.mIsScrollStarted = true;
-                    view.mScroller.computeScrollOffset();
-                    if (view.mScrollState != 2 || Math.abs(view.mScroller.getFinalX() - view.mScroller.getCurrX()) <= view.mCloseEnough) {
-                        completeScroll(false);
-                        view.mIsBeingDragged = false;
-                    } else {
-                        view.mScroller.abortAnimation();
-                        view.mPopulatePending = false;
-                        populate();
-                        view.mIsBeingDragged = true;
-                        requestParentDisallowInterceptTouchEvent(true);
-                        setScrollState(1);
-                    }
-                } else if (action == 2) {
-                    int activePointerId = view.mActivePointerId;
-                    if (activePointerId != -1) {
-                        float y;
-                        int pointerIndex = motionEvent.findPointerIndex(activePointerId);
-                        float x2 = motionEvent.getX(pointerIndex);
-                        float dx = x2 - view.mLastMotionX;
-                        float xDiff = Math.abs(dx);
-                        float y2 = motionEvent.getY(pointerIndex);
-                        float yDiff = Math.abs(y2 - view.mInitialMotionY);
-                        if (dx == 0.0f || isGutterDrag(view.mLastMotionX, dx)) {
-                            y = y2;
-                        } else {
-                            y = y2;
-                            if (canScroll(view, false, (int) dx, (int) x2, (int) y2)) {
-                                view.mLastMotionX = x2;
-                                view.mLastMotionY = y;
-                                view.mIsUnableToDrag = true;
-                                return false;
-                            }
-                        }
-                        if (xDiff > ((float) view.mTouchSlop) && 0.5f * xDiff > yDiff) {
-                            view.mIsBeingDragged = true;
-                            requestParentDisallowInterceptTouchEvent(true);
-                            setScrollState(1);
-                            view.mLastMotionX = dx > 0.0f ? view.mInitialMotionX + ((float) view.mTouchSlop) : view.mInitialMotionX - ((float) view.mTouchSlop);
-                            view.mLastMotionY = y;
-                            setScrollingCacheEnabled(true);
-                        } else if (yDiff > ((float) view.mTouchSlop)) {
-                            view.mIsUnableToDrag = true;
-                        }
-                        if (view.mIsBeingDragged && performDrag(x2)) {
-                            ViewCompat.postInvalidateOnAnimation(this);
-                        }
-                    }
-                } else if (action == 6) {
-                    onSecondaryPointerUp(ev);
-                }
-                if (view.mVelocityTracker == null) {
-                    view.mVelocityTracker = VelocityTracker.obtain();
-                }
-                view.mVelocityTracker.addMovement(motionEvent);
-                return view.mIsBeingDragged;
+        if (action == 3 || action == 1) {
+            resetTouch();
+            return false;
+        }
+        if (action != 0) {
+            if (this.mIsBeingDragged) {
+                return true;
+            }
+            if (this.mIsUnableToDrag) {
+                return false;
             }
         }
-        resetTouch();
-        return false;
+        switch (action) {
+            case 0:
+                float x = ev.getX();
+                this.mInitialMotionX = x;
+                this.mLastMotionX = x;
+                x = ev.getY();
+                this.mInitialMotionY = x;
+                this.mLastMotionY = x;
+                this.mActivePointerId = ev.getPointerId(0);
+                this.mIsUnableToDrag = false;
+                this.mIsScrollStarted = true;
+                this.mScroller.computeScrollOffset();
+                if (this.mScrollState == 2 && Math.abs(this.mScroller.getFinalX() - this.mScroller.getCurrX()) > this.mCloseEnough) {
+                    this.mScroller.abortAnimation();
+                    this.mPopulatePending = false;
+                    populate();
+                    this.mIsBeingDragged = true;
+                    requestParentDisallowInterceptTouchEvent(true);
+                    setScrollState(1);
+                    break;
+                }
+                completeScroll(false);
+                this.mIsBeingDragged = false;
+                break;
+                break;
+            case 2:
+                int activePointerId = this.mActivePointerId;
+                if (activePointerId != -1) {
+                    int pointerIndex = ev.findPointerIndex(activePointerId);
+                    float x2 = ev.getX(pointerIndex);
+                    float dx = x2 - this.mLastMotionX;
+                    float xDiff = Math.abs(dx);
+                    float y = ev.getY(pointerIndex);
+                    float yDiff = Math.abs(y - this.mInitialMotionY);
+                    if (dx == 0.0f || isGutterDrag(this.mLastMotionX, dx) || !canScroll(this, false, (int) dx, (int) x2, (int) y)) {
+                        if (xDiff > ((float) this.mTouchSlop) && 0.5f * xDiff > yDiff) {
+                            this.mIsBeingDragged = true;
+                            requestParentDisallowInterceptTouchEvent(true);
+                            setScrollState(1);
+                            this.mLastMotionX = dx > 0.0f ? this.mInitialMotionX + ((float) this.mTouchSlop) : this.mInitialMotionX - ((float) this.mTouchSlop);
+                            this.mLastMotionY = y;
+                            setScrollingCacheEnabled(true);
+                        } else if (yDiff > ((float) this.mTouchSlop)) {
+                            this.mIsUnableToDrag = true;
+                        }
+                        if (this.mIsBeingDragged && performDrag(x2)) {
+                            ViewCompat.postInvalidateOnAnimation(this);
+                            break;
+                        }
+                    }
+                    this.mLastMotionX = x2;
+                    this.mLastMotionY = y;
+                    this.mIsUnableToDrag = true;
+                    return false;
+                }
+                break;
+            case 6:
+                onSecondaryPointerUp(ev);
+                break;
+        }
+        if (this.mVelocityTracker == null) {
+            this.mVelocityTracker = VelocityTracker.obtain();
+        }
+        this.mVelocityTracker.addMovement(ev);
+        return this.mIsBeingDragged;
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public boolean onTouchEvent(android.view.MotionEvent r18) {
-        /*
-        r17 = this;
-        r0 = r17;
-        r1 = r18;
-        r2 = r0.mFakeDragging;
-        r3 = 1;
-        if (r2 == 0) goto L_0x000a;
-    L_0x0009:
-        return r3;
-    L_0x000a:
-        r2 = r18.getAction();
-        r4 = 0;
-        if (r2 != 0) goto L_0x0018;
-    L_0x0011:
-        r2 = r18.getEdgeFlags();
-        if (r2 == 0) goto L_0x0018;
-    L_0x0017:
-        return r4;
-    L_0x0018:
-        r2 = r0.mAdapter;
-        if (r2 == 0) goto L_0x0166;
-    L_0x001c:
-        r2 = r0.mAdapter;
-        r2 = r2.getCount();
-        if (r2 != 0) goto L_0x0026;
-    L_0x0024:
-        goto L_0x0166;
-    L_0x0026:
-        r2 = r0.mVelocityTracker;
-        if (r2 != 0) goto L_0x0030;
-    L_0x002a:
-        r2 = android.view.VelocityTracker.obtain();
-        r0.mVelocityTracker = r2;
-    L_0x0030:
-        r2 = r0.mVelocityTracker;
-        r2.addMovement(r1);
-        r2 = r18.getAction();
-        r5 = 0;
-        r6 = r2 & 255;
-        switch(r6) {
-            case 0: goto L_0x013d;
-            case 1: goto L_0x00ec;
-            case 2: goto L_0x0075;
-            case 3: goto L_0x0064;
-            case 4: goto L_0x003f;
-            case 5: goto L_0x0053;
-            case 6: goto L_0x0043;
-            default: goto L_0x003f;
-        };
-    L_0x003f:
-        r16 = r2;
-        goto L_0x0160;
-    L_0x0043:
-        r17.onSecondaryPointerUp(r18);
-        r4 = r0.mActivePointerId;
-        r4 = r1.findPointerIndex(r4);
-        r4 = r1.getX(r4);
-        r0.mLastMotionX = r4;
-        goto L_0x0071;
-    L_0x0053:
-        r4 = r18.getActionIndex();
-        r6 = r1.getX(r4);
-        r0.mLastMotionX = r6;
-        r7 = r1.getPointerId(r4);
-        r0.mActivePointerId = r7;
-        goto L_0x0071;
-    L_0x0064:
-        r6 = r0.mIsBeingDragged;
-        if (r6 == 0) goto L_0x0071;
-    L_0x0068:
-        r6 = r0.mCurItem;
-        r0.scrollToItem(r6, r3, r4, r4);
-        r5 = r17.resetTouch();
-    L_0x0071:
-        r16 = r2;
-        goto L_0x0160;
-    L_0x0075:
-        r4 = r0.mIsBeingDragged;
-        if (r4 != 0) goto L_0x00d8;
-    L_0x0079:
-        r4 = r0.mActivePointerId;
-        r4 = r1.findPointerIndex(r4);
-        r6 = -1;
-        if (r4 != r6) goto L_0x0087;
-    L_0x0082:
-        r5 = r17.resetTouch();
-        goto L_0x0071;
-    L_0x0087:
-        r6 = r1.getX(r4);
-        r7 = r0.mLastMotionX;
-        r7 = r6 - r7;
-        r7 = java.lang.Math.abs(r7);
-        r8 = r1.getY(r4);
-        r9 = r0.mLastMotionY;
-        r9 = r8 - r9;
-        r9 = java.lang.Math.abs(r9);
-        r10 = r0.mTouchSlop;
-        r10 = (float) r10;
-        r10 = (r7 > r10 ? 1 : (r7 == r10 ? 0 : -1));
-        if (r10 <= 0) goto L_0x00d8;
-    L_0x00a6:
-        r10 = (r7 > r9 ? 1 : (r7 == r9 ? 0 : -1));
-        if (r10 <= 0) goto L_0x00d8;
-    L_0x00aa:
-        r0.mIsBeingDragged = r3;
-        r0.requestParentDisallowInterceptTouchEvent(r3);
-        r10 = r0.mInitialMotionX;
-        r10 = r6 - r10;
-        r11 = 0;
-        r10 = (r10 > r11 ? 1 : (r10 == r11 ? 0 : -1));
-        if (r10 <= 0) goto L_0x00bf;
-    L_0x00b8:
-        r10 = r0.mInitialMotionX;
-        r11 = r0.mTouchSlop;
-        r11 = (float) r11;
-        r10 = r10 + r11;
-        goto L_0x00c5;
-    L_0x00bf:
-        r10 = r0.mInitialMotionX;
-        r11 = r0.mTouchSlop;
-        r11 = (float) r11;
-        r10 = r10 - r11;
-    L_0x00c5:
-        r0.mLastMotionX = r10;
-        r0.mLastMotionY = r8;
-        r0.setScrollState(r3);
-        r0.setScrollingCacheEnabled(r3);
-        r10 = r17.getParent();
-        if (r10 == 0) goto L_0x00d8;
-    L_0x00d5:
-        r10.requestDisallowInterceptTouchEvent(r3);
-    L_0x00d8:
-        r4 = r0.mIsBeingDragged;
-        if (r4 == 0) goto L_0x0071;
-    L_0x00dc:
-        r4 = r0.mActivePointerId;
-        r4 = r1.findPointerIndex(r4);
-        r6 = r1.getX(r4);
-        r7 = r0.performDrag(r6);
-        r5 = r5 | r7;
-        goto L_0x0071;
-    L_0x00ec:
-        r4 = r0.mIsBeingDragged;
-        if (r4 == 0) goto L_0x003f;
-    L_0x00f0:
-        r4 = r0.mVelocityTracker;
-        r6 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
-        r7 = r0.mMaximumVelocity;
-        r7 = (float) r7;
-        r4.computeCurrentVelocity(r6, r7);
-        r6 = r0.mActivePointerId;
-        r6 = r4.getXVelocity(r6);
-        r6 = (int) r6;
-        r0.mPopulatePending = r3;
-        r7 = r17.getClientWidth();
-        r8 = r17.getScrollX();
-        r9 = r17.infoForCurrentScrollPosition();
-        r10 = r0.mPageMargin;
-        r10 = (float) r10;
-        r11 = (float) r7;
-        r10 = r10 / r11;
-        r11 = r9.position;
-        r12 = (float) r8;
-        r13 = (float) r7;
-        r12 = r12 / r13;
-        r13 = r9.offset;
-        r12 = r12 - r13;
-        r13 = r9.widthFactor;
-        r13 = r13 + r10;
-        r12 = r12 / r13;
-        r13 = r0.mActivePointerId;
-        r13 = r1.findPointerIndex(r13);
-        r14 = r1.getX(r13);
-        r15 = r0.mInitialMotionX;
-        r15 = r14 - r15;
-        r15 = (int) r15;
-        r16 = r2;
-        r2 = r0.determineTargetPage(r11, r12, r6, r15);
-        r0.setCurrentItemInternal(r2, r3, r3, r6);
-        r5 = r17.resetTouch();
-        goto L_0x0160;
-    L_0x013d:
-        r16 = r2;
-        r2 = r0.mScroller;
-        r2.abortAnimation();
-        r0.mPopulatePending = r4;
-        r17.populate();
-        r2 = r18.getX();
-        r0.mInitialMotionX = r2;
-        r0.mLastMotionX = r2;
-        r2 = r18.getY();
-        r0.mInitialMotionY = r2;
-        r0.mLastMotionY = r2;
-        r2 = r1.getPointerId(r4);
-        r0.mActivePointerId = r2;
-    L_0x0160:
-        if (r5 == 0) goto L_0x0165;
-    L_0x0162:
-        android.support.v4.view.ViewCompat.postInvalidateOnAnimation(r17);
-    L_0x0165:
-        return r3;
-    L_0x0166:
-        return r4;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: android.support.v4.view.ViewPager.onTouchEvent(android.view.MotionEvent):boolean");
+    public boolean onTouchEvent(MotionEvent ev) {
+        if (this.mFakeDragging) {
+            return true;
+        }
+        if (ev.getAction() == 0 && ev.getEdgeFlags() != 0) {
+            return false;
+        }
+        if (this.mAdapter == null || this.mAdapter.getCount() == 0) {
+            return false;
+        }
+        if (this.mVelocityTracker == null) {
+            this.mVelocityTracker = VelocityTracker.obtain();
+        }
+        this.mVelocityTracker.addMovement(ev);
+        boolean needsInvalidate = false;
+        float x;
+        switch (ev.getAction() & 255) {
+            case 0:
+                this.mScroller.abortAnimation();
+                this.mPopulatePending = false;
+                populate();
+                x = ev.getX();
+                this.mInitialMotionX = x;
+                this.mLastMotionX = x;
+                x = ev.getY();
+                this.mInitialMotionY = x;
+                this.mLastMotionY = x;
+                this.mActivePointerId = ev.getPointerId(0);
+                break;
+            case 1:
+                if (this.mIsBeingDragged) {
+                    VelocityTracker velocityTracker = this.mVelocityTracker;
+                    velocityTracker.computeCurrentVelocity(1000, (float) this.mMaximumVelocity);
+                    int initialVelocity = (int) velocityTracker.getXVelocity(this.mActivePointerId);
+                    this.mPopulatePending = true;
+                    int width = getClientWidth();
+                    int scrollX = getScrollX();
+                    ItemInfo ii = infoForCurrentScrollPosition();
+                    float marginOffset = ((float) this.mPageMargin) / ((float) width);
+                    setCurrentItemInternal(determineTargetPage(ii.position, ((((float) scrollX) / ((float) width)) - ii.offset) / (ii.widthFactor + marginOffset), initialVelocity, (int) (ev.getX(ev.findPointerIndex(this.mActivePointerId)) - this.mInitialMotionX)), true, true, initialVelocity);
+                    needsInvalidate = resetTouch();
+                    break;
+                }
+                break;
+            case 2:
+                if (!this.mIsBeingDragged) {
+                    int pointerIndex = ev.findPointerIndex(this.mActivePointerId);
+                    if (pointerIndex == -1) {
+                        needsInvalidate = resetTouch();
+                        break;
+                    }
+                    float x2 = ev.getX(pointerIndex);
+                    float xDiff = Math.abs(x2 - this.mLastMotionX);
+                    float y = ev.getY(pointerIndex);
+                    float yDiff = Math.abs(y - this.mLastMotionY);
+                    if (xDiff > ((float) this.mTouchSlop) && xDiff > yDiff) {
+                        this.mIsBeingDragged = true;
+                        requestParentDisallowInterceptTouchEvent(true);
+                        if (x2 - this.mInitialMotionX > 0.0f) {
+                            x = this.mInitialMotionX + ((float) this.mTouchSlop);
+                        } else {
+                            x = this.mInitialMotionX - ((float) this.mTouchSlop);
+                        }
+                        this.mLastMotionX = x;
+                        this.mLastMotionY = y;
+                        setScrollState(1);
+                        setScrollingCacheEnabled(true);
+                        ViewParent parent = getParent();
+                        if (parent != null) {
+                            parent.requestDisallowInterceptTouchEvent(true);
+                        }
+                    }
+                }
+                if (this.mIsBeingDragged) {
+                    needsInvalidate = false | performDrag(ev.getX(ev.findPointerIndex(this.mActivePointerId)));
+                    break;
+                }
+                break;
+            case 3:
+                if (this.mIsBeingDragged) {
+                    scrollToItem(this.mCurItem, true, 0, false);
+                    needsInvalidate = resetTouch();
+                    break;
+                }
+                break;
+            case 5:
+                int index = ev.getActionIndex();
+                this.mLastMotionX = ev.getX(index);
+                this.mActivePointerId = ev.getPointerId(index);
+                break;
+            case 6:
+                onSecondaryPointerUp(ev);
+                this.mLastMotionX = ev.getX(ev.findPointerIndex(this.mActivePointerId));
+                break;
+        }
+        if (needsInvalidate) {
+            ViewCompat.postInvalidateOnAnimation(this);
+        }
+        return true;
     }
 
     private boolean resetTouch() {
@@ -2388,12 +1800,7 @@ Caused by: java.lang.NullPointerException
         endDrag();
         this.mLeftEdge.onRelease();
         this.mRightEdge.onRelease();
-        if (!this.mLeftEdge.isFinished()) {
-            if (!this.mRightEdge.isFinished()) {
-                return false;
-            }
-        }
-        return true;
+        return this.mLeftEdge.isFinished() || this.mRightEdge.isFinished();
     }
 
     private void requestParentDisallowInterceptTouchEvent(boolean disallowIntercept) {
@@ -2404,10 +1811,9 @@ Caused by: java.lang.NullPointerException
     }
 
     private boolean performDrag(float x) {
-        float f = x;
         boolean needsInvalidate = false;
-        float deltaX = this.mLastMotionX - f;
-        this.mLastMotionX = f;
+        float deltaX = this.mLastMotionX - x;
+        this.mLastMotionX = x;
         float scrollX = ((float) getScrollX()) + deltaX;
         int width = getClientWidth();
         float leftBound = ((float) width) * this.mFirstOffset;
@@ -2420,33 +1826,38 @@ Caused by: java.lang.NullPointerException
             leftAbsolute = false;
             leftBound = firstItem.offset * ((float) width);
         }
-        if (lastItem.position != r0.mAdapter.getCount() - 1) {
+        if (lastItem.position != this.mAdapter.getCount() - 1) {
             rightAbsolute = false;
             rightBound = lastItem.offset * ((float) width);
         }
         if (scrollX < leftBound) {
             if (leftAbsolute) {
-                r0.mLeftEdge.onPull(Math.abs(leftBound - scrollX) / ((float) width));
+                this.mLeftEdge.onPull(Math.abs(leftBound - scrollX) / ((float) width));
                 needsInvalidate = true;
             }
             scrollX = leftBound;
         } else if (scrollX > rightBound) {
             if (rightAbsolute) {
-                r0.mRightEdge.onPull(Math.abs(scrollX - rightBound) / ((float) width));
+                this.mRightEdge.onPull(Math.abs(scrollX - rightBound) / ((float) width));
                 needsInvalidate = true;
             }
             scrollX = rightBound;
         }
-        r0.mLastMotionX += scrollX - ((float) ((int) scrollX));
+        this.mLastMotionX += scrollX - ((float) ((int) scrollX));
         scrollTo((int) scrollX, getScrollY());
         pageScrolled((int) scrollX);
         return needsInvalidate;
     }
 
     private ItemInfo infoForCurrentScrollPosition() {
-        int width = getClientWidth();
+        float scrollOffset;
         float marginOffset = 0.0f;
-        float scrollOffset = width > 0 ? ((float) getScrollX()) / ((float) width) : 0.0f;
+        int width = getClientWidth();
+        if (width > 0) {
+            scrollOffset = ((float) getScrollX()) / ((float) width);
+        } else {
+            scrollOffset = 0.0f;
+        }
         if (width > 0) {
             marginOffset = ((float) this.mPageMargin) / ((float) width);
         }
@@ -2468,22 +1879,18 @@ Caused by: java.lang.NullPointerException
             float offset = ii.offset;
             float leftBound = offset;
             float rightBound = (ii.widthFactor + offset) + marginOffset;
-            if (!first) {
-                if (scrollOffset < leftBound) {
-                    return lastItem;
-                }
+            if (!first && scrollOffset < leftBound) {
+                return lastItem;
             }
-            if (scrollOffset >= rightBound) {
-                if (i != this.mItems.size() - 1) {
-                    first = false;
-                    lastPos = ii.position;
-                    lastOffset = offset;
-                    lastWidth = ii.widthFactor;
-                    lastItem = ii;
-                    i++;
-                }
+            if (scrollOffset < rightBound || i == this.mItems.size() - 1) {
+                return ii;
             }
-            return ii;
+            first = false;
+            lastPos = ii.position;
+            lastOffset = offset;
+            lastWidth = ii.widthFactor;
+            lastItem = ii;
+            i++;
         }
         return lastItem;
     }
@@ -2505,34 +1912,33 @@ Caused by: java.lang.NullPointerException
         super.draw(canvas);
         boolean needsInvalidate = false;
         int overScrollMode = getOverScrollMode();
-        if (overScrollMode != 0) {
-            if (overScrollMode != 1 || this.mAdapter == null || this.mAdapter.getCount() <= 1) {
-                this.mLeftEdge.finish();
-                this.mRightEdge.finish();
-                if (needsInvalidate) {
-                    ViewCompat.postInvalidateOnAnimation(this);
-                }
+        if (overScrollMode == 0 || (overScrollMode == 1 && this.mAdapter != null && this.mAdapter.getCount() > 1)) {
+            int restoreCount;
+            int height;
+            int width;
+            if (!this.mLeftEdge.isFinished()) {
+                restoreCount = canvas.save();
+                height = (getHeight() - getPaddingTop()) - getPaddingBottom();
+                width = getWidth();
+                canvas.rotate(270.0f);
+                canvas.translate((float) ((-height) + getPaddingTop()), this.mFirstOffset * ((float) width));
+                this.mLeftEdge.setSize(height, width);
+                needsInvalidate = false | this.mLeftEdge.draw(canvas);
+                canvas.restoreToCount(restoreCount);
             }
-        }
-        if (!this.mLeftEdge.isFinished()) {
-            int restoreCount = canvas.save();
-            int height = (getHeight() - getPaddingTop()) - getPaddingBottom();
-            int width = getWidth();
-            canvas.rotate(270.0f);
-            canvas.translate((float) ((-height) + getPaddingTop()), this.mFirstOffset * ((float) width));
-            this.mLeftEdge.setSize(height, width);
-            needsInvalidate = false | this.mLeftEdge.draw(canvas);
-            canvas.restoreToCount(restoreCount);
-        }
-        if (!this.mRightEdge.isFinished()) {
-            restoreCount = canvas.save();
-            height = getWidth();
-            width = (getHeight() - getPaddingTop()) - getPaddingBottom();
-            canvas.rotate(90.0f);
-            canvas.translate((float) (-getPaddingTop()), (-(this.mLastOffset + 1.0f)) * ((float) height));
-            this.mRightEdge.setSize(width, height);
-            needsInvalidate |= this.mRightEdge.draw(canvas);
-            canvas.restoreToCount(restoreCount);
+            if (!this.mRightEdge.isFinished()) {
+                restoreCount = canvas.save();
+                width = getWidth();
+                height = (getHeight() - getPaddingTop()) - getPaddingBottom();
+                canvas.rotate(90.0f);
+                canvas.translate((float) (-getPaddingTop()), (-(this.mLastOffset + 1.0f)) * ((float) width));
+                this.mRightEdge.setSize(height, width);
+                needsInvalidate |= this.mRightEdge.draw(canvas);
+                canvas.restoreToCount(restoreCount);
+            }
+        } else {
+            this.mLeftEdge.finish();
+            this.mRightEdge.finish();
         }
         if (needsInvalidate) {
             ViewCompat.postInvalidateOnAnimation(this);
@@ -2540,52 +1946,43 @@ Caused by: java.lang.NullPointerException
     }
 
     protected void onDraw(Canvas canvas) {
-        Canvas canvas2;
         super.onDraw(canvas);
-        if (this.mPageMargin > 0 && r0.mMarginDrawable != null && r0.mItems.size() > 0 && r0.mAdapter != null) {
+        if (this.mPageMargin > 0 && this.mMarginDrawable != null && this.mItems.size() > 0 && this.mAdapter != null) {
             int scrollX = getScrollX();
             int width = getWidth();
-            float marginOffset = ((float) r0.mPageMargin) / ((float) width);
-            ItemInfo ii = (ItemInfo) r0.mItems.get(0);
-            float offset = ii.offset;
-            int itemCount = r0.mItems.size();
-            int firstPos = ii.position;
-            int lastPos = ((ItemInfo) r0.mItems.get(itemCount - 1)).position;
-            float offset2 = offset;
+            float marginOffset = ((float) this.mPageMargin) / ((float) width);
             int itemIndex = 0;
+            ItemInfo ii = (ItemInfo) this.mItems.get(0);
+            float offset = ii.offset;
+            int itemCount = this.mItems.size();
+            int firstPos = ii.position;
+            int lastPos = ((ItemInfo) this.mItems.get(itemCount - 1)).position;
             int pos = firstPos;
             while (pos < lastPos) {
                 float drawAt;
-                float marginOffset2;
                 while (pos > ii.position && itemIndex < itemCount) {
                     itemIndex++;
-                    ii = (ItemInfo) r0.mItems.get(itemIndex);
+                    ii = (ItemInfo) this.mItems.get(itemIndex);
                 }
                 if (pos == ii.position) {
-                    offset2 = (ii.offset + ii.widthFactor) + marginOffset;
                     drawAt = (ii.offset + ii.widthFactor) * ((float) width);
+                    offset = (ii.offset + ii.widthFactor) + marginOffset;
                 } else {
-                    float widthFactor = r0.mAdapter.getPageWidth(pos);
-                    drawAt = (offset2 + widthFactor) * ((float) width);
-                    offset2 += widthFactor + marginOffset;
+                    float widthFactor = this.mAdapter.getPageWidth(pos);
+                    drawAt = (offset + widthFactor) * ((float) width);
+                    offset += widthFactor + marginOffset;
                 }
-                if (((float) r0.mPageMargin) + drawAt > ((float) scrollX)) {
-                    marginOffset2 = marginOffset;
-                    r0.mMarginDrawable.setBounds(Math.round(drawAt), r0.mTopPageBounds, Math.round(((float) r0.mPageMargin) + drawAt), r0.mBottomPageBounds);
-                    r0.mMarginDrawable.draw(canvas);
-                } else {
-                    canvas2 = canvas;
-                    marginOffset2 = marginOffset;
+                if (((float) this.mPageMargin) + drawAt > ((float) scrollX)) {
+                    this.mMarginDrawable.setBounds(Math.round(drawAt), this.mTopPageBounds, Math.round(((float) this.mPageMargin) + drawAt), this.mBottomPageBounds);
+                    this.mMarginDrawable.draw(canvas);
                 }
                 if (drawAt <= ((float) (scrollX + width))) {
                     pos++;
-                    marginOffset = marginOffset2;
                 } else {
                     return;
                 }
             }
         }
-        canvas2 = canvas;
     }
 
     public boolean beginFakeDrag() {
@@ -2631,18 +2028,18 @@ Caused by: java.lang.NullPointerException
     public void fakeDragBy(float xOffset) {
         if (!this.mFakeDragging) {
             throw new IllegalStateException("No fake drag in progress. Call beginFakeDrag first.");
-        } else if (r0.mAdapter != null) {
-            r0.mLastMotionX += xOffset;
+        } else if (this.mAdapter != null) {
+            this.mLastMotionX += xOffset;
             float scrollX = ((float) getScrollX()) - xOffset;
             int width = getClientWidth();
-            float leftBound = ((float) width) * r0.mFirstOffset;
-            float rightBound = ((float) width) * r0.mLastOffset;
-            ItemInfo firstItem = (ItemInfo) r0.mItems.get(0);
-            ItemInfo lastItem = (ItemInfo) r0.mItems.get(r0.mItems.size() - 1);
+            float leftBound = ((float) width) * this.mFirstOffset;
+            float rightBound = ((float) width) * this.mLastOffset;
+            ItemInfo firstItem = (ItemInfo) this.mItems.get(0);
+            ItemInfo lastItem = (ItemInfo) this.mItems.get(this.mItems.size() - 1);
             if (firstItem.position != 0) {
                 leftBound = firstItem.offset * ((float) width);
             }
-            if (lastItem.position != r0.mAdapter.getCount() - 1) {
+            if (lastItem.position != this.mAdapter.getCount() - 1) {
                 rightBound = lastItem.offset * ((float) width);
             }
             if (scrollX < leftBound) {
@@ -2650,11 +2047,11 @@ Caused by: java.lang.NullPointerException
             } else if (scrollX > rightBound) {
                 scrollX = rightBound;
             }
-            r0.mLastMotionX += scrollX - ((float) ((int) scrollX));
+            this.mLastMotionX += scrollX - ((float) ((int) scrollX));
             scrollTo((int) scrollX, getScrollY());
             pageScrolled((int) scrollX);
-            MotionEvent ev = MotionEvent.obtain(r0.mFakeDragBeginTime, SystemClock.uptimeMillis(), 2, r0.mLastMotionX, 0.0f, 0);
-            r0.mVelocityTracker.addMovement(ev);
+            MotionEvent ev = MotionEvent.obtain(this.mFakeDragBeginTime, SystemClock.uptimeMillis(), 2, this.mLastMotionX, 0.0f, 0);
+            this.mVelocityTracker.addMovement(ev);
             ev.recycle();
         }
     }
@@ -2691,34 +2088,32 @@ Caused by: java.lang.NullPointerException
     }
 
     public boolean canScrollHorizontally(int direction) {
-        boolean z = false;
+        boolean z = true;
         if (this.mAdapter == null) {
             return false;
         }
         int width = getClientWidth();
         int scrollX = getScrollX();
         if (direction < 0) {
-            if (scrollX > ((int) (((float) width) * this.mFirstOffset))) {
-                z = true;
+            if (scrollX <= ((int) (((float) width) * this.mFirstOffset))) {
+                z = false;
             }
             return z;
         } else if (direction <= 0) {
             return false;
         } else {
-            if (scrollX < ((int) (((float) width) * this.mLastOffset))) {
-                z = true;
+            if (scrollX >= ((int) (((float) width) * this.mLastOffset))) {
+                z = false;
             }
             return z;
         }
     }
 
     protected boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
-        View view = v;
-        boolean z = true;
-        if (view instanceof ViewGroup) {
-            ViewGroup group = (ViewGroup) view;
-            int scrollX = view.getScrollX();
-            int scrollY = view.getScrollY();
+        if (v instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) v;
+            int scrollX = v.getScrollX();
+            int scrollY = v.getScrollY();
             for (int i = group.getChildCount() - 1; i >= 0; i--) {
                 View child = group.getChildAt(i);
                 if (x + scrollX >= child.getLeft() && x + scrollX < child.getRight() && y + scrollY >= child.getTop() && y + scrollY < child.getBottom()) {
@@ -2728,61 +2123,47 @@ Caused by: java.lang.NullPointerException
                 }
             }
         }
-        if (!checkV) {
-            scrollX = dx;
-        } else if (view.canScrollHorizontally(-dx)) {
-            return z;
-        }
-        z = false;
-        return z;
+        return checkV && v.canScrollHorizontally(-dx);
     }
 
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!super.dispatchKeyEvent(event)) {
-            if (!executeKeyEvent(event)) {
-                return false;
-            }
-        }
-        return true;
+        return super.dispatchKeyEvent(event) || executeKeyEvent(event);
     }
 
     public boolean executeKeyEvent(KeyEvent event) {
         if (event.getAction() != 0) {
             return false;
         }
-        int keyCode = event.getKeyCode();
-        if (keyCode != 61) {
-            switch (keyCode) {
-                case 21:
-                    if (event.hasModifiers(2)) {
-                        return pageLeft();
-                    }
-                    return arrowScroll(17);
-                case 22:
-                    if (event.hasModifiers(2)) {
-                        return pageRight();
-                    }
-                    return arrowScroll(66);
-                default:
-                    return false;
-            }
-        } else if (event.hasNoModifiers()) {
-            return arrowScroll(2);
-        } else {
-            if (event.hasModifiers(1)) {
-                return arrowScroll(1);
-            }
-            return false;
+        switch (event.getKeyCode()) {
+            case 21:
+                if (event.hasModifiers(2)) {
+                    return pageLeft();
+                }
+                return arrowScroll(17);
+            case 22:
+                if (event.hasModifiers(2)) {
+                    return pageRight();
+                }
+                return arrowScroll(66);
+            case 61:
+                if (event.hasNoModifiers()) {
+                    return arrowScroll(2);
+                }
+                if (event.hasModifiers(1)) {
+                    return arrowScroll(1);
+                }
+                return false;
+            default:
+                return false;
         }
     }
 
     public boolean arrowScroll(int direction) {
-        boolean isChild;
         View currentFocused = findFocus();
         if (currentFocused == this) {
             currentFocused = null;
         } else if (currentFocused != null) {
-            isChild = false;
+            boolean isChild = false;
             for (ViewPager parent = currentFocused.getParent(); parent instanceof ViewGroup; parent = parent.getParent()) {
                 if (parent == this) {
                     isChild = true;
@@ -2793,49 +2174,29 @@ Caused by: java.lang.NullPointerException
                 StringBuilder sb = new StringBuilder();
                 sb.append(currentFocused.getClass().getSimpleName());
                 for (ViewParent parent2 = currentFocused.getParent(); parent2 instanceof ViewGroup; parent2 = parent2.getParent()) {
-                    sb.append(" => ");
-                    sb.append(parent2.getClass().getSimpleName());
+                    sb.append(" => ").append(parent2.getClass().getSimpleName());
                 }
-                String str = TAG;
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("arrowScroll tried to find focus based on non-child current focused view ");
-                stringBuilder.append(sb.toString());
-                Log.e(str, stringBuilder.toString());
+                Log.e(TAG, "arrowScroll tried to find focus based on non-child current focused view " + sb.toString());
                 currentFocused = null;
             }
         }
-        isChild = false;
+        boolean handled = false;
         View nextFocused = FocusFinder.getInstance().findNextFocus(this, currentFocused, direction);
         if (nextFocused == null || nextFocused == currentFocused) {
-            if (direction != 17) {
-                if (direction != 1) {
-                    if (direction == 66 || direction == 2) {
-                        isChild = pageRight();
-                    }
-                }
+            if (direction == 17 || direction == 1) {
+                handled = pageLeft();
+            } else if (direction == 66 || direction == 2) {
+                handled = pageRight();
             }
-            isChild = pageLeft();
         } else if (direction == 17) {
-            nextLeft = getChildRectInPagerCoordinates(this.mTempRect, nextFocused).left;
-            currLeft = getChildRectInPagerCoordinates(this.mTempRect, currentFocused).left;
-            if (currentFocused == null || nextLeft < currLeft) {
-                isChild = nextFocused.requestFocus();
-            } else {
-                isChild = pageLeft();
-            }
+            handled = (currentFocused == null || getChildRectInPagerCoordinates(this.mTempRect, nextFocused).left < getChildRectInPagerCoordinates(this.mTempRect, currentFocused).left) ? nextFocused.requestFocus() : pageLeft();
         } else if (direction == 66) {
-            nextLeft = getChildRectInPagerCoordinates(this.mTempRect, nextFocused).left;
-            currLeft = getChildRectInPagerCoordinates(this.mTempRect, currentFocused).left;
-            if (currentFocused == null || nextLeft > currLeft) {
-                isChild = nextFocused.requestFocus();
-            } else {
-                isChild = pageRight();
-            }
+            handled = (currentFocused == null || getChildRectInPagerCoordinates(this.mTempRect, nextFocused).left > getChildRectInPagerCoordinates(this.mTempRect, currentFocused).left) ? nextFocused.requestFocus() : pageRight();
         }
-        if (isChild) {
+        if (handled) {
             playSoundEffect(SoundEffectConstants.getContantForFocusDirection(direction));
         }
-        return isChild;
+        return handled;
     }
 
     private Rect getChildRectInPagerCoordinates(Rect outRect, View child) {
@@ -2844,20 +2205,20 @@ Caused by: java.lang.NullPointerException
         }
         if (child == null) {
             outRect.set(0, 0, 0, 0);
-            return outRect;
-        }
-        outRect.left = child.getLeft();
-        outRect.right = child.getRight();
-        outRect.top = child.getTop();
-        outRect.bottom = child.getBottom();
-        ViewGroup parent = child.getParent();
-        while ((parent instanceof ViewGroup) && parent != this) {
-            ViewGroup group = parent;
-            outRect.left += group.getLeft();
-            outRect.right += group.getRight();
-            outRect.top += group.getTop();
-            outRect.bottom += group.getBottom();
-            parent = group.getParent();
+        } else {
+            outRect.left = child.getLeft();
+            outRect.right = child.getRight();
+            outRect.top = child.getTop();
+            outRect.bottom = child.getBottom();
+            ViewGroup parent = child.getParent();
+            while ((parent instanceof ViewGroup) && parent != this) {
+                ViewGroup group = parent;
+                outRect.left += group.getLeft();
+                outRect.right += group.getRight();
+                outRect.top += group.getTop();
+                outRect.bottom += group.getBottom();
+                parent = group.getParent();
+            }
         }
         return outRect;
     }
@@ -2895,7 +2256,7 @@ Caused by: java.lang.NullPointerException
         if ((descendantFocusability == 262144 && focusableCount != views.size()) || !isFocusable()) {
             return;
         }
-        if (!(((focusableMode & 1) == 1 && isInTouchMode() && !isFocusableInTouchMode()) || views == null)) {
+        if (((focusableMode & 1) != 1 || !isInTouchMode() || isFocusableInTouchMode()) && views != null) {
             views.add(this);
         }
     }

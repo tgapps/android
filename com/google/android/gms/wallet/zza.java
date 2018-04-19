@@ -38,7 +38,7 @@ public final class zza extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, this.name, false);
         SafeParcelWriter.writeString(parcel, 3, this.zze, false);
         SafeParcelWriter.writeString(parcel, 4, this.zzf, false);
@@ -50,6 +50,6 @@ public final class zza extends AbstractSafeParcelable {
         SafeParcelWriter.writeString(parcel, 10, this.zzl, false);
         SafeParcelWriter.writeBoolean(parcel, 11, this.zzm);
         SafeParcelWriter.writeString(parcel, 12, this.zzn, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

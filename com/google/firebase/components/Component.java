@@ -18,9 +18,9 @@ public final class Component<T> {
         private ComponentFactory<T> zzae;
 
         private Builder(Class<T> cls, Class<? super T>... clsArr) {
+            int i = 0;
             this.zzab = new HashSet();
             this.zzac = new HashSet();
-            int i = 0;
             this.zzad = 0;
             zzk.zza(cls, "Null interface");
             this.zzab.add(cls);
@@ -59,14 +59,7 @@ public final class Component<T> {
     }
 
     public final String toString() {
-        StringBuilder stringBuilder = new StringBuilder("Component<");
-        stringBuilder.append(Arrays.toString(this.zzab.toArray()));
-        stringBuilder.append(">{");
-        stringBuilder.append(this.zzad);
-        stringBuilder.append(", deps=");
-        stringBuilder.append(Arrays.toString(this.zzac.toArray()));
-        stringBuilder.append("}");
-        return stringBuilder.toString();
+        return "Component<" + Arrays.toString(this.zzab.toArray()) + ">{" + this.zzad + ", deps=" + Arrays.toString(this.zzac.toArray()) + "}";
     }
 
     public final Set<Class<? super T>> zze() {

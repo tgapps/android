@@ -19,6 +19,7 @@ final class zzam extends zzat {
     }
 
     public final void zzaq() {
+        int i = 0;
         GoogleApiAvailabilityCache googleApiAvailabilityCache = new GoogleApiAvailabilityCache(this.zzhv.zzgk);
         List arrayList = new ArrayList();
         List arrayList2 = new ArrayList();
@@ -29,32 +30,35 @@ final class zzam extends zzat {
                 arrayList.add(client);
             }
         }
-        int i = -1;
-        int i2 = 0;
+        int i2 = -1;
+        ArrayList arrayList3;
+        int i3;
         if (!arrayList.isEmpty()) {
-            ArrayList arrayList3 = (ArrayList) arrayList;
+            arrayList3 = (ArrayList) arrayList;
             int size = arrayList3.size();
-            while (i2 < size) {
-                Object obj = arrayList3.get(i2);
-                i2++;
-                i = googleApiAvailabilityCache.getClientAvailability(this.zzhv.mContext, (Client) obj);
-                if (i != 0) {
+            i3 = 0;
+            while (i3 < size) {
+                Object obj = arrayList3.get(i3);
+                i3++;
+                i2 = googleApiAvailabilityCache.getClientAvailability(this.zzhv.mContext, (Client) obj);
+                if (i2 != 0) {
                     break;
                 }
             }
         }
-        ArrayList arrayList4 = (ArrayList) arrayList2;
-        int size2 = arrayList4.size();
-        while (i2 < size2) {
-            obj = arrayList4.get(i2);
-            i2++;
-            i = googleApiAvailabilityCache.getClientAvailability(this.zzhv.mContext, (Client) obj);
-            if (i == 0) {
+        arrayList3 = (ArrayList) arrayList2;
+        i3 = arrayList3.size();
+        while (i < i3) {
+            obj = arrayList3.get(i);
+            i++;
+            i2 = googleApiAvailabilityCache.getClientAvailability(this.zzhv.mContext, (Client) obj);
+            if (i2 == 0) {
                 break;
             }
         }
-        if (i != 0) {
-            this.zzhv.zzhf.zza(new zzan(this, this.zzhv, new ConnectionResult(i, null)));
+        int i4 = i2;
+        if (i4 != 0) {
+            this.zzhv.zzhf.zza(new zzan(this, this.zzhv, new ConnectionResult(i4, null)));
             return;
         }
         if (this.zzhv.zzhp) {

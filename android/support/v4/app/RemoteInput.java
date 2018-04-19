@@ -85,10 +85,10 @@ public final class RemoteInput {
         }
         if (VERSION.SDK_INT >= 16) {
             Intent clipDataIntent = getClipDataIntentFromIntent(intent);
-            if (clipDataIntent == null) {
-                return null;
+            if (clipDataIntent != null) {
+                return (Bundle) clipDataIntent.getExtras().getParcelable("android.remoteinput.resultsData");
             }
-            return (Bundle) clipDataIntent.getExtras().getParcelable("android.remoteinput.resultsData");
+            return null;
         }
         Log.w("RemoteInput", "RemoteInput is only supported from API Level 16");
         return null;

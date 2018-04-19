@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build.VERSION;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import java.io.File;
 
@@ -66,45 +67,14 @@ public class ContextCompat {
         return createFilesDir(new File(context.getApplicationInfo().dataDir, "no_backup"));
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private static synchronized java.io.File createFilesDir(java.io.File r4) {
-        /*
-        r0 = android.support.v4.content.ContextCompat.class;
-        monitor-enter(r0);
-        r1 = r4.exists();	 Catch:{ all -> 0x0036 }
-        if (r1 != 0) goto L_0x0034;
-    L_0x0009:
-        r1 = r4.mkdirs();	 Catch:{ all -> 0x0036 }
-        if (r1 != 0) goto L_0x0034;
-    L_0x000f:
-        r1 = r4.exists();	 Catch:{ all -> 0x0036 }
-        if (r1 == 0) goto L_0x0017;
-    L_0x0015:
-        monitor-exit(r0);
-        return r4;
-    L_0x0017:
-        r1 = "ContextCompat";
-        r2 = new java.lang.StringBuilder;	 Catch:{ all -> 0x0036 }
-        r2.<init>();	 Catch:{ all -> 0x0036 }
-        r3 = "Unable to create files subdir ";
-        r2.append(r3);	 Catch:{ all -> 0x0036 }
-        r3 = r4.getPath();	 Catch:{ all -> 0x0036 }
-        r2.append(r3);	 Catch:{ all -> 0x0036 }
-        r2 = r2.toString();	 Catch:{ all -> 0x0036 }
-        android.util.Log.w(r1, r2);	 Catch:{ all -> 0x0036 }
-        r1 = 0;
-        monitor-exit(r0);
-        return r1;
-    L_0x0034:
-        monitor-exit(r0);
-        return r4;
-    L_0x0036:
-        r4 = move-exception;
-        monitor-exit(r0);
-        throw r4;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: android.support.v4.content.ContextCompat.createFilesDir(java.io.File):java.io.File");
+    private static synchronized File createFilesDir(File file) {
+        synchronized (ContextCompat.class) {
+            if (!(file.exists() || file.mkdirs() || file.exists())) {
+                Log.w("ContextCompat", "Unable to create files subdir " + file.getPath());
+                file = null;
+            }
+        }
+        return file;
     }
 
     public static boolean isDeviceProtectedStorage(Context context) {

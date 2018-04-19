@@ -9,9 +9,9 @@ import java.util.List;
 public class CheckServerAuthResultCreator implements Creator<CheckServerAuthResult> {
     public CheckServerAuthResult createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        int i = 0;
         List list = null;
         boolean z = false;
+        int i = 0;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {

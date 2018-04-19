@@ -6,61 +6,60 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzeg implements Creator<zzef> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        Parcel parcel2 = parcel;
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        long j = 0;
-        long j2 = j;
-        long j3 = j2;
         String str = null;
-        String str2 = str;
-        zzjs com_google_android_gms_internal_measurement_zzjs = str2;
-        String str3 = com_google_android_gms_internal_measurement_zzjs;
-        zzeu com_google_android_gms_internal_measurement_zzeu = str3;
-        zzeu com_google_android_gms_internal_measurement_zzeu2 = com_google_android_gms_internal_measurement_zzeu;
-        zzeu com_google_android_gms_internal_measurement_zzeu3 = com_google_android_gms_internal_measurement_zzeu2;
+        String str2 = null;
+        zzjs com_google_android_gms_internal_measurement_zzjs = null;
+        long j = 0;
         boolean z = false;
+        String str3 = null;
+        zzeu com_google_android_gms_internal_measurement_zzeu = null;
+        long j2 = 0;
+        zzeu com_google_android_gms_internal_measurement_zzeu2 = null;
+        long j3 = 0;
+        zzeu com_google_android_gms_internal_measurement_zzeu3 = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = SafeParcelReader.createString(parcel2, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = SafeParcelReader.createString(parcel2, readHeader);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    com_google_android_gms_internal_measurement_zzjs = (zzjs) SafeParcelReader.createParcelable(parcel2, readHeader, zzjs.CREATOR);
+                    com_google_android_gms_internal_measurement_zzjs = (zzjs) SafeParcelReader.createParcelable(parcel, readHeader, zzjs.CREATOR);
                     break;
                 case 5:
-                    j = SafeParcelReader.readLong(parcel2, readHeader);
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 6:
-                    z = SafeParcelReader.readBoolean(parcel2, readHeader);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 7:
-                    str3 = SafeParcelReader.createString(parcel2, readHeader);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 8:
-                    com_google_android_gms_internal_measurement_zzeu = (zzeu) SafeParcelReader.createParcelable(parcel2, readHeader, zzeu.CREATOR);
+                    com_google_android_gms_internal_measurement_zzeu = (zzeu) SafeParcelReader.createParcelable(parcel, readHeader, zzeu.CREATOR);
                     break;
                 case 9:
-                    j2 = SafeParcelReader.readLong(parcel2, readHeader);
+                    j2 = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 10:
-                    com_google_android_gms_internal_measurement_zzeu2 = (zzeu) SafeParcelReader.createParcelable(parcel2, readHeader, zzeu.CREATOR);
+                    com_google_android_gms_internal_measurement_zzeu2 = (zzeu) SafeParcelReader.createParcelable(parcel, readHeader, zzeu.CREATOR);
                     break;
                 case 11:
-                    j3 = SafeParcelReader.readLong(parcel2, readHeader);
+                    j3 = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 12:
-                    com_google_android_gms_internal_measurement_zzeu3 = (zzeu) SafeParcelReader.createParcelable(parcel2, readHeader, zzeu.CREATOR);
+                    com_google_android_gms_internal_measurement_zzeu3 = (zzeu) SafeParcelReader.createParcelable(parcel, readHeader, zzeu.CREATOR);
                     break;
                 default:
-                    SafeParcelReader.skipUnknownField(parcel2, readHeader);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        SafeParcelReader.ensureAtEnd(parcel2, validateObjectHeader);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new zzef(str, str2, com_google_android_gms_internal_measurement_zzjs, j, z, str3, com_google_android_gms_internal_measurement_zzeu, j2, com_google_android_gms_internal_measurement_zzeu2, j3, com_google_android_gms_internal_measurement_zzeu3);
     }
 

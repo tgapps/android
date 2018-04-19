@@ -7,17 +7,17 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public final class zzp implements Creator<InstrumentInfo> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        String str = null;
         int i = 0;
+        String str = null;
         String str2 = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = SafeParcelReader.createString(parcel, readHeader);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
                     i = SafeParcelReader.readInt(parcel, readHeader);
@@ -28,7 +28,7 @@ public final class zzp implements Creator<InstrumentInfo> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new InstrumentInfo(str, str2, i);
+        return new InstrumentInfo(str2, str, i);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

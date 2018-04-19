@@ -6,13 +6,11 @@ public final class Dependency {
     private final int zzao;
 
     public final boolean equals(Object obj) {
-        if (obj instanceof Dependency) {
-            Dependency dependency = (Dependency) obj;
-            if (this.zzam == dependency.zzam && this.zzan == dependency.zzan && this.zzao == dependency.zzao) {
-                return true;
-            }
+        if (!(obj instanceof Dependency)) {
+            return false;
         }
-        return false;
+        Dependency dependency = (Dependency) obj;
+        return this.zzam == dependency.zzam && this.zzan == dependency.zzan && this.zzao == dependency.zzao;
     }
 
     public final int hashCode() {
@@ -20,18 +18,12 @@ public final class Dependency {
     }
 
     public final String toString() {
-        StringBuilder stringBuilder = new StringBuilder("Dependency{interface=");
-        stringBuilder.append(this.zzam);
-        stringBuilder.append(", required=");
-        boolean z = false;
-        stringBuilder.append(this.zzan == 1);
-        stringBuilder.append(", direct=");
-        if (this.zzao == 0) {
-            z = true;
+        boolean z = true;
+        StringBuilder append = new StringBuilder("Dependency{interface=").append(this.zzam).append(", required=").append(this.zzan == 1).append(", direct=");
+        if (this.zzao != 0) {
+            z = false;
         }
-        stringBuilder.append(z);
-        stringBuilder.append("}");
-        return stringBuilder.toString();
+        return append.append(z).append("}").toString();
     }
 
     public final Class<?> zzn() {

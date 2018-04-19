@@ -8,10 +8,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public final class zzae implements Creator<zzad> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        DataHolder dataHolder = null;
-        DataHolder dataHolder2 = dataHolder;
         int i = 0;
         long j = 0;
+        DataHolder dataHolder = null;
+        DataHolder dataHolder2 = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
@@ -19,13 +19,13 @@ public final class zzae implements Creator<zzad> {
                     i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    dataHolder = (DataHolder) SafeParcelReader.createParcelable(parcel, readHeader, DataHolder.CREATOR);
+                    dataHolder2 = (DataHolder) SafeParcelReader.createParcelable(parcel, readHeader, DataHolder.CREATOR);
                     break;
                 case 4:
                     j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 5:
-                    dataHolder2 = (DataHolder) SafeParcelReader.createParcelable(parcel, readHeader, DataHolder.CREATOR);
+                    dataHolder = (DataHolder) SafeParcelReader.createParcelable(parcel, readHeader, DataHolder.CREATOR);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -33,7 +33,7 @@ public final class zzae implements Creator<zzad> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new zzad(i, dataHolder, j, dataHolder2);
+        return new zzad(i, dataHolder2, j, dataHolder);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

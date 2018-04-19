@@ -94,16 +94,11 @@ public class AmrSpecificBox extends AbstractBox {
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_6, this, this));
         StringBuilder buffer = new StringBuilder();
-        buffer.append("AmrSpecificBox[vendor=");
-        buffer.append(getVendor());
-        buffer.append(";decoderVersion=");
-        buffer.append(getDecoderVersion());
-        buffer.append(";modeSet=");
-        buffer.append(getModeSet());
-        buffer.append(";modeChangePeriod=");
-        buffer.append(getModeChangePeriod());
-        buffer.append(";framesPerSample=");
-        buffer.append(getFramesPerSample());
+        buffer.append("AmrSpecificBox[vendor=").append(getVendor());
+        buffer.append(";decoderVersion=").append(getDecoderVersion());
+        buffer.append(";modeSet=").append(getModeSet());
+        buffer.append(";modeChangePeriod=").append(getModeChangePeriod());
+        buffer.append(";framesPerSample=").append(getFramesPerSample());
         buffer.append("]");
         return buffer.toString();
     }

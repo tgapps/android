@@ -13,17 +13,15 @@ final class zzt implements zzbq {
     public final void zzb(int i, boolean z) {
         this.zzgc.zzga.lock();
         try {
-            if (!(this.zzgc.zzfz || this.zzgc.zzfy == null)) {
-                if (this.zzgc.zzfy.isSuccess()) {
-                    this.zzgc.zzfz = true;
-                    this.zzgc.zzfs.onConnectionSuspended(i);
-                    this.zzgc.zzga.unlock();
-                }
+            if (this.zzgc.zzfz || this.zzgc.zzfy == null || !this.zzgc.zzfy.isSuccess()) {
+                this.zzgc.zzfz = false;
+                this.zzgc.zza(i, z);
+                return;
             }
-            this.zzgc.zzfz = false;
-            this.zzgc.zza(i, z);
+            this.zzgc.zzfz = true;
+            this.zzgc.zzfs.onConnectionSuspended(i);
             this.zzgc.zzga.unlock();
-        } catch (Throwable th) {
+        } finally {
             this.zzgc.zzga.unlock();
         }
     }

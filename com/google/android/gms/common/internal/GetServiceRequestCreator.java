@@ -11,62 +11,61 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public class GetServiceRequestCreator implements Creator<GetServiceRequest> {
     public GetServiceRequest createFromParcel(Parcel parcel) {
-        Parcel parcel2 = parcel;
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        int i = 0;
-        int i2 = i;
-        int i3 = i2;
-        boolean z = i3;
+        boolean z = false;
+        Feature[] featureArr = null;
+        Feature[] featureArr2 = null;
+        Account account = null;
+        Bundle bundle = null;
+        Scope[] scopeArr = null;
+        IBinder iBinder = null;
         String str = null;
-        IBinder iBinder = str;
-        Scope[] scopeArr = iBinder;
-        Bundle bundle = scopeArr;
-        Account account = bundle;
-        Feature[] featureArr = account;
-        Feature[] featureArr2 = featureArr;
+        int i = 0;
+        int i2 = 0;
+        int i3 = 0;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    i = SafeParcelReader.readInt(parcel2, readHeader);
+                    i3 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
-                    i2 = SafeParcelReader.readInt(parcel2, readHeader);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    i3 = SafeParcelReader.readInt(parcel2, readHeader);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 4:
-                    str = SafeParcelReader.createString(parcel2, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 5:
-                    iBinder = SafeParcelReader.readIBinder(parcel2, readHeader);
+                    iBinder = SafeParcelReader.readIBinder(parcel, readHeader);
                     break;
                 case 6:
-                    scopeArr = (Scope[]) SafeParcelReader.createTypedArray(parcel2, readHeader, Scope.CREATOR);
+                    scopeArr = (Scope[]) SafeParcelReader.createTypedArray(parcel, readHeader, Scope.CREATOR);
                     break;
                 case 7:
-                    bundle = SafeParcelReader.createBundle(parcel2, readHeader);
+                    bundle = SafeParcelReader.createBundle(parcel, readHeader);
                     break;
                 case 8:
-                    account = (Account) SafeParcelReader.createParcelable(parcel2, readHeader, Account.CREATOR);
+                    account = (Account) SafeParcelReader.createParcelable(parcel, readHeader, Account.CREATOR);
                     break;
                 case 10:
-                    featureArr = (Feature[]) SafeParcelReader.createTypedArray(parcel2, readHeader, Feature.CREATOR);
+                    featureArr2 = (Feature[]) SafeParcelReader.createTypedArray(parcel, readHeader, Feature.CREATOR);
                     break;
                 case 11:
-                    featureArr2 = (Feature[]) SafeParcelReader.createTypedArray(parcel2, readHeader, Feature.CREATOR);
+                    featureArr = (Feature[]) SafeParcelReader.createTypedArray(parcel, readHeader, Feature.CREATOR);
                     break;
                 case 12:
-                    z = SafeParcelReader.readBoolean(parcel2, readHeader);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 default:
-                    SafeParcelReader.skipUnknownField(parcel2, readHeader);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        SafeParcelReader.ensureAtEnd(parcel2, validateObjectHeader);
-        return new GetServiceRequest(i, i2, i3, str, iBinder, scopeArr, bundle, account, featureArr, featureArr2, z);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new GetServiceRequest(i3, i2, i, str, iBinder, scopeArr, bundle, account, featureArr2, featureArr, z);
     }
 
     public GetServiceRequest[] newArray(int i) {

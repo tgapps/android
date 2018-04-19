@@ -51,34 +51,14 @@ public class ConnectionConfiguration extends AbstractSafeParcelable implements R
         str = ", mAddress=";
         valueOf = String.valueOf(this.zzi);
         stringBuilder.append(valueOf.length() != 0 ? str.concat(valueOf) : new String(str));
-        int i = this.type;
-        StringBuilder stringBuilder2 = new StringBuilder(19);
-        stringBuilder2.append(", mType=");
-        stringBuilder2.append(i);
-        stringBuilder.append(stringBuilder2.toString());
-        i = this.zzj;
-        stringBuilder2 = new StringBuilder(19);
-        stringBuilder2.append(", mRole=");
-        stringBuilder2.append(i);
-        stringBuilder.append(stringBuilder2.toString());
-        boolean z = this.zzk;
-        StringBuilder stringBuilder3 = new StringBuilder(16);
-        stringBuilder3.append(", mEnabled=");
-        stringBuilder3.append(z);
-        stringBuilder.append(stringBuilder3.toString());
-        z = this.zzl;
-        stringBuilder3 = new StringBuilder(20);
-        stringBuilder3.append(", mIsConnected=");
-        stringBuilder3.append(z);
-        stringBuilder.append(stringBuilder3.toString());
+        stringBuilder.append(", mType=" + this.type);
+        stringBuilder.append(", mRole=" + this.zzj);
+        stringBuilder.append(", mEnabled=" + this.zzk);
+        stringBuilder.append(", mIsConnected=" + this.zzl);
         str = ", mPeerNodeId=";
         valueOf = String.valueOf(this.zzm);
         stringBuilder.append(valueOf.length() != 0 ? str.concat(valueOf) : new String(str));
-        z = this.zzn;
-        stringBuilder3 = new StringBuilder(21);
-        stringBuilder3.append(", mBtlePriority=");
-        stringBuilder3.append(z);
-        stringBuilder.append(stringBuilder3.toString());
+        stringBuilder.append(", mBtlePriority=" + this.zzn);
         str = ", mNodeId=";
         valueOf = String.valueOf(this.zzo);
         stringBuilder.append(valueOf.length() != 0 ? str.concat(valueOf) : new String(str));
@@ -87,7 +67,7 @@ public class ConnectionConfiguration extends AbstractSafeParcelable implements R
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, this.name, false);
         SafeParcelWriter.writeString(parcel, 3, this.zzi, false);
         SafeParcelWriter.writeInt(parcel, 4, this.type);
@@ -97,6 +77,6 @@ public class ConnectionConfiguration extends AbstractSafeParcelable implements R
         SafeParcelWriter.writeString(parcel, 8, this.zzm, false);
         SafeParcelWriter.writeBoolean(parcel, 9, this.zzn);
         SafeParcelWriter.writeString(parcel, 10, this.zzo, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -20,8 +20,7 @@ public class ExtensionDescriptor extends BaseDescriptor {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("ExtensionDescriptor");
-        sb.append("{bytes=");
-        sb.append(this.bytes == null ? "null" : Hex.encodeHex(this.bytes));
+        sb.append("{bytes=").append(this.bytes == null ? "null" : Hex.encodeHex(this.bytes));
         sb.append('}');
         return sb.toString();
     }

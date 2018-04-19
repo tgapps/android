@@ -45,16 +45,16 @@ public final class zzby extends BaseSignInCallbacks implements ConnectionCallbac
         ConnectionResult connectionResult = signInResponse.getConnectionResult();
         if (connectionResult.isSuccess()) {
             ResolveAccountResponse resolveAccountResponse = signInResponse.getResolveAccountResponse();
-            connectionResult = resolveAccountResponse.getConnectionResult();
-            if (connectionResult.isSuccess()) {
+            ConnectionResult connectionResult2 = resolveAccountResponse.getConnectionResult();
+            if (connectionResult2.isSuccess()) {
                 this.zzlw.zza(resolveAccountResponse.getAccountAccessor(), this.mScopes);
+            } else {
+                String valueOf = String.valueOf(connectionResult2);
+                Log.wtf("SignInCoordinator", new StringBuilder(String.valueOf(valueOf).length() + 48).append("Sign-in succeeded with resolve account failure: ").append(valueOf).toString(), new Exception());
+                this.zzlw.zzg(connectionResult2);
                 this.zzhn.disconnect();
+                return;
             }
-            String valueOf = String.valueOf(connectionResult);
-            StringBuilder stringBuilder = new StringBuilder(48 + String.valueOf(valueOf).length());
-            stringBuilder.append("Sign-in succeeded with resolve account failure: ");
-            stringBuilder.append(valueOf);
-            Log.wtf("SignInCoordinator", stringBuilder.toString(), new Exception());
         }
         this.zzlw.zzg(connectionResult);
         this.zzhn.disconnect();
@@ -83,13 +83,11 @@ public final class zzby extends BaseSignInCallbacks implements ConnectionCallbac
         this.zzgf.setClientSessionId(Integer.valueOf(System.identityHashCode(this)));
         this.zzhn = (SignInClient) this.zzby.buildClient(this.mContext, this.mHandler.getLooper(), this.zzgf, this.zzgf.getSignInOptions(), this, this);
         this.zzlw = com_google_android_gms_common_api_internal_zzcb;
-        if (this.mScopes != null) {
-            if (!this.mScopes.isEmpty()) {
-                this.zzhn.connect();
-                return;
-            }
+        if (this.mScopes == null || this.mScopes.isEmpty()) {
+            this.mHandler.post(new zzbz(this));
+        } else {
+            this.zzhn.connect();
         }
-        this.mHandler.post(new zzbz(this));
     }
 
     public final SignInClient zzbt() {

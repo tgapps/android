@@ -40,10 +40,10 @@ public final class InstrumentInfo extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, getInstrumentType(), false);
         SafeParcelWriter.writeString(parcel, 3, getInstrumentDetails(), false);
         SafeParcelWriter.writeInt(parcel, 4, getCardClass());
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

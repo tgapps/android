@@ -25,19 +25,21 @@ public class zza implements IInterface {
     }
 
     protected final Parcel transactAndReadException(int i, Parcel parcel) throws RemoteException {
+        IBinder iBinder;
         Parcel obtain = Parcel.obtain();
         try {
-            this.zza.transact(i, parcel, obtain, 0);
+            iBinder = this.zza;
+            iBinder.transact(i, parcel, obtain, 0);
             obtain.readException();
         } catch (RuntimeException e) {
-            i = e;
-            throw i;
+            iBinder = e;
+            throw iBinder;
         } finally {
             
 /*
 Method generation error in method: com.google.android.gms.internal.wallet.zza.transactAndReadException(int, android.os.Parcel):android.os.Parcel
-jadx.core.utils.exceptions.CodegenException: Error generate insn: 0x0018: INVOKE  (wrap: android.os.Parcel
-  ?: MERGE  (r5_1 android.os.Parcel) = (r5_0 'parcel' android.os.Parcel), (r0_0 'obtain' android.os.Parcel)) android.os.Parcel.recycle():void type: VIRTUAL in method: com.google.android.gms.internal.wallet.zza.transactAndReadException(int, android.os.Parcel):android.os.Parcel
+jadx.core.utils.exceptions.CodegenException: Error generate insn: 0x0017: INVOKE  (wrap: android.os.Parcel
+  ?: MERGE  (r5_1 android.os.Parcel) = (r5_0 'parcel' android.os.Parcel), (r1_0 'obtain' android.os.Parcel)) android.os.Parcel.recycle():void type: VIRTUAL in method: com.google.android.gms.internal.wallet.zza.transactAndReadException(int, android.os.Parcel):android.os.Parcel
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:203)
 	at jadx.core.codegen.RegionGen.makeSimpleBlock(RegionGen.java:100)
@@ -60,7 +62,7 @@ jadx.core.utils.exceptions.CodegenException: Error generate insn: 0x0018: INVOKE
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: jadx.core.utils.exceptions.CodegenException: Error generate insn: ?: MERGE  (r5_1 android.os.Parcel) = (r5_0 'parcel' android.os.Parcel), (r0_0 'obtain' android.os.Parcel) in method: com.google.android.gms.internal.wallet.zza.transactAndReadException(int, android.os.Parcel):android.os.Parcel
+Caused by: jadx.core.utils.exceptions.CodegenException: Error generate insn: ?: MERGE  (r5_1 android.os.Parcel) = (r5_0 'parcel' android.os.Parcel), (r1_0 'obtain' android.os.Parcel) in method: com.google.android.gms.internal.wallet.zza.transactAndReadException(int, android.os.Parcel):android.os.Parcel
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.InsnGen.addArg(InsnGen.java:101)
 	at jadx.core.codegen.InsnGen.addArgDot(InsnGen.java:84)

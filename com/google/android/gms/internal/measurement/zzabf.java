@@ -13,51 +13,48 @@ public final class zzabf implements Cloneable {
 
     private zzabf(int i) {
         this.zzbzm = false;
-        i = idealIntArraySize(i);
-        this.zzbzn = new int[i];
-        this.zzbzo = new zzabg[i];
+        int idealIntArraySize = idealIntArraySize(i);
+        this.zzbzn = new int[idealIntArraySize];
+        this.zzbzo = new zzabg[idealIntArraySize];
         this.mSize = 0;
     }
 
     private static int idealIntArraySize(int i) {
-        i <<= 2;
-        for (int i2 = 4; i2 < 32; i2++) {
-            int i3 = (1 << i2) - 12;
-            if (i <= i3) {
-                i = i3;
+        int i2 = i << 2;
+        for (int i3 = 4; i3 < 32; i3++) {
+            if (i2 <= (1 << i3) - 12) {
+                i2 = (1 << i3) - 12;
                 break;
             }
         }
-        return i / 4;
+        return i2 / 4;
     }
 
     private final int zzax(int i) {
-        int i2 = this.mSize - 1;
-        int i3 = 0;
-        while (i3 <= i2) {
-            int i4 = (i3 + i2) >>> 1;
+        int i2 = 0;
+        int i3 = this.mSize - 1;
+        while (i2 <= i3) {
+            int i4 = (i2 + i3) >>> 1;
             int i5 = this.zzbzn[i4];
             if (i5 < i) {
-                i3 = i4 + 1;
+                i2 = i4 + 1;
             } else if (i5 <= i) {
                 return i4;
             } else {
-                i2 = i4 - 1;
+                i3 = i4 - 1;
             }
         }
-        return i3 ^ -1;
+        return i2 ^ -1;
     }
 
     public final /* synthetic */ Object clone() throws CloneNotSupportedException {
         int i = this.mSize;
         zzabf com_google_android_gms_internal_measurement_zzabf = new zzabf(i);
-        int i2 = 0;
         System.arraycopy(this.zzbzn, 0, com_google_android_gms_internal_measurement_zzabf.zzbzn, 0, i);
-        while (i2 < i) {
+        for (int i2 = 0; i2 < i; i2++) {
             if (this.zzbzo[i2] != null) {
                 com_google_android_gms_internal_measurement_zzabf.zzbzo[i2] = (zzabg) this.zzbzo[i2].clone();
             }
-            i2++;
         }
         com_google_android_gms_internal_measurement_zzabf.mSize = i;
         return com_google_android_gms_internal_measurement_zzabf;
@@ -74,30 +71,30 @@ public final class zzabf implements Cloneable {
         if (this.mSize != com_google_android_gms_internal_measurement_zzabf.mSize) {
             return false;
         }
+        int i;
         boolean z;
         int[] iArr = this.zzbzn;
         int[] iArr2 = com_google_android_gms_internal_measurement_zzabf.zzbzn;
-        int i = this.mSize;
-        for (int i2 = 0; i2 < i; i2++) {
-            if (iArr[i2] != iArr2[i2]) {
+        int i2 = this.mSize;
+        for (i = 0; i < i2; i++) {
+            if (iArr[i] != iArr2[i]) {
                 z = false;
                 break;
             }
         }
         z = true;
         if (z) {
-            boolean z2;
             zzabg[] com_google_android_gms_internal_measurement_zzabgArr = this.zzbzo;
             zzabg[] com_google_android_gms_internal_measurement_zzabgArr2 = com_google_android_gms_internal_measurement_zzabf.zzbzo;
-            int i3 = this.mSize;
-            for (i = 0; i < i3; i++) {
+            i2 = this.mSize;
+            for (i = 0; i < i2; i++) {
                 if (!com_google_android_gms_internal_measurement_zzabgArr[i].equals(com_google_android_gms_internal_measurement_zzabgArr2[i])) {
-                    z2 = false;
+                    z = false;
                     break;
                 }
             }
-            z2 = true;
-            if (z2) {
+            z = true;
+            if (z) {
                 return true;
             }
         }
@@ -138,9 +135,8 @@ public final class zzabf implements Cloneable {
                 this.zzbzo = obj2;
             }
             if (this.mSize - zzax != 0) {
-                int i2 = zzax + 1;
-                System.arraycopy(this.zzbzn, zzax, this.zzbzn, i2, this.mSize - zzax);
-                System.arraycopy(this.zzbzo, zzax, this.zzbzo, i2, this.mSize - zzax);
+                System.arraycopy(this.zzbzn, zzax, this.zzbzn, zzax + 1, this.mSize - zzax);
+                System.arraycopy(this.zzbzo, zzax, this.zzbzo, zzax + 1, this.mSize - zzax);
             }
             this.zzbzn[zzax] = i;
             this.zzbzo[zzax] = com_google_android_gms_internal_measurement_zzabg;
@@ -152,13 +148,8 @@ public final class zzabf implements Cloneable {
     }
 
     final zzabg zzav(int i) {
-        i = zzax(i);
-        if (i >= 0) {
-            if (this.zzbzo[i] != zzbzl) {
-                return this.zzbzo[i];
-            }
-        }
-        return null;
+        int zzax = zzax(i);
+        return (zzax < 0 || this.zzbzo[zzax] == zzbzl) ? null : this.zzbzo[zzax];
     }
 
     final zzabg zzaw(int i) {

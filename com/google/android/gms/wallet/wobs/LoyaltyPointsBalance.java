@@ -30,13 +30,13 @@ public final class LoyaltyPointsBalance extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 2, this.zzgt);
         SafeParcelWriter.writeString(parcel, 3, this.zzgu, false);
         SafeParcelWriter.writeDouble(parcel, 4, this.zzgv);
         SafeParcelWriter.writeString(parcel, 5, this.zzbn, false);
         SafeParcelWriter.writeLong(parcel, 6, this.zzgw);
         SafeParcelWriter.writeInt(parcel, 7, this.zzgx);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

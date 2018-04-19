@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
 @Descriptor(tags = {0})
 public abstract class BaseDescriptor {
-    static final /* synthetic */ boolean $assertionsDisabled = false;
+    static final /* synthetic */ boolean $assertionsDisabled = (!BaseDescriptor.class.desiredAssertionStatus());
     int sizeBytes;
     int sizeOfInstance;
     int tag;
@@ -39,16 +39,18 @@ public abstract class BaseDescriptor {
         ByteBuffer detailSource = bb.slice();
         detailSource.limit(this.sizeOfInstance);
         parseDetail(detailSource);
-        bb.position(bb.position() + this.sizeOfInstance);
+        if ($assertionsDisabled || detailSource.remaining() == 0) {
+            bb.position(bb.position() + this.sizeOfInstance);
+            return;
+        }
+        throw new AssertionError(new StringBuilder(String.valueOf(getClass().getSimpleName())).append(" has not been fully parsed").toString());
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("BaseDescriptor");
-        sb.append("{tag=");
-        sb.append(this.tag);
-        sb.append(", sizeOfInstance=");
-        sb.append(this.sizeOfInstance);
+        sb.append("{tag=").append(this.tag);
+        sb.append(", sizeOfInstance=").append(this.sizeOfInstance);
         sb.append('}');
         return sb.toString();
     }

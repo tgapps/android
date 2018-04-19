@@ -100,29 +100,27 @@ public class FirebaseApp {
             firebaseApp = (FirebaseApp) zzf.get("[DEFAULT]");
             if (firebaseApp == null) {
                 String myProcessName = ProcessUtils.getMyProcessName();
-                StringBuilder stringBuilder = new StringBuilder(116 + String.valueOf(myProcessName).length());
-                stringBuilder.append("Default FirebaseApp is not initialized in this process ");
-                stringBuilder.append(myProcessName);
-                stringBuilder.append(". Make sure to call FirebaseApp.initializeApp(Context) first.");
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException(new StringBuilder(String.valueOf(myProcessName).length() + 116).append("Default FirebaseApp is not initialized in this process ").append(myProcessName).append(". Make sure to call FirebaseApp.initializeApp(Context) first.").toString());
             }
         }
         return firebaseApp;
     }
 
     public static FirebaseApp initializeApp(Context context) {
+        FirebaseApp instance;
         synchronized (sLock) {
             if (zzf.containsKey("[DEFAULT]")) {
-                FirebaseApp instance = getInstance();
-                return instance;
+                instance = getInstance();
+            } else {
+                FirebaseOptions fromResource = FirebaseOptions.fromResource(context);
+                if (fromResource == null) {
+                    instance = null;
+                } else {
+                    instance = initializeApp(context, fromResource);
+                }
             }
-            FirebaseOptions fromResource = FirebaseOptions.fromResource(context);
-            if (fromResource == null) {
-                return null;
-            }
-            instance = initializeApp(context, fromResource);
-            return instance;
         }
+        return instance;
     }
 
     public static FirebaseApp initializeApp(Context context, FirebaseOptions firebaseOptions) {
@@ -136,20 +134,15 @@ public class FirebaseApp {
             BackgroundDetector.initialize((Application) context.getApplicationContext());
             BackgroundDetector.getInstance().addListener(new zza());
         }
-        str = str.trim();
+        String trim = str.trim();
         if (context.getApplicationContext() != null) {
             context = context.getApplicationContext();
         }
         synchronized (sLock) {
-            boolean containsKey = zzf.containsKey(str) ^ 1;
-            StringBuilder stringBuilder = new StringBuilder(33 + String.valueOf(str).length());
-            stringBuilder.append("FirebaseApp name ");
-            stringBuilder.append(str);
-            stringBuilder.append(" already exists!");
-            Preconditions.checkState(containsKey, stringBuilder.toString());
+            Preconditions.checkState(!zzf.containsKey(trim), new StringBuilder(String.valueOf(trim).length() + 33).append("FirebaseApp name ").append(trim).append(" already exists!").toString());
             Preconditions.checkNotNull(context, "Application context cannot be null.");
-            firebaseApp = new FirebaseApp(context, str, firebaseOptions);
-            zzf.put(str, firebaseApp);
+            firebaseApp = new FirebaseApp(context, trim, firebaseOptions);
+            zzf.put(trim, firebaseApp);
         }
         zzb.zzb(firebaseApp);
         firebaseApp.zzc();
@@ -173,33 +166,33 @@ public class FirebaseApp {
     }
 
     private final void zza() {
-        Preconditions.checkState(this.zzk.get() ^ 1, "FirebaseApp was deleted");
+        Preconditions.checkState(!this.zzk.get(), "FirebaseApp was deleted");
     }
 
     private static <T> void zza(Class<T> cls, T t, Iterable<String> iterable, boolean z) {
-        String valueOf;
-        for (String valueOf2 : iterable) {
+        for (String str : iterable) {
+            String str2;
             if (z) {
                 try {
-                    if (zzd.contains(valueOf2)) {
+                    if (!zzd.contains(str2)) {
                     }
                 } catch (ClassNotFoundException e) {
-                    if (zze.contains(valueOf2)) {
-                        throw new IllegalStateException(String.valueOf(valueOf2).concat(" is missing, but is required. Check if it has been removed by Proguard."));
+                    if (zze.contains(str2)) {
+                        throw new IllegalStateException(String.valueOf(str2).concat(" is missing, but is required. Check if it has been removed by Proguard."));
                     }
-                    Log.d("FirebaseApp", String.valueOf(valueOf2).concat(" is not linked. Skipping initialization."));
+                    Log.d("FirebaseApp", String.valueOf(str2).concat(" is not linked. Skipping initialization."));
                 } catch (NoSuchMethodException e2) {
-                    throw new IllegalStateException(String.valueOf(valueOf2).concat("#getInstance has been removed by Proguard. Add keep rule to prevent it."));
+                    throw new IllegalStateException(String.valueOf(str2).concat("#getInstance has been removed by Proguard. Add keep rule to prevent it."));
                 } catch (Throwable e3) {
                     Log.wtf("FirebaseApp", "Firebase API initialization failure.", e3);
                 } catch (Throwable e4) {
-                    String str = "FirebaseApp";
-                    String str2 = "Failed to initialize ";
-                    valueOf2 = String.valueOf(valueOf2);
-                    Log.wtf(str, valueOf2.length() != 0 ? str2.concat(valueOf2) : new String(str2), e4);
+                    String str3 = "FirebaseApp";
+                    String str4 = "Failed to initialize ";
+                    str2 = String.valueOf(str2);
+                    Log.wtf(str3, str2.length() != 0 ? str4.concat(str2) : new String(str4), e4);
                 }
             }
-            Method method = Class.forName(valueOf2).getMethod("getInstance", new Class[]{cls});
+            Method method = Class.forName(str2).getMethod("getInstance", new Class[]{cls});
             int modifiers = method.getModifiers();
             if (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers)) {
                 method.invoke(null, new Object[]{t});

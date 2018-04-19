@@ -3,11 +3,13 @@ package org.telegram.ui.ActionBar;
 import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build.VERSION;
+import android.text.SpannedString;
 import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.exoplayer2.source.ExtractorMediaSource;
@@ -26,14 +29,23 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.ChatBigEmptyView;
+import org.telegram.ui.Components.CheckBox;
 import org.telegram.ui.Components.CombinedDrawable;
 import org.telegram.ui.Components.ContextProgressView;
 import org.telegram.ui.Components.EditTextBoldCursor;
+import org.telegram.ui.Components.EditTextCaption;
 import org.telegram.ui.Components.EmptyTextProgressView;
+import org.telegram.ui.Components.GroupCreateCheckBox;
+import org.telegram.ui.Components.GroupCreateSpan;
+import org.telegram.ui.Components.LetterDrawable;
 import org.telegram.ui.Components.LineProgressView;
 import org.telegram.ui.Components.NumberTextView;
 import org.telegram.ui.Components.RadialProgressView;
+import org.telegram.ui.Components.RadioButton;
 import org.telegram.ui.Components.RecyclerListView;
+import org.telegram.ui.Components.SeekBarView;
+import org.telegram.ui.Components.Switch;
+import org.telegram.ui.Components.TypefaceSpan;
 
 public class ThemeDescription {
     public static int FLAG_AB_AM_BACKGROUND = ExtractorMediaSource.DEFAULT_LOADING_CHECK_INTERVAL_BYTES;
@@ -85,506 +97,6 @@ public class ThemeDescription {
 
     public interface ThemeDescriptionDelegate {
         void didSetColor();
-    }
-
-    private void processViewColor(android.view.View r1, int r2) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.ActionBar.ThemeDescription.processViewColor(android.view.View, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = 0;
-        r1 = r0;
-        r2 = r13.listClasses;
-        r2 = r2.length;
-        if (r1 >= r2) goto L_0x03b8;
-    L_0x0007:
-        r2 = r13.listClasses;
-        r2 = r2[r1];
-        r2 = r2.isInstance(r14);
-        if (r2 == 0) goto L_0x03b4;
-    L_0x0011:
-        r14.invalidate();
-        r2 = r13.changeFlags;
-        r3 = FLAG_CHECKTAG;
-        r2 = r2 & r3;
-        if (r2 == 0) goto L_0x0032;
-    L_0x001b:
-        r2 = r13.changeFlags;
-        r3 = FLAG_CHECKTAG;
-        r2 = r2 & r3;
-        if (r2 == 0) goto L_0x002f;
-    L_0x0022:
-        r2 = r13.currentKey;
-        r3 = r14.getTag();
-        r2 = r2.equals(r3);
-        if (r2 == 0) goto L_0x002f;
-    L_0x002e:
-        goto L_0x0032;
-    L_0x002f:
-        r2 = r0;
-        goto L_0x00a6;
-    L_0x0032:
-        r2 = 1;
-        r14.invalidate();
-        r3 = r13.changeFlags;
-        r4 = FLAG_BACKGROUNDFILTER;
-        r3 = r3 & r4;
-        if (r3 == 0) goto L_0x0076;
-        r3 = r14.getBackground();
-        if (r3 == 0) goto L_0x0075;
-        r4 = r13.changeFlags;
-        r5 = FLAG_CELLBACKGROUNDCOLOR;
-        r4 = r4 & r5;
-        if (r4 == 0) goto L_0x0060;
-        r4 = r3 instanceof org.telegram.ui.Components.CombinedDrawable;
-        if (r4 == 0) goto L_0x0075;
-        r4 = r3;
-        r4 = (org.telegram.ui.Components.CombinedDrawable) r4;
-        r4 = r4.getBackground();
-        r5 = r4 instanceof android.graphics.drawable.ColorDrawable;
-        if (r5 == 0) goto L_0x005f;
-        r5 = r4;
-        r5 = (android.graphics.drawable.ColorDrawable) r5;
-        r5.setColor(r15);
-        goto L_0x0075;
-        r4 = r3 instanceof org.telegram.ui.Components.CombinedDrawable;
-        if (r4 == 0) goto L_0x006b;
-        r4 = r3;
-        r4 = (org.telegram.ui.Components.CombinedDrawable) r4;
-        r3 = r4.getIcon();
-        r4 = new android.graphics.PorterDuffColorFilter;
-        r5 = android.graphics.PorterDuff.Mode.MULTIPLY;
-        r4.<init>(r15, r5);
-        r3.setColorFilter(r4);
-        goto L_0x00a6;
-        r3 = r13.changeFlags;
-        r4 = FLAG_CELLBACKGROUNDCOLOR;
-        r3 = r3 & r4;
-        if (r3 == 0) goto L_0x0081;
-        r14.setBackgroundColor(r15);
-        goto L_0x00a6;
-        r3 = r13.changeFlags;
-        r4 = FLAG_TEXTCOLOR;
-        r3 = r3 & r4;
-        if (r3 == 0) goto L_0x0093;
-        r3 = r14 instanceof android.widget.TextView;
-        if (r3 == 0) goto L_0x00a6;
-        r3 = r14;
-        r3 = (android.widget.TextView) r3;
-        r3.setTextColor(r15);
-        goto L_0x00a6;
-        r3 = r13.changeFlags;
-        r4 = FLAG_SERVICEBACKGROUND;
-        r3 = r3 & r4;
-        if (r3 == 0) goto L_0x00a6;
-        r3 = r14.getBackground();
-        if (r3 == 0) goto L_0x00a5;
-        r4 = org.telegram.ui.ActionBar.Theme.colorFilter;
-        r3.setColorFilter(r4);
-        r3 = r13.listClassesFieldName;
-        if (r3 == 0) goto L_0x03aa;
-        r3 = new java.lang.StringBuilder;
-        r3.<init>();
-        r4 = r13.listClasses;
-        r4 = r4[r1];
-        r3.append(r4);
-        r4 = "_";
-        r3.append(r4);
-        r4 = r13.listClassesFieldName;
-        r4 = r4[r1];
-        r3.append(r4);
-        r3 = r3.toString();
-        r4 = r13.notFoundCachedFields;
-        if (r4 == 0) goto L_0x00d5;
-        r4 = r13.notFoundCachedFields;
-        r4 = r4.containsKey(r3);
-        if (r4 == 0) goto L_0x00d5;
-        goto L_0x03b4;
-        r4 = 1;
-        r5 = r13.cachedFields;	 Catch:{ Throwable -> 0x039c }
-        r5 = r5.get(r3);	 Catch:{ Throwable -> 0x039c }
-        r5 = (java.lang.reflect.Field) r5;	 Catch:{ Throwable -> 0x039c }
-        if (r5 != 0) goto L_0x00f7;	 Catch:{ Throwable -> 0x039c }
-        r6 = r13.listClasses;	 Catch:{ Throwable -> 0x039c }
-        r6 = r6[r1];	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.listClassesFieldName;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7[r1];	 Catch:{ Throwable -> 0x039c }
-        r6 = r6.getDeclaredField(r7);	 Catch:{ Throwable -> 0x039c }
-        r5 = r6;	 Catch:{ Throwable -> 0x039c }
-        if (r5 == 0) goto L_0x00f7;	 Catch:{ Throwable -> 0x039c }
-        r5.setAccessible(r4);	 Catch:{ Throwable -> 0x039c }
-        r6 = r13.cachedFields;	 Catch:{ Throwable -> 0x039c }
-        r6.put(r3, r5);	 Catch:{ Throwable -> 0x039c }
-        if (r5 == 0) goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r6 = r5.get(r14);	 Catch:{ Throwable -> 0x039c }
-        if (r6 == 0) goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        if (r2 != 0) goto L_0x0116;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.view.View;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0116;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.currentKey;	 Catch:{ Throwable -> 0x039c }
-        r8 = r6;	 Catch:{ Throwable -> 0x039c }
-        r8 = (android.view.View) r8;	 Catch:{ Throwable -> 0x039c }
-        r8 = r8.getTag();	 Catch:{ Throwable -> 0x039c }
-        r7 = r7.equals(r8);	 Catch:{ Throwable -> 0x039c }
-        if (r7 != 0) goto L_0x0116;	 Catch:{ Throwable -> 0x039c }
-        goto L_0x03b4;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.view.View;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0120;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.view.View) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.invalidate();	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_USEBACKGROUNDDRAWABLE;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0133;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.view.View;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0133;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.view.View) r7;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7.getBackground();	 Catch:{ Throwable -> 0x039c }
-        r6 = r7;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_BACKGROUND;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0146;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.view.View;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0146;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.view.View) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setBackgroundColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.Switch;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0152;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.Switch) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.checkColorFilters();	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.EditTextCaption;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0173;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_HINTTEXTCOLOR;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x016b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.EditTextCaption) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setHintColor(r15);	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.EditTextCaption) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setHintTextColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.EditTextCaption) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setTextColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.ActionBar.SimpleTextView;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x018e;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_LINKCOLOR;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0186;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.ActionBar.SimpleTextView) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setLinkTextColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.ActionBar.SimpleTextView) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setTextColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.widget.TextView;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0200;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.widget.TextView) r7;	 Catch:{ Throwable -> 0x039c }
-        r8 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r9 = FLAG_IMAGECOLOR;	 Catch:{ Throwable -> 0x039c }
-        r8 = r8 & r9;	 Catch:{ Throwable -> 0x039c }
-        if (r8 == 0) goto L_0x01ba;	 Catch:{ Throwable -> 0x039c }
-        r8 = r7.getCompoundDrawables();	 Catch:{ Throwable -> 0x039c }
-        if (r8 == 0) goto L_0x01b9;	 Catch:{ Throwable -> 0x039c }
-        r9 = r0;	 Catch:{ Throwable -> 0x039c }
-        r10 = r8.length;	 Catch:{ Throwable -> 0x039c }
-        if (r9 >= r10) goto L_0x01b9;	 Catch:{ Throwable -> 0x039c }
-        r10 = r8[r9];	 Catch:{ Throwable -> 0x039c }
-        if (r10 == 0) goto L_0x01b6;	 Catch:{ Throwable -> 0x039c }
-        r10 = r8[r9];	 Catch:{ Throwable -> 0x039c }
-        r11 = new android.graphics.PorterDuffColorFilter;	 Catch:{ Throwable -> 0x039c }
-        r12 = android.graphics.PorterDuff.Mode.MULTIPLY;	 Catch:{ Throwable -> 0x039c }
-        r11.<init>(r15, r12);	 Catch:{ Throwable -> 0x039c }
-        r10.setColorFilter(r11);	 Catch:{ Throwable -> 0x039c }
-        r9 = r9 + 1;	 Catch:{ Throwable -> 0x039c }
-        goto L_0x01a3;	 Catch:{ Throwable -> 0x039c }
-        goto L_0x01fe;	 Catch:{ Throwable -> 0x039c }
-        r8 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r9 = FLAG_LINKCOLOR;	 Catch:{ Throwable -> 0x039c }
-        r8 = r8 & r9;	 Catch:{ Throwable -> 0x039c }
-        if (r8 == 0) goto L_0x01cb;	 Catch:{ Throwable -> 0x039c }
-        r8 = r7.getPaint();	 Catch:{ Throwable -> 0x039c }
-        r8.linkColor = r15;	 Catch:{ Throwable -> 0x039c }
-        r7.invalidate();	 Catch:{ Throwable -> 0x039c }
-        goto L_0x01fe;	 Catch:{ Throwable -> 0x039c }
-        r8 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r9 = FLAG_FASTSCROLL;	 Catch:{ Throwable -> 0x039c }
-        r8 = r8 & r9;	 Catch:{ Throwable -> 0x039c }
-        if (r8 == 0) goto L_0x01fb;	 Catch:{ Throwable -> 0x039c }
-        r8 = r7.getText();	 Catch:{ Throwable -> 0x039c }
-        r9 = r8 instanceof android.text.SpannedString;	 Catch:{ Throwable -> 0x039c }
-        if (r9 == 0) goto L_0x01fa;	 Catch:{ Throwable -> 0x039c }
-        r9 = r8;	 Catch:{ Throwable -> 0x039c }
-        r9 = (android.text.SpannedString) r9;	 Catch:{ Throwable -> 0x039c }
-        r10 = r8.length();	 Catch:{ Throwable -> 0x039c }
-        r11 = org.telegram.ui.Components.TypefaceSpan.class;	 Catch:{ Throwable -> 0x039c }
-        r9 = r9.getSpans(r0, r10, r11);	 Catch:{ Throwable -> 0x039c }
-        r9 = (org.telegram.ui.Components.TypefaceSpan[]) r9;	 Catch:{ Throwable -> 0x039c }
-        if (r9 == 0) goto L_0x01fa;	 Catch:{ Throwable -> 0x039c }
-        r10 = r9.length;	 Catch:{ Throwable -> 0x039c }
-        if (r10 <= 0) goto L_0x01fa;	 Catch:{ Throwable -> 0x039c }
-        r10 = r0;	 Catch:{ Throwable -> 0x039c }
-        r11 = r9.length;	 Catch:{ Throwable -> 0x039c }
-        if (r10 >= r11) goto L_0x01fa;	 Catch:{ Throwable -> 0x039c }
-        r11 = r9[r10];	 Catch:{ Throwable -> 0x039c }
-        r11.setColor(r15);	 Catch:{ Throwable -> 0x039c }
-        r10 = r10 + 1;	 Catch:{ Throwable -> 0x039c }
-        goto L_0x01ef;	 Catch:{ Throwable -> 0x039c }
-        goto L_0x01fe;	 Catch:{ Throwable -> 0x039c }
-        r7.setTextColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.widget.ImageView;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0213;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.widget.ImageView) r7;	 Catch:{ Throwable -> 0x039c }
-        r8 = new android.graphics.PorterDuffColorFilter;	 Catch:{ Throwable -> 0x039c }
-        r9 = android.graphics.PorterDuff.Mode.MULTIPLY;	 Catch:{ Throwable -> 0x039c }
-        r8.<init>(r15, r9);	 Catch:{ Throwable -> 0x039c }
-        r7.setColorFilter(r8);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.BackupImageView;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x025f;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.BackupImageView) r7;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7.getImageReceiver();	 Catch:{ Throwable -> 0x039c }
-        r7 = r7.getStaticThumb();	 Catch:{ Throwable -> 0x039c }
-        r8 = r7 instanceof org.telegram.ui.Components.CombinedDrawable;	 Catch:{ Throwable -> 0x039c }
-        if (r8 == 0) goto L_0x0251;	 Catch:{ Throwable -> 0x039c }
-        r8 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r9 = FLAG_BACKGROUNDFILTER;	 Catch:{ Throwable -> 0x039c }
-        r8 = r8 & r9;	 Catch:{ Throwable -> 0x039c }
-        if (r8 == 0) goto L_0x023f;	 Catch:{ Throwable -> 0x039c }
-        r8 = r7;	 Catch:{ Throwable -> 0x039c }
-        r8 = (org.telegram.ui.Components.CombinedDrawable) r8;	 Catch:{ Throwable -> 0x039c }
-        r8 = r8.getBackground();	 Catch:{ Throwable -> 0x039c }
-        r9 = new android.graphics.PorterDuffColorFilter;	 Catch:{ Throwable -> 0x039c }
-        r10 = android.graphics.PorterDuff.Mode.MULTIPLY;	 Catch:{ Throwable -> 0x039c }
-        r9.<init>(r15, r10);	 Catch:{ Throwable -> 0x039c }
-        r8.setColorFilter(r9);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x025d;	 Catch:{ Throwable -> 0x039c }
-        r8 = r7;	 Catch:{ Throwable -> 0x039c }
-        r8 = (org.telegram.ui.Components.CombinedDrawable) r8;	 Catch:{ Throwable -> 0x039c }
-        r8 = r8.getIcon();	 Catch:{ Throwable -> 0x039c }
-        r9 = new android.graphics.PorterDuffColorFilter;	 Catch:{ Throwable -> 0x039c }
-        r10 = android.graphics.PorterDuff.Mode.MULTIPLY;	 Catch:{ Throwable -> 0x039c }
-        r9.<init>(r15, r10);	 Catch:{ Throwable -> 0x039c }
-        r8.setColorFilter(r9);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x025d;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x025d;	 Catch:{ Throwable -> 0x039c }
-        r8 = new android.graphics.PorterDuffColorFilter;	 Catch:{ Throwable -> 0x039c }
-        r9 = android.graphics.PorterDuff.Mode.MULTIPLY;	 Catch:{ Throwable -> 0x039c }
-        r8.<init>(r15, r9);	 Catch:{ Throwable -> 0x039c }
-        r7.setColorFilter(r8);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.graphics.drawable.Drawable;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x02df;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.LetterDrawable;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x027e;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_BACKGROUNDFILTER;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0276;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.LetterDrawable) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setBackgroundColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.LetterDrawable) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.CombinedDrawable;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x02af;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_BACKGROUNDFILTER;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x029c;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.CombinedDrawable) r7;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7.getBackground();	 Catch:{ Throwable -> 0x039c }
-        r8 = new android.graphics.PorterDuffColorFilter;	 Catch:{ Throwable -> 0x039c }
-        r9 = android.graphics.PorterDuff.Mode.MULTIPLY;	 Catch:{ Throwable -> 0x039c }
-        r8.<init>(r15, r9);	 Catch:{ Throwable -> 0x039c }
-        r7.setColorFilter(r8);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.CombinedDrawable) r7;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7.getIcon();	 Catch:{ Throwable -> 0x039c }
-        r8 = new android.graphics.PorterDuffColorFilter;	 Catch:{ Throwable -> 0x039c }
-        r9 = android.graphics.PorterDuff.Mode.MULTIPLY;	 Catch:{ Throwable -> 0x039c }
-        r8.<init>(r15, r9);	 Catch:{ Throwable -> 0x039c }
-        r7.setColorFilter(r8);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.graphics.drawable.StateListDrawable;	 Catch:{ Throwable -> 0x039c }
-        if (r7 != 0) goto L_0x02cd;	 Catch:{ Throwable -> 0x039c }
-        r7 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Throwable -> 0x039c }
-        r8 = 21;	 Catch:{ Throwable -> 0x039c }
-        if (r7 < r8) goto L_0x02be;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.graphics.drawable.RippleDrawable;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x02be;	 Catch:{ Throwable -> 0x039c }
-        goto L_0x02cd;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.graphics.drawable.Drawable) r7;	 Catch:{ Throwable -> 0x039c }
-        r8 = new android.graphics.PorterDuffColorFilter;	 Catch:{ Throwable -> 0x039c }
-        r9 = android.graphics.PorterDuff.Mode.MULTIPLY;	 Catch:{ Throwable -> 0x039c }
-        r8.<init>(r15, r9);	 Catch:{ Throwable -> 0x039c }
-        r7.setColorFilter(r8);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.graphics.drawable.Drawable) r7;	 Catch:{ Throwable -> 0x039c }
-        r8 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r9 = FLAG_DRAWABLESELECTEDSTATE;	 Catch:{ Throwable -> 0x039c }
-        r8 = r8 & r9;	 Catch:{ Throwable -> 0x039c }
-        if (r8 == 0) goto L_0x02d9;	 Catch:{ Throwable -> 0x039c }
-        r8 = r4;	 Catch:{ Throwable -> 0x039c }
-        goto L_0x02da;	 Catch:{ Throwable -> 0x039c }
-        r8 = r0;	 Catch:{ Throwable -> 0x039c }
-        org.telegram.ui.ActionBar.Theme.setSelectorDrawableColor(r7, r15, r8);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.CheckBox;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0301;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_CHECKBOX;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x02f2;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.CheckBox) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setBackgroundColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_CHECKBOXCHECK;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.CheckBox) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setCheckColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.GroupCreateCheckBox;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x030d;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.GroupCreateCheckBox) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.updateColors();	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof java.lang.Integer;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x031a;	 Catch:{ Throwable -> 0x039c }
-        r7 = java.lang.Integer.valueOf(r15);	 Catch:{ Throwable -> 0x039c }
-        r5.set(r14, r7);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.RadioButton;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0347;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_CHECKBOX;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0333;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.RadioButton) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setBackgroundColor(r15);	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.RadioButton) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.invalidate();	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_CHECKBOXCHECK;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.RadioButton) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setCheckedColor(r15);	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.RadioButton) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.invalidate();	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.text.TextPaint;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x035f;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_LINKCOLOR;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0358;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.text.TextPaint) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.linkColor = r15;	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.text.TextPaint) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.LineProgressView;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0378;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_PROGRESSBAR;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0371;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.LineProgressView) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setProgressColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.LineProgressView) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setBackColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof android.graphics.Paint;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0383;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (android.graphics.Paint) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6 instanceof org.telegram.ui.Components.SeekBarView;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r13.changeFlags;	 Catch:{ Throwable -> 0x039c }
-        r8 = FLAG_PROGRESSBAR;	 Catch:{ Throwable -> 0x039c }
-        r7 = r7 & r8;	 Catch:{ Throwable -> 0x039c }
-        if (r7 == 0) goto L_0x0395;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.SeekBarView) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setOuterColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x039b;	 Catch:{ Throwable -> 0x039c }
-        r7 = r6;	 Catch:{ Throwable -> 0x039c }
-        r7 = (org.telegram.ui.Components.SeekBarView) r7;	 Catch:{ Throwable -> 0x039c }
-        r7.setInnerColor(r15);	 Catch:{ Throwable -> 0x039c }
-        goto L_0x03a9;
-    L_0x039c:
-        r5 = move-exception;
-        org.telegram.messenger.FileLog.e(r5);
-        r6 = r13.notFoundCachedFields;
-        r4 = java.lang.Boolean.valueOf(r4);
-        r6.put(r3, r4);
-        goto L_0x03b4;
-        r3 = r14 instanceof org.telegram.ui.Components.GroupCreateSpan;
-        if (r3 == 0) goto L_0x03b4;
-        r3 = r14;
-        r3 = (org.telegram.ui.Components.GroupCreateSpan) r3;
-        r3.updateColors();
-    L_0x03b4:
-        r1 = r1 + 1;
-        goto L_0x0002;
-    L_0x03b8:
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.ThemeDescription.processViewColor(android.view.View, int):void");
     }
 
     public ThemeDescription(View view, int flags, Class[] classes, Paint[] paint, Drawable[] drawables, ThemeDescriptionDelegate themeDescriptionDelegate, String key, Object unused) {
@@ -639,11 +151,9 @@ Caused by: java.lang.NullPointerException
         int a;
         Drawable drawable;
         RecyclerListView recyclerListView;
-        int a2;
         if (save) {
             Theme.setColor(this.currentKey, color, useDefault);
         }
-        int a3 = 0;
         if (this.paintToUpdate != null) {
             a = 0;
             while (a < this.paintToUpdate.length) {
@@ -686,16 +196,13 @@ Caused by: java.lang.NullPointerException
                     }
                 }
                 if (drawable != null) {
-                    if (!(drawable instanceof StateListDrawable)) {
-                        if (VERSION.SDK_INT < 21 || !(drawable instanceof RippleDrawable)) {
-                            if (drawable instanceof ShapeDrawable) {
-                                ((ShapeDrawable) drawable).getPaint().setColor(color);
-                            } else {
-                                drawable.setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
-                            }
-                        }
+                    if ((drawable instanceof StateListDrawable) || (VERSION.SDK_INT >= 21 && (drawable instanceof RippleDrawable))) {
+                        Theme.setSelectorDrawableColor(drawable, color, (this.changeFlags & FLAG_DRAWABLESELECTEDSTATE) != 0);
+                    } else if (drawable instanceof ShapeDrawable) {
+                        ((ShapeDrawable) drawable).getPaint().setColor(color);
+                    } else {
+                        drawable.setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
                     }
-                    Theme.setSelectorDrawableColor(drawable, color, (this.changeFlags & FLAG_DRAWABLESELECTEDSTATE) != 0);
                 }
             }
         }
@@ -777,21 +284,22 @@ Caused by: java.lang.NullPointerException
             }
         }
         if (!(this.viewToInvalidate == null || (this.changeFlags & FLAG_SERVICEBACKGROUND) == 0)) {
-            drawable = this.viewToInvalidate.getBackground();
-            if (drawable != null) {
-                drawable.setColorFilter(Theme.colorFilter);
+            Drawable background = this.viewToInvalidate.getBackground();
+            if (background != null) {
+                background.setColorFilter(Theme.colorFilter);
             }
         }
         if ((this.changeFlags & FLAG_IMAGECOLOR) != 0 && ((this.changeFlags & FLAG_CHECKTAG) == 0 || ((this.changeFlags & FLAG_CHECKTAG) != 0 && this.currentKey.equals(this.viewToInvalidate.getTag())))) {
-            if (!(this.viewToInvalidate instanceof ImageView)) {
-                boolean z = this.viewToInvalidate instanceof BackupImageView;
-            } else if ((this.changeFlags & FLAG_USEBACKGROUNDDRAWABLE) != 0) {
-                drawable = ((ImageView) this.viewToInvalidate).getDrawable();
-                if ((drawable instanceof StateListDrawable) || (VERSION.SDK_INT >= 21 && (drawable instanceof RippleDrawable))) {
-                    Theme.setSelectorDrawableColor(drawable, color, (this.changeFlags & FLAG_DRAWABLESELECTEDSTATE) != 0);
+            if (this.viewToInvalidate instanceof ImageView) {
+                if ((this.changeFlags & FLAG_USEBACKGROUNDDRAWABLE) != 0) {
+                    drawable = ((ImageView) this.viewToInvalidate).getDrawable();
+                    if ((drawable instanceof StateListDrawable) || (VERSION.SDK_INT >= 21 && (drawable instanceof RippleDrawable))) {
+                        Theme.setSelectorDrawableColor(drawable, color, (this.changeFlags & FLAG_DRAWABLESELECTEDSTATE) != 0);
+                    }
+                } else {
+                    ((ImageView) this.viewToInvalidate).setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
                 }
-            } else {
-                ((ImageView) this.viewToInvalidate).setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+            } else if (this.viewToInvalidate instanceof BackupImageView) {
             }
         }
         if ((this.viewToInvalidate instanceof ScrollView) && (this.changeFlags & FLAG_LISTGLOWCOLOR) != 0) {
@@ -811,14 +319,14 @@ Caused by: java.lang.NullPointerException
             if ((this.changeFlags & FLAG_SECTIONS) != 0) {
                 ArrayList<View> headers = recyclerListView.getHeaders();
                 if (headers != null) {
-                    for (a2 = 0; a2 < headers.size(); a2++) {
-                        processViewColor((View) headers.get(a2), color);
+                    for (a = 0; a < headers.size(); a++) {
+                        processViewColor((View) headers.get(a), color);
                     }
                 }
                 headers = recyclerListView.getHeadersCache();
                 if (headers != null) {
-                    for (a2 = 0; a2 < headers.size(); a2++) {
-                        processViewColor((View) headers.get(a2), color);
+                    for (a = 0; a < headers.size(); a++) {
+                        processViewColor((View) headers.get(a), color);
                     }
                 }
                 View header = recyclerListView.getPinnedHeader();
@@ -839,24 +347,23 @@ Caused by: java.lang.NullPointerException
                 recyclerListView = (RecyclerListView) this.viewToInvalidate;
                 recyclerListView.getRecycledViewPool().clear();
                 count = recyclerListView.getHiddenChildCount();
-                for (a2 = 0; a2 < count; a2++) {
-                    processViewColor(recyclerListView.getHiddenChildAt(a2), color);
+                for (a = 0; a < count; a++) {
+                    processViewColor(recyclerListView.getHiddenChildAt(a), color);
                 }
                 count = recyclerListView.getCachedChildCount();
-                for (a2 = 0; a2 < count; a2++) {
-                    processViewColor(recyclerListView.getCachedChildAt(a2), color);
+                for (a = 0; a < count; a++) {
+                    processViewColor(recyclerListView.getCachedChildAt(a), color);
                 }
                 count = recyclerListView.getAttachedScrapChildCount();
-                for (a2 = 0; a2 < count; a2++) {
-                    processViewColor(recyclerListView.getAttachedScrapChildAt(a2), color);
+                for (a = 0; a < count; a++) {
+                    processViewColor(recyclerListView.getAttachedScrapChildAt(a), color);
                 }
             }
             if (this.viewToInvalidate instanceof ViewGroup) {
                 ViewGroup viewGroup = this.viewToInvalidate;
                 count = viewGroup.getChildCount();
-                while (a3 < count) {
-                    processViewColor(viewGroup.getChildAt(a3), color);
-                    a3++;
+                for (a = 0; a < count; a++) {
+                    processViewColor(viewGroup.getChildAt(a), color);
                 }
             }
             processViewColor(this.viewToInvalidate, color);
@@ -867,6 +374,200 @@ Caused by: java.lang.NullPointerException
         }
         if (this.viewToInvalidate != null) {
             this.viewToInvalidate.invalidate();
+        }
+    }
+
+    private void processViewColor(View child, int color) {
+        for (int b = 0; b < this.listClasses.length; b++) {
+            if (this.listClasses[b].isInstance(child)) {
+                boolean passedCheck;
+                Drawable drawable;
+                child.invalidate();
+                if ((this.changeFlags & FLAG_CHECKTAG) == 0 || ((this.changeFlags & FLAG_CHECKTAG) != 0 && this.currentKey.equals(child.getTag()))) {
+                    passedCheck = true;
+                    child.invalidate();
+                    if ((this.changeFlags & FLAG_BACKGROUNDFILTER) != 0) {
+                        drawable = child.getBackground();
+                        if (drawable != null) {
+                            if ((this.changeFlags & FLAG_CELLBACKGROUNDCOLOR) == 0) {
+                                if (drawable instanceof CombinedDrawable) {
+                                    drawable = ((CombinedDrawable) drawable).getIcon();
+                                }
+                                drawable.setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                            } else if (drawable instanceof CombinedDrawable) {
+                                Drawable back = ((CombinedDrawable) drawable).getBackground();
+                                if (back instanceof ColorDrawable) {
+                                    ((ColorDrawable) back).setColor(color);
+                                }
+                            }
+                        }
+                    } else if ((this.changeFlags & FLAG_CELLBACKGROUNDCOLOR) != 0) {
+                        child.setBackgroundColor(color);
+                    } else if ((this.changeFlags & FLAG_TEXTCOLOR) != 0) {
+                        if (child instanceof TextView) {
+                            ((TextView) child).setTextColor(color);
+                        }
+                    } else if ((this.changeFlags & FLAG_SERVICEBACKGROUND) != 0) {
+                        Drawable background = child.getBackground();
+                        if (background != null) {
+                            background.setColorFilter(Theme.colorFilter);
+                        }
+                    }
+                } else {
+                    passedCheck = false;
+                }
+                if (this.listClassesFieldName != null) {
+                    String key = this.listClasses[b] + "_" + this.listClassesFieldName[b];
+                    if (this.notFoundCachedFields == null || !this.notFoundCachedFields.containsKey(key)) {
+                        Field field = (Field) this.cachedFields.get(key);
+                        if (field == null) {
+                            field = this.listClasses[b].getDeclaredField(this.listClassesFieldName[b]);
+                            if (field != null) {
+                                field.setAccessible(true);
+                                this.cachedFields.put(key, field);
+                            }
+                        }
+                        if (field != null) {
+                            Object obj = field.get(child);
+                            if (obj != null) {
+                                if (!passedCheck && (obj instanceof View)) {
+                                    if (!this.currentKey.equals(((View) obj).getTag())) {
+                                    }
+                                }
+                                if (obj instanceof View) {
+                                    ((View) obj).invalidate();
+                                }
+                                if ((this.changeFlags & FLAG_USEBACKGROUNDDRAWABLE) != 0 && (obj instanceof View)) {
+                                    obj = ((View) obj).getBackground();
+                                }
+                                if ((this.changeFlags & FLAG_BACKGROUND) == 0 || !(obj instanceof View)) {
+                                    try {
+                                        if (obj instanceof Switch) {
+                                            ((Switch) obj).checkColorFilters();
+                                        } else if (obj instanceof EditTextCaption) {
+                                            if ((this.changeFlags & FLAG_HINTTEXTCOLOR) != 0) {
+                                                ((EditTextCaption) obj).setHintColor(color);
+                                                ((EditTextCaption) obj).setHintTextColor(color);
+                                            } else {
+                                                ((EditTextCaption) obj).setTextColor(color);
+                                            }
+                                        } else if (obj instanceof SimpleTextView) {
+                                            if ((this.changeFlags & FLAG_LINKCOLOR) != 0) {
+                                                ((SimpleTextView) obj).setLinkTextColor(color);
+                                            } else {
+                                                ((SimpleTextView) obj).setTextColor(color);
+                                            }
+                                        } else if (obj instanceof TextView) {
+                                            TextView textView = (TextView) obj;
+                                            if ((this.changeFlags & FLAG_IMAGECOLOR) != 0) {
+                                                Drawable[] drawables = textView.getCompoundDrawables();
+                                                if (drawables != null) {
+                                                    for (int a = 0; a < drawables.length; a++) {
+                                                        if (drawables[a] != null) {
+                                                            drawables[a].setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                                                        }
+                                                    }
+                                                }
+                                            } else if ((this.changeFlags & FLAG_LINKCOLOR) != 0) {
+                                                textView.getPaint().linkColor = color;
+                                                textView.invalidate();
+                                            } else if ((this.changeFlags & FLAG_FASTSCROLL) != 0) {
+                                                CharSequence text = textView.getText();
+                                                if (text instanceof SpannedString) {
+                                                    TypefaceSpan[] spans = (TypefaceSpan[]) ((SpannedString) text).getSpans(0, text.length(), TypefaceSpan.class);
+                                                    if (spans != null && spans.length > 0) {
+                                                        for (TypefaceSpan color2 : spans) {
+                                                            color2.setColor(color);
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                textView.setTextColor(color);
+                                            }
+                                        } else if (obj instanceof ImageView) {
+                                            ((ImageView) obj).setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                                        } else if (obj instanceof BackupImageView) {
+                                            drawable = ((BackupImageView) obj).getImageReceiver().getStaticThumb();
+                                            if (drawable instanceof CombinedDrawable) {
+                                                if ((this.changeFlags & FLAG_BACKGROUNDFILTER) != 0) {
+                                                    ((CombinedDrawable) drawable).getBackground().setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                                                } else {
+                                                    ((CombinedDrawable) drawable).getIcon().setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                                                }
+                                            } else if (drawable != null) {
+                                                drawable.setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                                            }
+                                        } else if (obj instanceof Drawable) {
+                                            if (obj instanceof LetterDrawable) {
+                                                if ((this.changeFlags & FLAG_BACKGROUNDFILTER) != 0) {
+                                                    ((LetterDrawable) obj).setBackgroundColor(color);
+                                                } else {
+                                                    ((LetterDrawable) obj).setColor(color);
+                                                }
+                                            } else if (obj instanceof CombinedDrawable) {
+                                                if ((this.changeFlags & FLAG_BACKGROUNDFILTER) != 0) {
+                                                    ((CombinedDrawable) obj).getBackground().setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                                                } else {
+                                                    ((CombinedDrawable) obj).getIcon().setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                                                }
+                                            } else if ((obj instanceof StateListDrawable) || (VERSION.SDK_INT >= 21 && (obj instanceof RippleDrawable))) {
+                                                Theme.setSelectorDrawableColor((Drawable) obj, color, (this.changeFlags & FLAG_DRAWABLESELECTEDSTATE) != 0);
+                                            } else {
+                                                ((Drawable) obj).setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                                            }
+                                        } else if (obj instanceof CheckBox) {
+                                            if ((this.changeFlags & FLAG_CHECKBOX) != 0) {
+                                                ((CheckBox) obj).setBackgroundColor(color);
+                                            } else if ((this.changeFlags & FLAG_CHECKBOXCHECK) != 0) {
+                                                ((CheckBox) obj).setCheckColor(color);
+                                            }
+                                        } else if (obj instanceof GroupCreateCheckBox) {
+                                            ((GroupCreateCheckBox) obj).updateColors();
+                                        } else if (obj instanceof Integer) {
+                                            field.set(child, Integer.valueOf(color));
+                                        } else if (obj instanceof RadioButton) {
+                                            if ((this.changeFlags & FLAG_CHECKBOX) != 0) {
+                                                ((RadioButton) obj).setBackgroundColor(color);
+                                                ((RadioButton) obj).invalidate();
+                                            } else if ((this.changeFlags & FLAG_CHECKBOXCHECK) != 0) {
+                                                ((RadioButton) obj).setCheckedColor(color);
+                                                ((RadioButton) obj).invalidate();
+                                            }
+                                        } else if (obj instanceof TextPaint) {
+                                            if ((this.changeFlags & FLAG_LINKCOLOR) != 0) {
+                                                ((TextPaint) obj).linkColor = color;
+                                            } else {
+                                                ((TextPaint) obj).setColor(color);
+                                            }
+                                        } else if (obj instanceof LineProgressView) {
+                                            if ((this.changeFlags & FLAG_PROGRESSBAR) != 0) {
+                                                ((LineProgressView) obj).setProgressColor(color);
+                                            } else {
+                                                ((LineProgressView) obj).setBackColor(color);
+                                            }
+                                        } else if (obj instanceof Paint) {
+                                            ((Paint) obj).setColor(color);
+                                        } else if (obj instanceof SeekBarView) {
+                                            if ((this.changeFlags & FLAG_PROGRESSBAR) != 0) {
+                                                ((SeekBarView) obj).setOuterColor(color);
+                                            } else {
+                                                ((SeekBarView) obj).setInnerColor(color);
+                                            }
+                                        }
+                                    } catch (Throwable e) {
+                                        FileLog.e(e);
+                                        this.notFoundCachedFields.put(key, Boolean.valueOf(true));
+                                    }
+                                } else {
+                                    ((View) obj).setBackgroundColor(color);
+                                }
+                            }
+                        }
+                    }
+                } else if (child instanceof GroupCreateSpan) {
+                    ((GroupCreateSpan) child).updateColors();
+                }
+            }
         }
     }
 

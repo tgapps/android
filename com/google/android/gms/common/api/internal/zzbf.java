@@ -21,11 +21,7 @@ final class zzbf extends Handler {
             case 2:
                 throw ((RuntimeException) message.obj);
             default:
-                int i = message.what;
-                StringBuilder stringBuilder = new StringBuilder(31);
-                stringBuilder.append("Unknown message id: ");
-                stringBuilder.append(i);
-                Log.w("GACStateManager", stringBuilder.toString());
+                Log.w("GACStateManager", "Unknown message id: " + message.what);
                 return;
         }
     }

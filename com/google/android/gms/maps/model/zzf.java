@@ -13,10 +13,10 @@ public final class zzf implements Creator<LatLng> {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    d = SafeParcelReader.readDouble(parcel, readHeader);
+                    d2 = SafeParcelReader.readDouble(parcel, readHeader);
                     break;
                 case 3:
-                    d2 = SafeParcelReader.readDouble(parcel, readHeader);
+                    d = SafeParcelReader.readDouble(parcel, readHeader);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -24,7 +24,7 @@ public final class zzf implements Creator<LatLng> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new LatLng(d, d2);
+        return new LatLng(d2, d);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

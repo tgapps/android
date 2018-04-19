@@ -10,17 +10,17 @@ public final class zzac implements Creator<PaymentData> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
-        CardInfo cardInfo = str;
-        UserAddress userAddress = cardInfo;
-        PaymentMethodToken paymentMethodToken = userAddress;
-        String str2 = paymentMethodToken;
-        Bundle bundle = str2;
-        String str3 = bundle;
+        Bundle bundle = null;
+        String str2 = null;
+        PaymentMethodToken paymentMethodToken = null;
+        UserAddress userAddress = null;
+        CardInfo cardInfo = null;
+        String str3 = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    str = SafeParcelReader.createString(parcel, readHeader);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 2:
                     cardInfo = (CardInfo) SafeParcelReader.createParcelable(parcel, readHeader, CardInfo.CREATOR);
@@ -38,7 +38,7 @@ public final class zzac implements Creator<PaymentData> {
                     bundle = SafeParcelReader.createBundle(parcel, readHeader);
                     break;
                 case 7:
-                    str3 = SafeParcelReader.createString(parcel, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -46,7 +46,7 @@ public final class zzac implements Creator<PaymentData> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new PaymentData(str, cardInfo, userAddress, paymentMethodToken, str2, bundle, str3);
+        return new PaymentData(str3, cardInfo, userAddress, paymentMethodToken, str2, bundle, str);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

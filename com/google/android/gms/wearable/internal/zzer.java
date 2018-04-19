@@ -21,7 +21,11 @@ final class zzer<T> {
                 com_google_android_gms_wearable_internal_zzep = null;
             } else {
                 IInterface queryLocalInterface = iBinder.queryLocalInterface("com.google.android.gms.wearable.internal.IWearableService");
-                com_google_android_gms_wearable_internal_zzep = queryLocalInterface instanceof zzep ? (zzep) queryLocalInterface : new zzeq(iBinder);
+                if (queryLocalInterface instanceof zzep) {
+                    com_google_android_gms_wearable_internal_zzep = (zzep) queryLocalInterface;
+                } else {
+                    Object com_google_android_gms_wearable_internal_zzeq = new zzeq(iBinder);
+                }
             }
             zzek com_google_android_gms_wearable_internal_zzgz = new zzgz();
             for (Entry entry : this.zzeb.entrySet()) {
@@ -31,22 +35,12 @@ final class zzer<T> {
                     if (Log.isLoggable("WearableClient", 3)) {
                         String valueOf = String.valueOf(entry.getKey());
                         String valueOf2 = String.valueOf(com_google_android_gms_wearable_internal_zzhk);
-                        StringBuilder stringBuilder = new StringBuilder((27 + String.valueOf(valueOf).length()) + String.valueOf(valueOf2).length());
-                        stringBuilder.append("onPostInitHandler: added: ");
-                        stringBuilder.append(valueOf);
-                        stringBuilder.append("/");
-                        stringBuilder.append(valueOf2);
-                        Log.d("WearableClient", stringBuilder.toString());
+                        Log.d("WearableClient", new StringBuilder((String.valueOf(valueOf).length() + 27) + String.valueOf(valueOf2).length()).append("onPostInitHandler: added: ").append(valueOf).append("/").append(valueOf2).toString());
                     }
                 } catch (RemoteException e) {
                     String valueOf3 = String.valueOf(entry.getKey());
                     String valueOf4 = String.valueOf(com_google_android_gms_wearable_internal_zzhk);
-                    StringBuilder stringBuilder2 = new StringBuilder((32 + String.valueOf(valueOf3).length()) + String.valueOf(valueOf4).length());
-                    stringBuilder2.append("onPostInitHandler: Didn't add: ");
-                    stringBuilder2.append(valueOf3);
-                    stringBuilder2.append("/");
-                    stringBuilder2.append(valueOf4);
-                    Log.w("WearableClient", stringBuilder2.toString());
+                    Log.w("WearableClient", new StringBuilder((String.valueOf(valueOf3).length() + 32) + String.valueOf(valueOf4).length()).append("onPostInitHandler: Didn't add: ").append(valueOf3).append("/").append(valueOf4).toString());
                 }
             }
         }

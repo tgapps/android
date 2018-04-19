@@ -21,14 +21,16 @@ public final class GoogleServices {
     private final boolean zzky;
 
     GoogleServices(Context context) {
+        boolean z = true;
         Resources resources = context.getResources();
         int identifier = resources.getIdentifier("google_app_measurement_enable", "integer", resources.getResourcePackageName(R.string.common_google_play_services_unknown_issue));
-        boolean z = true;
         if (identifier != 0) {
-            if (resources.getInteger(identifier) == 0) {
+            boolean z2 = resources.getInteger(identifier) != 0;
+            if (z2) {
                 z = false;
             }
-            this.zzky = z ^ 1;
+            this.zzky = z;
+            z = z2;
         } else {
             this.zzky = false;
         }
@@ -50,11 +52,7 @@ public final class GoogleServices {
         GoogleServices googleServices;
         synchronized (sLock) {
             if (zzku == null) {
-                StringBuilder stringBuilder = new StringBuilder(34 + String.valueOf(str).length());
-                stringBuilder.append("Initialize must be called before ");
-                stringBuilder.append(str);
-                stringBuilder.append(".");
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException(new StringBuilder(String.valueOf(str).length() + 34).append("Initialize must be called before ").append(str).append(".").toString());
             }
             googleServices = zzku;
         }

@@ -22,11 +22,7 @@ final class zzba extends Handler {
                 this.zzit.resume();
                 return;
             default:
-                int i = message.what;
-                StringBuilder stringBuilder = new StringBuilder(31);
-                stringBuilder.append("Unknown message id: ");
-                stringBuilder.append(i);
-                Log.w("GoogleApiClientImpl", stringBuilder.toString());
+                Log.w("GoogleApiClientImpl", "Unknown message id: " + message.what);
                 return;
         }
     }

@@ -20,75 +20,34 @@ public final class LatLngBounds extends AbstractSafeParcelable implements Reflec
         private double zzdj = Double.NaN;
 
         public final LatLngBounds build() {
-            Preconditions.checkState(Double.isNaN(this.zzdi) ^ 1, "no included points");
+            Preconditions.checkState(!Double.isNaN(this.zzdi), "no included points");
             return new LatLngBounds(new LatLng(this.zzdg, this.zzdi), new LatLng(this.zzdh, this.zzdj));
         }
 
-        /* JADX WARNING: inconsistent code. */
-        /* Code decompiled incorrectly, please refer to instructions dump. */
-        public final com.google.android.gms.maps.model.LatLngBounds.Builder include(com.google.android.gms.maps.model.LatLng r7) {
-            /*
-            r6 = this;
-            r0 = r6.zzdg;
-            r2 = r7.latitude;
-            r0 = java.lang.Math.min(r0, r2);
-            r6.zzdg = r0;
-            r0 = r6.zzdh;
-            r2 = r7.latitude;
-            r0 = java.lang.Math.max(r0, r2);
-            r6.zzdh = r0;
-            r0 = r7.longitude;
-            r2 = r6.zzdi;
-            r7 = java.lang.Double.isNaN(r2);
-            if (r7 == 0) goto L_0x0021;
-        L_0x001e:
-            r6.zzdi = r0;
-            goto L_0x005a;
-        L_0x0021:
-            r2 = r6.zzdi;
-            r4 = r6.zzdj;
-            r7 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
-            r2 = 0;
-            r3 = 1;
-            if (r7 > 0) goto L_0x0038;
-        L_0x002b:
-            r4 = r6.zzdi;
-            r7 = (r4 > r0 ? 1 : (r4 == r0 ? 0 : -1));
-            if (r7 > 0) goto L_0x0045;
-        L_0x0031:
-            r4 = r6.zzdj;
-            r7 = (r0 > r4 ? 1 : (r0 == r4 ? 0 : -1));
-            if (r7 > 0) goto L_0x0045;
-        L_0x0037:
-            goto L_0x0044;
-        L_0x0038:
-            r4 = r6.zzdi;
-            r7 = (r4 > r0 ? 1 : (r4 == r0 ? 0 : -1));
-            if (r7 <= 0) goto L_0x0044;
-        L_0x003e:
-            r4 = r6.zzdj;
-            r7 = (r0 > r4 ? 1 : (r0 == r4 ? 0 : -1));
-            if (r7 > 0) goto L_0x0045;
-        L_0x0044:
-            r2 = r3;
-        L_0x0045:
-            if (r2 != 0) goto L_0x005c;
-        L_0x0047:
-            r2 = r6.zzdi;
-            r2 = com.google.android.gms.maps.model.LatLngBounds.zza(r2, r0);
-            r4 = r6.zzdj;
-            r4 = com.google.android.gms.maps.model.LatLngBounds.zzb(r4, r0);
-            r7 = (r2 > r4 ? 1 : (r2 == r4 ? 0 : -1));
-            if (r7 >= 0) goto L_0x005a;
-        L_0x0057:
-            r6.zzdi = r0;
-            return r6;
-        L_0x005a:
-            r6.zzdj = r0;
-        L_0x005c:
-            return r6;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.maps.model.LatLngBounds.Builder.include(com.google.android.gms.maps.model.LatLng):com.google.android.gms.maps.model.LatLngBounds$Builder");
+        public final Builder include(LatLng latLng) {
+            Object obj = 1;
+            this.zzdg = Math.min(this.zzdg, latLng.latitude);
+            this.zzdh = Math.max(this.zzdh, latLng.latitude);
+            double d = latLng.longitude;
+            if (Double.isNaN(this.zzdi)) {
+                this.zzdi = d;
+            } else {
+                if (this.zzdi <= this.zzdj) {
+                    if (this.zzdi > d || d > this.zzdj) {
+                        obj = null;
+                    }
+                } else if (this.zzdi > d && d > this.zzdj) {
+                    obj = null;
+                }
+                if (obj == null) {
+                    if (LatLngBounds.zza(this.zzdi, d) < LatLngBounds.zzb(this.zzdj, d)) {
+                        this.zzdi = d;
+                    }
+                }
+                return this;
+            }
+            this.zzdj = d;
+            return this;
         }
     }
 

@@ -67,30 +67,29 @@ public final class zzav extends GoogleApiClient implements zzbq {
     private final GmsClientEventState zzis = new zzaw(this);
 
     public zzav(Context context, Lock lock, Looper looper, ClientSettings clientSettings, GoogleApiAvailability googleApiAvailability, AbstractClientBuilder<? extends SignInClient, SignInOptions> abstractClientBuilder, Map<Api<?>, Boolean> map, List<ConnectionCallbacks> list, List<OnConnectionFailedListener> list2, Map<AnyClientKey<?>, Client> map2, int i, int i2, ArrayList<zzp> arrayList, boolean z) {
-        Looper looper2 = looper;
         this.mContext = context;
         this.zzga = lock;
         this.zzdk = false;
-        this.zzie = new GmsClientEventManager(looper2, this.zzis);
-        this.zzcn = looper2;
-        this.zzij = new zzba(this, looper2);
+        this.zzie = new GmsClientEventManager(looper, this.zzis);
+        this.zzcn = looper;
+        this.zzij = new zzba(this, looper);
         this.zzdg = googleApiAvailability;
         this.zzde = i;
         if (this.zzde >= 0) {
-            r0.zzip = Integer.valueOf(i2);
+            this.zzip = Integer.valueOf(i2);
         }
-        r0.zzgi = map;
-        r0.zzil = map2;
-        r0.zzio = arrayList;
-        r0.zzir = new zzck(r0.zzil);
+        this.zzgi = map;
+        this.zzil = map2;
+        this.zzio = arrayList;
+        this.zzir = new zzck(this.zzil);
         for (ConnectionCallbacks registerConnectionCallbacks : list) {
-            r0.zzie.registerConnectionCallbacks(registerConnectionCallbacks);
+            this.zzie.registerConnectionCallbacks(registerConnectionCallbacks);
         }
         for (OnConnectionFailedListener registerConnectionFailedListener : list2) {
-            r0.zzie.registerConnectionFailedListener(registerConnectionFailedListener);
+            this.zzie.registerConnectionFailedListener(registerConnectionFailedListener);
         }
-        r0.zzgf = clientSettings;
-        r0.zzdh = abstractClientBuilder;
+        this.zzgf = clientSettings;
+        this.zzdh = abstractClientBuilder;
     }
 
     private final void resume() {
@@ -110,13 +109,11 @@ public final class zzav extends GoogleApiClient implements zzbq {
         int i2 = 0;
         for (Client client : iterable) {
             if (client.requiresSignIn()) {
-                i = 1;
-            }
-            if (client.providesSignIn()) {
                 i2 = 1;
             }
+            i = client.providesSignIn() ? 1 : i;
         }
-        return i != 0 ? (i2 == 0 || !z) ? 1 : 2 : 3;
+        return i2 != 0 ? (i == 0 || !z) ? 1 : 2 : 3;
     }
 
     @GuardedBy("mLock")
@@ -143,34 +140,27 @@ public final class zzav extends GoogleApiClient implements zzbq {
         } else if (this.zzip.intValue() != i) {
             String zzh = zzh(i);
             String zzh2 = zzh(this.zzip.intValue());
-            StringBuilder stringBuilder = new StringBuilder((51 + String.valueOf(zzh).length()) + String.valueOf(zzh2).length());
-            stringBuilder.append("Cannot use sign-in mode: ");
-            stringBuilder.append(zzh);
-            stringBuilder.append(". Mode was already set to ");
-            stringBuilder.append(zzh2);
-            throw new IllegalStateException(stringBuilder.toString());
+            throw new IllegalStateException(new StringBuilder((String.valueOf(zzh).length() + 51) + String.valueOf(zzh2).length()).append("Cannot use sign-in mode: ").append(zzh).append(". Mode was already set to ").append(zzh2).toString());
         }
         if (this.zzif == null) {
-            Object obj = null;
-            Object obj2 = null;
+            boolean z = false;
+            boolean z2 = false;
             for (Client client : this.zzil.values()) {
                 if (client.requiresSignIn()) {
-                    obj = 1;
+                    z2 = true;
                 }
-                if (client.providesSignIn()) {
-                    obj2 = 1;
-                }
+                z = client.providesSignIn() ? true : z;
             }
             switch (this.zzip.intValue()) {
                 case 1:
-                    if (obj == null) {
+                    if (!z2) {
                         throw new IllegalStateException("SIGN_IN_MODE_REQUIRED cannot be used on a GoogleApiClient that does not contain any authenticated APIs. Use connect() instead.");
-                    } else if (obj2 != null) {
+                    } else if (z) {
                         throw new IllegalStateException("Cannot use SIGN_IN_MODE_REQUIRED with GOOGLE_SIGN_IN_API. Use connect(SIGN_IN_MODE_OPTIONAL) instead.");
                     }
                     break;
                 case 2:
-                    if (obj != null) {
+                    if (z2) {
                         if (this.zzdk) {
                             this.zzif = new zzw(this.mContext, this.zzga, this.zzcn, this.zzdg, this.zzil, this.zzgf, this.zzgi, this.zzdh, this.zzio, this, true);
                             return;
@@ -180,15 +170,11 @@ public final class zzav extends GoogleApiClient implements zzbq {
                         }
                     }
                     break;
-                case 3:
-                    break;
-                default:
-                    break;
             }
-            if (this.zzdk && obj2 == null) {
-                this.zzif = new zzw(this.mContext, this.zzga, this.zzcn, this.zzdg, this.zzil, this.zzgf, this.zzgi, this.zzdh, this.zzio, this, false);
-            } else {
+            if (!this.zzdk || z) {
                 this.zzif = new zzbd(this.mContext, this, this.zzga, this.zzcn, this.zzdg, this.zzil, this.zzgf, this.zzgi, this.zzdh, this.zzio, this);
+            } else {
+                this.zzif = new zzw(this.mContext, this.zzga, this.zzcn, this.zzdg, this.zzil, this.zzgf, this.zzgi, this.zzdh, this.zzio, this, false);
             }
         }
     }
@@ -231,9 +217,9 @@ public final class zzav extends GoogleApiClient implements zzbq {
     }
 
     public final void connect() {
+        boolean z = false;
         this.zzga.lock();
         try {
-            boolean z = false;
             if (this.zzde >= 0) {
                 if (this.zzip != null) {
                     z = true;
@@ -251,18 +237,13 @@ public final class zzav extends GoogleApiClient implements zzbq {
     }
 
     public final void connect(int i) {
-        this.zzga.lock();
         boolean z = true;
-        if (!(i == 3 || i == 1)) {
-            if (i != 2) {
-                z = false;
-            }
+        this.zzga.lock();
+        if (!(i == 3 || i == 1 || i == 2)) {
+            z = false;
         }
         try {
-            StringBuilder stringBuilder = new StringBuilder(33);
-            stringBuilder.append("Illegal sign-in mode: ");
-            stringBuilder.append(i);
-            Preconditions.checkArgument(z, stringBuilder.toString());
+            Preconditions.checkArgument(z, "Illegal sign-in mode: " + i);
             zzg(i);
             zzax();
         } finally {
@@ -286,9 +267,9 @@ public final class zzav extends GoogleApiClient implements zzbq {
             if (this.zzif != null) {
                 zzaz();
                 this.zzie.disableCallbacks();
+                this.zzga.unlock();
             }
-            this.zzga.unlock();
-        } catch (Throwable th) {
+        } finally {
             this.zzga.unlock();
         }
     }
@@ -307,21 +288,17 @@ public final class zzav extends GoogleApiClient implements zzbq {
         Preconditions.checkArgument(t.getClientKey() != null, "This task can not be enqueued (it's probably a Batch or malformed)");
         boolean containsKey = this.zzil.containsKey(t.getClientKey());
         String name = t.getApi() != null ? t.getApi().getName() : "the API";
-        StringBuilder stringBuilder = new StringBuilder(65 + String.valueOf(name).length());
-        stringBuilder.append("GoogleApiClient is not configured to use ");
-        stringBuilder.append(name);
-        stringBuilder.append(" required for this call.");
-        Preconditions.checkArgument(containsKey, stringBuilder.toString());
+        Preconditions.checkArgument(containsKey, new StringBuilder(String.valueOf(name).length() + 65).append("GoogleApiClient is not configured to use ").append(name).append(" required for this call.").toString());
         this.zzga.lock();
         try {
             if (this.zzif == null) {
                 this.zzgo.add(t);
             } else {
                 t = this.zzif.enqueue(t);
+                this.zzga.unlock();
             }
-            this.zzga.unlock();
             return t;
-        } catch (Throwable th) {
+        } finally {
             this.zzga.unlock();
         }
     }
@@ -330,11 +307,7 @@ public final class zzav extends GoogleApiClient implements zzbq {
         Preconditions.checkArgument(t.getClientKey() != null, "This task can not be executed (it's probably a Batch or malformed)");
         boolean containsKey = this.zzil.containsKey(t.getClientKey());
         String name = t.getApi() != null ? t.getApi().getName() : "the API";
-        StringBuilder stringBuilder = new StringBuilder(65 + String.valueOf(name).length());
-        stringBuilder.append("GoogleApiClient is not configured to use ");
-        stringBuilder.append(name);
-        stringBuilder.append(" required for this call.");
-        Preconditions.checkArgument(containsKey, stringBuilder.toString());
+        Preconditions.checkArgument(containsKey, new StringBuilder(String.valueOf(name).length() + 65).append("GoogleApiClient is not configured to use ").append(name).append(" required for this call.").toString());
         this.zzga.lock();
         try {
             if (this.zzif == null) {
@@ -349,10 +322,10 @@ public final class zzav extends GoogleApiClient implements zzbq {
                 }
             } else {
                 t = this.zzif.execute(t);
+                this.zzga.unlock();
             }
-            this.zzga.unlock();
             return t;
-        } catch (Throwable th) {
+        } finally {
             this.zzga.unlock();
         }
     }
@@ -429,24 +402,13 @@ public final class zzav extends GoogleApiClient implements zzbq {
     public final void zzb(zzch com_google_android_gms_common_api_internal_zzch) {
         this.zzga.lock();
         try {
-            String str;
-            String str2;
-            Throwable exception;
             if (this.zziq == null) {
-                str = "GoogleApiClientImpl";
-                str2 = "Attempted to remove pending transform when no transforms are registered.";
-                exception = new Exception();
-            } else if (this.zziq.remove(com_google_android_gms_common_api_internal_zzch)) {
-                if (!zzba()) {
-                    this.zzif.zzz();
-                }
-                this.zzga.unlock();
-            } else {
-                str = "GoogleApiClientImpl";
-                str2 = "Failed to remove pending transform - this may lead to memory leaks!";
-                exception = new Exception();
+                Log.wtf("GoogleApiClientImpl", "Attempted to remove pending transform when no transforms are registered.", new Exception());
+            } else if (!this.zziq.remove(com_google_android_gms_common_api_internal_zzch)) {
+                Log.wtf("GoogleApiClientImpl", "Failed to remove pending transform - this may lead to memory leaks!", new Exception());
+            } else if (!zzba()) {
+                this.zzif.zzz();
             }
-            Log.wtf(str, str2, exception);
             this.zzga.unlock();
         } catch (Throwable th) {
             this.zzga.unlock();
@@ -454,14 +416,16 @@ public final class zzav extends GoogleApiClient implements zzbq {
     }
 
     final boolean zzba() {
+        boolean z = false;
         this.zzga.lock();
         try {
-            if (this.zziq == null) {
-                return false;
+            if (this.zziq != null) {
+                if (!this.zziq.isEmpty()) {
+                    z = true;
+                }
+                this.zzga.unlock();
             }
-            boolean isEmpty = this.zziq.isEmpty() ^ 1;
-            this.zzga.unlock();
-            return isEmpty;
+            return z;
         } finally {
             this.zzga.unlock();
         }

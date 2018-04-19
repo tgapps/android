@@ -36,21 +36,17 @@ public final class zzah extends AbstractSafeParcelable implements CapabilityInfo
             return false;
         }
         zzah com_google_android_gms_wearable_internal_zzah = (zzah) obj;
-        if (this.name != null) {
-            if (!this.name.equals(com_google_android_gms_wearable_internal_zzah.name)) {
-                return false;
-            }
-        } else if (com_google_android_gms_wearable_internal_zzah.name != null) {
+        if (this.name == null ? com_google_android_gms_wearable_internal_zzah.name != null : !this.name.equals(com_google_android_gms_wearable_internal_zzah.name)) {
             return false;
         }
         if (this.zzca != null) {
-            if (!this.zzca.equals(com_google_android_gms_wearable_internal_zzah.zzca)) {
-                return false;
+            if (this.zzca.equals(com_google_android_gms_wearable_internal_zzah.zzca)) {
+                return true;
             }
-        } else if (com_google_android_gms_wearable_internal_zzah.zzca != null) {
-            return false;
+        } else if (com_google_android_gms_wearable_internal_zzah.zzca == null) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     public final String getName() {
@@ -80,19 +76,13 @@ public final class zzah extends AbstractSafeParcelable implements CapabilityInfo
     public final String toString() {
         String str = this.name;
         String valueOf = String.valueOf(this.zzca);
-        StringBuilder stringBuilder = new StringBuilder((18 + String.valueOf(str).length()) + String.valueOf(valueOf).length());
-        stringBuilder.append("CapabilityInfo{");
-        stringBuilder.append(str);
-        stringBuilder.append(", ");
-        stringBuilder.append(valueOf);
-        stringBuilder.append("}");
-        return stringBuilder.toString();
+        return new StringBuilder((String.valueOf(str).length() + 18) + String.valueOf(valueOf).length()).append("CapabilityInfo{").append(str).append(", ").append(valueOf).append("}").toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, getName(), false);
         SafeParcelWriter.writeTypedList(parcel, 3, this.zzca, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

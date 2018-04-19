@@ -57,7 +57,7 @@ public class AlbumArtistBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) ((6 + Utf8.utf8StringLengthInBytes(this.albumArtist)) + 1);
+        return (long) ((Utf8.utf8StringLengthInBytes(this.albumArtist) + 6) + 1);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -75,11 +75,6 @@ public class AlbumArtistBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_4, this, this));
-        StringBuilder stringBuilder = new StringBuilder("AlbumArtistBox[language=");
-        stringBuilder.append(getLanguage());
-        stringBuilder.append(";albumArtist=");
-        stringBuilder.append(getAlbumArtist());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "AlbumArtistBox[language=" + getLanguage() + ";albumArtist=" + getAlbumArtist() + "]";
     }
 }

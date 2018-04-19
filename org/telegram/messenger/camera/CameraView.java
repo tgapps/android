@@ -53,138 +53,6 @@ public class CameraView extends FrameLayout implements SurfaceTextureListener {
         void onCameraInit();
     }
 
-    private void adjustAspectRatio(int r1, int r2, int r3) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.camera.CameraView.adjustAspectRatio(int, int, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r18;
-        r1 = r19;
-        r2 = r20;
-        r3 = r21;
-        r4 = r0.txform;
-        r4.reset();
-        r4 = r18.getWidth();
-        r5 = r18.getHeight();
-        r6 = r4 / 2;
-        r6 = (float) r6;
-        r7 = r5 / 2;
-        r7 = (float) r7;
-        r8 = 2;
-        if (r3 == 0) goto L_0x0032;
-    L_0x001e:
-        if (r3 != r8) goto L_0x0021;
-    L_0x0020:
-        goto L_0x0032;
-    L_0x0021:
-        r9 = r0.clipTop;
-        r9 = r9 + r5;
-        r9 = (float) r9;
-        r10 = (float) r2;
-        r9 = r9 / r10;
-        r10 = r0.clipLeft;
-        r10 = r10 + r4;
-        r10 = (float) r10;
-        r11 = (float) r1;
-        r10 = r10 / r11;
-        r9 = java.lang.Math.max(r9, r10);
-        goto L_0x0042;
-    L_0x0032:
-        r9 = r0.clipTop;
-        r9 = r9 + r5;
-        r9 = (float) r9;
-        r10 = (float) r1;
-        r9 = r9 / r10;
-        r10 = r0.clipLeft;
-        r10 = r10 + r4;
-        r10 = (float) r10;
-        r11 = (float) r2;
-        r10 = r10 / r11;
-        r9 = java.lang.Math.max(r9, r10);
-        r10 = (float) r1;
-        r10 = r10 * r9;
-        r11 = (float) r2;
-        r11 = r11 * r9;
-        r12 = (float) r4;
-        r12 = r11 / r12;
-        r13 = (float) r5;
-        r13 = r10 / r13;
-        r14 = r0.txform;
-        r14.postScale(r12, r13, r6, r7);
-        r14 = 1;
-        if (r14 == r3) goto L_0x0063;
-        r14 = 3;
-        if (r14 != r3) goto L_0x0059;
-        goto L_0x0063;
-        if (r8 != r3) goto L_0x006f;
-        r14 = r0.txform;
-        r15 = 1127481344; // 0x43340000 float:180.0 double:5.570497984E-315;
-        r14.postRotate(r15, r6, r7);
-        goto L_0x006f;
-        r14 = r0.txform;
-        r15 = 90;
-        r16 = r3 + -2;
-        r15 = r15 * r16;
-        r15 = (float) r15;
-        r14.postRotate(r15, r6, r7);
-        r14 = r0.mirror;
-        if (r14 == 0) goto L_0x007c;
-        r14 = r0.txform;
-        r15 = -1082130432; // 0xffffffffbf800000 float:-1.0 double:NaN;
-        r8 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
-        r14.postScale(r15, r8, r6, r7);
-        r8 = r0.clipTop;
-        if (r8 != 0) goto L_0x0084;
-        r8 = r0.clipLeft;
-        if (r8 == 0) goto L_0x0094;
-        r8 = r0.txform;
-        r14 = r0.clipLeft;
-        r14 = -r14;
-        r15 = 2;
-        r14 = r14 / r15;
-        r14 = (float) r14;
-        r1 = r0.clipTop;
-        r1 = -r1;
-        r1 = r1 / r15;
-        r1 = (float) r1;
-        r8.postTranslate(r14, r1);
-        r1 = r0.textureView;
-        r8 = r0.txform;
-        r1.setTransform(r8);
-        r1 = new android.graphics.Matrix;
-        r1.<init>();
-        r8 = r0.cameraSession;
-        r8 = r8.getDisplayOrientation();
-        r8 = (float) r8;
-        r1.postRotate(r8);
-        r8 = (float) r4;
-        r14 = 1157234688; // 0x44fa0000 float:2000.0 double:5.717499035E-315;
-        r8 = r8 / r14;
-        r15 = (float) r5;
-        r15 = r15 / r14;
-        r1.postScale(r8, r15);
-        r8 = (float) r4;
-        r14 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        r8 = r8 / r14;
-        r15 = (float) r5;
-        r15 = r15 / r14;
-        r1.postTranslate(r8, r15);
-        r8 = r0.matrix;
-        r1.invert(r8);
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.camera.CameraView.adjustAspectRatio(int, int, int):void");
-    }
-
     public CameraView(Context context, boolean frontface) {
         super(context, null);
         this.isFrontface = frontface;
@@ -223,23 +91,26 @@ Caused by: java.lang.NullPointerException
     }
 
     public void switchCamera() {
+        boolean z = false;
         if (this.cameraSession != null) {
             CameraController.getInstance().close(this.cameraSession, null, null);
             this.cameraSession = null;
         }
         this.initied = false;
-        this.isFrontface ^= 1;
+        if (!this.isFrontface) {
+            z = true;
+        }
+        this.isFrontface = z;
         initCamera(this.isFrontface);
     }
 
     private void initCamera(boolean front) {
-        CameraView cameraView = this;
         CameraInfo info = null;
         ArrayList<CameraInfo> cameraInfos = CameraController.getInstance().getCameras();
         if (cameraInfos != null) {
             for (int a = 0; a < cameraInfos.size(); a++) {
                 CameraInfo cameraInfo = (CameraInfo) cameraInfos.get(a);
-                if ((cameraView.isFrontface && cameraInfo.frontCamera != 0) || (!cameraView.isFrontface && cameraInfo.frontCamera == 0)) {
+                if ((this.isFrontface && cameraInfo.frontCamera != 0) || (!this.isFrontface && cameraInfo.frontCamera == 0)) {
                     info = cameraInfo;
                     break;
                 }
@@ -248,12 +119,8 @@ Caused by: java.lang.NullPointerException
                 Size aspectRatio;
                 int wantedWidth;
                 int wantedHeight;
-                int width;
-                Size pictureSize;
-                Size pictureSize2;
-                SurfaceTexture surfaceTexture;
                 float screenSize = ((float) Math.max(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y)) / ((float) Math.min(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y));
-                if (cameraView.initialFrontface) {
+                if (this.initialFrontface) {
                     aspectRatio = new Size(16, 9);
                     wantedWidth = 480;
                     wantedHeight = 270;
@@ -265,56 +132,42 @@ Caused by: java.lang.NullPointerException
                     aspectRatio = new Size(16, 9);
                     wantedWidth = 1280;
                     wantedHeight = 720;
-                    if (cameraView.textureView.getWidth() > 0 && cameraView.textureView.getHeight() > 0) {
-                        width = Math.min(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
-                        cameraView.previewSize = CameraController.chooseOptimalSize(info.getPreviewSizes(), width, (aspectRatio.getHeight() * width) / aspectRatio.getWidth(), aspectRatio);
+                }
+                if (this.textureView.getWidth() > 0 && this.textureView.getHeight() > 0) {
+                    int width = Math.min(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
+                    this.previewSize = CameraController.chooseOptimalSize(info.getPreviewSizes(), width, (aspectRatio.getHeight() * width) / aspectRatio.getWidth(), aspectRatio);
+                }
+                Size pictureSize = CameraController.chooseOptimalSize(info.getPictureSizes(), wantedWidth, wantedHeight, aspectRatio);
+                if (pictureSize.getWidth() >= 1280 && pictureSize.getHeight() >= 1280) {
+                    if (Math.abs(screenSize - 1.3333334f) < 0.1f) {
+                        aspectRatio = new Size(3, 4);
+                    } else {
+                        aspectRatio = new Size(9, 16);
                     }
-                    pictureSize = CameraController.chooseOptimalSize(info.getPictureSizes(), wantedWidth, wantedHeight, aspectRatio);
-                    if (pictureSize.getWidth() >= 1280 && pictureSize.getHeight() >= 1280) {
-                        if (Math.abs(screenSize - 1.3333334f) >= 0.1f) {
-                            aspectRatio = new Size(3, 4);
-                        } else {
-                            aspectRatio = new Size(9, 16);
-                        }
-                        pictureSize2 = CameraController.chooseOptimalSize(info.getPictureSizes(), wantedHeight, wantedWidth, aspectRatio);
-                        if (pictureSize2.getWidth() < 1280 || pictureSize2.getHeight() < 1280) {
-                            pictureSize = pictureSize2;
-                        }
-                    }
-                    surfaceTexture = cameraView.textureView.getSurfaceTexture();
-                    if (!(cameraView.previewSize == null || surfaceTexture == null)) {
-                        surfaceTexture.setDefaultBufferSize(cameraView.previewSize.getWidth(), cameraView.previewSize.getHeight());
-                        cameraView.cameraSession = new CameraSession(info, cameraView.previewSize, pictureSize, 256);
-                        CameraController.getInstance().open(cameraView.cameraSession, surfaceTexture, new Runnable() {
-                            public void run() {
-                                if (CameraView.this.cameraSession != null) {
-                                    CameraView.this.cameraSession.setInitied();
-                                }
-                                CameraView.this.checkPreviewMatrix();
-                            }
-                        }, new Runnable() {
-                            public void run() {
-                                if (CameraView.this.delegate != null) {
-                                    CameraView.this.delegate.onCameraCreated(CameraView.this.cameraSession.cameraInfo.camera);
-                                }
-                            }
-                        });
+                    Size pictureSize2 = CameraController.chooseOptimalSize(info.getPictureSizes(), wantedHeight, wantedWidth, aspectRatio);
+                    if (pictureSize2.getWidth() < 1280 || pictureSize2.getHeight() < 1280) {
+                        pictureSize = pictureSize2;
                     }
                 }
-                width = Math.min(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
-                cameraView.previewSize = CameraController.chooseOptimalSize(info.getPreviewSizes(), width, (aspectRatio.getHeight() * width) / aspectRatio.getWidth(), aspectRatio);
-                pictureSize = CameraController.chooseOptimalSize(info.getPictureSizes(), wantedWidth, wantedHeight, aspectRatio);
-                if (Math.abs(screenSize - 1.3333334f) >= 0.1f) {
-                    aspectRatio = new Size(9, 16);
-                } else {
-                    aspectRatio = new Size(3, 4);
+                SurfaceTexture surfaceTexture = this.textureView.getSurfaceTexture();
+                if (this.previewSize != null && surfaceTexture != null) {
+                    surfaceTexture.setDefaultBufferSize(this.previewSize.getWidth(), this.previewSize.getHeight());
+                    this.cameraSession = new CameraSession(info, this.previewSize, pictureSize, 256);
+                    CameraController.getInstance().open(this.cameraSession, surfaceTexture, new Runnable() {
+                        public void run() {
+                            if (CameraView.this.cameraSession != null) {
+                                CameraView.this.cameraSession.setInitied();
+                            }
+                            CameraView.this.checkPreviewMatrix();
+                        }
+                    }, new Runnable() {
+                        public void run() {
+                            if (CameraView.this.delegate != null) {
+                                CameraView.this.delegate.onCameraCreated(CameraView.this.cameraSession.cameraInfo.camera);
+                            }
+                        }
+                    });
                 }
-                pictureSize2 = CameraController.chooseOptimalSize(info.getPictureSizes(), wantedHeight, wantedWidth, aspectRatio);
-                pictureSize = pictureSize2;
-                surfaceTexture = cameraView.textureView.getSurfaceTexture();
-                surfaceTexture.setDefaultBufferSize(cameraView.previewSize.getWidth(), cameraView.previewSize.getHeight());
-                cameraView.cameraSession = new CameraSession(info, cameraView.previewSize, pictureSize, 256);
-                CameraController.getInstance().open(cameraView.cameraSession, surfaceTexture, /* anonymous class already generated */, /* anonymous class already generated */);
             }
         }
     }
@@ -359,6 +212,38 @@ Caused by: java.lang.NullPointerException
         if (this.previewSize != null) {
             adjustAspectRatio(this.previewSize.getWidth(), this.previewSize.getHeight(), ((Activity) getContext()).getWindowManager().getDefaultDisplay().getRotation());
         }
+    }
+
+    private void adjustAspectRatio(int previewWidth, int previewHeight, int rotation) {
+        float scale;
+        this.txform.reset();
+        int viewWidth = getWidth();
+        int viewHeight = getHeight();
+        float viewCenterX = (float) (viewWidth / 2);
+        float viewCenterY = (float) (viewHeight / 2);
+        if (rotation == 0 || rotation == 2) {
+            scale = Math.max(((float) (this.clipTop + viewHeight)) / ((float) previewWidth), ((float) (this.clipLeft + viewWidth)) / ((float) previewHeight));
+        } else {
+            scale = Math.max(((float) (this.clipTop + viewHeight)) / ((float) previewHeight), ((float) (this.clipLeft + viewWidth)) / ((float) previewWidth));
+        }
+        this.txform.postScale((((float) previewHeight) * scale) / ((float) viewWidth), (((float) previewWidth) * scale) / ((float) viewHeight), viewCenterX, viewCenterY);
+        if (1 == rotation || 3 == rotation) {
+            this.txform.postRotate((float) ((rotation - 2) * 90), viewCenterX, viewCenterY);
+        } else if (2 == rotation) {
+            this.txform.postRotate(180.0f, viewCenterX, viewCenterY);
+        }
+        if (this.mirror) {
+            this.txform.postScale(-1.0f, 1.0f, viewCenterX, viewCenterY);
+        }
+        if (!(this.clipTop == 0 && this.clipLeft == 0)) {
+            this.txform.postTranslate((float) ((-this.clipLeft) / 2), (float) ((-this.clipTop) / 2));
+        }
+        this.textureView.setTransform(this.txform);
+        Matrix matrix = new Matrix();
+        matrix.postRotate((float) this.cameraSession.getDisplayOrientation());
+        matrix.postScale(((float) viewWidth) / 2000.0f, ((float) viewHeight) / 2000.0f);
+        matrix.postTranslate(((float) viewWidth) / 2.0f, ((float) viewHeight) / 2.0f);
+        matrix.invert(this.matrix);
     }
 
     private Rect calculateTapArea(float x, float y, float coefficient) {
@@ -415,37 +300,36 @@ Caused by: java.lang.NullPointerException
     }
 
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
-        Canvas canvas2 = canvas;
         boolean result = super.drawChild(canvas, child, drawingTime);
-        if (!(this.focusProgress == 1.0f && r0.innerAlpha == 0.0f && r0.outerAlpha == 0.0f)) {
-            int baseRad = AndroidUtilities.dp(1106247680);
+        if (!(this.focusProgress == 1.0f && this.innerAlpha == 0.0f && this.outerAlpha == 0.0f)) {
+            int baseRad = AndroidUtilities.dp(30.0f);
             long newTime = System.currentTimeMillis();
-            long dt = newTime - r0.lastDrawTime;
+            long dt = newTime - this.lastDrawTime;
             if (dt < 0 || dt > 17) {
                 dt = 17;
             }
-            r0.lastDrawTime = newTime;
-            r0.outerPaint.setAlpha((int) (r0.interpolator.getInterpolation(r0.outerAlpha) * 255.0f));
-            r0.innerPaint.setAlpha((int) (r0.interpolator.getInterpolation(r0.innerAlpha) * 127.0f));
-            float interpolated = r0.interpolator.getInterpolation(r0.focusProgress);
-            canvas2.drawCircle((float) r0.cx, (float) r0.cy, ((float) baseRad) + (((float) baseRad) * (1.0f - interpolated)), r0.outerPaint);
-            canvas2.drawCircle((float) r0.cx, (float) r0.cy, ((float) baseRad) * interpolated, r0.innerPaint);
-            if (r0.focusProgress < 1.0f) {
-                r0.focusProgress += ((float) dt) / 200.0f;
-                if (r0.focusProgress > 1.0f) {
-                    r0.focusProgress = 1.0f;
+            this.lastDrawTime = newTime;
+            this.outerPaint.setAlpha((int) (this.interpolator.getInterpolation(this.outerAlpha) * 255.0f));
+            this.innerPaint.setAlpha((int) (this.interpolator.getInterpolation(this.innerAlpha) * 127.0f));
+            float interpolated = this.interpolator.getInterpolation(this.focusProgress);
+            canvas.drawCircle((float) this.cx, (float) this.cy, ((float) baseRad) + (((float) baseRad) * (1.0f - interpolated)), this.outerPaint);
+            canvas.drawCircle((float) this.cx, (float) this.cy, ((float) baseRad) * interpolated, this.innerPaint);
+            if (this.focusProgress < 1.0f) {
+                this.focusProgress += ((float) dt) / 200.0f;
+                if (this.focusProgress > 1.0f) {
+                    this.focusProgress = 1.0f;
                 }
                 invalidate();
-            } else if (r0.innerAlpha != 0.0f) {
-                r0.innerAlpha -= ((float) dt) / 150.0f;
-                if (r0.innerAlpha < 0.0f) {
-                    r0.innerAlpha = 0.0f;
+            } else if (this.innerAlpha != 0.0f) {
+                this.innerAlpha -= ((float) dt) / 150.0f;
+                if (this.innerAlpha < 0.0f) {
+                    this.innerAlpha = 0.0f;
                 }
                 invalidate();
-            } else if (r0.outerAlpha != 0.0f) {
-                r0.outerAlpha -= ((float) dt) / 150.0f;
-                if (r0.outerAlpha < 0.0f) {
-                    r0.outerAlpha = 0.0f;
+            } else if (this.outerAlpha != 0.0f) {
+                this.outerAlpha -= ((float) dt) / 150.0f;
+                if (this.outerAlpha < 0.0f) {
+                    this.outerAlpha = 0.0f;
                 }
                 invalidate();
             }

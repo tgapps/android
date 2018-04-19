@@ -32,39 +32,35 @@ public class ProcessUtils {
     private static String zzl(int i) {
         Closeable zzm;
         Throwable th;
-        Closeable closeable = null;
-        if (i <= 0) {
-            return null;
-        }
-        try {
-            StringBuilder stringBuilder = new StringBuilder(25);
-            stringBuilder.append("/proc/");
-            stringBuilder.append(i);
-            stringBuilder.append("/cmdline");
-            zzm = zzm(stringBuilder.toString());
+        Closeable closeable;
+        String str = null;
+        if (i > 0) {
             try {
-                String trim = zzm.readLine().trim();
+                zzm = zzm("/proc/" + i + "/cmdline");
+                try {
+                    str = zzm.readLine().trim();
+                    IOUtils.closeQuietly(zzm);
+                } catch (IOException e) {
+                    IOUtils.closeQuietly(zzm);
+                    return str;
+                } catch (Throwable th2) {
+                    th = th2;
+                    closeable = zzm;
+                    IOUtils.closeQuietly(closeable);
+                    throw th;
+                }
+            } catch (IOException e2) {
+                zzm = str;
                 IOUtils.closeQuietly(zzm);
-                return trim;
-            } catch (IOException e) {
-                IOUtils.closeQuietly(zzm);
-                return null;
-            } catch (Throwable th2) {
-                Throwable th3 = th2;
-                closeable = zzm;
+                return str;
+            } catch (Throwable th3) {
                 th = th3;
+                closeable = str;
                 IOUtils.closeQuietly(closeable);
                 throw th;
             }
-        } catch (IOException e2) {
-            zzm = null;
-            IOUtils.closeQuietly(zzm);
-            return null;
-        } catch (Throwable th4) {
-            th = th4;
-            IOUtils.closeQuietly(closeable);
-            throw th;
         }
+        return str;
     }
 
     private static BufferedReader zzm(String str) throws IOException {

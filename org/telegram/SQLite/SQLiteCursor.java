@@ -1,5 +1,7 @@
 package org.telegram.SQLite;
 
+import org.telegram.messenger.BuildVars;
+import org.telegram.messenger.FileLog;
 import org.telegram.tgnet.NativeByteBuffer;
 
 public class SQLiteCursor {
@@ -27,75 +29,16 @@ public class SQLiteCursor {
 
     native int columnType(long j, int i);
 
-    public boolean next() throws org.telegram.SQLite.SQLiteException {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.SQLite.SQLiteCursor.next():boolean
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r6.preparedStatement;
-        r1 = r6.preparedStatement;
-        r1 = r1.getStatementHandle();
-        r0 = r0.step(r1);
-        r1 = -1;
-        if (r0 != r1) goto L_0x003d;
-    L_0x000f:
-        r2 = 6;
-        r3 = r2 + -1;
-        if (r2 == 0) goto L_0x0033;
-    L_0x0014:
-        r2 = org.telegram.messenger.BuildVars.LOGS_ENABLED;	 Catch:{ Exception -> 0x002c }
-        if (r2 == 0) goto L_0x001d;	 Catch:{ Exception -> 0x002c }
-    L_0x0018:
-        r2 = "sqlite busy, waiting...";	 Catch:{ Exception -> 0x002c }
-        org.telegram.messenger.FileLog.d(r2);	 Catch:{ Exception -> 0x002c }
-    L_0x001d:
-        r4 = 500; // 0x1f4 float:7.0E-43 double:2.47E-321;	 Catch:{ Exception -> 0x002c }
-        java.lang.Thread.sleep(r4);	 Catch:{ Exception -> 0x002c }
-        r2 = r6.preparedStatement;	 Catch:{ Exception -> 0x002c }
-        r2 = r2.step();	 Catch:{ Exception -> 0x002c }
-        r0 = r2;
-        if (r0 != 0) goto L_0x0030;
-    L_0x002b:
-        goto L_0x0033;
-    L_0x002c:
-        r2 = move-exception;
-        org.telegram.messenger.FileLog.e(r2);
-        r2 = r3;
-        goto L_0x0010;
-    L_0x0033:
-        if (r0 != r1) goto L_0x003d;
-        r1 = new org.telegram.SQLite.SQLiteException;
-        r2 = "sqlite busy";
-        r1.<init>(r2);
-        throw r1;
-    L_0x003d:
-        if (r0 != 0) goto L_0x0041;
-        r1 = 1;
-        goto L_0x0042;
-        r1 = 0;
-        r6.inRow = r1;
-        r1 = r6.inRow;
-        return r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.SQLite.SQLiteCursor.next():boolean");
-    }
-
     public SQLiteCursor(SQLitePreparedStatement stmt) {
         this.preparedStatement = stmt;
     }
 
     public boolean isNull(int columnIndex) throws SQLiteException {
         checkRow();
-        return columnIsNull(this.preparedStatement.getStatementHandle(), columnIndex) == 1;
+        if (columnIsNull(this.preparedStatement.getStatementHandle(), columnIndex) == 1) {
+            return true;
+        }
+        return false;
     }
 
     public int intValue(int columnIndex) throws SQLiteException {
@@ -135,6 +78,38 @@ Caused by: java.lang.NullPointerException
     public int getTypeOf(int columnIndex) throws SQLiteException {
         checkRow();
         return columnType(this.preparedStatement.getStatementHandle(), columnIndex);
+    }
+
+    public boolean next() throws SQLiteException {
+        int res = this.preparedStatement.step(this.preparedStatement.getStatementHandle());
+        if (res == -1) {
+            int repeatCount = 6;
+            while (true) {
+                int repeatCount2 = repeatCount - 1;
+                if (repeatCount == 0) {
+                    break;
+                }
+                try {
+                    if (BuildVars.LOGS_ENABLED) {
+                        FileLog.d("sqlite busy, waiting...");
+                    }
+                    Thread.sleep(500);
+                    res = this.preparedStatement.step();
+                    if (res == 0) {
+                        break;
+                    }
+                    repeatCount = repeatCount2;
+                } catch (Throwable e) {
+                    FileLog.e(e);
+                    repeatCount = repeatCount2;
+                }
+            }
+            if (res == -1) {
+                throw new SQLiteException("sqlite busy");
+            }
+        }
+        this.inRow = res == 0;
+        return this.inRow;
     }
 
     public long getStatementHandle() {

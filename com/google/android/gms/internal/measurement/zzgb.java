@@ -16,11 +16,9 @@ public final class zzgb {
                 return false;
             }
             ActivityInfo receiverInfo = packageManager.getReceiverInfo(new ComponentName(context, "com.google.android.gms.measurement.AppMeasurementReceiver"), 0);
-            if (receiverInfo != null && receiverInfo.enabled) {
-                return true;
-            }
-            return false;
+            return receiverInfo != null && receiverInfo.enabled;
         } catch (NameNotFoundException e) {
+            return false;
         }
     }
 }

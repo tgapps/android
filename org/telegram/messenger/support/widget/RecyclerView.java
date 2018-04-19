@@ -27,6 +27,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v4.view.accessibility.AccessibilityEventCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.CollectionInfoCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.CollectionItemInfoCompat;
 import android.support.v4.widget.EdgeEffectCompat;
 import android.util.AttributeSet;
@@ -50,6 +51,8 @@ import android.widget.OverScroller;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,17 +63,17 @@ import org.telegram.messenger.exoplayer2.text.Cue;
 import org.telegram.tgnet.ConnectionsManager;
 
 public class RecyclerView extends ViewGroup implements NestedScrollingChild2 {
-    static final boolean ALLOW_SIZE_IN_UNSPECIFIED_SPEC = (VERSION.SDK_INT < 23);
-    private static final boolean ALLOW_THREAD_GAP_WORK = (VERSION.SDK_INT < 21);
+    static final boolean ALLOW_SIZE_IN_UNSPECIFIED_SPEC;
+    private static final boolean ALLOW_THREAD_GAP_WORK;
     private static final int[] CLIP_TO_PADDING_ATTR = new int[]{16842987};
     static final boolean DEBUG = false;
     static final int DEFAULT_ORIENTATION = 1;
     static final boolean DISPATCH_TEMP_DETACH = false;
-    private static final boolean FORCE_ABS_FOCUS_SEARCH_DIRECTION = (VERSION.SDK_INT > 15);
+    private static final boolean FORCE_ABS_FOCUS_SEARCH_DIRECTION;
     static final boolean FORCE_INVALIDATE_DISPLAY_LIST;
     static final long FOREVER_NS = Long.MAX_VALUE;
     public static final int HORIZONTAL = 0;
-    private static final boolean IGNORE_DETACHED_FOCUSED_CHILD = (VERSION.SDK_INT > 15);
+    private static final boolean IGNORE_DETACHED_FOCUSED_CHILD;
     private static final int INVALID_POINTER = -1;
     public static final int INVALID_TYPE = -1;
     private static final Class<?>[] LAYOUT_MANAGER_CONSTRUCTOR_SIGNATURE = new Class[]{Context.class, AttributeSet.class, Integer.TYPE, Integer.TYPE};
@@ -78,7 +81,7 @@ public class RecyclerView extends ViewGroup implements NestedScrollingChild2 {
     private static final int[] NESTED_SCROLLING_ATTRS = new int[]{16843830};
     public static final long NO_ID = -1;
     public static final int NO_POSITION = -1;
-    static final boolean POST_UPDATES_ON_ANIMATION = (VERSION.SDK_INT < 16);
+    static final boolean POST_UPDATES_ON_ANIMATION;
     public static final int SCROLL_STATE_DRAGGING = 1;
     public static final int SCROLL_STATE_IDLE = 0;
     public static final int SCROLL_STATE_SETTLING = 2;
@@ -318,7 +321,7 @@ public class RecyclerView extends ViewGroup implements NestedScrollingChild2 {
         }
 
         public boolean hasObservers() {
-            return this.mObservers.isEmpty() ^ 1;
+            return !this.mObservers.isEmpty();
         }
 
         public void notifyChanged() {
@@ -514,6 +517,7 @@ public class RecyclerView extends ViewGroup implements NestedScrollingChild2 {
                     flags |= 2048;
                 }
             }
+            int i = flags;
             return flags;
         }
 
@@ -683,59 +687,6 @@ public class RecyclerView extends ViewGroup implements NestedScrollingChild2 {
 
         public abstract LayoutParams generateDefaultLayoutParams();
 
-        public void onInitializeAccessibilityNodeInfo(org.telegram.messenger.support.widget.RecyclerView.Recycler r1, org.telegram.messenger.support.widget.RecyclerView.State r2, android.support.v4.view.accessibility.AccessibilityNodeInfoCompat r3) {
-            /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.RecyclerView.LayoutManager.onInitializeAccessibilityNodeInfo(org.telegram.messenger.support.widget.RecyclerView$Recycler, org.telegram.messenger.support.widget.RecyclerView$State, android.support.v4.view.accessibility.AccessibilityNodeInfoCompat):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-            /*
-            r0 = this;
-            r0 = r4.mRecyclerView;
-            r1 = -1;
-            r0 = r0.canScrollVertically(r1);
-            r2 = 1;
-            if (r0 != 0) goto L_0x0012;
-        L_0x000a:
-            r0 = r4.mRecyclerView;
-            r0 = r0.canScrollHorizontally(r1);
-            if (r0 == 0) goto L_0x001a;
-        L_0x0012:
-            r0 = 8192; // 0x2000 float:1.14794E-41 double:4.0474E-320;
-            r7.addAction(r0);
-            r7.setScrollable(r2);
-        L_0x001a:
-            r0 = r4.mRecyclerView;
-            r0 = r0.canScrollVertically(r2);
-            if (r0 != 0) goto L_0x002a;
-        L_0x0022:
-            r0 = r4.mRecyclerView;
-            r0 = r0.canScrollHorizontally(r2);
-            if (r0 == 0) goto L_0x0032;
-        L_0x002a:
-            r0 = 4096; // 0x1000 float:5.74E-42 double:2.0237E-320;
-            r7.addAction(r0);
-            r7.setScrollable(r2);
-            r0 = r4.getRowCountForAccessibility(r5, r6);
-            r1 = r4.getColumnCountForAccessibility(r5, r6);
-            r2 = r4.isLayoutHierarchical(r5, r6);
-            r3 = r4.getSelectionModeForAccessibility(r5, r6);
-            r0 = android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(r0, r1, r2, r3);
-            r7.setCollectionInfo(r0);
-            return;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.RecyclerView.LayoutManager.onInitializeAccessibilityNodeInfo(org.telegram.messenger.support.widget.RecyclerView$Recycler, org.telegram.messenger.support.widget.RecyclerView$State, android.support.v4.view.accessibility.AccessibilityNodeInfoCompat):void");
-        }
-
         void setRecyclerView(RecyclerView recyclerView) {
             if (recyclerView == null) {
                 this.mRecyclerView = null;
@@ -815,13 +766,14 @@ Caused by: java.lang.NullPointerException
         public static int chooseSize(int spec, int desired, int min) {
             int mode = MeasureSpec.getMode(spec);
             int size = MeasureSpec.getSize(spec);
-            if (mode == Integer.MIN_VALUE) {
-                return Math.min(size, Math.max(desired, min));
+            switch (mode) {
+                case Integer.MIN_VALUE:
+                    return Math.min(size, Math.max(desired, min));
+                case 1073741824:
+                    return size;
+                default:
+                    return Math.max(desired, min);
             }
-            if (mode != 1073741824) {
-                return Math.max(desired, min);
-            }
-            return size;
         }
 
         public void assertNotInLayoutOrScroll(String message) {
@@ -992,90 +944,38 @@ Caused by: java.lang.NullPointerException
         }
 
         private void addViewInt(View child, int index, boolean disappearing) {
-            LayoutParams lp;
-            int currentIndex;
             ViewHolder holder = RecyclerView.getChildViewHolderInt(child);
-            if (!disappearing) {
-                if (!holder.isRemoved()) {
-                    this.mRecyclerView.mViewInfoStore.removeFromDisappearedInLayout(holder);
-                    lp = (LayoutParams) child.getLayoutParams();
-                    if (!holder.wasReturnedFromScrap()) {
-                        if (holder.isScrap()) {
-                            if (child.getParent() != this.mRecyclerView) {
-                                currentIndex = this.mChildHelper.indexOfChild(child);
-                                if (index == -1) {
-                                    index = this.mChildHelper.getChildCount();
-                                }
-                                if (currentIndex == -1) {
-                                    StringBuilder stringBuilder = new StringBuilder();
-                                    stringBuilder.append("Added View has RecyclerView as parent but view is not a real child. Unfiltered index:");
-                                    stringBuilder.append(this.mRecyclerView.indexOfChild(child));
-                                    stringBuilder.append(this.mRecyclerView.exceptionLabel());
-                                    throw new IllegalStateException(stringBuilder.toString());
-                                } else if (currentIndex != index) {
-                                    this.mRecyclerView.mLayout.moveView(currentIndex, index);
-                                }
-                            } else {
-                                this.mChildHelper.addView(child, index, false);
-                                lp.mInsetsDirty = true;
-                                if (this.mSmoothScroller != null && this.mSmoothScroller.isRunning()) {
-                                    this.mSmoothScroller.onChildAttachedToWindow(child);
-                                }
-                            }
-                            if (!lp.mPendingInvalidate) {
-                                holder.itemView.invalidate();
-                                lp.mPendingInvalidate = false;
-                            }
-                        }
-                    }
-                    if (holder.isScrap()) {
-                        holder.clearReturnedFromScrapFlag();
-                    } else {
-                        holder.unScrap();
-                    }
-                    this.mChildHelper.attachViewToParent(child, index, child.getLayoutParams(), false);
-                    if (!lp.mPendingInvalidate) {
-                        holder.itemView.invalidate();
-                        lp.mPendingInvalidate = false;
-                    }
-                }
-            }
-            this.mRecyclerView.mViewInfoStore.addToDisappearedInLayout(holder);
-            lp = (LayoutParams) child.getLayoutParams();
-            if (holder.wasReturnedFromScrap()) {
-                if (holder.isScrap()) {
-                    if (child.getParent() != this.mRecyclerView) {
-                        this.mChildHelper.addView(child, index, false);
-                        lp.mInsetsDirty = true;
-                        this.mSmoothScroller.onChildAttachedToWindow(child);
-                    } else {
-                        currentIndex = this.mChildHelper.indexOfChild(child);
-                        if (index == -1) {
-                            index = this.mChildHelper.getChildCount();
-                        }
-                        if (currentIndex == -1) {
-                            StringBuilder stringBuilder2 = new StringBuilder();
-                            stringBuilder2.append("Added View has RecyclerView as parent but view is not a real child. Unfiltered index:");
-                            stringBuilder2.append(this.mRecyclerView.indexOfChild(child));
-                            stringBuilder2.append(this.mRecyclerView.exceptionLabel());
-                            throw new IllegalStateException(stringBuilder2.toString());
-                        } else if (currentIndex != index) {
-                            this.mRecyclerView.mLayout.moveView(currentIndex, index);
-                        }
-                    }
-                    if (!lp.mPendingInvalidate) {
-                        holder.itemView.invalidate();
-                        lp.mPendingInvalidate = false;
-                    }
-                }
-            }
-            if (holder.isScrap()) {
-                holder.clearReturnedFromScrapFlag();
+            if (disappearing || holder.isRemoved()) {
+                this.mRecyclerView.mViewInfoStore.addToDisappearedInLayout(holder);
             } else {
-                holder.unScrap();
+                this.mRecyclerView.mViewInfoStore.removeFromDisappearedInLayout(holder);
             }
-            this.mChildHelper.attachViewToParent(child, index, child.getLayoutParams(), false);
-            if (!lp.mPendingInvalidate) {
+            LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            if (holder.wasReturnedFromScrap() || holder.isScrap()) {
+                if (holder.isScrap()) {
+                    holder.unScrap();
+                } else {
+                    holder.clearReturnedFromScrapFlag();
+                }
+                this.mChildHelper.attachViewToParent(child, index, child.getLayoutParams(), false);
+            } else if (child.getParent() == this.mRecyclerView) {
+                int currentIndex = this.mChildHelper.indexOfChild(child);
+                if (index == -1) {
+                    index = this.mChildHelper.getChildCount();
+                }
+                if (currentIndex == -1) {
+                    throw new IllegalStateException("Added View has RecyclerView as parent but view is not a real child. Unfiltered index:" + this.mRecyclerView.indexOfChild(child) + this.mRecyclerView.exceptionLabel());
+                } else if (currentIndex != index) {
+                    this.mRecyclerView.mLayout.moveView(currentIndex, index);
+                }
+            } else {
+                this.mChildHelper.addView(child, index, false);
+                lp.mInsetsDirty = true;
+                if (this.mSmoothScroller != null && this.mSmoothScroller.isRunning()) {
+                    this.mSmoothScroller.onChildAttachedToWindow(child);
+                }
+            }
+            if (lp.mPendingInvalidate) {
                 holder.itemView.invalidate();
                 lp.mPendingInvalidate = false;
             }
@@ -1114,7 +1014,10 @@ Caused by: java.lang.NullPointerException
                 return null;
             }
             View found = this.mRecyclerView.findContainingItemView(view);
-            if (found == null || this.mChildHelper.isHidden(found)) {
+            if (found == null) {
+                return null;
+            }
+            if (this.mChildHelper.isHidden(found)) {
                 return null;
             }
             return found;
@@ -1125,10 +1028,8 @@ Caused by: java.lang.NullPointerException
             for (int i = 0; i < childCount; i++) {
                 View child = getChildAt(i);
                 ViewHolder vh = RecyclerView.getChildViewHolderInt(child);
-                if (vh != null) {
-                    if (vh.getLayoutPosition() == position && !vh.shouldIgnore() && (this.mRecyclerView.mState.isPreLayout() || !vh.isRemoved())) {
-                        return child;
-                    }
+                if (vh != null && vh.getLayoutPosition() == position && !vh.shouldIgnore() && (this.mRecyclerView.mState.isPreLayout() || !vh.isRemoved())) {
+                    return child;
                 }
             }
             return null;
@@ -1174,11 +1075,7 @@ Caused by: java.lang.NullPointerException
         public void moveView(int fromIndex, int toIndex) {
             View view = getChildAt(fromIndex);
             if (view == null) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Cannot move a child from non-existing index:");
-                stringBuilder.append(fromIndex);
-                stringBuilder.append(this.mRecyclerView.toString());
-                throw new IllegalArgumentException(stringBuilder.toString());
+                throw new IllegalArgumentException("Cannot move a child from non-existing index:" + fromIndex + this.mRecyclerView.toString());
             }
             detachViewAt(fromIndex);
             attachView(view, toIndex);
@@ -1264,12 +1161,10 @@ Caused by: java.lang.NullPointerException
                 return null;
             }
             View focused = this.mRecyclerView.getFocusedChild();
-            if (focused != null) {
-                if (!this.mChildHelper.isHidden(focused)) {
-                    return focused;
-                }
+            if (focused == null || this.mChildHelper.isHidden(focused)) {
+                return null;
             }
-            return null;
+            return focused;
         }
 
         public int getItemCount() {
@@ -1290,18 +1185,12 @@ Caused by: java.lang.NullPointerException
         }
 
         public void ignoreView(View view) {
-            if (view.getParent() == this.mRecyclerView) {
-                if (this.mRecyclerView.indexOfChild(view) != -1) {
-                    ViewHolder vh = RecyclerView.getChildViewHolderInt(view);
-                    vh.addFlags(128);
-                    this.mRecyclerView.mViewInfoStore.removeViewHolder(vh);
-                    return;
-                }
+            if (view.getParent() != this.mRecyclerView || this.mRecyclerView.indexOfChild(view) == -1) {
+                throw new IllegalArgumentException("View should be fully attached to be ignored" + this.mRecyclerView.exceptionLabel());
             }
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("View should be fully attached to be ignored");
-            stringBuilder.append(this.mRecyclerView.exceptionLabel());
-            throw new IllegalArgumentException(stringBuilder.toString());
+            ViewHolder vh = RecyclerView.getChildViewHolderInt(view);
+            vh.addFlags(128);
+            this.mRecyclerView.mViewInfoStore.removeViewHolder(vh);
         }
 
         public void stopIgnoringView(View view) {
@@ -1324,10 +1213,10 @@ Caused by: java.lang.NullPointerException
                     detachViewAt(index);
                     recycler.scrapView(view);
                     this.mRecyclerView.mViewInfoStore.onViewDetached(viewHolder);
-                } else {
-                    removeViewAt(index);
-                    recycler.recycleViewHolderInternal(viewHolder);
+                    return;
                 }
+                removeViewAt(index);
+                recycler.recycleViewHolderInternal(viewHolder);
             }
         }
 
@@ -1366,21 +1255,11 @@ Caused by: java.lang.NullPointerException
         }
 
         boolean shouldReMeasureChild(View child, int widthSpec, int heightSpec, LayoutParams lp) {
-            if (this.mMeasurementCacheEnabled && isMeasurementUpToDate(child.getMeasuredWidth(), widthSpec, lp.width)) {
-                if (isMeasurementUpToDate(child.getMeasuredHeight(), heightSpec, lp.height)) {
-                    return false;
-                }
-            }
-            return true;
+            return (this.mMeasurementCacheEnabled && isMeasurementUpToDate(child.getMeasuredWidth(), widthSpec, lp.width) && isMeasurementUpToDate(child.getMeasuredHeight(), heightSpec, lp.height)) ? false : true;
         }
 
         boolean shouldMeasureChild(View child, int widthSpec, int heightSpec, LayoutParams lp) {
-            if (!child.isLayoutRequested() && this.mMeasurementCacheEnabled && isMeasurementUpToDate(child.getWidth(), widthSpec, lp.width)) {
-                if (isMeasurementUpToDate(child.getHeight(), heightSpec, lp.height)) {
-                    return false;
-                }
-            }
-            return true;
+            return (!child.isLayoutRequested() && this.mMeasurementCacheEnabled && isMeasurementUpToDate(child.getWidth(), widthSpec, lp.width) && isMeasurementUpToDate(child.getHeight(), heightSpec, lp.height)) ? false : true;
         }
 
         public boolean isMeasurementCacheEnabled() {
@@ -1394,25 +1273,24 @@ Caused by: java.lang.NullPointerException
         private static boolean isMeasurementUpToDate(int childSize, int spec, int dimension) {
             int specMode = MeasureSpec.getMode(spec);
             int specSize = MeasureSpec.getSize(spec);
-            boolean z = false;
             if (dimension > 0 && childSize != dimension) {
                 return false;
             }
-            if (specMode == Integer.MIN_VALUE) {
-                if (specSize >= childSize) {
-                    z = true;
-                }
-                return z;
-            } else if (specMode == 0) {
-                return true;
-            } else {
-                if (specMode != 1073741824) {
+            switch (specMode) {
+                case Integer.MIN_VALUE:
+                    if (specSize < childSize) {
+                        return false;
+                    }
+                    return true;
+                case 0:
+                    return true;
+                case 1073741824:
+                    if (specSize != childSize) {
+                        return false;
+                    }
+                    return true;
+                default:
                     return false;
-                }
-                if (specSize == childSize) {
-                    z = true;
-                }
-                return z;
             }
         }
 
@@ -1462,15 +1340,19 @@ Caused by: java.lang.NullPointerException
                     resultSize = childDimension;
                     resultMode = 1073741824;
                 } else if (childDimension == -1) {
-                    if (parentMode != Integer.MIN_VALUE) {
-                        if (parentMode == 0) {
+                    switch (parentMode) {
+                        case Integer.MIN_VALUE:
+                        case 1073741824:
+                            resultSize = size;
+                            resultMode = parentMode;
+                            break;
+                        case 0:
                             resultSize = 0;
                             resultMode = 0;
-                        } else if (parentMode != 1073741824) {
-                        }
+                            break;
+                        default:
+                            break;
                     }
-                    resultSize = size;
-                    resultMode = parentMode;
                 } else if (childDimension == -2) {
                     resultSize = 0;
                     resultMode = 0;
@@ -1483,12 +1365,7 @@ Caused by: java.lang.NullPointerException
                 resultMode = parentMode;
             } else if (childDimension == -2) {
                 resultSize = size;
-                if (parentMode != Integer.MIN_VALUE) {
-                    if (parentMode != 1073741824) {
-                        resultMode = 0;
-                    }
-                }
-                resultMode = Integer.MIN_VALUE;
+                resultMode = (parentMode == Integer.MIN_VALUE || parentMode == 1073741824) ? Integer.MIN_VALUE : 0;
             }
             return MeasureSpec.makeMeasureSpec(resultSize, resultMode);
         }
@@ -1586,22 +1463,37 @@ Caused by: java.lang.NullPointerException
         }
 
         private int[] getChildRectangleOnScreenScrollAmount(RecyclerView parent, View child, Rect rect, boolean immediate) {
-            Rect rect2 = rect;
+            int dx;
+            int dy;
             int[] out = new int[2];
             int parentLeft = getPaddingLeft();
             int parentTop = getPaddingTop();
             int parentRight = getWidth() - getPaddingRight();
             int parentBottom = getHeight() - getPaddingBottom();
-            int childLeft = (child.getLeft() + rect2.left) - child.getScrollX();
-            int childTop = (child.getTop() + rect2.top) - child.getScrollY();
-            int childRight = rect.width() + childLeft;
-            int childBottom = rect.height() + childTop;
+            int childLeft = (child.getLeft() + rect.left) - child.getScrollX();
+            int childTop = (child.getTop() + rect.top) - child.getScrollY();
+            int childRight = childLeft + rect.width();
+            int childBottom = childTop + rect.height();
             int offScreenLeft = Math.min(0, childLeft - parentLeft);
             int offScreenTop = Math.min(0, childTop - parentTop);
             int offScreenRight = Math.max(0, childRight - parentRight);
             int offScreenBottom = Math.max(0, childBottom - parentBottom);
-            int dx = getLayoutDirection() == 1 ? offScreenRight != 0 ? offScreenRight : Math.max(offScreenLeft, childRight - parentRight) : offScreenLeft != 0 ? offScreenLeft : Math.min(childLeft - parentLeft, offScreenRight);
-            int dy = offScreenTop != 0 ? offScreenTop : Math.min(childTop - parentTop, offScreenBottom);
+            if (getLayoutDirection() == 1) {
+                if (offScreenRight != 0) {
+                    dx = offScreenRight;
+                } else {
+                    dx = Math.max(offScreenLeft, childRight - parentRight);
+                }
+            } else if (offScreenLeft != 0) {
+                dx = offScreenLeft;
+            } else {
+                dx = Math.min(childLeft - parentLeft, offScreenRight);
+            }
+            if (offScreenTop != 0) {
+                dy = offScreenTop;
+            } else {
+                dy = Math.min(childTop - parentTop, offScreenBottom);
+            }
             out[0] = dx;
             out[1] = dy;
             return out;
@@ -1615,29 +1507,33 @@ Caused by: java.lang.NullPointerException
             int[] scrollAmount = getChildRectangleOnScreenScrollAmount(parent, child, rect, immediate);
             int dx = scrollAmount[0];
             int dy = scrollAmount[1];
-            if (!focusedChildVisible || isFocusedChildVisibleAfterScrolling(parent, dx, dy)) {
-                if (dx == 0) {
-                    if (dy != 0) {
-                    }
-                }
-                if (immediate) {
-                    parent.scrollBy(dx, dy);
-                } else {
-                    parent.smoothScrollBy(dx, dy);
-                }
-                return true;
+            if (focusedChildVisible && !isFocusedChildVisibleAfterScrolling(parent, dx, dy)) {
+                return false;
             }
-            return false;
+            if (dx == 0 && dy == 0) {
+                return false;
+            }
+            if (immediate) {
+                parent.scrollBy(dx, dy);
+            } else {
+                parent.smoothScrollBy(dx, dy);
+            }
+            return true;
         }
 
         public boolean isViewPartiallyVisible(View child, boolean completelyVisible, boolean acceptEndPointInclusion) {
-            boolean z = false;
-            boolean isViewFullyVisible = this.mHorizontalBoundCheck.isViewWithinBoundFlags(child, 24579) && this.mVerticalBoundCheck.isViewWithinBoundFlags(child, 24579);
+            boolean isViewFullyVisible;
+            boolean z = true;
+            if (this.mHorizontalBoundCheck.isViewWithinBoundFlags(child, 24579) && this.mVerticalBoundCheck.isViewWithinBoundFlags(child, 24579)) {
+                isViewFullyVisible = true;
+            } else {
+                isViewFullyVisible = false;
+            }
             if (completelyVisible) {
                 return isViewFullyVisible;
             }
-            if (!isViewFullyVisible) {
-                z = true;
+            if (isViewFullyVisible) {
+                z = false;
             }
             return z;
         }
@@ -1653,22 +1549,15 @@ Caused by: java.lang.NullPointerException
             int parentBottom = getHeight() - getPaddingBottom();
             Rect bounds = this.mRecyclerView.mTempRect;
             getDecoratedBoundsWithMargins(focusedChild, bounds);
-            if (bounds.left - dx < parentRight && bounds.right - dx > parentLeft && bounds.top - dy < parentBottom) {
-                if (bounds.bottom - dy > parentTop) {
-                    return true;
-                }
+            if (bounds.left - dx >= parentRight || bounds.right - dx <= parentLeft || bounds.top - dy >= parentBottom || bounds.bottom - dy <= parentTop) {
+                return false;
             }
-            return false;
+            return true;
         }
 
         @Deprecated
         public boolean onRequestChildFocus(RecyclerView parent, View child, View focused) {
-            if (!isSmoothScrolling()) {
-                if (!parent.isComputingLayout()) {
-                    return false;
-                }
-            }
-            return true;
+            return isSmoothScrolling() || parent.isComputingLayout();
         }
 
         public boolean onRequestChildFocus(RecyclerView parent, State state, View child, View focused) {
@@ -1775,23 +1664,31 @@ Caused by: java.lang.NullPointerException
             onInitializeAccessibilityNodeInfo(this.mRecyclerView.mRecycler, this.mRecyclerView.mState, info);
         }
 
+        public void onInitializeAccessibilityNodeInfo(Recycler recycler, State state, AccessibilityNodeInfoCompat info) {
+            if (this.mRecyclerView.canScrollVertically(-1) || this.mRecyclerView.canScrollHorizontally(-1)) {
+                info.addAction(MessagesController.UPDATE_MASK_CHANNEL);
+                info.setScrollable(true);
+            }
+            if (this.mRecyclerView.canScrollVertically(1) || this.mRecyclerView.canScrollHorizontally(1)) {
+                info.addAction(4096);
+                info.setScrollable(true);
+            }
+            info.setCollectionInfo(CollectionInfoCompat.obtain(getRowCountForAccessibility(recycler, state), getColumnCountForAccessibility(recycler, state), isLayoutHierarchical(recycler, state), getSelectionModeForAccessibility(recycler, state)));
+        }
+
         public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
             onInitializeAccessibilityEvent(this.mRecyclerView.mRecycler, this.mRecyclerView.mState, event);
         }
 
         public void onInitializeAccessibilityEvent(Recycler recycler, State state, AccessibilityEvent event) {
-            if (this.mRecyclerView != null) {
-                if (event != null) {
-                    boolean z = true;
-                    if (!(this.mRecyclerView.canScrollVertically(1) || this.mRecyclerView.canScrollVertically(-1) || this.mRecyclerView.canScrollHorizontally(-1))) {
-                        if (!this.mRecyclerView.canScrollHorizontally(1)) {
-                            z = false;
-                        }
-                    }
-                    event.setScrollable(z);
-                    if (this.mRecyclerView.mAdapter != null) {
-                        event.setItemCount(this.mRecyclerView.mAdapter.getItemCount());
-                    }
+            boolean z = true;
+            if (this.mRecyclerView != null && event != null) {
+                if (!(this.mRecyclerView.canScrollVertically(1) || this.mRecyclerView.canScrollVertically(-1) || this.mRecyclerView.canScrollHorizontally(-1) || this.mRecyclerView.canScrollHorizontally(1))) {
+                    z = false;
+                }
+                event.setScrollable(z);
+                if (this.mRecyclerView.mAdapter != null) {
+                    event.setItemCount(this.mRecyclerView.mAdapter.getItemCount());
                 }
             }
         }
@@ -1804,12 +1701,19 @@ Caused by: java.lang.NullPointerException
         }
 
         public void onInitializeAccessibilityNodeInfoForItem(Recycler recycler, State state, View host, AccessibilityNodeInfoCompat info) {
-            int i = 0;
-            int rowIndexGuess = canScrollVertically() ? getPosition(host) : 0;
-            if (canScrollHorizontally()) {
-                i = getPosition(host);
+            int rowIndexGuess;
+            int columnIndexGuess;
+            if (canScrollVertically()) {
+                rowIndexGuess = getPosition(host);
+            } else {
+                rowIndexGuess = 0;
             }
-            info.setCollectionItemInfo(CollectionItemInfoCompat.obtain(rowIndexGuess, 1, i, 1, false, false));
+            if (canScrollHorizontally()) {
+                columnIndexGuess = getPosition(host);
+            } else {
+                columnIndexGuess = 0;
+            }
+            info.setCollectionItemInfo(CollectionItemInfoCompat.obtain(rowIndexGuess, 1, columnIndexGuess, 1, false, false));
         }
 
         public void requestSimpleAnimationsInNextLayout() {
@@ -1821,29 +1725,17 @@ Caused by: java.lang.NullPointerException
         }
 
         public int getRowCountForAccessibility(Recycler recycler, State state) {
-            int i = 1;
-            if (this.mRecyclerView != null) {
-                if (this.mRecyclerView.mAdapter != null) {
-                    if (canScrollVertically()) {
-                        i = this.mRecyclerView.mAdapter.getItemCount();
-                    }
-                    return i;
-                }
+            if (this.mRecyclerView == null || this.mRecyclerView.mAdapter == null || !canScrollVertically()) {
+                return 1;
             }
-            return 1;
+            return this.mRecyclerView.mAdapter.getItemCount();
         }
 
         public int getColumnCountForAccessibility(Recycler recycler, State state) {
-            int i = 1;
-            if (this.mRecyclerView != null) {
-                if (this.mRecyclerView.mAdapter != null) {
-                    if (canScrollHorizontally()) {
-                        i = this.mRecyclerView.mAdapter.getItemCount();
-                    }
-                    return i;
-                }
+            if (this.mRecyclerView == null || this.mRecyclerView.mAdapter == null || !canScrollHorizontally()) {
+                return 1;
             }
-            return 1;
+            return this.mRecyclerView.mAdapter.getItemCount();
         }
 
         public boolean isLayoutHierarchical(Recycler recycler, State state) {
@@ -1860,20 +1752,25 @@ Caused by: java.lang.NullPointerException
             }
             int vScroll = 0;
             int hScroll = 0;
-            if (action == 4096) {
-                if (this.mRecyclerView.canScrollVertically(1)) {
-                    vScroll = (getHeight() - getPaddingTop()) - getPaddingBottom();
-                }
-                if (this.mRecyclerView.canScrollHorizontally(1)) {
-                    hScroll = (getWidth() - getPaddingLeft()) - getPaddingRight();
-                }
-            } else if (action == MessagesController.UPDATE_MASK_CHANNEL) {
-                if (this.mRecyclerView.canScrollVertically(-1)) {
-                    vScroll = -((getHeight() - getPaddingTop()) - getPaddingBottom());
-                }
-                if (this.mRecyclerView.canScrollHorizontally(-1)) {
-                    hScroll = -((getWidth() - getPaddingLeft()) - getPaddingRight());
-                }
+            switch (action) {
+                case 4096:
+                    if (this.mRecyclerView.canScrollVertically(1)) {
+                        vScroll = (getHeight() - getPaddingTop()) - getPaddingBottom();
+                    }
+                    if (this.mRecyclerView.canScrollHorizontally(1)) {
+                        hScroll = (getWidth() - getPaddingLeft()) - getPaddingRight();
+                        break;
+                    }
+                    break;
+                case MessagesController.UPDATE_MASK_CHANNEL /*8192*/:
+                    if (this.mRecyclerView.canScrollVertically(-1)) {
+                        vScroll = -((getHeight() - getPaddingTop()) - getPaddingBottom());
+                    }
+                    if (this.mRecyclerView.canScrollHorizontally(-1)) {
+                        hScroll = -((getWidth() - getPaddingLeft()) - getPaddingRight());
+                        break;
+                    }
+                    break;
             }
             if (vScroll == 0 && hScroll == 0) {
                 return false;
@@ -2060,10 +1957,7 @@ Caused by: java.lang.NullPointerException
         }
 
         long runningAverage(long oldAverage, long newValue) {
-            if (oldAverage == 0) {
-                return newValue;
-            }
-            return ((oldAverage / 4) * 3) + (newValue / 4);
+            return oldAverage == 0 ? newValue : ((oldAverage / 4) * 3) + (newValue / 4);
         }
 
         void factorInCreateTime(int viewType, long createTimeNs) {
@@ -2078,22 +1972,12 @@ Caused by: java.lang.NullPointerException
 
         boolean willCreateInTime(int viewType, long approxCurrentNs, long deadlineNs) {
             long expectedDurationNs = getScrapDataForType(viewType).mCreateRunningAverageNs;
-            if (expectedDurationNs != 0) {
-                if (approxCurrentNs + expectedDurationNs >= deadlineNs) {
-                    return false;
-                }
-            }
-            return true;
+            return expectedDurationNs == 0 || approxCurrentNs + expectedDurationNs < deadlineNs;
         }
 
         boolean willBindInTime(int viewType, long approxCurrentNs, long deadlineNs) {
             long expectedDurationNs = getScrapDataForType(viewType).mBindRunningAverageNs;
-            if (expectedDurationNs != 0) {
-                if (approxCurrentNs + expectedDurationNs >= deadlineNs) {
-                    return false;
-                }
-            }
-            return true;
+            return expectedDurationNs == 0 || approxCurrentNs + expectedDurationNs < deadlineNs;
         }
 
         void attach(Adapter adapter) {
@@ -2138,234 +2022,6 @@ Caused by: java.lang.NullPointerException
         private ViewCacheExtension mViewCacheExtension;
         int mViewCacheMax = 2;
 
-        org.telegram.messenger.support.widget.RecyclerView.ViewHolder getChangedScrapViewForPosition(int r1) {
-            /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.RecyclerView.Recycler.getChangedScrapViewForPosition(int):org.telegram.messenger.support.widget.RecyclerView$ViewHolder
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-            /*
-            r0 = this;
-            r0 = r11.mChangedScrap;
-            r1 = 0;
-            if (r0 == 0) goto L_0x0078;
-        L_0x0005:
-            r0 = r11.mChangedScrap;
-            r0 = r0.size();
-            r2 = r0;
-            if (r0 != 0) goto L_0x000f;
-        L_0x000e:
-            goto L_0x0078;
-            r0 = 0;
-            r3 = r0;
-            r4 = 32;
-            if (r3 >= r2) goto L_0x0031;
-            r5 = r11.mChangedScrap;
-            r5 = r5.get(r3);
-            r5 = (org.telegram.messenger.support.widget.RecyclerView.ViewHolder) r5;
-            r6 = r5.wasReturnedFromScrap();
-            if (r6 != 0) goto L_0x002e;
-            r6 = r5.getLayoutPosition();
-            if (r6 != r12) goto L_0x002e;
-            r5.addFlags(r4);
-            return r5;
-            r3 = r3 + 1;
-            goto L_0x0012;
-            r3 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r3 = r3.mAdapter;
-            r3 = r3.hasStableIds();
-            if (r3 == 0) goto L_0x0077;
-            r3 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r3 = r3.mAdapterHelper;
-            r3 = r3.findPositionOffset(r12);
-            if (r3 <= 0) goto L_0x0077;
-            r5 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r5 = r5.mAdapter;
-            r5 = r5.getItemCount();
-            if (r3 >= r5) goto L_0x0077;
-            r5 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r5 = r5.mAdapter;
-            r5 = r5.getItemId(r3);
-            if (r0 >= r2) goto L_0x0077;
-            r7 = r11.mChangedScrap;
-            r7 = r7.get(r0);
-            r7 = (org.telegram.messenger.support.widget.RecyclerView.ViewHolder) r7;
-            r8 = r7.wasReturnedFromScrap();
-            if (r8 != 0) goto L_0x0074;
-            r8 = r7.getItemId();
-            r10 = (r8 > r5 ? 1 : (r8 == r5 ? 0 : -1));
-            if (r10 != 0) goto L_0x0074;
-            r7.addFlags(r4);
-            return r7;
-            r0 = r0 + 1;
-            goto L_0x0058;
-            return r1;
-        L_0x0078:
-            return r1;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.RecyclerView.Recycler.getChangedScrapViewForPosition(int):org.telegram.messenger.support.widget.RecyclerView$ViewHolder");
-        }
-
-        void recycleViewHolderInternal(org.telegram.messenger.support.widget.RecyclerView.ViewHolder r1) {
-            /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.RecyclerView.Recycler.recycleViewHolderInternal(org.telegram.messenger.support.widget.RecyclerView$ViewHolder):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-            /*
-            r0 = this;
-            r0 = r11.isScrap();
-            r1 = 0;
-            r2 = 1;
-            if (r0 != 0) goto L_0x00ed;
-        L_0x0008:
-            r0 = r11.itemView;
-            r0 = r0.getParent();
-            if (r0 == 0) goto L_0x0012;
-        L_0x0010:
-            goto L_0x00ed;
-        L_0x0012:
-            r0 = r11.isTmpDetached();
-            if (r0 == 0) goto L_0x0038;
-        L_0x0018:
-            r0 = new java.lang.IllegalArgumentException;
-            r1 = new java.lang.StringBuilder;
-            r1.<init>();
-            r2 = "Tmp detached view should be removed from RecyclerView before it can be recycled: ";
-            r1.append(r2);
-            r1.append(r11);
-            r2 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r2 = r2.exceptionLabel();
-            r1.append(r2);
-            r1 = r1.toString();
-            r0.<init>(r1);
-            throw r0;
-        L_0x0038:
-            r0 = r11.shouldIgnore();
-            if (r0 == 0) goto L_0x005b;
-        L_0x003e:
-            r0 = new java.lang.IllegalArgumentException;
-            r1 = new java.lang.StringBuilder;
-            r1.<init>();
-            r2 = "Trying to recycle an ignored view holder. You should first call stopIgnoringView(view) before calling recycle.";
-            r1.append(r2);
-            r2 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r2 = r2.exceptionLabel();
-            r1.append(r2);
-            r1 = r1.toString();
-            r0.<init>(r1);
-            throw r0;
-            r0 = r11.doesTransientStatePreventRecycling();
-            r3 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r3 = r3.mAdapter;
-            if (r3 == 0) goto L_0x0074;
-            if (r0 == 0) goto L_0x0074;
-            r3 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r3 = r3.mAdapter;
-            r3 = r3.onFailedToRecycleView(r11);
-            if (r3 == 0) goto L_0x0074;
-            r3 = r2;
-            goto L_0x0075;
-            r3 = r1;
-            r4 = 0;
-            r5 = 0;
-            if (r3 != 0) goto L_0x007f;
-            r6 = r11.isRecyclable();
-            if (r6 == 0) goto L_0x00dc;
-            r6 = r10.mViewCacheMax;
-            if (r6 <= 0) goto L_0x00d6;
-            r6 = 526; // 0x20e float:7.37E-43 double:2.6E-321;
-            r6 = r11.hasAnyOfTheFlags(r6);
-            if (r6 != 0) goto L_0x00d6;
-            r6 = r10.mCachedViews;
-            r6 = r6.size();
-            r7 = r10.mViewCacheMax;
-            if (r6 < r7) goto L_0x009c;
-            if (r6 <= 0) goto L_0x009c;
-            r10.recycleCachedViewAt(r1);
-            r6 = r6 + -1;
-            r1 = r6;
-            r7 = org.telegram.messenger.support.widget.RecyclerView.ALLOW_THREAD_GAP_WORK;
-            if (r7 == 0) goto L_0x00cf;
-            if (r6 <= 0) goto L_0x00cf;
-            r7 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r7 = r7.mPrefetchRegistry;
-            r8 = r11.mPosition;
-            r7 = r7.lastPrefetchIncludedPosition(r8);
-            if (r7 != 0) goto L_0x00cf;
-            r7 = r6 + -1;
-            if (r7 < 0) goto L_0x00cd;
-            r8 = r10.mCachedViews;
-            r8 = r8.get(r7);
-            r8 = (org.telegram.messenger.support.widget.RecyclerView.ViewHolder) r8;
-            r8 = r8.mPosition;
-            r9 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r9 = r9.mPrefetchRegistry;
-            r9 = r9.lastPrefetchIncludedPosition(r8);
-            if (r9 != 0) goto L_0x00ca;
-            goto L_0x00cd;
-            r7 = r7 + -1;
-            goto L_0x00b3;
-            r1 = r7 + 1;
-            r7 = r10.mCachedViews;
-            r7.add(r1, r11);
-            r1 = 1;
-            r4 = r1;
-            if (r4 != 0) goto L_0x00dc;
-            r10.addViewHolderToRecycledViewPool(r11, r2);
-            r5 = 1;
-            r1 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r1 = r1.mViewInfoStore;
-            r1.removeViewHolder(r11);
-            if (r4 != 0) goto L_0x00ec;
-            if (r5 != 0) goto L_0x00ec;
-            if (r0 == 0) goto L_0x00ec;
-            r1 = 0;
-            r11.mOwnerRecyclerView = r1;
-            return;
-        L_0x00ed:
-            r0 = new java.lang.IllegalArgumentException;
-            r3 = new java.lang.StringBuilder;
-            r3.<init>();
-            r4 = "Scrapped or attached views may not be recycled. isScrap:";
-            r3.append(r4);
-            r4 = r11.isScrap();
-            r3.append(r4);
-            r4 = " isAttached:";
-            r3.append(r4);
-            r4 = r11.itemView;
-            r4 = r4.getParent();
-            if (r4 == 0) goto L_0x010f;
-            r1 = r2;
-            r3.append(r1);
-            r1 = org.telegram.messenger.support.widget.RecyclerView.this;
-            r1 = r1.exceptionLabel();
-            r3.append(r1);
-            r1 = r3.toString();
-            r0.<init>(r1);
-            throw r0;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.RecyclerView.Recycler.recycleViewHolderInternal(org.telegram.messenger.support.widget.RecyclerView$ViewHolder):void");
-        }
-
         public void clear() {
             this.mAttachedScrap.clear();
             recycleAndClearCachedViews();
@@ -2391,26 +2047,16 @@ Caused by: java.lang.NullPointerException
             if (holder.isRemoved()) {
                 return RecyclerView.this.mState.isPreLayout();
             }
-            if (holder.mPosition >= 0) {
-                if (holder.mPosition < RecyclerView.this.mAdapter.getItemCount()) {
-                    boolean z = false;
-                    if (!RecyclerView.this.mState.isPreLayout() && RecyclerView.this.mAdapter.getItemViewType(holder.mPosition) != holder.getItemViewType()) {
-                        return false;
-                    }
-                    if (!RecyclerView.this.mAdapter.hasStableIds()) {
-                        return true;
-                    }
-                    if (holder.getItemId() == RecyclerView.this.mAdapter.getItemId(holder.mPosition)) {
-                        z = true;
-                    }
-                    return z;
+            if (holder.mPosition < 0 || holder.mPosition >= RecyclerView.this.mAdapter.getItemCount()) {
+                throw new IndexOutOfBoundsException("Inconsistency detected. Invalid view holder adapter position" + holder + RecyclerView.this.exceptionLabel());
+            } else if (!RecyclerView.this.mState.isPreLayout() && RecyclerView.this.mAdapter.getItemViewType(holder.mPosition) != holder.getItemViewType()) {
+                return false;
+            } else {
+                if (!RecyclerView.this.mAdapter.hasStableIds() || holder.getItemId() == RecyclerView.this.mAdapter.getItemId(holder.mPosition)) {
+                    return true;
                 }
+                return false;
             }
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Inconsistency detected. Invalid view holder adapter position");
-            stringBuilder.append(holder);
-            stringBuilder.append(RecyclerView.this.exceptionLabel());
-            throw new IndexOutOfBoundsException(stringBuilder.toString());
         }
 
         private boolean tryBindViewHolderByDeadline(ViewHolder holder, int offsetPosition, int position, long deadlineNs) {
@@ -2432,63 +2078,35 @@ Caused by: java.lang.NullPointerException
         public void bindViewToPosition(View view, int position) {
             ViewHolder holder = RecyclerView.getChildViewHolderInt(view);
             if (holder == null) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("The view does not have a ViewHolder. You cannot pass arbitrary views to this method, they should be created by the Adapter");
-                stringBuilder.append(RecyclerView.this.exceptionLabel());
-                throw new IllegalArgumentException(stringBuilder.toString());
+                throw new IllegalArgumentException("The view does not have a ViewHolder. You cannot pass arbitrary views to this method, they should be created by the Adapter" + RecyclerView.this.exceptionLabel());
             }
             int offsetPosition = RecyclerView.this.mAdapterHelper.findPositionOffset(position);
-            if (offsetPosition >= 0) {
-                if (offsetPosition < RecyclerView.this.mAdapter.getItemCount()) {
-                    LayoutParams rvLayoutParams;
-                    tryBindViewHolderByDeadline(holder, offsetPosition, position, Long.MAX_VALUE);
-                    android.view.ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
-                    if (lp == null) {
-                        rvLayoutParams = (LayoutParams) RecyclerView.this.generateDefaultLayoutParams();
-                        holder.itemView.setLayoutParams(rvLayoutParams);
-                    } else if (RecyclerView.this.checkLayoutParams(lp)) {
-                        rvLayoutParams = (LayoutParams) lp;
-                    } else {
-                        rvLayoutParams = (LayoutParams) RecyclerView.this.generateLayoutParams(lp);
-                        holder.itemView.setLayoutParams(rvLayoutParams);
-                    }
-                    boolean z = true;
-                    rvLayoutParams.mInsetsDirty = true;
-                    rvLayoutParams.mViewHolder = holder;
-                    if (holder.itemView.getParent() != null) {
-                        z = false;
-                    }
-                    rvLayoutParams.mPendingInvalidate = z;
-                    return;
-                }
+            if (offsetPosition < 0 || offsetPosition >= RecyclerView.this.mAdapter.getItemCount()) {
+                throw new IndexOutOfBoundsException("Inconsistency detected. Invalid item position " + position + "(offset:" + offsetPosition + ").state:" + RecyclerView.this.mState.getItemCount() + RecyclerView.this.exceptionLabel());
             }
-            stringBuilder = new StringBuilder();
-            stringBuilder.append("Inconsistency detected. Invalid item position ");
-            stringBuilder.append(position);
-            stringBuilder.append("(offset:");
-            stringBuilder.append(offsetPosition);
-            stringBuilder.append(").state:");
-            stringBuilder.append(RecyclerView.this.mState.getItemCount());
-            stringBuilder.append(RecyclerView.this.exceptionLabel());
-            throw new IndexOutOfBoundsException(stringBuilder.toString());
+            LayoutParams rvLayoutParams;
+            tryBindViewHolderByDeadline(holder, offsetPosition, position, Long.MAX_VALUE);
+            android.view.ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
+            if (lp == null) {
+                rvLayoutParams = (LayoutParams) RecyclerView.this.generateDefaultLayoutParams();
+                holder.itemView.setLayoutParams(rvLayoutParams);
+            } else if (RecyclerView.this.checkLayoutParams(lp)) {
+                rvLayoutParams = (LayoutParams) lp;
+            } else {
+                rvLayoutParams = (LayoutParams) RecyclerView.this.generateLayoutParams(lp);
+                holder.itemView.setLayoutParams(rvLayoutParams);
+            }
+            rvLayoutParams.mInsetsDirty = true;
+            rvLayoutParams.mViewHolder = holder;
+            rvLayoutParams.mPendingInvalidate = holder.itemView.getParent() == null;
         }
 
         public int convertPreLayoutPositionToPostLayout(int position) {
-            if (position >= 0) {
-                if (position < RecyclerView.this.mState.getItemCount()) {
-                    if (RecyclerView.this.mState.isPreLayout()) {
-                        return RecyclerView.this.mAdapterHelper.findPositionOffset(position);
-                    }
-                    return position;
-                }
+            if (position >= 0 && position < RecyclerView.this.mState.getItemCount()) {
+                return !RecyclerView.this.mState.isPreLayout() ? position : RecyclerView.this.mAdapterHelper.findPositionOffset(position);
+            } else {
+                throw new IndexOutOfBoundsException("invalid position " + position + ". State item count is " + RecyclerView.this.mState.getItemCount() + RecyclerView.this.exceptionLabel());
             }
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("invalid position ");
-            stringBuilder.append(position);
-            stringBuilder.append(". State item count is ");
-            stringBuilder.append(RecyclerView.this.mState.getItemCount());
-            stringBuilder.append(RecyclerView.this.exceptionLabel());
-            throw new IndexOutOfBoundsException(stringBuilder.toString());
         }
 
         public View getViewForPosition(int position) {
@@ -2500,145 +2118,115 @@ Caused by: java.lang.NullPointerException
         }
 
         ViewHolder tryGetViewHolderForPositionByDeadline(int position, boolean dryRun, long deadlineNs) {
-            Recycler recycler = this;
-            int i = position;
-            boolean z = dryRun;
-            if (i >= 0) {
-                if (i < RecyclerView.this.mState.getItemCount()) {
-                    LayoutParams rvLayoutParams;
-                    boolean fromScrapOrHiddenOrCache = false;
-                    ViewHolder holder = null;
-                    boolean z2 = true;
-                    if (RecyclerView.this.mState.isPreLayout()) {
-                        holder = getChangedScrapViewForPosition(position);
-                        fromScrapOrHiddenOrCache = holder != null;
-                    }
-                    if (holder == null) {
-                        holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);
-                        if (holder != null) {
-                            if (validateViewHolderForOffsetPosition(holder)) {
-                                fromScrapOrHiddenOrCache = true;
-                            } else {
-                                if (!z) {
-                                    holder.addFlags(4);
-                                    if (holder.isScrap()) {
-                                        RecyclerView.this.removeDetachedView(holder.itemView, false);
-                                        holder.unScrap();
-                                    } else if (holder.wasReturnedFromScrap()) {
-                                        holder.clearReturnedFromScrapFlag();
-                                    }
-                                    recycleViewHolderInternal(holder);
-                                }
-                                holder = null;
-                            }
-                        }
-                    }
-                    if (holder == null) {
-                        int offsetPosition = RecyclerView.this.mAdapterHelper.findPositionOffset(i);
-                        if (offsetPosition >= 0) {
-                            if (offsetPosition < RecyclerView.this.mAdapter.getItemCount()) {
-                                int type = RecyclerView.this.mAdapter.getItemViewType(offsetPosition);
-                                if (RecyclerView.this.mAdapter.hasStableIds()) {
-                                    holder = getScrapOrCachedViewForId(RecyclerView.this.mAdapter.getItemId(offsetPosition), type, z);
-                                    if (holder != null) {
-                                        holder.mPosition = offsetPosition;
-                                        fromScrapOrHiddenOrCache = true;
-                                    }
-                                }
-                                if (holder == null && recycler.mViewCacheExtension != null) {
-                                    View view = recycler.mViewCacheExtension.getViewForPositionAndType(recycler, i, type);
-                                    if (view != null) {
-                                        holder = RecyclerView.this.getChildViewHolder(view);
-                                        StringBuilder stringBuilder;
-                                        if (holder == null) {
-                                            stringBuilder = new StringBuilder();
-                                            stringBuilder.append("getViewForPositionAndType returned a view which does not have a ViewHolder");
-                                            stringBuilder.append(RecyclerView.this.exceptionLabel());
-                                            throw new IllegalArgumentException(stringBuilder.toString());
-                                        } else if (holder.shouldIgnore()) {
-                                            stringBuilder = new StringBuilder();
-                                            stringBuilder.append("getViewForPositionAndType returned a view that is ignored. You must call stopIgnoring before returning this view.");
-                                            stringBuilder.append(RecyclerView.this.exceptionLabel());
-                                            throw new IllegalArgumentException(stringBuilder.toString());
-                                        }
-                                    }
-                                }
-                                if (holder == null) {
-                                    holder = getRecycledViewPool().getRecycledView(type);
-                                    if (holder != null) {
-                                        holder.resetInternal();
-                                        if (RecyclerView.FORCE_INVALIDATE_DISPLAY_LIST) {
-                                            invalidateDisplayListInt(holder);
-                                        }
-                                    }
-                                }
-                                if (holder == null) {
-                                    long start = RecyclerView.this.getNanoTime();
-                                    if (deadlineNs != Long.MAX_VALUE && !recycler.mRecyclerPool.willCreateInTime(type, start, deadlineNs)) {
-                                        return null;
-                                    }
-                                    holder = RecyclerView.this.mAdapter.createViewHolder(RecyclerView.this, type);
-                                    if (RecyclerView.ALLOW_THREAD_GAP_WORK) {
-                                        RecyclerView innerView = RecyclerView.findNestedRecyclerView(holder.itemView);
-                                        if (innerView != null) {
-                                            holder.mNestedRecyclerView = new WeakReference(innerView);
-                                        }
-                                    }
-                                    recycler.mRecyclerPool.factorInCreateTime(type, RecyclerView.this.getNanoTime() - start);
-                                }
-                            }
-                        }
-                        StringBuilder stringBuilder2 = new StringBuilder();
-                        stringBuilder2.append("Inconsistency detected. Invalid item position ");
-                        stringBuilder2.append(i);
-                        stringBuilder2.append("(offset:");
-                        stringBuilder2.append(offsetPosition);
-                        stringBuilder2.append(").state:");
-                        stringBuilder2.append(RecyclerView.this.mState.getItemCount());
-                        stringBuilder2.append(RecyclerView.this.exceptionLabel());
-                        throw new IndexOutOfBoundsException(stringBuilder2.toString());
-                    }
-                    boolean fromScrapOrHiddenOrCache2 = fromScrapOrHiddenOrCache;
-                    ViewHolder holder2 = holder;
-                    if (fromScrapOrHiddenOrCache2 && !RecyclerView.this.mState.isPreLayout() && holder2.hasAnyOfTheFlags(MessagesController.UPDATE_MASK_CHANNEL)) {
-                        holder2.setFlags(0, MessagesController.UPDATE_MASK_CHANNEL);
-                        if (RecyclerView.this.mState.mRunSimpleAnimations) {
-                            RecyclerView.this.recordAnimationInfoIfBouncedHiddenView(holder2, RecyclerView.this.mItemAnimator.recordPreLayoutInformation(RecyclerView.this.mState, holder2, ItemAnimator.buildAdapterChangeFlagsForAnimations(holder2) | 4096, holder2.getUnmodifiedPayloads()));
-                        }
-                    }
-                    boolean bound = false;
-                    if (RecyclerView.this.mState.isPreLayout() && holder2.isBound()) {
-                        holder2.mPreLayoutPosition = i;
-                    } else if (!holder2.isBound() || holder2.needsUpdate() || holder2.isInvalid()) {
-                        bound = tryBindViewHolderByDeadline(holder2, RecyclerView.this.mAdapterHelper.findPositionOffset(i), i, deadlineNs);
-                    }
-                    android.view.ViewGroup.LayoutParams lp = holder2.itemView.getLayoutParams();
-                    if (lp == null) {
-                        rvLayoutParams = (LayoutParams) RecyclerView.this.generateDefaultLayoutParams();
-                        holder2.itemView.setLayoutParams(rvLayoutParams);
-                    } else if (RecyclerView.this.checkLayoutParams(lp)) {
-                        rvLayoutParams = (LayoutParams) lp;
+            if (position < 0 || position >= RecyclerView.this.mState.getItemCount()) {
+                throw new IndexOutOfBoundsException("Invalid item position " + position + "(" + position + "). Item count:" + RecyclerView.this.mState.getItemCount() + RecyclerView.this.exceptionLabel());
+            }
+            ViewHolder holder;
+            LayoutParams rvLayoutParams;
+            boolean fromScrapOrHiddenOrCache = false;
+            ViewHolder holder2 = null;
+            if (RecyclerView.this.mState.isPreLayout()) {
+                holder2 = getChangedScrapViewForPosition(position);
+                fromScrapOrHiddenOrCache = holder2 != null;
+            }
+            if (holder2 == null) {
+                holder2 = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);
+                if (holder2 != null) {
+                    if (validateViewHolderForOffsetPosition(holder2)) {
+                        fromScrapOrHiddenOrCache = true;
                     } else {
-                        rvLayoutParams = (LayoutParams) RecyclerView.this.generateLayoutParams(lp);
-                        holder2.itemView.setLayoutParams(rvLayoutParams);
+                        if (!dryRun) {
+                            holder2.addFlags(4);
+                            if (holder2.isScrap()) {
+                                RecyclerView.this.removeDetachedView(holder2.itemView, false);
+                                holder2.unScrap();
+                            } else if (holder2.wasReturnedFromScrap()) {
+                                holder2.clearReturnedFromScrapFlag();
+                            }
+                            recycleViewHolderInternal(holder2);
+                        }
+                        holder2 = null;
                     }
-                    rvLayoutParams.mViewHolder = holder2;
-                    if (!fromScrapOrHiddenOrCache2 || !bound) {
-                        z2 = false;
-                    }
-                    rvLayoutParams.mPendingInvalidate = z2;
-                    return holder2;
                 }
             }
-            StringBuilder stringBuilder3 = new StringBuilder();
-            stringBuilder3.append("Invalid item position ");
-            stringBuilder3.append(i);
-            stringBuilder3.append("(");
-            stringBuilder3.append(i);
-            stringBuilder3.append("). Item count:");
-            stringBuilder3.append(RecyclerView.this.mState.getItemCount());
-            stringBuilder3.append(RecyclerView.this.exceptionLabel());
-            throw new IndexOutOfBoundsException(stringBuilder3.toString());
+            if (holder2 == null) {
+                int offsetPosition = RecyclerView.this.mAdapterHelper.findPositionOffset(position);
+                if (offsetPosition < 0 || offsetPosition >= RecyclerView.this.mAdapter.getItemCount()) {
+                    throw new IndexOutOfBoundsException("Inconsistency detected. Invalid item position " + position + "(offset:" + offsetPosition + ").state:" + RecyclerView.this.mState.getItemCount() + RecyclerView.this.exceptionLabel());
+                }
+                int type = RecyclerView.this.mAdapter.getItemViewType(offsetPosition);
+                if (RecyclerView.this.mAdapter.hasStableIds()) {
+                    holder2 = getScrapOrCachedViewForId(RecyclerView.this.mAdapter.getItemId(offsetPosition), type, dryRun);
+                    if (holder2 != null) {
+                        holder2.mPosition = offsetPosition;
+                        fromScrapOrHiddenOrCache = true;
+                    }
+                }
+                if (holder2 == null && this.mViewCacheExtension != null) {
+                    View view = this.mViewCacheExtension.getViewForPositionAndType(this, position, type);
+                    if (view != null) {
+                        holder2 = RecyclerView.this.getChildViewHolder(view);
+                        if (holder2 == null) {
+                            throw new IllegalArgumentException("getViewForPositionAndType returned a view which does not have a ViewHolder" + RecyclerView.this.exceptionLabel());
+                        } else if (holder2.shouldIgnore()) {
+                            throw new IllegalArgumentException("getViewForPositionAndType returned a view that is ignored. You must call stopIgnoring before returning this view." + RecyclerView.this.exceptionLabel());
+                        }
+                    }
+                }
+                if (holder2 == null) {
+                    holder2 = getRecycledViewPool().getRecycledView(type);
+                    if (holder2 != null) {
+                        holder2.resetInternal();
+                        if (RecyclerView.FORCE_INVALIDATE_DISPLAY_LIST) {
+                            invalidateDisplayListInt(holder2);
+                        }
+                    }
+                }
+                holder = holder2;
+                if (holder == null) {
+                    long start = RecyclerView.this.getNanoTime();
+                    if (deadlineNs != Long.MAX_VALUE && !this.mRecyclerPool.willCreateInTime(type, start, deadlineNs)) {
+                        return null;
+                    }
+                    holder2 = RecyclerView.this.mAdapter.createViewHolder(RecyclerView.this, type);
+                    if (RecyclerView.ALLOW_THREAD_GAP_WORK) {
+                        RecyclerView innerView = RecyclerView.findNestedRecyclerView(holder2.itemView);
+                        if (innerView != null) {
+                            holder2.mNestedRecyclerView = new WeakReference(innerView);
+                        }
+                    }
+                    this.mRecyclerPool.factorInCreateTime(type, RecyclerView.this.getNanoTime() - start);
+                } else {
+                    holder2 = holder;
+                }
+            }
+            if (fromScrapOrHiddenOrCache && !RecyclerView.this.mState.isPreLayout() && holder2.hasAnyOfTheFlags(MessagesController.UPDATE_MASK_CHANNEL)) {
+                holder2.setFlags(0, MessagesController.UPDATE_MASK_CHANNEL);
+                if (RecyclerView.this.mState.mRunSimpleAnimations) {
+                    RecyclerView.this.recordAnimationInfoIfBouncedHiddenView(holder2, RecyclerView.this.mItemAnimator.recordPreLayoutInformation(RecyclerView.this.mState, holder2, ItemAnimator.buildAdapterChangeFlagsForAnimations(holder2) | 4096, holder2.getUnmodifiedPayloads()));
+                }
+            }
+            boolean bound = false;
+            if (RecyclerView.this.mState.isPreLayout() && holder2.isBound()) {
+                holder2.mPreLayoutPosition = position;
+            } else if (!holder2.isBound() || holder2.needsUpdate() || holder2.isInvalid()) {
+                bound = tryBindViewHolderByDeadline(holder2, RecyclerView.this.mAdapterHelper.findPositionOffset(position), position, deadlineNs);
+            }
+            android.view.ViewGroup.LayoutParams lp = holder2.itemView.getLayoutParams();
+            if (lp == null) {
+                rvLayoutParams = (LayoutParams) RecyclerView.this.generateDefaultLayoutParams();
+                holder2.itemView.setLayoutParams(rvLayoutParams);
+            } else if (RecyclerView.this.checkLayoutParams(lp)) {
+                rvLayoutParams = (LayoutParams) lp;
+            } else {
+                android.view.ViewGroup.LayoutParams rvLayoutParams2 = (LayoutParams) RecyclerView.this.generateLayoutParams(lp);
+                holder2.itemView.setLayoutParams(rvLayoutParams2);
+            }
+            rvLayoutParams.mViewHolder = holder2;
+            boolean z = fromScrapOrHiddenOrCache && bound;
+            rvLayoutParams.mPendingInvalidate = z;
+            holder = holder2;
+            return holder2;
         }
 
         private void attachAccessibilityDelegateOnBind(ViewHolder holder) {
@@ -2661,23 +2249,23 @@ Caused by: java.lang.NullPointerException
         }
 
         private void invalidateDisplayListInt(ViewGroup viewGroup, boolean invalidateThis) {
-            int i;
-            for (i = viewGroup.getChildCount() - 1; i >= 0; i--) {
+            for (int i = viewGroup.getChildCount() - 1; i >= 0; i--) {
                 View view = viewGroup.getChildAt(i);
                 if (view instanceof ViewGroup) {
                     invalidateDisplayListInt((ViewGroup) view, true);
                 }
             }
-            if (invalidateThis) {
-                if (viewGroup.getVisibility() == 4) {
-                    viewGroup.setVisibility(0);
-                    viewGroup.setVisibility(4);
-                } else {
-                    i = viewGroup.getVisibility();
-                    viewGroup.setVisibility(4);
-                    viewGroup.setVisibility(i);
-                }
+            if (!invalidateThis) {
+                return;
             }
+            if (viewGroup.getVisibility() == 4) {
+                viewGroup.setVisibility(0);
+                viewGroup.setVisibility(4);
+                return;
+            }
+            int visibility = viewGroup.getVisibility();
+            viewGroup.setVisibility(4);
+            viewGroup.setVisibility(visibility);
         }
 
         public void recycleView(View view) {
@@ -2712,6 +2300,61 @@ Caused by: java.lang.NullPointerException
             this.mCachedViews.remove(cachedViewIndex);
         }
 
+        void recycleViewHolderInternal(ViewHolder holder) {
+            boolean z = false;
+            if (holder.isScrap() || holder.itemView.getParent() != null) {
+                StringBuilder append = new StringBuilder().append("Scrapped or attached views may not be recycled. isScrap:").append(holder.isScrap()).append(" isAttached:");
+                if (holder.itemView.getParent() != null) {
+                    z = true;
+                }
+                throw new IllegalArgumentException(append.append(z).append(RecyclerView.this.exceptionLabel()).toString());
+            } else if (holder.isTmpDetached()) {
+                throw new IllegalArgumentException("Tmp detached view should be removed from RecyclerView before it can be recycled: " + holder + RecyclerView.this.exceptionLabel());
+            } else if (holder.shouldIgnore()) {
+                throw new IllegalArgumentException("Trying to recycle an ignored view holder. You should first call stopIgnoringView(view) before calling recycle." + RecyclerView.this.exceptionLabel());
+            } else {
+                boolean forceRecycle;
+                boolean transientStatePreventsRecycling = holder.doesTransientStatePreventRecycling();
+                if (RecyclerView.this.mAdapter != null && transientStatePreventsRecycling && RecyclerView.this.mAdapter.onFailedToRecycleView(holder)) {
+                    forceRecycle = true;
+                } else {
+                    forceRecycle = false;
+                }
+                boolean cached = false;
+                boolean recycled = false;
+                if (forceRecycle || holder.isRecyclable()) {
+                    if (this.mViewCacheMax > 0 && !holder.hasAnyOfTheFlags(526)) {
+                        int cachedViewSize = this.mCachedViews.size();
+                        if (cachedViewSize >= this.mViewCacheMax && cachedViewSize > 0) {
+                            recycleCachedViewAt(0);
+                            cachedViewSize--;
+                        }
+                        int targetCacheIndex = cachedViewSize;
+                        if (RecyclerView.ALLOW_THREAD_GAP_WORK && cachedViewSize > 0 && !RecyclerView.this.mPrefetchRegistry.lastPrefetchIncludedPosition(holder.mPosition)) {
+                            int cacheIndex = cachedViewSize - 1;
+                            while (cacheIndex >= 0) {
+                                if (!RecyclerView.this.mPrefetchRegistry.lastPrefetchIncludedPosition(((ViewHolder) this.mCachedViews.get(cacheIndex)).mPosition)) {
+                                    break;
+                                }
+                                cacheIndex--;
+                            }
+                            targetCacheIndex = cacheIndex + 1;
+                        }
+                        this.mCachedViews.add(targetCacheIndex, holder);
+                        cached = true;
+                    }
+                    if (!cached) {
+                        addViewHolderToRecycledViewPool(holder, true);
+                        recycled = true;
+                    }
+                }
+                RecyclerView.this.mViewInfoStore.removeViewHolder(holder);
+                if (!cached && !recycled && transientStatePreventsRecycling) {
+                    holder.mOwnerRecyclerView = null;
+                }
+            }
+        }
+
         void addViewHolderToRecycledViewPool(ViewHolder holder, boolean dispatchRecycled) {
             RecyclerView.clearNestedRecyclerViewIfNotNested(holder);
             if (holder.hasAnyOfTheFlags(MessagesController.UPDATE_MASK_CHAT_ADMINS)) {
@@ -2735,25 +2378,18 @@ Caused by: java.lang.NullPointerException
 
         void scrapView(View view) {
             ViewHolder holder = RecyclerView.getChildViewHolderInt(view);
-            if (!holder.hasAnyOfTheFlags(12) && holder.isUpdated()) {
-                if (!RecyclerView.this.canReuseUpdatedViewHolder(holder)) {
-                    if (this.mChangedScrap == null) {
-                        this.mChangedScrap = new ArrayList();
-                    }
-                    holder.setScrapContainer(this, true);
-                    this.mChangedScrap.add(holder);
-                    return;
+            if (!holder.hasAnyOfTheFlags(12) && holder.isUpdated() && !RecyclerView.this.canReuseUpdatedViewHolder(holder)) {
+                if (this.mChangedScrap == null) {
+                    this.mChangedScrap = new ArrayList();
                 }
-            }
-            if (!holder.isInvalid() || holder.isRemoved() || RecyclerView.this.mAdapter.hasStableIds()) {
+                holder.setScrapContainer(this, true);
+                this.mChangedScrap.add(holder);
+            } else if (!holder.isInvalid() || holder.isRemoved() || RecyclerView.this.mAdapter.hasStableIds()) {
                 holder.setScrapContainer(this, false);
                 this.mAttachedScrap.add(holder);
-                return;
+            } else {
+                throw new IllegalArgumentException("Called scrap view with an invalid view. Invalid views cannot be reused from scrap, they should rebound from recycler pool." + RecyclerView.this.exceptionLabel());
             }
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Called scrap view with an invalid view. Invalid views cannot be reused from scrap, they should rebound from recycler pool.");
-            stringBuilder.append(RecyclerView.this.exceptionLabel());
-            throw new IllegalArgumentException(stringBuilder.toString());
         }
 
         void unscrapView(ViewHolder holder) {
@@ -2782,14 +2418,50 @@ Caused by: java.lang.NullPointerException
             }
         }
 
+        ViewHolder getChangedScrapViewForPosition(int position) {
+            if (this.mChangedScrap != null) {
+                int changedScrapSize = this.mChangedScrap.size();
+                if (changedScrapSize != 0) {
+                    ViewHolder holder;
+                    int i = 0;
+                    while (i < changedScrapSize) {
+                        holder = (ViewHolder) this.mChangedScrap.get(i);
+                        if (holder.wasReturnedFromScrap() || holder.getLayoutPosition() != position) {
+                            i++;
+                        } else {
+                            holder.addFlags(32);
+                            return holder;
+                        }
+                    }
+                    if (RecyclerView.this.mAdapter.hasStableIds()) {
+                        int offsetPosition = RecyclerView.this.mAdapterHelper.findPositionOffset(position);
+                        if (offsetPosition > 0 && offsetPosition < RecyclerView.this.mAdapter.getItemCount()) {
+                            long id = RecyclerView.this.mAdapter.getItemId(offsetPosition);
+                            i = 0;
+                            while (i < changedScrapSize) {
+                                holder = (ViewHolder) this.mChangedScrap.get(i);
+                                if (holder.wasReturnedFromScrap() || holder.getItemId() != id) {
+                                    i++;
+                                } else {
+                                    holder.addFlags(32);
+                                    return holder;
+                                }
+                            }
+                        }
+                    }
+                    return null;
+                }
+            }
+            return null;
+        }
+
         ViewHolder getScrapOrHiddenOrCachedHolderForPosition(int position, boolean dryRun) {
             int scrapCount = this.mAttachedScrap.size();
             int i = 0;
-            int i2 = 0;
-            while (i2 < scrapCount) {
-                ViewHolder holder = (ViewHolder) this.mAttachedScrap.get(i2);
+            while (i < scrapCount) {
+                ViewHolder holder = (ViewHolder) this.mAttachedScrap.get(i);
                 if (holder.wasReturnedFromScrap() || holder.getLayoutPosition() != position || holder.isInvalid() || (!RecyclerView.this.mState.mInPreLayout && holder.isRemoved())) {
-                    i2++;
+                    i++;
                 } else {
                     holder.addFlags(32);
                     return holder;
@@ -2802,11 +2474,7 @@ Caused by: java.lang.NullPointerException
                     RecyclerView.this.mChildHelper.unhide(view);
                     int layoutIndex = RecyclerView.this.mChildHelper.indexOfChild(view);
                     if (layoutIndex == -1) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append("layout index should not be -1 after unhiding a view:");
-                        stringBuilder.append(vh);
-                        stringBuilder.append(RecyclerView.this.exceptionLabel());
-                        throw new IllegalStateException(stringBuilder.toString());
+                        throw new IllegalStateException("layout index should not be -1 after unhiding a view:" + vh + RecyclerView.this.exceptionLabel());
                     }
                     RecyclerView.this.mChildHelper.detachViewFromParent(layoutIndex);
                     scrapView(view);
@@ -2814,15 +2482,16 @@ Caused by: java.lang.NullPointerException
                     return vh;
                 }
             }
-            i2 = this.mCachedViews.size();
-            while (i < i2) {
+            int cacheSize = this.mCachedViews.size();
+            i = 0;
+            while (i < cacheSize) {
                 holder = (ViewHolder) this.mCachedViews.get(i);
                 if (holder.isInvalid() || holder.getLayoutPosition() != position) {
                     i++;
+                } else if (dryRun) {
+                    return holder;
                 } else {
-                    if (!dryRun) {
-                        this.mCachedViews.remove(i);
-                    }
+                    this.mCachedViews.remove(i);
                     return holder;
                 }
             }
@@ -2830,14 +2499,16 @@ Caused by: java.lang.NullPointerException
         }
 
         ViewHolder getScrapOrCachedViewForId(long id, int type, boolean dryRun) {
-            for (int i = this.mAttachedScrap.size() - 1; i >= 0; i--) {
+            int i;
+            for (i = this.mAttachedScrap.size() - 1; i >= 0; i--) {
                 ViewHolder holder = (ViewHolder) this.mAttachedScrap.get(i);
                 if (holder.getItemId() == id && !holder.wasReturnedFromScrap()) {
                     if (type == holder.getItemViewType()) {
                         holder.addFlags(32);
-                        if (holder.isRemoved() && !RecyclerView.this.mState.isPreLayout()) {
-                            holder.setFlags(2, 14);
+                        if (!holder.isRemoved() || RecyclerView.this.mState.isPreLayout()) {
+                            return holder;
                         }
+                        holder.setFlags(2, 14);
                         return holder;
                     } else if (!dryRun) {
                         this.mAttachedScrap.remove(i);
@@ -2846,16 +2517,17 @@ Caused by: java.lang.NullPointerException
                     }
                 }
             }
-            for (int i2 = this.mCachedViews.size() - 1; i2 >= 0; i2--) {
-                ViewHolder holder2 = (ViewHolder) this.mCachedViews.get(i2);
-                if (holder2.getItemId() == id) {
-                    if (type == holder2.getItemViewType()) {
-                        if (!dryRun) {
-                            this.mCachedViews.remove(i2);
+            for (i = this.mCachedViews.size() - 1; i >= 0; i--) {
+                holder = (ViewHolder) this.mCachedViews.get(i);
+                if (holder.getItemId() == id) {
+                    if (type == holder.getItemViewType()) {
+                        if (dryRun) {
+                            return holder;
                         }
-                        return holder2;
+                        this.mCachedViews.remove(i);
+                        return holder;
                     } else if (!dryRun) {
-                        recycleCachedViewAt(i2);
+                        recycleCachedViewAt(i);
                         return null;
                     }
                 }
@@ -2881,9 +2553,9 @@ Caused by: java.lang.NullPointerException
         }
 
         void offsetPositionRecordsForMove(int from, int to) {
-            int end;
             int inBetweenOffset;
             int start;
+            int end;
             if (from < to) {
                 start = from;
                 end = to;
@@ -2896,13 +2568,11 @@ Caused by: java.lang.NullPointerException
             int cachedCount = this.mCachedViews.size();
             for (int i = 0; i < cachedCount; i++) {
                 ViewHolder holder = (ViewHolder) this.mCachedViews.get(i);
-                if (holder != null && holder.mPosition >= start) {
-                    if (holder.mPosition <= end) {
-                        if (holder.mPosition == from) {
-                            holder.offsetPosition(to - from, false);
-                        } else {
-                            holder.offsetPosition(inBetweenOffset, false);
-                        }
+                if (holder != null && holder.mPosition >= start && holder.mPosition <= end) {
+                    if (holder.mPosition == from) {
+                        holder.offsetPosition(to - from, false);
+                    } else {
+                        holder.offsetPosition(inBetweenOffset, false);
                     }
                 }
             }
@@ -2984,21 +2654,18 @@ Caused by: java.lang.NullPointerException
 
         void clearOldPositions() {
             int i;
-            int i2;
             int cachedCount = this.mCachedViews.size();
-            int i3 = 0;
             for (i = 0; i < cachedCount; i++) {
                 ((ViewHolder) this.mCachedViews.get(i)).clearOldPosition();
             }
-            i = this.mAttachedScrap.size();
-            for (i2 = 0; i2 < i; i2++) {
-                ((ViewHolder) this.mAttachedScrap.get(i2)).clearOldPosition();
+            int scrapCount = this.mAttachedScrap.size();
+            for (i = 0; i < scrapCount; i++) {
+                ((ViewHolder) this.mAttachedScrap.get(i)).clearOldPosition();
             }
             if (this.mChangedScrap != null) {
-                i2 = this.mChangedScrap.size();
-                while (i3 < i2) {
-                    ((ViewHolder) this.mChangedScrap.get(i3)).clearOldPosition();
-                    i3++;
+                int changedScrapCount = this.mChangedScrap.size();
+                for (i = 0; i < changedScrapCount; i++) {
+                    ((ViewHolder) this.mChangedScrap.get(i)).clearOldPosition();
                 }
             }
         }
@@ -3069,9 +2736,7 @@ Caused by: java.lang.NullPointerException
                     this.mJumpToPosition = -1;
                     recyclerView.jumpToPositionForSmoothScroller(position);
                     this.mChanged = false;
-                    return;
-                }
-                if (this.mChanged) {
+                } else if (this.mChanged) {
                     validate();
                     if (this.mInterpolator != null) {
                         recyclerView.mViewFlinger.smoothScrollBy(this.mDx, this.mDy, this.mDuration, this.mInterpolator);
@@ -3293,12 +2958,7 @@ Caused by: java.lang.NullPointerException
 
         void assertLayoutStep(int accepted) {
             if ((this.mLayoutStep & accepted) == 0) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Layout state should be one of ");
-                stringBuilder.append(Integer.toBinaryString(accepted));
-                stringBuilder.append(" but it is ");
-                stringBuilder.append(Integer.toBinaryString(this.mLayoutStep));
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException("Layout state should be one of " + Integer.toBinaryString(accepted) + " but it is " + Integer.toBinaryString(this.mLayoutStep));
             }
         }
 
@@ -3382,29 +3042,7 @@ Caused by: java.lang.NullPointerException
         }
 
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("State{mTargetPosition=");
-            stringBuilder.append(this.mTargetPosition);
-            stringBuilder.append(", mData=");
-            stringBuilder.append(this.mData);
-            stringBuilder.append(", mItemCount=");
-            stringBuilder.append(this.mItemCount);
-            stringBuilder.append(", mIsMeasuring=");
-            stringBuilder.append(this.mIsMeasuring);
-            stringBuilder.append(", mPreviousLayoutItemCount=");
-            stringBuilder.append(this.mPreviousLayoutItemCount);
-            stringBuilder.append(", mDeletedInvisibleItemCountSincePreviousLayout=");
-            stringBuilder.append(this.mDeletedInvisibleItemCountSincePreviousLayout);
-            stringBuilder.append(", mStructureChanged=");
-            stringBuilder.append(this.mStructureChanged);
-            stringBuilder.append(", mInPreLayout=");
-            stringBuilder.append(this.mInPreLayout);
-            stringBuilder.append(", mRunSimpleAnimations=");
-            stringBuilder.append(this.mRunSimpleAnimations);
-            stringBuilder.append(", mRunPredictiveAnimations=");
-            stringBuilder.append(this.mRunPredictiveAnimations);
-            stringBuilder.append('}');
-            return stringBuilder.toString();
+            return "State{mTargetPosition=" + this.mTargetPosition + ", mData=" + this.mData + ", mItemCount=" + this.mItemCount + ", mIsMeasuring=" + this.mIsMeasuring + ", mPreviousLayoutItemCount=" + this.mPreviousLayoutItemCount + ", mDeletedInvisibleItemCountSincePreviousLayout=" + this.mDeletedInvisibleItemCountSincePreviousLayout + ", mStructureChanged=" + this.mStructureChanged + ", mInPreLayout=" + this.mInPreLayout + ", mRunSimpleAnimations=" + this.mRunSimpleAnimations + ", mRunPredictiveAnimations=" + this.mRunPredictiveAnimations + '}';
         }
     }
 
@@ -3431,20 +3069,18 @@ Caused by: java.lang.NullPointerException
             }
             disableRunOnAnimationRequests();
             RecyclerView.this.consumePendingUpdateOperations();
-            OverScroller scroller = r0.mScroller;
+            OverScroller scroller = this.mScroller;
             SmoothScroller smoothScroller = RecyclerView.this.mLayout.mSmoothScroller;
             if (scroller.computeScrollOffset()) {
                 int hresult;
-                boolean fullyConsumedAny;
                 int[] scrollConsumed = RecyclerView.this.mScrollConsumed;
                 int x = scroller.getCurrX();
                 int y = scroller.getCurrY();
-                int dx = x - r0.mLastFlingX;
-                int dy = y - r0.mLastFlingY;
-                int hresult2 = 0;
+                int dx = x - this.mLastFlingX;
+                int dy = y - this.mLastFlingY;
                 int vresult = 0;
-                r0.mLastFlingX = x;
-                r0.mLastFlingY = y;
+                this.mLastFlingX = x;
+                this.mLastFlingY = y;
                 int overscrollX = 0;
                 int overscrollY = 0;
                 if (RecyclerView.this.dispatchNestedPreScroll(dx, dy, scrollConsumed, null, 1)) {
@@ -3459,111 +3095,81 @@ Caused by: java.lang.NullPointerException
                     if (dx != 0) {
                         hresult = RecyclerView.this.mLayout.scrollHorizontallyBy(dx, RecyclerView.this.mRecycler, RecyclerView.this.mState);
                         overscrollX = dx - hresult;
-                        hresult2 = hresult;
+                    } else {
+                        hresult = 0;
                     }
                     if (dy != 0) {
-                        hresult = RecyclerView.this.mLayout.scrollVerticallyBy(dy, RecyclerView.this.mRecycler, RecyclerView.this.mState);
-                        overscrollY = dy - hresult;
-                        vresult = hresult;
+                        vresult = RecyclerView.this.mLayout.scrollVerticallyBy(dy, RecyclerView.this.mRecycler, RecyclerView.this.mState);
+                        overscrollY = dy - vresult;
                     }
                     TraceCompat.endSection();
                     RecyclerView.this.repositionShadowingViews();
                     RecyclerView.this.onExitLayoutOrScroll();
                     RecyclerView.this.stopInterceptRequestLayout(false);
                     if (!(smoothScroller == null || smoothScroller.isPendingInitialRun() || !smoothScroller.isRunning())) {
-                        hresult = RecyclerView.this.mState.getItemCount();
-                        if (hresult == 0) {
+                        int adapterSize = RecyclerView.this.mState.getItemCount();
+                        if (adapterSize == 0) {
                             smoothScroller.stop();
-                        } else if (smoothScroller.getTargetPosition() >= hresult) {
-                            smoothScroller.setTargetPosition(hresult - 1);
+                        } else if (smoothScroller.getTargetPosition() >= adapterSize) {
+                            smoothScroller.setTargetPosition(adapterSize - 1);
                             smoothScroller.onAnimation(dx - overscrollX, dy - overscrollY);
                         } else {
                             smoothScroller.onAnimation(dx - overscrollX, dy - overscrollY);
                         }
                     }
+                } else {
+                    hresult = 0;
                 }
-                hresult = vresult;
-                int overscrollX2 = overscrollX;
-                int overscrollY2 = overscrollY;
                 if (!RecyclerView.this.mItemDecorations.isEmpty()) {
                     RecyclerView.this.invalidate();
                 }
                 if (RecyclerView.this.getOverScrollMode() != 2) {
                     RecyclerView.this.considerReleasingGlowsOnScroll(dx, dy);
                 }
-                if (RecyclerView.this.dispatchNestedScroll(hresult2, hresult, overscrollX2, overscrollY2, null, 1)) {
-                } else {
-                    int i;
-                    int i2;
-                    if (overscrollX2 == 0) {
-                        if (overscrollY2 == 0) {
-                            int[] iArr = scrollConsumed;
-                        }
-                    }
+                if (!(RecyclerView.this.dispatchNestedScroll(hresult, vresult, overscrollX, overscrollY, null, 1) || (overscrollX == 0 && overscrollY == 0))) {
                     int vel = (int) scroller.getCurrVelocity();
-                    if (overscrollX2 != x) {
-                        i = overscrollX2 < 0 ? -vel : overscrollX2 > 0 ? vel : 0;
-                    } else {
-                        i = 0;
+                    int velX = 0;
+                    if (overscrollX != x) {
+                        velX = overscrollX < 0 ? -vel : overscrollX > 0 ? vel : 0;
                     }
-                    if (overscrollY2 != y) {
-                        i2 = overscrollY2 < 0 ? -vel : overscrollY2 > 0 ? vel : 0;
-                    } else {
-                        i2 = 0;
+                    int velY = 0;
+                    if (overscrollY != y) {
+                        velY = overscrollY < 0 ? -vel : overscrollY > 0 ? vel : 0;
                     }
                     if (RecyclerView.this.getOverScrollMode() != 2) {
-                        RecyclerView.this.absorbGlows(i, i2);
+                        RecyclerView.this.absorbGlows(velX, velY);
                     }
-                    if ((i != 0 || overscrollX2 == x || scroller.getFinalX() == 0) && (i2 != 0 || overscrollY2 == y || scroller.getFinalY() == 0)) {
+                    if ((velX != 0 || overscrollX == x || scroller.getFinalX() == 0) && (velY != 0 || overscrollY == y || scroller.getFinalY() == 0)) {
                         scroller.abortAnimation();
                     }
                 }
-                if (!(hresult2 == 0 && hresult == 0)) {
-                    RecyclerView.this.dispatchOnScrolled(hresult2, hresult);
+                if (!(hresult == 0 && vresult == 0)) {
+                    RecyclerView.this.dispatchOnScrolled(hresult, vresult);
                 }
                 if (!RecyclerView.this.awakenScrollBars()) {
                     RecyclerView.this.invalidate();
                 }
-                boolean fullyConsumedVertical = dy != 0 && RecyclerView.this.mLayout.canScrollVertically() && hresult == dy;
-                boolean fullyConsumedHorizontal = dx != 0 && RecyclerView.this.mLayout.canScrollHorizontally() && hresult2 == dx;
-                if (!((dx == 0 && dy == 0) || fullyConsumedHorizontal)) {
-                    if (!fullyConsumedVertical) {
-                        fullyConsumedAny = false;
-                        if (!scroller.isFinished()) {
-                            if (!fullyConsumedAny || RecyclerView.this.hasNestedScrollingParent(1)) {
-                                postOnAnimation();
-                                if (RecyclerView.this.mGapWorker != null) {
-                                    RecyclerView.this.mGapWorker.postFromTraversal(RecyclerView.this, dx, dy);
-                                }
-                            }
-                        }
-                        RecyclerView.this.setScrollState(0);
-                        if (RecyclerView.ALLOW_THREAD_GAP_WORK) {
-                            RecyclerView.this.mPrefetchRegistry.clearPrefetchPositions();
-                        }
-                        RecyclerView.this.stopNestedScroll(1);
+                boolean fullyConsumedVertical = dy != 0 && RecyclerView.this.mLayout.canScrollVertically() && vresult == dy;
+                boolean fullyConsumedHorizontal = dx != 0 && RecyclerView.this.mLayout.canScrollHorizontally() && hresult == dx;
+                boolean fullyConsumedAny = (dx == 0 && dy == 0) || fullyConsumedHorizontal || fullyConsumedVertical;
+                if (scroller.isFinished() || !(fullyConsumedAny || RecyclerView.this.hasNestedScrollingParent(1))) {
+                    RecyclerView.this.setScrollState(0);
+                    if (RecyclerView.ALLOW_THREAD_GAP_WORK) {
+                        RecyclerView.this.mPrefetchRegistry.clearPrefetchPositions();
                     }
-                }
-                fullyConsumedAny = true;
-                if (scroller.isFinished()) {
-                    if (fullyConsumedAny) {
-                    }
+                    RecyclerView.this.stopNestedScroll(1);
+                } else {
                     postOnAnimation();
                     if (RecyclerView.this.mGapWorker != null) {
                         RecyclerView.this.mGapWorker.postFromTraversal(RecyclerView.this, dx, dy);
                     }
                 }
-                RecyclerView.this.setScrollState(0);
-                if (RecyclerView.ALLOW_THREAD_GAP_WORK) {
-                    RecyclerView.this.mPrefetchRegistry.clearPrefetchPositions();
-                }
-                RecyclerView.this.stopNestedScroll(1);
             }
             if (smoothScroller != null) {
                 if (smoothScroller.isPendingInitialRun()) {
                     smoothScroller.onAnimation(0, 0);
                 }
-                if (!r0.mReSchedulePostAnimationCallback) {
+                if (!this.mReSchedulePostAnimationCallback) {
                     smoothScroller.stop();
                 }
             }
@@ -3613,7 +3219,6 @@ Caused by: java.lang.NullPointerException
 
         private int computeScrollDuration(int dx, int dy, int vx, int vy) {
             int duration;
-            ViewFlinger viewFlinger = this;
             int absDx = Math.abs(dx);
             int absDy = Math.abs(dy);
             boolean horizontal = absDx > absDy;
@@ -3621,11 +3226,14 @@ Caused by: java.lang.NullPointerException
             int delta = (int) Math.sqrt((double) ((dx * dx) + (dy * dy)));
             int containerSize = horizontal ? RecyclerView.this.getWidth() : RecyclerView.this.getHeight();
             int halfContainerSize = containerSize / 2;
-            float distance = ((float) halfContainerSize) + (((float) halfContainerSize) * distanceInfluenceForSnapDuration(Math.min(1.0f, (((float) delta) * 1.0f) / ((float) containerSize))));
+            float distance = ((float) halfContainerSize) + (((float) halfContainerSize) * distanceInfluenceForSnapDuration(Math.min(1.0f, (1.0f * ((float) delta)) / ((float) containerSize))));
             if (velocity > 0) {
                 duration = Math.round(1000.0f * Math.abs(distance / ((float) velocity))) * 4;
             } else {
-                duration = (int) (((((float) (horizontal ? absDx : absDy)) / ((float) containerSize)) + 1.0f) * 300.0f);
+                if (!horizontal) {
+                    absDx = absDy;
+                }
+                duration = (int) (((((float) absDx) / ((float) containerSize)) + 1.0f) * 300.0f);
             }
             return Math.min(duration, 2000);
         }
@@ -3635,7 +3243,11 @@ Caused by: java.lang.NullPointerException
         }
 
         public void smoothScrollBy(int dx, int dy, Interpolator interpolator) {
-            smoothScrollBy(dx, dy, computeScrollDuration(dx, dy, 0, 0), interpolator == null ? RecyclerView.sQuinticInterpolator : interpolator);
+            int computeScrollDuration = computeScrollDuration(dx, dy, 0, 0);
+            if (interpolator == null) {
+                interpolator = RecyclerView.sQuinticInterpolator;
+            }
+            smoothScrollBy(dx, dy, computeScrollDuration, interpolator);
         }
 
         public void smoothScrollBy(int dx, int dy, int duration, Interpolator interpolator) {
@@ -3821,12 +3433,7 @@ Caused by: java.lang.NullPointerException
         }
 
         boolean isAdapterPositionUnknown() {
-            if ((this.mFlags & 512) == 0) {
-                if (!isInvalid()) {
-                    return false;
-                }
-            }
-            return true;
+            return (this.mFlags & 512) != 0 || isInvalid();
         }
 
         void setFlags(int flags, int mask) {
@@ -3840,7 +3447,7 @@ Caused by: java.lang.NullPointerException
         void addChangePayload(Object payload) {
             if (payload == null) {
                 addFlags(1024);
-            } else if ((1024 & this.mFlags) == 0) {
+            } else if ((this.mFlags & 1024) == 0) {
                 createPayloadsIfNeeded();
                 this.mPayloads.add(payload);
             }
@@ -3864,12 +3471,10 @@ Caused by: java.lang.NullPointerException
             if ((this.mFlags & 1024) != 0) {
                 return FULLUPDATE_PAYLOADS;
             }
-            if (this.mPayloads != null) {
-                if (this.mPayloads.size() != 0) {
-                    return this.mUnmodifiedPayloads;
-                }
+            if (this.mPayloads == null || this.mPayloads.size() == 0) {
+                return FULLUPDATE_PAYLOADS;
             }
-            return FULLUPDATE_PAYLOADS;
+            return this.mUnmodifiedPayloads;
         }
 
         void resetInternal() {
@@ -3902,21 +3507,9 @@ Caused by: java.lang.NullPointerException
         }
 
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("ViewHolder{");
-            stringBuilder.append(Integer.toHexString(hashCode()));
-            stringBuilder.append(" position=");
-            stringBuilder.append(this.mPosition);
-            stringBuilder.append(" id=");
-            stringBuilder.append(this.mItemId);
-            stringBuilder.append(", oldPos=");
-            stringBuilder.append(this.mOldPosition);
-            stringBuilder.append(", pLpos:");
-            stringBuilder.append(this.mPreLayoutPosition);
-            StringBuilder sb = new StringBuilder(stringBuilder.toString());
+            StringBuilder sb = new StringBuilder("ViewHolder{" + Integer.toHexString(hashCode()) + " position=" + this.mPosition + " id=" + this.mItemId + ", oldPos=" + this.mOldPosition + ", pLpos:" + this.mPreLayoutPosition);
             if (isScrap()) {
-                sb.append(" scrap ");
-                sb.append(this.mInChangeScrap ? "[changeScrap]" : "[attachedScrap]");
+                sb.append(" scrap ").append(this.mInChangeScrap ? "[changeScrap]" : "[attachedScrap]");
             }
             if (isInvalid()) {
                 sb.append(" invalid");
@@ -3937,11 +3530,7 @@ Caused by: java.lang.NullPointerException
                 sb.append(" tmpDetached");
             }
             if (!isRecyclable()) {
-                stringBuilder = new StringBuilder();
-                stringBuilder.append(" not recyclable(");
-                stringBuilder.append(this.mIsRecyclableCount);
-                stringBuilder.append(")");
-                sb.append(stringBuilder.toString());
+                sb.append(" not recyclable(" + this.mIsRecyclableCount + ")");
             }
             if (isAdapterPositionUnknown()) {
                 sb.append(" undefined adapter position");
@@ -3957,10 +3546,7 @@ Caused by: java.lang.NullPointerException
             this.mIsRecyclableCount = recyclable ? this.mIsRecyclableCount - 1 : this.mIsRecyclableCount + 1;
             if (this.mIsRecyclableCount < 0) {
                 this.mIsRecyclableCount = 0;
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("isRecyclable decremented below 0: unmatched pair of setIsRecyable() calls for ");
-                stringBuilder.append(this);
-                Log.e("View", stringBuilder.toString());
+                Log.e("View", "isRecyclable decremented below 0: unmatched pair of setIsRecyable() calls for " + this);
             } else if (!recyclable && this.mIsRecyclableCount == 1) {
                 this.mFlags |= 16;
             } else if (recyclable && this.mIsRecyclableCount == 0) {
@@ -4069,14 +3655,11 @@ Caused by: java.lang.NullPointerException
         Parcelable mLayoutState;
 
         SavedState(Parcel in, ClassLoader loader) {
-            ClassLoader classLoader;
             super(in, loader);
-            if (loader != null) {
-                classLoader = loader;
-            } else {
-                classLoader = LayoutManager.class.getClassLoader();
+            if (loader == null) {
+                loader = LayoutManager.class.getClassLoader();
             }
-            this.mLayoutState = in.readParcelable(classLoader);
+            this.mLayoutState = in.readParcelable(loader);
         }
 
         SavedState(Parcelable superState) {
@@ -4105,224 +3688,39 @@ Caused by: java.lang.NullPointerException
         }
     }
 
-    private void createLayoutManager(android.content.Context r1, java.lang.String r2, android.util.AttributeSet r3, int r4, int r5) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.RecyclerView.createLayoutManager(android.content.Context, java.lang.String, android.util.AttributeSet, int, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        if (r11 == 0) goto L_0x0124;
-    L_0x0002:
-        r11 = r11.trim();
-        r0 = r11.isEmpty();
-        if (r0 != 0) goto L_0x0124;
-    L_0x000c:
-        r11 = r9.getFullClassName(r10, r11);
-        r0 = r9.isInEditMode();	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        if (r0 == 0) goto L_0x001f;	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-    L_0x0016:
-        r0 = r9.getClass();	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r0 = r0.getClassLoader();	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        goto L_0x0023;	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-    L_0x001f:
-        r0 = r10.getClassLoader();	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r1 = r0.loadClass(r11);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r2 = org.telegram.messenger.support.widget.RecyclerView.LayoutManager.class;	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r1 = r1.asSubclass(r2);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r2 = 0;
-        r3 = 1;
-        r4 = 0;
-        r5 = LAYOUT_MANAGER_CONSTRUCTOR_SIGNATURE;	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r5 = r1.getConstructor(r5);	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r6 = 4;	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r6 = new java.lang.Object[r6];	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r6[r4] = r10;	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r6[r3] = r12;	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r7 = 2;	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r8 = java.lang.Integer.valueOf(r13);	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r6[r7] = r8;	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r7 = 3;	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r8 = java.lang.Integer.valueOf(r14);	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r6[r7] = r8;	 Catch:{ NoSuchMethodException -> 0x0050 }
-        r2 = r6;
-        r4 = r5;
-        goto L_0x0058;
-    L_0x0050:
-        r5 = move-exception;
-        r4 = new java.lang.Class[r4];	 Catch:{ NoSuchMethodException -> 0x0067 }
-        r4 = r1.getConstructor(r4);	 Catch:{ NoSuchMethodException -> 0x0067 }
-        r4.setAccessible(r3);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r3 = r4.newInstance(r2);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r3 = (org.telegram.messenger.support.widget.RecyclerView.LayoutManager) r3;	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r9.setLayoutManager(r3);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        goto L_0x0124;	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-    L_0x0067:
-        r3 = move-exception;	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r3.initCause(r5);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r4 = new java.lang.IllegalStateException;	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r6 = new java.lang.StringBuilder;	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r6.<init>();	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r7 = r12.getPositionDescription();	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r6.append(r7);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r7 = ": Error creating LayoutManager ";	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r6.append(r7);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r6.append(r11);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r6 = r6.toString();	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        r4.<init>(r6, r3);	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-        throw r4;	 Catch:{ ClassNotFoundException -> 0x0105, InvocationTargetException -> 0x00e6, InstantiationException -> 0x00c7, IllegalAccessException -> 0x00a8, ClassCastException -> 0x0089 }
-    L_0x0089:
-        r0 = move-exception;
-        r1 = new java.lang.IllegalStateException;
-        r2 = new java.lang.StringBuilder;
-        r2.<init>();
-        r3 = r12.getPositionDescription();
-        r2.append(r3);
-        r3 = ": Class is not a LayoutManager ";
-        r2.append(r3);
-        r2.append(r11);
-        r2 = r2.toString();
-        r1.<init>(r2, r0);
-        throw r1;
-    L_0x00a8:
-        r0 = move-exception;
-        r1 = new java.lang.IllegalStateException;
-        r2 = new java.lang.StringBuilder;
-        r2.<init>();
-        r3 = r12.getPositionDescription();
-        r2.append(r3);
-        r3 = ": Cannot access non-public constructor ";
-        r2.append(r3);
-        r2.append(r11);
-        r2 = r2.toString();
-        r1.<init>(r2, r0);
-        throw r1;
-    L_0x00c7:
-        r0 = move-exception;
-        r1 = new java.lang.IllegalStateException;
-        r2 = new java.lang.StringBuilder;
-        r2.<init>();
-        r3 = r12.getPositionDescription();
-        r2.append(r3);
-        r3 = ": Could not instantiate the LayoutManager: ";
-        r2.append(r3);
-        r2.append(r11);
-        r2 = r2.toString();
-        r1.<init>(r2, r0);
-        throw r1;
-    L_0x00e6:
-        r0 = move-exception;
-        r1 = new java.lang.IllegalStateException;
-        r2 = new java.lang.StringBuilder;
-        r2.<init>();
-        r3 = r12.getPositionDescription();
-        r2.append(r3);
-        r3 = ": Could not instantiate the LayoutManager: ";
-        r2.append(r3);
-        r2.append(r11);
-        r2 = r2.toString();
-        r1.<init>(r2, r0);
-        throw r1;
-    L_0x0105:
-        r0 = move-exception;
-        r1 = new java.lang.IllegalStateException;
-        r2 = new java.lang.StringBuilder;
-        r2.<init>();
-        r3 = r12.getPositionDescription();
-        r2.append(r3);
-        r3 = ": Unable to find LayoutManager ";
-        r2.append(r3);
-        r2.append(r11);
-        r2 = r2.toString();
-        r1.<init>(r2, r0);
-        throw r1;
-    L_0x0124:
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.RecyclerView.createLayoutManager(android.content.Context, java.lang.String, android.util.AttributeSet, int, int):void");
-    }
-
-    void repositionShadowingViews() {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.support.widget.RecyclerView.repositionShadowingViews():void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r9.mChildHelper;
-        r0 = r0.getChildCount();
-        r1 = 0;
-        if (r1 >= r0) goto L_0x0042;
-    L_0x0009:
-        r2 = r9.mChildHelper;
-        r2 = r2.getChildAt(r1);
-        r3 = r9.getChildViewHolder(r2);
-        if (r3 == 0) goto L_0x003f;
-    L_0x0015:
-        r4 = r3.mShadowingHolder;
-        if (r4 == 0) goto L_0x003f;
-    L_0x0019:
-        r4 = r3.mShadowingHolder;
-        r4 = r4.itemView;
-        r5 = r2.getLeft();
-        r6 = r2.getTop();
-        r7 = r4.getLeft();
-        if (r5 != r7) goto L_0x0031;
-    L_0x002b:
-        r7 = r4.getTop();
-        if (r6 == r7) goto L_0x003f;
-        r7 = r4.getWidth();
-        r7 = r7 + r5;
-        r8 = r4.getHeight();
-        r8 = r8 + r6;
-        r4.layout(r5, r6, r7, r8);
-    L_0x003f:
-        r1 = r1 + 1;
-        goto L_0x0007;
-    L_0x0042:
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.RecyclerView.repositionShadowingViews():void");
-    }
-
     static {
-        boolean z;
-        if (!(VERSION.SDK_INT == 18 || VERSION.SDK_INT == 19)) {
-            if (VERSION.SDK_INT != 20) {
-                z = false;
-                FORCE_INVALIDATE_DISPLAY_LIST = z;
-            }
-        }
-        z = true;
+        boolean z = VERSION.SDK_INT == 18 || VERSION.SDK_INT == 19 || VERSION.SDK_INT == 20;
         FORCE_INVALIDATE_DISPLAY_LIST = z;
-        if (VERSION.SDK_INT < 23) {
+        if (VERSION.SDK_INT >= 23) {
+            z = true;
+        } else {
+            z = false;
         }
-        if (VERSION.SDK_INT < 16) {
+        ALLOW_SIZE_IN_UNSPECIFIED_SPEC = z;
+        if (VERSION.SDK_INT >= 16) {
+            z = true;
+        } else {
+            z = false;
         }
-        if (VERSION.SDK_INT < 21) {
+        POST_UPDATES_ON_ANIMATION = z;
+        if (VERSION.SDK_INT >= 21) {
+            z = true;
+        } else {
+            z = false;
         }
-        if (VERSION.SDK_INT > 15) {
+        ALLOW_THREAD_GAP_WORK = z;
+        if (VERSION.SDK_INT <= 15) {
+            z = true;
+        } else {
+            z = false;
         }
-        if (VERSION.SDK_INT > 15) {
+        FORCE_ABS_FOCUS_SEARCH_DIRECTION = z;
+        if (VERSION.SDK_INT <= 15) {
+            z = true;
+        } else {
+            z = false;
         }
+        IGNORE_DETACHED_FOCUSED_CHILD = z;
     }
 
     public void setTopGlowOffset(int offset) {
@@ -4342,12 +3740,10 @@ Caused by: java.lang.NullPointerException
     }
 
     public View getAttachedScrapChildAt(int index) {
-        if (index >= 0) {
-            if (index < this.mRecycler.mAttachedScrap.size()) {
-                return this.mRecycler.getScrapViewAt(index);
-            }
+        if (index < 0 || index >= this.mRecycler.mAttachedScrap.size()) {
+            return null;
         }
-        return null;
+        return this.mRecycler.getScrapViewAt(index);
     }
 
     public int getCachedChildCount() {
@@ -4355,12 +3751,10 @@ Caused by: java.lang.NullPointerException
     }
 
     public View getCachedChildAt(int index) {
-        if (index >= 0) {
-            if (index < this.mRecycler.mCachedViews.size()) {
-                return ((ViewHolder) this.mRecycler.mCachedViews.get(index)).itemView;
-            }
+        if (index < 0 || index >= this.mRecycler.mCachedViews.size()) {
+            return null;
         }
-        return null;
+        return ((ViewHolder) this.mRecycler.mCachedViews.get(index)).itemView;
     }
 
     public int getHiddenChildCount() {
@@ -4386,21 +3780,20 @@ Caused by: java.lang.NullPointerException
     }
 
     public RecyclerView(Context context, AttributeSet attrs, int defStyle) {
+        boolean z;
         super(context, attrs, defStyle);
         this.mObserver = new RecyclerViewDataObserver();
         this.mRecycler = new Recycler();
         this.mViewInfoStore = new ViewInfoStore();
         this.mUpdateChildViewsRunnable = new Runnable() {
             public void run() {
-                if (RecyclerView.this.mFirstLayoutComplete) {
-                    if (!RecyclerView.this.isLayoutRequested()) {
-                        if (!RecyclerView.this.mIsAttached) {
-                            RecyclerView.this.requestLayout();
-                        } else if (RecyclerView.this.mLayoutFrozen) {
-                            RecyclerView.this.mLayoutWasDefered = true;
-                        } else {
-                            RecyclerView.this.consumePendingUpdateOperations();
-                        }
+                if (RecyclerView.this.mFirstLayoutComplete && !RecyclerView.this.isLayoutRequested()) {
+                    if (!RecyclerView.this.mIsAttached) {
+                        RecyclerView.this.requestLayout();
+                    } else if (RecyclerView.this.mLayoutFrozen) {
+                        RecyclerView.this.mLayoutWasDefered = true;
+                    } else {
+                        RecyclerView.this.consumePendingUpdateOperations();
                     }
                 }
             }
@@ -4410,7 +3803,6 @@ Caused by: java.lang.NullPointerException
         this.mTempRectF = new RectF();
         this.mItemDecorations = new ArrayList();
         this.mOnItemTouchListeners = new ArrayList();
-        boolean z = false;
         this.mInterceptRequestLayoutDepth = 0;
         this.mDataSetHasChangedAfterLayout = false;
         this.mDispatchItemsChangedEvent = false;
@@ -4488,6 +3880,8 @@ Caused by: java.lang.NullPointerException
         this.mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
         if (getOverScrollMode() == 2) {
             z = true;
+        } else {
+            z = false;
         }
         setWillNotDraw(z);
         this.mItemAnimator.setListener(this.mItemAnimatorListener);
@@ -4503,16 +3897,7 @@ Caused by: java.lang.NullPointerException
     }
 
     String exceptionLabel() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(" ");
-        stringBuilder.append(super.toString());
-        stringBuilder.append(", adapter:");
-        stringBuilder.append(this.mAdapter);
-        stringBuilder.append(", layout:");
-        stringBuilder.append(this.mLayout);
-        stringBuilder.append(", context:");
-        stringBuilder.append(getContext());
-        return stringBuilder.toString();
+        return " " + super.toString() + ", adapter:" + this.mAdapter + ", layout:" + this.mLayout + ", context:" + getContext();
     }
 
     public RecyclerViewAccessibilityDelegate getCompatAccessibilityDelegate() {
@@ -4524,22 +3909,52 @@ Caused by: java.lang.NullPointerException
         ViewCompat.setAccessibilityDelegate(this, this.mAccessibilityDelegate);
     }
 
-    private String getFullClassName(Context context, String className) {
-        StringBuilder stringBuilder;
-        if (className.charAt(0) == '.') {
-            stringBuilder = new StringBuilder();
-            stringBuilder.append(context.getPackageName());
-            stringBuilder.append(className);
-            return stringBuilder.toString();
-        } else if (className.contains(".")) {
-            return className;
-        } else {
-            stringBuilder = new StringBuilder();
-            stringBuilder.append(RecyclerView.class.getPackage().getName());
-            stringBuilder.append('.');
-            stringBuilder.append(className);
-            return stringBuilder.toString();
+    private void createLayoutManager(Context context, String className, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        if (className != null) {
+            className = className.trim();
+            if (!className.isEmpty()) {
+                className = getFullClassName(context, className);
+                try {
+                    ClassLoader classLoader;
+                    Constructor<? extends LayoutManager> constructor;
+                    if (isInEditMode()) {
+                        classLoader = getClass().getClassLoader();
+                    } else {
+                        classLoader = context.getClassLoader();
+                    }
+                    Class<? extends LayoutManager> layoutManagerClass = classLoader.loadClass(className).asSubclass(LayoutManager.class);
+                    Object[] constructorArgs = null;
+                    try {
+                        constructor = layoutManagerClass.getConstructor(LAYOUT_MANAGER_CONSTRUCTOR_SIGNATURE);
+                        constructorArgs = new Object[]{context, attrs, Integer.valueOf(defStyleAttr), Integer.valueOf(defStyleRes)};
+                    } catch (NoSuchMethodException e) {
+                        constructor = layoutManagerClass.getConstructor(new Class[0]);
+                    }
+                    constructor.setAccessible(true);
+                    setLayoutManager((LayoutManager) constructor.newInstance(constructorArgs));
+                } catch (NoSuchMethodException e1) {
+                    e1.initCause(e);
+                    throw new IllegalStateException(attrs.getPositionDescription() + ": Error creating LayoutManager " + className, e1);
+                } catch (ClassNotFoundException e2) {
+                    throw new IllegalStateException(attrs.getPositionDescription() + ": Unable to find LayoutManager " + className, e2);
+                } catch (InvocationTargetException e3) {
+                    throw new IllegalStateException(attrs.getPositionDescription() + ": Could not instantiate the LayoutManager: " + className, e3);
+                } catch (InstantiationException e4) {
+                    throw new IllegalStateException(attrs.getPositionDescription() + ": Could not instantiate the LayoutManager: " + className, e4);
+                } catch (IllegalAccessException e5) {
+                    throw new IllegalStateException(attrs.getPositionDescription() + ": Cannot access non-public constructor " + className, e5);
+                } catch (ClassCastException e6) {
+                    throw new IllegalStateException(attrs.getPositionDescription() + ": Class is not a LayoutManager " + className, e6);
+                }
+            }
         }
+    }
+
+    private String getFullClassName(Context context, String className) {
+        if (className.charAt(0) == '.') {
+            return context.getPackageName() + className;
+        }
+        return !className.contains(".") ? RecyclerView.class.getPackage().getName() + '.' + className : className;
     }
 
     private void initChildrenHelper() {
@@ -4590,11 +4005,7 @@ Caused by: java.lang.NullPointerException
                     if (vh.isTmpDetached() || vh.shouldIgnore()) {
                         vh.clearTmpDetachFlag();
                     } else {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append("Called attach on a child which is not detached: ");
-                        stringBuilder.append(vh);
-                        stringBuilder.append(RecyclerView.this.exceptionLabel());
-                        throw new IllegalArgumentException(stringBuilder.toString());
+                        throw new IllegalArgumentException("Called attach on a child which is not detached: " + vh + RecyclerView.this.exceptionLabel());
                     }
                 }
                 RecyclerView.this.attachViewToParent(child, index, layoutParams);
@@ -4608,11 +4019,7 @@ Caused by: java.lang.NullPointerException
                         if (!vh.isTmpDetached() || vh.shouldIgnore()) {
                             vh.addFlags(256);
                         } else {
-                            StringBuilder stringBuilder = new StringBuilder();
-                            stringBuilder.append("called detach on an already detached child ");
-                            stringBuilder.append(vh);
-                            stringBuilder.append(RecyclerView.this.exceptionLabel());
-                            throw new IllegalArgumentException(stringBuilder.toString());
+                            throw new IllegalArgumentException("called detach on an already detached child " + vh + RecyclerView.this.exceptionLabel());
                         }
                     }
                 }
@@ -4639,7 +4046,10 @@ Caused by: java.lang.NullPointerException
         this.mAdapterHelper = new AdapterHelper(new Callback() {
             public ViewHolder findViewHolder(int position) {
                 ViewHolder vh = RecyclerView.this.findViewHolderForPosition(position, true);
-                if (vh == null || RecyclerView.this.mChildHelper.isHidden(vh.itemView)) {
+                if (vh == null) {
+                    return null;
+                }
+                if (RecyclerView.this.mChildHelper.isHidden(vh.itemView)) {
                     return null;
                 }
                 return vh;
@@ -4667,22 +4077,21 @@ Caused by: java.lang.NullPointerException
             }
 
             void dispatchUpdate(UpdateOp op) {
-                int i = op.cmd;
-                if (i == 4) {
-                    RecyclerView.this.mLayout.onItemsUpdated(RecyclerView.this, op.positionStart, op.itemCount, op.payload);
-                } else if (i != 8) {
-                    switch (i) {
-                        case 1:
-                            RecyclerView.this.mLayout.onItemsAdded(RecyclerView.this, op.positionStart, op.itemCount);
-                            return;
-                        case 2:
-                            RecyclerView.this.mLayout.onItemsRemoved(RecyclerView.this, op.positionStart, op.itemCount);
-                            return;
-                        default:
-                            return;
-                    }
-                } else {
-                    RecyclerView.this.mLayout.onItemsMoved(RecyclerView.this, op.positionStart, op.itemCount, 1);
+                switch (op.cmd) {
+                    case 1:
+                        RecyclerView.this.mLayout.onItemsAdded(RecyclerView.this, op.positionStart, op.itemCount);
+                        return;
+                    case 2:
+                        RecyclerView.this.mLayout.onItemsRemoved(RecyclerView.this, op.positionStart, op.itemCount);
+                        return;
+                    case 4:
+                        RecyclerView.this.mLayout.onItemsUpdated(RecyclerView.this, op.positionStart, op.itemCount, op.payload);
+                        return;
+                    case 8:
+                        RecyclerView.this.mLayout.onItemsMoved(RecyclerView.this, op.positionStart, op.itemCount, 1);
+                        return;
+                    default:
+                        return;
                 }
             }
 
@@ -4734,12 +4143,7 @@ Caused by: java.lang.NullPointerException
                 this.mTouchSlop = vc.getScaledPagingTouchSlop();
                 return;
             default:
-                String str = TAG;
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("setScrollingTouchSlop(): bad argument constant ");
-                stringBuilder.append(slopConstant);
-                stringBuilder.append("; using default value");
-                Log.w(str, stringBuilder.toString());
+                Log.w(TAG, "setScrollingTouchSlop(): bad argument constant " + slopConstant + "; using default value");
                 break;
         }
         this.mTouchSlop = vc.getScaledTouchSlop();
@@ -4848,12 +4252,7 @@ Caused by: java.lang.NullPointerException
             this.mLayout = layout;
             if (layout != null) {
                 if (layout.mRecyclerView != null) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("LayoutManager ");
-                    stringBuilder.append(layout);
-                    stringBuilder.append(" is already attached to a RecyclerView:");
-                    stringBuilder.append(layout.mRecyclerView.exceptionLabel());
-                    throw new IllegalArgumentException(stringBuilder.toString());
+                    throw new IllegalArgumentException("LayoutManager " + layout + " is already attached to a RecyclerView:" + layout.mRecyclerView.exceptionLabel());
                 }
                 this.mLayout.setRecyclerView(this);
                 if (this.mIsAttached) {
@@ -4889,8 +4288,9 @@ Caused by: java.lang.NullPointerException
         if (state instanceof SavedState) {
             this.mPendingSavedState = (SavedState) state;
             super.onRestoreInstanceState(this.mPendingSavedState.getSuperState());
-            if (!(this.mLayout == null || this.mPendingSavedState.mLayoutState == null)) {
+            if (this.mLayout != null && this.mPendingSavedState.mLayoutState != null) {
                 this.mLayout.onRestoreInstanceState(this.mPendingSavedState.mLayoutState);
+                return;
             }
             return;
         }
@@ -4926,7 +4326,7 @@ Caused by: java.lang.NullPointerException
             this.mRecycler.unscrapView(viewHolder);
             this.mRecycler.recycleViewHolderInternal(viewHolder);
         }
-        stopInterceptRequestLayout(removed ^ 1);
+        stopInterceptRequestLayout(!removed);
         return removed;
     }
 
@@ -4986,16 +4386,10 @@ Caused by: java.lang.NullPointerException
 
     public ItemDecoration getItemDecorationAt(int index) {
         int size = getItemDecorationCount();
-        if (index >= 0) {
-            if (index < size) {
-                return (ItemDecoration) this.mItemDecorations.get(index);
-            }
+        if (index >= 0 && index < size) {
+            return (ItemDecoration) this.mItemDecorations.get(index);
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(index);
-        stringBuilder.append(" is an invalid index for size ");
-        stringBuilder.append(size);
-        throw new IndexOutOfBoundsException(stringBuilder.toString());
+        throw new IndexOutOfBoundsException(index + " is an invalid index for size " + size);
     }
 
     public int getItemDecorationCount() {
@@ -5004,17 +4398,10 @@ Caused by: java.lang.NullPointerException
 
     public void removeItemDecorationAt(int index) {
         int size = getItemDecorationCount();
-        if (index >= 0) {
-            if (index < size) {
-                removeItemDecoration(getItemDecorationAt(index));
-                return;
-            }
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException(index + " is an invalid index for size " + size);
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(index);
-        stringBuilder.append(" is an invalid index for size ");
-        stringBuilder.append(size);
-        throw new IndexOutOfBoundsException(stringBuilder.toString());
+        removeItemDecoration(getItemDecorationAt(index));
     }
 
     public void removeItemDecoration(ItemDecoration decor) {
@@ -5100,69 +4487,59 @@ Caused by: java.lang.NullPointerException
             boolean canScrollHorizontal = this.mLayout.canScrollHorizontally();
             boolean canScrollVertical = this.mLayout.canScrollVertically();
             if (canScrollHorizontal || canScrollVertical) {
-                int i = 0;
-                int i2 = canScrollHorizontal ? x : 0;
-                if (canScrollVertical) {
-                    i = y;
+                if (!canScrollHorizontal) {
+                    x = 0;
                 }
-                scrollByInternal(i2, i, null);
+                if (!canScrollVertical) {
+                    y = 0;
+                }
+                scrollByInternal(x, y, null);
             }
         }
     }
 
     void consumePendingUpdateOperations() {
-        if (this.mFirstLayoutComplete) {
-            if (!this.mDataSetHasChangedAfterLayout) {
-                if (this.mAdapterHelper.hasPendingUpdates()) {
-                    if (this.mAdapterHelper.hasAnyUpdateTypes(4) && !this.mAdapterHelper.hasAnyUpdateTypes(11)) {
-                        TraceCompat.beginSection(TRACE_HANDLE_ADAPTER_UPDATES_TAG);
-                        startInterceptRequestLayout();
-                        onEnterLayoutOrScroll();
-                        this.mAdapterHelper.preProcess();
-                        if (!this.mLayoutWasDefered) {
-                            if (hasUpdatedView()) {
-                                dispatchLayout();
-                            } else {
-                                this.mAdapterHelper.consumePostponedUpdates();
-                            }
-                        }
-                        stopInterceptRequestLayout(true);
-                        onExitLayoutOrScroll();
-                        TraceCompat.endSection();
-                    } else if (this.mAdapterHelper.hasPendingUpdates()) {
-                        TraceCompat.beginSection(TRACE_ON_DATA_SET_CHANGE_LAYOUT_TAG);
+        if (!this.mFirstLayoutComplete || this.mDataSetHasChangedAfterLayout) {
+            TraceCompat.beginSection(TRACE_ON_DATA_SET_CHANGE_LAYOUT_TAG);
+            dispatchLayout();
+            TraceCompat.endSection();
+        } else if (!this.mAdapterHelper.hasPendingUpdates()) {
+        } else {
+            if (this.mAdapterHelper.hasAnyUpdateTypes(4) && !this.mAdapterHelper.hasAnyUpdateTypes(11)) {
+                TraceCompat.beginSection(TRACE_HANDLE_ADAPTER_UPDATES_TAG);
+                startInterceptRequestLayout();
+                onEnterLayoutOrScroll();
+                this.mAdapterHelper.preProcess();
+                if (!this.mLayoutWasDefered) {
+                    if (hasUpdatedView()) {
                         dispatchLayout();
-                        TraceCompat.endSection();
+                    } else {
+                        this.mAdapterHelper.consumePostponedUpdates();
                     }
-                    return;
                 }
-                return;
+                stopInterceptRequestLayout(true);
+                onExitLayoutOrScroll();
+                TraceCompat.endSection();
+            } else if (this.mAdapterHelper.hasPendingUpdates()) {
+                TraceCompat.beginSection(TRACE_ON_DATA_SET_CHANGE_LAYOUT_TAG);
+                dispatchLayout();
+                TraceCompat.endSection();
             }
         }
-        TraceCompat.beginSection(TRACE_ON_DATA_SET_CHANGE_LAYOUT_TAG);
-        dispatchLayout();
-        TraceCompat.endSection();
     }
 
     private boolean hasUpdatedView() {
         int childCount = this.mChildHelper.getChildCount();
         for (int i = 0; i < childCount; i++) {
             ViewHolder holder = getChildViewHolderInt(this.mChildHelper.getChildAt(i));
-            if (holder != null) {
-                if (!holder.shouldIgnore()) {
-                    if (holder.isUpdated()) {
-                        return true;
-                    }
-                }
+            if (holder != null && !holder.shouldIgnore() && holder.isUpdated()) {
+                return true;
             }
         }
         return false;
     }
 
     boolean scrollByInternal(int x, int y, MotionEvent ev) {
-        int i = x;
-        int i2 = y;
-        MotionEvent motionEvent = ev;
         int unconsumedX = 0;
         int unconsumedY = 0;
         int consumedX = 0;
@@ -5172,121 +4549,91 @@ Caused by: java.lang.NullPointerException
             startInterceptRequestLayout();
             onEnterLayoutOrScroll();
             TraceCompat.beginSection(TRACE_SCROLL_TAG);
-            fillRemainingScrollValues(r7.mState);
-            if (i != 0) {
-                consumedX = r7.mLayout.scrollHorizontallyBy(i, r7.mRecycler, r7.mState);
-                unconsumedX = i - consumedX;
+            fillRemainingScrollValues(this.mState);
+            if (x != 0) {
+                consumedX = this.mLayout.scrollHorizontallyBy(x, this.mRecycler, this.mState);
+                unconsumedX = x - consumedX;
             }
-            if (i2 != 0) {
-                consumedY = r7.mLayout.scrollVerticallyBy(i2, r7.mRecycler, r7.mState);
-                unconsumedY = i2 - consumedY;
+            if (y != 0) {
+                consumedY = this.mLayout.scrollVerticallyBy(y, this.mRecycler, this.mState);
+                unconsumedY = y - consumedY;
             }
             TraceCompat.endSection();
             repositionShadowingViews();
             onExitLayoutOrScroll();
             stopInterceptRequestLayout(false);
         }
-        int unconsumedX2 = unconsumedX;
-        int unconsumedY2 = unconsumedY;
-        int consumedX2 = consumedX;
-        int consumedY2 = consumedY;
-        if (!r7.mItemDecorations.isEmpty()) {
+        if (!this.mItemDecorations.isEmpty()) {
             invalidate();
         }
-        if (dispatchNestedScroll(consumedX2, consumedY2, unconsumedX2, unconsumedY2, r7.mScrollOffset, 0)) {
-            r7.mLastTouchX -= r7.mScrollOffset[0];
-            r7.mLastTouchY -= r7.mScrollOffset[1];
-            if (motionEvent != null) {
-                motionEvent.offsetLocation((float) r7.mScrollOffset[0], (float) r7.mScrollOffset[1]);
+        if (dispatchNestedScroll(consumedX, consumedY, unconsumedX, unconsumedY, this.mScrollOffset, 0)) {
+            this.mLastTouchX -= this.mScrollOffset[0];
+            this.mLastTouchY -= this.mScrollOffset[1];
+            if (ev != null) {
+                ev.offsetLocation((float) this.mScrollOffset[0], (float) this.mScrollOffset[1]);
             }
-            int[] iArr = r7.mNestedOffsets;
-            iArr[0] = iArr[0] + r7.mScrollOffset[0];
-            iArr = r7.mNestedOffsets;
-            iArr[1] = iArr[1] + r7.mScrollOffset[1];
+            int[] iArr = this.mNestedOffsets;
+            iArr[0] = iArr[0] + this.mScrollOffset[0];
+            iArr = this.mNestedOffsets;
+            iArr[1] = iArr[1] + this.mScrollOffset[1];
         } else if (getOverScrollMode() != 2) {
-            if (!(motionEvent == null || MotionEventCompat.isFromSource(motionEvent, 8194))) {
-                pullGlows(ev.getX(), (float) unconsumedX2, ev.getY(), (float) unconsumedY2);
+            if (!(ev == null || MotionEventCompat.isFromSource(ev, 8194))) {
+                pullGlows(ev.getX(), (float) unconsumedX, ev.getY(), (float) unconsumedY);
             }
             considerReleasingGlowsOnScroll(x, y);
         }
-        if (!(consumedX2 == 0 && consumedY2 == 0)) {
-            dispatchOnScrolled(consumedX2, consumedY2);
+        if (!(consumedX == 0 && consumedY == 0)) {
+            dispatchOnScrolled(consumedX, consumedY);
         }
         if (!awakenScrollBars()) {
             invalidate();
         }
-        if (consumedX2 == 0) {
-            if (consumedY2 == 0) {
-                return false;
-            }
+        if (consumedX == 0 && consumedY == 0) {
+            return false;
         }
         return true;
     }
 
     public int computeHorizontalScrollOffset() {
-        int i = 0;
-        if (this.mLayout == null) {
-            return 0;
+        if (this.mLayout != null && this.mLayout.canScrollHorizontally()) {
+            return this.mLayout.computeHorizontalScrollOffset(this.mState);
         }
-        if (this.mLayout.canScrollHorizontally()) {
-            i = this.mLayout.computeHorizontalScrollOffset(this.mState);
-        }
-        return i;
+        return 0;
     }
 
     public int computeHorizontalScrollExtent() {
-        int i = 0;
-        if (this.mLayout == null) {
-            return 0;
+        if (this.mLayout != null && this.mLayout.canScrollHorizontally()) {
+            return this.mLayout.computeHorizontalScrollExtent(this.mState);
         }
-        if (this.mLayout.canScrollHorizontally()) {
-            i = this.mLayout.computeHorizontalScrollExtent(this.mState);
-        }
-        return i;
+        return 0;
     }
 
     public int computeHorizontalScrollRange() {
-        int i = 0;
-        if (this.mLayout == null) {
-            return 0;
+        if (this.mLayout != null && this.mLayout.canScrollHorizontally()) {
+            return this.mLayout.computeHorizontalScrollRange(this.mState);
         }
-        if (this.mLayout.canScrollHorizontally()) {
-            i = this.mLayout.computeHorizontalScrollRange(this.mState);
-        }
-        return i;
+        return 0;
     }
 
     public int computeVerticalScrollOffset() {
-        int i = 0;
-        if (this.mLayout == null) {
-            return 0;
+        if (this.mLayout != null && this.mLayout.canScrollVertically()) {
+            return this.mLayout.computeVerticalScrollOffset(this.mState);
         }
-        if (this.mLayout.canScrollVertically()) {
-            i = this.mLayout.computeVerticalScrollOffset(this.mState);
-        }
-        return i;
+        return 0;
     }
 
     public int computeVerticalScrollExtent() {
-        int i = 0;
-        if (this.mLayout == null) {
-            return 0;
+        if (this.mLayout != null && this.mLayout.canScrollVertically()) {
+            return this.mLayout.computeVerticalScrollExtent(this.mState);
         }
-        if (this.mLayout.canScrollVertically()) {
-            i = this.mLayout.computeVerticalScrollExtent(this.mState);
-        }
-        return i;
+        return 0;
     }
 
     public int computeVerticalScrollRange() {
-        int i = 0;
-        if (this.mLayout == null) {
-            return 0;
+        if (this.mLayout != null && this.mLayout.canScrollVertically()) {
+            return this.mLayout.computeVerticalScrollRange(this.mState);
         }
-        if (this.mLayout.canScrollVertically()) {
-            i = this.mLayout.computeVerticalScrollRange(this.mState);
-        }
-        return i;
+        return 0;
     }
 
     void startInterceptRequestLayout() {
@@ -5351,7 +4698,7 @@ Caused by: java.lang.NullPointerException
             if (!this.mLayout.canScrollVertically()) {
                 dy = 0;
             }
-            if (!(dx == 0 && dy == 0)) {
+            if (dx != 0 || dy != 0) {
                 this.mViewFlinger.smoothScrollBy(dx, dy, interpolator);
             }
         }
@@ -5372,48 +4719,32 @@ Caused by: java.lang.NullPointerException
             if (!canScrollVertical || Math.abs(velocityY) < this.mMinFlingVelocity) {
                 velocityY = 0;
             }
-            if (!((velocityX == 0 && velocityY == 0) || dispatchNestedPreFling((float) velocityX, (float) velocityY))) {
-                boolean canScroll;
-                int nestedScrollAxis;
-                if (!canScrollHorizontal) {
-                    if (!canScrollVertical) {
-                        canScroll = false;
-                        dispatchNestedFling((float) velocityX, (float) velocityY, canScroll);
-                        if (this.mOnFlingListener == null && this.mOnFlingListener.onFling(velocityX, velocityY)) {
-                            return true;
-                        }
-                        if (canScroll) {
-                            nestedScrollAxis = 0;
-                            if (canScrollHorizontal) {
-                                nestedScrollAxis = 0 | 1;
-                            }
-                            if (canScrollVertical) {
-                                nestedScrollAxis |= 2;
-                            }
-                            startNestedScroll(nestedScrollAxis, 1);
-                            this.mViewFlinger.fling(Math.max(-this.mMaxFlingVelocity, Math.min(velocityX, this.mMaxFlingVelocity)), Math.max(-this.mMaxFlingVelocity, Math.min(velocityY, this.mMaxFlingVelocity)));
-                            return true;
-                        }
-                    }
-                }
-                canScroll = true;
-                dispatchNestedFling((float) velocityX, (float) velocityY, canScroll);
-                if (this.mOnFlingListener == null) {
-                }
-                if (canScroll) {
-                    nestedScrollAxis = 0;
-                    if (canScrollHorizontal) {
-                        nestedScrollAxis = 0 | 1;
-                    }
-                    if (canScrollVertical) {
-                        nestedScrollAxis |= 2;
-                    }
-                    startNestedScroll(nestedScrollAxis, 1);
-                    this.mViewFlinger.fling(Math.max(-this.mMaxFlingVelocity, Math.min(velocityX, this.mMaxFlingVelocity)), Math.max(-this.mMaxFlingVelocity, Math.min(velocityY, this.mMaxFlingVelocity)));
-                    return true;
-                }
+            if ((velocityX == 0 && velocityY == 0) || dispatchNestedPreFling((float) velocityX, (float) velocityY)) {
+                return false;
             }
-            return false;
+            boolean canScroll;
+            if (canScrollHorizontal || canScrollVertical) {
+                canScroll = true;
+            } else {
+                canScroll = false;
+            }
+            dispatchNestedFling((float) velocityX, (float) velocityY, canScroll);
+            if (this.mOnFlingListener != null && this.mOnFlingListener.onFling(velocityX, velocityY)) {
+                return true;
+            }
+            if (!canScroll) {
+                return false;
+            }
+            int nestedScrollAxis = 0;
+            if (canScrollHorizontal) {
+                nestedScrollAxis = 0 | 1;
+            }
+            if (canScrollVertical) {
+                nestedScrollAxis |= 2;
+            }
+            startNestedScroll(nestedScrollAxis, 1);
+            this.mViewFlinger.fling(Math.max(-this.mMaxFlingVelocity, Math.min(velocityX, this.mMaxFlingVelocity)), Math.max(-this.mMaxFlingVelocity, Math.min(velocityY, this.mMaxFlingVelocity)));
+            return true;
         }
     }
 
@@ -5597,31 +4928,30 @@ Caused by: java.lang.NullPointerException
         if (result != null) {
             return result;
         }
-        boolean z = true;
+        View view;
         boolean canRunFocusFailure = (this.mAdapter == null || this.mLayout == null || isComputingLayout() || this.mLayoutFrozen) ? false : true;
         FocusFinder ff = FocusFinder.getInstance();
         if (canRunFocusFailure && (direction == 2 || direction == 1)) {
+            int absDir;
             boolean needsFocusFailureLayout = false;
             if (this.mLayout.canScrollVertically()) {
-                int absDir = direction == 2 ? TsExtractor.TS_STREAM_TYPE_HDMV_DTS : 33;
+                absDir = direction == 2 ? TsExtractor.TS_STREAM_TYPE_HDMV_DTS : 33;
                 needsFocusFailureLayout = ff.findNextFocus(this, focused, absDir) == null;
                 if (FORCE_ABS_FOCUS_SEARCH_DIRECTION) {
                     direction = absDir;
                 }
             }
             if (!needsFocusFailureLayout && this.mLayout.canScrollHorizontally()) {
-                int absDir2 = ((direction == 2 ? 1 : 0) ^ (this.mLayout.getLayoutDirection() == 1)) != 0 ? 66 : 17;
-                if (ff.findNextFocus(this, focused, absDir2) != null) {
-                    z = false;
-                }
-                needsFocusFailureLayout = z;
+                absDir = ((direction == 2 ? 1 : 0) ^ (this.mLayout.getLayoutDirection() == 1)) != 0 ? 66 : 17;
+                needsFocusFailureLayout = ff.findNextFocus(this, focused, absDir) == null;
                 if (FORCE_ABS_FOCUS_SEARCH_DIRECTION) {
-                    direction = absDir2;
+                    direction = absDir;
                 }
             }
             if (needsFocusFailureLayout) {
                 consumePendingUpdateOperations();
                 if (findContainingItemView(focused) == null) {
+                    view = result;
                     return null;
                 }
                 startInterceptRequestLayout();
@@ -5634,6 +4964,7 @@ Caused by: java.lang.NullPointerException
             if (result == null && canRunFocusFailure) {
                 consumePendingUpdateOperations();
                 if (findContainingItemView(focused) == null) {
+                    view = result;
                     return null;
                 }
                 startInterceptRequestLayout();
@@ -5642,97 +4973,91 @@ Caused by: java.lang.NullPointerException
             }
         }
         if (result == null || result.hasFocusable()) {
-            View view;
+            View view2;
             if (isPreferredNextFocus(focused, result, direction)) {
-                view = result;
+                view2 = result;
             } else {
-                view = super.focusSearch(focused, direction);
+                view2 = super.focusSearch(focused, direction);
             }
-            return view;
+            view = result;
+            return view2;
         } else if (getFocusedChild() == null) {
+            view = result;
             return super.focusSearch(focused, direction);
         } else {
             requestChildOnScreen(result, null);
+            view = result;
             return focused;
         }
     }
 
     private boolean isPreferredNextFocus(View focused, View next, int direction) {
         boolean z = false;
-        if (next != null) {
-            if (next != this) {
-                if (findContainingItemView(next) == null) {
+        if (next == null || next == this) {
+            return false;
+        }
+        if (findContainingItemView(next) == null) {
+            return false;
+        }
+        if (focused == null || findContainingItemView(focused) == null) {
+            return true;
+        }
+        this.mTempRect.set(0, 0, focused.getWidth(), focused.getHeight());
+        this.mTempRect2.set(0, 0, next.getWidth(), next.getHeight());
+        offsetDescendantRectToMyCoords(focused, this.mTempRect);
+        offsetDescendantRectToMyCoords(next, this.mTempRect2);
+        int rtl;
+        if (this.mLayout.getLayoutDirection() == 1) {
+            rtl = -1;
+        } else {
+            rtl = 1;
+        }
+        int rightness = 0;
+        if ((this.mTempRect.left < this.mTempRect2.left || this.mTempRect.right <= this.mTempRect2.left) && this.mTempRect.right < this.mTempRect2.right) {
+            rightness = 1;
+        } else if ((this.mTempRect.right > this.mTempRect2.right || this.mTempRect.left >= this.mTempRect2.right) && this.mTempRect.left > this.mTempRect2.left) {
+            rightness = -1;
+        }
+        int downness = 0;
+        if ((this.mTempRect.top < this.mTempRect2.top || this.mTempRect.bottom <= this.mTempRect2.top) && this.mTempRect.bottom < this.mTempRect2.bottom) {
+            downness = 1;
+        } else if ((this.mTempRect.bottom > this.mTempRect2.bottom || this.mTempRect.top >= this.mTempRect2.bottom) && this.mTempRect.top > this.mTempRect2.top) {
+            downness = -1;
+        }
+        switch (direction) {
+            case 1:
+                if (downness < 0 || (downness == 0 && rightness * rtl <= 0)) {
+                    z = true;
+                }
+                return z;
+            case 2:
+                if (downness > 0 || (downness == 0 && rightness * rtl >= 0)) {
+                    z = true;
+                }
+                return z;
+            case 17:
+                if (rightness >= 0) {
                     return false;
                 }
-                if (focused == null || findContainingItemView(focused) == null) {
-                    return true;
+                return true;
+            case 33:
+                if (downness >= 0) {
+                    return false;
                 }
-                this.mTempRect.set(0, 0, focused.getWidth(), focused.getHeight());
-                this.mTempRect2.set(0, 0, next.getWidth(), next.getHeight());
-                offsetDescendantRectToMyCoords(focused, this.mTempRect);
-                offsetDescendantRectToMyCoords(next, this.mTempRect2);
-                int rtl = this.mLayout.getLayoutDirection() == 1 ? -1 : 1;
-                int rightness = 0;
-                if ((this.mTempRect.left < this.mTempRect2.left || this.mTempRect.right <= this.mTempRect2.left) && this.mTempRect.right < this.mTempRect2.right) {
-                    rightness = 1;
-                } else if ((this.mTempRect.right > this.mTempRect2.right || this.mTempRect.left >= this.mTempRect2.right) && this.mTempRect.left > this.mTempRect2.left) {
-                    rightness = -1;
+                return true;
+            case 66:
+                if (rightness <= 0) {
+                    return false;
                 }
-                int downness = 0;
-                if ((this.mTempRect.top < this.mTempRect2.top || this.mTempRect.bottom <= this.mTempRect2.top) && this.mTempRect.bottom < this.mTempRect2.bottom) {
-                    downness = 1;
-                } else if ((this.mTempRect.bottom > this.mTempRect2.bottom || this.mTempRect.top >= this.mTempRect2.bottom) && this.mTempRect.top > this.mTempRect2.top) {
-                    downness = -1;
+                return true;
+            case TsExtractor.TS_STREAM_TYPE_HDMV_DTS /*130*/:
+                if (downness <= 0) {
+                    return false;
                 }
-                if (direction == 17) {
-                    if (rightness < 0) {
-                        z = true;
-                    }
-                    return z;
-                } else if (direction == 33) {
-                    if (downness < 0) {
-                        z = true;
-                    }
-                    return z;
-                } else if (direction == 66) {
-                    if (rightness > 0) {
-                        z = true;
-                    }
-                    return z;
-                } else if (direction != TsExtractor.TS_STREAM_TYPE_HDMV_DTS) {
-                    switch (direction) {
-                        case 1:
-                            if (downness >= 0) {
-                                if (downness != 0 || rightness * rtl > 0) {
-                                    return z;
-                                }
-                            }
-                            z = true;
-                            return z;
-                        case 2:
-                            if (downness <= 0) {
-                                if (downness != 0 || rightness * rtl < 0) {
-                                    return z;
-                                }
-                            }
-                            z = true;
-                            return z;
-                        default:
-                            StringBuilder stringBuilder = new StringBuilder();
-                            stringBuilder.append("Invalid direction: ");
-                            stringBuilder.append(direction);
-                            stringBuilder.append(exceptionLabel());
-                            throw new IllegalArgumentException(stringBuilder.toString());
-                    }
-                } else {
-                    if (downness > 0) {
-                        z = true;
-                    }
-                    return z;
-                }
-            }
+                return true;
+            default:
+                throw new IllegalArgumentException("Invalid direction: " + direction + exceptionLabel());
         }
-        return false;
     }
 
     public void requestChildFocus(View child, View focused) {
@@ -5743,7 +5068,14 @@ Caused by: java.lang.NullPointerException
     }
 
     private void requestChildOnScreen(View child, View focused) {
-        View rectView = focused != null ? focused : child;
+        View rectView;
+        boolean z;
+        boolean z2 = true;
+        if (focused != null) {
+            rectView = focused;
+        } else {
+            rectView = child;
+        }
         this.mTempRect.set(0, 0, rectView.getWidth(), rectView.getHeight());
         android.view.ViewGroup.LayoutParams focusedLayoutParams = rectView.getLayoutParams();
         if (focusedLayoutParams instanceof LayoutParams) {
@@ -5764,7 +5096,17 @@ Caused by: java.lang.NullPointerException
             offsetDescendantRectToMyCoords(focused, this.mTempRect);
             offsetRectIntoDescendantCoords(child, this.mTempRect);
         }
-        this.mLayout.requestChildRectangleOnScreen(this, child, this.mTempRect, this.mFirstLayoutComplete ^ 1, focused == null);
+        LayoutManager layoutManager = this.mLayout;
+        Rect rect2 = this.mTempRect;
+        if (this.mFirstLayoutComplete) {
+            z = false;
+        } else {
+            z = true;
+        }
+        if (focused != null) {
+            z2 = false;
+        }
+        layoutManager.requestChildRectangleOnScreen(this, child, rect2, z, z2);
     }
 
     public boolean requestChildRectangleOnScreen(View child, Rect rect, boolean immediate) {
@@ -5785,9 +5127,9 @@ Caused by: java.lang.NullPointerException
     }
 
     protected void onAttachedToWindow() {
+        boolean z = true;
         super.onAttachedToWindow();
         this.mLayoutOrScrollCounter = 0;
-        boolean z = true;
         this.mIsAttached = true;
         if (!this.mFirstLayoutComplete || isLayoutRequested()) {
             z = false;
@@ -5841,34 +5183,21 @@ Caused by: java.lang.NullPointerException
 
     void assertInLayoutOrScroll(String message) {
         if (!isComputingLayout()) {
-            StringBuilder stringBuilder;
             if (message == null) {
-                stringBuilder = new StringBuilder();
-                stringBuilder.append("Cannot call this method unless RecyclerView is computing a layout or scrolling");
-                stringBuilder.append(exceptionLabel());
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException("Cannot call this method unless RecyclerView is computing a layout or scrolling" + exceptionLabel());
             }
-            stringBuilder = new StringBuilder();
-            stringBuilder.append(message);
-            stringBuilder.append(exceptionLabel());
-            throw new IllegalStateException(stringBuilder.toString());
+            throw new IllegalStateException(message + exceptionLabel());
         }
     }
 
     void assertNotInLayoutOrScroll(String message) {
         if (isComputingLayout()) {
             if (message == null) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Cannot call this method while RecyclerView is computing a layout or scrolling");
-                stringBuilder.append(exceptionLabel());
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException("Cannot call this method while RecyclerView is computing a layout or scrolling" + exceptionLabel());
             }
             throw new IllegalStateException(message);
         } else if (this.mDispatchScrollCounter > 0) {
-            StringBuilder stringBuilder2 = new StringBuilder();
-            stringBuilder2.append(TtmlNode.ANONYMOUS_REGION_ID);
-            stringBuilder2.append(exceptionLabel());
-            Log.w(TAG, "Cannot call this method in a scroll callback. Scroll callbacks mightbe run during a measure & layout pass where you cannot change theRecyclerView data. Any method call that might change the structureof the RecyclerView or the adapter contents should be postponed tothe next frame.", new IllegalStateException(stringBuilder2.toString()));
+            Log.w(TAG, "Cannot call this method in a scroll callback. Scroll callbacks mightbe run during a measure & layout pass where you cannot change theRecyclerView data. Any method call that might change the structureof the RecyclerView or the adapter contents should be postponed tothe next frame.", new IllegalStateException(TtmlNode.ANONYMOUS_REGION_ID + exceptionLabel()));
         }
     }
 
@@ -5909,9 +5238,10 @@ Caused by: java.lang.NullPointerException
                 this.mActiveOnItemTouchListener = null;
             } else {
                 this.mActiveOnItemTouchListener.onTouchEvent(this, e);
-                if (action == 3 || action == 1) {
-                    this.mActiveOnItemTouchListener = null;
+                if (action != 3 && action != 1) {
+                    return true;
                 }
+                this.mActiveOnItemTouchListener = null;
                 return true;
             }
         }
@@ -5929,7 +5259,6 @@ Caused by: java.lang.NullPointerException
     }
 
     public boolean onInterceptTouchEvent(MotionEvent e) {
-        boolean z = false;
         if (this.mLayoutFrozen) {
             return false;
         }
@@ -5948,7 +5277,6 @@ Caused by: java.lang.NullPointerException
             int action = e.getActionMasked();
             int actionIndex = e.getActionIndex();
             int x;
-            int y;
             switch (action) {
                 case 0:
                     if (this.mIgnoreMotionEventTillDown) {
@@ -5958,9 +5286,9 @@ Caused by: java.lang.NullPointerException
                     x = (int) (e.getX() + 0.5f);
                     this.mLastTouchX = x;
                     this.mInitialTouchX = x;
-                    y = (int) (e.getY() + 0.5f);
-                    this.mLastTouchY = y;
-                    this.mInitialTouchY = y;
+                    x = (int) (e.getY() + 0.5f);
+                    this.mLastTouchY = x;
+                    this.mInitialTouchY = x;
                     if (this.mScrollState == 2) {
                         getParent().requestDisallowInterceptTouchEvent(true);
                         setScrollState(1);
@@ -5968,24 +5296,24 @@ Caused by: java.lang.NullPointerException
                     int[] iArr = this.mNestedOffsets;
                     this.mNestedOffsets[1] = 0;
                     iArr[0] = 0;
-                    y = 0;
+                    int nestedScrollAxis = 0;
                     if (canScrollHorizontally) {
-                        y = 0 | 1;
+                        nestedScrollAxis = 0 | 1;
                     }
                     if (canScrollVertically) {
-                        y |= 2;
+                        nestedScrollAxis |= 2;
                     }
-                    startNestedScroll(y, 0);
+                    startNestedScroll(nestedScrollAxis, 0);
                     break;
                 case 1:
                     this.mVelocityTracker.clear();
                     stopNestedScroll(0);
                     break;
                 case 2:
-                    x = e.findPointerIndex(this.mScrollPointerId);
-                    if (x >= 0) {
-                        int x2 = (int) (e.getX(x) + 1056964608);
-                        y = (int) (e.getY(x) + 0.5f);
+                    int index = e.findPointerIndex(this.mScrollPointerId);
+                    if (index >= 0) {
+                        int x2 = (int) (e.getX(index) + 0.5f);
+                        int y = (int) (e.getY(index) + 0.5f);
                         if (this.mScrollState != 1) {
                             int dx = x2 - this.mInitialTouchX;
                             int dy = y - this.mInitialTouchY;
@@ -6000,17 +5328,13 @@ Caused by: java.lang.NullPointerException
                             }
                             if (startScroll) {
                                 setScrollState(1);
+                                break;
                             }
                         }
-                        break;
                     }
-                    String str = TAG;
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("Error processing scroll; pointer index for id ");
-                    stringBuilder.append(this.mScrollPointerId);
-                    stringBuilder.append(" not found. Did any MotionEvents get skipped?");
-                    Log.e(str, stringBuilder.toString());
+                    Log.e(TAG, "Error processing scroll; pointer index for id " + this.mScrollPointerId + " not found. Did any MotionEvents get skipped?");
                     return false;
+                    break;
                 case 3:
                     cancelTouch();
                     break;
@@ -6019,20 +5343,18 @@ Caused by: java.lang.NullPointerException
                     x = (int) (e.getX(actionIndex) + 0.5f);
                     this.mLastTouchX = x;
                     this.mInitialTouchX = x;
-                    y = (int) (e.getY(actionIndex) + 0.5f);
-                    this.mLastTouchY = y;
-                    this.mInitialTouchY = y;
+                    x = (int) (e.getY(actionIndex) + 0.5f);
+                    this.mLastTouchY = x;
+                    this.mInitialTouchY = x;
                     break;
                 case 6:
                     onPointerUp(e);
                     break;
-                default:
-                    break;
             }
             if (this.mScrollState == 1) {
-                z = true;
+                return true;
             }
-            return z;
+            return false;
         }
     }
 
@@ -6044,156 +5366,423 @@ Caused by: java.lang.NullPointerException
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
 
-    public boolean onTouchEvent(MotionEvent e) {
-        MotionEvent motionEvent = e;
-        int i = 0;
-        if (!this.mLayoutFrozen) {
-            if (!r6.mIgnoreMotionEventTillDown) {
-                if (dispatchOnItemTouch(e)) {
-                    cancelTouch();
-                    return true;
-                } else if (r6.mLayout == null) {
-                    return false;
-                } else {
-                    int[] iArr;
-                    boolean canScrollHorizontally = r6.mLayout.canScrollHorizontally();
-                    boolean canScrollVertically = r6.mLayout.canScrollVertically();
-                    if (r6.mVelocityTracker == null) {
-                        r6.mVelocityTracker = VelocityTracker.obtain();
-                    }
-                    boolean eventAddedToVelocityTracker = false;
-                    MotionEvent vtev = MotionEvent.obtain(e);
-                    int action = e.getActionMasked();
-                    int actionIndex = e.getActionIndex();
-                    if (action == 0) {
-                        iArr = r6.mNestedOffsets;
-                        r6.mNestedOffsets[1] = 0;
-                        iArr[0] = 0;
-                    }
-                    vtev.offsetLocation((float) r6.mNestedOffsets[0], (float) r6.mNestedOffsets[1]);
-                    int x;
-                    int y;
-                    switch (action) {
-                        case 0:
-                            r6.mScrollPointerId = motionEvent.getPointerId(0);
-                            x = (int) (e.getX() + 0.5f);
-                            r6.mLastTouchX = x;
-                            r6.mInitialTouchX = x;
-                            y = (int) (e.getY() + 0.5f);
-                            r6.mLastTouchY = y;
-                            r6.mInitialTouchY = y;
-                            y = 0;
-                            if (canScrollHorizontally) {
-                                y = 0 | 1;
-                            }
-                            if (canScrollVertically) {
-                                y |= 2;
-                            }
-                            startNestedScroll(y, 0);
-                            break;
-                        case 1:
-                            r6.mVelocityTracker.addMovement(vtev);
-                            eventAddedToVelocityTracker = true;
-                            r6.mVelocityTracker.computeCurrentVelocity(1000, (float) r6.mMaxFlingVelocity);
-                            float xvel = canScrollHorizontally ? -r6.mVelocityTracker.getXVelocity(r6.mScrollPointerId) : 0.0f;
-                            float yvel = canScrollVertically ? -r6.mVelocityTracker.getYVelocity(r6.mScrollPointerId) : 0.0f;
-                            if ((xvel == 0.0f && yvel == 0.0f) || !fling((int) xvel, (int) yvel)) {
-                                setScrollState(0);
-                            }
-                            resetTouch();
-                            break;
-                        case 2:
-                            int index = motionEvent.findPointerIndex(r6.mScrollPointerId);
-                            if (index >= 0) {
-                                int x2 = (int) (motionEvent.getX(index) + 0.5f);
-                                int y2 = (int) (motionEvent.getY(index) + 0.5f);
-                                int dx = r6.mLastTouchX - x2;
-                                int dy = r6.mLastTouchY - y2;
-                                int y3 = y2;
-                                int x3 = x2;
-                                if (dispatchNestedPreScroll(dx, dy, r6.mScrollConsumed, r6.mScrollOffset, 0)) {
-                                    dx -= r6.mScrollConsumed[0];
-                                    dy -= r6.mScrollConsumed[1];
-                                    vtev.offsetLocation((float) r6.mScrollOffset[0], (float) r6.mScrollOffset[1]);
-                                    iArr = r6.mNestedOffsets;
-                                    iArr[0] = iArr[0] + r6.mScrollOffset[0];
-                                    iArr = r6.mNestedOffsets;
-                                    iArr[1] = iArr[1] + r6.mScrollOffset[1];
-                                }
-                                y = dx;
-                                x = dy;
-                                if (r6.mScrollState != 1) {
-                                    boolean startScroll = false;
-                                    if (canScrollHorizontally && Math.abs(y) > r6.mTouchSlop) {
-                                        if (y > 0) {
-                                            y -= r6.mTouchSlop;
-                                        } else {
-                                            y += r6.mTouchSlop;
-                                        }
-                                        startScroll = true;
-                                    }
-                                    if (canScrollVertically && Math.abs(x) > r6.mTouchSlop) {
-                                        if (x > 0) {
-                                            x -= r6.mTouchSlop;
-                                        } else {
-                                            x += r6.mTouchSlop;
-                                        }
-                                        startScroll = true;
-                                    }
-                                    if (startScroll) {
-                                        setScrollState(1);
-                                    }
-                                }
-                                if (r6.mScrollState == 1) {
-                                    r6.mLastTouchX = x3 - r6.mScrollOffset[0];
-                                    r6.mLastTouchY = y3 - r6.mScrollOffset[1];
-                                    int i2 = canScrollHorizontally ? y : 0;
-                                    if (canScrollVertically) {
-                                        i = x;
-                                    }
-                                    if (scrollByInternal(i2, i, vtev)) {
-                                        getParent().requestDisallowInterceptTouchEvent(true);
-                                    }
-                                    if (!(r6.mGapWorker == null || (y == 0 && x == 0))) {
-                                        r6.mGapWorker.postFromTraversal(r6, y, x);
-                                    }
-                                }
-                                break;
-                            }
-                            String str = TAG;
-                            StringBuilder stringBuilder = new StringBuilder();
-                            stringBuilder.append("Error processing scroll; pointer index for id ");
-                            stringBuilder.append(r6.mScrollPointerId);
-                            stringBuilder.append(" not found. Did any MotionEvents get skipped?");
-                            Log.e(str, stringBuilder.toString());
-                            return false;
-                        case 3:
-                            cancelTouch();
-                            break;
-                        case 5:
-                            r6.mScrollPointerId = motionEvent.getPointerId(actionIndex);
-                            x = (int) (motionEvent.getX(actionIndex) + 0.5f);
-                            r6.mLastTouchX = x;
-                            r6.mInitialTouchX = x;
-                            y = (int) (motionEvent.getY(actionIndex) + 0.5f);
-                            r6.mLastTouchY = y;
-                            r6.mInitialTouchY = y;
-                            break;
-                        case 6:
-                            onPointerUp(e);
-                            break;
-                        default:
-                            break;
-                    }
-                    if (!eventAddedToVelocityTracker) {
-                        r6.mVelocityTracker.addMovement(vtev);
-                    }
-                    vtev.recycle();
-                    return true;
-                }
-            }
-        }
-        return false;
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public boolean onTouchEvent(android.view.MotionEvent r22) {
+        /*
+        r21 = this;
+        r0 = r21;
+        r1 = r0.mLayoutFrozen;
+        if (r1 != 0) goto L_0x000c;
+    L_0x0006:
+        r0 = r21;
+        r1 = r0.mIgnoreMotionEventTillDown;
+        if (r1 == 0) goto L_0x000e;
+    L_0x000c:
+        r1 = 0;
+    L_0x000d:
+        return r1;
+    L_0x000e:
+        r1 = r21.dispatchOnItemTouch(r22);
+        if (r1 == 0) goto L_0x0019;
+    L_0x0014:
+        r21.cancelTouch();
+        r1 = 1;
+        goto L_0x000d;
+    L_0x0019:
+        r0 = r21;
+        r1 = r0.mLayout;
+        if (r1 != 0) goto L_0x0021;
+    L_0x001f:
+        r1 = 0;
+        goto L_0x000d;
+    L_0x0021:
+        r0 = r21;
+        r1 = r0.mLayout;
+        r9 = r1.canScrollHorizontally();
+        r0 = r21;
+        r1 = r0.mLayout;
+        r10 = r1.canScrollVertically();
+        r0 = r21;
+        r1 = r0.mVelocityTracker;
+        if (r1 != 0) goto L_0x003f;
+    L_0x0037:
+        r1 = android.view.VelocityTracker.obtain();
+        r0 = r21;
+        r0.mVelocityTracker = r1;
+    L_0x003f:
+        r11 = 0;
+        r15 = android.view.MotionEvent.obtain(r22);
+        r7 = r22.getActionMasked();
+        r8 = r22.getActionIndex();
+        if (r7 != 0) goto L_0x005e;
+    L_0x004e:
+        r0 = r21;
+        r1 = r0.mNestedOffsets;
+        r4 = 0;
+        r0 = r21;
+        r5 = r0.mNestedOffsets;
+        r6 = 1;
+        r20 = 0;
+        r5[r6] = r20;
+        r1[r4] = r20;
+    L_0x005e:
+        r0 = r21;
+        r1 = r0.mNestedOffsets;
+        r4 = 0;
+        r1 = r1[r4];
+        r1 = (float) r1;
+        r0 = r21;
+        r4 = r0.mNestedOffsets;
+        r5 = 1;
+        r4 = r4[r5];
+        r4 = (float) r4;
+        r15.offsetLocation(r1, r4);
+        switch(r7) {
+            case 0: goto L_0x0082;
+            case 1: goto L_0x0236;
+            case 2: goto L_0x00ec;
+            case 3: goto L_0x0297;
+            case 4: goto L_0x0074;
+            case 5: goto L_0x00bd;
+            case 6: goto L_0x0231;
+            default: goto L_0x0074;
+        };
+    L_0x0074:
+        if (r11 != 0) goto L_0x007d;
+    L_0x0076:
+        r0 = r21;
+        r1 = r0.mVelocityTracker;
+        r1.addMovement(r15);
+    L_0x007d:
+        r15.recycle();
+        r1 = 1;
+        goto L_0x000d;
+    L_0x0082:
+        r1 = 0;
+        r0 = r22;
+        r1 = r0.getPointerId(r1);
+        r0 = r21;
+        r0.mScrollPointerId = r1;
+        r1 = r22.getX();
+        r4 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
+        r1 = r1 + r4;
+        r1 = (int) r1;
+        r0 = r21;
+        r0.mLastTouchX = r1;
+        r0 = r21;
+        r0.mInitialTouchX = r1;
+        r1 = r22.getY();
+        r4 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
+        r1 = r1 + r4;
+        r1 = (int) r1;
+        r0 = r21;
+        r0.mLastTouchY = r1;
+        r0 = r21;
+        r0.mInitialTouchY = r1;
+        r13 = 0;
+        if (r9 == 0) goto L_0x00b2;
+    L_0x00b0:
+        r13 = r13 | 1;
+    L_0x00b2:
+        if (r10 == 0) goto L_0x00b6;
+    L_0x00b4:
+        r13 = r13 | 2;
+    L_0x00b6:
+        r1 = 0;
+        r0 = r21;
+        r0.startNestedScroll(r13, r1);
+        goto L_0x0074;
+    L_0x00bd:
+        r0 = r22;
+        r1 = r0.getPointerId(r8);
+        r0 = r21;
+        r0.mScrollPointerId = r1;
+        r0 = r22;
+        r1 = r0.getX(r8);
+        r4 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
+        r1 = r1 + r4;
+        r1 = (int) r1;
+        r0 = r21;
+        r0.mLastTouchX = r1;
+        r0 = r21;
+        r0.mInitialTouchX = r1;
+        r0 = r22;
+        r1 = r0.getY(r8);
+        r4 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
+        r1 = r1 + r4;
+        r1 = (int) r1;
+        r0 = r21;
+        r0.mLastTouchY = r1;
+        r0 = r21;
+        r0.mInitialTouchY = r1;
+        goto L_0x0074;
+    L_0x00ec:
+        r0 = r21;
+        r1 = r0.mScrollPointerId;
+        r0 = r22;
+        r12 = r0.findPointerIndex(r1);
+        if (r12 >= 0) goto L_0x0120;
+    L_0x00f8:
+        r1 = "RecyclerView";
+        r4 = new java.lang.StringBuilder;
+        r4.<init>();
+        r5 = "Error processing scroll; pointer index for id ";
+        r4 = r4.append(r5);
+        r0 = r21;
+        r5 = r0.mScrollPointerId;
+        r4 = r4.append(r5);
+        r5 = " not found. Did any MotionEvents get skipped?";
+        r4 = r4.append(r5);
+        r4 = r4.toString();
+        android.util.Log.e(r1, r4);
+        r1 = 0;
+        goto L_0x000d;
+    L_0x0120:
+        r0 = r22;
+        r1 = r0.getX(r12);
+        r4 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
+        r1 = r1 + r4;
+        r0 = (int) r1;
+        r16 = r0;
+        r0 = r22;
+        r1 = r0.getY(r12);
+        r4 = 1056964608; // 0x3f000000 float:0.5 double:5.222099017E-315;
+        r1 = r1 + r4;
+        r0 = (int) r1;
+        r18 = r0;
+        r0 = r21;
+        r1 = r0.mLastTouchX;
+        r2 = r1 - r16;
+        r0 = r21;
+        r1 = r0.mLastTouchY;
+        r3 = r1 - r18;
+        r0 = r21;
+        r4 = r0.mScrollConsumed;
+        r0 = r21;
+        r5 = r0.mScrollOffset;
+        r6 = 0;
+        r1 = r21;
+        r1 = r1.dispatchNestedPreScroll(r2, r3, r4, r5, r6);
+        if (r1 == 0) goto L_0x019c;
+    L_0x0155:
+        r0 = r21;
+        r1 = r0.mScrollConsumed;
+        r4 = 0;
+        r1 = r1[r4];
+        r2 = r2 - r1;
+        r0 = r21;
+        r1 = r0.mScrollConsumed;
+        r4 = 1;
+        r1 = r1[r4];
+        r3 = r3 - r1;
+        r0 = r21;
+        r1 = r0.mScrollOffset;
+        r4 = 0;
+        r1 = r1[r4];
+        r1 = (float) r1;
+        r0 = r21;
+        r4 = r0.mScrollOffset;
+        r5 = 1;
+        r4 = r4[r5];
+        r4 = (float) r4;
+        r15.offsetLocation(r1, r4);
+        r0 = r21;
+        r1 = r0.mNestedOffsets;
+        r4 = 0;
+        r5 = r1[r4];
+        r0 = r21;
+        r6 = r0.mScrollOffset;
+        r20 = 0;
+        r6 = r6[r20];
+        r5 = r5 + r6;
+        r1[r4] = r5;
+        r0 = r21;
+        r1 = r0.mNestedOffsets;
+        r4 = 1;
+        r5 = r1[r4];
+        r0 = r21;
+        r6 = r0.mScrollOffset;
+        r20 = 1;
+        r6 = r6[r20];
+        r5 = r5 + r6;
+        r1[r4] = r5;
+    L_0x019c:
+        r0 = r21;
+        r1 = r0.mScrollState;
+        r4 = 1;
+        if (r1 == r4) goto L_0x01d4;
+    L_0x01a3:
+        r14 = 0;
+        if (r9 == 0) goto L_0x01b8;
+    L_0x01a6:
+        r1 = java.lang.Math.abs(r2);
+        r0 = r21;
+        r4 = r0.mTouchSlop;
+        if (r1 <= r4) goto L_0x01b8;
+    L_0x01b0:
+        if (r2 <= 0) goto L_0x0220;
+    L_0x01b2:
+        r0 = r21;
+        r1 = r0.mTouchSlop;
+        r2 = r2 - r1;
+    L_0x01b7:
+        r14 = 1;
+    L_0x01b8:
+        if (r10 == 0) goto L_0x01cc;
+    L_0x01ba:
+        r1 = java.lang.Math.abs(r3);
+        r0 = r21;
+        r4 = r0.mTouchSlop;
+        if (r1 <= r4) goto L_0x01cc;
+    L_0x01c4:
+        if (r3 <= 0) goto L_0x0226;
+    L_0x01c6:
+        r0 = r21;
+        r1 = r0.mTouchSlop;
+        r3 = r3 - r1;
+    L_0x01cb:
+        r14 = 1;
+    L_0x01cc:
+        if (r14 == 0) goto L_0x01d4;
+    L_0x01ce:
+        r1 = 1;
+        r0 = r21;
+        r0.setScrollState(r1);
+    L_0x01d4:
+        r0 = r21;
+        r1 = r0.mScrollState;
+        r4 = 1;
+        if (r1 != r4) goto L_0x0074;
+    L_0x01db:
+        r0 = r21;
+        r1 = r0.mScrollOffset;
+        r4 = 0;
+        r1 = r1[r4];
+        r1 = r16 - r1;
+        r0 = r21;
+        r0.mLastTouchX = r1;
+        r0 = r21;
+        r1 = r0.mScrollOffset;
+        r4 = 1;
+        r1 = r1[r4];
+        r1 = r18 - r1;
+        r0 = r21;
+        r0.mLastTouchY = r1;
+        if (r9 == 0) goto L_0x022c;
+    L_0x01f7:
+        r4 = r2;
+    L_0x01f8:
+        if (r10 == 0) goto L_0x022f;
+    L_0x01fa:
+        r1 = r3;
+    L_0x01fb:
+        r0 = r21;
+        r1 = r0.scrollByInternal(r4, r1, r15);
+        if (r1 == 0) goto L_0x020b;
+    L_0x0203:
+        r1 = r21.getParent();
+        r4 = 1;
+        r1.requestDisallowInterceptTouchEvent(r4);
+    L_0x020b:
+        r0 = r21;
+        r1 = r0.mGapWorker;
+        if (r1 == 0) goto L_0x0074;
+    L_0x0211:
+        if (r2 != 0) goto L_0x0215;
+    L_0x0213:
+        if (r3 == 0) goto L_0x0074;
+    L_0x0215:
+        r0 = r21;
+        r1 = r0.mGapWorker;
+        r0 = r21;
+        r1.postFromTraversal(r0, r2, r3);
+        goto L_0x0074;
+    L_0x0220:
+        r0 = r21;
+        r1 = r0.mTouchSlop;
+        r2 = r2 + r1;
+        goto L_0x01b7;
+    L_0x0226:
+        r0 = r21;
+        r1 = r0.mTouchSlop;
+        r3 = r3 + r1;
+        goto L_0x01cb;
+    L_0x022c:
+        r1 = 0;
+        r4 = r1;
+        goto L_0x01f8;
+    L_0x022f:
+        r1 = 0;
+        goto L_0x01fb;
+    L_0x0231:
+        r21.onPointerUp(r22);
+        goto L_0x0074;
+    L_0x0236:
+        r0 = r21;
+        r1 = r0.mVelocityTracker;
+        r1.addMovement(r15);
+        r11 = 1;
+        r0 = r21;
+        r1 = r0.mVelocityTracker;
+        r4 = 1000; // 0x3e8 float:1.401E-42 double:4.94E-321;
+        r0 = r21;
+        r5 = r0.mMaxFlingVelocity;
+        r5 = (float) r5;
+        r1.computeCurrentVelocity(r4, r5);
+        if (r9 == 0) goto L_0x0291;
+    L_0x024e:
+        r0 = r21;
+        r1 = r0.mVelocityTracker;
+        r0 = r21;
+        r4 = r0.mScrollPointerId;
+        r1 = r1.getXVelocity(r4);
+        r0 = -r1;
+        r17 = r0;
+    L_0x025d:
+        if (r10 == 0) goto L_0x0294;
+    L_0x025f:
+        r0 = r21;
+        r1 = r0.mVelocityTracker;
+        r0 = r21;
+        r4 = r0.mScrollPointerId;
+        r1 = r1.getYVelocity(r4);
+        r0 = -r1;
+        r19 = r0;
+    L_0x026e:
+        r1 = 0;
+        r1 = (r17 > r1 ? 1 : (r17 == r1 ? 0 : -1));
+        if (r1 != 0) goto L_0x0278;
+    L_0x0273:
+        r1 = 0;
+        r1 = (r19 > r1 ? 1 : (r19 == r1 ? 0 : -1));
+        if (r1 == 0) goto L_0x0286;
+    L_0x0278:
+        r0 = r17;
+        r1 = (int) r0;
+        r0 = r19;
+        r4 = (int) r0;
+        r0 = r21;
+        r1 = r0.fling(r1, r4);
+        if (r1 != 0) goto L_0x028c;
+    L_0x0286:
+        r1 = 0;
+        r0 = r21;
+        r0.setScrollState(r1);
+    L_0x028c:
+        r21.resetTouch();
+        goto L_0x0074;
+    L_0x0291:
+        r17 = 0;
+        goto L_0x025d;
+    L_0x0294:
+        r19 = 0;
+        goto L_0x026e;
+    L_0x0297:
+        r21.cancelTouch();
+        goto L_0x0074;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.widget.RecyclerView.onTouchEvent(android.view.MotionEvent):boolean");
     }
 
     private void resetTouch() {
@@ -6225,73 +5814,66 @@ Caused by: java.lang.NullPointerException
 
     public boolean onGenericMotionEvent(MotionEvent event) {
         if (!(this.mLayout == null || this.mLayoutFrozen || event.getAction() != 8)) {
-            float f;
+            float vScroll;
             float hScroll;
             if ((event.getSource() & 2) != 0) {
                 if (this.mLayout.canScrollVertically()) {
-                    f = -event.getAxisValue(9);
+                    vScroll = -event.getAxisValue(9);
                 } else {
-                    f = 0.0f;
+                    vScroll = 0.0f;
                 }
                 if (this.mLayout.canScrollHorizontally()) {
-                    hScroll = event.getAxisValue(1.4E-44f);
+                    hScroll = event.getAxisValue(10);
                 } else {
                     hScroll = 0.0f;
                 }
             } else if ((event.getSource() & 4194304) != 0) {
-                float hScroll2;
-                f = event.getAxisValue(3.6E-44f);
+                float axisScroll = event.getAxisValue(26);
                 if (this.mLayout.canScrollVertically()) {
-                    hScroll = -f;
-                    hScroll2 = 0.0f;
+                    vScroll = -axisScroll;
+                    hScroll = 0.0f;
                 } else if (this.mLayout.canScrollHorizontally()) {
-                    hScroll = 0.0f;
-                    hScroll2 = f;
+                    vScroll = 0.0f;
+                    hScroll = axisScroll;
                 } else {
+                    vScroll = 0.0f;
                     hScroll = 0.0f;
-                    hScroll2 = 0.0f;
                 }
-                f = hScroll;
-                hScroll = hScroll2;
             } else {
-                f = 0.0f;
+                vScroll = 0.0f;
                 hScroll = 0.0f;
             }
-            if (!(f == 0.0f && hScroll == 0.0f)) {
-                scrollByInternal((int) (this.mScaledHorizontalScrollFactor * hScroll), (int) (this.mScaledVerticalScrollFactor * f), event);
+            if (!(vScroll == 0.0f && hScroll == 0.0f)) {
+                scrollByInternal((int) (this.mScaledHorizontalScrollFactor * hScroll), (int) (this.mScaledVerticalScrollFactor * vScroll), event);
             }
         }
         return false;
     }
 
     protected void onMeasure(int widthSpec, int heightSpec) {
+        boolean measureSpecModeIsExactly = false;
         if (this.mLayout == null) {
             defaultOnMeasure(widthSpec, heightSpec);
-            return;
-        }
-        boolean measureSpecModeIsExactly = false;
-        if (this.mLayout.isAutoMeasureEnabled()) {
+        } else if (this.mLayout.isAutoMeasureEnabled()) {
             int widthMode = MeasureSpec.getMode(widthSpec);
             int heightMode = MeasureSpec.getMode(heightSpec);
             this.mLayout.onMeasure(this.mRecycler, this.mState, widthSpec, heightSpec);
             if (widthMode == 1073741824 && heightMode == 1073741824) {
                 measureSpecModeIsExactly = true;
             }
-            if (!measureSpecModeIsExactly) {
-                if (this.mAdapter != null) {
-                    if (this.mState.mLayoutStep == 1) {
-                        dispatchLayoutStep1();
-                    }
-                    this.mLayout.setMeasureSpecs(widthSpec, heightSpec);
+            if (!measureSpecModeIsExactly && this.mAdapter != null) {
+                if (this.mState.mLayoutStep == 1) {
+                    dispatchLayoutStep1();
+                }
+                this.mLayout.setMeasureSpecs(widthSpec, heightSpec);
+                this.mState.mIsMeasuring = true;
+                dispatchLayoutStep2();
+                this.mLayout.setMeasuredDimensionFromChildren(widthSpec, heightSpec);
+                if (this.mLayout.shouldMeasureTwice()) {
+                    this.mLayout.setMeasureSpecs(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), 1073741824), MeasureSpec.makeMeasureSpec(getMeasuredHeight(), 1073741824));
                     this.mState.mIsMeasuring = true;
                     dispatchLayoutStep2();
                     this.mLayout.setMeasuredDimensionFromChildren(widthSpec, heightSpec);
-                    if (this.mLayout.shouldMeasureTwice()) {
-                        this.mLayout.setMeasureSpecs(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), 1073741824), MeasureSpec.makeMeasureSpec(getMeasuredHeight(), 1073741824));
-                        this.mState.mIsMeasuring = true;
-                        dispatchLayoutStep2();
-                        this.mLayout.setMeasuredDimensionFromChildren(widthSpec, heightSpec);
-                    }
                 }
             }
         } else if (this.mHasFixedSize) {
@@ -6423,9 +6005,8 @@ Caused by: java.lang.NullPointerException
     }
 
     private void processAdapterUpdatesAndSetAnimationFlags() {
-        boolean animationTypeSupported;
-        State state;
         boolean z;
+        boolean z2 = true;
         if (this.mDataSetHasChangedAfterLayout) {
             this.mAdapterHelper.reset();
             if (this.mDispatchItemsChangedEvent) {
@@ -6437,30 +6018,24 @@ Caused by: java.lang.NullPointerException
         } else {
             this.mAdapterHelper.consumeUpdatesInOnePass();
         }
-        boolean z2 = true;
-        if (!this.mItemsAddedOrRemoved) {
-            if (!this.mItemsChanged) {
-                animationTypeSupported = false;
-                state = this.mState;
-                z = this.mFirstLayoutComplete && this.mItemAnimator != null && ((this.mDataSetHasChangedAfterLayout || animationTypeSupported || this.mLayout.mRequestedSimpleAnimations) && (!this.mDataSetHasChangedAfterLayout || this.mAdapter.hasStableIds()));
-                state.mRunSimpleAnimations = z;
-                state = this.mState;
-                if (this.mState.mRunSimpleAnimations || !animationTypeSupported || this.mDataSetHasChangedAfterLayout || !predictiveItemAnimationsEnabled()) {
-                    z2 = false;
-                }
-                state.mRunPredictiveAnimations = z2;
-            }
+        boolean animationTypeSupported;
+        if (this.mItemsAddedOrRemoved || this.mItemsChanged) {
+            animationTypeSupported = true;
+        } else {
+            animationTypeSupported = false;
         }
-        animationTypeSupported = true;
-        state = this.mState;
-        if (!this.mFirstLayoutComplete) {
+        State state = this.mState;
+        if (!this.mFirstLayoutComplete || this.mItemAnimator == null || (!(this.mDataSetHasChangedAfterLayout || animationTypeSupported || this.mLayout.mRequestedSimpleAnimations) || (this.mDataSetHasChangedAfterLayout && !this.mAdapter.hasStableIds()))) {
+            z = false;
+        } else {
+            z = true;
         }
         state.mRunSimpleAnimations = z;
-        state = this.mState;
-        if (this.mState.mRunSimpleAnimations) {
+        State state2 = this.mState;
+        if (!(this.mState.mRunSimpleAnimations && animationTypeSupported && !this.mDataSetHasChangedAfterLayout && predictiveItemAnimationsEnabled())) {
+            z2 = false;
         }
-        z2 = false;
-        state.mRunPredictiveAnimations = z2;
+        state2.mRunPredictiveAnimations = z2;
     }
 
     void dispatchLayout() {
@@ -6474,12 +6049,9 @@ Caused by: java.lang.NullPointerException
                 dispatchLayoutStep1();
                 this.mLayout.setExactMeasureSpecsFrom(this);
                 dispatchLayoutStep2();
+            } else if (!this.mAdapterHelper.hasUpdates() && this.mLayout.getWidth() == getWidth() && this.mLayout.getHeight() == getHeight()) {
+                this.mLayout.setExactMeasureSpecsFrom(this);
             } else {
-                if (!this.mAdapterHelper.hasUpdates() && this.mLayout.getWidth() == getWidth()) {
-                    if (this.mLayout.getHeight() == getHeight()) {
-                        this.mLayout.setExactMeasureSpecsFrom(this);
-                    }
-                }
                 this.mLayout.setExactMeasureSpecsFrom(this);
                 dispatchLayoutStep2();
             }
@@ -6531,13 +6103,13 @@ Caused by: java.lang.NullPointerException
                 i++;
             }
         }
-        for (int i2 = Math.min(itemCount, startFocusSearchIndex) - 1; i2 >= 0; i2--) {
-            ViewHolder nextFocus2 = findViewHolderForAdapterPosition(i2);
-            if (nextFocus2 == null) {
+        for (i = Math.min(itemCount, startFocusSearchIndex) - 1; i >= 0; i--) {
+            nextFocus = findViewHolderForAdapterPosition(i);
+            if (nextFocus == null) {
                 return null;
             }
-            if (nextFocus2.itemView.hasFocusable()) {
-                return nextFocus2.itemView;
+            if (nextFocus.itemView.hasFocusable()) {
+                return nextFocus.itemView;
             }
         }
         return null;
@@ -6546,7 +6118,6 @@ Caused by: java.lang.NullPointerException
     private void recoverFocusFromState() {
         if (this.mPreserveFocusAfterLayout && this.mAdapter != null && hasFocus() && getDescendantFocusability() != 393216) {
             if (getDescendantFocusability() != 131072 || !isFocused()) {
-                View child;
                 if (!isFocused()) {
                     View focusedChild = getFocusedChild();
                     if (!IGNORE_DETACHED_FOCUSED_CHILD || (focusedChild.getParent() != null && focusedChild.hasFocus())) {
@@ -6563,27 +6134,17 @@ Caused by: java.lang.NullPointerException
                     focusTarget = findViewHolderForItemId(this.mState.mFocusedItemId);
                 }
                 View viewToFocus = null;
-                if (!(focusTarget == null || this.mChildHelper.isHidden(focusTarget.itemView))) {
-                    if (focusTarget.itemView.hasFocusable()) {
-                        viewToFocus = focusTarget.itemView;
-                        if (viewToFocus != null) {
-                            if (((long) this.mState.mFocusedSubChildId) != -1) {
-                                child = viewToFocus.findViewById(this.mState.mFocusedSubChildId);
-                                if (child != null && child.isFocusable()) {
-                                    viewToFocus = child;
-                                }
-                            }
-                            viewToFocus.requestFocus();
-                        }
-                    }
-                }
-                if (this.mChildHelper.getChildCount() > 0) {
+                if (focusTarget != null && !this.mChildHelper.isHidden(focusTarget.itemView) && focusTarget.itemView.hasFocusable()) {
+                    viewToFocus = focusTarget.itemView;
+                } else if (this.mChildHelper.getChildCount() > 0) {
                     viewToFocus = findNextViewToFocus();
                 }
                 if (viewToFocus != null) {
                     if (((long) this.mState.mFocusedSubChildId) != -1) {
-                        child = viewToFocus.findViewById(this.mState.mFocusedSubChildId);
-                        viewToFocus = child;
+                        View child = viewToFocus.findViewById(this.mState.mFocusedSubChildId);
+                        if (child != null && child.isFocusable()) {
+                            viewToFocus = child;
+                        }
                     }
                     viewToFocus.requestFocus();
                 }
@@ -6615,7 +6176,6 @@ Caused by: java.lang.NullPointerException
 
     private void dispatchLayoutStep1() {
         int i;
-        boolean z = true;
         this.mState.assertLayoutStep(1);
         fillRemainingScrollValues(this.mState);
         this.mState.mIsMeasuring = false;
@@ -6625,9 +6185,7 @@ Caused by: java.lang.NullPointerException
         processAdapterUpdatesAndSetAnimationFlags();
         saveFocusInfo();
         State state = this.mState;
-        if (!this.mState.mRunSimpleAnimations || !this.mItemsChanged) {
-            z = false;
-        }
+        boolean z = this.mState.mRunSimpleAnimations && this.mItemsChanged;
         state.mTrackOldChangeHolders = z;
         this.mItemsChanged = false;
         this.mItemsAddedOrRemoved = false;
@@ -6638,12 +6196,10 @@ Caused by: java.lang.NullPointerException
             int count = this.mChildHelper.getChildCount();
             for (i = 0; i < count; i++) {
                 ViewHolder holder = getChildViewHolderInt(this.mChildHelper.getChildAt(i));
-                if (!holder.shouldIgnore()) {
-                    if (!holder.isInvalid() || this.mAdapter.hasStableIds()) {
-                        this.mViewInfoStore.addToPreLayout(holder, this.mItemAnimator.recordPreLayoutInformation(this.mState, holder, ItemAnimator.buildAdapterChangeFlagsForAnimations(holder), holder.getUnmodifiedPayloads()));
-                        if (!(!this.mState.mTrackOldChangeHolders || !holder.isUpdated() || holder.isRemoved() || holder.shouldIgnore() || holder.isInvalid())) {
-                            this.mViewInfoStore.addToOldChangeHolders(getChangedHolderKey(holder), holder);
-                        }
+                if (!holder.shouldIgnore() && (!holder.isInvalid() || this.mAdapter.hasStableIds())) {
+                    this.mViewInfoStore.addToPreLayout(holder, this.mItemAnimator.recordPreLayoutInformation(this.mState, holder, ItemAnimator.buildAdapterChangeFlagsForAnimations(holder), holder.getUnmodifiedPayloads()));
+                    if (!(!this.mState.mTrackOldChangeHolders || !holder.isUpdated() || holder.isRemoved() || holder.shouldIgnore() || holder.isInvalid())) {
+                        this.mViewInfoStore.addToOldChangeHolders(getChangedHolderKey(holder), holder);
                     }
                 }
             }
@@ -6656,19 +6212,17 @@ Caused by: java.lang.NullPointerException
             this.mState.mStructureChanged = didStructureChange;
             for (i = 0; i < this.mChildHelper.getChildCount(); i++) {
                 ViewHolder viewHolder = getChildViewHolderInt(this.mChildHelper.getChildAt(i));
-                if (!viewHolder.shouldIgnore()) {
-                    if (!this.mViewInfoStore.isInPreLayout(viewHolder)) {
-                        int flags = ItemAnimator.buildAdapterChangeFlagsForAnimations(viewHolder);
-                        boolean wasHidden = viewHolder.hasAnyOfTheFlags(true);
-                        if (!wasHidden) {
-                            flags |= 4096;
-                        }
-                        ItemHolderInfo animationInfo = this.mItemAnimator.recordPreLayoutInformation(this.mState, viewHolder, flags, viewHolder.getUnmodifiedPayloads());
-                        if (wasHidden) {
-                            recordAnimationInfoIfBouncedHiddenView(viewHolder, animationInfo);
-                        } else {
-                            this.mViewInfoStore.addToAppearedInPreLayoutHolders(viewHolder, animationInfo);
-                        }
+                if (!(viewHolder.shouldIgnore() || this.mViewInfoStore.isInPreLayout(viewHolder))) {
+                    int flags = ItemAnimator.buildAdapterChangeFlagsForAnimations(viewHolder);
+                    boolean wasHidden = viewHolder.hasAnyOfTheFlags(MessagesController.UPDATE_MASK_CHANNEL);
+                    if (!wasHidden) {
+                        flags |= 4096;
+                    }
+                    ItemHolderInfo animationInfo = this.mItemAnimator.recordPreLayoutInformation(this.mState, viewHolder, flags, viewHolder.getUnmodifiedPayloads());
+                    if (wasHidden) {
+                        recordAnimationInfoIfBouncedHiddenView(viewHolder, animationInfo);
+                    } else {
+                        this.mViewInfoStore.addToAppearedInPreLayoutHolders(viewHolder, animationInfo);
                     }
                 }
             }
@@ -6682,6 +6236,7 @@ Caused by: java.lang.NullPointerException
     }
 
     private void dispatchLayoutStep2() {
+        boolean z;
         startInterceptRequestLayout();
         onEnterLayoutOrScroll();
         this.mState.assertLayoutStep(6);
@@ -6693,7 +6248,11 @@ Caused by: java.lang.NullPointerException
         this.mState.mStructureChanged = false;
         this.mPendingSavedState = null;
         State state = this.mState;
-        boolean z = this.mState.mRunSimpleAnimations && this.mItemAnimator != null;
+        if (!this.mState.mRunSimpleAnimations || this.mItemAnimator == null) {
+            z = false;
+        } else {
+            z = true;
+        }
         state.mRunSimpleAnimations = z;
         this.mState.mLayoutStep = 4;
         onExitLayoutOrScroll();
@@ -6706,28 +6265,23 @@ Caused by: java.lang.NullPointerException
         onEnterLayoutOrScroll();
         this.mState.mLayoutStep = 1;
         if (this.mState.mRunSimpleAnimations) {
-            int i = r7.mChildHelper.getChildCount() - 1;
-            while (true) {
-                int i2 = i;
-                if (i2 < 0) {
-                    break;
-                }
-                ViewHolder holder = getChildViewHolderInt(r7.mChildHelper.getChildAt(i2));
+            for (int i = this.mChildHelper.getChildCount() - 1; i >= 0; i--) {
+                ViewHolder holder = getChildViewHolderInt(this.mChildHelper.getChildAt(i));
                 if (!holder.shouldIgnore()) {
                     long key = getChangedHolderKey(holder);
-                    ItemHolderInfo animationInfo = r7.mItemAnimator.recordPostLayoutInformation(r7.mState, holder);
-                    ViewHolder oldChangeViewHolder = r7.mViewInfoStore.getFromOldChangeHolders(key);
+                    ItemHolderInfo animationInfo = this.mItemAnimator.recordPostLayoutInformation(this.mState, holder);
+                    ViewHolder oldChangeViewHolder = this.mViewInfoStore.getFromOldChangeHolders(key);
                     if (oldChangeViewHolder == null || oldChangeViewHolder.shouldIgnore()) {
-                        r7.mViewInfoStore.addToPostLayout(holder, animationInfo);
+                        this.mViewInfoStore.addToPostLayout(holder, animationInfo);
                     } else {
-                        boolean oldDisappearing = r7.mViewInfoStore.isDisappearing(oldChangeViewHolder);
-                        boolean newDisappearing = r7.mViewInfoStore.isDisappearing(holder);
+                        boolean oldDisappearing = this.mViewInfoStore.isDisappearing(oldChangeViewHolder);
+                        boolean newDisappearing = this.mViewInfoStore.isDisappearing(holder);
                         if (oldDisappearing && oldChangeViewHolder == holder) {
-                            r7.mViewInfoStore.addToPostLayout(holder, animationInfo);
+                            this.mViewInfoStore.addToPostLayout(holder, animationInfo);
                         } else {
-                            ItemHolderInfo preInfo = r7.mViewInfoStore.popFromPreLayout(oldChangeViewHolder);
-                            r7.mViewInfoStore.addToPostLayout(holder, animationInfo);
-                            ItemHolderInfo postInfo = r7.mViewInfoStore.popFromPostLayout(holder);
+                            ItemHolderInfo preInfo = this.mViewInfoStore.popFromPreLayout(oldChangeViewHolder);
+                            this.mViewInfoStore.addToPostLayout(holder, animationInfo);
+                            ItemHolderInfo postInfo = this.mViewInfoStore.popFromPostLayout(holder);
                             if (preInfo == null) {
                                 handleMissingPreInfoForChangeError(key, holder, oldChangeViewHolder);
                             } else {
@@ -6736,30 +6290,29 @@ Caused by: java.lang.NullPointerException
                         }
                     }
                 }
-                i = i2 - 1;
             }
-            r7.mViewInfoStore.process(r7.mViewInfoProcessCallback);
+            this.mViewInfoStore.process(this.mViewInfoProcessCallback);
         }
-        r7.mLayout.removeAndRecycleScrapInt(r7.mRecycler);
-        r7.mState.mPreviousLayoutItemCount = r7.mState.mItemCount;
-        r7.mDataSetHasChangedAfterLayout = false;
-        r7.mDispatchItemsChangedEvent = false;
-        r7.mState.mRunSimpleAnimations = false;
-        r7.mState.mRunPredictiveAnimations = false;
-        r7.mLayout.mRequestedSimpleAnimations = false;
-        if (r7.mRecycler.mChangedScrap != null) {
-            r7.mRecycler.mChangedScrap.clear();
+        this.mLayout.removeAndRecycleScrapInt(this.mRecycler);
+        this.mState.mPreviousLayoutItemCount = this.mState.mItemCount;
+        this.mDataSetHasChangedAfterLayout = false;
+        this.mDispatchItemsChangedEvent = false;
+        this.mState.mRunSimpleAnimations = false;
+        this.mState.mRunPredictiveAnimations = false;
+        this.mLayout.mRequestedSimpleAnimations = false;
+        if (this.mRecycler.mChangedScrap != null) {
+            this.mRecycler.mChangedScrap.clear();
         }
-        if (r7.mLayout.mPrefetchMaxObservedInInitialPrefetch) {
-            r7.mLayout.mPrefetchMaxCountObserved = 0;
-            r7.mLayout.mPrefetchMaxObservedInInitialPrefetch = false;
-            r7.mRecycler.updateViewCacheSize();
+        if (this.mLayout.mPrefetchMaxObservedInInitialPrefetch) {
+            this.mLayout.mPrefetchMaxCountObserved = 0;
+            this.mLayout.mPrefetchMaxObservedInInitialPrefetch = false;
+            this.mRecycler.updateViewCacheSize();
         }
-        r7.mLayout.onLayoutCompleted(r7.mState);
+        this.mLayout.onLayoutCompleted(this.mState);
         onExitLayoutOrScroll();
         stopInterceptRequestLayout(false);
-        r7.mViewInfoStore.clear();
-        if (didChildRangeChange(r7.mMinMaxLayoutPositions[0], r7.mMinMaxLayoutPositions[1])) {
+        this.mViewInfoStore.clear();
+        if (didChildRangeChange(this.mMinMaxLayoutPositions[0], this.mMinMaxLayoutPositions[1])) {
             dispatchOnScrolled(0, 0);
         }
         recoverFocusFromState();
@@ -6768,38 +6321,18 @@ Caused by: java.lang.NullPointerException
 
     private void handleMissingPreInfoForChangeError(long key, ViewHolder holder, ViewHolder oldChangeViewHolder) {
         int childCount = this.mChildHelper.getChildCount();
-        for (int i = 0; i < childCount; i++) {
+        int i = 0;
+        while (i < childCount) {
             ViewHolder other = getChildViewHolderInt(this.mChildHelper.getChildAt(i));
-            if (other != holder) {
-                if (getChangedHolderKey(other) == key) {
-                    StringBuilder stringBuilder;
-                    if (this.mAdapter == null || !this.mAdapter.hasStableIds()) {
-                        stringBuilder = new StringBuilder();
-                        stringBuilder.append("Two different ViewHolders have the same change ID. This might happen due to inconsistent Adapter update events or if the LayoutManager lays out the same View multiple times.\n ViewHolder 1:");
-                        stringBuilder.append(other);
-                        stringBuilder.append(" \n View Holder 2:");
-                        stringBuilder.append(holder);
-                        stringBuilder.append(exceptionLabel());
-                        throw new IllegalStateException(stringBuilder.toString());
-                    }
-                    stringBuilder = new StringBuilder();
-                    stringBuilder.append("Two different ViewHolders have the same stable ID. Stable IDs in your adapter MUST BE unique and SHOULD NOT change.\n ViewHolder 1:");
-                    stringBuilder.append(other);
-                    stringBuilder.append(" \n View Holder 2:");
-                    stringBuilder.append(holder);
-                    stringBuilder.append(exceptionLabel());
-                    throw new IllegalStateException(stringBuilder.toString());
-                }
+            if (other == holder || getChangedHolderKey(other) != key) {
+                i++;
+            } else if (this.mAdapter == null || !this.mAdapter.hasStableIds()) {
+                throw new IllegalStateException("Two different ViewHolders have the same change ID. This might happen due to inconsistent Adapter update events or if the LayoutManager lays out the same View multiple times.\n ViewHolder 1:" + other + " \n View Holder 2:" + holder + exceptionLabel());
+            } else {
+                throw new IllegalStateException("Two different ViewHolders have the same stable ID. Stable IDs in your adapter MUST BE unique and SHOULD NOT change.\n ViewHolder 1:" + other + " \n View Holder 2:" + holder + exceptionLabel());
             }
         }
-        String str = TAG;
-        StringBuilder stringBuilder2 = new StringBuilder();
-        stringBuilder2.append("Problem while matching changed view holders with the newones. The pre-layout information for the change holder ");
-        stringBuilder2.append(oldChangeViewHolder);
-        stringBuilder2.append(" cannot be found but it is necessary for ");
-        stringBuilder2.append(holder);
-        stringBuilder2.append(exceptionLabel());
-        Log.e(str, stringBuilder2.toString());
+        Log.e(TAG, "Problem while matching changed view holders with the newones. The pre-layout information for the change holder " + oldChangeViewHolder + " cannot be found but it is necessary for " + holder + exceptionLabel());
     }
 
     void recordAnimationInfoIfBouncedHiddenView(ViewHolder viewHolder, ItemHolderInfo animationInfo) {
@@ -6817,8 +6350,8 @@ Caused by: java.lang.NullPointerException
             into[1] = -1;
             return;
         }
-        int maxPositionPreLayout = Integer.MIN_VALUE;
         int minPositionPreLayout = ConnectionsManager.DEFAULT_DATACENTER_ID;
+        int maxPositionPreLayout = Integer.MIN_VALUE;
         for (int i = 0; i < count; i++) {
             ViewHolder holder = getChildViewHolderInt(this.mChildHelper.getChildAt(i));
             if (!holder.shouldIgnore()) {
@@ -6837,10 +6370,8 @@ Caused by: java.lang.NullPointerException
 
     private boolean didChildRangeChange(int minPositionPreLayout, int maxPositionPreLayout) {
         findMinMaxChildLayoutPositions(this.mMinMaxLayoutPositions);
-        if (this.mMinMaxLayoutPositions[0] == minPositionPreLayout) {
-            if (this.mMinMaxLayoutPositions[1] == maxPositionPreLayout) {
-                return false;
-            }
+        if (this.mMinMaxLayoutPositions[0] == minPositionPreLayout && this.mMinMaxLayoutPositions[1] == maxPositionPreLayout) {
+            return false;
         }
         return true;
     }
@@ -6851,11 +6382,7 @@ Caused by: java.lang.NullPointerException
             if (vh.isTmpDetached()) {
                 vh.clearTmpDetachFlag();
             } else if (!vh.shouldIgnore()) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Called removeDetachedView with a view which is not flagged as tmp detached.");
-                stringBuilder.append(vh);
-                stringBuilder.append(exceptionLabel());
-                throw new IllegalArgumentException(stringBuilder.toString());
+                throw new IllegalArgumentException("Called removeDetachedView with a view which is not flagged as tmp detached." + vh + exceptionLabel());
             }
         }
         child.clearAnimation();
@@ -6926,20 +6453,29 @@ Caused by: java.lang.NullPointerException
     }
 
     public void draw(Canvas c) {
+        int padding;
+        int i;
+        int i2 = 1;
         super.draw(c);
         int count = this.mItemDecorations.size();
-        int i = 0;
-        for (int i2 = 0; i2 < count; i2++) {
-            ((ItemDecoration) this.mItemDecorations.get(i2)).onDrawOver(c, this, this.mState);
+        for (int i3 = 0; i3 < count; i3++) {
+            ((ItemDecoration) this.mItemDecorations.get(i3)).onDrawOver(c, this, this.mState);
         }
         boolean needsInvalidate = false;
         if (!(this.mLeftGlow == null || this.mLeftGlow.isFinished())) {
             int restore = c.save();
-            int padding = this.mClipToPadding ? getPaddingBottom() : 0;
+            if (this.mClipToPadding) {
+                padding = getPaddingBottom();
+            } else {
+                padding = 0;
+            }
             c.rotate(270.0f);
             c.translate((float) ((-getHeight()) + padding), 0.0f);
-            boolean z = this.mLeftGlow != null && this.mLeftGlow.draw(c);
-            needsInvalidate = z;
+            if (this.mLeftGlow == null || !this.mLeftGlow.draw(c)) {
+                needsInvalidate = false;
+            } else {
+                needsInvalidate = true;
+            }
             c.restoreToCount(restore);
         }
         if (!(this.mTopGlow == null || this.mTopGlow.isFinished())) {
@@ -6948,18 +6484,30 @@ Caused by: java.lang.NullPointerException
                 c.translate((float) getPaddingLeft(), (float) getPaddingTop());
             }
             c.translate(0.0f, (float) this.topGlowOffset);
-            int i3 = (this.mTopGlow == null || !this.mTopGlow.draw(c)) ? 0 : 1;
-            needsInvalidate |= i3;
+            if (this.mTopGlow == null || !this.mTopGlow.draw(c)) {
+                i = 0;
+            } else {
+                i = 1;
+            }
+            needsInvalidate |= i;
             c.restoreToCount(restore);
         }
         if (!(this.mRightGlow == null || this.mRightGlow.isFinished())) {
             restore = c.save();
-            i3 = getWidth();
-            padding = this.mClipToPadding ? getPaddingTop() : 0;
+            int width = getWidth();
+            if (this.mClipToPadding) {
+                padding = getPaddingTop();
+            } else {
+                padding = 0;
+            }
             c.rotate(90.0f);
-            c.translate((float) (-padding), (float) (-i3));
-            int i4 = (this.mRightGlow == null || !this.mRightGlow.draw(c)) ? 0 : 1;
-            needsInvalidate |= i4;
+            c.translate((float) (-padding), (float) (-width));
+            if (this.mRightGlow == null || !this.mRightGlow.draw(c)) {
+                i = 0;
+            } else {
+                i = 1;
+            }
+            needsInvalidate |= i;
             c.restoreToCount(restore);
         }
         if (!(this.mBottomGlow == null || this.mBottomGlow.isFinished())) {
@@ -6970,10 +6518,10 @@ Caused by: java.lang.NullPointerException
             } else {
                 c.translate((float) (-getWidth()), (float) ((-getHeight()) + this.bottomGlowOffset));
             }
-            if (this.mBottomGlow != null && this.mBottomGlow.draw(c)) {
-                i = 1;
+            if (this.mBottomGlow == null || !this.mBottomGlow.draw(c)) {
+                i2 = 0;
             }
-            needsInvalidate |= i;
+            needsInvalidate |= i2;
             c.restoreToCount(restore);
         }
         if (!needsInvalidate && this.mItemAnimator != null && this.mItemDecorations.size() > 0 && this.mItemAnimator.isRunning()) {
@@ -7000,30 +6548,21 @@ Caused by: java.lang.NullPointerException
         if (this.mLayout != null) {
             return this.mLayout.generateDefaultLayoutParams();
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("RecyclerView has no LayoutManager");
-        stringBuilder.append(exceptionLabel());
-        throw new IllegalStateException(stringBuilder.toString());
+        throw new IllegalStateException("RecyclerView has no LayoutManager" + exceptionLabel());
     }
 
     public android.view.ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
         if (this.mLayout != null) {
             return this.mLayout.generateLayoutParams(getContext(), attrs);
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("RecyclerView has no LayoutManager");
-        stringBuilder.append(exceptionLabel());
-        throw new IllegalStateException(stringBuilder.toString());
+        throw new IllegalStateException("RecyclerView has no LayoutManager" + exceptionLabel());
     }
 
     protected android.view.ViewGroup.LayoutParams generateLayoutParams(android.view.ViewGroup.LayoutParams p) {
         if (this.mLayout != null) {
             return this.mLayout.generateLayoutParams(p);
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("RecyclerView has no LayoutManager");
-        stringBuilder.append(exceptionLabel());
-        throw new IllegalStateException(stringBuilder.toString());
+        throw new IllegalStateException("RecyclerView has no LayoutManager" + exceptionLabel());
     }
 
     public boolean isAnimating() {
@@ -7052,10 +6591,10 @@ Caused by: java.lang.NullPointerException
     }
 
     void offsetPositionRecordsForMove(int from, int to) {
-        int end;
         int inBetweenOffset;
         int childCount = this.mChildHelper.getUnfilteredChildCount();
         int start;
+        int end;
         if (from < to) {
             start = from;
             end = to;
@@ -7067,15 +6606,13 @@ Caused by: java.lang.NullPointerException
         }
         for (int i = 0; i < childCount; i++) {
             ViewHolder holder = getChildViewHolderInt(this.mChildHelper.getUnfilteredChildAt(i));
-            if (holder != null && holder.mPosition >= start) {
-                if (holder.mPosition <= end) {
-                    if (holder.mPosition == from) {
-                        holder.offsetPosition(to - from, false);
-                    } else {
-                        holder.offsetPosition(inBetweenOffset, false);
-                    }
-                    this.mState.mStructureChanged = true;
+            if (holder != null && holder.mPosition >= start && holder.mPosition <= end) {
+                if (holder.mPosition == from) {
+                    holder.offsetPosition(to - from, false);
+                } else {
+                    holder.offsetPosition(inBetweenOffset, false);
                 }
+                this.mState.mStructureChanged = true;
             }
         }
         this.mRecycler.offsetPositionRecordsForMove(from, to);
@@ -7120,26 +6657,17 @@ Caused by: java.lang.NullPointerException
         for (int i = 0; i < childCount; i++) {
             View child = this.mChildHelper.getUnfilteredChildAt(i);
             ViewHolder holder = getChildViewHolderInt(child);
-            if (holder != null) {
-                if (!holder.shouldIgnore()) {
-                    if (holder.mPosition >= positionStart && holder.mPosition < positionEnd) {
-                        holder.addFlags(2);
-                        holder.addChangePayload(payload);
-                        ((LayoutParams) child.getLayoutParams()).mInsetsDirty = true;
-                    }
-                }
+            if (holder != null && !holder.shouldIgnore() && holder.mPosition >= positionStart && holder.mPosition < positionEnd) {
+                holder.addFlags(2);
+                holder.addChangePayload(payload);
+                ((LayoutParams) child.getLayoutParams()).mInsetsDirty = true;
             }
         }
         this.mRecycler.viewRangeUpdate(positionStart, itemCount);
     }
 
     boolean canReuseUpdatedViewHolder(ViewHolder viewHolder) {
-        if (this.mItemAnimator != null) {
-            if (!this.mItemAnimator.canReuseUpdatedViewHolder(viewHolder, viewHolder.getUnmodifiedPayloads())) {
-                return false;
-            }
-        }
-        return true;
+        return this.mItemAnimator == null || this.mItemAnimator.canReuseUpdatedViewHolder(viewHolder, viewHolder.getUnmodifiedPayloads());
     }
 
     void processDataSetCompletelyChanged(boolean dispatchItemsChanged) {
@@ -7183,12 +6711,7 @@ Caused by: java.lang.NullPointerException
         if (parent == null || parent == this) {
             return getChildViewHolderInt(child);
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("View ");
-        stringBuilder.append(child);
-        stringBuilder.append(" is not a direct child of ");
-        stringBuilder.append(this);
-        throw new IllegalArgumentException(stringBuilder.toString());
+        throw new IllegalArgumentException("View " + child + " is not a direct child of " + this);
     }
 
     public View findContainingItemView(View view) {
@@ -7228,15 +6751,12 @@ Caused by: java.lang.NullPointerException
     }
 
     public long getChildItemId(View child) {
-        long j = -1;
-        if (this.mAdapter != null) {
-            if (this.mAdapter.hasStableIds()) {
-                ViewHolder holder = getChildViewHolderInt(child);
-                if (holder != null) {
-                    j = holder.getItemId();
-                }
-                return j;
-            }
+        if (this.mAdapter == null || !this.mAdapter.hasStableIds()) {
+            return -1;
+        }
+        ViewHolder holder = getChildViewHolderInt(child);
+        if (holder != null) {
+            return holder.getItemId();
         }
         return -1;
     }
@@ -7272,13 +6792,33 @@ Caused by: java.lang.NullPointerException
         int childCount = this.mChildHelper.getUnfilteredChildCount();
         ViewHolder hidden = null;
         for (int i = 0; i < childCount; i++) {
-            ViewHolder holder = getChildViewHolderInt(this.mChildHelper.getUnfilteredChildAt(i));
-            if (!(holder == null || holder.isRemoved())) {
+            ViewHolder childViewHolderInt = getChildViewHolderInt(this.mChildHelper.getUnfilteredChildAt(i));
+            if (!(childViewHolderInt == null || childViewHolderInt.isRemoved())) {
                 if (checkNewPosition) {
-                    if (holder.mPosition != position) {
+                    if (childViewHolderInt.mPosition != position) {
+                        continue;
                     }
-                } else if (holder.getLayoutPosition() != position) {
+                } else if (childViewHolderInt.getLayoutPosition() != position) {
+                    continue;
                 }
+                if (!this.mChildHelper.isHidden(childViewHolderInt.itemView)) {
+                    return childViewHolderInt;
+                }
+                hidden = childViewHolderInt;
+            }
+        }
+        return hidden;
+    }
+
+    public ViewHolder findViewHolderForItemId(long id) {
+        if (this.mAdapter == null || !this.mAdapter.hasStableIds()) {
+            return null;
+        }
+        int childCount = this.mChildHelper.getUnfilteredChildCount();
+        ViewHolder hidden = null;
+        for (int i = 0; i < childCount; i++) {
+            ViewHolder holder = getChildViewHolderInt(this.mChildHelper.getUnfilteredChildAt(i));
+            if (!(holder == null || holder.isRemoved() || holder.getItemId() != id)) {
                 if (!this.mChildHelper.isHidden(holder.itemView)) {
                     return holder;
                 }
@@ -7286,26 +6826,6 @@ Caused by: java.lang.NullPointerException
             }
         }
         return hidden;
-    }
-
-    public ViewHolder findViewHolderForItemId(long id) {
-        if (this.mAdapter != null) {
-            if (this.mAdapter.hasStableIds()) {
-                int childCount = this.mChildHelper.getUnfilteredChildCount();
-                ViewHolder hidden = null;
-                for (int i = 0; i < childCount; i++) {
-                    ViewHolder holder = getChildViewHolderInt(this.mChildHelper.getUnfilteredChildAt(i));
-                    if (!(holder == null || holder.isRemoved() || holder.getItemId() != id)) {
-                        if (!this.mChildHelper.isHidden(holder.itemView)) {
-                            return holder;
-                        }
-                        hidden = holder;
-                    }
-                }
-                return hidden;
-            }
-        }
-        return null;
     }
 
     public View findChildViewUnder(float x, float y) {
@@ -7416,12 +6936,23 @@ Caused by: java.lang.NullPointerException
     }
 
     public boolean hasPendingAdapterUpdates() {
-        if (this.mFirstLayoutComplete && !this.mDataSetHasChangedAfterLayout) {
-            if (!this.mAdapterHelper.hasPendingUpdates()) {
-                return false;
+        return !this.mFirstLayoutComplete || this.mDataSetHasChangedAfterLayout || this.mAdapterHelper.hasPendingUpdates();
+    }
+
+    void repositionShadowingViews() {
+        int count = this.mChildHelper.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View view = this.mChildHelper.getChildAt(i);
+            ViewHolder holder = getChildViewHolder(view);
+            if (!(holder == null || holder.mShadowingHolder == null)) {
+                View shadowingView = holder.mShadowingHolder.itemView;
+                int left = view.getLeft();
+                int top = view.getTop();
+                if (left != shadowingView.getLeft() || top != shadowingView.getTop()) {
+                    shadowingView.layout(left, top, shadowingView.getWidth() + left, shadowingView.getHeight() + top);
+                }
             }
         }
-        return true;
     }
 
     static RecyclerView findNestedRecyclerView(View view) {
@@ -7434,7 +6965,7 @@ Caused by: java.lang.NullPointerException
         ViewGroup parent = (ViewGroup) view;
         int count = parent.getChildCount();
         for (int i = 0; i < count; i++) {
-            RecyclerView descendant = findNestedRecyclerView(parent.getChildAt(i));
+            View descendant = findNestedRecyclerView(parent.getChildAt(i));
             if (descendant != null) {
                 return descendant;
             }
@@ -7507,13 +7038,11 @@ Caused by: java.lang.NullPointerException
     void dispatchPendingImportantForAccessibilityChanges() {
         for (int i = this.mPendingAccessibilityImportanceChange.size() - 1; i >= 0; i--) {
             ViewHolder viewHolder = (ViewHolder) this.mPendingAccessibilityImportanceChange.get(i);
-            if (viewHolder.itemView.getParent() == this) {
-                if (!viewHolder.shouldIgnore()) {
-                    int state = viewHolder.mPendingAccessibilityState;
-                    if (state != -1) {
-                        ViewCompat.setImportantForAccessibility(viewHolder.itemView, state);
-                        viewHolder.mPendingAccessibilityState = -1;
-                    }
+            if (viewHolder.itemView.getParent() == this && !viewHolder.shouldIgnore()) {
+                int state = viewHolder.mPendingAccessibilityState;
+                if (state != -1) {
+                    ViewCompat.setImportantForAccessibility(viewHolder.itemView, state);
+                    viewHolder.mPendingAccessibilityState = -1;
                 }
             }
         }
@@ -7521,26 +7050,18 @@ Caused by: java.lang.NullPointerException
     }
 
     int getAdapterPositionFor(ViewHolder viewHolder) {
-        if (!viewHolder.hasAnyOfTheFlags(524)) {
-            if (viewHolder.isBound()) {
-                return this.mAdapterHelper.applyPendingUpdatesToPosition(viewHolder.mPosition);
-            }
+        if (viewHolder.hasAnyOfTheFlags(524) || !viewHolder.isBound()) {
+            return -1;
         }
-        return -1;
+        return this.mAdapterHelper.applyPendingUpdatesToPosition(viewHolder.mPosition);
     }
 
     void initFastScroller(StateListDrawable verticalThumbDrawable, Drawable verticalTrackDrawable, StateListDrawable horizontalThumbDrawable, Drawable horizontalTrackDrawable) {
-        if (!(verticalThumbDrawable == null || verticalTrackDrawable == null || horizontalThumbDrawable == null)) {
-            if (horizontalTrackDrawable != null) {
-                Resources resources = getContext().getResources();
-                FastScroller fastScroller = new FastScroller(this, verticalThumbDrawable, verticalTrackDrawable, horizontalThumbDrawable, horizontalTrackDrawable, AndroidUtilities.dp(8.0f), AndroidUtilities.dp(50.0f), 0);
-                return;
-            }
+        if (verticalThumbDrawable == null || verticalTrackDrawable == null || horizontalThumbDrawable == null || horizontalTrackDrawable == null) {
+            throw new IllegalArgumentException("Trying to set fast scroller without both required drawables." + exceptionLabel());
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Trying to set fast scroller without both required drawables.");
-        stringBuilder.append(exceptionLabel());
-        throw new IllegalArgumentException(stringBuilder.toString());
+        Resources resources = getContext().getResources();
+        FastScroller fastScroller = new FastScroller(this, verticalThumbDrawable, verticalTrackDrawable, horizontalThumbDrawable, horizontalTrackDrawable, AndroidUtilities.dp(8.0f), AndroidUtilities.dp(50.0f), 0);
     }
 
     public void setNestedScrollingEnabled(boolean enabled) {

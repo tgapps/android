@@ -54,17 +54,17 @@ public class GoogleApiAvailability extends GoogleApiAvailabilityLight {
         }
 
         public final void handleMessage(Message message) {
-            if (message.what != 1) {
-                int i = message.what;
-                StringBuilder stringBuilder = new StringBuilder(50);
-                stringBuilder.append("Don't know how to handle this message: ");
-                stringBuilder.append(i);
-                Log.w("GoogleApiAvailability", stringBuilder.toString());
-                return;
-            }
-            i = this.zzav.isGooglePlayServicesAvailable(this.zzau);
-            if (this.zzav.isUserResolvableError(i)) {
-                this.zzav.showErrorNotification(this.zzau, i);
+            switch (message.what) {
+                case 1:
+                    int isGooglePlayServicesAvailable = this.zzav.isGooglePlayServicesAvailable(this.zzau);
+                    if (this.zzav.isUserResolvableError(isGooglePlayServicesAvailable)) {
+                        this.zzav.showErrorNotification(this.zzau, isGooglePlayServicesAvailable);
+                        return;
+                    }
+                    return;
+                default:
+                    Log.w("GoogleApiAvailability", "Don't know how to handle this message: " + message.what);
+                    return;
             }
         }
     }
@@ -97,9 +97,9 @@ public class GoogleApiAvailability extends GoogleApiAvailabilityLight {
         if (errorDialogButtonMessage != null) {
             builder.setPositiveButton(errorDialogButtonMessage, dialogRedirect);
         }
-        CharSequence errorTitle = ConnectionErrorMessages.getErrorTitle(context, i);
-        if (errorTitle != null) {
-            builder.setTitle(errorTitle);
+        errorDialogButtonMessage = ConnectionErrorMessages.getErrorTitle(context, i);
+        if (errorDialogButtonMessage != null) {
+            builder.setTitle(errorDialogButtonMessage);
         }
         return builder.create();
     }
@@ -113,12 +113,11 @@ public class GoogleApiAvailability extends GoogleApiAvailabilityLight {
             NotificationChannel notificationChannel = notificationManager.getNotificationChannel(zzb);
             CharSequence defaultNotificationChannelName = ConnectionErrorMessages.getDefaultNotificationChannelName(context);
             if (notificationChannel == null) {
-                notificationChannel = new NotificationChannel(zzb, defaultNotificationChannelName, 4);
+                notificationManager.createNotificationChannel(new NotificationChannel(zzb, defaultNotificationChannelName, 4));
             } else if (!defaultNotificationChannelName.equals(notificationChannel.getName())) {
                 notificationChannel.setName(defaultNotificationChannelName);
+                notificationManager.createNotificationChannel(notificationChannel);
             }
-            notificationManager.createNotificationChannel(notificationChannel);
-            return zzb;
         }
         return zzb;
     }
@@ -135,12 +134,9 @@ public class GoogleApiAvailability extends GoogleApiAvailabilityLight {
     private final void zza(Context context, int i, String str, PendingIntent pendingIntent) {
         if (i == 18) {
             zza(context);
-        } else if (pendingIntent == null) {
-            if (i == 6) {
-                Log.w("GoogleApiAvailability", "Missing resolution for ConnectionResult.RESOLUTION_REQUIRED. Call GoogleApiAvailability#showErrorNotification(Context, ConnectionResult) instead.");
-            }
-        } else {
+        } else if (pendingIntent != null) {
             Notification build;
+            int i2;
             CharSequence errorNotificationTitle = ConnectionErrorMessages.getErrorNotificationTitle(context, i);
             CharSequence errorNotificationMessage = ConnectionErrorMessages.getErrorNotificationMessage(context, i);
             Resources resources = context.getResources();
@@ -168,18 +164,20 @@ public class GoogleApiAvailability extends GoogleApiAvailabilityLight {
                 case 1:
                 case 2:
                 case 3:
-                    i = 10436;
+                    i2 = 10436;
                     GooglePlayServicesUtilLight.zzbt.set(false);
                     break;
                 default:
-                    i = 39789;
+                    i2 = 39789;
                     break;
             }
             if (str == null) {
-                notificationManager.notify(i, build);
+                notificationManager.notify(i2, build);
             } else {
-                notificationManager.notify(str, i, build);
+                notificationManager.notify(str, i2, build);
             }
+        } else if (i == 6) {
+            Log.w("GoogleApiAvailability", "Missing resolution for ConnectionResult.RESOLUTION_REQUIRED. Call GoogleApiAvailability#showErrorNotification(Context, ConnectionResult) instead.");
         }
     }
 

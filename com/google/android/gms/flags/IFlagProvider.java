@@ -23,10 +23,10 @@ public interface IFlagProvider extends IInterface {
                 obtainAndWriteInterfaceToken.writeString(str);
                 zzc.zza(obtainAndWriteInterfaceToken, z);
                 obtainAndWriteInterfaceToken.writeInt(i);
-                Parcel transactAndReadException = transactAndReadException(2, obtainAndWriteInterfaceToken);
-                z = zzc.zza(transactAndReadException);
-                transactAndReadException.recycle();
-                return z;
+                obtainAndWriteInterfaceToken = transactAndReadException(2, obtainAndWriteInterfaceToken);
+                boolean zza = zzc.zza(obtainAndWriteInterfaceToken);
+                obtainAndWriteInterfaceToken.recycle();
+                return zza;
             }
 
             public int getIntFlagValue(String str, int i, int i2) throws RemoteException {
@@ -34,10 +34,10 @@ public interface IFlagProvider extends IInterface {
                 obtainAndWriteInterfaceToken.writeString(str);
                 obtainAndWriteInterfaceToken.writeInt(i);
                 obtainAndWriteInterfaceToken.writeInt(i2);
-                Parcel transactAndReadException = transactAndReadException(3, obtainAndWriteInterfaceToken);
-                i = transactAndReadException.readInt();
-                transactAndReadException.recycle();
-                return i;
+                obtainAndWriteInterfaceToken = transactAndReadException(3, obtainAndWriteInterfaceToken);
+                int readInt = obtainAndWriteInterfaceToken.readInt();
+                obtainAndWriteInterfaceToken.recycle();
+                return readInt;
             }
 
             public long getLongFlagValue(String str, long j, int i) throws RemoteException {
@@ -45,10 +45,10 @@ public interface IFlagProvider extends IInterface {
                 obtainAndWriteInterfaceToken.writeString(str);
                 obtainAndWriteInterfaceToken.writeLong(j);
                 obtainAndWriteInterfaceToken.writeInt(i);
-                Parcel transactAndReadException = transactAndReadException(4, obtainAndWriteInterfaceToken);
-                j = transactAndReadException.readLong();
-                transactAndReadException.recycle();
-                return j;
+                obtainAndWriteInterfaceToken = transactAndReadException(4, obtainAndWriteInterfaceToken);
+                long readLong = obtainAndWriteInterfaceToken.readLong();
+                obtainAndWriteInterfaceToken.recycle();
+                return readLong;
             }
 
             public String getStringFlagValue(String str, String str2, int i) throws RemoteException {
@@ -56,10 +56,10 @@ public interface IFlagProvider extends IInterface {
                 obtainAndWriteInterfaceToken.writeString(str);
                 obtainAndWriteInterfaceToken.writeString(str2);
                 obtainAndWriteInterfaceToken.writeInt(i);
-                Parcel transactAndReadException = transactAndReadException(5, obtainAndWriteInterfaceToken);
-                str2 = transactAndReadException.readString();
-                transactAndReadException.recycle();
-                return str2;
+                obtainAndWriteInterfaceToken = transactAndReadException(5, obtainAndWriteInterfaceToken);
+                String readString = obtainAndWriteInterfaceToken.readString();
+                obtainAndWriteInterfaceToken.recycle();
+                return readString;
             }
 
             public void init(IObjectWrapper iObjectWrapper) throws RemoteException {
@@ -93,9 +93,9 @@ public interface IFlagProvider extends IInterface {
                     zzc.zza(parcel2, booleanFlagValue);
                     break;
                 case 3:
-                    i = getIntFlagValue(parcel.readString(), parcel.readInt(), parcel.readInt());
+                    int intFlagValue = getIntFlagValue(parcel.readString(), parcel.readInt(), parcel.readInt());
                     parcel2.writeNoException();
-                    parcel2.writeInt(i);
+                    parcel2.writeInt(intFlagValue);
                     break;
                 case 4:
                     long longFlagValue = getLongFlagValue(parcel.readString(), parcel.readLong(), parcel.readInt());

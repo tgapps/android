@@ -44,12 +44,7 @@ public final class zzaa {
     }
 
     final boolean zzaj() {
-        if (this.zzgw.isEmpty()) {
-            if (this.zzgx.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return (this.zzgw.isEmpty() && this.zzgx.isEmpty()) ? false : true;
     }
 
     public final void zzak() {

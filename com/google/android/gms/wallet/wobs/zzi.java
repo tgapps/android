@@ -7,26 +7,25 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public final class zzi implements Creator<LoyaltyPoints> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        String str = null;
+        TimeInterval timeInterval = null;
         LoyaltyPointsBalance loyaltyPointsBalance = null;
-        TimeInterval timeInterval = loyaltyPointsBalance;
+        String str = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
-            int fieldId = SafeParcelReader.getFieldId(readHeader);
-            if (fieldId != 5) {
-                switch (fieldId) {
-                    case 2:
-                        str = SafeParcelReader.createString(parcel, readHeader);
-                        break;
-                    case 3:
-                        loyaltyPointsBalance = (LoyaltyPointsBalance) SafeParcelReader.createParcelable(parcel, readHeader, LoyaltyPointsBalance.CREATOR);
-                        break;
-                    default:
-                        SafeParcelReader.skipUnknownField(parcel, readHeader);
-                        break;
-                }
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 2:
+                    str = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 3:
+                    loyaltyPointsBalance = (LoyaltyPointsBalance) SafeParcelReader.createParcelable(parcel, readHeader, LoyaltyPointsBalance.CREATOR);
+                    break;
+                case 5:
+                    timeInterval = (TimeInterval) SafeParcelReader.createParcelable(parcel, readHeader, TimeInterval.CREATOR);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
             }
-            timeInterval = (TimeInterval) SafeParcelReader.createParcelable(parcel, readHeader, TimeInterval.CREATOR);
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new LoyaltyPoints(str, loyaltyPointsBalance, timeInterval);

@@ -16,10 +16,7 @@ public class GetFileSizeTask extends DownloadFileTask {
         try {
             return Long.valueOf((long) createConnection(new URL(getURLString()), 6).getContentLength());
         } catch (Throwable e) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Failed to get size ");
-            stringBuilder.append(this.mUrlString);
-            HockeyLog.error(stringBuilder.toString(), e);
+            HockeyLog.error("Failed to get size " + this.mUrlString, e);
             return Long.valueOf(0);
         }
     }

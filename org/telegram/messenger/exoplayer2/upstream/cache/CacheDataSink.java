@@ -32,120 +32,68 @@ public final class CacheDataSink implements DataSink {
     private void closeCurrentOutputStream() throws java.io.IOException {
         /* JADX: method processing error */
 /*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink.closeCurrentOutputStream():void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
+Error: java.util.NoSuchElementException
+	at java.util.HashMap$HashIterator.nextEntry(HashMap.java:925)
+	at java.util.HashMap$KeyIterator.next(HashMap.java:956)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.applyRemove(BlockFinallyExtract.java:535)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.extractFinally(BlockFinallyExtract.java:175)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.processExceptionHandler(BlockFinallyExtract.java:79)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.visit(BlockFinallyExtract.java:51)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
+	at jadx.core.ProcessClass.process(ProcessClass.java:37)
 	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
 	at jadx.core.ProcessClass.process(ProcessClass.java:42)
 	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
 	at jadx.api.JavaClass.decompile(JavaClass.java:62)
 	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
 */
         /*
-        r0 = this;
-        r0 = r4.outputStream;
-        if (r0 != 0) goto L_0x0005;
-    L_0x0004:
-        return;
+        r5 = this;
+        r4 = 0;
+        r2 = r5.outputStream;
+        if (r2 != 0) goto L_0x0006;
     L_0x0005:
-        r0 = 0;
-        r1 = 0;
-        r2 = r4.outputStream;	 Catch:{ all -> 0x002e }
-        r2.flush();	 Catch:{ all -> 0x002e }
-        r2 = r4.underlyingFileOutputStream;	 Catch:{ all -> 0x002e }
-        r2 = r2.getFD();	 Catch:{ all -> 0x002e }
-        r2.sync();	 Catch:{ all -> 0x002e }
-        r0 = 1;
-        r2 = r4.outputStream;
-        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r2);
-        r4.outputStream = r1;
-        r2 = r4.file;
-        r4.file = r1;
-        if (r0 == 0) goto L_0x0029;
-    L_0x0023:
-        r1 = r4.cache;
-        r1.commitFile(r2);
-        goto L_0x002c;
-    L_0x0029:
-        r2.delete();
         return;
-    L_0x002e:
+    L_0x0006:
+        r1 = 0;
+        r2 = r5.outputStream;	 Catch:{ all -> 0x002d }
+        r2.flush();	 Catch:{ all -> 0x002d }
+        r2 = r5.underlyingFileOutputStream;	 Catch:{ all -> 0x002d }
+        r2 = r2.getFD();	 Catch:{ all -> 0x002d }
+        r2.sync();	 Catch:{ all -> 0x002d }
+        r1 = 1;
+        r2 = r5.outputStream;
+        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r2);
+        r5.outputStream = r4;
+        r0 = r5.file;
+        r5.file = r4;
+        if (r1 == 0) goto L_0x0029;
+    L_0x0023:
+        r2 = r5.cache;
+        r2.commitFile(r0);
+        goto L_0x0005;
+    L_0x0029:
+        r0.delete();
+        goto L_0x0005;
+    L_0x002d:
         r2 = move-exception;
-        r3 = r4.outputStream;
+        r3 = r5.outputStream;
         org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r3);
-        r4.outputStream = r1;
-        r3 = r4.file;
-        r4.file = r1;
-        if (r0 == 0) goto L_0x0042;
-        r1 = r4.cache;
-        r1.commitFile(r3);
-        goto L_0x0045;
-        r3.delete();
+        r5.outputStream = r4;
+        r0 = r5.file;
+        r5.file = r4;
+        if (r1 == 0) goto L_0x0041;
+    L_0x003b:
+        r3 = r5.cache;
+        r3.commitFile(r0);
+    L_0x0040:
         throw r2;
+    L_0x0041:
+        r0.delete();
+        goto L_0x0040;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink.closeCurrentOutputStream():void");
-    }
-
-    public void write(byte[] r1, int r2, int r3) throws org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink.CacheDataSinkException {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink.write(byte[], int, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r9.dataSpec;
-        if (r0 != 0) goto L_0x0005;
-    L_0x0004:
-        return;
-    L_0x0005:
-        r0 = 0;
-        if (r0 >= r12) goto L_0x0042;
-    L_0x0008:
-        r1 = r9.outputStreamBytesWritten;	 Catch:{ IOException -> 0x003b }
-        r3 = r9.maxCacheFileSize;	 Catch:{ IOException -> 0x003b }
-        r5 = (r1 > r3 ? 1 : (r1 == r3 ? 0 : -1));	 Catch:{ IOException -> 0x003b }
-        if (r5 != 0) goto L_0x0016;	 Catch:{ IOException -> 0x003b }
-        r9.closeCurrentOutputStream();	 Catch:{ IOException -> 0x003b }
-        r9.openNextOutputStream();	 Catch:{ IOException -> 0x003b }
-        r1 = r12 - r0;	 Catch:{ IOException -> 0x003b }
-        r1 = (long) r1;	 Catch:{ IOException -> 0x003b }
-        r3 = r9.maxCacheFileSize;	 Catch:{ IOException -> 0x003b }
-        r5 = r9.outputStreamBytesWritten;	 Catch:{ IOException -> 0x003b }
-        r7 = r3 - r5;	 Catch:{ IOException -> 0x003b }
-        r1 = java.lang.Math.min(r1, r7);	 Catch:{ IOException -> 0x003b }
-        r1 = (int) r1;	 Catch:{ IOException -> 0x003b }
-        r2 = r9.outputStream;	 Catch:{ IOException -> 0x003b }
-        r3 = r11 + r0;	 Catch:{ IOException -> 0x003b }
-        r2.write(r10, r3, r1);	 Catch:{ IOException -> 0x003b }
-        r0 = r0 + r1;	 Catch:{ IOException -> 0x003b }
-        r2 = r9.outputStreamBytesWritten;	 Catch:{ IOException -> 0x003b }
-        r4 = (long) r1;	 Catch:{ IOException -> 0x003b }
-        r6 = r2 + r4;	 Catch:{ IOException -> 0x003b }
-        r9.outputStreamBytesWritten = r6;	 Catch:{ IOException -> 0x003b }
-        r2 = r9.dataSpecBytesWritten;	 Catch:{ IOException -> 0x003b }
-        r4 = (long) r1;	 Catch:{ IOException -> 0x003b }
-        r6 = r2 + r4;	 Catch:{ IOException -> 0x003b }
-        r9.dataSpecBytesWritten = r6;	 Catch:{ IOException -> 0x003b }
-        goto L_0x0006;
-    L_0x003b:
-        r0 = move-exception;
-        r1 = new org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink$CacheDataSinkException;
-        r1.<init>(r0);
-        throw r1;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink.write(byte[], int, int):void");
     }
 
     public CacheDataSink(Cache cache, long maxCacheFileSize) {
@@ -172,6 +120,27 @@ Caused by: java.lang.NullPointerException
         this.dataSpec = null;
     }
 
+    public void write(byte[] buffer, int offset, int length) throws CacheDataSinkException {
+        if (this.dataSpec != null) {
+            int bytesWritten = 0;
+            while (bytesWritten < length) {
+                try {
+                    if (this.outputStreamBytesWritten == this.maxCacheFileSize) {
+                        closeCurrentOutputStream();
+                        openNextOutputStream();
+                    }
+                    int bytesToWrite = (int) Math.min((long) (length - bytesWritten), this.maxCacheFileSize - this.outputStreamBytesWritten);
+                    this.outputStream.write(buffer, offset + bytesWritten, bytesToWrite);
+                    bytesWritten += bytesToWrite;
+                    this.outputStreamBytesWritten += (long) bytesToWrite;
+                    this.dataSpecBytesWritten += (long) bytesToWrite;
+                } catch (IOException e) {
+                    throw new CacheDataSinkException(e);
+                }
+            }
+        }
+    }
+
     public void close() throws CacheDataSinkException {
         if (this.dataSpec != null) {
             try {
@@ -183,13 +152,13 @@ Caused by: java.lang.NullPointerException
     }
 
     private void openNextOutputStream() throws IOException {
-        long j;
+        long maxLength;
         if (this.dataSpec.length == -1) {
-            j = this.maxCacheFileSize;
+            maxLength = this.maxCacheFileSize;
         } else {
-            j = Math.min(this.dataSpec.length - this.dataSpecBytesWritten, this.maxCacheFileSize);
+            maxLength = Math.min(this.dataSpec.length - this.dataSpecBytesWritten, this.maxCacheFileSize);
         }
-        this.file = this.cache.startFile(this.dataSpec.key, this.dataSpec.absoluteStreamPosition + this.dataSpecBytesWritten, j);
+        this.file = this.cache.startFile(this.dataSpec.key, this.dataSpec.absoluteStreamPosition + this.dataSpecBytesWritten, maxLength);
         this.underlyingFileOutputStream = new FileOutputStream(this.file);
         if (this.bufferSize > 0) {
             if (this.bufferedOutputStream == null) {

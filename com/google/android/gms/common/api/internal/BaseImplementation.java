@@ -60,7 +60,7 @@ public class BaseImplementation {
         }
 
         public final void setFailedResult(Status status) {
-            Preconditions.checkArgument(status.isSuccess() ^ 1, "Failed result must not be success");
+            Preconditions.checkArgument(!status.isSuccess(), "Failed result must not be success");
             Result createFailedResult = createFailedResult(status);
             setResult(createFailedResult);
             onSetFailedResult(createFailedResult);

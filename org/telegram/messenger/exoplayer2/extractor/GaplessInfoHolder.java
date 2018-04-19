@@ -21,10 +21,8 @@ public final class GaplessInfoHolder {
     public boolean setFromXingHeaderValue(int value) {
         int encoderDelay = value >> 12;
         int encoderPadding = value & 4095;
-        if (encoderDelay <= 0) {
-            if (encoderPadding <= 0) {
-                return false;
-            }
+        if (encoderDelay <= 0 && encoderPadding <= 0) {
+            return false;
         }
         this.encoderDelay = encoderDelay;
         this.encoderPadding = encoderPadding;
@@ -49,21 +47,21 @@ public final class GaplessInfoHolder {
             return false;
         }
         Matcher matcher = GAPLESS_COMMENT_PATTERN.matcher(data);
-        if (matcher.find()) {
-            try {
-                int encoderDelay = Integer.parseInt(matcher.group(1), 16);
-                int encoderPadding = Integer.parseInt(matcher.group(2), 16);
-                if (encoderDelay <= 0) {
-                    if (encoderPadding > 0) {
-                    }
-                }
-                this.encoderDelay = encoderDelay;
-                this.encoderPadding = encoderPadding;
-                return true;
-            } catch (NumberFormatException e) {
-            }
+        if (!matcher.find()) {
+            return false;
         }
-        return false;
+        try {
+            int encoderDelay = Integer.parseInt(matcher.group(1), 16);
+            int encoderPadding = Integer.parseInt(matcher.group(2), 16);
+            if (encoderDelay <= 0 && encoderPadding <= 0) {
+                return false;
+            }
+            this.encoderDelay = encoderDelay;
+            this.encoderPadding = encoderPadding;
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public boolean hasGaplessInfo() {

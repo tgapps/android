@@ -43,13 +43,8 @@ final class zzd {
             }
         }
         if (Log.isLoggable("FirebaseMessaging", 3)) {
-            stringExtra = String.valueOf(bundle);
-            StringBuilder stringBuilder = new StringBuilder((22 + String.valueOf(str).length()) + String.valueOf(stringExtra).length());
-            stringBuilder.append("Sending event=");
-            stringBuilder.append(str);
-            stringBuilder.append(" params=");
-            stringBuilder.append(stringExtra);
-            Log.d("FirebaseMessaging", stringBuilder.toString());
+            String valueOf = String.valueOf(bundle);
+            Log.d("FirebaseMessaging", new StringBuilder((String.valueOf(str).length() + 22) + String.valueOf(valueOf).length()).append("Sending event=").append(str).append(" params=").append(valueOf).toString());
         }
         AppMeasurement zzx = zzx(context);
         if (zzx != null) {

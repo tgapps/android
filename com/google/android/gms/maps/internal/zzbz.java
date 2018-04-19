@@ -26,24 +26,30 @@ public class zzbz {
             return zzck;
         }
         int isGooglePlayServicesAvailable = GooglePlayServicesUtilLight.isGooglePlayServicesAvailable(context, 12451000);
-        if (isGooglePlayServicesAvailable != 0) {
-            throw new GooglePlayServicesNotAvailableException(isGooglePlayServicesAvailable);
-        }
-        zze com_google_android_gms_maps_internal_zze;
-        Log.i(TAG, "Making Creator dynamically");
-        IBinder iBinder = (IBinder) zza(zzb(context).getClassLoader(), "com.google.android.gms.maps.internal.CreatorImpl");
-        if (iBinder == null) {
-            com_google_android_gms_maps_internal_zze = null;
-        } else {
-            IInterface queryLocalInterface = iBinder.queryLocalInterface("com.google.android.gms.maps.internal.ICreator");
-            com_google_android_gms_maps_internal_zze = queryLocalInterface instanceof zze ? (zze) queryLocalInterface : new zzf(iBinder);
-        }
-        zzck = com_google_android_gms_maps_internal_zze;
-        try {
-            zzck.zza(ObjectWrapper.wrap(zzb(context).getResources()), GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE);
-            return zzck;
-        } catch (RemoteException e) {
-            throw new RuntimeRemoteException(e);
+        switch (isGooglePlayServicesAvailable) {
+            case 0:
+                zze com_google_android_gms_maps_internal_zze;
+                Log.i(TAG, "Making Creator dynamically");
+                IBinder iBinder = (IBinder) zza(zzb(context).getClassLoader(), "com.google.android.gms.maps.internal.CreatorImpl");
+                if (iBinder == null) {
+                    com_google_android_gms_maps_internal_zze = null;
+                } else {
+                    IInterface queryLocalInterface = iBinder.queryLocalInterface("com.google.android.gms.maps.internal.ICreator");
+                    if (queryLocalInterface instanceof zze) {
+                        com_google_android_gms_maps_internal_zze = (zze) queryLocalInterface;
+                    } else {
+                        Object com_google_android_gms_maps_internal_zzf = new zzf(iBinder);
+                    }
+                }
+                zzck = com_google_android_gms_maps_internal_zze;
+                try {
+                    zzck.zza(ObjectWrapper.wrap(zzb(context).getResources()), GooglePlayServicesUtil.GOOGLE_PLAY_SERVICES_VERSION_CODE);
+                    return zzck;
+                } catch (RemoteException e) {
+                    throw new RuntimeRemoteException(e);
+                }
+            default:
+                throw new GooglePlayServicesNotAvailableException(isGooglePlayServicesAvailable);
         }
     }
 
@@ -68,8 +74,8 @@ public class zzbz {
             return zza(((ClassLoader) Preconditions.checkNotNull(classLoader)).loadClass(str));
         } catch (ClassNotFoundException e) {
             String str2 = "Unable to find dynamic class ";
-            str = String.valueOf(str);
-            throw new IllegalStateException(str.length() != 0 ? str2.concat(str) : new String(str2));
+            String valueOf = String.valueOf(str);
+            throw new IllegalStateException(valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2));
         }
     }
 
@@ -77,9 +83,9 @@ public class zzbz {
         if (zzcj != null) {
             return zzcj;
         }
-        context = zzc(context);
-        zzcj = context;
-        return context;
+        Context zzc = zzc(context);
+        zzcj = zzc;
+        return zzc;
     }
 
     private static Context zzc(Context context) {

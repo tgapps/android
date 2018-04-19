@@ -2,7 +2,6 @@ package net.hockeyapp.android;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 
 public class Tracking {
     public static long getUsageTime(Context context) {
@@ -10,18 +9,11 @@ public class Tracking {
             return 0;
         }
         SharedPreferences preferences = getPreferences(context);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("usageTime");
-        stringBuilder.append(Constants.APP_VERSION);
-        long sum = preferences.getLong(stringBuilder.toString(), 0);
+        long sum = preferences.getLong("usageTime" + Constants.APP_VERSION, 0);
         if (sum >= 0) {
             return sum / 1000;
         }
-        Editor edit = preferences.edit();
-        StringBuilder stringBuilder2 = new StringBuilder();
-        stringBuilder2.append("usageTime");
-        stringBuilder2.append(Constants.APP_VERSION);
-        edit.remove(stringBuilder2.toString()).apply();
+        preferences.edit().remove("usageTime" + Constants.APP_VERSION).apply();
         return 0;
     }
 

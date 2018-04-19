@@ -14,20 +14,18 @@ public class AccountAccessor extends Stub {
     private Account zzs;
 
     public static Account getAccountBinderSafe(IAccountAccessor iAccountAccessor) {
-        Account account;
+        Account account = null;
         if (iAccountAccessor != null) {
             long clearCallingIdentity = Binder.clearCallingIdentity();
             try {
                 account = iAccountAccessor.getAccount();
-                return account;
             } catch (RemoteException e) {
-                account = "AccountAccessor";
-                Log.w(account, "Remote account accessor probably died");
+                Log.w("AccountAccessor", "Remote account accessor probably died");
             } finally {
                 Binder.restoreCallingIdentity(clearCallingIdentity);
             }
         }
-        return null;
+        return account;
     }
 
     public boolean equals(Object obj) {

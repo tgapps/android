@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import org.telegram.messenger.exoplayer2.DefaultLoadControl;
 import org.telegram.messenger.exoplayer2.util.Assertions;
+import org.telegram.messenger.exoplayer2.util.TraceUtil;
 import org.telegram.messenger.exoplayer2.util.Util;
 
 public final class Loader implements LoaderErrorThrower {
@@ -45,110 +46,6 @@ public final class Loader implements LoaderErrorThrower {
         private final T loadable;
         private volatile boolean released;
         private final long startTimeMs;
-
-        public void run() {
-            /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.upstream.Loader.LoadTask.run():void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-            /*
-            r0 = this;
-            r0 = 2;
-            r1 = 3;
-            r2 = java.lang.Thread.currentThread();	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r4.executorThread = r2;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r2 = r4.loadable;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r2 = r2.isLoadCanceled();	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            if (r2 != 0) goto L_0x003c;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-        L_0x0010:
-            r2 = new java.lang.StringBuilder;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r2.<init>();	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r3 = "load:";	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r2.append(r3);	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r3 = r4.loadable;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r3 = r3.getClass();	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r3 = r3.getSimpleName();	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r2.append(r3);	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r2 = r2.toString();	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            org.telegram.messenger.exoplayer2.util.TraceUtil.beginSection(r2);	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            r2 = r4.loadable;	 Catch:{ all -> 0x0037 }
-            r2.load();	 Catch:{ all -> 0x0037 }
-            org.telegram.messenger.exoplayer2.util.TraceUtil.endSection();	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            goto L_0x003c;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-        L_0x0037:
-            r2 = move-exception;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            org.telegram.messenger.exoplayer2.util.TraceUtil.endSection();	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            throw r2;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-        L_0x003c:
-            r2 = r4.released;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            if (r2 != 0) goto L_0x00a9;	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-        L_0x0040:
-            r4.sendEmptyMessage(r0);	 Catch:{ IOException -> 0x009d, InterruptedException -> 0x008b, Exception -> 0x0072, OutOfMemoryError -> 0x0059, Error -> 0x0044 }
-            goto L_0x00a9;
-        L_0x0044:
-            r0 = move-exception;
-            r1 = "LoadTask";
-            r2 = "Unexpected error loading stream";
-            android.util.Log.e(r1, r2, r0);
-            r1 = r4.released;
-            if (r1 != 0) goto L_0x0058;
-            r1 = 4;
-            r1 = r4.obtainMessage(r1, r0);
-            r1.sendToTarget();
-            throw r0;
-        L_0x0059:
-            r0 = move-exception;
-            r2 = "LoadTask";
-            r3 = "OutOfMemory error loading stream";
-            android.util.Log.e(r2, r3, r0);
-            r2 = r4.released;
-            if (r2 != 0) goto L_0x00a9;
-            r2 = new org.telegram.messenger.exoplayer2.upstream.Loader$UnexpectedLoaderException;
-            r2.<init>(r0);
-            r1 = r4.obtainMessage(r1, r2);
-            r1.sendToTarget();
-            goto L_0x00a9;
-        L_0x0072:
-            r0 = move-exception;
-            r2 = "LoadTask";
-            r3 = "Unexpected exception loading stream";
-            android.util.Log.e(r2, r3, r0);
-            r2 = r4.released;
-            if (r2 != 0) goto L_0x00a9;
-            r2 = new org.telegram.messenger.exoplayer2.upstream.Loader$UnexpectedLoaderException;
-            r2.<init>(r0);
-            r1 = r4.obtainMessage(r1, r2);
-            r1.sendToTarget();
-            goto L_0x00a9;
-        L_0x008b:
-            r1 = move-exception;
-            r2 = r4.loadable;
-            r2 = r2.isLoadCanceled();
-            org.telegram.messenger.exoplayer2.util.Assertions.checkState(r2);
-            r2 = r4.released;
-            if (r2 != 0) goto L_0x00a9;
-            r4.sendEmptyMessage(r0);
-            goto L_0x00a9;
-        L_0x009d:
-            r0 = move-exception;
-            r2 = r4.released;
-            if (r2 != 0) goto L_0x00a9;
-            r1 = r4.obtainMessage(r1, r0);
-            r1.sendToTarget();
-            return;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.upstream.Loader.LoadTask.run():void");
-        }
 
         public LoadTask(Looper looper, T loadable, Callback<T> callback, int defaultMinRetryCount, long startTimeMs) {
             super(looper);
@@ -195,6 +92,47 @@ Caused by: java.lang.NullPointerException
             }
         }
 
+        public void run() {
+            try {
+                this.executorThread = Thread.currentThread();
+                if (!this.loadable.isLoadCanceled()) {
+                    TraceUtil.beginSection("load:" + this.loadable.getClass().getSimpleName());
+                    this.loadable.load();
+                    TraceUtil.endSection();
+                }
+                if (!this.released) {
+                    sendEmptyMessage(2);
+                }
+            } catch (IOException e) {
+                if (!this.released) {
+                    obtainMessage(3, e).sendToTarget();
+                }
+            } catch (InterruptedException e2) {
+                Assertions.checkState(this.loadable.isLoadCanceled());
+                if (!this.released) {
+                    sendEmptyMessage(2);
+                }
+            } catch (Exception e3) {
+                Log.e(TAG, "Unexpected exception loading stream", e3);
+                if (!this.released) {
+                    obtainMessage(3, new UnexpectedLoaderException(e3)).sendToTarget();
+                }
+            } catch (OutOfMemoryError e4) {
+                Log.e(TAG, "OutOfMemory error loading stream", e4);
+                if (!this.released) {
+                    obtainMessage(3, new UnexpectedLoaderException(e4)).sendToTarget();
+                }
+            } catch (Error e5) {
+                Log.e(TAG, "Unexpected error loading stream", e5);
+                if (!this.released) {
+                    obtainMessage(4, e5).sendToTarget();
+                }
+                throw e5;
+            } catch (Throwable th) {
+                TraceUtil.endSection();
+            }
+        }
+
         public void handleMessage(Message msg) {
             if (!this.released) {
                 if (msg.what == 0) {
@@ -212,35 +150,37 @@ Caused by: java.lang.NullPointerException
                     switch (msg.what) {
                         case 1:
                             this.callback.onLoadCanceled(this.loadable, nowMs, durationMs, false);
-                            break;
+                            return;
                         case 2:
                             try {
                                 this.callback.onLoadCompleted(this.loadable, nowMs, durationMs);
-                                break;
+                                return;
                             } catch (RuntimeException e) {
                                 Log.e(TAG, "Unexpected exception handling load completed", e);
                                 Loader.this.fatalError = new UnexpectedLoaderException(e);
-                                break;
+                                return;
                             }
                         case 3:
                             this.currentError = (IOException) msg.obj;
                             int retryAction = this.callback.onLoadError(this.loadable, nowMs, durationMs, this.currentError);
-                            if (retryAction != 3) {
-                                if (retryAction != 2) {
-                                    int i = 1;
-                                    if (retryAction != 1) {
-                                        i = 1 + this.errorCount;
-                                    }
-                                    this.errorCount = i;
-                                    start(getRetryDelayMillis());
-                                    break;
+                            if (retryAction == 3) {
+                                Loader.this.fatalError = this.currentError;
+                                return;
+                            } else if (retryAction != 2) {
+                                int i;
+                                if (retryAction == 1) {
+                                    i = 1;
+                                } else {
+                                    i = this.errorCount + 1;
                                 }
+                                this.errorCount = i;
+                                start(getRetryDelayMillis());
+                                return;
+                            } else {
+                                return;
                             }
-                            Loader.this.fatalError = this.currentError;
-                            break;
-                            break;
                         default:
-                            break;
+                            return;
                     }
                 }
             }
@@ -292,12 +232,7 @@ Caused by: java.lang.NullPointerException
 
     public static final class UnexpectedLoaderException extends IOException {
         public UnexpectedLoaderException(Throwable cause) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Unexpected ");
-            stringBuilder.append(cause.getClass().getSimpleName());
-            stringBuilder.append(": ");
-            stringBuilder.append(cause.getMessage());
-            super(stringBuilder.toString(), cause);
+            super("Unexpected " + cause.getClass().getSimpleName() + ": " + cause.getMessage(), cause);
         }
     }
 
@@ -348,7 +283,11 @@ Caused by: java.lang.NullPointerException
         if (this.fatalError != null) {
             throw this.fatalError;
         } else if (this.currentTask != null) {
-            this.currentTask.maybeThrowError(minRetryCount == Integer.MIN_VALUE ? this.currentTask.defaultMinRetryCount : minRetryCount);
+            LoadTask loadTask = this.currentTask;
+            if (minRetryCount == Integer.MIN_VALUE) {
+                minRetryCount = this.currentTask.defaultMinRetryCount;
+            }
+            loadTask.maybeThrowError(minRetryCount);
         }
     }
 }

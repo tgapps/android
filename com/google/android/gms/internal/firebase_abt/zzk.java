@@ -8,111 +8,100 @@ import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 
 public final class zzk {
     private static void zza(String str, Object obj, StringBuffer stringBuffer, StringBuffer stringBuffer2) throws IllegalAccessException, InvocationTargetException {
-        if (obj != null) {
-            int i;
-            if (obj instanceof zzj) {
-                int length = stringBuffer.length();
-                if (str != null) {
-                    stringBuffer2.append(stringBuffer);
-                    stringBuffer2.append(zzb(str));
-                    stringBuffer2.append(" <\n");
-                    stringBuffer.append("  ");
-                }
-                Class cls = obj.getClass();
-                for (Field field : cls.getFields()) {
-                    int modifiers = field.getModifiers();
-                    String name = field.getName();
-                    if (!("cachedSize".equals(name) || (modifiers & 1) != 1 || (modifiers & 8) == 8 || name.startsWith("_") || name.endsWith("_"))) {
-                        Class type = field.getType();
-                        Object obj2 = field.get(obj);
-                        if (!type.isArray() || type.getComponentType() == Byte.TYPE) {
-                            zza(name, obj2, stringBuffer, stringBuffer2);
-                        } else {
-                            modifiers = obj2 == null ? 0 : Array.getLength(obj2);
-                            for (int i2 = 0; i2 < modifiers; i2++) {
-                                zza(name, Array.get(obj2, i2), stringBuffer, stringBuffer2);
-                            }
+        if (obj == null) {
+            return;
+        }
+        int modifiers;
+        int length;
+        if (obj instanceof zzj) {
+            String name;
+            int length2 = stringBuffer.length();
+            if (str != null) {
+                stringBuffer2.append(stringBuffer).append(zzb(str)).append(" <\n");
+                stringBuffer.append("  ");
+            }
+            Class cls = obj.getClass();
+            for (Field field : cls.getFields()) {
+                modifiers = field.getModifiers();
+                name = field.getName();
+                if (!("cachedSize".equals(name) || (modifiers & 1) != 1 || (modifiers & 8) == 8 || name.startsWith("_") || name.endsWith("_"))) {
+                    Class type = field.getType();
+                    Object obj2 = field.get(obj);
+                    if (!type.isArray() || type.getComponentType() == Byte.TYPE) {
+                        zza(name, obj2, stringBuffer, stringBuffer2);
+                    } else {
+                        length = obj2 == null ? 0 : Array.getLength(obj2);
+                        for (modifiers = 0; modifiers < length; modifiers++) {
+                            zza(name, Array.get(obj2, modifiers), stringBuffer, stringBuffer2);
                         }
                     }
                 }
-                for (Method name2 : cls.getMethods()) {
-                    String name3 = name2.getName();
-                    if (name3.startsWith("set")) {
-                        name3 = name3.substring(3);
-                        try {
-                            String str2 = "has";
-                            String valueOf = String.valueOf(name3);
-                            if (((Boolean) cls.getMethod(valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2), new Class[0]).invoke(obj, new Object[0])).booleanValue()) {
-                                str2 = "get";
-                                valueOf = String.valueOf(name3);
-                                zza(name3, cls.getMethod(valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2), new Class[0]).invoke(obj, new Object[0]), stringBuffer, stringBuffer2);
+            }
+            for (Method name2 : cls.getMethods()) {
+                String name3 = name2.getName();
+                if (name3.startsWith("set")) {
+                    String substring = name3.substring(3);
+                    try {
+                        name = "has";
+                        name3 = String.valueOf(substring);
+                        if (((Boolean) cls.getMethod(name3.length() != 0 ? name.concat(name3) : new String(name), new Class[0]).invoke(obj, new Object[0])).booleanValue()) {
+                            try {
+                                name = "get";
+                                name3 = String.valueOf(substring);
+                                zza(substring, cls.getMethod(name3.length() != 0 ? name.concat(name3) : new String(name), new Class[0]).invoke(obj, new Object[0]), stringBuffer, stringBuffer2);
+                            } catch (NoSuchMethodException e) {
                             }
-                        } catch (NoSuchMethodException e) {
                         }
+                    } catch (NoSuchMethodException e2) {
                     }
                 }
-                if (str != null) {
-                    stringBuffer.setLength(length);
-                    stringBuffer2.append(stringBuffer);
-                    stringBuffer2.append(">\n");
-                }
+            }
+            if (str != null) {
+                stringBuffer.setLength(length2);
+                stringBuffer2.append(stringBuffer).append(">\n");
                 return;
             }
-            str = zzb(str);
-            stringBuffer2.append(stringBuffer);
-            stringBuffer2.append(str);
-            stringBuffer2.append(": ");
-            int length2;
-            if (obj instanceof String) {
-                String str3 = (String) obj;
-                if (!str3.startsWith("http") && str3.length() > Callback.DEFAULT_DRAG_ANIMATION_DURATION) {
-                    str3 = String.valueOf(str3.substring(0, Callback.DEFAULT_DRAG_ANIMATION_DURATION)).concat("[...]");
-                }
-                length2 = str3.length();
-                StringBuilder stringBuilder = new StringBuilder(length2);
-                for (i = 0; i < length2; i++) {
-                    char charAt = str3.charAt(i);
-                    if (charAt < ' ' || charAt > '~' || charAt == '\"' || charAt == '\'') {
-                        stringBuilder.append(String.format("\\u%04x", new Object[]{Integer.valueOf(charAt)}));
-                    } else {
-                        stringBuilder.append(charAt);
-                    }
-                }
-                str = stringBuilder.toString();
-                stringBuffer2.append("\"");
-                stringBuffer2.append(str);
-                str = "\"";
-            } else {
-                if (obj instanceof byte[]) {
-                    byte[] bArr = (byte[]) obj;
-                    if (bArr == null) {
-                        str = "\"\"";
-                    } else {
-                        stringBuffer2.append('\"');
-                        for (byte b : bArr) {
-                            int i3 = b & 255;
-                            if (i3 != 92) {
-                                if (i3 != 34) {
-                                    if (i3 < 32 || i3 >= 127) {
-                                        stringBuffer2.append(String.format("\\%03o", new Object[]{Integer.valueOf(i3)}));
-                                    } else {
-                                        stringBuffer2.append((char) i3);
-                                    }
-                                }
-                            }
-                            stringBuffer2.append('\\');
-                            stringBuffer2.append((char) i3);
-                        }
-                        stringBuffer2.append('\"');
-                    }
-                } else {
-                    stringBuffer2.append(obj);
-                }
-                stringBuffer2.append("\n");
-            }
-            stringBuffer2.append(str);
-            stringBuffer2.append("\n");
+            return;
         }
+        stringBuffer2.append(stringBuffer).append(zzb(str)).append(": ");
+        if (obj instanceof String) {
+            String str2 = (String) obj;
+            if (!str2.startsWith("http") && str2.length() > Callback.DEFAULT_DRAG_ANIMATION_DURATION) {
+                str2 = String.valueOf(str2.substring(0, Callback.DEFAULT_DRAG_ANIMATION_DURATION)).concat("[...]");
+            }
+            modifiers = str2.length();
+            StringBuilder stringBuilder = new StringBuilder(modifiers);
+            for (length = 0; length < modifiers; length++) {
+                char charAt = str2.charAt(length);
+                if (charAt < ' ' || charAt > '~' || charAt == '\"' || charAt == '\'') {
+                    stringBuilder.append(String.format("\\u%04x", new Object[]{Integer.valueOf(charAt)}));
+                } else {
+                    stringBuilder.append(charAt);
+                }
+            }
+            stringBuffer2.append("\"").append(stringBuilder.toString()).append("\"");
+        } else if (obj instanceof byte[]) {
+            byte[] bArr = (byte[]) obj;
+            if (bArr == null) {
+                stringBuffer2.append("\"\"");
+            } else {
+                stringBuffer2.append('\"');
+                for (byte b : bArr) {
+                    modifiers = b & 255;
+                    if (modifiers == 92 || modifiers == 34) {
+                        stringBuffer2.append('\\').append((char) modifiers);
+                    } else if (modifiers < 32 || modifiers >= 127) {
+                        stringBuffer2.append(String.format("\\%03o", new Object[]{Integer.valueOf(modifiers)}));
+                    } else {
+                        stringBuffer2.append((char) modifiers);
+                    }
+                }
+                stringBuffer2.append('\"');
+            }
+        } else {
+            stringBuffer2.append(obj);
+        }
+        stringBuffer2.append("\n");
     }
 
     public static <T extends zzj> String zzb(T t) {
@@ -140,14 +129,13 @@ public final class zzk {
         StringBuffer stringBuffer = new StringBuffer();
         for (int i = 0; i < str.length(); i++) {
             char charAt = str.charAt(i);
-            if (i != 0) {
-                if (Character.isUpperCase(charAt)) {
-                    stringBuffer.append('_');
-                }
+            if (i == 0) {
+                stringBuffer.append(Character.toLowerCase(charAt));
+            } else if (Character.isUpperCase(charAt)) {
+                stringBuffer.append('_').append(Character.toLowerCase(charAt));
+            } else {
                 stringBuffer.append(charAt);
             }
-            charAt = Character.toLowerCase(charAt);
-            stringBuffer.append(charAt);
         }
         return stringBuffer.toString();
     }

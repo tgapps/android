@@ -47,99 +47,26 @@ public final class Palette {
         private final List<Swatch> mSwatches;
         private final List<Target> mTargets = new ArrayList();
 
-        private android.graphics.Bitmap scaleBitmapDown(android.graphics.Bitmap r1) {
-            /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: android.support.v7.graphics.Palette.Builder.scaleBitmapDown(android.graphics.Bitmap):android.graphics.Bitmap
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-            /*
-            r0 = this;
-            r0 = -4616189618054758400; // 0xbff0000000000000 float:0.0 double:-1.0;
-            r2 = r7.mResizeArea;
-            if (r2 <= 0) goto L_0x001d;
-        L_0x0006:
-            r2 = r8.getWidth();
-            r3 = r8.getHeight();
-            r2 = r2 * r3;
-            r3 = r7.mResizeArea;
-            if (r2 <= r3) goto L_0x001c;
-        L_0x0013:
-            r3 = r7.mResizeArea;
-            r3 = (double) r3;
-            r5 = (double) r2;
-            r3 = r3 / r5;
-            r0 = java.lang.Math.sqrt(r3);
-        L_0x001c:
-            goto L_0x0037;
-        L_0x001d:
-            r2 = r7.mResizeMaxDimension;
-            if (r2 <= 0) goto L_0x0037;
-        L_0x0021:
-            r2 = r8.getWidth();
-            r3 = r8.getHeight();
-            r2 = java.lang.Math.max(r2, r3);
-            r3 = r7.mResizeMaxDimension;
-            if (r2 <= r3) goto L_0x0037;
-        L_0x0031:
-            r3 = r7.mResizeMaxDimension;
-            r3 = (double) r3;
-            r5 = (double) r2;
-            r0 = r3 / r5;
-        L_0x0037:
-            r2 = 0;
-            r4 = (r0 > r2 ? 1 : (r0 == r2 ? 0 : -1));
-            if (r4 > 0) goto L_0x003e;
-        L_0x003d:
-            return r8;
-            r2 = r8.getWidth();
-            r2 = (double) r2;
-            r2 = r2 * r0;
-            r2 = java.lang.Math.ceil(r2);
-            r2 = (int) r2;
-            r3 = r8.getHeight();
-            r3 = (double) r3;
-            r3 = r3 * r0;
-            r3 = java.lang.Math.ceil(r3);
-            r3 = (int) r3;
-            r4 = 0;
-            r2 = android.graphics.Bitmap.createScaledBitmap(r8, r2, r3, r4);
-            return r2;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: android.support.v7.graphics.Palette.Builder.scaleBitmapDown(android.graphics.Bitmap):android.graphics.Bitmap");
-        }
-
         public Builder(Bitmap bitmap) {
-            if (bitmap != null) {
-                if (!bitmap.isRecycled()) {
-                    this.mFilters.add(Palette.DEFAULT_FILTER);
-                    this.mBitmap = bitmap;
-                    this.mSwatches = null;
-                    this.mTargets.add(Target.LIGHT_VIBRANT);
-                    this.mTargets.add(Target.VIBRANT);
-                    this.mTargets.add(Target.DARK_VIBRANT);
-                    this.mTargets.add(Target.LIGHT_MUTED);
-                    this.mTargets.add(Target.MUTED);
-                    this.mTargets.add(Target.DARK_MUTED);
-                    return;
-                }
+            if (bitmap == null || bitmap.isRecycled()) {
+                throw new IllegalArgumentException("Bitmap is not valid");
             }
-            throw new IllegalArgumentException("Bitmap is not valid");
+            this.mFilters.add(Palette.DEFAULT_FILTER);
+            this.mBitmap = bitmap;
+            this.mSwatches = null;
+            this.mTargets.add(Target.LIGHT_VIBRANT);
+            this.mTargets.add(Target.VIBRANT);
+            this.mTargets.add(Target.DARK_VIBRANT);
+            this.mTargets.add(Target.LIGHT_MUTED);
+            this.mTargets.add(Target.MUTED);
+            this.mTargets.add(Target.DARK_MUTED);
         }
 
         public Palette generate() {
             List<Swatch> swatches;
             TimingLogger logger = null;
             if (this.mBitmap != null) {
+                Filter[] filterArr;
                 Bitmap bitmap = scaleBitmapDown(this.mBitmap);
                 if (logger != null) {
                     logger.addSplit("Processed Bitmap");
@@ -152,7 +79,14 @@ Caused by: java.lang.NullPointerException
                     region.right = Math.min((int) Math.ceil(((double) region.right) * scale), bitmap.getWidth());
                     region.bottom = Math.min((int) Math.ceil(((double) region.bottom) * scale), bitmap.getHeight());
                 }
-                ColorCutQuantizer quantizer = new ColorCutQuantizer(getPixelsFromBitmap(bitmap), this.mMaxColors, this.mFilters.isEmpty() ? null : (Filter[]) this.mFilters.toArray(new Filter[this.mFilters.size()]));
+                int[] pixelsFromBitmap = getPixelsFromBitmap(bitmap);
+                int i = this.mMaxColors;
+                if (this.mFilters.isEmpty()) {
+                    filterArr = null;
+                } else {
+                    filterArr = (Filter[]) this.mFilters.toArray(new Filter[this.mFilters.size()]);
+                }
+                ColorCutQuantizer quantizer = new ColorCutQuantizer(pixelsFromBitmap, i, filterArr);
                 if (bitmap != this.mBitmap) {
                     bitmap.recycle();
                 }
@@ -187,6 +121,22 @@ Caused by: java.lang.NullPointerException
                 System.arraycopy(pixels, ((this.mRegion.top + row) * bitmapWidth) + this.mRegion.left, subsetPixels, row * regionWidth, regionWidth);
             }
             return subsetPixels;
+        }
+
+        private Bitmap scaleBitmapDown(Bitmap bitmap) {
+            double scaleRatio = -1.0d;
+            if (this.mResizeArea > 0) {
+                int bitmapArea = bitmap.getWidth() * bitmap.getHeight();
+                if (bitmapArea > this.mResizeArea) {
+                    scaleRatio = Math.sqrt(((double) this.mResizeArea) / ((double) bitmapArea));
+                }
+            } else if (this.mResizeMaxDimension > 0) {
+                int maxDimension = Math.max(bitmap.getWidth(), bitmap.getHeight());
+                if (maxDimension > this.mResizeMaxDimension) {
+                    scaleRatio = ((double) this.mResizeMaxDimension) / ((double) maxDimension);
+                }
+            }
+            return scaleRatio <= 0.0d ? bitmap : Bitmap.createScaledBitmap(bitmap, (int) Math.ceil(((double) bitmap.getWidth()) * scaleRatio), (int) Math.ceil(((double) bitmap.getHeight()) * scaleRatio), false);
         }
     }
 
@@ -248,7 +198,6 @@ Caused by: java.lang.NullPointerException
                     int darkTitleAlpha = ColorUtils.calculateMinimumAlpha(Theme.ACTION_BAR_VIDEO_EDIT_COLOR, this.mRgb, 3.0f);
                     if (darkBodyAlpha == -1 || darkTitleAlpha == -1) {
                         int alphaComponent;
-                        int alphaComponent2;
                         if (lightBodyAlpha != -1) {
                             alphaComponent = ColorUtils.setAlphaComponent(-1, lightBodyAlpha);
                         } else {
@@ -256,18 +205,18 @@ Caused by: java.lang.NullPointerException
                         }
                         this.mBodyTextColor = alphaComponent;
                         if (lightTitleAlpha != -1) {
-                            alphaComponent2 = ColorUtils.setAlphaComponent(-1, lightTitleAlpha);
+                            alphaComponent = ColorUtils.setAlphaComponent(-1, lightTitleAlpha);
                         } else {
-                            alphaComponent2 = ColorUtils.setAlphaComponent(Theme.ACTION_BAR_VIDEO_EDIT_COLOR, darkTitleAlpha);
+                            alphaComponent = ColorUtils.setAlphaComponent(Theme.ACTION_BAR_VIDEO_EDIT_COLOR, darkTitleAlpha);
                         }
-                        this.mTitleTextColor = alphaComponent2;
-                        this.mGeneratedTextColors = true;
-                    } else {
-                        this.mBodyTextColor = ColorUtils.setAlphaComponent(Theme.ACTION_BAR_VIDEO_EDIT_COLOR, darkBodyAlpha);
-                        this.mTitleTextColor = ColorUtils.setAlphaComponent(Theme.ACTION_BAR_VIDEO_EDIT_COLOR, darkTitleAlpha);
+                        this.mTitleTextColor = alphaComponent;
                         this.mGeneratedTextColors = true;
                         return;
                     }
+                    this.mBodyTextColor = ColorUtils.setAlphaComponent(Theme.ACTION_BAR_VIDEO_EDIT_COLOR, darkBodyAlpha);
+                    this.mTitleTextColor = ColorUtils.setAlphaComponent(Theme.ACTION_BAR_VIDEO_EDIT_COLOR, darkTitleAlpha);
+                    this.mGeneratedTextColors = true;
+                    return;
                 }
                 this.mBodyTextColor = ColorUtils.setAlphaComponent(-1, lightBodyAlpha);
                 this.mTitleTextColor = ColorUtils.setAlphaComponent(-1, lightTitleAlpha);
@@ -276,44 +225,25 @@ Caused by: java.lang.NullPointerException
         }
 
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder(getClass().getSimpleName());
-            stringBuilder.append(" [RGB: #");
-            stringBuilder.append(Integer.toHexString(getRgb()));
-            stringBuilder.append(']');
-            stringBuilder.append(" [HSL: ");
-            stringBuilder.append(Arrays.toString(getHsl()));
-            stringBuilder.append(']');
-            stringBuilder.append(" [Population: ");
-            stringBuilder.append(this.mPopulation);
-            stringBuilder.append(']');
-            stringBuilder.append(" [Title Text: #");
-            stringBuilder.append(Integer.toHexString(getTitleTextColor()));
-            stringBuilder.append(']');
-            stringBuilder.append(" [Body Text: #");
-            stringBuilder.append(Integer.toHexString(getBodyTextColor()));
-            stringBuilder.append(']');
-            return stringBuilder.toString();
+            return new StringBuilder(getClass().getSimpleName()).append(" [RGB: #").append(Integer.toHexString(getRgb())).append(']').append(" [HSL: ").append(Arrays.toString(getHsl())).append(']').append(" [Population: ").append(this.mPopulation).append(']').append(" [Title Text: #").append(Integer.toHexString(getTitleTextColor())).append(']').append(" [Body Text: #").append(Integer.toHexString(getBodyTextColor())).append(']').toString();
         }
 
         public boolean equals(Object o) {
-            boolean z = true;
             if (this == o) {
                 return true;
             }
-            if (o != null) {
-                if (getClass() == o.getClass()) {
-                    Swatch swatch = (Swatch) o;
-                    if (this.mPopulation != swatch.mPopulation || this.mRgb != swatch.mRgb) {
-                        z = false;
-                    }
-                    return z;
-                }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Swatch swatch = (Swatch) o;
+            if (this.mPopulation == swatch.mPopulation && this.mRgb == swatch.mRgb) {
+                return true;
             }
             return false;
         }
 
         public int hashCode() {
-            return (31 * this.mRgb) + this.mPopulation;
+            return (this.mRgb * 31) + this.mPopulation;
         }
     }
 
@@ -383,11 +313,16 @@ Caused by: java.lang.NullPointerException
     }
 
     private float generateScore(Swatch swatch, Target target) {
+        int maxPopulation;
         float[] hsl = swatch.getHsl();
         float saturationScore = 0.0f;
         float luminanceScore = 0.0f;
         float populationScore = 0.0f;
-        int maxPopulation = this.mDominantSwatch != null ? this.mDominantSwatch.getPopulation() : 1;
+        if (this.mDominantSwatch != null) {
+            maxPopulation = this.mDominantSwatch.getPopulation();
+        } else {
+            maxPopulation = 1;
+        }
         if (target.getSaturationWeight() > 0.0f) {
             saturationScore = target.getSaturationWeight() * (1.0f - Math.abs(hsl[1] - target.getTargetSaturation()));
         }

@@ -18,60 +18,6 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
     private int[] mHashes;
     private int mSize;
 
-    public boolean equals(java.lang.Object r1) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: android.support.v4.util.ArraySet.equals(java.lang.Object):boolean
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = 1;
-        if (r6 != r7) goto L_0x0004;
-    L_0x0003:
-        return r0;
-    L_0x0004:
-        r1 = r7 instanceof java.util.Set;
-        r2 = 0;
-        if (r1 == 0) goto L_0x0030;
-    L_0x0009:
-        r1 = r7;
-        r1 = (java.util.Set) r1;
-        r3 = r6.size();
-        r4 = r1.size();
-        if (r3 == r4) goto L_0x0017;
-    L_0x0016:
-        return r2;
-    L_0x0017:
-        r3 = r2;
-        r4 = r6.mSize;	 Catch:{ NullPointerException -> 0x002e, ClassCastException -> 0x002c }
-        if (r3 >= r4) goto L_0x002a;	 Catch:{ NullPointerException -> 0x002e, ClassCastException -> 0x002c }
-    L_0x001c:
-        r4 = r6.valueAt(r3);	 Catch:{ NullPointerException -> 0x002e, ClassCastException -> 0x002c }
-        r5 = r1.contains(r4);	 Catch:{ NullPointerException -> 0x002e, ClassCastException -> 0x002c }
-        if (r5 != 0) goto L_0x0027;
-        return r2;
-        r3 = r3 + 1;
-        goto L_0x0018;
-        return r0;
-    L_0x002c:
-        r0 = move-exception;
-        return r2;
-    L_0x002e:
-        r0 = move-exception;
-        return r2;
-    L_0x0030:
-        return r2;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: android.support.v4.util.ArraySet.equals(java.lang.Object):boolean");
-    }
-
     private int indexOf(Object key, int hash) {
         int N = this.mSize;
         if (N == 0) {
@@ -241,6 +187,7 @@ Caused by: java.lang.NullPointerException
     public boolean add(E value) {
         int hash;
         int index;
+        int n = 8;
         if (value == null) {
             hash = 0;
             index = indexOfNull();
@@ -253,13 +200,11 @@ Caused by: java.lang.NullPointerException
         }
         index ^= -1;
         if (this.mSize >= this.mHashes.length) {
-            int i = 4;
             if (this.mSize >= 8) {
-                i = (this.mSize >> 1) + this.mSize;
-            } else if (this.mSize >= 4) {
-                i = 8;
+                n = this.mSize + (this.mSize >> 1);
+            } else if (this.mSize < 4) {
+                n = 4;
             }
-            int n = i;
             int[] ohashes = this.mHashes;
             Object[] oarray = this.mArray;
             allocArrays(n);
@@ -289,38 +234,35 @@ Caused by: java.lang.NullPointerException
     }
 
     public E removeAt(int index) {
+        int n = 8;
         Object old = this.mArray[index];
         if (this.mSize <= 1) {
             freeArrays(this.mHashes, this.mArray, this.mSize);
             this.mHashes = INT;
             this.mArray = OBJECT;
             this.mSize = 0;
+        } else if (this.mHashes.length <= 8 || this.mSize >= this.mHashes.length / 3) {
+            this.mSize--;
+            if (index < this.mSize) {
+                System.arraycopy(this.mHashes, index + 1, this.mHashes, index, this.mSize - index);
+                System.arraycopy(this.mArray, index + 1, this.mArray, index, this.mSize - index);
+            }
+            this.mArray[this.mSize] = null;
         } else {
-            int i = 8;
-            if (this.mHashes.length <= 8 || this.mSize >= this.mHashes.length / 3) {
-                this.mSize--;
-                if (index < this.mSize) {
-                    System.arraycopy(this.mHashes, index + 1, this.mHashes, index, this.mSize - index);
-                    System.arraycopy(this.mArray, index + 1, this.mArray, index, this.mSize - index);
-                }
-                this.mArray[this.mSize] = null;
-            } else {
-                if (this.mSize > 8) {
-                    i = (this.mSize >> 1) + this.mSize;
-                }
-                int n = i;
-                int[] ohashes = this.mHashes;
-                Object[] oarray = this.mArray;
-                allocArrays(n);
-                this.mSize--;
-                if (index > 0) {
-                    System.arraycopy(ohashes, 0, this.mHashes, 0, index);
-                    System.arraycopy(oarray, 0, this.mArray, 0, index);
-                }
-                if (index < this.mSize) {
-                    System.arraycopy(ohashes, index + 1, this.mHashes, index, this.mSize - index);
-                    System.arraycopy(oarray, index + 1, this.mArray, index, this.mSize - index);
-                }
+            if (this.mSize > 8) {
+                n = this.mSize + (this.mSize >> 1);
+            }
+            int[] ohashes = this.mHashes;
+            Object[] oarray = this.mArray;
+            allocArrays(n);
+            this.mSize--;
+            if (index > 0) {
+                System.arraycopy(ohashes, 0, this.mHashes, 0, index);
+                System.arraycopy(oarray, 0, this.mArray, 0, index);
+            }
+            if (index < this.mSize) {
+                System.arraycopy(ohashes, index + 1, this.mHashes, index, this.mSize - index);
+                System.arraycopy(oarray, index + 1, this.mArray, index, this.mSize - index);
             }
         }
         return old;
@@ -338,13 +280,40 @@ Caused by: java.lang.NullPointerException
 
     public <T> T[] toArray(T[] array) {
         if (array.length < this.mSize) {
-            array = (Object[]) Array.newInstance(array.getClass().getComponentType(), this.mSize);
+            array = (Object[]) ((Object[]) Array.newInstance(array.getClass().getComponentType(), this.mSize));
         }
         System.arraycopy(this.mArray, 0, array, 0, this.mSize);
         if (array.length > this.mSize) {
             array[this.mSize] = null;
         }
         return array;
+    }
+
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Set)) {
+            return false;
+        }
+        Set<?> set = (Set) object;
+        if (size() != set.size()) {
+            return false;
+        }
+        int i = 0;
+        while (i < this.mSize) {
+            try {
+                if (!set.contains(valueAt(i))) {
+                    return false;
+                }
+                i++;
+            } catch (NullPointerException e) {
+                return false;
+            } catch (ClassCastException e2) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public int hashCode() {

@@ -8,18 +8,18 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public class ConnectionResultCreator implements Creator<ConnectionResult> {
     public ConnectionResult createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        int i = 0;
+        String str = null;
         PendingIntent pendingIntent = null;
-        String str = pendingIntent;
+        int i = 0;
         int i2 = 0;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
-                    i2 = SafeParcelReader.readInt(parcel, readHeader);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
                     pendingIntent = (PendingIntent) SafeParcelReader.createParcelable(parcel, readHeader, PendingIntent.CREATOR);
@@ -33,7 +33,7 @@ public class ConnectionResultCreator implements Creator<ConnectionResult> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new ConnectionResult(i, i2, pendingIntent, str);
+        return new ConnectionResult(i2, i, pendingIntent, str);
     }
 
     public ConnectionResult[] newArray(int i) {

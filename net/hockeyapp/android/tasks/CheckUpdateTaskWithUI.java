@@ -48,51 +48,49 @@ public class CheckUpdateTaskWithUI extends CheckUpdateTask {
     }
 
     private void showDialog(final Activity activity, final JSONArray updateInfo) {
-        if (activity != null) {
-            if (!activity.isFinishing()) {
-                Builder builder = new Builder(activity);
-                builder.setTitle(R.string.hockeyapp_update_dialog_title);
-                if (this.mandatory.booleanValue()) {
-                    String appName = Util.getAppName(activity);
-                    Toast.makeText(activity, activity.getString(R.string.hockeyapp_update_mandatory_toast, new Object[]{appName}), 1).show();
-                    startUpdateIntent(activity, updateInfo, Boolean.valueOf(true));
-                } else {
-                    builder.setMessage(R.string.hockeyapp_update_dialog_message);
-                    builder.setNegativeButton(R.string.hockeyapp_update_dialog_negative_button, new OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            CheckUpdateTaskWithUI.this.cleanUp();
-                            if (CheckUpdateTaskWithUI.this.listener != null) {
-                                CheckUpdateTaskWithUI.this.listener.onCancel();
-                            }
-                        }
-                    });
-                    builder.setOnCancelListener(new OnCancelListener() {
-                        public void onCancel(DialogInterface dialog) {
-                            CheckUpdateTaskWithUI.this.cleanUp();
-                            if (CheckUpdateTaskWithUI.this.listener != null) {
-                                CheckUpdateTaskWithUI.this.listener.onCancel();
-                            }
-                        }
-                    });
-                    builder.setPositiveButton(R.string.hockeyapp_update_dialog_positive_button, new OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            boolean useUpdateDialog;
-                            if (CheckUpdateTaskWithUI.this.listener != null) {
-                                useUpdateDialog = CheckUpdateTaskWithUI.this.listener.useUpdateDialog(activity);
-                            } else {
-                                useUpdateDialog = Util.runsOnTablet(activity).booleanValue();
-                            }
-                            if (useUpdateDialog) {
-                                CheckUpdateTaskWithUI.this.showUpdateFragment(activity, updateInfo);
-                            } else {
-                                CheckUpdateTaskWithUI.this.startUpdateIntent(activity, updateInfo, Boolean.valueOf(false));
-                            }
-                        }
-                    });
-                    this.mDialog = builder.create();
-                    this.mDialog.show();
-                }
+        if (activity != null && !activity.isFinishing()) {
+            Builder builder = new Builder(activity);
+            builder.setTitle(R.string.hockeyapp_update_dialog_title);
+            if (this.mandatory.booleanValue()) {
+                String appName = Util.getAppName(activity);
+                Toast.makeText(activity, activity.getString(R.string.hockeyapp_update_mandatory_toast, new Object[]{appName}), 1).show();
+                startUpdateIntent(activity, updateInfo, Boolean.valueOf(true));
+                return;
             }
+            builder.setMessage(R.string.hockeyapp_update_dialog_message);
+            builder.setNegativeButton(R.string.hockeyapp_update_dialog_negative_button, new OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    CheckUpdateTaskWithUI.this.cleanUp();
+                    if (CheckUpdateTaskWithUI.this.listener != null) {
+                        CheckUpdateTaskWithUI.this.listener.onCancel();
+                    }
+                }
+            });
+            builder.setOnCancelListener(new OnCancelListener() {
+                public void onCancel(DialogInterface dialog) {
+                    CheckUpdateTaskWithUI.this.cleanUp();
+                    if (CheckUpdateTaskWithUI.this.listener != null) {
+                        CheckUpdateTaskWithUI.this.listener.onCancel();
+                    }
+                }
+            });
+            builder.setPositiveButton(R.string.hockeyapp_update_dialog_positive_button, new OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    boolean useUpdateDialog;
+                    if (CheckUpdateTaskWithUI.this.listener != null) {
+                        useUpdateDialog = CheckUpdateTaskWithUI.this.listener.useUpdateDialog(activity);
+                    } else {
+                        useUpdateDialog = Util.runsOnTablet(activity).booleanValue();
+                    }
+                    if (useUpdateDialog) {
+                        CheckUpdateTaskWithUI.this.showUpdateFragment(activity, updateInfo);
+                    } else {
+                        CheckUpdateTaskWithUI.this.startUpdateIntent(activity, updateInfo, Boolean.valueOf(false));
+                    }
+                }
+            });
+            this.mDialog = builder.create();
+            this.mDialog.show();
         }
     }
 

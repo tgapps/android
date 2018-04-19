@@ -23,14 +23,7 @@ public final class zzeu extends AbstractSafeParcelable {
         String str = this.zzaek;
         String str2 = this.name;
         String valueOf = String.valueOf(this.zzafo);
-        StringBuilder stringBuilder = new StringBuilder(((21 + String.valueOf(str).length()) + String.valueOf(str2).length()) + String.valueOf(valueOf).length());
-        stringBuilder.append("origin=");
-        stringBuilder.append(str);
-        stringBuilder.append(",name=");
-        stringBuilder.append(str2);
-        stringBuilder.append(",params=");
-        stringBuilder.append(valueOf);
-        return stringBuilder.toString();
+        return new StringBuilder(((String.valueOf(str).length() + 21) + String.valueOf(str2).length()) + String.valueOf(valueOf).length()).append("origin=").append(str).append(",name=").append(str2).append(",params=").append(valueOf).toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {

@@ -25,30 +25,34 @@ public final class zzih extends zzhk {
     }
 
     private final void zza(Activity activity, zzik com_google_android_gms_internal_measurement_zzik, boolean z) {
-        zzig com_google_android_gms_internal_measurement_zzig = null;
-        zzig com_google_android_gms_internal_measurement_zzig2 = this.zzapd != null ? this.zzapd : (this.zzape == null || Math.abs(zzbt().elapsedRealtime() - this.zzapf) >= 1000) ? null : this.zzape;
-        if (com_google_android_gms_internal_measurement_zzig2 != null) {
-            com_google_android_gms_internal_measurement_zzig = new zzig(com_google_android_gms_internal_measurement_zzig2);
-        }
-        int i = 1;
+        boolean hasNext;
+        boolean z2 = true;
+        zzig com_google_android_gms_internal_measurement_zzig = this.zzapd != null ? this.zzapd : (this.zzape == null || Math.abs(zzbt().elapsedRealtime() - this.zzapf) >= 1000) ? null : this.zzape;
+        com_google_android_gms_internal_measurement_zzig = com_google_android_gms_internal_measurement_zzig != null ? new zzig(com_google_android_gms_internal_measurement_zzig) : null;
         this.zzapi = true;
         try {
             Iterator it = this.zzaph.iterator();
-            while (it.hasNext()) {
+            while (true) {
+                hasNext = it.hasNext();
+                if (!hasNext) {
+                    break;
+                }
                 try {
-                    i &= ((zza) it.next()).zza(com_google_android_gms_internal_measurement_zzig, com_google_android_gms_internal_measurement_zzik);
+                    z2 &= ((zza) it.next()).zza(com_google_android_gms_internal_measurement_zzig, com_google_android_gms_internal_measurement_zzik);
                 } catch (Exception e) {
                     zzgg().zzil().zzg("onScreenChangeCallback threw exception", e);
                 }
             }
+            hasNext = z2;
         } catch (Exception e2) {
-            zzgg().zzil().zzg("onScreenChangeCallback loop threw exception", e2);
-        } catch (Throwable th) {
+            hasNext = z2;
+            z2 = zzgg().zzil();
+            z2.zzg("onScreenChangeCallback loop threw exception", e2);
+        } finally {
             this.zzapi = false;
         }
-        this.zzapi = false;
         com_google_android_gms_internal_measurement_zzig = this.zzapd == null ? this.zzape : this.zzapd;
-        if (i != 0) {
+        if (hasNext) {
             if (com_google_android_gms_internal_measurement_zzik.zzapa == null) {
                 com_google_android_gms_internal_measurement_zzik.zzapa = zzbu(activity.getClass().getCanonicalName());
             }
@@ -61,21 +65,19 @@ public final class zzih extends zzhk {
     }
 
     public static void zza(zzig com_google_android_gms_internal_measurement_zzig, Bundle bundle, boolean z) {
-        if (bundle == null || com_google_android_gms_internal_measurement_zzig == null || (bundle.containsKey("_sc") && !z)) {
-            if (bundle != null && com_google_android_gms_internal_measurement_zzig == null && z) {
+        if (bundle != null && com_google_android_gms_internal_measurement_zzig != null && (!bundle.containsKey("_sc") || z)) {
+            if (com_google_android_gms_internal_measurement_zzig.zzug != null) {
+                bundle.putString("_sn", com_google_android_gms_internal_measurement_zzig.zzug);
+            } else {
                 bundle.remove("_sn");
-                bundle.remove("_sc");
-                bundle.remove("_si");
             }
-            return;
-        }
-        if (com_google_android_gms_internal_measurement_zzig.zzug != null) {
-            bundle.putString("_sn", com_google_android_gms_internal_measurement_zzig.zzug);
-        } else {
+            bundle.putString("_sc", com_google_android_gms_internal_measurement_zzig.zzapa);
+            bundle.putLong("_si", com_google_android_gms_internal_measurement_zzig.zzapb);
+        } else if (bundle != null && com_google_android_gms_internal_measurement_zzig == null && z) {
             bundle.remove("_sn");
+            bundle.remove("_sc");
+            bundle.remove("_si");
         }
-        bundle.putString("_sc", com_google_android_gms_internal_measurement_zzig.zzapa);
-        bundle.putLong("_si", com_google_android_gms_internal_measurement_zzig.zzapb);
     }
 
     private final void zza(zzik com_google_android_gms_internal_measurement_zzik) {
@@ -87,8 +89,8 @@ public final class zzih extends zzhk {
 
     private static String zzbu(String str) {
         String[] split = str.split("\\.");
-        str = split.length > 0 ? split[split.length - 1] : TtmlNode.ANONYMOUS_REGION_ID;
-        return str.length() > 100 ? str.substring(0, 100) : str;
+        String str2 = split.length > 0 ? split[split.length - 1] : TtmlNode.ANONYMOUS_REGION_ID;
+        return str2.length() > 100 ? str2.substring(0, 100) : str2;
     }
 
     public final /* bridge */ /* synthetic */ Context getContext() {
@@ -156,7 +158,15 @@ public final class zzih extends zzhk {
             } else if (str != null && (str.length() <= 0 || str.length() > 100)) {
                 zzgg().zzin().zzg("Invalid screen name length in setCurrentScreen. Length", Integer.valueOf(str.length()));
             } else if (str2 == null || (str2.length() > 0 && str2.length() <= 100)) {
-                zzgg().zzir().zze("Setting current screen to name, class", str == null ? "null" : str, str2);
+                Object obj;
+                zzfi zzir = zzgg().zzir();
+                String str3 = "Setting current screen to name, class";
+                if (str == null) {
+                    obj = "null";
+                } else {
+                    String str4 = str;
+                }
+                zzir.zze(str3, obj, str2);
                 zzik com_google_android_gms_internal_measurement_zzik = new zzik(str, str2, zzgc().zzkt());
                 this.zzapg.put(activity, com_google_android_gms_internal_measurement_zzik);
                 zza(activity, com_google_android_gms_internal_measurement_zzik, true);
@@ -184,9 +194,9 @@ public final class zzih extends zzhk {
         if (com_google_android_gms_internal_measurement_zzik != null) {
             return com_google_android_gms_internal_measurement_zzik;
         }
-        zzik com_google_android_gms_internal_measurement_zzik2 = new zzik(null, zzbu(activity.getClass().getCanonicalName()), zzgc().zzkt());
-        this.zzapg.put(activity, com_google_android_gms_internal_measurement_zzik2);
-        return com_google_android_gms_internal_measurement_zzik2;
+        com_google_android_gms_internal_measurement_zzik = new zzik(null, zzbu(activity.getClass().getCanonicalName()), zzgc().zzkt());
+        this.zzapg.put(activity, com_google_android_gms_internal_measurement_zzik);
+        return com_google_android_gms_internal_measurement_zzik;
     }
 
     public final /* bridge */ /* synthetic */ void zzfq() {

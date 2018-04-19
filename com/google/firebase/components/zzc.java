@@ -19,10 +19,6 @@ public final class zzc {
     }
 
     private static List<ComponentRegistrar> zza(List<String> list) {
-        Throwable e;
-        String str;
-        String str2;
-        Object[] objArr;
         List<ComponentRegistrar> arrayList = new ArrayList();
         for (String cls : list) {
             try {
@@ -32,24 +28,12 @@ public final class zzc {
                 } else {
                     Log.w("ComponentDiscovery", String.format("Class %s is not an instance of %s", new Object[]{cls, "com.google.firebase.components.ComponentRegistrar"}));
                 }
-            } catch (ClassNotFoundException e2) {
-                e = e2;
-                str = "ComponentDiscovery";
-                str2 = "Class %s is not an found.";
-                objArr = new Object[]{cls};
-                Log.w(str, String.format(str2, objArr), e);
-            } catch (IllegalAccessException e3) {
-                e = e3;
-                str = "ComponentDiscovery";
-                str2 = "Could not instantiate %s.";
-                objArr = new Object[]{cls};
-                Log.w(str, String.format(str2, objArr), e);
-            } catch (InstantiationException e4) {
-                e = e4;
-                str = "ComponentDiscovery";
-                str2 = "Could not instantiate %s.";
-                objArr = new Object[]{cls};
-                Log.w(str, String.format(str2, objArr), e);
+            } catch (Throwable e) {
+                Log.w("ComponentDiscovery", String.format("Class %s is not an found.", new Object[]{cls}), e);
+            } catch (Throwable e2) {
+                Log.w("ComponentDiscovery", String.format("Could not instantiate %s.", new Object[]{cls}), e2);
+            } catch (Throwable e22) {
+                Log.w("ComponentDiscovery", String.format("Could not instantiate %s.", new Object[]{cls}), e22);
             }
         }
         return arrayList;

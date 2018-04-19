@@ -13,11 +13,17 @@ final class zzhx implements Runnable {
 
     public final void run() {
         try {
+            Object obj;
             AtomicReference atomicReference = this.zzaoo;
             zzhj zzgi = this.zzaop.zzgi();
             String zzah = zzgi.zzfv().zzah();
             zzex com_google_android_gms_internal_measurement_zzex = zzew.zzaht;
-            atomicReference.set((String) (zzah == null ? com_google_android_gms_internal_measurement_zzex.get() : com_google_android_gms_internal_measurement_zzex.get(zzgi.zzgd().zzm(zzah, com_google_android_gms_internal_measurement_zzex.getKey()))));
+            if (zzah == null) {
+                obj = (String) com_google_android_gms_internal_measurement_zzex.get();
+            } else {
+                String str = (String) com_google_android_gms_internal_measurement_zzex.get(zzgi.zzgd().zzm(zzah, com_google_android_gms_internal_measurement_zzex.getKey()));
+            }
+            atomicReference.set(obj);
         } finally {
             this.zzaoo.notify();
         }

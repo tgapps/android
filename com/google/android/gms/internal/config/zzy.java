@@ -10,10 +10,13 @@ public final class zzy implements Creator<zzx> {
         byte[] bArr = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
-            if (SafeParcelReader.getFieldId(readHeader) != 2) {
-                SafeParcelReader.skipUnknownField(parcel, readHeader);
-            } else {
-                bArr = SafeParcelReader.createByteArray(parcel, readHeader);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 2:
+                    bArr = SafeParcelReader.createByteArray(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);

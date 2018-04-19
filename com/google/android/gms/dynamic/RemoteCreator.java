@@ -28,12 +28,12 @@ public abstract class RemoteCreator<T> {
     protected final T getRemoteCreatorInstance(Context context) throws RemoteCreatorException {
         if (this.zzabp == null) {
             Preconditions.checkNotNull(context);
-            context = GooglePlayServicesUtilLight.getRemoteContext(context);
-            if (context == null) {
+            Context remoteContext = GooglePlayServicesUtilLight.getRemoteContext(context);
+            if (remoteContext == null) {
                 throw new RemoteCreatorException("Could not get remote context.");
             }
             try {
-                this.zzabp = getRemoteCreator((IBinder) context.getClassLoader().loadClass(this.zzabo).newInstance());
+                this.zzabp = getRemoteCreator((IBinder) remoteContext.getClassLoader().loadClass(this.zzabo).newInstance());
             } catch (Throwable e) {
                 throw new RemoteCreatorException("Could not load creator class.", e);
             } catch (Throwable e2) {

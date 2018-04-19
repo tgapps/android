@@ -19,7 +19,7 @@ public final class InputConnectionCompat {
     }
 
     static boolean handlePerformPrivateCommand(String action, Bundle data, OnCommitContentListener onCommitContentListener) {
-        int i = 0;
+        int i = 1;
         if (!TextUtils.equals("android.support.v13.view.inputmethod.InputConnectionCompat.COMMIT_CONTENT", action) || data == null) {
             return false;
         }
@@ -31,11 +31,20 @@ public final class InputConnectionCompat {
             ClipDescription description = (ClipDescription) data.getParcelable("android.support.v13.view.inputmethod.InputConnectionCompat.CONTENT_DESCRIPTION");
             Uri linkUri = (Uri) data.getParcelable("android.support.v13.view.inputmethod.InputConnectionCompat.CONTENT_LINK_URI");
             result = onCommitContentListener.onCommitContent(new InputContentInfoCompat(contentUri, description, linkUri), data.getInt("android.support.v13.view.inputmethod.InputConnectionCompat.CONTENT_FLAGS"), (Bundle) data.getParcelable("android.support.v13.view.inputmethod.InputConnectionCompat.CONTENT_OPTS"));
-            return result;
-        } finally {
             if (resultReceiver != null) {
+                int i2;
                 if (result) {
-                    i = 1;
+                    i2 = 1;
+                } else {
+                    i2 = 0;
+                }
+                resultReceiver.send(i2, null);
+            }
+            return result;
+        } catch (Throwable th) {
+            if (resultReceiver != null) {
+                if (!result) {
+                    i = 0;
                 }
                 resultReceiver.send(i, null);
             }
@@ -50,7 +59,7 @@ public final class InputConnectionCompat {
         } else if (onCommitContentListener == null) {
             throw new IllegalArgumentException("onCommitContentListener must be non-null");
         } else if (VERSION.SDK_INT >= 25) {
-            final OnCommitContentListener listener = onCommitContentListener;
+            listener = onCommitContentListener;
             return new InputConnectionWrapper(inputConnection, false) {
                 public boolean commitContent(InputContentInfo inputContentInfo, int flags, Bundle opts) {
                     if (listener.onCommitContent(InputContentInfoCompat.wrap(inputContentInfo), flags, opts)) {
@@ -62,10 +71,10 @@ public final class InputConnectionCompat {
         } else if (EditorInfoCompat.getContentMimeTypes(editorInfo).length == 0) {
             return inputConnection;
         } else {
-            final OnCommitContentListener listener2 = onCommitContentListener;
+            listener = onCommitContentListener;
             return new InputConnectionWrapper(inputConnection, false) {
                 public boolean performPrivateCommand(String action, Bundle data) {
-                    if (InputConnectionCompat.handlePerformPrivateCommand(action, data, listener2)) {
+                    if (InputConnectionCompat.handlePerformPrivateCommand(action, data, listener)) {
                         return true;
                     }
                     return super.performPrivateCommand(action, data);

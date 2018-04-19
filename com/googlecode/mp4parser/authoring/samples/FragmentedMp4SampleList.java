@@ -20,7 +20,6 @@ import java.nio.ByteBuffer;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +43,7 @@ public class FragmentedMp4SampleList extends AbstractList<Sample> {
             }
         }
         if (this.trackBox == null) {
-            StringBuilder stringBuilder = new StringBuilder("This MP4 does not contain track ");
-            stringBuilder.append(track);
-            throw new RuntimeException(stringBuilder.toString());
+            throw new RuntimeException("This MP4 does not contain track " + track);
         }
         for (TrackExtendsBox box : Path.getPaths(topLevel, "moov[0]/mvex[0]/trex")) {
             if (box.getTrackId() == this.trackBox.getTrackHeaderBox().getTrackId()) {
@@ -61,7 +58,6 @@ public class FragmentedMp4SampleList extends AbstractList<Sample> {
         if (this.allTrafs != null) {
             return this.allTrafs;
         }
-        int i;
         List<TrackFragmentBox> trafs = new ArrayList();
         for (MovieFragmentBox moof : this.topLevel.getBoxes(MovieFragmentBox.class)) {
             for (TrackFragmentBox trackFragmentBox : moof.getBoxes(TrackFragmentBox.class)) {
@@ -84,7 +80,7 @@ public class FragmentedMp4SampleList extends AbstractList<Sample> {
         this.allTrafs = trafs;
         int firstSample = 1;
         this.firstSamples = new int[this.allTrafs.size()];
-        for (i = 0; i < this.allTrafs.size(); i++) {
+        for (int i = 0; i < this.allTrafs.size(); i++) {
             this.firstSamples[i] = firstSample;
             firstSample += getTrafSize((TrackFragmentBox) this.allTrafs.get(i));
         }
@@ -104,158 +100,90 @@ public class FragmentedMp4SampleList extends AbstractList<Sample> {
     }
 
     public Sample get(int index) {
-        FragmentedMp4SampleList fragmentedMp4SampleList;
-        IOException e;
         if (this.sampleCache[index] != null) {
-            Sample sample = (Sample) fragmentedMp4SampleList.sampleCache[index].get();
-            Sample cachedSample = sample;
-            if (sample != null) {
+            Sample cachedSample = (Sample) this.sampleCache[index].get();
+            if (cachedSample != null) {
                 return cachedSample;
             }
         }
         int targetIndex = index + 1;
-        int j = fragmentedMp4SampleList.firstSamples.length - 1;
-        while (targetIndex - fragmentedMp4SampleList.firstSamples[j] < 0) {
+        int j = this.firstSamples.length - 1;
+        while (targetIndex - this.firstSamples[j] < 0) {
             j--;
-            fragmentedMp4SampleList = this;
         }
-        TrackFragmentBox trackFragmentBox = (TrackFragmentBox) fragmentedMp4SampleList.allTrafs.get(j);
-        int sampleIndexWithInTraf = targetIndex - fragmentedMp4SampleList.firstSamples[j];
-        MovieFragmentBox moof = (MovieFragmentBox) trackFragmentBox.getParent();
+        TrackFragmentBox trackFragmentBox = (TrackFragmentBox) this.allTrafs.get(j);
+        int sampleIndexWithInTraf = targetIndex - this.firstSamples[j];
         int previousTrunsSize = 0;
+        MovieFragmentBox moof = (MovieFragmentBox) trackFragmentBox.getParent();
         for (Box box : trackFragmentBox.getBoxes()) {
             if (box instanceof TrackRunBox) {
                 TrackRunBox trun = (TrackRunBox) box;
                 if (trun.getEntries().size() < sampleIndexWithInTraf - previousTrunsSize) {
                     previousTrunsSize += trun.getEntries().size();
                 } else {
-                    long defaultSampleSize;
-                    long defaultSampleSize2;
-                    SoftReference<ByteBuffer> softReference;
-                    TrackFragmentHeaderBox trackFragmentHeaderBox;
-                    ByteBuffer trunData;
+                    long sampleSize;
                     List<Entry> trackRunEntries = trun.getEntries();
                     TrackFragmentHeaderBox tfhd = trackFragmentBox.getTrackFragmentHeaderBox();
                     boolean sampleSizePresent = trun.isSampleSizePresent();
                     boolean hasDefaultSampleSize = tfhd.hasDefaultSampleSize();
-                    if (sampleSizePresent) {
-                        defaultSampleSize = 0;
-                    } else {
+                    long defaultSampleSize = 0;
+                    if (!sampleSizePresent) {
                         if (hasDefaultSampleSize) {
-                            defaultSampleSize2 = tfhd.getDefaultSampleSize();
-                        } else if (fragmentedMp4SampleList.trex == null) {
-                            defaultSampleSize = 0;
+                            defaultSampleSize = tfhd.getDefaultSampleSize();
+                        } else if (this.trex == null) {
                             throw new RuntimeException("File doesn't contain trex box but track fragments aren't fully self contained. Cannot determine sample size.");
                         } else {
-                            defaultSampleSize = 0;
-                            defaultSampleSize2 = fragmentedMp4SampleList.trex.getDefaultSampleSize();
+                            defaultSampleSize = this.trex.getDefaultSampleSize();
                         }
-                        defaultSampleSize = defaultSampleSize2;
                     }
-                    SoftReference<ByteBuffer> trunDataRef = (SoftReference) fragmentedMp4SampleList.trunDataCache.get(trun);
-                    ByteBuffer trunData2 = trunDataRef != null ? (ByteBuffer) trunDataRef.get() : null;
-                    int j2;
-                    TrackFragmentBox trackFragmentBox2;
-                    if (trunData2 == null) {
-                        Container parent;
-                        long dataOffset;
+                    SoftReference<ByteBuffer> trunDataRef = (SoftReference) this.trunDataCache.get(trun);
+                    ByteBuffer trunData = trunDataRef != null ? (ByteBuffer) trunDataRef.get() : null;
+                    if (trunData == null) {
+                        Container base;
                         long offset = 0;
                         if (tfhd.hasBaseDataOffset()) {
-                            long offset2 = 0 + tfhd.getBaseDataOffset();
-                            parent = moof.getParent();
-                            offset = offset2;
+                            offset = 0 + tfhd.getBaseDataOffset();
+                            base = moof.getParent();
                         } else {
-                            parent = moof;
+                            Object base2 = moof;
                         }
                         if (trun.isDataOffsetPresent()) {
-                            softReference = trunDataRef;
-                            trackFragmentHeaderBox = tfhd;
-                            dataOffset = offset + ((long) trun.getDataOffset());
-                        } else {
-                            softReference = trunDataRef;
-                            trackFragmentHeaderBox = tfhd;
-                            dataOffset = offset;
+                            offset += (long) trun.getDataOffset();
                         }
-                        int size = null;
-                        trunData2 = trackRunEntries.iterator();
-                        targetIndex = size;
-                        while (trunData2.hasNext()) {
-                            ByteBuffer byteBuffer;
-                            Container base;
-                            long offset3;
-                            j2 = j;
-                            trackFragmentBox2 = trackFragmentBox;
-                            Entry e2 = (Entry) trunData2.next();
+                        int size = 0;
+                        for (Entry e : trackRunEntries) {
                             if (sampleSizePresent) {
-                                byteBuffer = trunData2;
-                                base = parent;
-                                offset3 = dataOffset;
-                                targetIndex = (int) (((long) targetIndex) + e2.getSampleSize());
+                                size = (int) (((long) size) + e.getSampleSize());
                             } else {
-                                byteBuffer = trunData2;
-                                base = parent;
-                                offset3 = dataOffset;
-                                targetIndex = (int) (((long) targetIndex) + defaultSampleSize);
+                                size = (int) (((long) size) + defaultSampleSize);
                             }
-                            j = j2;
-                            trackFragmentBox = trackFragmentBox2;
-                            parent = base;
-                            trunData2 = byteBuffer;
-                            dataOffset = offset3;
                         }
                         try {
-                            trunData2 = parent.getByteBuffer(dataOffset, (long) targetIndex);
-                            try {
-                                fragmentedMp4SampleList.trunDataCache.put(trun, new SoftReference(trunData2));
-                                trunData = trunData2;
-                            } catch (IOException e3) {
-                                e = e3;
-                                trunData = trunData2;
-                                throw new RuntimeException(e);
-                            }
-                        } catch (IOException e4) {
-                            e = e4;
-                            throw new RuntimeException(e);
+                            trunData = base.getByteBuffer(offset, (long) size);
+                            this.trunDataCache.put(trun, new SoftReference(trunData));
+                        } catch (IOException e2) {
+                            throw new RuntimeException(e2);
                         }
                     }
-                    trunData = trunData2;
-                    softReference = trunDataRef;
-                    trackFragmentHeaderBox = tfhd;
-                    int i = targetIndex;
-                    j2 = j;
-                    trackFragmentBox2 = trackFragmentBox;
-                    int i2 = 0;
-                    targetIndex = 0;
-                    while (i2 < sampleIndexWithInTraf - previousTrunsSize) {
-                        int offset4;
-                        TrackRunBox trun2 = trun;
-                        j = trackRunEntries;
-                        TrackFragmentHeaderBox tfhd2 = trackFragmentHeaderBox;
-                        SoftReference<ByteBuffer> trunDataRef2 = softReference;
+                    int offset2 = 0;
+                    for (int i = 0; i < sampleIndexWithInTraf - previousTrunsSize; i++) {
                         if (sampleSizePresent) {
-                            offset4 = (int) (((long) targetIndex) + ((Entry) j.get(i2)).getSampleSize());
+                            offset2 = (int) (((long) offset2) + ((Entry) trackRunEntries.get(i)).getSampleSize());
                         } else {
-                            offset4 = (int) (((long) targetIndex) + defaultSampleSize);
+                            offset2 = (int) (((long) offset2) + defaultSampleSize);
                         }
-                        targetIndex = offset4;
-                        i2++;
-                        trackRunEntries = j;
-                        trackFragmentHeaderBox = tfhd2;
-                        trun = trun2;
-                        softReference = trunDataRef2;
-                        fragmentedMp4SampleList = this;
                     }
                     if (sampleSizePresent) {
-                        defaultSampleSize2 = ((Entry) trackRunEntries.get(sampleIndexWithInTraf - previousTrunsSize)).getSampleSize();
+                        sampleSize = ((Entry) trackRunEntries.get(sampleIndexWithInTraf - previousTrunsSize)).getSampleSize();
                     } else {
-                        defaultSampleSize2 = defaultSampleSize;
+                        sampleSize = defaultSampleSize;
                     }
                     final ByteBuffer finalTrunData = trunData;
-                    final int finalOffset = targetIndex;
-                    AnonymousClass1 trun3 = new Sample() {
+                    final int finalOffset = offset2;
+                    Sample sample = new Sample() {
                     };
-                    fragmentedMp4SampleList.sampleCache[index] = new SoftReference(trun3);
-                    return trun3;
+                    this.sampleCache[index] = new SoftReference(sample);
+                    return sample;
                 }
             }
         }
@@ -264,35 +192,26 @@ public class FragmentedMp4SampleList extends AbstractList<Sample> {
 
     public int size() {
         if (this.size_ != -1) {
-            return r0.size_;
+            return this.size_;
         }
         int i = 0;
-        Iterator it = r0.topLevel.getBoxes(MovieFragmentBox.class).iterator();
-        while (true) {
-            int i2 = 0;
-            if (!it.hasNext()) {
-                break;
-            }
-            for (TrackFragmentBox trackFragmentBox : ((MovieFragmentBox) it.next()).getBoxes(TrackFragmentBox.class)) {
-                if (trackFragmentBox.getTrackFragmentHeaderBox().getTrackId() == r0.trackBox.getTrackHeaderBox().getTrackId()) {
+        for (MovieFragmentBox moof : this.topLevel.getBoxes(MovieFragmentBox.class)) {
+            for (TrackFragmentBox trackFragmentBox : moof.getBoxes(TrackFragmentBox.class)) {
+                if (trackFragmentBox.getTrackFragmentHeaderBox().getTrackId() == this.trackBox.getTrackHeaderBox().getTrackId()) {
                     i = (int) (((long) i) + ((TrackRunBox) trackFragmentBox.getBoxes(TrackRunBox.class).get(0)).getSampleCount());
                 }
             }
         }
-        IsoFile[] isoFileArr = r0.fragments;
-        int length = isoFileArr.length;
-        for (int i3 = 0; i3 < length; i3++) {
-            for (MovieFragmentBox moof : isoFileArr[i3].getBoxes(MovieFragmentBox.class)) {
-                for (TrackFragmentBox trackFragmentBox2 : moof.getBoxes(TrackFragmentBox.class)) {
-                    if (trackFragmentBox2.getTrackFragmentHeaderBox().getTrackId() == r0.trackBox.getTrackHeaderBox().getTrackId()) {
-                        i = (int) (((long) i) + ((TrackRunBox) trackFragmentBox2.getBoxes(TrackRunBox.class).get(i2)).getSampleCount());
-                        length = length;
-                        i2 = 0;
+        for (IsoFile fragment : this.fragments) {
+            for (MovieFragmentBox moof2 : fragment.getBoxes(MovieFragmentBox.class)) {
+                for (TrackFragmentBox trackFragmentBox2 : moof2.getBoxes(TrackFragmentBox.class)) {
+                    if (trackFragmentBox2.getTrackFragmentHeaderBox().getTrackId() == this.trackBox.getTrackHeaderBox().getTrackId()) {
+                        i = (int) (((long) i) + ((TrackRunBox) trackFragmentBox2.getBoxes(TrackRunBox.class).get(0)).getSampleCount());
                     }
                 }
             }
         }
-        r0.size_ = i;
+        this.size_ = i;
         return i;
     }
 }

@@ -71,12 +71,11 @@ public final class zzgf extends zzhk {
                     arrayMap.put(com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzash);
                     arrayMap2.put(com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzasi);
                     if (com_google_android_gms_internal_measurement_zzke.zzasj != null) {
-                        if (com_google_android_gms_internal_measurement_zzke.zzasj.intValue() >= zzale) {
-                            if (com_google_android_gms_internal_measurement_zzke.zzasj.intValue() <= zzald) {
-                                arrayMap3.put(com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzasj);
-                            }
+                        if (com_google_android_gms_internal_measurement_zzke.zzasj.intValue() < zzale || com_google_android_gms_internal_measurement_zzke.zzasj.intValue() > zzald) {
+                            zzgg().zzin().zze("Invalid sampling rate. Event name, sample rate", com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzasj);
+                        } else {
+                            arrayMap3.put(com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzasj);
                         }
-                        zzgg().zzin().zze("Invalid sampling rate. Event name, sample rate", com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzasj);
                     }
                 }
             }
@@ -114,85 +113,58 @@ public final class zzgf extends zzhk {
     }
 
     protected final boolean zza(String str, byte[] bArr, String str2) {
-        zzgf com_google_android_gms_internal_measurement_zzgf = this;
-        String str3 = str;
         zzch();
         zzab();
         Preconditions.checkNotEmpty(str);
         zzkf zza = zza(str, bArr);
-        boolean z = false;
         if (zza == null) {
             return false;
         }
-        byte[] bArr2;
-        zza(str3, zza);
-        com_google_android_gms_internal_measurement_zzgf.zzali.put(str3, zza);
-        com_google_android_gms_internal_measurement_zzgf.zzalk.put(str3, str2);
-        com_google_android_gms_internal_measurement_zzgf.zzalf.put(str3, zza(zza));
+        zza(str, zza);
+        this.zzali.put(str, zza);
+        this.zzalk.put(str, str2);
+        this.zzalf.put(str, zza(zza));
         zzhj zzft = zzft();
         zzjy[] com_google_android_gms_internal_measurement_zzjyArr = zza.zzaso;
         Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzjyArr);
-        int length = com_google_android_gms_internal_measurement_zzjyArr.length;
-        int i = 0;
-        while (i < length) {
-            int i2;
-            zzjy com_google_android_gms_internal_measurement_zzjy = com_google_android_gms_internal_measurement_zzjyArr[i];
-            zzjz[] com_google_android_gms_internal_measurement_zzjzArr = com_google_android_gms_internal_measurement_zzjy.zzari;
-            int length2 = com_google_android_gms_internal_measurement_zzjzArr.length;
-            int i3 = z;
-            while (i3 < length2) {
-                zzjz com_google_android_gms_internal_measurement_zzjz = com_google_android_gms_internal_measurement_zzjzArr[i3];
+        for (zzjy com_google_android_gms_internal_measurement_zzjy : com_google_android_gms_internal_measurement_zzjyArr) {
+            for (zzjz com_google_android_gms_internal_measurement_zzjz : com_google_android_gms_internal_measurement_zzjy.zzari) {
                 String zzak = Event.zzak(com_google_android_gms_internal_measurement_zzjz.zzarl);
                 if (zzak != null) {
                     com_google_android_gms_internal_measurement_zzjz.zzarl = zzak;
                 }
-                zzka[] com_google_android_gms_internal_measurement_zzkaArr = com_google_android_gms_internal_measurement_zzjz.zzarm;
-                int length3 = com_google_android_gms_internal_measurement_zzkaArr.length;
-                int i4 = z;
-                while (i4 < length3) {
-                    zzka com_google_android_gms_internal_measurement_zzka = com_google_android_gms_internal_measurement_zzkaArr[i4];
-                    i2 = length;
+                for (zzka com_google_android_gms_internal_measurement_zzka : com_google_android_gms_internal_measurement_zzjz.zzarm) {
                     String zzak2 = Param.zzak(com_google_android_gms_internal_measurement_zzka.zzart);
                     if (zzak2 != null) {
                         com_google_android_gms_internal_measurement_zzka.zzart = zzak2;
                     }
-                    i4++;
-                    length = i2;
                 }
-                i2 = length;
-                i3++;
-                z = false;
             }
-            i2 = length;
             for (zzkc com_google_android_gms_internal_measurement_zzkc : com_google_android_gms_internal_measurement_zzjy.zzarh) {
                 String zzak3 = UserProperty.zzak(com_google_android_gms_internal_measurement_zzkc.zzasa);
                 if (zzak3 != null) {
                     com_google_android_gms_internal_measurement_zzkc.zzasa = zzak3;
                 }
             }
-            i++;
-            length = i2;
-            z = false;
         }
-        zzft.zzga().zza(str3, com_google_android_gms_internal_measurement_zzjyArr);
+        zzft.zzga().zza(str, com_google_android_gms_internal_measurement_zzjyArr);
         try {
             zza.zzaso = null;
-            bArr2 = new byte[zza.zzwg()];
+            byte[] bArr2 = new byte[zza.zzwg()];
             zza.zza(zzabb.zzb(bArr2, 0, bArr2.length));
+            bArr = bArr2;
         } catch (IOException e) {
             zzgg().zzin().zze("Unable to serialize reduced-size config. Storing full config instead. appId", zzfg.zzbh(str), e);
-            bArr2 = bArr;
         }
         zzhj zzga = zzga();
         Preconditions.checkNotEmpty(str);
         zzga.zzab();
         zzga.zzch();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("remote_config", bArr2);
+        contentValues.put("remote_config", bArr);
         try {
-            if (((long) zzga.getWritableDatabase().update("apps", contentValues, "app_id = ?", new String[]{str3})) == 0) {
+            if (((long) zzga.getWritableDatabase().update("apps", contentValues, "app_id = ?", new String[]{str})) == 0) {
                 zzga.zzgg().zzil().zzg("Failed to update remote config (got 0). appId", zzfg.zzbh(str));
-                return true;
             }
         } catch (SQLiteException e2) {
             zzga.zzgg().zzil().zze("Error storing remote config. appId", zzfg.zzbh(str), e2);

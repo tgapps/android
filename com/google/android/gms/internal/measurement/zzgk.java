@@ -31,14 +31,14 @@ final class zzgk extends Thread {
                 zza(e);
             }
         }
-        try {
-            int threadPriority = Process.getThreadPriority(Process.myTid());
-            while (true) {
-                zzgj com_google_android_gms_internal_measurement_zzgj = (zzgj) this.zzamb.poll();
-                if (com_google_android_gms_internal_measurement_zzgj != null) {
-                    Process.setThreadPriority(com_google_android_gms_internal_measurement_zzgj.zzalz ? threadPriority : 10);
-                    com_google_android_gms_internal_measurement_zzgj.run();
-                } else {
+        int threadPriority = Process.getThreadPriority(Process.myTid());
+        while (true) {
+            zzgj com_google_android_gms_internal_measurement_zzgj = (zzgj) this.zzamb.poll();
+            if (com_google_android_gms_internal_measurement_zzgj != null) {
+                Process.setThreadPriority(com_google_android_gms_internal_measurement_zzgj.zzalz ? threadPriority : 10);
+                com_google_android_gms_internal_measurement_zzgj.run();
+            } else {
+                try {
                     synchronized (this.zzama) {
                         if (this.zzamb.peek() == null && !this.zzalx.zzalu) {
                             try {
@@ -53,30 +53,30 @@ final class zzgk extends Thread {
                             break;
                         }
                     }
+                } catch (Throwable th) {
+                    synchronized (this.zzalx.zzals) {
+                        this.zzalx.zzalt.release();
+                        this.zzalx.zzals.notifyAll();
+                        if (this == this.zzalx.zzalm) {
+                            this.zzalx.zzalm = null;
+                        } else if (this == this.zzalx.zzaln) {
+                            this.zzalx.zzaln = null;
+                        } else {
+                            this.zzalx.zzgg().zzil().log("Current scheduler thread is neither worker nor network");
+                        }
+                    }
                 }
             }
-            synchronized (this.zzalx.zzals) {
-                this.zzalx.zzalt.release();
-                this.zzalx.zzals.notifyAll();
-                if (this == this.zzalx.zzalm) {
-                    this.zzalx.zzalm = null;
-                } else if (this == this.zzalx.zzaln) {
-                    this.zzalx.zzaln = null;
-                } else {
-                    this.zzalx.zzgg().zzil().log("Current scheduler thread is neither worker nor network");
-                }
-            }
-        } catch (Throwable th) {
-            synchronized (this.zzalx.zzals) {
-                this.zzalx.zzalt.release();
-                this.zzalx.zzals.notifyAll();
-                if (this == this.zzalx.zzalm) {
-                    this.zzalx.zzalm = null;
-                } else if (this == this.zzalx.zzaln) {
-                    this.zzalx.zzaln = null;
-                } else {
-                    this.zzalx.zzgg().zzil().log("Current scheduler thread is neither worker nor network");
-                }
+        }
+        synchronized (this.zzalx.zzals) {
+            this.zzalx.zzalt.release();
+            this.zzalx.zzals.notifyAll();
+            if (this == this.zzalx.zzalm) {
+                this.zzalx.zzalm = null;
+            } else if (this == this.zzalx.zzaln) {
+                this.zzalx.zzaln = null;
+            } else {
+                this.zzalx.zzgg().zzil().log("Current scheduler thread is neither worker nor network");
             }
         }
     }

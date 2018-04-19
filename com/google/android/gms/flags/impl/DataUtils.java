@@ -11,10 +11,10 @@ public abstract class DataUtils<T> {
             try {
                 return (Boolean) StrictModeUtil.runWithLaxStrictMode(new zza(sharedPreferences, str, bool));
             } catch (Exception e) {
-                str = "FlagDataUtils";
-                String str2 = "Flag value not available, returning default: ";
+                String str2 = "FlagDataUtils";
+                String str3 = "Flag value not available, returning default: ";
                 String valueOf = String.valueOf(e.getMessage());
-                Log.w(str, valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2));
+                Log.w(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
                 return bool;
             }
         }
@@ -25,10 +25,10 @@ public abstract class DataUtils<T> {
             try {
                 return (Integer) StrictModeUtil.runWithLaxStrictMode(new zzb(sharedPreferences, str, num));
             } catch (Exception e) {
-                str = "FlagDataUtils";
-                String str2 = "Flag value not available, returning default: ";
+                String str2 = "FlagDataUtils";
+                String str3 = "Flag value not available, returning default: ";
                 String valueOf = String.valueOf(e.getMessage());
-                Log.w(str, valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2));
+                Log.w(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
                 return num;
             }
         }
@@ -39,10 +39,10 @@ public abstract class DataUtils<T> {
             try {
                 return (Long) StrictModeUtil.runWithLaxStrictMode(new zzc(sharedPreferences, str, l));
             } catch (Exception e) {
-                str = "FlagDataUtils";
-                String str2 = "Flag value not available, returning default: ";
+                String str2 = "FlagDataUtils";
+                String str3 = "Flag value not available, returning default: ";
                 String valueOf = String.valueOf(e.getMessage());
-                Log.w(str, valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2));
+                Log.w(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
                 return l;
             }
         }
@@ -53,10 +53,10 @@ public abstract class DataUtils<T> {
             try {
                 return (String) StrictModeUtil.runWithLaxStrictMode(new zzd(sharedPreferences, str, str2));
             } catch (Exception e) {
-                str = "FlagDataUtils";
-                String str3 = "Flag value not available, returning default: ";
+                String str3 = "FlagDataUtils";
+                String str4 = "Flag value not available, returning default: ";
                 String valueOf = String.valueOf(e.getMessage());
-                Log.w(str, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
+                Log.w(str3, valueOf.length() != 0 ? str4.concat(valueOf) : new String(str4));
                 return str2;
             }
         }

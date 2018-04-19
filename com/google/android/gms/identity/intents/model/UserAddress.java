@@ -46,7 +46,7 @@ public final class UserAddress extends AbstractSafeParcelable implements Reflect
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, this.name, false);
         SafeParcelWriter.writeString(parcel, 3, this.zzl, false);
         SafeParcelWriter.writeString(parcel, 4, this.zzm, false);
@@ -62,6 +62,6 @@ public final class UserAddress extends AbstractSafeParcelable implements Reflect
         SafeParcelWriter.writeBoolean(parcel, 14, this.zzv);
         SafeParcelWriter.writeString(parcel, 15, this.zzw, false);
         SafeParcelWriter.writeString(parcel, 16, this.zzx, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

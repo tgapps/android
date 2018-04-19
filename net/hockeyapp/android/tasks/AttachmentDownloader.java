@@ -6,8 +6,12 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -99,171 +103,6 @@ public class AttachmentDownloader {
         private final DownloadJob downloadJob;
         private final Handler handler;
 
-        private boolean downloadAttachment(java.lang.String r1, java.io.File r2) {
-            /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: net.hockeyapp.android.tasks.AttachmentDownloader.DownloadTask.downloadAttachment(java.lang.String, java.io.File):boolean
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-            /*
-            r0 = this;
-            r1 = r19;
-            r2 = r21;
-            r3 = 0;
-            r4 = 0;
-            r5 = 0;
-            r6 = 0;
-            r7 = new java.net.URL;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r8 = r20;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r7.<init>(r8);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r7 = r1.createConnection(r7);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r7 = (java.net.HttpURLConnection) r7;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r5 = r7;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r5.connect();	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r7 = r5.getContentLength();	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r9 = "Status";	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r9 = r5.getHeaderField(r9);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            if (r9 == 0) goto L_0x0044;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-        L_0x0025:
-            r10 = "200";	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r10 = r9.startsWith(r10);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            if (r10 != 0) goto L_0x0044;
-        L_0x002e:
-            if (r4 == 0) goto L_0x0036;
-        L_0x0030:
-            r4.close();	 Catch:{ IOException -> 0x0034 }
-            goto L_0x0036;	 Catch:{ IOException -> 0x0034 }
-        L_0x0034:
-            r0 = move-exception;	 Catch:{ IOException -> 0x0034 }
-            goto L_0x003c;	 Catch:{ IOException -> 0x0034 }
-        L_0x0036:
-            if (r3 == 0) goto L_0x003d;	 Catch:{ IOException -> 0x0034 }
-        L_0x0038:
-            r3.close();	 Catch:{ IOException -> 0x0034 }
-            goto L_0x003d;
-        L_0x003c:
-            goto L_0x003e;
-            if (r5 == 0) goto L_0x0043;
-            r5.disconnect();
-            return r6;
-        L_0x0044:
-            r10 = new java.io.BufferedInputStream;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r11 = r5.getInputStream();	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r10.<init>(r11);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r3 = r10;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r10 = new java.io.FileOutputStream;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r10.<init>(r2);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r4 = r10;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r10 = 1024; // 0x400 float:1.435E-42 double:5.06E-321;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r10 = new byte[r10];	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r13 = 0;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r15 = r3.read(r10);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r16 = r15;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r11 = -1;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r12 = 1;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            if (r15 == r11) goto L_0x008b;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r17 = r7;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r11 = r16;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r6 = (long) r11;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r15 = r13 + r6;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r6 = new java.lang.Integer[r12];	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r12 = 100;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r12 = r12 * r15;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r18 = r9;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r7 = r17;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r8 = (long) r7;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r12 = r12 / r8;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r8 = (int) r12;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r8 = java.lang.Integer.valueOf(r8);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r9 = 0;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r6[r9] = r8;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r1.publishProgress(r6);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r4.write(r10, r9, r11);	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r13 = r15;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r9 = r18;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r6 = 0;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r8 = r20;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            goto L_0x005a;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r18 = r9;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r11 = r16;	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r4.flush();	 Catch:{ IOException -> 0x00b5, all -> 0x00b0 }
-            r8 = 0;
-            r6 = (r13 > r8 ? 1 : (r13 == r8 ? 0 : -1));
-            if (r6 <= 0) goto L_0x0099;
-            goto L_0x009a;
-            r12 = 0;
-            if (r4 == 0) goto L_0x00a2;
-            r4.close();	 Catch:{ IOException -> 0x00a0 }
-            goto L_0x00a2;	 Catch:{ IOException -> 0x00a0 }
-        L_0x00a0:
-            r0 = move-exception;	 Catch:{ IOException -> 0x00a0 }
-            goto L_0x00a8;	 Catch:{ IOException -> 0x00a0 }
-            if (r3 == 0) goto L_0x00a9;	 Catch:{ IOException -> 0x00a0 }
-            r3.close();	 Catch:{ IOException -> 0x00a0 }
-            goto L_0x00a9;
-            goto L_0x00aa;
-            if (r5 == 0) goto L_0x00af;
-            r5.disconnect();
-            return r12;
-        L_0x00b0:
-            r0 = move-exception;
-            r6 = r5;
-            r5 = r3;
-            r3 = r0;
-            goto L_0x00e7;
-        L_0x00b5:
-            r0 = move-exception;
-            r6 = r5;
-            r5 = r3;
-            r3 = r0;
-            r7 = new java.lang.StringBuilder;	 Catch:{ all -> 0x00e5 }
-            r7.<init>();	 Catch:{ all -> 0x00e5 }
-            r8 = "Failed to download attachment to ";	 Catch:{ all -> 0x00e5 }
-            r7.append(r8);	 Catch:{ all -> 0x00e5 }
-            r7.append(r2);	 Catch:{ all -> 0x00e5 }
-            r7 = r7.toString();	 Catch:{ all -> 0x00e5 }
-            net.hockeyapp.android.utils.HockeyLog.error(r7, r3);	 Catch:{ all -> 0x00e5 }
-            if (r4 == 0) goto L_0x00d6;
-            r4.close();	 Catch:{ IOException -> 0x00d4 }
-            goto L_0x00d6;	 Catch:{ IOException -> 0x00d4 }
-        L_0x00d4:
-            r0 = move-exception;	 Catch:{ IOException -> 0x00d4 }
-            goto L_0x00dc;	 Catch:{ IOException -> 0x00d4 }
-            if (r5 == 0) goto L_0x00dd;	 Catch:{ IOException -> 0x00d4 }
-            r5.close();	 Catch:{ IOException -> 0x00d4 }
-            goto L_0x00dd;
-            goto L_0x00de;
-            if (r6 == 0) goto L_0x00e3;
-            r6.disconnect();
-            r7 = 0;
-            return r7;
-        L_0x00e5:
-            r0 = move-exception;
-            goto L_0x00b3;
-            if (r4 == 0) goto L_0x00ef;
-            r4.close();	 Catch:{ IOException -> 0x00ed }
-            goto L_0x00ef;	 Catch:{ IOException -> 0x00ed }
-        L_0x00ed:
-            r0 = move-exception;	 Catch:{ IOException -> 0x00ed }
-            goto L_0x00f5;	 Catch:{ IOException -> 0x00ed }
-            if (r5 == 0) goto L_0x00f6;	 Catch:{ IOException -> 0x00ed }
-            r5.close();	 Catch:{ IOException -> 0x00ed }
-            goto L_0x00f6;
-            goto L_0x00f7;
-            if (r6 == 0) goto L_0x00fc;
-            r6.disconnect();
-            throw r3;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.tasks.AttachmentDownloader.DownloadTask.downloadAttachment(java.lang.String, java.io.File):boolean");
-        }
-
         DownloadTask(DownloadJob downloadJob, Handler handler) {
             this.downloadJob = downloadJob;
             this.handler = handler;
@@ -311,6 +150,171 @@ Caused by: java.lang.NullPointerException
             } catch (Throwable e) {
                 HockeyLog.error("Failed to load image thumbnail", e);
                 this.bitmap = null;
+            }
+        }
+
+        private boolean downloadAttachment(String url, File file) {
+            Throwable e;
+            Throwable th;
+            InputStream input = null;
+            OutputStream output = null;
+            HttpURLConnection connection = null;
+            boolean z;
+            try {
+                connection = (HttpURLConnection) createConnection(new URL(url));
+                connection.connect();
+                int lengthOfFile = connection.getContentLength();
+                String status = connection.getHeaderField("Status");
+                if (status == null || status.startsWith("200")) {
+                    InputStream input2 = new BufferedInputStream(connection.getInputStream());
+                    try {
+                        OutputStream output2 = new FileOutputStream(file);
+                        try {
+                            byte[] data = new byte[1024];
+                            long total = 0;
+                            while (true) {
+                                int count = input2.read(data);
+                                if (count == -1) {
+                                    break;
+                                }
+                                total += (long) count;
+                                publishProgress(new Integer[]{Integer.valueOf((int) ((100 * total) / ((long) lengthOfFile)))});
+                                output2.write(data, 0, count);
+                            }
+                            output2.flush();
+                            z = total > 0;
+                            if (output2 != null) {
+                                try {
+                                    output2.close();
+                                } catch (IOException e2) {
+                                }
+                            }
+                            if (input2 != null) {
+                                input2.close();
+                            }
+                            if (connection != null) {
+                                connection.disconnect();
+                            }
+                            output = output2;
+                            input = input2;
+                        } catch (IOException e3) {
+                            e = e3;
+                            output = output2;
+                            input = input2;
+                            try {
+                                HockeyLog.error("Failed to download attachment to " + file, e);
+                                z = false;
+                                if (output != null) {
+                                    try {
+                                        output.close();
+                                    } catch (IOException e4) {
+                                        if (connection != null) {
+                                            connection.disconnect();
+                                        }
+                                        return z;
+                                    }
+                                }
+                                if (input != null) {
+                                    input.close();
+                                }
+                                if (connection != null) {
+                                    connection.disconnect();
+                                }
+                                return z;
+                            } catch (Throwable th2) {
+                                th = th2;
+                                if (output != null) {
+                                    try {
+                                        output.close();
+                                    } catch (IOException e5) {
+                                        if (connection != null) {
+                                            connection.disconnect();
+                                        }
+                                        throw th;
+                                    }
+                                }
+                                if (input != null) {
+                                    input.close();
+                                }
+                                if (connection != null) {
+                                    connection.disconnect();
+                                }
+                                throw th;
+                            }
+                        } catch (Throwable th3) {
+                            th = th3;
+                            output = output2;
+                            input = input2;
+                            if (output != null) {
+                                output.close();
+                            }
+                            if (input != null) {
+                                input.close();
+                            }
+                            if (connection != null) {
+                                connection.disconnect();
+                            }
+                            throw th;
+                        }
+                    } catch (IOException e6) {
+                        e = e6;
+                        input = input2;
+                        HockeyLog.error("Failed to download attachment to " + file, e);
+                        z = false;
+                        if (output != null) {
+                            output.close();
+                        }
+                        if (input != null) {
+                            input.close();
+                        }
+                        if (connection != null) {
+                            connection.disconnect();
+                        }
+                        return z;
+                    } catch (Throwable th4) {
+                        th = th4;
+                        input = input2;
+                        if (output != null) {
+                            output.close();
+                        }
+                        if (input != null) {
+                            input.close();
+                        }
+                        if (connection != null) {
+                            connection.disconnect();
+                        }
+                        throw th;
+                    }
+                    return z;
+                }
+                z = false;
+                if (output != null) {
+                    try {
+                        output.close();
+                    } catch (IOException e7) {
+                    }
+                }
+                if (input != null) {
+                    input.close();
+                }
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                return z;
+            } catch (IOException e8) {
+                e = e8;
+                HockeyLog.error("Failed to download attachment to " + file, e);
+                z = false;
+                if (output != null) {
+                    output.close();
+                }
+                if (input != null) {
+                    input.close();
+                }
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                return z;
             }
         }
 

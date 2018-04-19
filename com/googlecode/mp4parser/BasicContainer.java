@@ -61,9 +61,7 @@ public class BasicContainer implements Container, Closeable, Iterator<Box> {
 
     protected long getContainerSize() {
         long contentSize = 0;
-        int i = 0;
-        while (i < getBoxes().size()) {
-            i++;
+        for (int i = 0; i < getBoxes().size(); i++) {
             contentSize += ((Box) this.boxes.get(i)).getSize();
         }
         return contentSize;
@@ -150,36 +148,33 @@ public class BasicContainer implements Container, Closeable, Iterator<Box> {
     }
 
     public Box next() {
-        if (this.lookahead == null || this.lookahead == EOF) {
-            if (this.dataSource != null) {
-                if (this.parsePosition < this.endPosition) {
-                    try {
-                        Box b;
-                        synchronized (this.dataSource) {
-                            this.dataSource.position(this.parsePosition);
-                            b = this.boxParser.parseBox(this.dataSource, this);
-                            this.parsePosition = this.dataSource.position();
-                        }
-                        return b;
-                    } catch (EOFException e) {
-                        throw new NoSuchElementException();
-                    } catch (IOException e2) {
-                        throw new NoSuchElementException();
-                    }
-                }
-            }
+        Box b;
+        if (this.lookahead != null && this.lookahead != EOF) {
+            b = this.lookahead;
+            this.lookahead = null;
+            return b;
+        } else if (this.dataSource == null || this.parsePosition >= this.endPosition) {
             this.lookahead = EOF;
             throw new NoSuchElementException();
+        } else {
+            try {
+                synchronized (this.dataSource) {
+                    this.dataSource.position(this.parsePosition);
+                    b = this.boxParser.parseBox(this.dataSource, this);
+                    this.parsePosition = this.dataSource.position();
+                }
+                return b;
+            } catch (EOFException e) {
+                throw new NoSuchElementException();
+            } catch (IOException e2) {
+                throw new NoSuchElementException();
+            }
         }
-        Box b2 = this.lookahead;
-        this.lookahead = null;
-        return b2;
     }
 
     public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append(getClass().getSimpleName());
-        buffer.append("[");
+        buffer.append(getClass().getSimpleName()).append("[");
         for (int i = 0; i < this.boxes.size(); i++) {
             if (i > 0) {
                 buffer.append(";");
@@ -197,66 +192,36 @@ public class BasicContainer implements Container, Closeable, Iterator<Box> {
     }
 
     public ByteBuffer getByteBuffer(long rangeStart, long size) throws IOException {
-        long j = size;
-        BasicContainer basicContainer;
         if (this.dataSource != null) {
             ByteBuffer map;
-            synchronized (basicContainer.dataSource) {
-                try {
-                    map = basicContainer.dataSource.map(basicContainer.startPosition + rangeStart, j);
-                } catch (Throwable th) {
-                    Throwable th2 = th;
-                }
+            synchronized (this.dataSource) {
+                map = this.dataSource.map(this.startPosition + rangeStart, size);
             }
             return map;
         }
         ByteBuffer out = ByteBuffer.allocate(CastUtils.l2i(size));
-        long rangeEnd = rangeStart + j;
+        long rangeEnd = rangeStart + size;
         long boxEnd = 0;
-        Iterator it = basicContainer.boxes.iterator();
-        while (it.hasNext()) {
-            long rangeEnd2;
-            Iterator it2;
-            Box box = (Box) it.next();
+        for (Box box : this.boxes) {
             long boxStart = boxEnd;
             boxEnd = boxStart + box.getSize();
-            if (boxEnd <= rangeStart || boxStart >= rangeEnd) {
-                rangeEnd2 = rangeEnd;
-                it2 = it;
-            } else {
+            if (boxEnd > rangeStart && boxStart < rangeEnd) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 WritableByteChannel wbc = Channels.newChannel(baos);
                 box.getBox(wbc);
                 wbc.close();
-                if (boxStart < rangeStart || boxEnd > rangeEnd) {
-                    if (boxStart >= rangeStart || boxEnd <= rangeEnd) {
-                        it2 = it;
-                        Box box2 = box;
-                        if (boxStart >= rangeStart || boxEnd > rangeEnd) {
-                            rangeEnd2 = rangeEnd;
-                            Box box3 = box2;
-                            if (boxStart >= rangeStart && boxEnd > rangeEnd2) {
-                                out.put(baos.toByteArray(), 0, CastUtils.l2i(box3.getSize() - (boxEnd - rangeEnd2)));
-                            }
-                        } else {
-                            rangeEnd2 = rangeEnd;
-                            out.put(baos.toByteArray(), CastUtils.l2i(rangeStart - boxStart), CastUtils.l2i(box2.getSize() - (rangeStart - boxStart)));
-                        }
-                    } else {
-                        it2 = it;
-                        out.put(baos.toByteArray(), CastUtils.l2i(rangeStart - boxStart), CastUtils.l2i((box.getSize() - (rangeStart - boxStart)) - (boxEnd - rangeEnd)));
-                        rangeEnd2 = rangeEnd;
-                    }
-                } else {
+                if (boxStart >= rangeStart && boxEnd <= rangeEnd) {
                     out.put(baos.toByteArray());
-                    rangeEnd2 = rangeEnd;
-                    it2 = it;
+                } else if (boxStart < rangeStart && boxEnd > rangeEnd) {
+                    length = CastUtils.l2i((box.getSize() - (rangeStart - boxStart)) - (boxEnd - rangeEnd));
+                    out.put(baos.toByteArray(), CastUtils.l2i(rangeStart - boxStart), length);
+                } else if (boxStart < rangeStart && boxEnd <= rangeEnd) {
+                    length = CastUtils.l2i(box.getSize() - (rangeStart - boxStart));
+                    out.put(baos.toByteArray(), CastUtils.l2i(rangeStart - boxStart), length);
+                } else if (boxStart >= rangeStart && boxEnd > rangeEnd) {
+                    out.put(baos.toByteArray(), 0, CastUtils.l2i(box.getSize() - (boxEnd - rangeEnd)));
                 }
             }
-            it = it2;
-            rangeEnd = rangeEnd2;
-            basicContainer = this;
-            j = size;
         }
         return (ByteBuffer) out.rewind();
     }

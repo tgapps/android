@@ -17,39 +17,27 @@ public final class Objects {
 
         public final ToStringHelper add(String str, Object obj) {
             List list = this.zzul;
-            str = (String) Preconditions.checkNotNull(str);
+            String str2 = (String) Preconditions.checkNotNull(str);
             String valueOf = String.valueOf(obj);
-            StringBuilder stringBuilder = new StringBuilder((1 + String.valueOf(str).length()) + String.valueOf(valueOf).length());
-            stringBuilder.append(str);
-            stringBuilder.append("=");
-            stringBuilder.append(valueOf);
-            list.add(stringBuilder.toString());
+            list.add(new StringBuilder((String.valueOf(str2).length() + 1) + String.valueOf(valueOf).length()).append(str2).append("=").append(valueOf).toString());
             return this;
         }
 
         public final String toString() {
-            StringBuilder stringBuilder = new StringBuilder(100);
-            stringBuilder.append(this.zzum.getClass().getSimpleName());
-            stringBuilder.append('{');
+            StringBuilder append = new StringBuilder(100).append(this.zzum.getClass().getSimpleName()).append('{');
             int size = this.zzul.size();
             for (int i = 0; i < size; i++) {
-                stringBuilder.append((String) this.zzul.get(i));
+                append.append((String) this.zzul.get(i));
                 if (i < size - 1) {
-                    stringBuilder.append(", ");
+                    append.append(", ");
                 }
             }
-            stringBuilder.append('}');
-            return stringBuilder.toString();
+            return append.append('}').toString();
         }
     }
 
     public static boolean equal(Object obj, Object obj2) {
-        if (obj != obj2) {
-            if (obj == null || !obj.equals(obj2)) {
-                return false;
-            }
-        }
-        return true;
+        return obj == obj2 || (obj != null && obj.equals(obj2));
     }
 
     public static int hashCode(Object... objArr) {

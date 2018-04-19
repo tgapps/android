@@ -26,10 +26,7 @@ public final class zzk {
     private final synchronized <T> Task<T> zza(zzt<T> com_google_firebase_iid_zzt_T) {
         if (Log.isLoggable("MessengerIpcClient", 3)) {
             String valueOf = String.valueOf(com_google_firebase_iid_zzt_T);
-            StringBuilder stringBuilder = new StringBuilder(9 + String.valueOf(valueOf).length());
-            stringBuilder.append("Queueing ");
-            stringBuilder.append(valueOf);
-            Log.d("MessengerIpcClient", stringBuilder.toString());
+            Log.d("MessengerIpcClient", new StringBuilder(String.valueOf(valueOf).length() + 9).append("Queueing ").append(valueOf).toString());
         }
         if (!this.zzbqx.zzb(com_google_firebase_iid_zzt_T)) {
             this.zzbqx = new zzm();

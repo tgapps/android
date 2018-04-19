@@ -13,17 +13,18 @@ public final class zzc {
     private SparseArray<Integer> zzau = new SparseArray();
 
     public final int zzb(int i) {
+        int intValue;
         synchronized (sLock) {
             Integer num = (Integer) this.zzat.get(i);
             if (num != null) {
-                i = num.intValue();
-                return i;
+                intValue = num.intValue();
+            } else {
+                intValue = zzas;
+                zzas++;
+                this.zzat.append(i, Integer.valueOf(intValue));
+                this.zzau.append(intValue, Integer.valueOf(i));
             }
-            int i2 = zzas;
-            zzas++;
-            this.zzat.append(i, Integer.valueOf(i2));
-            this.zzau.append(i2, Integer.valueOf(i));
-            return i2;
         }
+        return intValue;
     }
 }

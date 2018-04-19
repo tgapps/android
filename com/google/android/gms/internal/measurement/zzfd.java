@@ -45,8 +45,8 @@ final class zzfd extends SQLiteOpenHelper {
 
     public final void onOpen(SQLiteDatabase sQLiteDatabase) {
         Throwable th;
+        Cursor cursor = null;
         if (VERSION.SDK_INT < 15) {
-            Cursor cursor = null;
             try {
                 Cursor rawQuery = sQLiteDatabase.rawQuery("PRAGMA journal_mode=memory", null);
                 try {

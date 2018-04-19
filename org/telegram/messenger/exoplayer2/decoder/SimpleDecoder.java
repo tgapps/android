@@ -18,149 +18,6 @@ public abstract class SimpleDecoder<I extends DecoderInputBuffer, O extends Outp
     private boolean released;
     private int skippedOutputBufferCount;
 
-    private boolean decode() throws java.lang.InterruptedException {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.decoder.SimpleDecoder.decode():boolean
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r7.lock;
-        monitor-enter(r0);
-    L_0x0003:
-        r1 = r7.released;	 Catch:{ all -> 0x0097 }
-        if (r1 != 0) goto L_0x0013;	 Catch:{ all -> 0x0097 }
-    L_0x0007:
-        r1 = r7.canDecodeBuffer();	 Catch:{ all -> 0x0097 }
-        if (r1 != 0) goto L_0x0013;	 Catch:{ all -> 0x0097 }
-    L_0x000d:
-        r1 = r7.lock;	 Catch:{ all -> 0x0097 }
-        r1.wait();	 Catch:{ all -> 0x0097 }
-        goto L_0x0003;	 Catch:{ all -> 0x0097 }
-    L_0x0013:
-        r1 = r7.released;	 Catch:{ all -> 0x0097 }
-        r2 = 0;	 Catch:{ all -> 0x0097 }
-        if (r1 == 0) goto L_0x001a;	 Catch:{ all -> 0x0097 }
-    L_0x0018:
-        monitor-exit(r0);	 Catch:{ all -> 0x0097 }
-        return r2;	 Catch:{ all -> 0x0097 }
-    L_0x001a:
-        r1 = r7.queuedInputBuffers;	 Catch:{ all -> 0x0097 }
-        r1 = r1.removeFirst();	 Catch:{ all -> 0x0097 }
-        r1 = (org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer) r1;	 Catch:{ all -> 0x0097 }
-        r3 = r7.availableOutputBuffers;	 Catch:{ all -> 0x0097 }
-        r4 = r7.availableOutputBufferCount;	 Catch:{ all -> 0x0097 }
-        r5 = 1;	 Catch:{ all -> 0x0097 }
-        r4 = r4 - r5;	 Catch:{ all -> 0x0097 }
-        r7.availableOutputBufferCount = r4;	 Catch:{ all -> 0x0097 }
-        r3 = r3[r4];	 Catch:{ all -> 0x0097 }
-        r4 = r7.flushed;	 Catch:{ all -> 0x0097 }
-        r7.flushed = r2;	 Catch:{ all -> 0x0097 }
-        monitor-exit(r0);	 Catch:{ all -> 0x0097 }
-        r0 = r1.isEndOfStream();
-        if (r0 == 0) goto L_0x003c;
-    L_0x0037:
-        r0 = 4;
-        r3.addFlag(r0);
-        goto L_0x006a;
-    L_0x003c:
-        r0 = r1.isDecodeOnly();
-        if (r0 == 0) goto L_0x0047;
-    L_0x0042:
-        r0 = -2147483648; // 0xffffffff80000000 float:-0.0 double:NaN;
-        r3.addFlag(r0);
-    L_0x0047:
-        r0 = r7.decode(r1, r3, r4);	 Catch:{ RuntimeException -> 0x0056, OutOfMemoryError -> 0x004e }
-        r7.exception = r0;	 Catch:{ RuntimeException -> 0x0056, OutOfMemoryError -> 0x004e }
-        goto L_0x005d;
-    L_0x004e:
-        r0 = move-exception;
-        r6 = r7.createUnexpectedDecodeException(r0);
-        r7.exception = r6;
-        goto L_0x005e;
-    L_0x0056:
-        r0 = move-exception;
-        r6 = r7.createUnexpectedDecodeException(r0);
-        r7.exception = r6;
-        r0 = r7.exception;
-        if (r0 == 0) goto L_0x006a;
-        r0 = r7.lock;
-        monitor-enter(r0);
-        monitor-exit(r0);	 Catch:{ all -> 0x0067 }
-        return r2;	 Catch:{ all -> 0x0067 }
-    L_0x0067:
-        r2 = move-exception;	 Catch:{ all -> 0x0067 }
-        monitor-exit(r0);	 Catch:{ all -> 0x0067 }
-        throw r2;
-    L_0x006a:
-        r6 = r7.lock;
-        monitor-enter(r6);
-        r0 = r7.flushed;	 Catch:{ all -> 0x0094 }
-        if (r0 == 0) goto L_0x0075;	 Catch:{ all -> 0x0094 }
-        r7.releaseOutputBufferInternal(r3);	 Catch:{ all -> 0x0094 }
-        goto L_0x008f;	 Catch:{ all -> 0x0094 }
-        r0 = r3.isDecodeOnly();	 Catch:{ all -> 0x0094 }
-        if (r0 == 0) goto L_0x0084;	 Catch:{ all -> 0x0094 }
-        r0 = r7.skippedOutputBufferCount;	 Catch:{ all -> 0x0094 }
-        r0 = r0 + r5;	 Catch:{ all -> 0x0094 }
-        r7.skippedOutputBufferCount = r0;	 Catch:{ all -> 0x0094 }
-        r7.releaseOutputBufferInternal(r3);	 Catch:{ all -> 0x0094 }
-        goto L_0x008f;	 Catch:{ all -> 0x0094 }
-        r0 = r7.skippedOutputBufferCount;	 Catch:{ all -> 0x0094 }
-        r3.skippedOutputBufferCount = r0;	 Catch:{ all -> 0x0094 }
-        r7.skippedOutputBufferCount = r2;	 Catch:{ all -> 0x0094 }
-        r0 = r7.queuedOutputBuffers;	 Catch:{ all -> 0x0094 }
-        r0.addLast(r3);	 Catch:{ all -> 0x0094 }
-        r7.releaseInputBufferInternal(r1);	 Catch:{ all -> 0x0094 }
-        monitor-exit(r6);	 Catch:{ all -> 0x0094 }
-        return r5;	 Catch:{ all -> 0x0094 }
-    L_0x0094:
-        r0 = move-exception;	 Catch:{ all -> 0x0094 }
-        monitor-exit(r6);	 Catch:{ all -> 0x0094 }
-        throw r0;
-    L_0x0097:
-        r1 = move-exception;
-        monitor-exit(r0);	 Catch:{ all -> 0x0097 }
-        throw r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.decoder.SimpleDecoder.decode():boolean");
-    }
-
-    private void run() {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.decoder.SimpleDecoder.run():void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r2.decode();	 Catch:{ InterruptedException -> 0x0009 }
-        if (r0 == 0) goto L_0x0007;
-    L_0x0006:
-        goto L_0x0000;
-        return;
-    L_0x0009:
-        r0 = move-exception;
-        r1 = new java.lang.IllegalStateException;
-        r1.<init>(r0);
-        throw r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.decoder.SimpleDecoder.run():void");
-    }
-
     protected abstract I createInputBuffer();
 
     protected abstract O createOutputBuffer();
@@ -170,17 +27,16 @@ Caused by: java.lang.NullPointerException
     protected abstract E decode(I i, O o, boolean z);
 
     protected SimpleDecoder(I[] inputBuffers, O[] outputBuffers) {
+        int i;
         this.availableInputBuffers = inputBuffers;
-        int i = 0;
         this.availableInputBufferCount = inputBuffers.length;
-        for (int i2 = 0; i2 < this.availableInputBufferCount; i2++) {
-            this.availableInputBuffers[i2] = createInputBuffer();
+        for (i = 0; i < this.availableInputBufferCount; i++) {
+            this.availableInputBuffers[i] = createInputBuffer();
         }
         this.availableOutputBuffers = outputBuffers;
         this.availableOutputBufferCount = outputBuffers.length;
-        while (i < this.availableOutputBufferCount) {
+        for (i = 0; i < this.availableOutputBufferCount; i++) {
             this.availableOutputBuffers[i] = createOutputBuffer();
-            i++;
         }
         this.decodeThread = new Thread() {
             public void run() {
@@ -191,8 +47,14 @@ Caused by: java.lang.NullPointerException
     }
 
     protected final void setInitialInputBufferSize(int size) {
+        boolean z;
         int i = 0;
-        Assertions.checkState(this.availableInputBufferCount == this.availableInputBuffers.length);
+        if (this.availableInputBufferCount == this.availableInputBuffers.length) {
+            z = true;
+        } else {
+            z = false;
+        }
+        Assertions.checkState(z);
         DecoderInputBuffer[] decoderInputBufferArr = this.availableInputBuffers;
         int length = decoderInputBufferArr.length;
         while (i < length) {
@@ -232,14 +94,16 @@ Caused by: java.lang.NullPointerException
     }
 
     public final O dequeueOutputBuffer() throws Exception {
+        O o;
         synchronized (this.lock) {
             maybeThrowException();
             if (this.queuedOutputBuffers.isEmpty()) {
-                return null;
+                o = null;
+            } else {
+                OutputBuffer outputBuffer = (OutputBuffer) this.queuedOutputBuffers.removeFirst();
             }
-            OutputBuffer outputBuffer = (OutputBuffer) this.queuedOutputBuffers.removeFirst();
-            return outputBuffer;
         }
+        return o;
     }
 
     protected void releaseOutputBuffer(O outputBuffer) {
@@ -288,6 +152,130 @@ Caused by: java.lang.NullPointerException
         if (canDecodeBuffer()) {
             this.lock.notify();
         }
+    }
+
+    private void run() {
+        do {
+            try {
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+        } while (decode());
+    }
+
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private boolean decode() throws java.lang.InterruptedException {
+        /*
+        r8 = this;
+        r4 = 0;
+        r5 = r8.lock;
+        monitor-enter(r5);
+    L_0x0004:
+        r6 = r8.released;	 Catch:{ all -> 0x0014 }
+        if (r6 != 0) goto L_0x0017;
+    L_0x0008:
+        r6 = r8.canDecodeBuffer();	 Catch:{ all -> 0x0014 }
+        if (r6 != 0) goto L_0x0017;
+    L_0x000e:
+        r6 = r8.lock;	 Catch:{ all -> 0x0014 }
+        r6.wait();	 Catch:{ all -> 0x0014 }
+        goto L_0x0004;
+    L_0x0014:
+        r4 = move-exception;
+        monitor-exit(r5);	 Catch:{ all -> 0x0014 }
+        throw r4;
+    L_0x0017:
+        r6 = r8.released;	 Catch:{ all -> 0x0014 }
+        if (r6 == 0) goto L_0x001d;
+    L_0x001b:
+        monitor-exit(r5);	 Catch:{ all -> 0x0014 }
+    L_0x001c:
+        return r4;
+    L_0x001d:
+        r6 = r8.queuedInputBuffers;	 Catch:{ all -> 0x0014 }
+        r1 = r6.removeFirst();	 Catch:{ all -> 0x0014 }
+        r1 = (org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer) r1;	 Catch:{ all -> 0x0014 }
+        r6 = r8.availableOutputBuffers;	 Catch:{ all -> 0x0014 }
+        r7 = r8.availableOutputBufferCount;	 Catch:{ all -> 0x0014 }
+        r7 = r7 + -1;
+        r8.availableOutputBufferCount = r7;	 Catch:{ all -> 0x0014 }
+        r2 = r6[r7];	 Catch:{ all -> 0x0014 }
+        r3 = r8.flushed;	 Catch:{ all -> 0x0014 }
+        r6 = 0;
+        r8.flushed = r6;	 Catch:{ all -> 0x0014 }
+        monitor-exit(r5);	 Catch:{ all -> 0x0014 }
+        r5 = r1.isEndOfStream();
+        if (r5 == 0) goto L_0x004f;
+    L_0x003b:
+        r4 = 4;
+        r2.addFlag(r4);
+    L_0x003f:
+        r5 = r8.lock;
+        monitor-enter(r5);
+        r4 = r8.flushed;	 Catch:{ all -> 0x008c }
+        if (r4 == 0) goto L_0x007c;
+    L_0x0046:
+        r8.releaseOutputBufferInternal(r2);	 Catch:{ all -> 0x008c }
+    L_0x0049:
+        r8.releaseInputBufferInternal(r1);	 Catch:{ all -> 0x008c }
+        monitor-exit(r5);	 Catch:{ all -> 0x008c }
+        r4 = 1;
+        goto L_0x001c;
+    L_0x004f:
+        r5 = r1.isDecodeOnly();
+        if (r5 == 0) goto L_0x005a;
+    L_0x0055:
+        r5 = -2147483648; // 0xffffffff80000000 float:-0.0 double:NaN;
+        r2.addFlag(r5);
+    L_0x005a:
+        r5 = r8.decode(r1, r2, r3);	 Catch:{ RuntimeException -> 0x006c, OutOfMemoryError -> 0x0074 }
+        r8.exception = r5;	 Catch:{ RuntimeException -> 0x006c, OutOfMemoryError -> 0x0074 }
+    L_0x0060:
+        r5 = r8.exception;
+        if (r5 == 0) goto L_0x003f;
+    L_0x0064:
+        r5 = r8.lock;
+        monitor-enter(r5);
+        monitor-exit(r5);	 Catch:{ all -> 0x0069 }
+        goto L_0x001c;
+    L_0x0069:
+        r4 = move-exception;
+        monitor-exit(r5);	 Catch:{ all -> 0x0069 }
+        throw r4;
+    L_0x006c:
+        r0 = move-exception;
+        r5 = r8.createUnexpectedDecodeException(r0);
+        r8.exception = r5;
+        goto L_0x0060;
+    L_0x0074:
+        r0 = move-exception;
+        r5 = r8.createUnexpectedDecodeException(r0);
+        r8.exception = r5;
+        goto L_0x0060;
+    L_0x007c:
+        r4 = r2.isDecodeOnly();	 Catch:{ all -> 0x008c }
+        if (r4 == 0) goto L_0x008f;
+    L_0x0082:
+        r4 = r8.skippedOutputBufferCount;	 Catch:{ all -> 0x008c }
+        r4 = r4 + 1;
+        r8.skippedOutputBufferCount = r4;	 Catch:{ all -> 0x008c }
+        r8.releaseOutputBufferInternal(r2);	 Catch:{ all -> 0x008c }
+        goto L_0x0049;
+    L_0x008c:
+        r4 = move-exception;
+        monitor-exit(r5);	 Catch:{ all -> 0x008c }
+        throw r4;
+    L_0x008f:
+        r4 = r8.skippedOutputBufferCount;	 Catch:{ all -> 0x008c }
+        r2.skippedOutputBufferCount = r4;	 Catch:{ all -> 0x008c }
+        r4 = 0;
+        r8.skippedOutputBufferCount = r4;	 Catch:{ all -> 0x008c }
+        r4 = r8.queuedOutputBuffers;	 Catch:{ all -> 0x008c }
+        r4.addLast(r2);	 Catch:{ all -> 0x008c }
+        goto L_0x0049;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.decoder.SimpleDecoder.decode():boolean");
     }
 
     private boolean canDecodeBuffer() {

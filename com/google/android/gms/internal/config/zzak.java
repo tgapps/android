@@ -11,10 +11,13 @@ public final class zzak implements Creator<zzaj> {
         Bundle bundle = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
-            if (SafeParcelReader.getFieldId(readHeader) != 2) {
-                SafeParcelReader.skipUnknownField(parcel, readHeader);
-            } else {
-                bundle = SafeParcelReader.createBundle(parcel, readHeader);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 2:
+                    bundle = SafeParcelReader.createBundle(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);

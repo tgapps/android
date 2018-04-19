@@ -13,51 +13,48 @@ public final class zzf implements Cloneable {
 
     private zzf(int i) {
         this.zzv = false;
-        i = idealIntArraySize(i);
-        this.zzw = new int[i];
-        this.zzx = new zzg[i];
+        int idealIntArraySize = idealIntArraySize(i);
+        this.zzw = new int[idealIntArraySize];
+        this.zzx = new zzg[idealIntArraySize];
         this.mSize = 0;
     }
 
     private static int idealIntArraySize(int i) {
-        i <<= 2;
-        for (int i2 = 4; i2 < 32; i2++) {
-            int i3 = (1 << i2) - 12;
-            if (i <= i3) {
-                i = i3;
+        int i2 = i << 2;
+        for (int i3 = 4; i3 < 32; i3++) {
+            if (i2 <= (1 << i3) - 12) {
+                i2 = (1 << i3) - 12;
                 break;
             }
         }
-        return i / 4;
+        return i2 / 4;
     }
 
     private final int zzh(int i) {
-        int i2 = this.mSize - 1;
-        int i3 = 0;
-        while (i3 <= i2) {
-            int i4 = (i3 + i2) >>> 1;
+        int i2 = 0;
+        int i3 = this.mSize - 1;
+        while (i2 <= i3) {
+            int i4 = (i2 + i3) >>> 1;
             int i5 = this.zzw[i4];
             if (i5 < i) {
-                i3 = i4 + 1;
+                i2 = i4 + 1;
             } else if (i5 <= i) {
                 return i4;
             } else {
-                i2 = i4 - 1;
+                i3 = i4 - 1;
             }
         }
-        return i3 ^ -1;
+        return i2 ^ -1;
     }
 
     public final /* synthetic */ Object clone() throws CloneNotSupportedException {
         int i = this.mSize;
         zzf com_google_android_gms_internal_firebase_abt_zzf = new zzf(i);
-        int i2 = 0;
         System.arraycopy(this.zzw, 0, com_google_android_gms_internal_firebase_abt_zzf.zzw, 0, i);
-        while (i2 < i) {
+        for (int i2 = 0; i2 < i; i2++) {
             if (this.zzx[i2] != null) {
                 com_google_android_gms_internal_firebase_abt_zzf.zzx[i2] = (zzg) this.zzx[i2].clone();
             }
-            i2++;
         }
         com_google_android_gms_internal_firebase_abt_zzf.mSize = i;
         return com_google_android_gms_internal_firebase_abt_zzf;
@@ -74,30 +71,30 @@ public final class zzf implements Cloneable {
         if (this.mSize != com_google_android_gms_internal_firebase_abt_zzf.mSize) {
             return false;
         }
+        int i;
         boolean z;
         int[] iArr = this.zzw;
         int[] iArr2 = com_google_android_gms_internal_firebase_abt_zzf.zzw;
-        int i = this.mSize;
-        for (int i2 = 0; i2 < i; i2++) {
-            if (iArr[i2] != iArr2[i2]) {
+        int i2 = this.mSize;
+        for (i = 0; i < i2; i++) {
+            if (iArr[i] != iArr2[i]) {
                 z = false;
                 break;
             }
         }
         z = true;
         if (z) {
-            boolean z2;
             zzg[] com_google_android_gms_internal_firebase_abt_zzgArr = this.zzx;
             zzg[] com_google_android_gms_internal_firebase_abt_zzgArr2 = com_google_android_gms_internal_firebase_abt_zzf.zzx;
-            int i3 = this.mSize;
-            for (i = 0; i < i3; i++) {
+            i2 = this.mSize;
+            for (i = 0; i < i2; i++) {
                 if (!com_google_android_gms_internal_firebase_abt_zzgArr[i].equals(com_google_android_gms_internal_firebase_abt_zzgArr2[i])) {
-                    z2 = false;
+                    z = false;
                     break;
                 }
             }
-            z2 = true;
-            if (z2) {
+            z = true;
+            if (z) {
                 return true;
             }
         }
@@ -130,9 +127,8 @@ public final class zzf implements Cloneable {
                 this.zzx = obj2;
             }
             if (this.mSize - zzh != 0) {
-                int i2 = zzh + 1;
-                System.arraycopy(this.zzw, zzh, this.zzw, i2, this.mSize - zzh);
-                System.arraycopy(this.zzx, zzh, this.zzx, i2, this.mSize - zzh);
+                System.arraycopy(this.zzw, zzh, this.zzw, zzh + 1, this.mSize - zzh);
+                System.arraycopy(this.zzx, zzh, this.zzx, zzh + 1, this.mSize - zzh);
             }
             this.zzw[zzh] = i;
             this.zzx[zzh] = com_google_android_gms_internal_firebase_abt_zzg;
@@ -144,12 +140,7 @@ public final class zzf implements Cloneable {
     }
 
     final zzg zzg(int i) {
-        i = zzh(i);
-        if (i >= 0) {
-            if (this.zzx[i] != zzu) {
-                return this.zzx[i];
-            }
-        }
-        return null;
+        int zzh = zzh(i);
+        return (zzh < 0 || this.zzx[zzh] == zzu) ? null : this.zzx[zzh];
     }
 }

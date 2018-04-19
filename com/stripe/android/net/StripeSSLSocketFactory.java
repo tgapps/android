@@ -19,8 +19,8 @@ public class StripeSSLSocketFactory extends SSLSocketFactory {
 
     public StripeSSLSocketFactory() {
         String[] supportedProtocols;
-        boolean tlsv11Supported = false;
         int i = 0;
+        boolean tlsv11Supported = false;
         boolean tlsv12Supported = false;
         try {
             supportedProtocols = SSLContext.getDefault().getSupportedSSLParameters().getProtocols();
@@ -73,7 +73,7 @@ public class StripeSSLSocketFactory extends SSLSocketFactory {
         if (!(sock instanceof SSLSocket)) {
             return sock;
         }
-        SSLSocket sslSock = (SSLSocket) sock;
+        Socket sslSock = (SSLSocket) sock;
         Set<String> protos = new HashSet(Arrays.asList(sslSock.getEnabledProtocols()));
         if (this.tlsv11Supported) {
             protos.add("TLSv1.1");

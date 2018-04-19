@@ -59,34 +59,31 @@ public class SampleToChunkBox extends AbstractFullBox {
         }
 
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder("Entry{firstChunk=");
-            stringBuilder.append(this.firstChunk);
-            stringBuilder.append(", samplesPerChunk=");
-            stringBuilder.append(this.samplesPerChunk);
-            stringBuilder.append(", sampleDescriptionIndex=");
-            stringBuilder.append(this.sampleDescriptionIndex);
-            stringBuilder.append('}');
-            return stringBuilder.toString();
+            return "Entry{firstChunk=" + this.firstChunk + ", samplesPerChunk=" + this.samplesPerChunk + ", sampleDescriptionIndex=" + this.sampleDescriptionIndex + '}';
         }
 
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
-            if (o != null) {
-                if (getClass() == o.getClass()) {
-                    Entry entry = (Entry) o;
-                    if (this.firstChunk == entry.firstChunk && this.sampleDescriptionIndex == entry.sampleDescriptionIndex && this.samplesPerChunk == entry.samplesPerChunk) {
-                        return true;
-                    }
-                    return false;
-                }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
             }
-            return false;
+            Entry entry = (Entry) o;
+            if (this.firstChunk != entry.firstChunk) {
+                return false;
+            }
+            if (this.sampleDescriptionIndex != entry.sampleDescriptionIndex) {
+                return false;
+            }
+            if (this.samplesPerChunk != entry.samplesPerChunk) {
+                return false;
+            }
+            return true;
         }
 
         public int hashCode() {
-            return (31 * ((31 * ((int) (this.firstChunk ^ (this.firstChunk >>> 32)))) + ((int) (this.samplesPerChunk ^ (this.samplesPerChunk >>> 32))))) + ((int) (this.sampleDescriptionIndex ^ (this.sampleDescriptionIndex >>> 32)));
+            return (((((int) (this.firstChunk ^ (this.firstChunk >>> 32))) * 31) + ((int) (this.samplesPerChunk ^ (this.samplesPerChunk >>> 32)))) * 31) + ((int) (this.sampleDescriptionIndex ^ (this.sampleDescriptionIndex >>> 32)));
         }
     }
 
@@ -141,10 +138,7 @@ public class SampleToChunkBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        StringBuilder stringBuilder = new StringBuilder("SampleToChunkBox[entryCount=");
-        stringBuilder.append(this.entries.size());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "SampleToChunkBox[entryCount=" + this.entries.size() + "]";
     }
 
     public long[] blowup(int chunkCount) {

@@ -17,10 +17,10 @@ public final class zzee extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i |= 1;
+        int i2 = i | 1;
         int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 2, this.statusCode);
-        SafeParcelWriter.writeParcelable(parcel, 3, this.zzdz, i, false);
+        SafeParcelWriter.writeParcelable(parcel, 3, this.zzdz, i2, false);
         SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

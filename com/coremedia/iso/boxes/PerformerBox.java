@@ -57,7 +57,7 @@ public class PerformerBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) ((6 + Utf8.utf8StringLengthInBytes(this.performer)) + 1);
+        return (long) ((Utf8.utf8StringLengthInBytes(this.performer) + 6) + 1);
     }
 
     protected void getContent(ByteBuffer byteBuffer) {
@@ -75,11 +75,6 @@ public class PerformerBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_4, this, this));
-        StringBuilder stringBuilder = new StringBuilder("PerformerBox[language=");
-        stringBuilder.append(getLanguage());
-        stringBuilder.append(";performer=");
-        stringBuilder.append(getPerformer());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "PerformerBox[language=" + getLanguage() + ";performer=" + getPerformer() + "]";
     }
 }

@@ -13,10 +13,10 @@ public final class zzdh implements Creator<zzdg> {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    i2 = SafeParcelReader.readInt(parcel, readHeader);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -24,7 +24,7 @@ public final class zzdh implements Creator<zzdg> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new zzdg(i, i2);
+        return new zzdg(i2, i);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

@@ -42,24 +42,40 @@ public abstract class zzj<T> {
     }
 
     protected final T zzh() {
+        T t;
+        Throwable e;
         synchronized (this.mLock) {
             if (this.zzcj != null) {
-                T t = this.zzcj;
-                return t;
+                t = this.zzcj;
+            } else {
+                try {
+                    this.zzcj = zza(DynamiteModule.load(this.mContext, DynamiteModule.PREFER_HIGHEST_OR_REMOTE_VERSION, "com.google.android.gms.vision.dynamite"), this.mContext);
+                } catch (LoadingException e2) {
+                    e = e2;
+                    Log.e(this.mTag, "Error creating remote native handle", e);
+                    if (!!this.zzci) {
+                    }
+                    Log.w(this.mTag, "Native handle is now available.");
+                    t = this.zzcj;
+                    return t;
+                } catch (RemoteException e3) {
+                    e = e3;
+                    Log.e(this.mTag, "Error creating remote native handle", e);
+                    if (!this.zzci) {
+                    }
+                    Log.w(this.mTag, "Native handle is now available.");
+                    t = this.zzcj;
+                    return t;
+                }
+                if (!this.zzci && this.zzcj == null) {
+                    Log.w(this.mTag, "Native handle not yet available. Reverting to no-op handle.");
+                    this.zzci = true;
+                } else if (this.zzci && this.zzcj != null) {
+                    Log.w(this.mTag, "Native handle is now available.");
+                }
+                t = this.zzcj;
             }
-            try {
-                this.zzcj = zza(DynamiteModule.load(this.mContext, DynamiteModule.PREFER_HIGHEST_OR_REMOTE_VERSION, "com.google.android.gms.vision.dynamite"), this.mContext);
-            } catch (Throwable e) {
-                Log.e(this.mTag, "Error creating remote native handle", e);
-            }
-            if (!this.zzci && this.zzcj == null) {
-                Log.w(this.mTag, "Native handle not yet available. Reverting to no-op handle.");
-                this.zzci = true;
-            } else if (this.zzci && this.zzcj != null) {
-                Log.w(this.mTag, "Native handle is now available.");
-            }
-            t = this.zzcj;
-            return t;
         }
+        return t;
     }
 }

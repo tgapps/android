@@ -10,10 +10,13 @@ public class ValidateAccountRequestCreator implements Creator<ValidateAccountReq
         int i = 0;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
-            if (SafeParcelReader.getFieldId(readHeader) != 1) {
-                SafeParcelReader.skipUnknownField(parcel, readHeader);
-            } else {
-                i = SafeParcelReader.readInt(parcel, readHeader);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 1:
+                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);

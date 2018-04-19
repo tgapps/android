@@ -12,10 +12,10 @@ public class SupportErrorDialogFragment extends DialogFragment {
 
     public static SupportErrorDialogFragment newInstance(Dialog dialog, OnCancelListener onCancelListener) {
         SupportErrorDialogFragment supportErrorDialogFragment = new SupportErrorDialogFragment();
-        dialog = (Dialog) Preconditions.checkNotNull(dialog, "Cannot display null dialog");
-        dialog.setOnCancelListener(null);
-        dialog.setOnDismissListener(null);
-        supportErrorDialogFragment.mDialog = dialog;
+        Dialog dialog2 = (Dialog) Preconditions.checkNotNull(dialog, "Cannot display null dialog");
+        dialog2.setOnCancelListener(null);
+        dialog2.setOnDismissListener(null);
+        supportErrorDialogFragment.mDialog = dialog2;
         if (onCancelListener != null) {
             supportErrorDialogFragment.zzap = onCancelListener;
         }

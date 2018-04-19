@@ -9,8 +9,8 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public class ConnectionInfoCreator implements Creator<ConnectionInfo> {
     public ConnectionInfo createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        Bundle bundle = null;
         Feature[] featureArr = null;
+        Bundle bundle = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {

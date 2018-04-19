@@ -18,10 +18,10 @@ public final class zzdt extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 2, this.statusCode);
         SafeParcelWriter.writeBoolean(parcel, 3, this.zzdt);
         SafeParcelWriter.writeBoolean(parcel, 4, this.zzdu);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

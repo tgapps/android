@@ -102,13 +102,15 @@ final class zzfr extends zzhk {
     }
 
     final String zziw() {
+        String str;
         synchronized (this.zzakg) {
             if (Math.abs(zzbt().elapsedRealtime() - this.zzakf) < 1000) {
-                String str = this.zzake;
-                return str;
+                str = this.zzake;
+            } else {
+                str = null;
             }
-            return null;
         }
+        return str;
     }
 
     final Boolean zzix() {
@@ -117,10 +119,10 @@ final class zzfr extends zzhk {
     }
 
     final void zziy() {
+        boolean z = true;
         zzab();
         zzgg().zzir().log("Clearing collection preferences.");
         boolean contains = zziu().contains("measurement_enabled");
-        boolean z = true;
         if (contains) {
             z = zzg(true);
         }

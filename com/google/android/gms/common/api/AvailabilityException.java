@@ -31,16 +31,16 @@ public class AvailabilityException extends Exception {
             }
             String zzq = com_google_android_gms_common_api_internal_zzh.zzq();
             String valueOf = String.valueOf(connectionResult);
-            StringBuilder stringBuilder = new StringBuilder((2 + String.valueOf(zzq).length()) + String.valueOf(valueOf).length());
-            stringBuilder.append(zzq);
-            stringBuilder.append(": ");
-            stringBuilder.append(valueOf);
-            arrayList.add(stringBuilder.toString());
+            arrayList.add(new StringBuilder((String.valueOf(zzq).length() + 2) + String.valueOf(valueOf).length()).append(zzq).append(": ").append(valueOf).toString());
         }
-        StringBuilder stringBuilder2 = new StringBuilder();
-        stringBuilder2.append(obj != null ? "None of the queried APIs are available. " : "Some of the queried APIs are unavailable. ");
-        stringBuilder2.append(TextUtils.join("; ", arrayList));
-        return stringBuilder2.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        if (obj != null) {
+            stringBuilder.append("None of the queried APIs are available. ");
+        } else {
+            stringBuilder.append("Some of the queried APIs are unavailable. ");
+        }
+        stringBuilder.append(TextUtils.join("; ", arrayList));
+        return stringBuilder.toString();
     }
 
     public final ArrayMap<zzh<?>, ConnectionResult> zzl() {

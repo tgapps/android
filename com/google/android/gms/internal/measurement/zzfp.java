@@ -26,6 +26,7 @@ class zzfp extends BroadcastReceiver {
             if (this.zzaat != zzew) {
                 this.zzaat = zzew;
                 this.zzacr.zzgf().zzc(new zzfq(this, zzew));
+                return;
             }
             return;
         }

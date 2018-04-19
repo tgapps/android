@@ -68,10 +68,7 @@ public class WearableListenerService extends Service implements CapabilityListen
             if (!this.started) {
                 if (Log.isLoggable("WearableLS", 2)) {
                     String valueOf = String.valueOf(this.zzak.service);
-                    StringBuilder stringBuilder = new StringBuilder(13 + String.valueOf(valueOf).length());
-                    stringBuilder.append("bindService: ");
-                    stringBuilder.append(valueOf);
-                    Log.v("WearableLS", stringBuilder.toString());
+                    Log.v("WearableLS", new StringBuilder(String.valueOf(valueOf).length() + 13).append("bindService: ").append(valueOf).toString());
                 }
                 this.zzak.bindService(this.zzak.zzaf, this.zzal, 1);
                 this.started = true;
@@ -83,12 +80,7 @@ public class WearableListenerService extends Service implements CapabilityListen
             if (this.started) {
                 if (Log.isLoggable("WearableLS", 2)) {
                     String valueOf = String.valueOf(this.zzak.service);
-                    StringBuilder stringBuilder = new StringBuilder((17 + String.valueOf(str).length()) + String.valueOf(valueOf).length());
-                    stringBuilder.append("unbindService: ");
-                    stringBuilder.append(str);
-                    stringBuilder.append(", ");
-                    stringBuilder.append(valueOf);
-                    Log.v("WearableLS", stringBuilder.toString());
+                    Log.v("WearableLS", new StringBuilder((String.valueOf(str).length() + 17) + String.valueOf(valueOf).length()).append("unbindService: ").append(str).append(", ").append(valueOf).toString());
                 }
                 try {
                     this.zzak.unbindService(this.zzal);
@@ -150,43 +142,31 @@ public class WearableListenerService extends Service implements CapabilityListen
         }
 
         private final boolean zza(Runnable runnable, String str, Object obj) {
-            boolean z;
             if (Log.isLoggable("WearableLS", 3)) {
                 Log.d("WearableLS", String.format("%s: %s %s", new Object[]{str, this.zzak.service.toString(), obj}));
             }
             int callingUid = Binder.getCallingUid();
-            if (callingUid != this.zzam) {
-                if (!(zzhp.zza(this.zzak).zze("com.google.android.wearable.app.cn") && UidVerifier.uidHasPackageName(this.zzak, callingUid, "com.google.android.wearable.app.cn"))) {
-                    if (!UidVerifier.isGooglePlayServicesUid(this.zzak, callingUid)) {
-                        StringBuilder stringBuilder = new StringBuilder(57);
-                        stringBuilder.append("Caller is not GooglePlayServices; caller UID: ");
-                        stringBuilder.append(callingUid);
-                        Log.e("WearableLS", stringBuilder.toString());
-                        z = false;
-                        if (!z) {
-                            return false;
-                        }
-                        synchronized (this.zzak.zzah) {
-                            if (this.zzak.zzai) {
-                                this.zzak.zzad.post(runnable);
-                                return true;
-                            }
-                            return false;
-                        }
-                    }
-                }
+            if (callingUid == this.zzam) {
+                callingUid = 1;
+            } else if (zzhp.zza(this.zzak).zze("com.google.android.wearable.app.cn") && UidVerifier.uidHasPackageName(this.zzak, callingUid, "com.google.android.wearable.app.cn")) {
                 this.zzam = callingUid;
+                callingUid = 1;
+            } else if (UidVerifier.isGooglePlayServicesUid(this.zzak, callingUid)) {
+                this.zzam = callingUid;
+                callingUid = 1;
+            } else {
+                Log.e("WearableLS", "Caller is not GooglePlayServices; caller UID: " + callingUid);
+                boolean z = false;
             }
-            z = true;
-            if (!z) {
+            if (callingUid == 0) {
                 return false;
             }
             synchronized (this.zzak.zzah) {
                 if (this.zzak.zzai) {
-                    this.zzak.zzad.post(runnable);
-                    return true;
+                    return false;
                 }
-                return false;
+                this.zzak.zzad.post(runnable);
+                return true;
             }
         }
 
@@ -198,12 +178,7 @@ public class WearableListenerService extends Service implements CapabilityListen
             Runnable com_google_android_gms_wearable_zzl = new zzl(this, dataHolder);
             try {
                 String valueOf = String.valueOf(dataHolder);
-                int count = dataHolder.getCount();
-                StringBuilder stringBuilder = new StringBuilder(18 + String.valueOf(valueOf).length());
-                stringBuilder.append(valueOf);
-                stringBuilder.append(", rows=");
-                stringBuilder.append(count);
-                if (!zza(com_google_android_gms_wearable_zzl, "onDataItemChanged", stringBuilder.toString())) {
+                if (!zza(com_google_android_gms_wearable_zzl, "onDataItemChanged", new StringBuilder(String.valueOf(valueOf).length() + 18).append(valueOf).append(", rows=").append(dataHolder.getCount()).toString())) {
                 }
             } finally {
                 dataHolder.close();
@@ -275,10 +250,7 @@ public class WearableListenerService extends Service implements CapabilityListen
         this.service = new ComponentName(this, getClass().getName());
         if (Log.isLoggable("WearableLS", 3)) {
             String valueOf = String.valueOf(this.service);
-            StringBuilder stringBuilder = new StringBuilder(10 + String.valueOf(valueOf).length());
-            stringBuilder.append("onCreate: ");
-            stringBuilder.append(valueOf);
-            Log.d("WearableLS", stringBuilder.toString());
+            Log.d("WearableLS", new StringBuilder(String.valueOf(valueOf).length() + 10).append("onCreate: ").append(valueOf).toString());
         }
         this.zzad = new zzc(this, getLooper());
         this.zzaf = new Intent(BIND_LISTENER_INTENT_ACTION);
@@ -292,21 +264,16 @@ public class WearableListenerService extends Service implements CapabilityListen
     public void onDestroy() {
         if (Log.isLoggable("WearableLS", 3)) {
             String valueOf = String.valueOf(this.service);
-            StringBuilder stringBuilder = new StringBuilder(11 + String.valueOf(valueOf).length());
-            stringBuilder.append("onDestroy: ");
-            stringBuilder.append(valueOf);
-            Log.d("WearableLS", stringBuilder.toString());
+            Log.d("WearableLS", new StringBuilder(String.valueOf(valueOf).length() + 11).append("onDestroy: ").append(valueOf).toString());
         }
         synchronized (this.zzah) {
             this.zzai = true;
             if (this.zzad == null) {
                 String valueOf2 = String.valueOf(this.service);
-                StringBuilder stringBuilder2 = new StringBuilder(111 + String.valueOf(valueOf2).length());
-                stringBuilder2.append("onDestroy: mServiceHandler not set, did you override onCreate() but forget to call super.onCreate()? component=");
-                stringBuilder2.append(valueOf2);
-                throw new IllegalStateException(stringBuilder2.toString());
+                throw new IllegalStateException(new StringBuilder(String.valueOf(valueOf2).length() + 111).append("onDestroy: mServiceHandler not set, did you override onCreate() but forget to call super.onCreate()? component=").append(valueOf2).toString());
+            } else {
+                this.zzad.quit();
             }
-            this.zzad.quit();
         }
         super.onDestroy();
     }

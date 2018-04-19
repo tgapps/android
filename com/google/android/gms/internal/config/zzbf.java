@@ -10,55 +10,52 @@ public final class zzbf {
     public static final Object zzcq = new Object();
 
     public static boolean equals(Object[] objArr, Object[] objArr2) {
-        int length = objArr == null ? 0 : objArr.length;
+        boolean length = objArr == null ? false : objArr.length;
         int length2 = objArr2 == null ? 0 : objArr2.length;
         int i = 0;
-        int i2 = i;
+        boolean z = false;
         while (true) {
-            if (i >= length || objArr[i] != null) {
+            if (z >= length || objArr[z] != null) {
+                int i2 = i;
                 while (i2 < length2 && objArr2[i2] == null) {
                     i2++;
                 }
-                boolean z = i >= length;
-                boolean z2 = i2 >= length2;
-                if (z && z2) {
+                boolean z2 = z >= length;
+                boolean z3 = i2 >= length2;
+                if (z2 && z3) {
                     return true;
                 }
-                if (z != z2 || !objArr[i].equals(objArr2[i2])) {
+                if (z2 != z3 || !objArr[z].equals(objArr2[i2])) {
                     return false;
                 }
-                i++;
-                i2++;
+                i = i2 + 1;
+                z++;
             } else {
-                i++;
+                z++;
             }
         }
     }
 
     public static int hashCode(Object[] objArr) {
-        int i = 0;
         int length = objArr == null ? 0 : objArr.length;
+        int i = 0;
         int i2 = 0;
         while (i < length) {
             Object obj = objArr[i];
-            if (obj != null) {
-                i2 = (i2 * 31) + obj.hashCode();
-            }
             i++;
+            i2 = obj != null ? obj.hashCode() + (i2 * 31) : i2;
         }
         return i2;
     }
 
     public static int zza(byte[][] bArr) {
-        int i = 0;
         int length = bArr == null ? 0 : bArr.length;
+        int i = 0;
         int i2 = 0;
         while (i < length) {
             byte[] bArr2 = bArr[i];
-            if (bArr2 != null) {
-                i2 = (i2 * 31) + Arrays.hashCode(bArr2);
-            }
             i++;
+            i2 = bArr2 != null ? Arrays.hashCode(bArr2) + (i2 * 31) : i2;
         }
         return i2;
     }
@@ -70,27 +67,28 @@ public final class zzbf {
     }
 
     public static boolean zza(byte[][] bArr, byte[][] bArr2) {
-        int length = bArr == null ? 0 : bArr.length;
+        boolean length = bArr == null ? false : bArr.length;
         int length2 = bArr2 == null ? 0 : bArr2.length;
         int i = 0;
-        int i2 = i;
+        boolean z = false;
         while (true) {
-            if (i >= length || bArr[i] != null) {
+            if (z >= length || bArr[z] != null) {
+                int i2 = i;
                 while (i2 < length2 && bArr2[i2] == null) {
                     i2++;
                 }
-                boolean z = i >= length;
-                boolean z2 = i2 >= length2;
-                if (z && z2) {
+                boolean z2 = z >= length;
+                boolean z3 = i2 >= length2;
+                if (z2 && z3) {
                     return true;
                 }
-                if (z != z2 || !Arrays.equals(bArr[i], bArr2[i2])) {
+                if (z2 != z3 || !Arrays.equals(bArr[z], bArr2[i2])) {
                     return false;
                 }
-                i++;
-                i2++;
+                i = i2 + 1;
+                z++;
             } else {
-                i++;
+                z++;
             }
         }
     }

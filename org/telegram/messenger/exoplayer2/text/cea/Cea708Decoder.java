@@ -1,5 +1,6 @@
 package org.telegram.messenger.exoplayer2.text.cea;
 
+import android.graphics.Color;
 import android.text.Layout.Alignment;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -169,74 +170,12 @@ public final class Cea708Decoder extends CeaDecoder {
         private int windowFillColor;
         private int windowStyleId;
 
-        public static int getArgbColorFromCeaColor(int r1, int r2, int r3, int r4) {
-            /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.text.cea.Cea708Decoder.CueBuilder.getArgbColorFromCeaColor(int, int, int, int):int
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-            /*
-            r0 = 4;
-            r1 = 0;
-            org.telegram.messenger.exoplayer2.util.Assertions.checkIndex(r6, r1, r0);
-            org.telegram.messenger.exoplayer2.util.Assertions.checkIndex(r7, r1, r0);
-            org.telegram.messenger.exoplayer2.util.Assertions.checkIndex(r8, r1, r0);
-            org.telegram.messenger.exoplayer2.util.Assertions.checkIndex(r9, r1, r0);
-            r0 = 255; // 0xff float:3.57E-43 double:1.26E-321;
-            switch(r9) {
-                case 0: goto L_0x001a;
-                case 1: goto L_0x001a;
-                case 2: goto L_0x0017;
-                case 3: goto L_0x0015;
-                default: goto L_0x0013;
-            };
-        L_0x0013:
-            r2 = r0;
-            goto L_0x001d;
-        L_0x0015:
-            r2 = 0;
-            goto L_0x001d;
-        L_0x0017:
-            r2 = 127; // 0x7f float:1.78E-43 double:6.27E-322;
-            goto L_0x001d;
-        L_0x001a:
-            r2 = 255; // 0xff float:3.57E-43 double:1.26E-321;
-            r3 = 1;
-            if (r6 <= r3) goto L_0x0023;
-            r4 = r0;
-            goto L_0x0024;
-            r4 = r1;
-            if (r7 <= r3) goto L_0x0028;
-            r5 = r0;
-            goto L_0x0029;
-            r5 = r1;
-            if (r8 <= r3) goto L_0x002c;
-            goto L_0x002d;
-            r0 = r1;
-            r0 = android.graphics.Color.argb(r2, r4, r5, r0);
-            return r0;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.text.cea.Cea708Decoder.CueBuilder.getArgbColorFromCeaColor(int, int, int, int):int");
-        }
-
         public CueBuilder() {
             reset();
         }
 
         public boolean isEmpty() {
-            if (isDefined()) {
-                if (!this.rolledUpCaptions.isEmpty() || this.captionStringBuilder.length() != 0) {
-                    return false;
-                }
-            }
-            return true;
+            return !isDefined() || (this.rolledUpCaptions.isEmpty() && this.captionStringBuilder.length() == 0);
         }
 
         public void reset() {
@@ -281,36 +220,33 @@ Caused by: java.lang.NullPointerException
         }
 
         public void defineWindow(boolean visible, boolean rowLock, boolean columnLock, int priority, boolean relativePositioning, int verticalAnchor, int horizontalAnchor, int rowCount, int columnCount, int anchorId, int windowStyleId, int penStyleId) {
-            boolean z = rowLock;
-            int i = windowStyleId;
-            int i2 = penStyleId;
             this.defined = true;
             this.visible = visible;
-            this.rowLock = z;
+            this.rowLock = rowLock;
             this.priority = priority;
             this.relativePositioning = relativePositioning;
             this.verticalAnchor = verticalAnchor;
             this.horizontalAnchor = horizontalAnchor;
             this.anchorId = anchorId;
             if (this.rowCount != rowCount + 1) {
-                r8.rowCount = rowCount + 1;
+                this.rowCount = rowCount + 1;
                 while (true) {
-                    if ((!z || r8.rolledUpCaptions.size() < r8.rowCount) && r8.rolledUpCaptions.size() < 15) {
+                    if ((!rowLock || this.rolledUpCaptions.size() < this.rowCount) && this.rolledUpCaptions.size() < 15) {
                         break;
                     }
-                    r8.rolledUpCaptions.remove(0);
+                    this.rolledUpCaptions.remove(0);
                 }
             }
-            if (!(i == 0 || r8.windowStyleId == i)) {
-                r8.windowStyleId = i;
-                int windowStyleIdIndex = i - 1;
+            if (!(windowStyleId == 0 || this.windowStyleId == windowStyleId)) {
+                this.windowStyleId = windowStyleId;
+                int windowStyleIdIndex = windowStyleId - 1;
                 setWindowAttributes(WINDOW_STYLE_FILL[windowStyleIdIndex], COLOR_TRANSPARENT, WINDOW_STYLE_WORD_WRAP[windowStyleIdIndex], 0, WINDOW_STYLE_PRINT_DIRECTION[windowStyleIdIndex], WINDOW_STYLE_SCROLL_DIRECTION[windowStyleIdIndex], WINDOW_STYLE_JUSTIFICATION[windowStyleIdIndex]);
             }
-            if (i2 != 0 && r8.penStyleId != i2) {
-                r8.penStyleId = i2;
-                windowStyleIdIndex = i2 - 1;
-                setPenAttributes(0, 1, 1, false, false, PEN_STYLE_EDGE_TYPE[windowStyleIdIndex], PEN_STYLE_FONT_STYLE[windowStyleIdIndex]);
-                setPenColor(COLOR_SOLID_WHITE, PEN_STYLE_BACKGROUND[windowStyleIdIndex], COLOR_SOLID_BLACK);
+            if (penStyleId != 0 && this.penStyleId != penStyleId) {
+                this.penStyleId = penStyleId;
+                int penStyleIdIndex = penStyleId - 1;
+                setPenAttributes(0, 1, 1, false, false, PEN_STYLE_EDGE_TYPE[penStyleIdIndex], PEN_STYLE_FONT_STYLE[penStyleIdIndex]);
+                setPenColor(COLOR_SOLID_WHITE, PEN_STYLE_BACKGROUND[penStyleIdIndex], COLOR_SOLID_BLACK);
             }
         }
 
@@ -417,23 +353,22 @@ Caused by: java.lang.NullPointerException
         }
 
         public Cea708Cue build() {
-            CueBuilder cueBuilder = this;
+            boolean windowColorSet = true;
             if (isEmpty()) {
                 return null;
             }
-            int i;
             Alignment alignment;
             float position;
             float line;
             int verticalAnchorType;
             int horizontalAnchorType;
             SpannableStringBuilder cueString = new SpannableStringBuilder();
-            for (i = 0; i < cueBuilder.rolledUpCaptions.size(); i++) {
-                cueString.append((CharSequence) cueBuilder.rolledUpCaptions.get(i));
+            for (int i = 0; i < this.rolledUpCaptions.size(); i++) {
+                cueString.append((CharSequence) this.rolledUpCaptions.get(i));
                 cueString.append('\n');
             }
             cueString.append(buildSpannableString());
-            switch (cueBuilder.justification) {
+            switch (this.justification) {
                 case 0:
                 case 3:
                     alignment = Alignment.ALIGN_NORMAL;
@@ -445,59 +380,79 @@ Caused by: java.lang.NullPointerException
                     alignment = Alignment.ALIGN_CENTER;
                     break;
                 default:
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("Unexpected justification value: ");
-                    stringBuilder.append(cueBuilder.justification);
-                    throw new IllegalArgumentException(stringBuilder.toString());
+                    throw new IllegalArgumentException("Unexpected justification value: " + this.justification);
             }
-            Alignment alignment2 = alignment;
-            if (cueBuilder.relativePositioning) {
-                position = ((float) cueBuilder.horizontalAnchor) / 99.0f;
-                line = ((float) cueBuilder.verticalAnchor) / 99.0f;
+            if (this.relativePositioning) {
+                position = ((float) this.horizontalAnchor) / 99.0f;
+                line = ((float) this.verticalAnchor) / 99.0f;
             } else {
-                position = ((float) cueBuilder.horizontalAnchor) / 209.0f;
-                line = ((float) cueBuilder.verticalAnchor) / 74.0f;
+                position = ((float) this.horizontalAnchor) / 209.0f;
+                line = ((float) this.verticalAnchor) / 74.0f;
             }
-            float position2 = (position * 0.9f) + 0.05f;
-            float line2 = (0.9f * line) + 0.05f;
-            if (cueBuilder.anchorId % 3 == 0) {
-                i = 0;
-            } else if (cueBuilder.anchorId % 3 == 1) {
-                i = 1;
+            position = (position * 0.9f) + 0.05f;
+            line = (line * 0.9f) + 0.05f;
+            if (this.anchorId % 3 == 0) {
+                verticalAnchorType = 0;
+            } else if (this.anchorId % 3 == 1) {
+                verticalAnchorType = 1;
             } else {
                 verticalAnchorType = 2;
-                if (cueBuilder.anchorId / 3 == 0) {
-                    i = 0;
-                } else if (cueBuilder.anchorId / 3 != 1) {
-                    i = 1;
-                } else {
-                    horizontalAnchorType = 2;
-                    return new Cea708Cue(cueString, alignment2, line2, 0, verticalAnchorType, position2, horizontalAnchorType, Cue.DIMEN_UNSET, cueBuilder.windowFillColor == COLOR_SOLID_BLACK, cueBuilder.windowFillColor, cueBuilder.priority);
-                }
-                horizontalAnchorType = i;
-                if (cueBuilder.windowFillColor == COLOR_SOLID_BLACK) {
-                }
-                return new Cea708Cue(cueString, alignment2, line2, 0, verticalAnchorType, position2, horizontalAnchorType, Cue.DIMEN_UNSET, cueBuilder.windowFillColor == COLOR_SOLID_BLACK, cueBuilder.windowFillColor, cueBuilder.priority);
             }
-            verticalAnchorType = i;
-            if (cueBuilder.anchorId / 3 == 0) {
-                i = 0;
-            } else if (cueBuilder.anchorId / 3 != 1) {
-                horizontalAnchorType = 2;
-                if (cueBuilder.windowFillColor == COLOR_SOLID_BLACK) {
-                }
-                return new Cea708Cue(cueString, alignment2, line2, 0, verticalAnchorType, position2, horizontalAnchorType, Cue.DIMEN_UNSET, cueBuilder.windowFillColor == COLOR_SOLID_BLACK, cueBuilder.windowFillColor, cueBuilder.priority);
+            if (this.anchorId / 3 == 0) {
+                horizontalAnchorType = 0;
+            } else if (this.anchorId / 3 == 1) {
+                horizontalAnchorType = 1;
             } else {
-                i = 1;
+                horizontalAnchorType = 2;
             }
-            horizontalAnchorType = i;
-            if (cueBuilder.windowFillColor == COLOR_SOLID_BLACK) {
+            if (this.windowFillColor == COLOR_SOLID_BLACK) {
+                windowColorSet = false;
             }
-            return new Cea708Cue(cueString, alignment2, line2, 0, verticalAnchorType, position2, horizontalAnchorType, Cue.DIMEN_UNSET, cueBuilder.windowFillColor == COLOR_SOLID_BLACK, cueBuilder.windowFillColor, cueBuilder.priority);
+            return new Cea708Cue(cueString, alignment, line, 0, verticalAnchorType, position, horizontalAnchorType, Cue.DIMEN_UNSET, windowColorSet, this.windowFillColor, this.priority);
         }
 
         public static int getArgbColorFromCeaColor(int red, int green, int blue) {
             return getArgbColorFromCeaColor(red, green, blue, 0);
+        }
+
+        public static int getArgbColorFromCeaColor(int red, int green, int blue, int opacity) {
+            int alpha;
+            int i;
+            int i2;
+            int i3 = 255;
+            Assertions.checkIndex(red, 0, 4);
+            Assertions.checkIndex(green, 0, 4);
+            Assertions.checkIndex(blue, 0, 4);
+            Assertions.checkIndex(opacity, 0, 4);
+            switch (opacity) {
+                case 0:
+                case 1:
+                    alpha = 255;
+                    break;
+                case 2:
+                    alpha = 127;
+                    break;
+                case 3:
+                    alpha = 0;
+                    break;
+                default:
+                    alpha = 255;
+                    break;
+            }
+            if (red > 1) {
+                i = 255;
+            } else {
+                i = 0;
+            }
+            if (green > 1) {
+                i2 = 255;
+            } else {
+                i2 = 0;
+            }
+            if (blue <= 1) {
+                i3 = 0;
+            }
+            return Color.argb(alpha, i, i2, i3);
         }
     }
 
@@ -510,277 +465,8 @@ Caused by: java.lang.NullPointerException
         public DtvCcPacket(int sequenceNumber, int packetSize) {
             this.sequenceNumber = sequenceNumber;
             this.packetSize = packetSize;
-            this.packetData = new byte[((2 * packetSize) - 1)];
+            this.packetData = new byte[((packetSize * 2) - 1)];
         }
-    }
-
-    private void handleC0Command(int r1) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.text.cea.Cea708Decoder.handleC0Command(int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        if (r5 == 0) goto L_0x0087;
-    L_0x0002:
-        r0 = 3;
-        if (r5 == r0) goto L_0x0080;
-        r0 = 8;
-        if (r5 == r0) goto L_0x007a;
-        switch(r5) {
-            case 12: goto L_0x0076;
-            case 13: goto L_0x006e;
-            case 14: goto L_0x006d;
-            default: goto L_0x000c;
-        };
-        r1 = 17;
-        if (r5 < r1) goto L_0x0030;
-        r1 = 23;
-        if (r5 > r1) goto L_0x0030;
-        r1 = "Cea708Decoder";
-        r2 = new java.lang.StringBuilder;
-        r2.<init>();
-        r3 = "Currently unsupported COMMAND_EXT1 Command: ";
-        r2.append(r3);
-        r2.append(r5);
-        r2 = r2.toString();
-        android.util.Log.w(r1, r2);
-        r1 = r4.serviceBlockPacket;
-        r1.skipBits(r0);
-        goto L_0x0088;
-        r0 = 24;
-        if (r5 < r0) goto L_0x0056;
-        r0 = 31;
-        if (r5 > r0) goto L_0x0056;
-        r0 = "Cea708Decoder";
-        r1 = new java.lang.StringBuilder;
-        r1.<init>();
-        r2 = "Currently unsupported COMMAND_P16 Command: ";
-        r1.append(r2);
-        r1.append(r5);
-        r1 = r1.toString();
-        android.util.Log.w(r0, r1);
-        r0 = r4.serviceBlockPacket;
-        r1 = 16;
-        r0.skipBits(r1);
-        goto L_0x0088;
-        r0 = "Cea708Decoder";
-        r1 = new java.lang.StringBuilder;
-        r1.<init>();
-        r2 = "Invalid C0 command: ";
-        r1.append(r2);
-        r1.append(r5);
-        r1 = r1.toString();
-        android.util.Log.w(r0, r1);
-        goto L_0x0088;
-        goto L_0x0088;
-        r0 = r4.currentCueBuilder;
-        r1 = 10;
-        r0.append(r1);
-        goto L_0x0088;
-        r4.resetCueBuilders();
-        goto L_0x0088;
-        r0 = r4.currentCueBuilder;
-        r0.backspace();
-        goto L_0x0088;
-        r0 = r4.getDisplayCues();
-        r4.cues = r0;
-        goto L_0x0088;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.text.cea.Cea708Decoder.handleC0Command(int):void");
-    }
-
-    private void handleC1Command(int r1) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.text.cea.Cea708Decoder.handleC1Command(int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = 16;
-        r1 = 8;
-        r2 = 1;
-        switch(r6) {
-            case 128: goto L_0x011a;
-            case 129: goto L_0x011a;
-            case 130: goto L_0x011a;
-            case 131: goto L_0x011a;
-            case 132: goto L_0x011a;
-            case 133: goto L_0x011a;
-            case 134: goto L_0x011a;
-            case 135: goto L_0x011a;
-            case 136: goto L_0x0101;
-            case 137: goto L_0x00e9;
-            case 138: goto L_0x00cf;
-            case 139: goto L_0x00b2;
-            case 140: goto L_0x0098;
-            case 141: goto L_0x0091;
-            case 142: goto L_0x008f;
-            case 143: goto L_0x008a;
-            case 144: goto L_0x0076;
-            case 145: goto L_0x0060;
-            case 146: goto L_0x004c;
-            default: goto L_0x0008;
-        };
-        switch(r6) {
-            case 151: goto L_0x0036;
-            case 152: goto L_0x0023;
-            case 153: goto L_0x0023;
-            case 154: goto L_0x0023;
-            case 155: goto L_0x0023;
-            case 156: goto L_0x0023;
-            case 157: goto L_0x0023;
-            case 158: goto L_0x0023;
-            case 159: goto L_0x0023;
-            default: goto L_0x000b;
-        };
-        r0 = "Cea708Decoder";
-        r1 = new java.lang.StringBuilder;
-        r1.<init>();
-        r2 = "Invalid C1 command: ";
-        r1.append(r2);
-        r1.append(r6);
-        r1 = r1.toString();
-        android.util.Log.w(r0, r1);
-        goto L_0x0128;
-        r0 = r6 + -152;
-        r5.handleDefineWindow(r0);
-        r1 = r5.currentWindow;
-        if (r1 == r0) goto L_0x0128;
-        r5.currentWindow = r0;
-        r1 = r5.cueBuilders;
-        r1 = r1[r0];
-        r5.currentCueBuilder = r1;
-        goto L_0x0128;
-        r0 = r5.currentCueBuilder;
-        r0 = r0.isDefined();
-        if (r0 != 0) goto L_0x0047;
-        r0 = r5.serviceBlockPacket;
-        r1 = 32;
-        r0.skipBits(r1);
-        goto L_0x0128;
-        r5.handleSetWindowAttributes();
-        goto L_0x0128;
-        r1 = r5.currentCueBuilder;
-        r1 = r1.isDefined();
-        if (r1 != 0) goto L_0x005b;
-        r1 = r5.serviceBlockPacket;
-        r1.skipBits(r0);
-        goto L_0x0128;
-        r5.handleSetPenLocation();
-        goto L_0x0128;
-        r0 = r5.currentCueBuilder;
-        r0 = r0.isDefined();
-        if (r0 != 0) goto L_0x0071;
-        r0 = r5.serviceBlockPacket;
-        r1 = 24;
-        r0.skipBits(r1);
-        goto L_0x0128;
-        r5.handleSetPenColor();
-        goto L_0x0128;
-        r1 = r5.currentCueBuilder;
-        r1 = r1.isDefined();
-        if (r1 != 0) goto L_0x0085;
-        r1 = r5.serviceBlockPacket;
-        r1.skipBits(r0);
-        goto L_0x0128;
-        r5.handleSetPenAttributes();
-        goto L_0x0128;
-        r5.resetCueBuilders();
-        goto L_0x0128;
-        goto L_0x0128;
-        r0 = r5.serviceBlockPacket;
-        r0.skipBits(r1);
-        goto L_0x0128;
-        r0 = r2;
-        if (r0 > r1) goto L_0x00b0;
-        r2 = r5.serviceBlockPacket;
-        r2 = r2.readBit();
-        if (r2 == 0) goto L_0x00ad;
-        r2 = r5.cueBuilders;
-        r3 = 8 - r0;
-        r2 = r2[r3];
-        r2.reset();
-        r2 = r0 + 1;
-        goto L_0x0099;
-        goto L_0x0128;
-        r0 = r2;
-        if (r0 > r1) goto L_0x00ce;
-        r3 = r5.serviceBlockPacket;
-        r3 = r3.readBit();
-        if (r3 == 0) goto L_0x00cb;
-        r3 = r5.cueBuilders;
-        r4 = 8 - r0;
-        r3 = r3[r4];
-        r4 = r3.isVisible();
-        r4 = r4 ^ r2;
-        r3.setVisibility(r4);
-        r0 = r0 + 1;
-        goto L_0x00b3;
-        goto L_0x0128;
-        r0 = r2;
-        if (r0 > r1) goto L_0x00e8;
-        r2 = r5.serviceBlockPacket;
-        r2 = r2.readBit();
-        if (r2 == 0) goto L_0x00e5;
-        r2 = r5.cueBuilders;
-        r3 = 8 - r0;
-        r2 = r2[r3];
-        r3 = 0;
-        r2.setVisibility(r3);
-        r2 = r0 + 1;
-        goto L_0x00d0;
-        goto L_0x0128;
-        r0 = r2;
-        if (r0 > r1) goto L_0x0100;
-        r3 = r5.serviceBlockPacket;
-        r3 = r3.readBit();
-        if (r3 == 0) goto L_0x00fd;
-        r3 = r5.cueBuilders;
-        r4 = 8 - r0;
-        r3 = r3[r4];
-        r3.setVisibility(r2);
-        r0 = r0 + 1;
-        goto L_0x00ea;
-        goto L_0x0128;
-        r0 = r2;
-        if (r0 > r1) goto L_0x0119;
-        r2 = r5.serviceBlockPacket;
-        r2 = r2.readBit();
-        if (r2 == 0) goto L_0x0116;
-        r2 = r5.cueBuilders;
-        r3 = 8 - r0;
-        r2 = r2[r3];
-        r2.clear();
-        r2 = r0 + 1;
-        goto L_0x0102;
-        goto L_0x0128;
-    L_0x011a:
-        r0 = r6 + -128;
-        r1 = r5.currentWindow;
-        if (r1 == r0) goto L_0x0128;
-        r5.currentWindow = r0;
-        r1 = r5.cueBuilders;
-        r1 = r1[r0];
-        r5.currentCueBuilder = r1;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.text.cea.Cea708Decoder.handleC1Command(int):void");
     }
 
     public /* bridge */ /* synthetic */ SubtitleInputBuffer dequeueInputBuffer() throws SubtitleDecoderException {
@@ -804,7 +490,10 @@ Caused by: java.lang.NullPointerException
     }
 
     public Cea708Decoder(int accessibilityChannel) {
-        this.selectedServiceNumber = accessibilityChannel == -1 ? 1 : accessibilityChannel;
+        if (accessibilityChannel == -1) {
+            accessibilityChannel = 1;
+        }
+        this.selectedServiceNumber = accessibilityChannel;
         this.cueBuilders = new CueBuilder[8];
         for (int i = 0; i < 8; i++) {
             this.cueBuilders[i] = new CueBuilder();
@@ -841,48 +530,45 @@ Caused by: java.lang.NullPointerException
         while (this.ccData.bytesLeft() >= 3) {
             int ccTypeAndValid = this.ccData.readUnsignedByte() & 7;
             int ccType = ccTypeAndValid & 3;
-            boolean z = false;
             boolean ccValid = (ccTypeAndValid & 4) == 4;
             byte ccData1 = (byte) this.ccData.readUnsignedByte();
             byte ccData2 = (byte) this.ccData.readUnsignedByte();
-            if (ccType == 2 || ccType == 3) {
-                if (ccValid) {
-                    if (ccType == 3) {
-                        finalizeCurrentPacket();
-                        int sequenceNumber = (ccData1 & PsExtractor.AUDIO_STREAM) >> 6;
-                        int packetSize = ccData1 & CHARACTER_DIAERESIS_Y;
-                        if (packetSize == 0) {
-                            packetSize = 64;
-                        }
-                        this.currentDtvCcPacket = new DtvCcPacket(sequenceNumber, packetSize);
-                        byte[] bArr = this.currentDtvCcPacket.packetData;
-                        DtvCcPacket dtvCcPacket = this.currentDtvCcPacket;
-                        int i = dtvCcPacket.currentIndex;
+            if ((ccType == 2 || ccType == 3) && ccValid) {
+                byte[] bArr;
+                DtvCcPacket dtvCcPacket;
+                int i;
+                if (ccType == 3) {
+                    finalizeCurrentPacket();
+                    int sequenceNumber = (ccData1 & PsExtractor.AUDIO_STREAM) >> 6;
+                    int packetSize = ccData1 & CHARACTER_DIAERESIS_Y;
+                    if (packetSize == 0) {
+                        packetSize = 64;
+                    }
+                    this.currentDtvCcPacket = new DtvCcPacket(sequenceNumber, packetSize);
+                    bArr = this.currentDtvCcPacket.packetData;
+                    dtvCcPacket = this.currentDtvCcPacket;
+                    i = dtvCcPacket.currentIndex;
+                    dtvCcPacket.currentIndex = i + 1;
+                    bArr[i] = ccData2;
+                } else {
+                    Assertions.checkArgument(ccType == 2);
+                    if (this.currentDtvCcPacket == null) {
+                        Log.e(TAG, "Encountered DTVCC_PACKET_DATA before DTVCC_PACKET_START");
+                    } else {
+                        bArr = this.currentDtvCcPacket.packetData;
+                        dtvCcPacket = this.currentDtvCcPacket;
+                        i = dtvCcPacket.currentIndex;
+                        dtvCcPacket.currentIndex = i + 1;
+                        bArr[i] = ccData1;
+                        bArr = this.currentDtvCcPacket.packetData;
+                        dtvCcPacket = this.currentDtvCcPacket;
+                        i = dtvCcPacket.currentIndex;
                         dtvCcPacket.currentIndex = i + 1;
                         bArr[i] = ccData2;
-                    } else {
-                        if (ccType == 2) {
-                            z = true;
-                        }
-                        Assertions.checkArgument(z);
-                        if (this.currentDtvCcPacket == null) {
-                            Log.e(TAG, "Encountered DTVCC_PACKET_DATA before DTVCC_PACKET_START");
-                        } else {
-                            byte[] bArr2 = this.currentDtvCcPacket.packetData;
-                            DtvCcPacket dtvCcPacket2 = this.currentDtvCcPacket;
-                            int i2 = dtvCcPacket2.currentIndex;
-                            dtvCcPacket2.currentIndex = i2 + 1;
-                            bArr2[i2] = ccData1;
-                            bArr2 = this.currentDtvCcPacket.packetData;
-                            dtvCcPacket2 = this.currentDtvCcPacket;
-                            i2 = dtvCcPacket2.currentIndex;
-                            dtvCcPacket2.currentIndex = i2 + 1;
-                            bArr2[i2] = ccData2;
-                        }
                     }
-                    if (this.currentDtvCcPacket.currentIndex == (this.currentDtvCcPacket.packetSize * 2) - 1) {
-                        finalizeCurrentPacket();
-                    }
+                }
+                if (this.currentDtvCcPacket.currentIndex == (this.currentDtvCcPacket.packetSize * 2) - 1) {
+                    finalizeCurrentPacket();
                 }
             }
         }
@@ -897,16 +583,7 @@ Caused by: java.lang.NullPointerException
 
     private void processCurrentPacket() {
         if (this.currentDtvCcPacket.currentIndex != (this.currentDtvCcPacket.packetSize * 2) - 1) {
-            String str = TAG;
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("DtvCcPacket ended prematurely; size is ");
-            stringBuilder.append((this.currentDtvCcPacket.packetSize * 2) - 1);
-            stringBuilder.append(", but current index is ");
-            stringBuilder.append(this.currentDtvCcPacket.currentIndex);
-            stringBuilder.append(" (sequence number ");
-            stringBuilder.append(this.currentDtvCcPacket.sequenceNumber);
-            stringBuilder.append("); ignoring packet");
-            Log.w(str, stringBuilder.toString());
+            Log.w(TAG, "DtvCcPacket ended prematurely; size is " + ((this.currentDtvCcPacket.packetSize * 2) - 1) + ", but current index is " + this.currentDtvCcPacket.currentIndex + " (sequence number " + this.currentDtvCcPacket.sequenceNumber + "); ignoring packet");
             return;
         }
         this.serviceBlockPacket.reset(this.currentDtvCcPacket.packetData, this.currentDtvCcPacket.currentIndex);
@@ -918,19 +595,12 @@ Caused by: java.lang.NullPointerException
         }
         if (blockSize == 0) {
             if (serviceNumber != 0) {
-                String str2 = TAG;
-                StringBuilder stringBuilder2 = new StringBuilder();
-                stringBuilder2.append("serviceNumber is non-zero (");
-                stringBuilder2.append(serviceNumber);
-                stringBuilder2.append(") when blockSize is 0");
-                Log.w(str2, stringBuilder2.toString());
+                Log.w(TAG, "serviceNumber is non-zero (" + serviceNumber + ") when blockSize is 0");
             }
         } else if (serviceNumber == this.selectedServiceNumber) {
             boolean cuesNeedUpdate = false;
             while (this.serviceBlockPacket.bitsLeft() > 0) {
                 int command = this.serviceBlockPacket.readBits(8);
-                String str3;
-                StringBuilder stringBuilder3;
                 if (command == 16) {
                     command = this.serviceBlockPacket.readBits(8);
                     if (command <= 31) {
@@ -944,11 +614,7 @@ Caused by: java.lang.NullPointerException
                         handleG3Character(command);
                         cuesNeedUpdate = true;
                     } else {
-                        str3 = TAG;
-                        stringBuilder3 = new StringBuilder();
-                        stringBuilder3.append("Invalid extended command: ");
-                        stringBuilder3.append(command);
-                        Log.w(str3, stringBuilder3.toString());
+                        Log.w(TAG, "Invalid extended command: " + command);
                     }
                 } else if (command <= 31) {
                     handleC0Command(command);
@@ -962,16 +628,168 @@ Caused by: java.lang.NullPointerException
                     handleG1Character(command);
                     cuesNeedUpdate = true;
                 } else {
-                    str3 = TAG;
-                    stringBuilder3 = new StringBuilder();
-                    stringBuilder3.append("Invalid base command: ");
-                    stringBuilder3.append(command);
-                    Log.w(str3, stringBuilder3.toString());
+                    Log.w(TAG, "Invalid base command: " + command);
                 }
             }
             if (cuesNeedUpdate) {
                 this.cues = getDisplayCues();
             }
+        }
+    }
+
+    private void handleC0Command(int command) {
+        switch (command) {
+            case 0:
+            case 14:
+                return;
+            case 3:
+                this.cues = getDisplayCues();
+                return;
+            case 8:
+                this.currentCueBuilder.backspace();
+                return;
+            case 12:
+                resetCueBuilders();
+                return;
+            case 13:
+                this.currentCueBuilder.append('\n');
+                return;
+            default:
+                if (command >= 17 && command <= COMMAND_EXT1_END) {
+                    Log.w(TAG, "Currently unsupported COMMAND_EXT1 Command: " + command);
+                    this.serviceBlockPacket.skipBits(8);
+                    return;
+                } else if (command < 24 || command > 31) {
+                    Log.w(TAG, "Invalid C0 command: " + command);
+                    return;
+                } else {
+                    Log.w(TAG, "Currently unsupported COMMAND_P16 Command: " + command);
+                    this.serviceBlockPacket.skipBits(16);
+                    return;
+                }
+        }
+    }
+
+    private void handleC1Command(int command) {
+        int window;
+        int i;
+        switch (command) {
+            case 128:
+            case 129:
+            case 130:
+            case COMMAND_CW3 /*131*/:
+            case COMMAND_CW4 /*132*/:
+            case COMMAND_CW5 /*133*/:
+            case 134:
+            case 135:
+                window = command - 128;
+                if (this.currentWindow != window) {
+                    this.currentWindow = window;
+                    this.currentCueBuilder = this.cueBuilders[window];
+                    return;
+                }
+                return;
+            case COMMAND_CLW /*136*/:
+                for (i = 1; i <= 8; i++) {
+                    if (this.serviceBlockPacket.readBit()) {
+                        this.cueBuilders[8 - i].clear();
+                    }
+                }
+                return;
+            case COMMAND_DSW /*137*/:
+                for (i = 1; i <= 8; i++) {
+                    if (this.serviceBlockPacket.readBit()) {
+                        this.cueBuilders[8 - i].setVisibility(true);
+                    }
+                }
+                return;
+            case 138:
+                for (i = 1; i <= 8; i++) {
+                    if (this.serviceBlockPacket.readBit()) {
+                        this.cueBuilders[8 - i].setVisibility(false);
+                    }
+                }
+                return;
+            case COMMAND_TGW /*139*/:
+                for (i = 1; i <= 8; i++) {
+                    if (this.serviceBlockPacket.readBit()) {
+                        boolean z;
+                        CueBuilder cueBuilder = this.cueBuilders[8 - i];
+                        if (cueBuilder.isVisible()) {
+                            z = false;
+                        } else {
+                            z = true;
+                        }
+                        cueBuilder.setVisibility(z);
+                    }
+                }
+                return;
+            case COMMAND_DLW /*140*/:
+                for (i = 1; i <= 8; i++) {
+                    if (this.serviceBlockPacket.readBit()) {
+                        this.cueBuilders[8 - i].reset();
+                    }
+                }
+                return;
+            case COMMAND_DLY /*141*/:
+                this.serviceBlockPacket.skipBits(8);
+                return;
+            case COMMAND_DLC /*142*/:
+                return;
+            case COMMAND_RST /*143*/:
+                resetCueBuilders();
+                return;
+            case COMMAND_SPA /*144*/:
+                if (this.currentCueBuilder.isDefined()) {
+                    handleSetPenAttributes();
+                    return;
+                } else {
+                    this.serviceBlockPacket.skipBits(16);
+                    return;
+                }
+            case COMMAND_SPC /*145*/:
+                if (this.currentCueBuilder.isDefined()) {
+                    handleSetPenColor();
+                    return;
+                } else {
+                    this.serviceBlockPacket.skipBits(24);
+                    return;
+                }
+            case COMMAND_SPL /*146*/:
+                if (this.currentCueBuilder.isDefined()) {
+                    handleSetPenLocation();
+                    return;
+                } else {
+                    this.serviceBlockPacket.skipBits(16);
+                    return;
+                }
+            case COMMAND_SWA /*151*/:
+                if (this.currentCueBuilder.isDefined()) {
+                    handleSetWindowAttributes();
+                    return;
+                } else {
+                    this.serviceBlockPacket.skipBits(32);
+                    return;
+                }
+            case COMMAND_DF0 /*152*/:
+            case COMMAND_DF1 /*153*/:
+            case COMMAND_DF2 /*154*/:
+            case COMMAND_DF3 /*155*/:
+            case COMMAND_DF4 /*156*/:
+            case COMMAND_DF5 /*157*/:
+            case COMMAND_DF6 /*158*/:
+            case 159:
+                window = command - 152;
+                handleDefineWindow(window);
+                if (this.currentWindow != window) {
+                    this.currentWindow = window;
+                    this.currentCueBuilder = this.cueBuilders[window];
+                    return;
+                }
+                return;
+            default:
+                Log.w(TAG, "Invalid C1 command: " + command);
+                return;
         }
     }
 
@@ -994,7 +812,7 @@ Caused by: java.lang.NullPointerException
             this.serviceBlockPacket.skipBits(40);
         } else if (command <= 159) {
             this.serviceBlockPacket.skipBits(2);
-            this.serviceBlockPacket.skipBits(8 * this.serviceBlockPacket.readBits(6));
+            this.serviceBlockPacket.skipBits(this.serviceBlockPacket.readBits(6) * 8);
         }
     }
 
@@ -1011,102 +829,88 @@ Caused by: java.lang.NullPointerException
     }
 
     private void handleG2Character(int characterCode) {
-        if (characterCode == CHARACTER_ELLIPSIS) {
-            this.currentCueBuilder.append('…');
-        } else if (characterCode == CHARACTER_BIG_CARONS) {
-            this.currentCueBuilder.append('Š');
-        } else if (characterCode == CHARACTER_BIG_OE) {
-            this.currentCueBuilder.append('Œ');
-        } else if (characterCode != CHARACTER_DIAERESIS_Y) {
-            switch (characterCode) {
-                case 32:
-                    this.currentCueBuilder.append(' ');
-                    return;
-                case CHARACTER_NBTSP /*33*/:
-                    this.currentCueBuilder.append(' ');
-                    return;
-                default:
-                    switch (characterCode) {
-                        case CHARACTER_SOLID_BLOCK /*48*/:
-                            this.currentCueBuilder.append('█');
-                            return;
-                        case CHARACTER_OPEN_SINGLE_QUOTE /*49*/:
-                            this.currentCueBuilder.append('‘');
-                            return;
-                        case CHARACTER_CLOSE_SINGLE_QUOTE /*50*/:
-                            this.currentCueBuilder.append('’');
-                            return;
-                        case CHARACTER_OPEN_DOUBLE_QUOTE /*51*/:
-                            this.currentCueBuilder.append('“');
-                            return;
-                        case CHARACTER_CLOSE_DOUBLE_QUOTE /*52*/:
-                            this.currentCueBuilder.append('”');
-                            return;
-                        case CHARACTER_BOLD_BULLET /*53*/:
-                            this.currentCueBuilder.append('•');
-                            return;
-                        default:
-                            switch (characterCode) {
-                                case CHARACTER_TM /*57*/:
-                                    this.currentCueBuilder.append('™');
-                                    return;
-                                case CHARACTER_SMALL_CARONS /*58*/:
-                                    this.currentCueBuilder.append('š');
-                                    return;
-                                default:
-                                    switch (characterCode) {
-                                        case CHARACTER_SMALL_OE /*60*/:
-                                            this.currentCueBuilder.append('œ');
-                                            return;
-                                        case CHARACTER_SM /*61*/:
-                                            this.currentCueBuilder.append('℠');
-                                            return;
-                                        default:
-                                            switch (characterCode) {
-                                                case CHARACTER_ONE_EIGHTH /*118*/:
-                                                    this.currentCueBuilder.append('⅛');
-                                                    return;
-                                                case CHARACTER_THREE_EIGHTHS /*119*/:
-                                                    this.currentCueBuilder.append('⅜');
-                                                    return;
-                                                case CHARACTER_FIVE_EIGHTHS /*120*/:
-                                                    this.currentCueBuilder.append('⅝');
-                                                    return;
-                                                case CHARACTER_SEVEN_EIGHTHS /*121*/:
-                                                    this.currentCueBuilder.append('⅞');
-                                                    return;
-                                                case CHARACTER_VERTICAL_BORDER /*122*/:
-                                                    this.currentCueBuilder.append('│');
-                                                    return;
-                                                case CHARACTER_UPPER_RIGHT_BORDER /*123*/:
-                                                    this.currentCueBuilder.append('┐');
-                                                    return;
-                                                case CHARACTER_LOWER_LEFT_BORDER /*124*/:
-                                                    this.currentCueBuilder.append('└');
-                                                    return;
-                                                case CHARACTER_HORIZONTAL_BORDER /*125*/:
-                                                    this.currentCueBuilder.append('─');
-                                                    return;
-                                                case CHARACTER_LOWER_RIGHT_BORDER /*126*/:
-                                                    this.currentCueBuilder.append('┘');
-                                                    return;
-                                                case 127:
-                                                    this.currentCueBuilder.append('┌');
-                                                    return;
-                                                default:
-                                                    String str = TAG;
-                                                    StringBuilder stringBuilder = new StringBuilder();
-                                                    stringBuilder.append("Invalid G2 character: ");
-                                                    stringBuilder.append(characterCode);
-                                                    Log.w(str, stringBuilder.toString());
-                                                    return;
-                                            }
-                                    }
-                            }
-                    }
-            }
-        } else {
-            this.currentCueBuilder.append('Ÿ');
+        switch (characterCode) {
+            case 32:
+                this.currentCueBuilder.append(' ');
+                return;
+            case CHARACTER_NBTSP /*33*/:
+                this.currentCueBuilder.append(' ');
+                return;
+            case CHARACTER_ELLIPSIS /*37*/:
+                this.currentCueBuilder.append('…');
+                return;
+            case CHARACTER_BIG_CARONS /*42*/:
+                this.currentCueBuilder.append('Š');
+                return;
+            case CHARACTER_BIG_OE /*44*/:
+                this.currentCueBuilder.append('Œ');
+                return;
+            case CHARACTER_SOLID_BLOCK /*48*/:
+                this.currentCueBuilder.append('█');
+                return;
+            case CHARACTER_OPEN_SINGLE_QUOTE /*49*/:
+                this.currentCueBuilder.append('‘');
+                return;
+            case CHARACTER_CLOSE_SINGLE_QUOTE /*50*/:
+                this.currentCueBuilder.append('’');
+                return;
+            case CHARACTER_OPEN_DOUBLE_QUOTE /*51*/:
+                this.currentCueBuilder.append('“');
+                return;
+            case CHARACTER_CLOSE_DOUBLE_QUOTE /*52*/:
+                this.currentCueBuilder.append('”');
+                return;
+            case CHARACTER_BOLD_BULLET /*53*/:
+                this.currentCueBuilder.append('•');
+                return;
+            case CHARACTER_TM /*57*/:
+                this.currentCueBuilder.append('™');
+                return;
+            case CHARACTER_SMALL_CARONS /*58*/:
+                this.currentCueBuilder.append('š');
+                return;
+            case CHARACTER_SMALL_OE /*60*/:
+                this.currentCueBuilder.append('œ');
+                return;
+            case CHARACTER_SM /*61*/:
+                this.currentCueBuilder.append('℠');
+                return;
+            case CHARACTER_DIAERESIS_Y /*63*/:
+                this.currentCueBuilder.append('Ÿ');
+                return;
+            case CHARACTER_ONE_EIGHTH /*118*/:
+                this.currentCueBuilder.append('⅛');
+                return;
+            case CHARACTER_THREE_EIGHTHS /*119*/:
+                this.currentCueBuilder.append('⅜');
+                return;
+            case CHARACTER_FIVE_EIGHTHS /*120*/:
+                this.currentCueBuilder.append('⅝');
+                return;
+            case CHARACTER_SEVEN_EIGHTHS /*121*/:
+                this.currentCueBuilder.append('⅞');
+                return;
+            case CHARACTER_VERTICAL_BORDER /*122*/:
+                this.currentCueBuilder.append('│');
+                return;
+            case CHARACTER_UPPER_RIGHT_BORDER /*123*/:
+                this.currentCueBuilder.append('┐');
+                return;
+            case CHARACTER_LOWER_LEFT_BORDER /*124*/:
+                this.currentCueBuilder.append('└');
+                return;
+            case CHARACTER_HORIZONTAL_BORDER /*125*/:
+                this.currentCueBuilder.append('─');
+                return;
+            case CHARACTER_LOWER_RIGHT_BORDER /*126*/:
+                this.currentCueBuilder.append('┘');
+                return;
+            case 127:
+                this.currentCueBuilder.append('┌');
+                return;
+            default:
+                Log.w(TAG, "Invalid G2 character: " + characterCode);
+                return;
         }
     }
 
@@ -1115,11 +919,7 @@ Caused by: java.lang.NullPointerException
             this.currentCueBuilder.append('㏄');
             return;
         }
-        String str = TAG;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Invalid G3 character: ");
-        stringBuilder.append(characterCode);
-        Log.w(str, stringBuilder.toString());
+        Log.w(TAG, "Invalid G3 character: " + characterCode);
         this.currentCueBuilder.append('_');
     }
 
@@ -1144,20 +944,16 @@ Caused by: java.lang.NullPointerException
     private void handleSetWindowAttributes() {
         int fillColor = CueBuilder.getArgbColorFromCeaColor(this.serviceBlockPacket.readBits(2), this.serviceBlockPacket.readBits(2), this.serviceBlockPacket.readBits(2), this.serviceBlockPacket.readBits(2));
         int borderType = this.serviceBlockPacket.readBits(2);
-        int borderR = this.serviceBlockPacket.readBits(2);
-        int borderG = this.serviceBlockPacket.readBits(2);
-        int borderB = this.serviceBlockPacket.readBits(2);
-        int borderColor = CueBuilder.getArgbColorFromCeaColor(borderR, borderG, borderB);
+        int borderColor = CueBuilder.getArgbColorFromCeaColor(this.serviceBlockPacket.readBits(2), this.serviceBlockPacket.readBits(2), this.serviceBlockPacket.readBits(2));
         if (this.serviceBlockPacket.readBit()) {
             borderType |= 4;
         }
-        int borderType2 = borderType;
-        boolean wordWrapToggle = r0.serviceBlockPacket.readBit();
-        int printDirection = r0.serviceBlockPacket.readBits(2);
-        int scrollDirection = r0.serviceBlockPacket.readBits(2);
-        int justification = r0.serviceBlockPacket.readBits(2);
-        r0.serviceBlockPacket.skipBits(8);
-        r0.currentCueBuilder.setWindowAttributes(fillColor, borderColor, wordWrapToggle, borderType2, printDirection, scrollDirection, justification);
+        boolean wordWrapToggle = this.serviceBlockPacket.readBit();
+        int printDirection = this.serviceBlockPacket.readBits(2);
+        int scrollDirection = this.serviceBlockPacket.readBits(2);
+        int justification = this.serviceBlockPacket.readBits(2);
+        this.serviceBlockPacket.skipBits(8);
+        this.currentCueBuilder.setWindowAttributes(fillColor, borderColor, wordWrapToggle, borderType, printDirection, scrollDirection, justification);
     }
 
     private void handleDefineWindow(int window) {

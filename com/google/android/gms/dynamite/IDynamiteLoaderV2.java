@@ -23,9 +23,9 @@ public interface IDynamiteLoaderV2 extends IInterface {
                 zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper);
                 obtainAndWriteInterfaceToken.writeString(str);
                 obtainAndWriteInterfaceToken.writeByteArray(bArr);
-                Parcel transactAndReadException = transactAndReadException(1, obtainAndWriteInterfaceToken);
-                IObjectWrapper asInterface = com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(transactAndReadException.readStrongBinder());
-                transactAndReadException.recycle();
+                obtainAndWriteInterfaceToken = transactAndReadException(1, obtainAndWriteInterfaceToken);
+                IObjectWrapper asInterface = com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+                obtainAndWriteInterfaceToken.recycle();
                 return asInterface;
             }
 
@@ -35,9 +35,9 @@ public interface IDynamiteLoaderV2 extends IInterface {
                 obtainAndWriteInterfaceToken.writeString(str);
                 obtainAndWriteInterfaceToken.writeInt(i);
                 zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper2);
-                Parcel transactAndReadException = transactAndReadException(2, obtainAndWriteInterfaceToken);
-                IObjectWrapper asInterface = com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(transactAndReadException.readStrongBinder());
-                transactAndReadException.recycle();
+                obtainAndWriteInterfaceToken = transactAndReadException(2, obtainAndWriteInterfaceToken);
+                IObjectWrapper asInterface = com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+                obtainAndWriteInterfaceToken.recycle();
                 return asInterface;
             }
         }
@@ -55,15 +55,17 @@ public interface IDynamiteLoaderV2 extends IInterface {
             switch (i) {
                 case 1:
                     loadModule = loadModule(com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(parcel.readStrongBinder()), parcel.readString(), parcel.createByteArray());
+                    parcel2.writeNoException();
+                    zzc.zza(parcel2, loadModule);
                     break;
                 case 2:
                     loadModule = loadModule2(com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(parcel.readStrongBinder()), parcel.readString(), parcel.readInt(), com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(parcel.readStrongBinder()));
+                    parcel2.writeNoException();
+                    zzc.zza(parcel2, loadModule);
                     break;
                 default:
                     return false;
             }
-            parcel2.writeNoException();
-            zzc.zza(parcel2, loadModule);
             return true;
         }
     }

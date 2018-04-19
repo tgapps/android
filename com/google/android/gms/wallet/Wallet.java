@@ -45,23 +45,19 @@ public final class Wallet {
             }
 
             public final Builder setEnvironment(int i) {
-                if (!(i == 0 || i == 0 || i == 2 || i == 1)) {
-                    if (i != 3) {
-                        throw new IllegalArgumentException(String.format(Locale.US, "Invalid environment value %d", new Object[]{Integer.valueOf(i)}));
-                    }
+                if (i == 0 || i == 0 || i == 2 || i == 1 || i == 3) {
+                    this.environment = i;
+                    return this;
                 }
-                this.environment = i;
-                return this;
+                throw new IllegalArgumentException(String.format(Locale.US, "Invalid environment value %d", new Object[]{Integer.valueOf(i)}));
             }
 
             public final Builder setTheme(int i) {
-                if (i != 0) {
-                    if (i != 1) {
-                        throw new IllegalArgumentException(String.format(Locale.US, "Invalid theme value %d", new Object[]{Integer.valueOf(i)}));
-                    }
+                if (i == 0 || i == 1) {
+                    this.theme = i;
+                    return this;
                 }
-                this.theme = i;
-                return this;
+                throw new IllegalArgumentException(String.format(Locale.US, "Invalid theme value %d", new Object[]{Integer.valueOf(i)}));
             }
         }
 

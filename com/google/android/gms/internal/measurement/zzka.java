@@ -1,6 +1,7 @@
 package com.google.android.gms.internal.measurement;
 
 import java.io.IOException;
+import org.telegram.messenger.exoplayer2.RendererCapabilities;
 
 public final class zzka extends zzabd<zzka> {
     private static volatile zzka[] zzarp;
@@ -65,25 +66,18 @@ public final class zzka extends zzabd<zzka> {
         } else if (!this.zzart.equals(com_google_android_gms_internal_measurement_zzka.zzart)) {
             return false;
         }
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                return this.zzbzh.equals(com_google_android_gms_internal_measurement_zzka.zzbzh);
-            }
-        }
-        return com_google_android_gms_internal_measurement_zzka.zzbzh == null || com_google_android_gms_internal_measurement_zzka.zzbzh.isEmpty();
+        return (this.zzbzh == null || this.zzbzh.isEmpty()) ? com_google_android_gms_internal_measurement_zzka.zzbzh == null || com_google_android_gms_internal_measurement_zzka.zzbzh.isEmpty() : this.zzbzh.equals(com_google_android_gms_internal_measurement_zzka.zzbzh);
     }
 
     public final int hashCode() {
-        int hashCode = 527 + getClass().getName().hashCode();
-        zzkd com_google_android_gms_internal_measurement_zzkd = this.zzarq;
         int i = 0;
-        hashCode = (hashCode * 31) + (com_google_android_gms_internal_measurement_zzkd == null ? 0 : com_google_android_gms_internal_measurement_zzkd.hashCode());
+        int hashCode = getClass().getName().hashCode() + 527;
+        zzkd com_google_android_gms_internal_measurement_zzkd = this.zzarq;
+        hashCode = (com_google_android_gms_internal_measurement_zzkd == null ? 0 : com_google_android_gms_internal_measurement_zzkd.hashCode()) + (hashCode * 31);
         zzkb com_google_android_gms_internal_measurement_zzkb = this.zzarr;
-        hashCode = ((((((hashCode * 31) + (com_google_android_gms_internal_measurement_zzkb == null ? 0 : com_google_android_gms_internal_measurement_zzkb.hashCode())) * 31) + (this.zzars == null ? 0 : this.zzars.hashCode())) * 31) + (this.zzart == null ? 0 : this.zzart.hashCode())) * 31;
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                i = this.zzbzh.hashCode();
-            }
+        hashCode = ((this.zzart == null ? 0 : this.zzart.hashCode()) + (((this.zzars == null ? 0 : this.zzars.hashCode()) + (((com_google_android_gms_internal_measurement_zzkb == null ? 0 : com_google_android_gms_internal_measurement_zzkb.hashCode()) + (hashCode * 31)) * 31)) * 31)) * 31;
+        if (!(this.zzbzh == null || this.zzbzh.isEmpty())) {
+            i = this.zzbzh.hashCode();
         }
         return hashCode + i;
     }
@@ -122,28 +116,34 @@ public final class zzka extends zzabd<zzka> {
     public final /* synthetic */ zzabj zzb(zzaba com_google_android_gms_internal_measurement_zzaba) throws IOException {
         while (true) {
             int zzvo = com_google_android_gms_internal_measurement_zzaba.zzvo();
-            if (zzvo == 0) {
-                return this;
+            switch (zzvo) {
+                case 0:
+                    break;
+                case 10:
+                    if (this.zzarq == null) {
+                        this.zzarq = new zzkd();
+                    }
+                    com_google_android_gms_internal_measurement_zzaba.zza(this.zzarq);
+                    continue;
+                case 18:
+                    if (this.zzarr == null) {
+                        this.zzarr = new zzkb();
+                    }
+                    com_google_android_gms_internal_measurement_zzaba.zza(this.zzarr);
+                    continue;
+                case RendererCapabilities.ADAPTIVE_SUPPORT_MASK /*24*/:
+                    this.zzars = Boolean.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvr());
+                    continue;
+                case 34:
+                    this.zzart = com_google_android_gms_internal_measurement_zzaba.readString();
+                    continue;
+                default:
+                    if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
+                        break;
+                    }
+                    continue;
             }
-            zzabj com_google_android_gms_internal_measurement_zzabj;
-            if (zzvo == 10) {
-                if (this.zzarq == null) {
-                    this.zzarq = new zzkd();
-                }
-                com_google_android_gms_internal_measurement_zzabj = this.zzarq;
-            } else if (zzvo == 18) {
-                if (this.zzarr == null) {
-                    this.zzarr = new zzkb();
-                }
-                com_google_android_gms_internal_measurement_zzabj = this.zzarr;
-            } else if (zzvo == 24) {
-                this.zzars = Boolean.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvr());
-            } else if (zzvo == 34) {
-                this.zzart = com_google_android_gms_internal_measurement_zzaba.readString();
-            } else if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
-                return this;
-            }
-            com_google_android_gms_internal_measurement_zzaba.zza(com_google_android_gms_internal_measurement_zzabj);
+            return this;
         }
     }
 }

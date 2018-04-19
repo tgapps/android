@@ -56,18 +56,15 @@ public final class zzhg extends GmsClient<zzep> {
     }
 
     public final void connect(ConnectionProgressReportCallbacks connectionProgressReportCallbacks) {
+        int i = 0;
         if (!requiresGooglePlayServices()) {
             try {
                 Bundle bundle = getContext().getPackageManager().getApplicationInfo("com.google.android.wearable.app.cn", 128).metaData;
-                int i = bundle != null ? bundle.getInt("com.google.android.wearable.api.version", 0) : 0;
+                if (bundle != null) {
+                    i = bundle.getInt("com.google.android.wearable.api.version", 0);
+                }
                 if (i < GoogleApiAvailabilityLight.GOOGLE_PLAY_SERVICES_VERSION_CODE) {
-                    int i2 = GoogleApiAvailabilityLight.GOOGLE_PLAY_SERVICES_VERSION_CODE;
-                    StringBuilder stringBuilder = new StringBuilder(86);
-                    stringBuilder.append("The Wear OS app is out of date. Requires API version ");
-                    stringBuilder.append(i2);
-                    stringBuilder.append(" but found ");
-                    stringBuilder.append(i);
-                    Log.w("WearableClient", stringBuilder.toString());
+                    Log.w("WearableClient", "The Wear OS app is out of date. Requires API version " + GoogleApiAvailabilityLight.GOOGLE_PLAY_SERVICES_VERSION_CODE + " but found " + i);
                     Context context = getContext();
                     Context context2 = getContext();
                     Intent intent = new Intent("com.google.android.wearable.app.cn.UPDATE_ANDROID_WEAR").setPackage("com.google.android.wearable.app.cn");
@@ -111,10 +108,7 @@ public final class zzhg extends GmsClient<zzep> {
 
     protected final void onPostInitHandler(int i, IBinder iBinder, Bundle bundle, int i2) {
         if (Log.isLoggable("WearableClient", 2)) {
-            StringBuilder stringBuilder = new StringBuilder(41);
-            stringBuilder.append("onPostInitHandler: statusCode ");
-            stringBuilder.append(i);
-            Log.v("WearableClient", stringBuilder.toString());
+            Log.v("WearableClient", "onPostInitHandler: statusCode " + i);
         }
         if (i == 0) {
             this.zzex.zza(iBinder);

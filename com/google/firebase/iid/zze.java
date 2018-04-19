@@ -14,11 +14,7 @@ final class zze implements Runnable {
 
     public final void run() {
         String action = this.zzbpr.getAction();
-        StringBuilder stringBuilder = new StringBuilder(61 + String.valueOf(action).length());
-        stringBuilder.append("Service took too long to process intent: ");
-        stringBuilder.append(action);
-        stringBuilder.append(" App may get closed.");
-        Log.w("EnhancedIntentService", stringBuilder.toString());
+        Log.w("EnhancedIntentService", new StringBuilder(String.valueOf(action).length() + 61).append("Service took too long to process intent: ").append(action).append(" App may get closed.").toString());
         this.zzbpx.finish();
     }
 }

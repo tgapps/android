@@ -44,32 +44,18 @@ public final class zzdf extends DataBufferRef implements DataItem {
         Map assets = getAssets();
         StringBuilder stringBuilder = new StringBuilder("DataItemRef{ ");
         String valueOf = String.valueOf(getUri());
-        StringBuilder stringBuilder2 = new StringBuilder(4 + String.valueOf(valueOf).length());
-        stringBuilder2.append("uri=");
-        stringBuilder2.append(valueOf);
-        stringBuilder.append(stringBuilder2.toString());
+        stringBuilder.append(new StringBuilder(String.valueOf(valueOf).length() + 4).append("uri=").append(valueOf).toString());
         String valueOf2 = String.valueOf(data == null ? "null" : Integer.valueOf(data.length));
-        stringBuilder2 = new StringBuilder(9 + String.valueOf(valueOf2).length());
-        stringBuilder2.append(", dataSz=");
-        stringBuilder2.append(valueOf2);
-        stringBuilder.append(stringBuilder2.toString());
-        int size = assets.size();
-        stringBuilder2 = new StringBuilder(23);
-        stringBuilder2.append(", numAssets=");
-        stringBuilder2.append(size);
-        stringBuilder.append(stringBuilder2.toString());
+        stringBuilder.append(new StringBuilder(String.valueOf(valueOf2).length() + 9).append(", dataSz=").append(valueOf2).toString());
+        stringBuilder.append(", numAssets=" + assets.size());
         if (isLoggable && !assets.isEmpty()) {
             stringBuilder.append(", assets=[");
-            String str = TtmlNode.ANONYMOUS_REGION_ID;
+            valueOf2 = TtmlNode.ANONYMOUS_REGION_ID;
+            String str = valueOf2;
             for (Entry entry : assets.entrySet()) {
-                valueOf = (String) entry.getKey();
-                String id = ((DataItemAsset) entry.getValue()).getId();
-                StringBuilder stringBuilder3 = new StringBuilder(((2 + String.valueOf(str).length()) + String.valueOf(valueOf).length()) + String.valueOf(id).length());
-                stringBuilder3.append(str);
-                stringBuilder3.append(valueOf);
-                stringBuilder3.append(": ");
-                stringBuilder3.append(id);
-                stringBuilder.append(stringBuilder3.toString());
+                String str2 = (String) entry.getKey();
+                valueOf2 = ((DataItemAsset) entry.getValue()).getId();
+                stringBuilder.append(new StringBuilder(((String.valueOf(str).length() + 2) + String.valueOf(str2).length()) + String.valueOf(valueOf2).length()).append(str).append(str2).append(": ").append(valueOf2).toString());
                 str = ", ";
             }
             stringBuilder.append("]");

@@ -76,10 +76,10 @@ abstract class MapCollections<K, V> {
             }
             Entry<?, ?> e = (Entry) o;
             int index = MapCollections.this.colIndexOfKey(e.getKey());
-            if (index < 0) {
-                return false;
+            if (index >= 0) {
+                return ContainerHelpers.equal(MapCollections.this.colGetEntry(index, 1), e.getValue());
             }
-            return ContainerHelpers.equal(MapCollections.this.colGetEntry(index, 1), e.getValue());
+            return false;
         }
 
         public boolean containsAll(Collection<?> collection) {
@@ -130,11 +130,13 @@ abstract class MapCollections<K, V> {
         public int hashCode() {
             int result = 0;
             for (int i = MapCollections.this.colGetSize() - 1; i >= 0; i--) {
-                int i2 = 0;
+                int i2;
                 Object key = MapCollections.this.colGetEntry(i, 0);
                 Object value = MapCollections.this.colGetEntry(i, 1);
                 int hashCode = key == null ? 0 : key.hashCode();
-                if (value != null) {
+                if (value == null) {
+                    i2 = 0;
+                } else {
                     i2 = value.hashCode();
                 }
                 result += i2 ^ hashCode;
@@ -211,12 +213,8 @@ abstract class MapCollections<K, V> {
         public int hashCode() {
             int result = 0;
             for (int i = MapCollections.this.colGetSize() - 1; i >= 0; i--) {
-                int i2 = 0;
                 Object obj = MapCollections.this.colGetEntry(i, 0);
-                if (obj != null) {
-                    i2 = obj.hashCode();
-                }
-                result += i2;
+                result += obj == null ? 0 : obj.hashCode();
             }
             return result;
         }
@@ -278,23 +276,23 @@ abstract class MapCollections<K, V> {
         }
 
         public boolean equals(Object o) {
-            if (this.mEntryValid) {
-                boolean z = false;
-                if (!(o instanceof Entry)) {
-                    return false;
-                }
+            boolean z = true;
+            if (!this.mEntryValid) {
+                throw new IllegalStateException("This container does not support retaining Map.Entry objects");
+            } else if (!(o instanceof Entry)) {
+                return false;
+            } else {
                 Entry<?, ?> e = (Entry) o;
-                if (ContainerHelpers.equal(e.getKey(), MapCollections.this.colGetEntry(this.mIndex, 0)) && ContainerHelpers.equal(e.getValue(), MapCollections.this.colGetEntry(this.mIndex, 1))) {
-                    z = true;
+                if (!(ContainerHelpers.equal(e.getKey(), MapCollections.this.colGetEntry(this.mIndex, 0)) && ContainerHelpers.equal(e.getValue(), MapCollections.this.colGetEntry(this.mIndex, 1)))) {
+                    z = false;
                 }
                 return z;
             }
-            throw new IllegalStateException("This container does not support retaining Map.Entry objects");
         }
 
         public int hashCode() {
+            int i = 0;
             if (this.mEntryValid) {
-                int i = 0;
                 Object key = MapCollections.this.colGetEntry(this.mIndex, 0);
                 Object value = MapCollections.this.colGetEntry(this.mIndex, 1);
                 int hashCode = key == null ? 0 : key.hashCode();
@@ -307,11 +305,7 @@ abstract class MapCollections<K, V> {
         }
 
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(getKey());
-            stringBuilder.append("=");
-            stringBuilder.append(getValue());
-            return stringBuilder.toString();
+            return getKey() + "=" + getValue();
         }
     }
 
@@ -467,7 +461,7 @@ abstract class MapCollections<K, V> {
     public <T> T[] toArrayHelper(T[] array, int offset) {
         int N = colGetSize();
         if (array.length < N) {
-            array = (Object[]) Array.newInstance(array.getClass().getComponentType(), N);
+            array = (Object[]) ((Object[]) Array.newInstance(array.getClass().getComponentType(), N));
         }
         for (int i = 0; i < N; i++) {
             array[i] = colGetEntry(i, offset);
@@ -488,7 +482,7 @@ abstract class MapCollections<K, V> {
         }
         Set<?> s = (Set) object;
         try {
-            if (set.size() != s.size() || !set.containsAll(s)) {
+            if (!(set.size() == s.size() && set.containsAll(s))) {
                 z = false;
             }
             return z;

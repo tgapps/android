@@ -80,24 +80,24 @@ public class TrackFragmentHeaderBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        long j = 8;
+        long size = 8;
         int flags = getFlags();
         if ((flags & 1) == 1) {
-            j = 8 + 8;
+            size = 8 + 8;
         }
         if ((flags & 2) == 2) {
-            j += 4;
+            size += 4;
         }
         if ((flags & 8) == 8) {
-            j += 4;
+            size += 4;
         }
         if ((flags & 16) == 16) {
-            j += 4;
+            size += 4;
         }
         if ((flags & 32) == 32) {
-            return j + 4;
+            return size + 4;
         }
-        return j;
+        return size;
     }
 
     protected void getContent(ByteBuffer byteBuffer) {
@@ -270,22 +270,14 @@ public class TrackFragmentHeaderBox extends AbstractFullBox {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_21, this, this));
         StringBuilder sb = new StringBuilder();
         sb.append("TrackFragmentHeaderBox");
-        sb.append("{trackId=");
-        sb.append(this.trackId);
-        sb.append(", baseDataOffset=");
-        sb.append(this.baseDataOffset);
-        sb.append(", sampleDescriptionIndex=");
-        sb.append(this.sampleDescriptionIndex);
-        sb.append(", defaultSampleDuration=");
-        sb.append(this.defaultSampleDuration);
-        sb.append(", defaultSampleSize=");
-        sb.append(this.defaultSampleSize);
-        sb.append(", defaultSampleFlags=");
-        sb.append(this.defaultSampleFlags);
-        sb.append(", durationIsEmpty=");
-        sb.append(this.durationIsEmpty);
-        sb.append(", defaultBaseIsMoof=");
-        sb.append(this.defaultBaseIsMoof);
+        sb.append("{trackId=").append(this.trackId);
+        sb.append(", baseDataOffset=").append(this.baseDataOffset);
+        sb.append(", sampleDescriptionIndex=").append(this.sampleDescriptionIndex);
+        sb.append(", defaultSampleDuration=").append(this.defaultSampleDuration);
+        sb.append(", defaultSampleSize=").append(this.defaultSampleSize);
+        sb.append(", defaultSampleFlags=").append(this.defaultSampleFlags);
+        sb.append(", durationIsEmpty=").append(this.durationIsEmpty);
+        sb.append(", defaultBaseIsMoof=").append(this.defaultBaseIsMoof);
         sb.append('}');
         return sb.toString();
     }

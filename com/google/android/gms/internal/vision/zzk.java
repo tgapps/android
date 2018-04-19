@@ -33,12 +33,12 @@ public final class zzk extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 2, this.width);
         SafeParcelWriter.writeInt(parcel, 3, this.height);
         SafeParcelWriter.writeInt(parcel, 4, this.id);
         SafeParcelWriter.writeLong(parcel, 5, this.zzck);
         SafeParcelWriter.writeInt(parcel, 6, this.rotation);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -9,18 +9,18 @@ public final class zzbi implements Creator<zzay> {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
         String str2 = null;
-        String str3 = str2;
+        String str3 = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = SafeParcelReader.createString(parcel, readHeader);
+                    str3 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
                     str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
-                    str3 = SafeParcelReader.createString(parcel, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -28,7 +28,7 @@ public final class zzbi implements Creator<zzay> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new zzay(str, str2, str3);
+        return new zzay(str3, str2, str);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

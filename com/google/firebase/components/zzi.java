@@ -13,15 +13,14 @@ final class zzi<T> implements Provider<T> {
 
     public final T get() {
         T t = this.zzar;
-        if (t != zzaq) {
-            return t;
-        }
-        synchronized (this) {
-            t = this.zzar;
-            if (t == zzaq) {
-                t = this.zzas.get();
-                this.zzar = t;
-                this.zzas = null;
+        if (t == zzaq) {
+            synchronized (this) {
+                t = this.zzar;
+                if (t == zzaq) {
+                    t = this.zzas.get();
+                    this.zzar = t;
+                    this.zzas = null;
+                }
             }
         }
         return t;

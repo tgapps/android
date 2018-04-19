@@ -19,9 +19,9 @@ public final class zzb extends zza implements ICameraUpdateFactoryDelegate {
     public final IObjectWrapper newLatLng(LatLng latLng) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) latLng);
-        Parcel transactAndReadException = transactAndReadException(8, obtainAndWriteInterfaceToken);
-        IObjectWrapper asInterface = Stub.asInterface(transactAndReadException.readStrongBinder());
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(8, obtainAndWriteInterfaceToken);
+        IObjectWrapper asInterface = Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+        obtainAndWriteInterfaceToken.recycle();
         return asInterface;
     }
 
@@ -29,9 +29,9 @@ public final class zzb extends zza implements ICameraUpdateFactoryDelegate {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) latLngBounds);
         obtainAndWriteInterfaceToken.writeInt(i);
-        Parcel transactAndReadException = transactAndReadException(10, obtainAndWriteInterfaceToken);
-        IObjectWrapper asInterface = Stub.asInterface(transactAndReadException.readStrongBinder());
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(10, obtainAndWriteInterfaceToken);
+        IObjectWrapper asInterface = Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+        obtainAndWriteInterfaceToken.recycle();
         return asInterface;
     }
 
@@ -39,9 +39,9 @@ public final class zzb extends zza implements ICameraUpdateFactoryDelegate {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) latLng);
         obtainAndWriteInterfaceToken.writeFloat(f);
-        Parcel transactAndReadException = transactAndReadException(9, obtainAndWriteInterfaceToken);
-        IObjectWrapper asInterface = Stub.asInterface(transactAndReadException.readStrongBinder());
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(9, obtainAndWriteInterfaceToken);
+        IObjectWrapper asInterface = Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+        obtainAndWriteInterfaceToken.recycle();
         return asInterface;
     }
 }

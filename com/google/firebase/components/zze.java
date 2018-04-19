@@ -16,22 +16,23 @@ final class zze implements zzf {
     }
 
     private static Bundle zzd(Context context) {
+        Bundle bundle = null;
         try {
             PackageManager packageManager = context.getPackageManager();
             if (packageManager == null) {
                 Log.w("ComponentDiscovery", "Context has no PackageManager.");
-                return null;
+            } else {
+                ServiceInfo serviceInfo = packageManager.getServiceInfo(new ComponentName(context, ComponentDiscoveryService.class), 128);
+                if (serviceInfo == null) {
+                    Log.w("ComponentDiscovery", "ComponentDiscoveryService has no service info.");
+                } else {
+                    bundle = serviceInfo.metaData;
+                }
             }
-            ServiceInfo serviceInfo = packageManager.getServiceInfo(new ComponentName(context, ComponentDiscoveryService.class), 128);
-            if (serviceInfo != null) {
-                return serviceInfo.metaData;
-            }
-            Log.w("ComponentDiscovery", "ComponentDiscoveryService has no service info.");
-            return null;
         } catch (NameNotFoundException e) {
             Log.w("ComponentDiscovery", "Application info not found.");
-            return null;
         }
+        return bundle;
     }
 
     public final List<String> zzc(Context context) {

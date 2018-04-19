@@ -10,7 +10,7 @@ import com.google.android.gms.common.api.Api.AbstractClientBuilder;
 import com.google.android.gms.common.api.Api.AnyClient;
 import com.google.android.gms.common.api.Api.AnyClientKey;
 import com.google.android.gms.common.api.Api.Client;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.internal.BaseImplementation.ApiMethodImpl;
@@ -70,8 +70,8 @@ public final class zzaj implements zzbc {
             ConnectionResult connectionResult = signInResponse.getConnectionResult();
             if (connectionResult.isSuccess()) {
                 ResolveAccountResponse resolveAccountResponse = signInResponse.getResolveAccountResponse();
-                connectionResult = resolveAccountResponse.getConnectionResult();
-                if (connectionResult.isSuccess()) {
+                ConnectionResult connectionResult2 = resolveAccountResponse.getConnectionResult();
+                if (connectionResult2.isSuccess()) {
                     this.zzhq = true;
                     this.zzhr = resolveAccountResponse.getAccountAccessor();
                     this.zzhs = resolveAccountResponse.getSaveDefaultAccount();
@@ -79,12 +79,9 @@ public final class zzaj implements zzbc {
                     zzas();
                     return;
                 }
-                String valueOf = String.valueOf(connectionResult);
-                StringBuilder stringBuilder = new StringBuilder(48 + String.valueOf(valueOf).length());
-                stringBuilder.append("Sign-in succeeded with resolve account failure: ");
-                stringBuilder.append(valueOf);
-                Log.wtf("GoogleApiClientConnecting", stringBuilder.toString(), new Exception());
-                zze(connectionResult);
+                String valueOf = String.valueOf(connectionResult2);
+                Log.wtf("GoogleApiClientConnecting", new StringBuilder(String.valueOf(valueOf).length() + 48).append("Sign-in succeeded with resolve account failure: ").append(valueOf).toString(), new Exception());
+                zze(connectionResult2);
             } else if (zzd(connectionResult)) {
                 zzau();
                 zzas();
@@ -110,19 +107,18 @@ public final class zzaj implements zzbc {
         if (this.zzhk > 0) {
             return false;
         }
-        ConnectionResult connectionResult;
         if (this.zzhk < 0) {
             Log.w("GoogleApiClientConnecting", this.zzhf.zzfq.zzbb());
             Log.wtf("GoogleApiClientConnecting", "GoogleApiClient received too many callbacks for the given step. Clients may be in an unexpected state; GoogleApiClient will now disconnect.", new Exception());
-            connectionResult = new ConnectionResult(8, null);
+            zze(new ConnectionResult(8, null));
+            return false;
         } else if (this.zzgt == null) {
             return true;
         } else {
             this.zzhf.zzje = this.zzhi;
-            connectionResult = this.zzgt;
+            zze(this.zzgt);
+            return false;
         }
-        zze(connectionResult);
-        return false;
     }
 
     @GuardedBy("mLock")
@@ -202,50 +198,52 @@ public final class zzaj implements zzbc {
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     @javax.annotation.concurrent.GuardedBy("mLock")
-    private final void zzb(com.google.android.gms.common.ConnectionResult r5, com.google.android.gms.common.api.Api<?> r6, boolean r7) {
+    private final void zzb(com.google.android.gms.common.ConnectionResult r6, com.google.android.gms.common.api.Api<?> r7, boolean r8) {
         /*
-        r4 = this;
-        r0 = r6.zzj();
-        r0 = r0.getPriority();
+        r5 = this;
         r1 = 0;
-        r2 = 1;
-        if (r7 == 0) goto L_0x0024;
+        r0 = 1;
+        r2 = r7.zzj();
+        r3 = r2.getPriority();
+        if (r8 == 0) goto L_0x0015;
     L_0x000c:
-        r7 = r5.hasResolution();
-        if (r7 == 0) goto L_0x0014;
+        r2 = r6.hasResolution();
+        if (r2 == 0) goto L_0x002f;
     L_0x0012:
-        r7 = r2;
-        goto L_0x0022;
-    L_0x0014:
-        r7 = r4.zzgk;
-        r3 = r5.getErrorCode();
-        r7 = r7.getErrorResolutionIntent(r3);
-        if (r7 == 0) goto L_0x0021;
-    L_0x0020:
-        goto L_0x0012;
-    L_0x0021:
-        r7 = r1;
-    L_0x0022:
-        if (r7 == 0) goto L_0x002d;
-    L_0x0024:
-        r7 = r4.zzgt;
-        if (r7 == 0) goto L_0x002c;
-    L_0x0028:
-        r7 = r4.zzhi;
-        if (r0 >= r7) goto L_0x002d;
-    L_0x002c:
-        r1 = r2;
-    L_0x002d:
-        if (r1 == 0) goto L_0x0033;
-    L_0x002f:
-        r4.zzgt = r5;
-        r4.zzhi = r0;
-    L_0x0033:
-        r7 = r4.zzhf;
-        r7 = r7.zzjb;
-        r6 = r6.getClientKey();
-        r7.put(r6, r5);
+        r2 = r0;
+    L_0x0013:
+        if (r2 == 0) goto L_0x003f;
+    L_0x0015:
+        r2 = r5.zzgt;
+        if (r2 == 0) goto L_0x001d;
+    L_0x0019:
+        r2 = r5.zzhi;
+        if (r3 >= r2) goto L_0x003f;
+    L_0x001d:
+        if (r0 == 0) goto L_0x0023;
+    L_0x001f:
+        r5.zzgt = r6;
+        r5.zzhi = r3;
+    L_0x0023:
+        r0 = r5.zzhf;
+        r0 = r0.zzjb;
+        r1 = r7.getClientKey();
+        r0.put(r1, r6);
         return;
+    L_0x002f:
+        r2 = r5.zzgk;
+        r4 = r6.getErrorCode();
+        r2 = r2.getErrorResolutionIntent(r4);
+        if (r2 == 0) goto L_0x003d;
+    L_0x003b:
+        r2 = r0;
+        goto L_0x0013;
+    L_0x003d:
+        r2 = r1;
+        goto L_0x0013;
+    L_0x003f:
+        r0 = r1;
+        goto L_0x001d;
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.common.api.internal.zzaj.zzb(com.google.android.gms.common.ConnectionResult, com.google.android.gms.common.api.Api, boolean):void");
     }
@@ -258,7 +256,7 @@ public final class zzaj implements zzbc {
     @GuardedBy("mLock")
     private final void zze(ConnectionResult connectionResult) {
         zzav();
-        zza(connectionResult.hasResolution() ^ 1);
+        zza(!connectionResult.hasResolution());
         this.zzhf.zzf(connectionResult);
         this.zzhf.zzjf.zzc(connectionResult);
     }
@@ -270,23 +268,11 @@ public final class zzaj implements zzbc {
         }
         Log.w("GoogleApiClientConnecting", this.zzhf.zzfq.zzbb());
         String valueOf = String.valueOf(this);
-        StringBuilder stringBuilder = new StringBuilder(23 + String.valueOf(valueOf).length());
-        stringBuilder.append("Unexpected callback in ");
-        stringBuilder.append(valueOf);
-        Log.w("GoogleApiClientConnecting", stringBuilder.toString());
-        int i2 = this.zzhk;
-        stringBuilder = new StringBuilder(33);
-        stringBuilder.append("mRemainingConnections=");
-        stringBuilder.append(i2);
-        Log.w("GoogleApiClientConnecting", stringBuilder.toString());
+        Log.w("GoogleApiClientConnecting", new StringBuilder(String.valueOf(valueOf).length() + 23).append("Unexpected callback in ").append(valueOf).toString());
+        Log.w("GoogleApiClientConnecting", "mRemainingConnections=" + this.zzhk);
         valueOf = zzf(this.zzhj);
         String zzf = zzf(i);
-        stringBuilder = new StringBuilder((70 + String.valueOf(valueOf).length()) + String.valueOf(zzf).length());
-        stringBuilder.append("GoogleApiClient connecting is in step ");
-        stringBuilder.append(valueOf);
-        stringBuilder.append(" but received callback for step ");
-        stringBuilder.append(zzf);
-        Log.wtf("GoogleApiClientConnecting", stringBuilder.toString(), new Exception());
+        Log.wtf("GoogleApiClientConnecting", new StringBuilder((String.valueOf(valueOf).length() + 70) + String.valueOf(zzf).length()).append("GoogleApiClient connecting is in step ").append(valueOf).append(" but received callback for step ").append(zzf).toString(), new Exception());
         zze(new ConnectionResult(8, null));
         return false;
     }
@@ -314,7 +300,7 @@ public final class zzaj implements zzbc {
         int i = 0;
         for (Api api : this.zzgi.keySet()) {
             Client client = (Client) this.zzhf.zzil.get(api.getClientKey());
-            i |= api.zzj().getPriority() == 1 ? 1 : 0;
+            int i2 = (api.zzj().getPriority() == 1 ? 1 : 0) | i;
             boolean booleanValue = ((Boolean) this.zzgi.get(api)).booleanValue();
             if (client.requiresSignIn()) {
                 this.zzhp = true;
@@ -325,13 +311,14 @@ public final class zzaj implements zzbc {
                 }
             }
             hashMap.put(client, new zzal(this, api, booleanValue));
+            i = i2;
         }
         if (i != 0) {
             this.zzhp = false;
         }
         if (this.zzhp) {
             this.zzgf.setClientSessionId(Integer.valueOf(System.identityHashCode(this.zzhf.zzfq)));
-            OnConnectionFailedListener com_google_android_gms_common_api_internal_zzas = new zzas();
+            ConnectionCallbacks com_google_android_gms_common_api_internal_zzas = new zzas();
             this.zzhn = (SignInClient) this.zzdh.buildClient(this.mContext, this.zzhf.zzfq.getLooper(), this.zzgf, this.zzgf.getSignInOptions(), com_google_android_gms_common_api_internal_zzas, com_google_android_gms_common_api_internal_zzas);
         }
         this.zzhk = this.zzhf.zzil.size();

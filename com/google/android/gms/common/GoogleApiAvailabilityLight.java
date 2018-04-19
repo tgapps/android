@@ -85,8 +85,8 @@ public class GoogleApiAvailabilityLight {
     }
 
     public int isGooglePlayServicesAvailable(Context context, int i) {
-        i = GooglePlayServicesUtilLight.isGooglePlayServicesAvailable(context, i);
-        return GooglePlayServicesUtilLight.isPlayServicesPossiblyUpdating(context, i) ? 18 : i;
+        int isGooglePlayServicesAvailable = GooglePlayServicesUtilLight.isGooglePlayServicesAvailable(context, i);
+        return GooglePlayServicesUtilLight.isPlayServicesPossiblyUpdating(context, isGooglePlayServicesAvailable) ? 18 : isGooglePlayServicesAvailable;
     }
 
     public boolean isPlayServicesPossiblyUpdating(Context context, int i) {

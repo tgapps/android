@@ -167,7 +167,10 @@ public class AccessibilityNodeInfoCompat {
         if (this == obj) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
             return false;
         }
         AccessibilityNodeInfoCompat other = (AccessibilityNodeInfoCompat) obj;
@@ -175,10 +178,12 @@ public class AccessibilityNodeInfoCompat {
             if (other.mInfo != null) {
                 return false;
             }
-        } else if (!this.mInfo.equals(other.mInfo)) {
+            return true;
+        } else if (this.mInfo.equals(other.mInfo)) {
+            return true;
+        } else {
             return false;
         }
-        return true;
     }
 
     public String toString() {
@@ -186,47 +191,24 @@ public class AccessibilityNodeInfoCompat {
         builder.append(super.toString());
         Rect bounds = new Rect();
         getBoundsInParent(bounds);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("; boundsInParent: ");
-        stringBuilder.append(bounds);
-        builder.append(stringBuilder.toString());
+        builder.append("; boundsInParent: " + bounds);
         getBoundsInScreen(bounds);
-        stringBuilder = new StringBuilder();
-        stringBuilder.append("; boundsInScreen: ");
-        stringBuilder.append(bounds);
-        builder.append(stringBuilder.toString());
-        builder.append("; packageName: ");
-        builder.append(getPackageName());
-        builder.append("; className: ");
-        builder.append(getClassName());
-        builder.append("; text: ");
-        builder.append(getText());
-        builder.append("; contentDescription: ");
-        builder.append(getContentDescription());
-        builder.append("; viewId: ");
-        builder.append(getViewIdResourceName());
-        builder.append("; checkable: ");
-        builder.append(isCheckable());
-        builder.append("; checked: ");
-        builder.append(isChecked());
-        builder.append("; focusable: ");
-        builder.append(isFocusable());
-        builder.append("; focused: ");
-        builder.append(isFocused());
-        builder.append("; selected: ");
-        builder.append(isSelected());
-        builder.append("; clickable: ");
-        builder.append(isClickable());
-        builder.append("; longClickable: ");
-        builder.append(isLongClickable());
-        builder.append("; enabled: ");
-        builder.append(isEnabled());
-        builder.append("; password: ");
-        builder.append(isPassword());
-        stringBuilder = new StringBuilder();
-        stringBuilder.append("; scrollable: ");
-        stringBuilder.append(isScrollable());
-        builder.append(stringBuilder.toString());
+        builder.append("; boundsInScreen: " + bounds);
+        builder.append("; packageName: ").append(getPackageName());
+        builder.append("; className: ").append(getClassName());
+        builder.append("; text: ").append(getText());
+        builder.append("; contentDescription: ").append(getContentDescription());
+        builder.append("; viewId: ").append(getViewIdResourceName());
+        builder.append("; checkable: ").append(isCheckable());
+        builder.append("; checked: ").append(isChecked());
+        builder.append("; focusable: ").append(isFocusable());
+        builder.append("; focused: ").append(isFocused());
+        builder.append("; selected: ").append(isSelected());
+        builder.append("; clickable: ").append(isClickable());
+        builder.append("; longClickable: ").append(isLongClickable());
+        builder.append("; enabled: ").append(isEnabled());
+        builder.append("; password: ").append(isPassword());
+        builder.append("; scrollable: " + isScrollable());
         builder.append("; [");
         int actionBits = getActions();
         while (actionBits != 0) {

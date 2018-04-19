@@ -54,11 +54,6 @@ public class FreeSpaceBox extends AbstractBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        StringBuilder stringBuilder = new StringBuilder("FreeSpaceBox[size=");
-        stringBuilder.append(this.data.length);
-        stringBuilder.append(";type=");
-        stringBuilder.append(getType());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "FreeSpaceBox[size=" + this.data.length + ";type=" + getType() + "]";
     }
 }

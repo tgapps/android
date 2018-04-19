@@ -9,10 +9,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public class RecordConsentRequestCreator implements Creator<RecordConsentRequest> {
     public RecordConsentRequest createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        Account account = null;
         int i = 0;
+        String str = null;
         Scope[] scopeArr = null;
-        String str = scopeArr;
+        Account account = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {

@@ -31,10 +31,7 @@ public final class zzch<R extends Result> extends TransformedResult<R> implement
                 ((Releasable) result).release();
             } catch (Throwable e) {
                 String valueOf = String.valueOf(result);
-                StringBuilder stringBuilder = new StringBuilder(18 + String.valueOf(valueOf).length());
-                stringBuilder.append("Unable to release ");
-                stringBuilder.append(valueOf);
-                Log.w("TransformedResultImpl", stringBuilder.toString(), e);
+                Log.w("TransformedResultImpl", new StringBuilder(String.valueOf(valueOf).length() + 18).append("Unable to release ").append(valueOf).toString(), e);
             }
         }
     }
@@ -49,9 +46,7 @@ public final class zzch<R extends Result> extends TransformedResult<R> implement
             }
             if (this.zzmh != null) {
                 zze(this.zzmh);
-                return;
-            }
-            if (this.zzmg != null) {
+            } else if (this.zzmg != null) {
                 this.zzmg.setResultCallback(this);
             }
         }
@@ -72,9 +67,9 @@ public final class zzch<R extends Result> extends TransformedResult<R> implement
     private final void zze(Status status) {
         synchronized (this.zzfa) {
             if (this.zzmd != null) {
-                status = this.zzmd.onFailure(status);
-                Preconditions.checkNotNull(status, "onFailure must not return null");
-                this.zzme.zzd(status);
+                Status onFailure = this.zzmd.onFailure(status);
+                Preconditions.checkNotNull(onFailure, "onFailure must not return null");
+                this.zzme.zzd(onFailure);
             } else if (zzcd()) {
                 this.zzmf.onFailure(status);
             }

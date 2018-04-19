@@ -69,16 +69,7 @@ public class VideoMediaHeaderBox extends AbstractMediaHeaderBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        StringBuilder stringBuilder = new StringBuilder("VideoMediaHeaderBox[graphicsmode=");
-        stringBuilder.append(getGraphicsmode());
-        stringBuilder.append(";opcolor0=");
-        stringBuilder.append(getOpcolor()[0]);
-        stringBuilder.append(";opcolor1=");
-        stringBuilder.append(getOpcolor()[1]);
-        stringBuilder.append(";opcolor2=");
-        stringBuilder.append(getOpcolor()[2]);
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "VideoMediaHeaderBox[graphicsmode=" + getGraphicsmode() + ";opcolor0=" + getOpcolor()[0] + ";opcolor1=" + getOpcolor()[1] + ";opcolor2=" + getOpcolor()[2] + "]";
     }
 
     public void setOpcolor(int[] opcolor) {

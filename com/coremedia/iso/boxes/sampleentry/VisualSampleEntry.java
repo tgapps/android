@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 
 public final class VisualSampleEntry extends AbstractSampleEntry implements Container {
-    static final /* synthetic */ boolean $assertionsDisabled = false;
+    static final /* synthetic */ boolean $assertionsDisabled;
     public static final String TYPE1 = "mp4v";
     public static final String TYPE2 = "s263";
     public static final String TYPE3 = "avc1";
@@ -29,6 +29,16 @@ public final class VisualSampleEntry extends AbstractSampleEntry implements Cont
     private long[] predefined;
     private double vertresolution;
     private int width;
+
+    static {
+        boolean z;
+        if (VisualSampleEntry.class.desiredAssertionStatus()) {
+            z = false;
+        } else {
+            z = true;
+        }
+        $assertionsDisabled = z;
+    }
 
     public VisualSampleEntry() {
         super(TYPE3);
@@ -111,73 +121,86 @@ public final class VisualSampleEntry extends AbstractSampleEntry implements Cont
     }
 
     public void parse(DataSource dataSource, ByteBuffer header, long contentSize, BoxParser boxParser) throws IOException {
-        final DataSource dataSource2 = dataSource;
-        final long endPosition = dataSource2.position() + contentSize;
+        final long endPosition = dataSource.position() + contentSize;
         ByteBuffer content = ByteBuffer.allocate(78);
-        dataSource2.read(content);
+        dataSource.read(content);
         content.position(6);
         this.dataReferenceIndex = IsoTypeReader.readUInt16(content);
         long tmp = (long) IsoTypeReader.readUInt16(content);
-        tmp = (long) IsoTypeReader.readUInt16(content);
-        this.predefined[0] = IsoTypeReader.readUInt32(content);
-        this.predefined[1] = IsoTypeReader.readUInt32(content);
-        this.predefined[2] = IsoTypeReader.readUInt32(content);
-        this.width = IsoTypeReader.readUInt16(content);
-        this.height = IsoTypeReader.readUInt16(content);
-        this.horizresolution = IsoTypeReader.readFixedPoint1616(content);
-        this.vertresolution = IsoTypeReader.readFixedPoint1616(content);
-        tmp = IsoTypeReader.readUInt32(content);
-        this.frameCount = IsoTypeReader.readUInt16(content);
-        int compressornameDisplayAbleData = IsoTypeReader.readUInt8(content);
-        if (compressornameDisplayAbleData > 31) {
-            compressornameDisplayAbleData = 31;
-        }
-        byte[] bytes = new byte[compressornameDisplayAbleData];
-        content.get(bytes);
-        r0.compressorname = Utf8.convert(bytes);
-        if (compressornameDisplayAbleData < 31) {
-            content.get(new byte[(31 - compressornameDisplayAbleData)]);
-        }
-        r0.depth = IsoTypeReader.readUInt16(content);
-        tmp = (long) IsoTypeReader.readUInt16(content);
-        initContainer(new DataSource() {
-            public int read(ByteBuffer byteBuffer) throws IOException {
-                if (endPosition == dataSource2.position()) {
-                    return -1;
+        if ($assertionsDisabled || 0 == tmp) {
+            tmp = (long) IsoTypeReader.readUInt16(content);
+            if ($assertionsDisabled || 0 == tmp) {
+                this.predefined[0] = IsoTypeReader.readUInt32(content);
+                this.predefined[1] = IsoTypeReader.readUInt32(content);
+                this.predefined[2] = IsoTypeReader.readUInt32(content);
+                this.width = IsoTypeReader.readUInt16(content);
+                this.height = IsoTypeReader.readUInt16(content);
+                this.horizresolution = IsoTypeReader.readFixedPoint1616(content);
+                this.vertresolution = IsoTypeReader.readFixedPoint1616(content);
+                tmp = IsoTypeReader.readUInt32(content);
+                if ($assertionsDisabled || 0 == tmp) {
+                    this.frameCount = IsoTypeReader.readUInt16(content);
+                    int compressornameDisplayAbleData = IsoTypeReader.readUInt8(content);
+                    if (compressornameDisplayAbleData > 31) {
+                        compressornameDisplayAbleData = 31;
+                    }
+                    byte[] bytes = new byte[compressornameDisplayAbleData];
+                    content.get(bytes);
+                    this.compressorname = Utf8.convert(bytes);
+                    if (compressornameDisplayAbleData < 31) {
+                        content.get(new byte[(31 - compressornameDisplayAbleData)]);
+                    }
+                    this.depth = IsoTypeReader.readUInt16(content);
+                    tmp = (long) IsoTypeReader.readUInt16(content);
+                    if ($assertionsDisabled || 65535 == tmp) {
+                        final DataSource dataSource2 = dataSource;
+                        initContainer(new DataSource() {
+                            public int read(ByteBuffer byteBuffer) throws IOException {
+                                if (endPosition == dataSource2.position()) {
+                                    return -1;
+                                }
+                                if (((long) byteBuffer.remaining()) <= endPosition - dataSource2.position()) {
+                                    return dataSource2.read(byteBuffer);
+                                }
+                                ByteBuffer bb = ByteBuffer.allocate(CastUtils.l2i(endPosition - dataSource2.position()));
+                                dataSource2.read(bb);
+                                byteBuffer.put((ByteBuffer) bb.rewind());
+                                return bb.capacity();
+                            }
+
+                            public long size() throws IOException {
+                                return endPosition;
+                            }
+
+                            public long position() throws IOException {
+                                return dataSource2.position();
+                            }
+
+                            public void position(long nuPos) throws IOException {
+                                dataSource2.position(nuPos);
+                            }
+
+                            public long transferTo(long position, long count, WritableByteChannel target) throws IOException {
+                                return dataSource2.transferTo(position, count, target);
+                            }
+
+                            public ByteBuffer map(long startPosition, long size) throws IOException {
+                                return dataSource2.map(startPosition, size);
+                            }
+
+                            public void close() throws IOException {
+                                dataSource2.close();
+                            }
+                        }, contentSize - 78, boxParser);
+                        return;
+                    }
+                    throw new AssertionError();
                 }
-                if (((long) byteBuffer.remaining()) <= endPosition - dataSource2.position()) {
-                    return dataSource2.read(byteBuffer);
-                }
-                ByteBuffer bb = ByteBuffer.allocate(CastUtils.l2i(endPosition - dataSource2.position()));
-                dataSource2.read(bb);
-                byteBuffer.put((ByteBuffer) bb.rewind());
-                return bb.capacity();
+                throw new AssertionError("reserved byte not 0");
             }
-
-            public long size() throws IOException {
-                return endPosition;
-            }
-
-            public long position() throws IOException {
-                return dataSource2.position();
-            }
-
-            public void position(long nuPos) throws IOException {
-                dataSource2.position(nuPos);
-            }
-
-            public long transferTo(long position, long count, WritableByteChannel target) throws IOException {
-                return dataSource2.transferTo(position, count, target);
-            }
-
-            public ByteBuffer map(long startPosition, long size) throws IOException {
-                return dataSource2.map(startPosition, size);
-            }
-
-            public void close() throws IOException {
-                dataSource2.close();
-            }
-        }, contentSize - 78, boxParser);
+            throw new AssertionError("reserved byte not 0");
+        }
+        throw new AssertionError("reserved byte not 0");
     }
 
     public void getBox(WritableByteChannel writableByteChannel) throws IOException {
@@ -210,16 +233,9 @@ public final class VisualSampleEntry extends AbstractSampleEntry implements Cont
     }
 
     public long getSize() {
-        int i;
         long s = getContainerSize();
         long j = s + 78;
-        if (!this.largeBox) {
-            if ((s + 78) + 8 < 4294967296L) {
-                i = 8;
-                return j + ((long) i);
-            }
-        }
-        i = 16;
-        return j + ((long) i);
+        int i = (this.largeBox || (s + 78) + 8 >= 4294967296L) ? 16 : 8;
+        return ((long) i) + j;
     }
 }

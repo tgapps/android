@@ -40,23 +40,15 @@ public final class zzfe extends AbstractSafeParcelable implements MessageEvent {
         int i = this.zzeh;
         String str = this.zzcl;
         String valueOf = String.valueOf(this.data == null ? "null" : Integer.valueOf(this.data.length));
-        StringBuilder stringBuilder = new StringBuilder((43 + String.valueOf(str).length()) + String.valueOf(valueOf).length());
-        stringBuilder.append("MessageEventParcelable[");
-        stringBuilder.append(i);
-        stringBuilder.append(",");
-        stringBuilder.append(str);
-        stringBuilder.append(", size=");
-        stringBuilder.append(valueOf);
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return new StringBuilder((String.valueOf(str).length() + 43) + String.valueOf(valueOf).length()).append("MessageEventParcelable[").append(i).append(",").append(str).append(", size=").append(valueOf).append("]").toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 2, getRequestId());
         SafeParcelWriter.writeString(parcel, 3, getPath(), false);
         SafeParcelWriter.writeByteArray(parcel, 4, getData(), false);
         SafeParcelWriter.writeString(parcel, 5, getSourceNodeId(), false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

@@ -8,10 +8,10 @@ import com.google.android.gms.wallet.wobs.CommonWalletObject;
 public final class zzab implements Creator<OfferWalletObject> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        String str = null;
         int i = 0;
+        CommonWalletObject commonWalletObject = null;
+        String str = null;
         String str2 = null;
-        CommonWalletObject commonWalletObject = str2;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
@@ -19,10 +19,10 @@ public final class zzab implements Creator<OfferWalletObject> {
                     i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
-                    str = SafeParcelReader.createString(parcel, readHeader);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
                     commonWalletObject = (CommonWalletObject) SafeParcelReader.createParcelable(parcel, readHeader, CommonWalletObject.CREATOR);
@@ -33,7 +33,7 @@ public final class zzab implements Creator<OfferWalletObject> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new OfferWalletObject(i, str, str2, commonWalletObject);
+        return new OfferWalletObject(i, str2, str, commonWalletObject);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

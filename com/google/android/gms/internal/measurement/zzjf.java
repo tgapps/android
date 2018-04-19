@@ -7,6 +7,6 @@ import com.google.android.gms.common.internal.Preconditions;
 public final class zzjf<T extends Context> {
     public static boolean zza(Context context, boolean z) {
         Preconditions.checkNotNull(context);
-        return zzjv.zzc(context, VERSION.SDK_INT >= 24 ? "com.google.android.gms.measurement.AppMeasurementJobService" : "com.google.android.gms.measurement.AppMeasurementService");
+        return VERSION.SDK_INT >= 24 ? zzjv.zzc(context, "com.google.android.gms.measurement.AppMeasurementJobService") : zzjv.zzc(context, "com.google.android.gms.measurement.AppMeasurementService");
     }
 }

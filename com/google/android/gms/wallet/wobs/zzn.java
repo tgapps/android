@@ -7,28 +7,28 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public final class zzn implements Creator<WalletObjectMessage> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        UriData uriData = null;
+        UriData uriData2 = null;
+        TimeInterval timeInterval = null;
         String str = null;
-        String str2 = str;
-        TimeInterval timeInterval = str2;
-        UriData uriData = timeInterval;
-        UriData uriData2 = uriData;
+        String str2 = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = SafeParcelReader.createString(parcel, readHeader);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
                     timeInterval = (TimeInterval) SafeParcelReader.createParcelable(parcel, readHeader, TimeInterval.CREATOR);
                     break;
                 case 5:
-                    uriData = (UriData) SafeParcelReader.createParcelable(parcel, readHeader, UriData.CREATOR);
+                    uriData2 = (UriData) SafeParcelReader.createParcelable(parcel, readHeader, UriData.CREATOR);
                     break;
                 case 6:
-                    uriData2 = (UriData) SafeParcelReader.createParcelable(parcel, readHeader, UriData.CREATOR);
+                    uriData = (UriData) SafeParcelReader.createParcelable(parcel, readHeader, UriData.CREATOR);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -36,7 +36,7 @@ public final class zzn implements Creator<WalletObjectMessage> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new WalletObjectMessage(str, str2, timeInterval, uriData, uriData2);
+        return new WalletObjectMessage(str2, str, timeInterval, uriData2, uriData);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

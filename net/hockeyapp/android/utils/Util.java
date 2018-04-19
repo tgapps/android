@@ -41,72 +41,11 @@ public class Util {
     };
     private static final Pattern appIdentifierPattern = Pattern.compile("[0-9a-f]+", 2);
 
-    public static java.lang.String convertStreamToString(java.io.InputStream r1) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: net.hockeyapp.android.utils.Util.convertStreamToString(java.io.InputStream):java.lang.String
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = new java.io.BufferedReader;
-        r1 = new java.io.InputStreamReader;
-        r1.<init>(r4);
-        r2 = 1024; // 0x400 float:1.435E-42 double:5.06E-321;
-        r0.<init>(r1, r2);
-        r1 = new java.lang.StringBuilder;
-        r1.<init>();
-    L_0x0011:
-        r2 = r0.readLine();	 Catch:{ IOException -> 0x0029 }
-        r3 = r2;	 Catch:{ IOException -> 0x0029 }
-        if (r2 == 0) goto L_0x0021;	 Catch:{ IOException -> 0x0029 }
-    L_0x0018:
-        r1.append(r3);	 Catch:{ IOException -> 0x0029 }
-        r2 = 10;	 Catch:{ IOException -> 0x0029 }
-        r1.append(r2);	 Catch:{ IOException -> 0x0029 }
-        goto L_0x0011;
-    L_0x0021:
-        r4.close();	 Catch:{ IOException -> 0x0025 }
-        goto L_0x0033;
-    L_0x0025:
-        r2 = move-exception;
-        goto L_0x0033;
-    L_0x0027:
-        r2 = move-exception;
-        goto L_0x0038;
-    L_0x0029:
-        r2 = move-exception;
-        r3 = "Failed to convert stream to string";	 Catch:{ all -> 0x0027 }
-        net.hockeyapp.android.utils.HockeyLog.error(r3, r2);	 Catch:{ all -> 0x0027 }
-        r4.close();	 Catch:{ IOException -> 0x0025 }
-        goto L_0x0024;
-    L_0x0033:
-        r2 = r1.toString();
-        return r2;
-        r4.close();	 Catch:{ IOException -> 0x003d }
-        goto L_0x003e;
-    L_0x003d:
-        r3 = move-exception;
-        throw r2;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.utils.Util.convertStreamToString(java.io.InputStream):java.lang.String");
-    }
-
     public static String encodeParam(String param) {
         try {
             return URLEncoder.encode(param, C.UTF8_NAME);
         } catch (Throwable e) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Failed to encode param ");
-            stringBuilder.append(param);
-            HockeyLog.error(stringBuilder.toString(), e);
+            HockeyLog.error("Failed to encode param " + param, e);
             return TtmlNode.ANONYMOUS_REGION_ID;
         }
     }
@@ -121,12 +60,9 @@ Caused by: java.lang.NullPointerException
             return Boolean.valueOf(false);
         }
         Configuration configuration = context.getResources().getConfiguration();
-        if ((configuration.screenLayout & 15) != 3) {
-            if ((configuration.screenLayout & 15) != 4) {
-                return Boolean.valueOf(z);
-            }
+        if ((configuration.screenLayout & 15) == 3 || (configuration.screenLayout & 15) == 4) {
+            z = true;
         }
-        z = true;
         return Boolean.valueOf(z);
     }
 
@@ -191,19 +127,19 @@ Caused by: java.lang.NullPointerException
     }
 
     public static boolean isConnectedToNetwork(Context context) {
-        boolean z = false;
         try {
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getApplicationContext().getSystemService("connectivity");
             if (connectivityManager == null) {
                 return false;
             }
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-            if (activeNetwork != null && activeNetwork.isConnected()) {
-                z = true;
+            if (activeNetwork == null || !activeNetwork.isConnected()) {
+                return false;
             }
-            return z;
+            return true;
         } catch (Throwable e) {
             HockeyLog.error("Exception thrown when check network is connected", e);
+            return false;
         }
     }
 
@@ -220,6 +156,54 @@ Caused by: java.lang.NullPointerException
         return context.getString(R.string.hockeyapp_crash_dialog_app_name_fallback);
     }
 
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static java.lang.String convertStreamToString(java.io.InputStream r6) {
+        /*
+        r2 = new java.io.BufferedReader;
+        r4 = new java.io.InputStreamReader;
+        r4.<init>(r6);
+        r5 = 1024; // 0x400 float:1.435E-42 double:5.06E-321;
+        r2.<init>(r4, r5);
+        r3 = new java.lang.StringBuilder;
+        r3.<init>();
+    L_0x0011:
+        r1 = r2.readLine();	 Catch:{ IOException -> 0x0021 }
+        if (r1 == 0) goto L_0x0030;
+    L_0x0017:
+        r4 = r3.append(r1);	 Catch:{ IOException -> 0x0021 }
+        r5 = 10;
+        r4.append(r5);	 Catch:{ IOException -> 0x0021 }
+        goto L_0x0011;
+    L_0x0021:
+        r0 = move-exception;
+        r4 = "Failed to convert stream to string";
+        net.hockeyapp.android.utils.HockeyLog.error(r4, r0);	 Catch:{ all -> 0x0036 }
+        r6.close();	 Catch:{ IOException -> 0x003b }
+    L_0x002b:
+        r4 = r3.toString();
+        return r4;
+    L_0x0030:
+        r6.close();	 Catch:{ IOException -> 0x0034 }
+        goto L_0x002b;
+    L_0x0034:
+        r4 = move-exception;
+        goto L_0x002b;
+    L_0x0036:
+        r4 = move-exception;
+        r6.close();	 Catch:{ IOException -> 0x003d }
+    L_0x003a:
+        throw r4;
+    L_0x003b:
+        r4 = move-exception;
+        goto L_0x002b;
+    L_0x003d:
+        r5 = move-exception;
+        goto L_0x003a;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.utils.Util.convertStreamToString(java.io.InputStream):java.lang.String");
+    }
+
     public static byte[] hash(byte[] bytes, String algorithm) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance(algorithm);
         digest.update(bytes);
@@ -229,12 +213,9 @@ Caused by: java.lang.NullPointerException
     public static String bytesToHex(byte[] bytes) {
         StringBuilder hexString = new StringBuilder();
         for (byte aMessageDigest : bytes) {
-            String h = Integer.toHexString(255 & aMessageDigest);
+            String h = Integer.toHexString(aMessageDigest & 255);
             while (h.length() < 2) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("0");
-                stringBuilder.append(h);
-                h = stringBuilder.toString();
+                h = "0" + h;
             }
             hexString.append(h);
         }

@@ -319,11 +319,11 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
                     Util.announceForAccessibility(this.mAttachmentListView, getString(R.string.hockeyapp_feedback_attachment_added));
                 }
             } else if (requestCode == 1) {
-                Uri uri2 = data.getData();
-                if (uri2 != null) {
+                uri = data.getData();
+                if (uri != null) {
                     try {
                         Intent intent = new Intent(this, PaintActivity.class);
-                        intent.putExtra("imageUri", uri2);
+                        intent.putExtra("imageUri", uri);
                         startActivityForResult(intent, 3);
                     } catch (Throwable e) {
                         HockeyLog.error("Paint activity not declared!", e);
@@ -368,6 +368,7 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
             refreshButton.setOnFocusChangeListener(this);
             return;
         }
+        int i;
         wrapperLayoutFeedbackAndMessages.setVisibility(8);
         feedbackScrollView.setVisibility(0);
         this.mNameInput = (EditText) findViewById(R.id.input_name);
@@ -394,8 +395,20 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
             }
             this.mFeedbackViewInitialized = true;
         }
-        this.mNameInput.setVisibility(FeedbackManager.getRequireUserName() == FeedbackUserDataElement.DONT_SHOW ? 8 : 0);
-        this.mEmailInput.setVisibility(FeedbackManager.getRequireUserEmail() == FeedbackUserDataElement.DONT_SHOW ? 8 : 0);
+        EditText editText = this.mNameInput;
+        if (FeedbackManager.getRequireUserName() == FeedbackUserDataElement.DONT_SHOW) {
+            i = 8;
+        } else {
+            i = 0;
+        }
+        editText.setVisibility(i);
+        editText = this.mEmailInput;
+        if (FeedbackManager.getRequireUserEmail() == FeedbackUserDataElement.DONT_SHOW) {
+            i = 8;
+        } else {
+            i = 0;
+        }
+        editText.setVisibility(i);
         this.mTextInput.setText(TtmlNode.ANONYMOUS_REGION_ID);
         if ((!this.mForceNewThread || this.mInSendFeedback) && this.mToken != null) {
             this.mSubjectInput.setVisibility(8);
@@ -406,21 +419,22 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
         for (Uri attachmentUri : this.mInitialAttachments) {
             this.mAttachmentListView.addView(new AttachmentView((Context) this, this.mAttachmentListView, attachmentUri, true));
         }
-        addResponseButton = (Button) findViewById(R.id.button_attachment);
-        addResponseButton.setOnClickListener(this);
-        addResponseButton.setOnFocusChangeListener(this);
-        registerForContextMenu(addResponseButton);
+        Button addAttachmentButton = (Button) findViewById(R.id.button_attachment);
+        addAttachmentButton.setOnClickListener(this);
+        addAttachmentButton.setOnFocusChangeListener(this);
+        registerForContextMenu(addAttachmentButton);
         this.mSendFeedbackButton = (Button) findViewById(R.id.button_send);
         this.mSendFeedbackButton.setOnClickListener(this);
-        addResponseButton.setOnFocusChangeListener(this);
+        addAttachmentButton.setOnFocusChangeListener(this);
     }
 
     protected void onSendFeedbackResult(boolean success) {
     }
 
     private boolean addAttachment(int request) {
+        Intent intent;
         if (request == 2) {
-            Intent intent = new Intent();
+            intent = new Intent();
             intent.setType("*/*");
             intent.setAction("android.intent.action.GET_CONTENT");
             startActivityForResult(Intent.createChooser(intent, getString(R.string.hockeyapp_feedback_select_file)), 2);
@@ -428,10 +442,10 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
         } else if (request != 1) {
             return false;
         } else {
-            Intent intent2 = new Intent();
-            intent2.setType("image/*");
-            intent2.setAction("android.intent.action.GET_CONTENT");
-            startActivityForResult(Intent.createChooser(intent2, getString(R.string.hockeyapp_feedback_select_picture)), 1);
+            intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction("android.intent.action.GET_CONTENT");
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.hockeyapp_feedback_select_picture)), 1);
             return true;
         }
     }
@@ -448,14 +462,12 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
     }
 
     private void configureAppropriateView() {
-        if (this.mToken != null) {
-            if (!this.mInSendFeedback) {
-                configureFeedbackView(true);
-                sendFetchFeedback(this.mUrl, null, null, null, null, null, this.mToken, this.mFeedbackHandler, true);
-                return;
-            }
+        if (this.mToken == null || this.mInSendFeedback) {
+            configureFeedbackView(false);
+            return;
         }
-        configureFeedbackView(false);
+        configureFeedbackView(true);
+        sendFetchFeedback(this.mUrl, null, null, null, null, null, this.mToken, this.mFeedbackHandler, true);
     }
 
     private void createParseFeedbackTask(String feedbackResponseString, String requestType) {
@@ -532,34 +544,38 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
     private void sendFeedback() {
         if (Util.isConnectedToNetwork(this)) {
             enableDisableSendFeedbackButton(false);
-            String str = (!this.mForceNewThread || this.mInSendFeedback) ? this.mToken : null;
-            String token = str;
-            str = this.mNameInput.getText().toString().trim();
+            String token = (!this.mForceNewThread || this.mInSendFeedback) ? this.mToken : null;
+            final String name = this.mNameInput.getText().toString().trim();
             final String email = this.mEmailInput.getText().toString().trim();
             final String subject = this.mSubjectInput.getText().toString().trim();
             String text = this.mTextInput.getText().toString().trim();
             if (TextUtils.isEmpty(subject)) {
                 this.mSubjectInput.setVisibility(0);
                 setError(this.mSubjectInput, R.string.hockeyapp_feedback_validate_subject_error);
-            } else if (FeedbackManager.getRequireUserName() == FeedbackUserDataElement.REQUIRED && TextUtils.isEmpty(str)) {
+                return;
+            } else if (FeedbackManager.getRequireUserName() == FeedbackUserDataElement.REQUIRED && TextUtils.isEmpty(name)) {
                 setError(this.mNameInput, R.string.hockeyapp_feedback_validate_name_error);
+                return;
             } else if (FeedbackManager.getRequireUserEmail() == FeedbackUserDataElement.REQUIRED && TextUtils.isEmpty(email)) {
                 setError(this.mEmailInput, R.string.hockeyapp_feedback_validate_email_empty);
+                return;
             } else if (TextUtils.isEmpty(text)) {
                 setError(this.mTextInput, R.string.hockeyapp_feedback_validate_text_error);
+                return;
             } else if (FeedbackManager.getRequireUserEmail() != FeedbackUserDataElement.REQUIRED || Util.isValidEmail(email)) {
                 AsyncTaskUtils.execute(new AsyncTask<Void, Object, Object>() {
                     protected Object doInBackground(Void... voids) {
-                        PrefsUtil.getInstance().saveNameEmailSubjectToPrefs(FeedbackActivity.this.mContext, str, email, subject);
+                        PrefsUtil.getInstance().saveNameEmailSubjectToPrefs(FeedbackActivity.this.mContext, name, email, subject);
                         return null;
                     }
                 });
-                sendFetchFeedback(this.mUrl, str, email, subject, text, this.mAttachmentListView.getAttachments(), token, this.mFeedbackHandler, false);
+                sendFetchFeedback(this.mUrl, name, email, subject, text, this.mAttachmentListView.getAttachments(), token, this.mFeedbackHandler, false);
                 hideKeyboard();
+                return;
             } else {
                 setError(this.mEmailInput, R.string.hockeyapp_feedback_validate_email_error);
+                return;
             }
-            return;
         }
         Toast.makeText(this, R.string.hockeyapp_error_no_network_message, 1).show();
     }

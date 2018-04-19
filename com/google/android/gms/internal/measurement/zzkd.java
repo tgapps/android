@@ -1,6 +1,7 @@
 package com.google.android.gms.internal.measurement;
 
 import java.io.IOException;
+import org.telegram.messenger.exoplayer2.RendererCapabilities;
 
 public final class zzkd extends zzabd<zzkd> {
     public Integer zzasc;
@@ -18,53 +19,55 @@ public final class zzkd extends zzabd<zzkd> {
     }
 
     private final zzkd zze(zzaba com_google_android_gms_internal_measurement_zzaba) throws IOException {
-        int zzvs;
-        StringBuilder stringBuilder;
         while (true) {
             int zzvo = com_google_android_gms_internal_measurement_zzaba.zzvo();
-            if (zzvo == 0) {
-                return this;
-            }
-            if (zzvo == 8) {
-                try {
-                    zzvs = com_google_android_gms_internal_measurement_zzaba.zzvs();
-                    if (zzvs < 0 || zzvs > 6) {
-                        stringBuilder = new StringBuilder(41);
-                        stringBuilder.append(zzvs);
-                        stringBuilder.append(" is not a valid enum MatchType");
-                    } else {
+            int position;
+            switch (zzvo) {
+                case 0:
+                    break;
+                case 8:
+                    position = com_google_android_gms_internal_measurement_zzaba.getPosition();
+                    try {
+                        int zzvs = com_google_android_gms_internal_measurement_zzaba.zzvs();
+                        if (zzvs < 0 || zzvs > 6) {
+                            throw new IllegalArgumentException(zzvs + " is not a valid enum MatchType");
+                        }
                         this.zzasc = Integer.valueOf(zzvs);
+                        continue;
+                    } catch (IllegalArgumentException e) {
+                        com_google_android_gms_internal_measurement_zzaba.zzao(position);
+                        zza(com_google_android_gms_internal_measurement_zzaba, zzvo);
+                        break;
                     }
-                } catch (IllegalArgumentException e) {
-                    com_google_android_gms_internal_measurement_zzaba.zzao(com_google_android_gms_internal_measurement_zzaba.getPosition());
-                    zza(com_google_android_gms_internal_measurement_zzaba, zzvo);
-                }
-            } else if (zzvo == 18) {
-                this.zzasd = com_google_android_gms_internal_measurement_zzaba.readString();
-            } else if (zzvo == 24) {
-                this.zzase = Boolean.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvr());
-            } else if (zzvo == 34) {
-                zzvo = zzabm.zzb(com_google_android_gms_internal_measurement_zzaba, 34);
-                int length = this.zzasf == null ? 0 : this.zzasf.length;
-                Object obj = new String[(zzvo + length)];
-                if (length != 0) {
-                    System.arraycopy(this.zzasf, 0, obj, 0, length);
-                }
-                while (length < obj.length - 1) {
-                    obj[length] = com_google_android_gms_internal_measurement_zzaba.readString();
-                    com_google_android_gms_internal_measurement_zzaba.zzvo();
-                    length++;
-                }
-                obj[length] = com_google_android_gms_internal_measurement_zzaba.readString();
-                this.zzasf = obj;
-            } else if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
-                return this;
+                case 18:
+                    this.zzasd = com_google_android_gms_internal_measurement_zzaba.readString();
+                    continue;
+                case RendererCapabilities.ADAPTIVE_SUPPORT_MASK /*24*/:
+                    this.zzase = Boolean.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvr());
+                    continue;
+                case 34:
+                    position = zzabm.zzb(com_google_android_gms_internal_measurement_zzaba, 34);
+                    zzvo = this.zzasf == null ? 0 : this.zzasf.length;
+                    Object obj = new String[(position + zzvo)];
+                    if (zzvo != 0) {
+                        System.arraycopy(this.zzasf, 0, obj, 0, zzvo);
+                    }
+                    while (zzvo < obj.length - 1) {
+                        obj[zzvo] = com_google_android_gms_internal_measurement_zzaba.readString();
+                        com_google_android_gms_internal_measurement_zzaba.zzvo();
+                        zzvo++;
+                    }
+                    obj[zzvo] = com_google_android_gms_internal_measurement_zzaba.readString();
+                    this.zzasf = obj;
+                    continue;
+                default:
+                    if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
+                        break;
+                    }
+                    continue;
             }
+            return this;
         }
-        stringBuilder = new StringBuilder(41);
-        stringBuilder.append(zzvs);
-        stringBuilder.append(" is not a valid enum MatchType");
-        throw new IllegalArgumentException(stringBuilder.toString());
     }
 
     public final boolean equals(Object obj) {
@@ -96,24 +99,14 @@ public final class zzkd extends zzabd<zzkd> {
         } else if (!this.zzase.equals(com_google_android_gms_internal_measurement_zzkd.zzase)) {
             return false;
         }
-        if (!zzabh.equals(this.zzasf, com_google_android_gms_internal_measurement_zzkd.zzasf)) {
-            return false;
-        }
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                return this.zzbzh.equals(com_google_android_gms_internal_measurement_zzkd.zzbzh);
-            }
-        }
-        return com_google_android_gms_internal_measurement_zzkd.zzbzh == null || com_google_android_gms_internal_measurement_zzkd.zzbzh.isEmpty();
+        return !zzabh.equals(this.zzasf, com_google_android_gms_internal_measurement_zzkd.zzasf) ? false : (this.zzbzh == null || this.zzbzh.isEmpty()) ? com_google_android_gms_internal_measurement_zzkd.zzbzh == null || com_google_android_gms_internal_measurement_zzkd.zzbzh.isEmpty() : this.zzbzh.equals(com_google_android_gms_internal_measurement_zzkd.zzbzh);
     }
 
     public final int hashCode() {
         int i = 0;
-        int hashCode = (((((((((527 + getClass().getName().hashCode()) * 31) + (this.zzasc == null ? 0 : this.zzasc.intValue())) * 31) + (this.zzasd == null ? 0 : this.zzasd.hashCode())) * 31) + (this.zzase == null ? 0 : this.zzase.hashCode())) * 31) + zzabh.hashCode(this.zzasf)) * 31;
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                i = this.zzbzh.hashCode();
-            }
+        int hashCode = ((((this.zzase == null ? 0 : this.zzase.hashCode()) + (((this.zzasd == null ? 0 : this.zzasd.hashCode()) + (((this.zzasc == null ? 0 : this.zzasc.intValue()) + ((getClass().getName().hashCode() + 527) * 31)) * 31)) * 31)) * 31) + zzabh.hashCode(this.zzasf)) * 31;
+        if (!(this.zzbzh == null || this.zzbzh.isEmpty())) {
+            i = this.zzbzh.hashCode();
         }
         return hashCode + i;
     }
@@ -135,16 +128,20 @@ public final class zzkd extends zzabd<zzkd> {
         }
         int i = 0;
         int i2 = 0;
-        int i3 = i2;
+        int i3 = 0;
         while (i < this.zzasf.length) {
+            int zzfp;
             String str = this.zzasf[i];
             if (str != null) {
                 i3++;
-                i2 += zzabb.zzfp(str);
+                zzfp = zzabb.zzfp(str) + i2;
+            } else {
+                zzfp = i2;
             }
             i++;
+            i2 = zzfp;
         }
-        return (zza + i2) + (1 * i3);
+        return (zza + i2) + (i3 * 1);
     }
 
     public final void zza(zzabb com_google_android_gms_internal_measurement_zzabb) throws IOException {

@@ -89,7 +89,7 @@ public class ClassificationBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) ((8 + Utf8.utf8StringLengthInBytes(this.classificationInfo)) + 1);
+        return (long) ((Utf8.utf8StringLengthInBytes(this.classificationInfo) + 8) + 1);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -113,16 +113,11 @@ public class ClassificationBox extends AbstractFullBox {
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_8, this, this));
         StringBuilder buffer = new StringBuilder();
-        buffer.append("ClassificationBox[language=");
-        buffer.append(getLanguage());
-        buffer.append("classificationEntity=");
-        buffer.append(getClassificationEntity());
-        buffer.append(";classificationTableIndex=");
-        buffer.append(getClassificationTableIndex());
-        buffer.append(";language=");
-        buffer.append(getLanguage());
-        buffer.append(";classificationInfo=");
-        buffer.append(getClassificationInfo());
+        buffer.append("ClassificationBox[language=").append(getLanguage());
+        buffer.append("classificationEntity=").append(getClassificationEntity());
+        buffer.append(";classificationTableIndex=").append(getClassificationTableIndex());
+        buffer.append(";language=").append(getLanguage());
+        buffer.append(";classificationInfo=").append(getClassificationInfo());
         buffer.append("]");
         return buffer.toString();
     }

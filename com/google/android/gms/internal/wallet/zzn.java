@@ -44,10 +44,10 @@ public final class zzn extends zza implements zzl {
         zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper);
         zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper2);
         zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) bundle);
-        Parcel transactAndReadException = transactAndReadException(3, obtainAndWriteInterfaceToken);
-        iObjectWrapper2 = Stub.asInterface(transactAndReadException.readStrongBinder());
-        transactAndReadException.recycle();
-        return iObjectWrapper2;
+        obtainAndWriteInterfaceToken = transactAndReadException(3, obtainAndWriteInterfaceToken);
+        IObjectWrapper asInterface = Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+        obtainAndWriteInterfaceToken.recycle();
+        return asInterface;
     }
 
     public final void onPause() throws RemoteException {

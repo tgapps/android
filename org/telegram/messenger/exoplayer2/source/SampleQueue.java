@@ -2,6 +2,7 @@ package org.telegram.messenger.exoplayer2.source;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import org.telegram.messenger.exoplayer2.Format;
 import org.telegram.messenger.exoplayer2.FormatHolder;
 import org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer;
@@ -41,7 +42,7 @@ public final class SampleQueue implements TrackOutput {
 
         public AllocationNode(long startPosition, int allocationLength) {
             this.startPosition = startPosition;
-            this.endPosition = startPosition + ((long) allocationLength);
+            this.endPosition = ((long) allocationLength) + startPosition;
         }
 
         public void initialize(Allocation allocation, AllocationNode next) {
@@ -64,267 +65,6 @@ public final class SampleQueue implements TrackOutput {
 
     public interface UpstreamFormatChangedListener {
         void onUpstreamFormatChanged(Format format);
-    }
-
-    private void readData(long r1, java.nio.ByteBuffer r3, int r4) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.source.SampleQueue.readData(long, java.nio.ByteBuffer, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r7.advanceReadTo(r8);
-        r0 = r8;
-        r8 = r11;
-        if (r8 <= 0) goto L_0x0036;
-    L_0x0007:
-        r9 = r7.readAllocationNode;
-        r2 = r9.endPosition;
-        r4 = r2 - r0;
-        r9 = (int) r4;
-        r9 = java.lang.Math.min(r8, r9);
-        r2 = r7.readAllocationNode;
-        r2 = r2.allocation;
-        r3 = r2.data;
-        r4 = r7.readAllocationNode;
-        r4 = r4.translateOffset(r0);
-        r10.put(r3, r4, r9);
-        r8 = r8 - r9;
-        r3 = (long) r9;
-        r5 = r0 + r3;
-        r0 = r7.readAllocationNode;
-        r0 = r0.endPosition;
-        r3 = (r5 > r0 ? 1 : (r5 == r0 ? 0 : -1));
-        if (r3 != 0) goto L_0x0033;
-    L_0x002d:
-        r0 = r7.readAllocationNode;
-        r0 = r0.next;
-        r7.readAllocationNode = r0;
-        r0 = r5;
-        goto L_0x0005;
-    L_0x0036:
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.SampleQueue.readData(long, java.nio.ByteBuffer, int):void");
-    }
-
-    private void readData(long r1, byte[] r3, int r4) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.source.SampleQueue.readData(long, byte[], int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r7.advanceReadTo(r8);
-        r0 = r8;
-        r8 = r11;
-        if (r8 <= 0) goto L_0x0038;
-    L_0x0007:
-        r9 = r7.readAllocationNode;
-        r2 = r9.endPosition;
-        r4 = r2 - r0;
-        r9 = (int) r4;
-        r9 = java.lang.Math.min(r8, r9);
-        r2 = r7.readAllocationNode;
-        r2 = r2.allocation;
-        r3 = r2.data;
-        r4 = r7.readAllocationNode;
-        r4 = r4.translateOffset(r0);
-        r5 = r11 - r8;
-        java.lang.System.arraycopy(r3, r4, r10, r5, r9);
-        r8 = r8 - r9;
-        r3 = (long) r9;
-        r5 = r0 + r3;
-        r0 = r7.readAllocationNode;
-        r0 = r0.endPosition;
-        r3 = (r5 > r0 ? 1 : (r5 == r0 ? 0 : -1));
-        if (r3 != 0) goto L_0x0035;
-    L_0x002f:
-        r0 = r7.readAllocationNode;
-        r0 = r0.next;
-        r7.readAllocationNode = r0;
-        r0 = r5;
-        goto L_0x0005;
-    L_0x0038:
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.SampleQueue.readData(long, byte[], int):void");
-    }
-
-    private void readEncryptionData(org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer r1, org.telegram.messenger.exoplayer2.source.SampleMetadataQueue.SampleExtrasHolder r2) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.source.SampleQueue.readEncryptionData(org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer, org.telegram.messenger.exoplayer2.source.SampleMetadataQueue$SampleExtrasHolder):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r28;
-        r1 = r29;
-        r2 = r30;
-        r3 = r2.offset;
-        r5 = r0.scratch;
-        r6 = 1;
-        r5.reset(r6);
-        r5 = r0.scratch;
-        r5 = r5.data;
-        r0.readData(r3, r5, r6);
-        r7 = 1;
-        r9 = r3 + r7;
-        r3 = r0.scratch;
-        r3 = r3.data;
-        r4 = 0;
-        r3 = r3[r4];
-        r5 = r3 & 128;
-        if (r5 == 0) goto L_0x0026;
-    L_0x0024:
-        r5 = r6;
-        goto L_0x0027;
-    L_0x0026:
-        r5 = r4;
-    L_0x0027:
-        r7 = r3 & 127;
-        r8 = r1.cryptoInfo;
-        r8 = r8.iv;
-        if (r8 != 0) goto L_0x0037;
-    L_0x002f:
-        r8 = r1.cryptoInfo;
-        r11 = 16;
-        r11 = new byte[r11];
-        r8.iv = r11;
-    L_0x0037:
-        r8 = r1.cryptoInfo;
-        r8 = r8.iv;
-        r0.readData(r9, r8, r7);
-        r11 = (long) r7;
-        r13 = r9 + r11;
-        if (r5 == 0) goto L_0x005c;
-    L_0x0043:
-        r6 = r0.scratch;
-        r8 = 2;
-        r6.reset(r8);
-        r6 = r0.scratch;
-        r6 = r6.data;
-        r0.readData(r13, r6, r8);
-        r8 = 2;
-        r10 = r13 + r8;
-        r6 = r0.scratch;
-        r6 = r6.readUnsignedShort();
-        r13 = r10;
-    L_0x005c:
-        r8 = r1.cryptoInfo;
-        r8 = r8.numBytesOfClearData;
-        if (r8 == 0) goto L_0x0065;
-    L_0x0062:
-        r9 = r8.length;
-        if (r9 >= r6) goto L_0x0067;
-    L_0x0065:
-        r8 = new int[r6];
-    L_0x0067:
-        r9 = r1.cryptoInfo;
-        r9 = r9.numBytesOfEncryptedData;
-        if (r9 == 0) goto L_0x0070;
-    L_0x006d:
-        r10 = r9.length;
-        if (r10 >= r6) goto L_0x0072;
-    L_0x0070:
-        r9 = new int[r6];
-    L_0x0072:
-        if (r5 == 0) goto L_0x00a5;
-    L_0x0074:
-        r10 = 6;
-        r10 = r10 * r6;
-        r11 = r0.scratch;
-        r11.reset(r10);
-        r11 = r0.scratch;
-        r11 = r11.data;
-        r0.readData(r13, r11, r10);
-        r11 = (long) r10;
-        r15 = r13 + r11;
-        r11 = r0.scratch;
-        r11.setPosition(r4);
-        if (r4 >= r6) goto L_0x00a0;
-    L_0x008d:
-        r11 = r0.scratch;
-        r11 = r11.readUnsignedShort();
-        r8[r4] = r11;
-        r11 = r0.scratch;
-        r11 = r11.readUnsignedIntToInt();
-        r9[r4] = r11;
-        r4 = r4 + 1;
-        goto L_0x008b;
-        r24 = r5;
-        r13 = r15;
-        goto L_0x00b4;
-    L_0x00a5:
-        r8[r4] = r4;
-        r10 = r2.size;
-        r11 = r2.offset;
-        r24 = r5;
-        r4 = r13 - r11;
-        r4 = (int) r4;
-        r10 = r10 - r4;
-        r4 = 0;
-        r9[r4] = r10;
-        r4 = r2.cryptoData;
-        r15 = r1.cryptoInfo;
-        r5 = r4.encryptionKey;
-        r10 = r1.cryptoInfo;
-        r10 = r10.iv;
-        r11 = r4.cryptoMode;
-        r12 = r4.encryptedBlocks;
-        r0 = r4.clearBlocks;
-        r16 = r6;
-        r17 = r8;
-        r18 = r9;
-        r19 = r5;
-        r20 = r10;
-        r21 = r11;
-        r22 = r12;
-        r23 = r0;
-        r15.set(r16, r17, r18, r19, r20, r21, r22, r23);
-        r10 = r2.offset;
-        r0 = r13 - r10;
-        r0 = (int) r0;
-        r10 = r2.offset;
-        r25 = r3;
-        r26 = r4;
-        r3 = (long) r0;
-        r27 = r6;
-        r5 = r10 + r3;
-        r2.offset = r5;
-        r1 = r2.size;
-        r1 = r1 - r0;
-        r2.size = r1;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.SampleQueue.readEncryptionData(org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer, org.telegram.messenger.exoplayer2.source.SampleMetadataQueue$SampleExtrasHolder):void");
     }
 
     public SampleQueue(Allocator allocator) {
@@ -360,27 +100,30 @@ Caused by: java.lang.NullPointerException
 
     public void discardUpstreamSamples(int discardFromIndex) {
         this.totalBytesWritten = this.metadataQueue.discardUpstreamSamples(discardFromIndex);
-        if (this.totalBytesWritten != 0) {
-            if (this.totalBytesWritten != this.firstAllocationNode.startPosition) {
-                AllocationNode lastNodeToKeep = this.firstAllocationNode;
-                while (this.totalBytesWritten > lastNodeToKeep.endPosition) {
-                    lastNodeToKeep = lastNodeToKeep.next;
-                }
-                AllocationNode firstNodeToDiscard = lastNodeToKeep.next;
-                clearAllocationNodes(firstNodeToDiscard);
-                lastNodeToKeep.next = new AllocationNode(lastNodeToKeep.endPosition, this.allocationLength);
-                this.writeAllocationNode = this.totalBytesWritten == lastNodeToKeep.endPosition ? lastNodeToKeep.next : lastNodeToKeep;
-                if (this.readAllocationNode == firstNodeToDiscard) {
-                    this.readAllocationNode = lastNodeToKeep.next;
-                    return;
-                }
-                return;
-            }
+        if (this.totalBytesWritten == 0 || this.totalBytesWritten == this.firstAllocationNode.startPosition) {
+            clearAllocationNodes(this.firstAllocationNode);
+            this.firstAllocationNode = new AllocationNode(this.totalBytesWritten, this.allocationLength);
+            this.readAllocationNode = this.firstAllocationNode;
+            this.writeAllocationNode = this.firstAllocationNode;
+            return;
         }
-        clearAllocationNodes(this.firstAllocationNode);
-        this.firstAllocationNode = new AllocationNode(this.totalBytesWritten, this.allocationLength);
-        this.readAllocationNode = this.firstAllocationNode;
-        this.writeAllocationNode = this.firstAllocationNode;
+        AllocationNode allocationNode;
+        AllocationNode lastNodeToKeep = this.firstAllocationNode;
+        while (this.totalBytesWritten > lastNodeToKeep.endPosition) {
+            lastNodeToKeep = lastNodeToKeep.next;
+        }
+        AllocationNode firstNodeToDiscard = lastNodeToKeep.next;
+        clearAllocationNodes(firstNodeToDiscard);
+        lastNodeToKeep.next = new AllocationNode(lastNodeToKeep.endPosition, this.allocationLength);
+        if (this.totalBytesWritten == lastNodeToKeep.endPosition) {
+            allocationNode = lastNodeToKeep.next;
+        } else {
+            allocationNode = lastNodeToKeep;
+        }
+        this.writeAllocationNode = allocationNode;
+        if (this.readAllocationNode == firstNodeToDiscard) {
+            this.readAllocationNode = lastNodeToKeep.next;
+        }
     }
 
     public boolean hasNextSample() {
@@ -464,6 +207,85 @@ Caused by: java.lang.NullPointerException
         }
     }
 
+    private void readEncryptionData(DecoderInputBuffer buffer, SampleExtrasHolder extrasHolder) {
+        int subsampleCount;
+        long offset = extrasHolder.offset;
+        this.scratch.reset(1);
+        readData(offset, this.scratch.data, 1);
+        offset++;
+        byte signalByte = this.scratch.data[0];
+        boolean subsampleEncryption = (signalByte & 128) != 0;
+        int ivSize = signalByte & 127;
+        if (buffer.cryptoInfo.iv == null) {
+            buffer.cryptoInfo.iv = new byte[16];
+        }
+        readData(offset, buffer.cryptoInfo.iv, ivSize);
+        offset += (long) ivSize;
+        if (subsampleEncryption) {
+            this.scratch.reset(2);
+            readData(offset, this.scratch.data, 2);
+            offset += 2;
+            subsampleCount = this.scratch.readUnsignedShort();
+        } else {
+            subsampleCount = 1;
+        }
+        int[] clearDataSizes = buffer.cryptoInfo.numBytesOfClearData;
+        if (clearDataSizes == null || clearDataSizes.length < subsampleCount) {
+            clearDataSizes = new int[subsampleCount];
+        }
+        int[] encryptedDataSizes = buffer.cryptoInfo.numBytesOfEncryptedData;
+        if (encryptedDataSizes == null || encryptedDataSizes.length < subsampleCount) {
+            encryptedDataSizes = new int[subsampleCount];
+        }
+        if (subsampleEncryption) {
+            int subsampleDataLength = subsampleCount * 6;
+            this.scratch.reset(subsampleDataLength);
+            readData(offset, this.scratch.data, subsampleDataLength);
+            offset += (long) subsampleDataLength;
+            this.scratch.setPosition(0);
+            for (int i = 0; i < subsampleCount; i++) {
+                clearDataSizes[i] = this.scratch.readUnsignedShort();
+                encryptedDataSizes[i] = this.scratch.readUnsignedIntToInt();
+            }
+        } else {
+            clearDataSizes[0] = 0;
+            encryptedDataSizes[0] = extrasHolder.size - ((int) (offset - extrasHolder.offset));
+        }
+        CryptoData cryptoData = extrasHolder.cryptoData;
+        buffer.cryptoInfo.set(subsampleCount, clearDataSizes, encryptedDataSizes, cryptoData.encryptionKey, buffer.cryptoInfo.iv, cryptoData.cryptoMode, cryptoData.encryptedBlocks, cryptoData.clearBlocks);
+        int bytesRead = (int) (offset - extrasHolder.offset);
+        extrasHolder.offset += (long) bytesRead;
+        extrasHolder.size -= bytesRead;
+    }
+
+    private void readData(long absolutePosition, ByteBuffer target, int length) {
+        advanceReadTo(absolutePosition);
+        int remaining = length;
+        while (remaining > 0) {
+            int toCopy = Math.min(remaining, (int) (this.readAllocationNode.endPosition - absolutePosition));
+            target.put(this.readAllocationNode.allocation.data, this.readAllocationNode.translateOffset(absolutePosition), toCopy);
+            remaining -= toCopy;
+            absolutePosition += (long) toCopy;
+            if (absolutePosition == this.readAllocationNode.endPosition) {
+                this.readAllocationNode = this.readAllocationNode.next;
+            }
+        }
+    }
+
+    private void readData(long absolutePosition, byte[] target, int length) {
+        advanceReadTo(absolutePosition);
+        int remaining = length;
+        while (remaining > 0) {
+            int toCopy = Math.min(remaining, (int) (this.readAllocationNode.endPosition - absolutePosition));
+            System.arraycopy(this.readAllocationNode.allocation.data, this.readAllocationNode.translateOffset(absolutePosition), target, length - remaining, toCopy);
+            remaining -= toCopy;
+            absolutePosition += (long) toCopy;
+            if (absolutePosition == this.readAllocationNode.endPosition) {
+                this.readAllocationNode = this.readAllocationNode.next;
+            }
+        }
+    }
+
     private void advanceReadTo(long absolutePosition) {
         while (absolutePosition >= this.readAllocationNode.endPosition) {
             this.readAllocationNode = this.readAllocationNode.next;
@@ -525,25 +347,22 @@ Caused by: java.lang.NullPointerException
     }
 
     public void sampleMetadata(long timeUs, int flags, int size, int offset, CryptoData cryptoData) {
-        long j = timeUs;
         if (this.pendingFormatAdjustment) {
-            format(r0.lastUnadjustedFormat);
+            format(this.lastUnadjustedFormat);
         }
-        if (r0.pendingSplice) {
-            if ((flags & 1) != 0) {
-                if (r0.metadataQueue.attemptSplice(j)) {
-                    r0.pendingSplice = false;
-                }
+        if (this.pendingSplice) {
+            if ((flags & 1) != 0 && this.metadataQueue.attemptSplice(timeUs)) {
+                this.pendingSplice = false;
+            } else {
+                return;
             }
-            return;
         }
-        int i = size;
-        r0.metadataQueue.commitSample(j + r0.sampleOffsetUs, flags, (r0.totalBytesWritten - ((long) i)) - ((long) offset), i, cryptoData);
+        this.metadataQueue.commitSample(timeUs + this.sampleOffsetUs, flags, (this.totalBytesWritten - ((long) size)) - ((long) offset), size, cryptoData);
     }
 
     private void clearAllocationNodes(AllocationNode fromNode) {
         if (fromNode.wasInitialized) {
-            Allocation[] allocationsToRelease = new Allocation[(this.writeAllocationNode.wasInitialized + (((int) (this.writeAllocationNode.startPosition - fromNode.startPosition)) / this.allocationLength))];
+            Allocation[] allocationsToRelease = new Allocation[((this.writeAllocationNode.wasInitialized ? 1 : 0) + (((int) (this.writeAllocationNode.startPosition - fromNode.startPosition)) / this.allocationLength))];
             AllocationNode currentNode = fromNode;
             for (int i = 0; i < allocationsToRelease.length; i++) {
                 allocationsToRelease[i] = currentNode.allocation;
@@ -571,9 +390,9 @@ Caused by: java.lang.NullPointerException
         if (format == null) {
             return null;
         }
-        if (!(sampleOffsetUs == 0 || format.subsampleOffsetUs == Long.MAX_VALUE)) {
-            format = format.copyWithSubsampleOffsetUs(format.subsampleOffsetUs + sampleOffsetUs);
+        if (sampleOffsetUs == 0 || format.subsampleOffsetUs == Long.MAX_VALUE) {
+            return format;
         }
-        return format;
+        return format.copyWithSubsampleOffsetUs(format.subsampleOffsetUs + sampleOffsetUs);
     }
 }

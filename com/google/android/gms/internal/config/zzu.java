@@ -41,14 +41,7 @@ public final class zzu implements zzk {
     }
 
     public final byte[] zza(String str, byte[] bArr, String str2) {
-        Object obj = null;
-        if (this.zzq != null) {
-            if (this.zzq.get(str2) != null) {
-                if (((TreeMap) this.zzq.get(str2)).get(str) != null) {
-                    obj = 1;
-                }
-            }
-        }
+        Object obj = (this.zzq == null || this.zzq.get(str2) == null) ? null : ((TreeMap) this.zzq.get(str2)).get(str) != null ? 1 : null;
         return obj != null ? (byte[]) ((TreeMap) this.zzq.get(str2)).get(str) : null;
     }
 

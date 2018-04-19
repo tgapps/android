@@ -17,17 +17,10 @@ public abstract class StripeException extends Exception {
     }
 
     public String toString() {
-        StringBuilder stringBuilder;
         String reqIdStr = TtmlNode.ANONYMOUS_REGION_ID;
         if (this.requestId != null) {
-            stringBuilder = new StringBuilder();
-            stringBuilder.append("; request-id: ");
-            stringBuilder.append(this.requestId);
-            reqIdStr = stringBuilder.toString();
+            reqIdStr = "; request-id: " + this.requestId;
         }
-        stringBuilder = new StringBuilder();
-        stringBuilder.append(super.toString());
-        stringBuilder.append(reqIdStr);
-        return stringBuilder.toString();
+        return super.toString() + reqIdStr;
     }
 }

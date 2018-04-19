@@ -10,64 +10,48 @@ public final class zzabh {
     public static final Object zzbzr = new Object();
 
     public static boolean equals(long[] jArr, long[] jArr2) {
-        if (jArr != null) {
-            if (jArr.length != 0) {
-                return Arrays.equals(jArr, jArr2);
-            }
-        }
-        if (jArr2 != null) {
-            if (jArr2.length != 0) {
-                return false;
-            }
-        }
-        return true;
+        return (jArr == null || jArr.length == 0) ? jArr2 == null || jArr2.length == 0 : Arrays.equals(jArr, jArr2);
     }
 
     public static boolean equals(Object[] objArr, Object[] objArr2) {
-        int length = objArr == null ? 0 : objArr.length;
+        boolean length = objArr == null ? false : objArr.length;
         int length2 = objArr2 == null ? 0 : objArr2.length;
         int i = 0;
-        int i2 = i;
+        boolean z = false;
         while (true) {
-            if (i >= length || objArr[i] != null) {
+            if (z >= length || objArr[z] != null) {
+                int i2 = i;
                 while (i2 < length2 && objArr2[i2] == null) {
                     i2++;
                 }
-                boolean z = i >= length;
-                boolean z2 = i2 >= length2;
-                if (z && z2) {
+                boolean z2 = z >= length;
+                boolean z3 = i2 >= length2;
+                if (z2 && z3) {
                     return true;
                 }
-                if (z != z2 || !objArr[i].equals(objArr2[i2])) {
+                if (z2 != z3 || !objArr[z].equals(objArr2[i2])) {
                     return false;
                 }
-                i++;
-                i2++;
+                i = i2 + 1;
+                z++;
             } else {
-                i++;
+                z++;
             }
         }
     }
 
     public static int hashCode(long[] jArr) {
-        if (jArr != null) {
-            if (jArr.length != 0) {
-                return Arrays.hashCode(jArr);
-            }
-        }
-        return 0;
+        return (jArr == null || jArr.length == 0) ? 0 : Arrays.hashCode(jArr);
     }
 
     public static int hashCode(Object[] objArr) {
-        int i = 0;
         int length = objArr == null ? 0 : objArr.length;
+        int i = 0;
         int i2 = 0;
         while (i < length) {
             Object obj = objArr[i];
-            if (obj != null) {
-                i2 = (i2 * 31) + obj.hashCode();
-            }
             i++;
+            i2 = obj != null ? obj.hashCode() + (i2 * 31) : i2;
         }
         return i2;
     }

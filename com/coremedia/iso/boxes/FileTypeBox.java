@@ -51,7 +51,7 @@ public class FileTypeBox extends AbstractBox {
     }
 
     protected long getContentSize() {
-        return (long) (8 + (this.compatibleBrands.size() * 4));
+        return (long) ((this.compatibleBrands.size() * 4) + 8);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -105,15 +105,12 @@ public class FileTypeBox extends AbstractBox {
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append("FileTypeBox[");
-        result.append("majorBrand=");
-        result.append(getMajorBrand());
+        result.append("majorBrand=").append(getMajorBrand());
         result.append(";");
-        result.append("minorVersion=");
-        result.append(getMinorVersion());
+        result.append("minorVersion=").append(getMinorVersion());
         for (String compatibleBrand : this.compatibleBrands) {
             result.append(";");
-            result.append("compatibleBrand=");
-            result.append(compatibleBrand);
+            result.append("compatibleBrand=").append(compatibleBrand);
         }
         result.append("]");
         return result.toString();

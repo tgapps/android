@@ -24,9 +24,9 @@ public final class zzer extends AbstractSafeParcelable implements Iterable<Strin
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeBundle(parcel, 2, zzif(), false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
     public final Bundle zzif() {

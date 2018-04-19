@@ -21,9 +21,9 @@ public final class zzg extends zza implements IGoogleMapDelegate {
     public final zzt addMarker(MarkerOptions markerOptions) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) markerOptions);
-        Parcel transactAndReadException = transactAndReadException(11, obtainAndWriteInterfaceToken);
-        zzt zzg = zzu.zzg(transactAndReadException.readStrongBinder());
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(11, obtainAndWriteInterfaceToken);
+        zzt zzg = zzu.zzg(obtainAndWriteInterfaceToken.readStrongBinder());
+        obtainAndWriteInterfaceToken.recycle();
         return zzg;
     }
 

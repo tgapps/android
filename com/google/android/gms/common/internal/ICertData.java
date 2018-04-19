@@ -22,9 +22,9 @@ public interface ICertData extends IInterface {
                     zzc.zza(parcel2, bytesWrapped);
                     break;
                 case 2:
-                    i = getHashCode();
+                    int hashCode = getHashCode();
                     parcel2.writeNoException();
-                    parcel2.writeInt(i);
+                    parcel2.writeInt(hashCode);
                     break;
                 default:
                     return false;

@@ -12,7 +12,6 @@ public final class zzabe<M extends zzabd<M>, T> {
 
     private final Object zzf(zzaba com_google_android_gms_internal_measurement_zzaba) {
         String valueOf;
-        StringBuilder stringBuilder;
         Class componentType = this.zzbzj ? this.zzbzi.getComponentType() : this.zzbzi;
         try {
             zzabj com_google_android_gms_internal_measurement_zzabj;
@@ -26,24 +25,14 @@ public final class zzabe<M extends zzabd<M>, T> {
                     com_google_android_gms_internal_measurement_zzaba.zza(com_google_android_gms_internal_measurement_zzabj);
                     return com_google_android_gms_internal_measurement_zzabj;
                 default:
-                    int i = this.type;
-                    StringBuilder stringBuilder2 = new StringBuilder(24);
-                    stringBuilder2.append("Unknown type ");
-                    stringBuilder2.append(i);
-                    throw new IllegalArgumentException(stringBuilder2.toString());
+                    throw new IllegalArgumentException("Unknown type " + this.type);
             }
         } catch (Throwable e) {
             valueOf = String.valueOf(componentType);
-            stringBuilder = new StringBuilder(33 + String.valueOf(valueOf).length());
-            stringBuilder.append("Error creating instance of class ");
-            stringBuilder.append(valueOf);
-            throw new IllegalArgumentException(stringBuilder.toString(), e);
+            throw new IllegalArgumentException(new StringBuilder(String.valueOf(valueOf).length() + 33).append("Error creating instance of class ").append(valueOf).toString(), e);
         } catch (Throwable e2) {
             valueOf = String.valueOf(componentType);
-            stringBuilder = new StringBuilder(33 + String.valueOf(valueOf).length());
-            stringBuilder.append("Error creating instance of class ");
-            stringBuilder.append(valueOf);
-            throw new IllegalArgumentException(stringBuilder.toString(), e2);
+            throw new IllegalArgumentException(new StringBuilder(String.valueOf(valueOf).length() + 33).append("Error creating instance of class ").append(valueOf).toString(), e2);
         } catch (Throwable e22) {
             throw new IllegalArgumentException("Error reading extension field", e22);
         }
@@ -61,7 +50,7 @@ public final class zzabe<M extends zzabd<M>, T> {
     }
 
     public final int hashCode() {
-        return ((((((1147 + this.type) * 31) + this.zzbzi.hashCode()) * 31) + this.tag) * 31) + this.zzbzj;
+        return (this.zzbzj ? 1 : 0) + ((((((this.type + 1147) * 31) + this.zzbzi.hashCode()) * 31) + this.tag) * 31);
     }
 
     protected final void zza(Object obj, zzabb com_google_android_gms_internal_measurement_zzabb) {
@@ -77,36 +66,34 @@ public final class zzabe<M extends zzabd<M>, T> {
                     com_google_android_gms_internal_measurement_zzabb.zzb((zzabj) obj);
                     return;
                 default:
-                    int i2 = this.type;
-                    StringBuilder stringBuilder = new StringBuilder(24);
-                    stringBuilder.append("Unknown type ");
-                    stringBuilder.append(i2);
-                    throw new IllegalArgumentException(stringBuilder.toString());
+                    throw new IllegalArgumentException("Unknown type " + this.type);
             }
         } catch (Throwable e) {
             throw new IllegalStateException(e);
         }
+        throw new IllegalStateException(e);
     }
 
     final T zzi(List<zzabl> list) {
+        int i = 0;
         if (list == null) {
             return null;
         }
         if (this.zzbzj) {
+            int i2;
             List arrayList = new ArrayList();
-            int i = 0;
-            for (int i2 = 0; i2 < list.size(); i2++) {
+            for (i2 = 0; i2 < list.size(); i2++) {
                 zzabl com_google_android_gms_internal_measurement_zzabl = (zzabl) list.get(i2);
                 if (com_google_android_gms_internal_measurement_zzabl.zzbto.length != 0) {
                     arrayList.add(zzf(zzaba.zzj(com_google_android_gms_internal_measurement_zzabl.zzbto)));
                 }
             }
-            int size = arrayList.size();
-            if (size == 0) {
+            i2 = arrayList.size();
+            if (i2 == 0) {
                 return null;
             }
-            T cast = this.zzbzi.cast(Array.newInstance(this.zzbzi.getComponentType(), size));
-            while (i < size) {
+            T cast = this.zzbzi.cast(Array.newInstance(this.zzbzi.getComponentType(), i2));
+            while (i < i2) {
                 Array.set(cast, i, arrayList.get(i));
                 i++;
             }
@@ -126,11 +113,7 @@ public final class zzabe<M extends zzabd<M>, T> {
             case 11:
                 return zzabb.zzb(i, (zzabj) obj);
             default:
-                i = this.type;
-                StringBuilder stringBuilder = new StringBuilder(24);
-                stringBuilder.append("Unknown type ");
-                stringBuilder.append(i);
-                throw new IllegalArgumentException(stringBuilder.toString());
+                throw new IllegalArgumentException("Unknown type " + this.type);
         }
     }
 }

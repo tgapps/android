@@ -23,39 +23,24 @@ public final class zzfk extends zzhk {
     }
 
     private static byte[] zzb(HttpURLConnection httpURLConnection) throws IOException {
-        Throwable th;
-        InputStream inputStream;
+        InputStream inputStream = null;
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             inputStream = httpURLConnection.getInputStream();
-            try {
-                byte[] bArr = new byte[1024];
-                while (true) {
-                    int read = inputStream.read(bArr);
-                    if (read <= 0) {
-                        break;
-                    }
-                    byteArrayOutputStream.write(bArr, 0, read);
+            byte[] bArr = new byte[1024];
+            while (true) {
+                int read = inputStream.read(bArr);
+                if (read <= 0) {
+                    break;
                 }
-                bArr = byteArrayOutputStream.toByteArray();
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                return bArr;
-            } catch (Throwable th2) {
-                th = th2;
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                throw th;
+                byteArrayOutputStream.write(bArr, 0, read);
             }
-        } catch (Throwable th3) {
-            th = th3;
-            inputStream = null;
+            byte[] toByteArray = byteArrayOutputStream.toByteArray();
+            return toByteArray;
+        } finally {
             if (inputStream != null) {
                 inputStream.close();
             }
-            throw th;
         }
     }
 

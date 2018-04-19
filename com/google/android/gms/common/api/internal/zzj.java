@@ -34,13 +34,14 @@ public final class zzj {
         if (!connectionResult.isSuccess()) {
             this.zzel = true;
         }
-        if (this.zzek == 0) {
-            if (this.zzel) {
-                this.zzej.setException(new AvailabilityException(this.zzcc));
-                return;
-            }
-            this.zzej.setResult(this.zzei);
+        if (this.zzek != 0) {
+            return;
         }
+        if (this.zzel) {
+            this.zzej.setException(new AvailabilityException(this.zzcc));
+            return;
+        }
+        this.zzej.setResult(this.zzei);
     }
 
     public final Set<zzh<?>> zzs() {

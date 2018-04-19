@@ -33,10 +33,9 @@ public class MetadataValueReader {
                 Bundle bundle = Wrappers.packageManager(context).getApplicationInfo(context.getPackageName(), 128).metaData;
                 if (bundle == null) {
                     return;
-                } else {
-                    zzuj = bundle.getString("com.google.app.id");
-                    zzuk = bundle.getInt("com.google.android.gms.version");
                 }
+                zzuj = bundle.getString("com.google.app.id");
+                zzuk = bundle.getInt("com.google.android.gms.version");
             } catch (Throwable e) {
                 Log.wtf("MetadataValueReader", "This should never happen.", e);
             }

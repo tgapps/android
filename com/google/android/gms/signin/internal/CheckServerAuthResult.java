@@ -20,10 +20,10 @@ public class CheckServerAuthResult extends AbstractSafeParcelable {
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 1, this.zzal);
         SafeParcelWriter.writeBoolean(parcel, 2, this.zzadp);
         SafeParcelWriter.writeTypedList(parcel, 3, this.zzadq, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

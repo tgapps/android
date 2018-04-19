@@ -30,60 +30,43 @@ public final class zzfg extends zzhk {
         if (obj == null) {
             return TtmlNode.ANONYMOUS_REGION_ID;
         }
-        if (obj instanceof Integer) {
-            obj = Long.valueOf((long) ((Integer) obj).intValue());
-        }
-        int i = 0;
-        String valueOf;
-        if (obj instanceof Long) {
+        Object valueOf = obj instanceof Integer ? Long.valueOf((long) ((Integer) obj).intValue()) : obj;
+        if (valueOf instanceof Long) {
             if (!z) {
-                return String.valueOf(obj);
+                return String.valueOf(valueOf);
             }
-            Long l = (Long) obj;
-            if (Math.abs(l.longValue()) < 100) {
-                return String.valueOf(obj);
+            if (Math.abs(((Long) valueOf).longValue()) < 100) {
+                return String.valueOf(valueOf);
             }
-            String str = String.valueOf(obj).charAt(0) == '-' ? "-" : TtmlNode.ANONYMOUS_REGION_ID;
-            valueOf = String.valueOf(Math.abs(l.longValue()));
-            long round = Math.round(Math.pow(10.0d, (double) (valueOf.length() - 1)));
-            long round2 = Math.round(Math.pow(10.0d, (double) valueOf.length()) - 1.0d);
-            StringBuilder stringBuilder = new StringBuilder((43 + String.valueOf(str).length()) + String.valueOf(str).length());
-            stringBuilder.append(str);
-            stringBuilder.append(round);
-            stringBuilder.append("...");
-            stringBuilder.append(str);
-            stringBuilder.append(round2);
-            return stringBuilder.toString();
-        } else if (obj instanceof Boolean) {
-            return String.valueOf(obj);
+            String str = String.valueOf(valueOf).charAt(0) == '-' ? "-" : TtmlNode.ANONYMOUS_REGION_ID;
+            String valueOf2 = String.valueOf(Math.abs(((Long) valueOf).longValue()));
+            return new StringBuilder((String.valueOf(str).length() + 43) + String.valueOf(str).length()).append(str).append(Math.round(Math.pow(10.0d, (double) (valueOf2.length() - 1)))).append("...").append(str).append(Math.round(Math.pow(10.0d, (double) valueOf2.length()) - 1.0d)).toString();
+        } else if (valueOf instanceof Boolean) {
+            return String.valueOf(valueOf);
         } else {
-            if (!(obj instanceof Throwable)) {
-                return obj instanceof zzfj ? ((zzfj) obj).zzajf : z ? "-" : String.valueOf(obj);
+            if (!(valueOf instanceof Throwable)) {
+                return valueOf instanceof zzfj ? ((zzfj) valueOf).zzajf : z ? "-" : String.valueOf(valueOf);
             } else {
-                Throwable th = (Throwable) obj;
-                StringBuilder stringBuilder2 = new StringBuilder(z ? th.getClass().getName() : th.toString());
-                valueOf = zzbi(AppMeasurement.class.getCanonicalName());
-                String zzbi = zzbi(zzgl.class.getCanonicalName());
-                StackTraceElement[] stackTrace = th.getStackTrace();
-                int length = stackTrace.length;
-                while (i < length) {
-                    StackTraceElement stackTraceElement = stackTrace[i];
+                Throwable th = (Throwable) valueOf;
+                StringBuilder stringBuilder = new StringBuilder(z ? th.getClass().getName() : th.toString());
+                String zzbi = zzbi(AppMeasurement.class.getCanonicalName());
+                String zzbi2 = zzbi(zzgl.class.getCanonicalName());
+                for (StackTraceElement stackTraceElement : th.getStackTrace()) {
                     if (!stackTraceElement.isNativeMethod()) {
                         String className = stackTraceElement.getClassName();
                         if (className != null) {
                             className = zzbi(className);
-                            if (className.equals(valueOf) || className.equals(zzbi)) {
-                                stringBuilder2.append(": ");
-                                stringBuilder2.append(stackTraceElement);
+                            if (className.equals(zzbi) || className.equals(zzbi2)) {
+                                stringBuilder.append(": ");
+                                stringBuilder.append(stackTraceElement);
                                 break;
                             }
                         } else {
                             continue;
                         }
                     }
-                    i++;
                 }
-                return stringBuilder2.toString();
+                return stringBuilder.toString();
             }
         }
     }
@@ -92,28 +75,28 @@ public final class zzfg extends zzhk {
         if (str == null) {
             Object obj4 = TtmlNode.ANONYMOUS_REGION_ID;
         }
-        obj = zza(z, obj);
-        obj2 = zza(z, obj2);
-        Object zza = zza(z, obj3);
+        Object zza = zza(z, obj);
+        Object zza2 = zza(z, obj2);
+        Object zza3 = zza(z, obj3);
         StringBuilder stringBuilder = new StringBuilder();
         String str2 = TtmlNode.ANONYMOUS_REGION_ID;
         if (!TextUtils.isEmpty(obj4)) {
             stringBuilder.append(obj4);
             str2 = ": ";
         }
-        if (!TextUtils.isEmpty(obj)) {
-            stringBuilder.append(str2);
-            stringBuilder.append(obj);
-            str2 = ", ";
-        }
-        if (!TextUtils.isEmpty(obj2)) {
-            stringBuilder.append(str2);
-            stringBuilder.append(obj2);
-            str2 = ", ";
-        }
         if (!TextUtils.isEmpty(zza)) {
             stringBuilder.append(str2);
             stringBuilder.append(zza);
+            str2 = ", ";
+        }
+        if (!TextUtils.isEmpty(zza2)) {
+            stringBuilder.append(str2);
+            stringBuilder.append(zza2);
+            str2 = ", ";
+        }
+        if (!TextUtils.isEmpty(zza3)) {
+            stringBuilder.append(str2);
+            stringBuilder.append(zza3);
         }
         return stringBuilder.toString();
     }
@@ -127,7 +110,7 @@ public final class zzfg extends zzhk {
             return TtmlNode.ANONYMOUS_REGION_ID;
         }
         int lastIndexOf = str.lastIndexOf(46);
-        return lastIndexOf == -1 ? str : str.substring(0, lastIndexOf);
+        return lastIndexOf != -1 ? str.substring(0, lastIndexOf) : str;
     }
 
     private final String zzis() {
@@ -154,27 +137,26 @@ public final class zzfg extends zzhk {
     }
 
     protected final void zza(int i, boolean z, boolean z2, String str, Object obj, Object obj2, Object obj3) {
+        int i2 = 0;
         if (!z && isLoggable(i)) {
             zza(i, zza(false, str, obj, obj2, obj3));
         }
         if (!z2 && i >= 5) {
-            String str2;
             Preconditions.checkNotNull(str);
             zzhk zzjn = this.zzacr.zzjn();
             if (zzjn == null) {
-                str2 = "Scheduler not set. Not logging error/warn";
+                zza(6, "Scheduler not set. Not logging error/warn");
             } else if (zzjn.isInitialized()) {
-                if (i < 0) {
-                    i = 0;
+                if (i >= 0) {
+                    i2 = i;
                 }
-                if (i >= 9) {
-                    i = 8;
+                if (i2 >= 9) {
+                    i2 = 8;
                 }
-                zzjn.zzc(new zzfh(this, i, str, obj, obj2, obj3));
+                zzjn.zzc(new zzfh(this, i2, str, obj, obj2, obj3));
             } else {
-                str2 = "Scheduler not initialized. Not logging error/warn";
+                zza(6, "Scheduler not initialized. Not logging error/warn");
             }
-            zza(6, str2);
         }
     }
 
@@ -296,17 +278,11 @@ public final class zzfg extends zzhk {
 
     public final String zzit() {
         Pair zzfh = zzgh().zzajs.zzfh();
-        if (zzfh != null) {
-            if (zzfh != zzfr.zzajr) {
-                String valueOf = String.valueOf(zzfh.second);
-                String str = (String) zzfh.first;
-                StringBuilder stringBuilder = new StringBuilder((1 + String.valueOf(valueOf).length()) + String.valueOf(str).length());
-                stringBuilder.append(valueOf);
-                stringBuilder.append(":");
-                stringBuilder.append(str);
-                return stringBuilder.toString();
-            }
+        if (zzfh == null || zzfh == zzfr.zzajr) {
+            return null;
         }
-        return null;
+        String valueOf = String.valueOf(zzfh.second);
+        String str = (String) zzfh.first;
+        return new StringBuilder((String.valueOf(valueOf).length() + 1) + String.valueOf(str).length()).append(valueOf).append(":").append(str).toString();
     }
 }

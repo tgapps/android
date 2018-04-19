@@ -1,6 +1,7 @@
 package com.google.android.gms.internal.measurement;
 
 import java.io.IOException;
+import org.telegram.messenger.exoplayer2.RendererCapabilities;
 
 public final class zzke extends zzabd<zzke> {
     private static volatile zzke[] zzasg;
@@ -65,21 +66,14 @@ public final class zzke extends zzabd<zzke> {
         } else if (!this.zzasj.equals(com_google_android_gms_internal_measurement_zzke.zzasj)) {
             return false;
         }
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                return this.zzbzh.equals(com_google_android_gms_internal_measurement_zzke.zzbzh);
-            }
-        }
-        return com_google_android_gms_internal_measurement_zzke.zzbzh == null || com_google_android_gms_internal_measurement_zzke.zzbzh.isEmpty();
+        return (this.zzbzh == null || this.zzbzh.isEmpty()) ? com_google_android_gms_internal_measurement_zzke.zzbzh == null || com_google_android_gms_internal_measurement_zzke.zzbzh.isEmpty() : this.zzbzh.equals(com_google_android_gms_internal_measurement_zzke.zzbzh);
     }
 
     public final int hashCode() {
         int i = 0;
-        int hashCode = (((((((((527 + getClass().getName().hashCode()) * 31) + (this.name == null ? 0 : this.name.hashCode())) * 31) + (this.zzash == null ? 0 : this.zzash.hashCode())) * 31) + (this.zzasi == null ? 0 : this.zzasi.hashCode())) * 31) + (this.zzasj == null ? 0 : this.zzasj.hashCode())) * 31;
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                i = this.zzbzh.hashCode();
-            }
+        int hashCode = ((this.zzasj == null ? 0 : this.zzasj.hashCode()) + (((this.zzasi == null ? 0 : this.zzasi.hashCode()) + (((this.zzash == null ? 0 : this.zzash.hashCode()) + (((this.name == null ? 0 : this.name.hashCode()) + ((getClass().getName().hashCode() + 527) * 31)) * 31)) * 31)) * 31)) * 31;
+        if (!(this.zzbzh == null || this.zzbzh.isEmpty())) {
+            i = this.zzbzh.hashCode();
         }
         return hashCode + i;
     }
@@ -119,20 +113,28 @@ public final class zzke extends zzabd<zzke> {
     public final /* synthetic */ zzabj zzb(zzaba com_google_android_gms_internal_measurement_zzaba) throws IOException {
         while (true) {
             int zzvo = com_google_android_gms_internal_measurement_zzaba.zzvo();
-            if (zzvo == 0) {
-                return this;
+            switch (zzvo) {
+                case 0:
+                    break;
+                case 10:
+                    this.name = com_google_android_gms_internal_measurement_zzaba.readString();
+                    continue;
+                case 16:
+                    this.zzash = Boolean.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvr());
+                    continue;
+                case RendererCapabilities.ADAPTIVE_SUPPORT_MASK /*24*/:
+                    this.zzasi = Boolean.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvr());
+                    continue;
+                case 32:
+                    this.zzasj = Integer.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvs());
+                    continue;
+                default:
+                    if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
+                        break;
+                    }
+                    continue;
             }
-            if (zzvo == 10) {
-                this.name = com_google_android_gms_internal_measurement_zzaba.readString();
-            } else if (zzvo == 16) {
-                this.zzash = Boolean.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvr());
-            } else if (zzvo == 24) {
-                this.zzasi = Boolean.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvr());
-            } else if (zzvo == 32) {
-                this.zzasj = Integer.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvs());
-            } else if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
-                return this;
-            }
+            return this;
         }
     }
 }

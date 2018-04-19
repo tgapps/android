@@ -44,13 +44,13 @@ public final class IsReadyToPayRequest extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeIntegerList(parcel, 2, this.zzai, false);
         SafeParcelWriter.writeString(parcel, 4, this.zzbu, false);
         SafeParcelWriter.writeString(parcel, 5, this.zzbv, false);
         SafeParcelWriter.writeIntegerList(parcel, 6, this.zzbw, false);
         SafeParcelWriter.writeBoolean(parcel, 7, this.zzbx);
         SafeParcelWriter.writeString(parcel, 8, this.zzby, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

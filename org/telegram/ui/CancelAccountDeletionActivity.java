@@ -2,6 +2,8 @@ package org.telegram.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +22,7 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -78,25 +81,6 @@ public class CancelAccountDeletionActivity extends BaseFragment {
     private AlertDialog progressDialog;
     private SlideView[] views = new SlideView[5];
 
-    class AnonymousClass2 extends AnimatorListenerAdapter {
-        final /* synthetic */ SlideView val$newView;
-        final /* synthetic */ SlideView val$outView;
-
-        AnonymousClass2(SlideView slideView, SlideView slideView2) {
-            this.val$newView = slideView;
-            this.val$outView = slideView2;
-        }
-
-        public void onAnimationStart(Animator animation) {
-            this.val$newView.setVisibility(0);
-        }
-
-        public void onAnimationEnd(Animator animation) {
-            this.val$outView.setVisibility(8);
-            this.val$outView.setX(0.0f);
-        }
-    }
-
     private class ProgressView extends View {
         private Paint paint = new Paint();
         private Paint paint2 = new Paint();
@@ -140,7 +124,6 @@ public class CancelAccountDeletionActivity extends BaseFragment {
         private String phoneHash;
         private TextView problemText;
         private ProgressView progressView;
-        final /* synthetic */ CancelAccountDeletionActivity this$0;
         private volatile int time = 60000;
         private TextView timeText;
         private Timer timeTimer;
@@ -148,48 +131,45 @@ public class CancelAccountDeletionActivity extends BaseFragment {
         private final Object timerSync = new Object();
         private boolean waitingForEvent;
 
-        public LoginActivitySmsView(CancelAccountDeletionActivity this$0, Context context, int type) {
-            final CancelAccountDeletionActivity cancelAccountDeletionActivity = this$0;
-            Context context2 = context;
-            this.this$0 = cancelAccountDeletionActivity;
-            super(context2);
+        public LoginActivitySmsView(Context context, int type) {
+            super(context);
             this.currentType = type;
             setOrientation(1);
-            this.confirmTextView = new TextView(context2);
+            this.confirmTextView = new TextView(context);
             this.confirmTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
             this.confirmTextView.setTextSize(1, 14.0f);
             this.confirmTextView.setGravity(LocaleController.isRTL ? 5 : 3);
-            r0.confirmTextView.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
-            if (r0.currentType == 3) {
-                FrameLayout frameLayout = new FrameLayout(context2);
-                ImageView imageView = new ImageView(context2);
+            this.confirmTextView.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
+            if (this.currentType == 3) {
+                FrameLayout frameLayout = new FrameLayout(context);
+                ImageView imageView = new ImageView(context);
                 imageView.setImageResource(R.drawable.phone_activate);
                 if (LocaleController.isRTL) {
                     frameLayout.addView(imageView, LayoutHelper.createFrame(64, 76.0f, 19, 2.0f, 2.0f, 0.0f, 0.0f));
-                    frameLayout.addView(r0.confirmTextView, LayoutHelper.createFrame(-1, -2.0f, LocaleController.isRTL ? 5 : 3, 82.0f, 0.0f, 0.0f, 0.0f));
+                    frameLayout.addView(this.confirmTextView, LayoutHelper.createFrame(-1, -2.0f, LocaleController.isRTL ? 5 : 3, 82.0f, 0.0f, 0.0f, 0.0f));
                 } else {
-                    frameLayout.addView(r0.confirmTextView, LayoutHelper.createFrame(-1, -2.0f, LocaleController.isRTL ? 5 : 3, 0.0f, 0.0f, 82.0f, 0.0f));
+                    frameLayout.addView(this.confirmTextView, LayoutHelper.createFrame(-1, -2.0f, LocaleController.isRTL ? 5 : 3, 0.0f, 0.0f, 82.0f, 0.0f));
                     frameLayout.addView(imageView, LayoutHelper.createFrame(64, 76.0f, 21, 0.0f, 2.0f, 0.0f, 2.0f));
                 }
                 addView(frameLayout, LayoutHelper.createLinear(-2, -2, LocaleController.isRTL ? 5 : 3));
             } else {
-                addView(r0.confirmTextView, LayoutHelper.createLinear(-2, -2, LocaleController.isRTL ? 5 : 3));
+                addView(this.confirmTextView, LayoutHelper.createLinear(-2, -2, LocaleController.isRTL ? 5 : 3));
             }
-            r0.codeField = new EditTextBoldCursor(context2);
-            r0.codeField.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-            r0.codeField.setHint(LocaleController.getString("Code", R.string.Code));
-            r0.codeField.setCursorColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-            r0.codeField.setCursorWidth(1.5f);
-            r0.codeField.setCursorSize(AndroidUtilities.dp(20.0f));
-            r0.codeField.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
-            r0.codeField.setImeOptions(268435461);
-            r0.codeField.setTextSize(1, 18.0f);
-            r0.codeField.setInputType(3);
-            r0.codeField.setMaxLines(1);
-            r0.codeField.setPadding(0, 0, 0, 0);
-            r0.codeField.setBackgroundDrawable(Theme.createEditTextDrawable(context2, false));
-            addView(r0.codeField, LayoutHelper.createLinear(-1, 36, 1, 0, 20, 0, 0));
-            r0.codeField.addTextChangedListener(new TextWatcher() {
+            this.codeField = new EditTextBoldCursor(context);
+            this.codeField.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+            this.codeField.setHint(LocaleController.getString("Code", R.string.Code));
+            this.codeField.setCursorColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+            this.codeField.setCursorWidth(1.5f);
+            this.codeField.setCursorSize(AndroidUtilities.dp(20.0f));
+            this.codeField.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
+            this.codeField.setImeOptions(268435461);
+            this.codeField.setTextSize(1, 18.0f);
+            this.codeField.setInputType(3);
+            this.codeField.setMaxLines(1);
+            this.codeField.setPadding(0, 0, 0, 0);
+            this.codeField.setBackgroundDrawable(Theme.createEditTextDrawable(context, false));
+            addView(this.codeField, LayoutHelper.createLinear(-1, 36, 1, 0, 20, 0, 0));
+            this.codeField.addTextChangedListener(new TextWatcher(CancelAccountDeletionActivity.this) {
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
 
@@ -197,12 +177,12 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                 }
 
                 public void afterTextChanged(Editable s) {
-                    if (!(LoginActivitySmsView.this.ignoreOnTextChange || LoginActivitySmsView.this.length == 0 || LoginActivitySmsView.this.codeField.length() != LoginActivitySmsView.this.length)) {
+                    if (!LoginActivitySmsView.this.ignoreOnTextChange && LoginActivitySmsView.this.length != 0 && LoginActivitySmsView.this.codeField.length() == LoginActivitySmsView.this.length) {
                         LoginActivitySmsView.this.onNextPressed();
                     }
                 }
             });
-            r0.codeField.setOnEditorActionListener(new OnEditorActionListener() {
+            this.codeField.setOnEditorActionListener(new OnEditorActionListener(CancelAccountDeletionActivity.this) {
                 public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                     if (i != 5) {
                         return false;
@@ -211,30 +191,30 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                     return true;
                 }
             });
-            if (r0.currentType == 3) {
-                r0.codeField.setEnabled(false);
-                r0.codeField.setInputType(0);
-                r0.codeField.setVisibility(8);
+            if (this.currentType == 3) {
+                this.codeField.setEnabled(false);
+                this.codeField.setInputType(0);
+                this.codeField.setVisibility(8);
             }
-            r0.timeText = new TextView(context2);
-            r0.timeText.setTextSize(1, 14.0f);
-            r0.timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
-            r0.timeText.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
-            r0.timeText.setGravity(LocaleController.isRTL ? 5 : 3);
-            addView(r0.timeText, LayoutHelper.createLinear(-2, -2, LocaleController.isRTL ? 5 : 3, 0, 30, 0, 0));
-            if (r0.currentType == 3) {
-                r0.progressView = new ProgressView(context2);
-                addView(r0.progressView, LayoutHelper.createLinear(-1, 3, 0.0f, 12.0f, 0.0f, 0.0f));
+            this.timeText = new TextView(context);
+            this.timeText.setTextSize(1, 14.0f);
+            this.timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+            this.timeText.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
+            this.timeText.setGravity(LocaleController.isRTL ? 5 : 3);
+            addView(this.timeText, LayoutHelper.createLinear(-2, -2, LocaleController.isRTL ? 5 : 3, 0, 30, 0, 0));
+            if (this.currentType == 3) {
+                this.progressView = new ProgressView(context);
+                addView(this.progressView, LayoutHelper.createLinear(-1, 3, 0.0f, 12.0f, 0.0f, 0.0f));
             }
-            r0.problemText = new TextView(context2);
-            r0.problemText.setText(LocaleController.getString("DidNotGetTheCode", R.string.DidNotGetTheCode));
-            r0.problemText.setGravity(LocaleController.isRTL ? 5 : 3);
-            r0.problemText.setTextSize(1, 14.0f);
-            r0.problemText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
-            r0.problemText.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
-            r0.problemText.setPadding(0, AndroidUtilities.dp(2.0f), 0, AndroidUtilities.dp(12.0f));
-            addView(r0.problemText, LayoutHelper.createLinear(-2, -2, LocaleController.isRTL ? 5 : 3, 0, 20, 0, 0));
-            r0.problemText.setOnClickListener(new OnClickListener() {
+            this.problemText = new TextView(context);
+            this.problemText.setText(LocaleController.getString("DidNotGetTheCode", R.string.DidNotGetTheCode));
+            this.problemText.setGravity(LocaleController.isRTL ? 5 : 3);
+            this.problemText.setTextSize(1, 14.0f);
+            this.problemText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
+            this.problemText.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
+            this.problemText.setPadding(0, AndroidUtilities.dp(2.0f), 0, AndroidUtilities.dp(12.0f));
+            addView(this.problemText, LayoutHelper.createLinear(-2, -2, LocaleController.isRTL ? 5 : 3, 0, 20, 0, 0));
+            this.problemText.setOnClickListener(new OnClickListener(CancelAccountDeletionActivity.this) {
                 public void onClick(View v) {
                     if (!LoginActivitySmsView.this.nextPressed) {
                         if (LoginActivitySmsView.this.nextType == 0 || LoginActivitySmsView.this.nextType == 4) {
@@ -244,34 +224,16 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                                 Intent mailer = new Intent("android.intent.action.SEND");
                                 mailer.setType("message/rfc822");
                                 mailer.putExtra("android.intent.extra.EMAIL", new String[]{"sms@stel.com"});
-                                StringBuilder stringBuilder = new StringBuilder();
-                                stringBuilder.append("Android cancel account deletion issue ");
-                                stringBuilder.append(version);
-                                stringBuilder.append(" ");
-                                stringBuilder.append(LoginActivitySmsView.this.phone);
-                                mailer.putExtra("android.intent.extra.SUBJECT", stringBuilder.toString());
-                                stringBuilder = new StringBuilder();
-                                stringBuilder.append("Phone: ");
-                                stringBuilder.append(LoginActivitySmsView.this.phone);
-                                stringBuilder.append("\nApp version: ");
-                                stringBuilder.append(version);
-                                stringBuilder.append("\nOS version: SDK ");
-                                stringBuilder.append(VERSION.SDK_INT);
-                                stringBuilder.append("\nDevice Name: ");
-                                stringBuilder.append(Build.MANUFACTURER);
-                                stringBuilder.append(Build.MODEL);
-                                stringBuilder.append("\nLocale: ");
-                                stringBuilder.append(Locale.getDefault());
-                                stringBuilder.append("\nError: ");
-                                stringBuilder.append(LoginActivitySmsView.this.lastError);
-                                mailer.putExtra("android.intent.extra.TEXT", stringBuilder.toString());
+                                mailer.putExtra("android.intent.extra.SUBJECT", "Android cancel account deletion issue " + version + " " + LoginActivitySmsView.this.phone);
+                                mailer.putExtra("android.intent.extra.TEXT", "Phone: " + LoginActivitySmsView.this.phone + "\nApp version: " + version + "\nOS version: SDK " + VERSION.SDK_INT + "\nDevice Name: " + Build.MANUFACTURER + Build.MODEL + "\nLocale: " + Locale.getDefault() + "\nError: " + LoginActivitySmsView.this.lastError);
                                 LoginActivitySmsView.this.getContext().startActivity(Intent.createChooser(mailer, "Send email..."));
+                                return;
                             } catch (Exception e) {
-                                AlertsCreator.showSimpleAlert(LoginActivitySmsView.this.this$0, LocaleController.getString("NoMailInstalled", R.string.NoMailInstalled));
+                                AlertsCreator.showSimpleAlert(CancelAccountDeletionActivity.this, LocaleController.getString("NoMailInstalled", R.string.NoMailInstalled));
+                                return;
                             }
-                        } else {
-                            LoginActivitySmsView.this.resendCode();
                         }
+                        LoginActivitySmsView.this.resendCode();
                     }
                 }
             });
@@ -281,21 +243,21 @@ public class CancelAccountDeletionActivity extends BaseFragment {
             final Bundle params = new Bundle();
             params.putString("phone", this.phone);
             this.nextPressed = true;
-            this.this$0.needShowProgress();
+            CancelAccountDeletionActivity.this.needShowProgress();
             final TL_auth_resendCode req = new TL_auth_resendCode();
             req.phone_number = this.phone;
             req.phone_code_hash = this.phoneHash;
-            ConnectionsManager.getInstance(this.this$0.currentAccount).sendRequest(req, new RequestDelegate() {
+            ConnectionsManager.getInstance(CancelAccountDeletionActivity.this.currentAccount).sendRequest(req, new RequestDelegate() {
                 public void run(final TLObject response, final TL_error error) {
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         public void run() {
                             LoginActivitySmsView.this.nextPressed = false;
                             if (error == null) {
-                                LoginActivitySmsView.this.this$0.fillNextCodeParams(params, (TL_auth_sentCode) response);
+                                CancelAccountDeletionActivity.this.fillNextCodeParams(params, (TL_auth_sentCode) response);
                             } else {
-                                AlertsCreator.processError(LoginActivitySmsView.this.this$0.currentAccount, error, LoginActivitySmsView.this.this$0, req, new Object[0]);
+                                AlertsCreator.processError(CancelAccountDeletionActivity.this.currentAccount, error, CancelAccountDeletionActivity.this, req, new Object[0]);
                             }
-                            LoginActivitySmsView.this.this$0.needHideProgress();
+                            CancelAccountDeletionActivity.this.needHideProgress();
                         }
                     });
                 }
@@ -327,7 +289,6 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                 this.nextType = params.getInt("nextType");
                 this.pattern = params.getString("pattern");
                 this.length = params.getInt("length");
-                int i2 = 0;
                 if (this.length != 0) {
                     this.codeField.setFilters(new InputFilter[]{new LengthFilter(this.length)});
                 } else {
@@ -338,13 +299,7 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                 }
                 if (this.phone != null) {
                     String number = PhoneFormat.getInstance().format(this.phone);
-                    Object[] objArr = new Object[1];
-                    PhoneFormat instance = PhoneFormat.getInstance();
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("+");
-                    stringBuilder.append(number);
-                    objArr[0] = instance.format(stringBuilder.toString());
-                    this.confirmTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("CancelAccountResetInfo", R.string.CancelAccountResetInfo, objArr)));
+                    this.confirmTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("CancelAccountResetInfo", R.string.CancelAccountResetInfo, PhoneFormat.getInstance().format("+" + number))));
                     if (this.currentType != 3) {
                         AndroidUtilities.showKeyboard(this.codeField);
                         this.codeField.requestFocus();
@@ -369,11 +324,7 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                     } else if (this.currentType == 2 && (this.nextType == 4 || this.nextType == 3)) {
                         this.timeText.setVisibility(0);
                         this.timeText.setText(LocaleController.formatString("CallText", R.string.CallText, Integer.valueOf(2), Integer.valueOf(0)));
-                        TextView textView = this.problemText;
-                        if (this.time >= 1000) {
-                            i2 = 8;
-                        }
-                        textView.setVisibility(i2);
+                        this.problemText.setVisibility(this.time < 1000 ? 0 : 8);
                         createTimer();
                     } else {
                         this.timeText.setVisibility(8);
@@ -433,20 +384,14 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                                 public void run() {
                                     if (LoginActivitySmsView.this.time >= 1000) {
                                         int seconds = (LoginActivitySmsView.this.time / 1000) - (((LoginActivitySmsView.this.time / 1000) / 60) * 60);
-                                        if (LoginActivitySmsView.this.nextType != 4) {
-                                            if (LoginActivitySmsView.this.nextType != 3) {
-                                                if (LoginActivitySmsView.this.nextType == 2) {
-                                                    LoginActivitySmsView.this.timeText.setText(LocaleController.formatString("SmsText", R.string.SmsText, Integer.valueOf(minutes), Integer.valueOf(seconds)));
-                                                }
-                                                if (LoginActivitySmsView.this.progressView != null) {
-                                                    LoginActivitySmsView.this.progressView.setProgress(1.0f - (((float) LoginActivitySmsView.this.time) / ((float) LoginActivitySmsView.this.timeout)));
-                                                }
-                                                return;
-                                            }
+                                        if (LoginActivitySmsView.this.nextType == 4 || LoginActivitySmsView.this.nextType == 3) {
+                                            LoginActivitySmsView.this.timeText.setText(LocaleController.formatString("CallText", R.string.CallText, Integer.valueOf(minutes), Integer.valueOf(seconds)));
+                                        } else if (LoginActivitySmsView.this.nextType == 2) {
+                                            LoginActivitySmsView.this.timeText.setText(LocaleController.formatString("SmsText", R.string.SmsText, Integer.valueOf(minutes), Integer.valueOf(seconds)));
                                         }
-                                        LoginActivitySmsView.this.timeText.setText(LocaleController.formatString("CallText", R.string.CallText, Integer.valueOf(minutes), Integer.valueOf(seconds)));
                                         if (LoginActivitySmsView.this.progressView != null) {
                                             LoginActivitySmsView.this.progressView.setProgress(1.0f - (((float) LoginActivitySmsView.this.time) / ((float) LoginActivitySmsView.this.timeout)));
+                                            return;
                                         }
                                         return;
                                     }
@@ -468,7 +413,7 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                                             TL_auth_resendCode req = new TL_auth_resendCode();
                                             req.phone_number = LoginActivitySmsView.this.phone;
                                             req.phone_code_hash = LoginActivitySmsView.this.phoneHash;
-                                            ConnectionsManager.getInstance(LoginActivitySmsView.this.this$0.currentAccount).sendRequest(req, new RequestDelegate() {
+                                            ConnectionsManager.getInstance(CancelAccountDeletionActivity.this.currentAccount).sendRequest(req, new RequestDelegate() {
                                                 public void run(TLObject response, final TL_error error) {
                                                     if (error != null && error.text != null) {
                                                         AndroidUtilities.runOnUIThread(new Runnable() {
@@ -523,23 +468,15 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                 req.phone_code = this.codeField.getText().toString();
                 req.phone_code_hash = this.phoneHash;
                 destroyTimer();
-                this.this$0.needShowProgress();
-                ConnectionsManager.getInstance(this.this$0.currentAccount).sendRequest(req, new RequestDelegate() {
+                CancelAccountDeletionActivity.this.needShowProgress();
+                ConnectionsManager.getInstance(CancelAccountDeletionActivity.this.currentAccount).sendRequest(req, new RequestDelegate() {
                     public void run(TLObject response, final TL_error error) {
                         AndroidUtilities.runOnUIThread(new Runnable() {
                             public void run() {
-                                LoginActivitySmsView.this.this$0.needHideProgress();
+                                CancelAccountDeletionActivity.this.needHideProgress();
                                 LoginActivitySmsView.this.nextPressed = false;
                                 if (error == null) {
-                                    CancelAccountDeletionActivity cancelAccountDeletionActivity = LoginActivitySmsView.this.this$0;
-                                    BaseFragment baseFragment = LoginActivitySmsView.this.this$0;
-                                    Object[] objArr = new Object[1];
-                                    PhoneFormat instance = PhoneFormat.getInstance();
-                                    StringBuilder stringBuilder = new StringBuilder();
-                                    stringBuilder.append("+");
-                                    stringBuilder.append(LoginActivitySmsView.this.phone);
-                                    objArr[0] = instance.format(stringBuilder.toString());
-                                    cancelAccountDeletionActivity.errorDialog = AlertsCreator.showSimpleAlert(baseFragment, LocaleController.formatString("CancelLinkSuccess", R.string.CancelLinkSuccess, objArr));
+                                    CancelAccountDeletionActivity.this.errorDialog = AlertsCreator.showSimpleAlert(CancelAccountDeletionActivity.this, LocaleController.formatString("CancelLinkSuccess", R.string.CancelLinkSuccess, PhoneFormat.getInstance().format("+" + LoginActivitySmsView.this.phone)));
                                     return;
                                 }
                                 LoginActivitySmsView.this.lastError = error.text;
@@ -555,7 +492,7 @@ public class CancelAccountDeletionActivity extends BaseFragment {
                                 }
                                 LoginActivitySmsView.this.waitingForEvent = true;
                                 if (LoginActivitySmsView.this.currentType != 3) {
-                                    AlertsCreator.processError(LoginActivitySmsView.this.this$0.currentAccount, error, LoginActivitySmsView.this.this$0, req, new Object[0]);
+                                    AlertsCreator.processError(CancelAccountDeletionActivity.this.currentAccount, error, CancelAccountDeletionActivity.this, req, new Object[0]);
                                 }
                             }
                         });
@@ -587,28 +524,19 @@ public class CancelAccountDeletionActivity extends BaseFragment {
         }
 
         public void didReceivedNotification(int id, int account, Object... args) {
-            if (this.waitingForEvent) {
-                if (this.codeField != null) {
-                    if (id == NotificationCenter.didReceiveSmsCode) {
+            if (this.waitingForEvent && this.codeField != null) {
+                if (id == NotificationCenter.didReceiveSmsCode) {
+                    this.ignoreOnTextChange = true;
+                    this.codeField.setText(TtmlNode.ANONYMOUS_REGION_ID + args[0]);
+                    this.ignoreOnTextChange = false;
+                    onNextPressed();
+                } else if (id == NotificationCenter.didReceiveCall) {
+                    String num = TtmlNode.ANONYMOUS_REGION_ID + args[0];
+                    if (AndroidUtilities.checkPhonePattern(this.pattern, num)) {
                         this.ignoreOnTextChange = true;
-                        EditTextBoldCursor editTextBoldCursor = this.codeField;
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append(TtmlNode.ANONYMOUS_REGION_ID);
-                        stringBuilder.append(args[0]);
-                        editTextBoldCursor.setText(stringBuilder.toString());
+                        this.codeField.setText(num);
                         this.ignoreOnTextChange = false;
                         onNextPressed();
-                    } else if (id == NotificationCenter.didReceiveCall) {
-                        String num = new StringBuilder();
-                        num.append(TtmlNode.ANONYMOUS_REGION_ID);
-                        num.append(args[0]);
-                        num = num.toString();
-                        if (AndroidUtilities.checkPhonePattern(this.pattern, num)) {
-                            this.ignoreOnTextChange = true;
-                            this.codeField.setText(num);
-                            this.ignoreOnTextChange = false;
-                            onNextPressed();
-                        }
                     }
                 }
             }
@@ -629,64 +557,63 @@ public class CancelAccountDeletionActivity extends BaseFragment {
         }
 
         public void onNextPressed() {
-            if (CancelAccountDeletionActivity.this.getParentActivity() != null) {
-                if (!this.nextPressed) {
-                    TelephonyManager tm = (TelephonyManager) ApplicationLoader.applicationContext.getSystemService("phone");
-                    boolean simcardAvailable;
-                    if (tm.getSimState() == 1 || tm.getPhoneType() == 0) {
-                        simcardAvailable = false;
-                    } else {
-                        simcardAvailable = true;
-                    }
-                    int i = VERSION.SDK_INT;
-                    final TL_account_sendConfirmPhoneCode req = new TL_account_sendConfirmPhoneCode();
+            if (CancelAccountDeletionActivity.this.getParentActivity() != null && !this.nextPressed) {
+                final TL_account_sendConfirmPhoneCode req;
+                TelephonyManager tm = (TelephonyManager) ApplicationLoader.applicationContext.getSystemService("phone");
+                boolean simcardAvailable;
+                if (tm.getSimState() == 1 || tm.getPhoneType() == 0) {
+                    simcardAvailable = false;
+                } else {
+                    simcardAvailable = true;
+                }
+                if (VERSION.SDK_INT < 23 || simcardAvailable) {
+                    req = new TL_account_sendConfirmPhoneCode();
                     req.allow_flashcall = false;
                     req.hash = CancelAccountDeletionActivity.this.hash;
-                    if (req.allow_flashcall) {
-                        try {
-                            String number = tm.getLine1Number();
-                            if (TextUtils.isEmpty(number)) {
-                                req.current_number = false;
-                            } else {
-                                boolean z;
-                                if (!CancelAccountDeletionActivity.this.phone.contains(number)) {
-                                    if (!number.contains(CancelAccountDeletionActivity.this.phone)) {
-                                        z = false;
-                                        req.current_number = z;
-                                        if (!req.current_number) {
-                                            req.allow_flashcall = false;
-                                        }
-                                    }
-                                }
+                } else {
+                    req = new TL_account_sendConfirmPhoneCode();
+                    req.allow_flashcall = false;
+                    req.hash = CancelAccountDeletionActivity.this.hash;
+                }
+                if (req.allow_flashcall) {
+                    try {
+                        String number = tm.getLine1Number();
+                        if (TextUtils.isEmpty(number)) {
+                            req.current_number = false;
+                        } else {
+                            boolean z;
+                            if (CancelAccountDeletionActivity.this.phone.contains(number) || number.contains(CancelAccountDeletionActivity.this.phone)) {
                                 z = true;
-                                req.current_number = z;
-                                if (req.current_number) {
-                                    req.allow_flashcall = false;
+                            } else {
+                                z = false;
+                            }
+                            req.current_number = z;
+                            if (!req.current_number) {
+                                req.allow_flashcall = false;
+                            }
+                        }
+                    } catch (Throwable e) {
+                        req.allow_flashcall = false;
+                        FileLog.e(e);
+                    }
+                }
+                final Bundle params = new Bundle();
+                params.putString("phone", CancelAccountDeletionActivity.this.phone);
+                this.nextPressed = true;
+                ConnectionsManager.getInstance(CancelAccountDeletionActivity.this.currentAccount).sendRequest(req, new RequestDelegate() {
+                    public void run(final TLObject response, final TL_error error) {
+                        AndroidUtilities.runOnUIThread(new Runnable() {
+                            public void run() {
+                                PhoneView.this.nextPressed = false;
+                                if (error == null) {
+                                    CancelAccountDeletionActivity.this.fillNextCodeParams(params, (TL_auth_sentCode) response);
+                                } else {
+                                    CancelAccountDeletionActivity.this.errorDialog = AlertsCreator.processError(CancelAccountDeletionActivity.this.currentAccount, error, CancelAccountDeletionActivity.this, req, new Object[0]);
                                 }
                             }
-                        } catch (Throwable e) {
-                            req.allow_flashcall = false;
-                            FileLog.e(e);
-                        }
+                        });
                     }
-                    final Bundle params = new Bundle();
-                    params.putString("phone", CancelAccountDeletionActivity.this.phone);
-                    this.nextPressed = true;
-                    ConnectionsManager.getInstance(CancelAccountDeletionActivity.this.currentAccount).sendRequest(req, new RequestDelegate() {
-                        public void run(final TLObject response, final TL_error error) {
-                            AndroidUtilities.runOnUIThread(new Runnable() {
-                                public void run() {
-                                    PhoneView.this.nextPressed = false;
-                                    if (error == null) {
-                                        CancelAccountDeletionActivity.this.fillNextCodeParams(params, (TL_auth_sentCode) response);
-                                    } else {
-                                        CancelAccountDeletionActivity.this.errorDialog = AlertsCreator.processError(CancelAccountDeletionActivity.this.currentAccount, error, CancelAccountDeletionActivity.this, req, new Object[0]);
-                                    }
-                                }
-                            });
-                        }
-                    }, 2);
-                }
+                }, 2);
             }
         }
 
@@ -698,93 +625,6 @@ public class CancelAccountDeletionActivity extends BaseFragment {
             super.onShow();
             onNextPressed();
         }
-    }
-
-    public void setPage(int r1, boolean r2, android.os.Bundle r3, boolean r4) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.CancelAccountDeletionActivity.setPage(int, boolean, android.os.Bundle, boolean):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = 0;
-        r1 = 3;
-        if (r10 == r1) goto L_0x000d;
-    L_0x0004:
-        if (r10 != 0) goto L_0x0007;
-        goto L_0x000d;
-        r1 = r9.doneButton;
-        r1.setVisibility(r0);
-        goto L_0x0015;
-        r1 = r9.doneButton;
-        r2 = 8;
-        r1.setVisibility(r2);
-        r1 = r9.views;
-        r2 = r9.currentViewNum;
-        r1 = r1[r2];
-        r2 = r9.views;
-        r2 = r2[r10];
-        r9.currentViewNum = r10;
-        r2.setParams(r12, r0);
-        r3 = r9.actionBar;
-        r4 = r2.getHeaderName();
-        r3.setTitle(r4);
-        r2.onShow();
-        if (r13 == 0) goto L_0x0039;
-        r3 = org.telegram.messenger.AndroidUtilities.displaySize;
-        r3 = r3.x;
-        r3 = -r3;
-        r3 = (float) r3;
-        goto L_0x003e;
-        r3 = org.telegram.messenger.AndroidUtilities.displaySize;
-        r3 = r3.x;
-        goto L_0x0037;
-        r2.setX(r3);
-        r3 = new android.animation.AnimatorSet;
-        r3.<init>();
-        r4 = new android.view.animation.AccelerateDecelerateInterpolator;
-        r4.<init>();
-        r3.setInterpolator(r4);
-        r4 = 300; // 0x12c float:4.2E-43 double:1.48E-321;
-        r3.setDuration(r4);
-        r4 = 2;
-        r4 = new android.animation.Animator[r4];
-        r5 = "translationX";
-        r6 = 1;
-        r7 = new float[r6];
-        if (r13 == 0) goto L_0x0063;
-        r8 = org.telegram.messenger.AndroidUtilities.displaySize;
-        r8 = r8.x;
-        r8 = (float) r8;
-        goto L_0x0069;
-        r8 = org.telegram.messenger.AndroidUtilities.displaySize;
-        r8 = r8.x;
-        r8 = -r8;
-        goto L_0x0061;
-        r7[r0] = r8;
-        r5 = android.animation.ObjectAnimator.ofFloat(r1, r5, r7);
-        r4[r0] = r5;
-        r5 = "translationX";
-        r7 = new float[r6];
-        r8 = 0;
-        r7[r0] = r8;
-        r0 = android.animation.ObjectAnimator.ofFloat(r2, r5, r7);
-        r4[r6] = r0;
-        r3.playTogether(r4);
-        r0 = new org.telegram.ui.CancelAccountDeletionActivity$2;
-        r0.<init>(r2, r1);
-        r3.addListener(r0);
-        r3.start();
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.CancelAccountDeletionActivity.setPage(int, boolean, android.os.Bundle, boolean):void");
     }
 
     public CancelAccountDeletionActivity(Bundle args) {
@@ -812,7 +652,6 @@ Caused by: java.lang.NullPointerException
     }
 
     public View createView(Context context) {
-        Context context2 = context;
         this.actionBar.setTitle(LocaleController.getString("AppName", R.string.AppName));
         this.actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         this.actionBar.setActionBarMenuOnItemClick(new ActionBarMenuOnItemClick() {
@@ -826,24 +665,24 @@ Caused by: java.lang.NullPointerException
         });
         this.doneButton = this.actionBar.createMenu().addItemWithWidth(1, R.drawable.ic_done, AndroidUtilities.dp(56.0f));
         this.doneButton.setVisibility(8);
-        this.fragmentView = new ScrollView(context2);
+        this.fragmentView = new ScrollView(context);
         ScrollView scrollView = this.fragmentView;
         scrollView.setFillViewport(true);
-        FrameLayout frameLayout = new FrameLayout(context2);
+        FrameLayout frameLayout = new FrameLayout(context);
         scrollView.addView(frameLayout, LayoutHelper.createScroll(-1, -2, 51));
-        this.views[0] = new PhoneView(context2);
-        this.views[1] = new LoginActivitySmsView(this, context2, 1);
-        this.views[2] = new LoginActivitySmsView(this, context2, 2);
-        this.views[3] = new LoginActivitySmsView(this, context2, 3);
-        this.views[4] = new LoginActivitySmsView(this, context2, 4);
+        this.views[0] = new PhoneView(context);
+        this.views[1] = new LoginActivitySmsView(context, 1);
+        this.views[2] = new LoginActivitySmsView(context, 2);
+        this.views[3] = new LoginActivitySmsView(context, 3);
+        this.views[4] = new LoginActivitySmsView(context, 4);
         int a = 0;
-        while (a < r0.views.length) {
-            r0.views[a].setVisibility(a == 0 ? 0 : 8);
-            frameLayout.addView(r0.views[a], LayoutHelper.createFrame(-1, a == 0 ? -2.0f : -1.0f, 51, AndroidUtilities.isTablet() ? 26.0f : 18.0f, 30.0f, AndroidUtilities.isTablet() ? 26.0f : 18.0f, 0.0f));
+        while (a < this.views.length) {
+            this.views[a].setVisibility(a == 0 ? 0 : 8);
+            frameLayout.addView(this.views[a], LayoutHelper.createFrame(-1, a == 0 ? -2.0f : -1.0f, 51, AndroidUtilities.isTablet() ? 26.0f : 18.0f, 30.0f, AndroidUtilities.isTablet() ? 26.0f : 18.0f, 0.0f));
             a++;
         }
-        r0.actionBar.setTitle(r0.views[0].getHeaderName());
-        return r0.fragmentView;
+        this.actionBar.setTitle(this.views[0].getHeaderName());
+        return this.fragmentView;
     }
 
     public void onResume() {
@@ -885,14 +724,12 @@ Caused by: java.lang.NullPointerException
     }
 
     public void needShowProgress() {
-        if (!(getParentActivity() == null || getParentActivity().isFinishing())) {
-            if (this.progressDialog == null) {
-                this.progressDialog = new AlertDialog(getParentActivity(), 1);
-                this.progressDialog.setMessage(LocaleController.getString("Loading", R.string.Loading));
-                this.progressDialog.setCanceledOnTouchOutside(false);
-                this.progressDialog.setCancelable(false);
-                this.progressDialog.show();
-            }
+        if (getParentActivity() != null && !getParentActivity().isFinishing() && this.progressDialog == null) {
+            this.progressDialog = new AlertDialog(getParentActivity(), 1);
+            this.progressDialog.setMessage(LocaleController.getString("Loading", R.string.Loading));
+            this.progressDialog.setCanceledOnTouchOutside(false);
+            this.progressDialog.setCancelable(false);
+            this.progressDialog.show();
         }
     }
 
@@ -905,6 +742,44 @@ Caused by: java.lang.NullPointerException
             }
             this.progressDialog = null;
         }
+    }
+
+    public void setPage(int page, boolean animated, Bundle params, boolean back) {
+        if (page != 3 && page != 0) {
+            this.doneButton.setVisibility(0);
+        } else if (page == 0) {
+            this.doneButton.setVisibility(8);
+        } else {
+            this.doneButton.setVisibility(8);
+        }
+        final SlideView outView = this.views[this.currentViewNum];
+        final SlideView newView = this.views[page];
+        this.currentViewNum = page;
+        newView.setParams(params, false);
+        this.actionBar.setTitle(newView.getHeaderName());
+        newView.onShow();
+        newView.setX(back ? (float) (-AndroidUtilities.displaySize.x) : (float) AndroidUtilities.displaySize.x);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        animatorSet.setDuration(300);
+        Animator[] animatorArr = new Animator[2];
+        String str = "translationX";
+        float[] fArr = new float[1];
+        fArr[0] = back ? (float) AndroidUtilities.displaySize.x : (float) (-AndroidUtilities.displaySize.x);
+        animatorArr[0] = ObjectAnimator.ofFloat(outView, str, fArr);
+        animatorArr[1] = ObjectAnimator.ofFloat(newView, "translationX", new float[]{0.0f});
+        animatorSet.playTogether(animatorArr);
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            public void onAnimationStart(Animator animation) {
+                newView.setVisibility(0);
+            }
+
+            public void onAnimationEnd(Animator animation) {
+                outView.setVisibility(8);
+                outView.setX(0.0f);
+            }
+        });
+        animatorSet.start();
     }
 
     private void fillNextCodeParams(Bundle params, TL_auth_sentCode res) {

@@ -90,7 +90,7 @@ public class WallpapersActivity extends BaseFragment implements NotificationCent
         }
 
         public int getItemCount() {
-            int count = 1 + WallpapersActivity.this.wallPapers.size();
+            int count = WallpapersActivity.this.wallPapers.size() + 1;
             if (Theme.hasWallpaperFromTheme()) {
                 return count + 1;
             }
@@ -106,37 +106,34 @@ public class WallpapersActivity extends BaseFragment implements NotificationCent
         }
 
         public void onBindViewHolder(ViewHolder viewHolder, int i) {
-            WallpaperCell wallpaperCell = viewHolder.itemView;
             int i2 = -2;
+            WallpaperCell wallpaperCell = viewHolder.itemView;
             if (i == 0) {
-                if (Theme.hasWallpaperFromTheme()) {
-                    if (!WallpapersActivity.this.overrideThemeWallpaper) {
-                        wallpaperCell.setWallpaper(null, i2, null, false);
-                    }
-                }
-                i2 = WallpapersActivity.this.selectedBackground;
-                wallpaperCell.setWallpaper(null, i2, null, false);
-            } else {
-                if (!Theme.hasWallpaperFromTheme()) {
-                    i--;
-                } else if (i == 1) {
-                    if (WallpapersActivity.this.overrideThemeWallpaper) {
-                        i2 = -1;
-                    }
-                    wallpaperCell.setWallpaper(null, i2, WallpapersActivity.this.themedWallpaper, true);
-                    return;
+                int access$000;
+                if (!Theme.hasWallpaperFromTheme() || WallpapersActivity.this.overrideThemeWallpaper) {
+                    access$000 = WallpapersActivity.this.selectedBackground;
                 } else {
-                    i -= 2;
+                    access$000 = -2;
                 }
-                WallPaper wallPaper = (WallPaper) WallpapersActivity.this.wallPapers.get(i);
-                if (Theme.hasWallpaperFromTheme()) {
-                    if (!WallpapersActivity.this.overrideThemeWallpaper) {
-                        wallpaperCell.setWallpaper(wallPaper, i2, null, false);
-                    }
-                }
-                i2 = WallpapersActivity.this.selectedBackground;
-                wallpaperCell.setWallpaper(wallPaper, i2, null, false);
+                wallpaperCell.setWallpaper(null, access$000, null, false);
+                return;
             }
+            if (!Theme.hasWallpaperFromTheme()) {
+                i--;
+            } else if (i == 1) {
+                if (WallpapersActivity.this.overrideThemeWallpaper) {
+                    i2 = -1;
+                }
+                wallpaperCell.setWallpaper(null, i2, WallpapersActivity.this.themedWallpaper, true);
+                return;
+            } else {
+                i -= 2;
+            }
+            WallPaper wallPaper = (WallPaper) WallpapersActivity.this.wallPapers.get(i);
+            if (!Theme.hasWallpaperFromTheme() || WallpapersActivity.this.overrideThemeWallpaper) {
+                i2 = WallpapersActivity.this.selectedBackground;
+            }
+            wallpaperCell.setWallpaper(wallPaper, i2, null, false);
         }
     }
 
@@ -183,15 +180,10 @@ public class WallpapersActivity extends BaseFragment implements NotificationCent
             public void onItemClick(int id) {
                 if (id == -1) {
                     WallpapersActivity.this.finishFragment();
-                    return;
-                }
-                boolean z = true;
-                if (id == 1) {
-                    String fileName;
+                } else if (id == 1) {
                     boolean done;
                     WallPaper wallPaper = (WallPaper) WallpapersActivity.this.wallpappersByIds.get(WallpapersActivity.this.selectedBackground);
                     if (wallPaper != null && wallPaper.id != 1000001 && (wallPaper instanceof TL_wallPaper)) {
-                        boolean done2;
                         int width = AndroidUtilities.displaySize.x;
                         int height = AndroidUtilities.displaySize.y;
                         if (width > height) {
@@ -200,24 +192,18 @@ public class WallpapersActivity extends BaseFragment implements NotificationCent
                             height = temp;
                         }
                         PhotoSize size = FileLoader.getClosestPhotoSizeWithSize(wallPaper.sizes, Math.min(width, height));
-                        fileName = new StringBuilder();
-                        fileName.append(size.location.volume_id);
-                        fileName.append("_");
-                        fileName.append(size.location.local_id);
-                        fileName.append(".jpg");
                         try {
-                            done2 = AndroidUtilities.copyFile(new File(FileLoader.getDirectory(4), fileName.toString()), new File(ApplicationLoader.getFilesDirFixed(), "wallpaper.jpg"));
+                            done = AndroidUtilities.copyFile(new File(FileLoader.getDirectory(4), size.location.volume_id + "_" + size.location.local_id + ".jpg"), new File(ApplicationLoader.getFilesDirFixed(), "wallpaper.jpg"));
                         } catch (Throwable e) {
+                            done = false;
                             FileLog.e(e);
-                            done2 = false;
                         }
-                        done = done2;
                     } else if (WallpapersActivity.this.selectedBackground == -1) {
                         try {
                             done = AndroidUtilities.copyFile(WallpapersActivity.this.updater.getCurrentWallpaperPath(), new File(ApplicationLoader.getFilesDirFixed(), "wallpaper.jpg"));
                         } catch (Throwable e2) {
-                            FileLog.e(e2);
                             done = false;
+                            FileLog.e(e2);
                         }
                     } else {
                         done = true;
@@ -226,11 +212,9 @@ public class WallpapersActivity extends BaseFragment implements NotificationCent
                         Editor editor = MessagesController.getGlobalMainSettings().edit();
                         editor.putInt("selectedBackground", WallpapersActivity.this.selectedBackground);
                         editor.putInt("selectedColor", WallpapersActivity.this.selectedColor);
-                        fileName = "overrideThemeWallpaper";
-                        if (!Theme.hasWallpaperFromTheme() || !WallpapersActivity.this.overrideThemeWallpaper) {
-                            z = false;
-                        }
-                        editor.putBoolean(fileName, z);
+                        String str = "overrideThemeWallpaper";
+                        boolean z = Theme.hasWallpaperFromTheme() && WallpapersActivity.this.overrideThemeWallpaper;
+                        editor.putBoolean(str, z);
                         editor.commit();
                         Theme.reloadWallpaper();
                     }
@@ -277,23 +261,23 @@ public class WallpapersActivity extends BaseFragment implements NotificationCent
             public void onItemClick(View view, int position) {
                 if (position == 0) {
                     WallpapersActivity.this.updater.showAlert(false);
-                } else {
-                    if (!Theme.hasWallpaperFromTheme()) {
-                        position--;
-                    } else if (position == 1) {
-                        WallpapersActivity.this.selectedBackground = -2;
-                        WallpapersActivity.this.overrideThemeWallpaper = false;
-                        WallpapersActivity.this.listAdapter.notifyDataSetChanged();
-                        WallpapersActivity.this.processSelectedBackground();
-                        return;
-                    } else {
-                        position -= 2;
-                    }
-                    WallpapersActivity.this.selectedBackground = ((WallPaper) WallpapersActivity.this.wallPapers.get(position)).id;
-                    WallpapersActivity.this.overrideThemeWallpaper = true;
+                    return;
+                }
+                if (!Theme.hasWallpaperFromTheme()) {
+                    position--;
+                } else if (position == 1) {
+                    WallpapersActivity.this.selectedBackground = -2;
+                    WallpapersActivity.this.overrideThemeWallpaper = false;
                     WallpapersActivity.this.listAdapter.notifyDataSetChanged();
                     WallpapersActivity.this.processSelectedBackground();
+                    return;
+                } else {
+                    position -= 2;
                 }
+                WallpapersActivity.this.selectedBackground = ((WallPaper) WallpapersActivity.this.wallPapers.get(position)).id;
+                WallpapersActivity.this.overrideThemeWallpaper = true;
+                WallpapersActivity.this.listAdapter.notifyDataSetChanged();
+                WallpapersActivity.this.processSelectedBackground();
             }
         });
         processSelectedBackground();
@@ -340,69 +324,64 @@ public class WallpapersActivity extends BaseFragment implements NotificationCent
                         this.overrideThemeWallpaper = true;
                         processSelectedBackground();
                     }
-                } else if (wallPaper != null) {
+                } else if (wallPaper == null) {
+                    return;
+                } else {
                     if (wallPaper instanceof TL_wallPaperSolid) {
                         Drawable drawable = this.backgroundImage.getDrawable();
                         this.backgroundImage.setImageBitmap(null);
                         this.selectedColor = Theme.ACTION_BAR_VIDEO_EDIT_COLOR | wallPaper.bg_color;
                         this.backgroundImage.setBackgroundColor(this.selectedColor);
                     }
-                } else {
-                    return;
                 }
                 this.loadingFileObject = null;
                 this.loadingFile = null;
                 this.loadingSize = null;
                 this.doneButton.setEnabled(true);
                 this.progressView.setVisibility(8);
-            } else {
-                int width = AndroidUtilities.displaySize.x;
-                int height = AndroidUtilities.displaySize.y;
-                if (width > height) {
-                    int temp = width;
-                    width = height;
-                    height = temp;
-                }
-                PhotoSize size = FileLoader.getClosestPhotoSizeWithSize(wallPaper.sizes, Math.min(width, height));
-                if (size != null) {
-                    String fileName = new StringBuilder();
-                    fileName.append(size.location.volume_id);
-                    fileName.append("_");
-                    fileName.append(size.location.local_id);
-                    fileName.append(".jpg");
-                    fileName = fileName.toString();
-                    File f = new File(FileLoader.getDirectory(4), fileName);
-                    if (f.exists()) {
-                        if (this.loadingFile != null) {
-                            FileLoader.getInstance(this.currentAccount).cancelLoadFile(this.loadingSize);
-                        }
-                        this.loadingFileObject = null;
-                        this.loadingFile = null;
-                        this.loadingSize = null;
-                        try {
-                            this.backgroundImage.setImageURI(Uri.fromFile(f));
-                        } catch (Throwable e) {
-                            FileLog.e(e);
-                        }
-                        this.backgroundImage.setBackgroundColor(0);
-                        this.selectedColor = 0;
-                        this.doneButton.setEnabled(true);
-                        this.progressView.setVisibility(8);
-                    } else {
-                        this.progressViewBackground.getBackground().setColorFilter(new PorterDuffColorFilter(AndroidUtilities.calcDrawableColor(this.backgroundImage.getDrawable())[0], Mode.MULTIPLY));
-                        this.loadingFile = fileName;
-                        this.loadingFileObject = f;
-                        this.doneButton.setEnabled(false);
-                        this.progressView.setVisibility(0);
-                        this.loadingSize = size;
-                        this.selectedColor = 0;
-                        FileLoader.getInstance(this.currentAccount).loadFile(size, null, 1);
-                        this.backgroundImage.setBackgroundColor(0);
+                return;
+            }
+            int width = AndroidUtilities.displaySize.x;
+            int height = AndroidUtilities.displaySize.y;
+            if (width > height) {
+                int temp = width;
+                width = height;
+                height = temp;
+            }
+            PhotoSize size = FileLoader.getClosestPhotoSizeWithSize(wallPaper.sizes, Math.min(width, height));
+            if (size != null) {
+                String fileName = size.location.volume_id + "_" + size.location.local_id + ".jpg";
+                File f = new File(FileLoader.getDirectory(4), fileName);
+                if (f.exists()) {
+                    if (this.loadingFile != null) {
+                        FileLoader.getInstance(this.currentAccount).cancelLoadFile(this.loadingSize);
                     }
-                } else {
+                    this.loadingFileObject = null;
+                    this.loadingFile = null;
+                    this.loadingSize = null;
+                    try {
+                        this.backgroundImage.setImageURI(Uri.fromFile(f));
+                    } catch (Throwable e) {
+                        FileLog.e(e);
+                    }
+                    this.backgroundImage.setBackgroundColor(0);
+                    this.selectedColor = 0;
+                    this.doneButton.setEnabled(true);
+                    this.progressView.setVisibility(8);
                     return;
                 }
+                this.progressViewBackground.getBackground().setColorFilter(new PorterDuffColorFilter(AndroidUtilities.calcDrawableColor(this.backgroundImage.getDrawable())[0], Mode.MULTIPLY));
+                this.loadingFile = fileName;
+                this.loadingFileObject = f;
+                this.doneButton.setEnabled(false);
+                this.progressView.setVisibility(0);
+                this.loadingSize = size;
+                this.selectedColor = 0;
+                FileLoader.getInstance(this.currentAccount).loadFile(size, null, 1);
+                this.backgroundImage.setBackgroundColor(0);
+                return;
             }
+            return;
         }
         this.backgroundImage.setImageDrawable(Theme.getThemedWallpaper(false));
     }
@@ -485,6 +464,14 @@ public class WallpapersActivity extends BaseFragment implements NotificationCent
     }
 
     public ThemeDescription[] getThemeDescriptions() {
-        return new ThemeDescription[]{new ThemeDescription(this.fragmentView, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundWhite), new ThemeDescription(this.actionBar, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_actionBarDefault), new ThemeDescription(this.listView, ThemeDescription.FLAG_LISTGLOWCOLOR, null, null, null, null, Theme.key_actionBarDefault), new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_ITEMSCOLOR, null, null, null, null, Theme.key_actionBarDefaultIcon), new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_TITLECOLOR, null, null, null, null, Theme.key_actionBarDefaultTitle), new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_SELECTORCOLOR, null, null, null, null, Theme.key_actionBarDefaultSelector), new ThemeDescription(this.listView, ThemeDescription.FLAG_SELECTOR, null, null, null, null, Theme.key_listSelector)};
+        ThemeDescription[] themeDescriptionArr = new ThemeDescription[7];
+        themeDescriptionArr[0] = new ThemeDescription(this.fragmentView, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundWhite);
+        themeDescriptionArr[1] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_actionBarDefault);
+        themeDescriptionArr[2] = new ThemeDescription(this.listView, ThemeDescription.FLAG_LISTGLOWCOLOR, null, null, null, null, Theme.key_actionBarDefault);
+        themeDescriptionArr[3] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_ITEMSCOLOR, null, null, null, null, Theme.key_actionBarDefaultIcon);
+        themeDescriptionArr[4] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_TITLECOLOR, null, null, null, null, Theme.key_actionBarDefaultTitle);
+        themeDescriptionArr[5] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_SELECTORCOLOR, null, null, null, null, Theme.key_actionBarDefaultSelector);
+        themeDescriptionArr[6] = new ThemeDescription(this.listView, ThemeDescription.FLAG_SELECTOR, null, null, null, null, Theme.key_listSelector);
+        return themeDescriptionArr;
     }
 }

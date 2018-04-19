@@ -15,9 +15,9 @@ public final class zzfa extends zzn implements zzey {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
         zzp.zza(obtainAndWriteInterfaceToken, z);
-        Parcel transactAndReadException = transactAndReadException(7, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = transactAndReadException.createTypedArrayList(zzjs.CREATOR);
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(7, obtainAndWriteInterfaceToken);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzjs.CREATOR);
+        obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }
 
@@ -26,9 +26,9 @@ public final class zzfa extends zzn implements zzey {
         obtainAndWriteInterfaceToken.writeString(str);
         obtainAndWriteInterfaceToken.writeString(str2);
         zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
-        Parcel transactAndReadException = transactAndReadException(16, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = transactAndReadException.createTypedArrayList(zzef.CREATOR);
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(16, obtainAndWriteInterfaceToken);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzef.CREATOR);
+        obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }
 
@@ -38,9 +38,9 @@ public final class zzfa extends zzn implements zzey {
         obtainAndWriteInterfaceToken.writeString(str2);
         obtainAndWriteInterfaceToken.writeString(str3);
         zzp.zza(obtainAndWriteInterfaceToken, z);
-        Parcel transactAndReadException = transactAndReadException(15, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = transactAndReadException.createTypedArrayList(zzjs.CREATOR);
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(15, obtainAndWriteInterfaceToken);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzjs.CREATOR);
+        obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }
 
@@ -50,9 +50,9 @@ public final class zzfa extends zzn implements zzey {
         obtainAndWriteInterfaceToken.writeString(str2);
         zzp.zza(obtainAndWriteInterfaceToken, z);
         zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
-        Parcel transactAndReadException = transactAndReadException(14, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = transactAndReadException.createTypedArrayList(zzjs.CREATOR);
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(14, obtainAndWriteInterfaceToken);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzjs.CREATOR);
+        obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }
 
@@ -115,9 +115,9 @@ public final class zzfa extends zzn implements zzey {
     public final String zzc(zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
-        Parcel transactAndReadException = transactAndReadException(11, obtainAndWriteInterfaceToken);
-        String readString = transactAndReadException.readString();
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(11, obtainAndWriteInterfaceToken);
+        String readString = obtainAndWriteInterfaceToken.readString();
+        obtainAndWriteInterfaceToken.recycle();
         return readString;
     }
 
@@ -132,9 +132,9 @@ public final class zzfa extends zzn implements zzey {
         obtainAndWriteInterfaceToken.writeString(str);
         obtainAndWriteInterfaceToken.writeString(str2);
         obtainAndWriteInterfaceToken.writeString(str3);
-        Parcel transactAndReadException = transactAndReadException(17, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = transactAndReadException.createTypedArrayList(zzef.CREATOR);
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(17, obtainAndWriteInterfaceToken);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzef.CREATOR);
+        obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }
 }

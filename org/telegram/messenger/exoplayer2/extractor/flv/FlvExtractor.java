@@ -51,7 +51,6 @@ public final class FlvExtractor implements Extractor {
     }
 
     public boolean sniff(ExtractorInput input) throws IOException, InterruptedException {
-        boolean z = false;
         input.peekFully(this.scratch.data, 0, 3);
         this.scratch.setPosition(0);
         if (this.scratch.readUnsignedInt24() != FLV_TAG) {
@@ -70,9 +69,9 @@ public final class FlvExtractor implements Extractor {
         input.peekFully(this.scratch.data, 0, 4);
         this.scratch.setPosition(0);
         if (this.scratch.readInt() == 0) {
-            z = true;
+            return true;
         }
-        return z;
+        return false;
     }
 
     public void init(ExtractorOutput output) {
@@ -116,16 +115,23 @@ public final class FlvExtractor implements Extractor {
     }
 
     private boolean readFlvHeader(ExtractorInput input) throws IOException, InterruptedException {
-        boolean hasVideo = false;
         if (!input.readFully(this.headerBuffer.data, 0, 9, true)) {
             return false;
         }
+        boolean hasAudio;
+        boolean hasVideo;
         this.headerBuffer.setPosition(0);
         this.headerBuffer.skipBytes(4);
         int flags = this.headerBuffer.readUnsignedByte();
-        boolean hasAudio = (flags & 4) != 0;
+        if ((flags & 4) != 0) {
+            hasAudio = true;
+        } else {
+            hasAudio = false;
+        }
         if ((flags & 1) != 0) {
             hasVideo = true;
+        } else {
+            hasVideo = false;
         }
         if (hasAudio && this.audioReader == null) {
             this.audioReader = new AudioTagPayloadReader(this.extractorOutput.track(8, 1));

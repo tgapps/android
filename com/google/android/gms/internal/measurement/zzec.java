@@ -30,22 +30,25 @@ public final class zzec extends AbstractSafeParcelable {
     zzec(String str, String str2, String str3, long j, String str4, long j2, long j3, String str5, boolean z, boolean z2, String str6, long j4, long j5, int i, boolean z3, boolean z4, boolean z5) {
         Preconditions.checkNotEmpty(str);
         this.packageName = str;
-        r0.zzadh = TextUtils.isEmpty(str2) ? null : str2;
-        r0.zztc = str3;
-        r0.zzadn = j;
-        r0.zzado = str4;
-        r0.zzadp = j2;
-        r0.zzadq = j3;
-        r0.zzaef = str5;
-        r0.zzadr = z;
-        r0.zzaeg = z2;
-        r0.zzadj = str6;
-        r0.zzads = j4;
-        r0.zzaeh = j5;
-        r0.zzaei = i;
-        r0.zzadt = z3;
-        r0.zzadu = z4;
-        r0.zzaej = z5;
+        if (TextUtils.isEmpty(str2)) {
+            str2 = null;
+        }
+        this.zzadh = str2;
+        this.zztc = str3;
+        this.zzadn = j;
+        this.zzado = str4;
+        this.zzadp = j2;
+        this.zzadq = j3;
+        this.zzaef = str5;
+        this.zzadr = z;
+        this.zzaeg = z2;
+        this.zzadj = str6;
+        this.zzads = j4;
+        this.zzaeh = j5;
+        this.zzaei = i;
+        this.zzadt = z3;
+        this.zzadu = z4;
+        this.zzaej = z5;
     }
 
     zzec(String str, String str2, String str3, String str4, long j, long j2, String str5, boolean z, boolean z2, long j3, String str6, long j4, long j5, int i, boolean z3, boolean z4, boolean z5) {
@@ -69,7 +72,7 @@ public final class zzec extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, this.packageName, false);
         SafeParcelWriter.writeString(parcel, 3, this.zzadh, false);
         SafeParcelWriter.writeString(parcel, 4, this.zztc, false);
@@ -87,6 +90,6 @@ public final class zzec extends AbstractSafeParcelable {
         SafeParcelWriter.writeBoolean(parcel, 16, this.zzadt);
         SafeParcelWriter.writeBoolean(parcel, 17, this.zzadu);
         SafeParcelWriter.writeBoolean(parcel, 18, this.zzaej);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

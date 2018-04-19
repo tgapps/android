@@ -15,8 +15,7 @@ public class ProfileLevelIndicationDescriptor extends BaseDescriptor {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("ProfileLevelIndicationDescriptor");
-        sb.append("{profileLevelIndicationIndex=");
-        sb.append(Integer.toHexString(this.profileLevelIndicationIndex));
+        sb.append("{profileLevelIndicationIndex=").append(Integer.toHexString(this.profileLevelIndicationIndex));
         sb.append('}');
         return sb.toString();
     }
@@ -25,15 +24,13 @@ public class ProfileLevelIndicationDescriptor extends BaseDescriptor {
         if (this == o) {
             return true;
         }
-        if (o != null) {
-            if (getClass() == o.getClass()) {
-                if (this.profileLevelIndicationIndex != ((ProfileLevelIndicationDescriptor) o).profileLevelIndicationIndex) {
-                    return false;
-                }
-                return true;
-            }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
         }
-        return false;
+        if (this.profileLevelIndicationIndex != ((ProfileLevelIndicationDescriptor) o).profileLevelIndicationIndex) {
+            return false;
+        }
+        return true;
     }
 
     public int hashCode() {

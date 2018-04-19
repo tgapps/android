@@ -31,11 +31,7 @@ final class zzcj extends Handler {
                 Log.e(str, valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2));
                 throw runtimeException;
             default:
-                int i = message.what;
-                StringBuilder stringBuilder = new StringBuilder(70);
-                stringBuilder.append("TransformationResultHandler received unknown message type: ");
-                stringBuilder.append(i);
-                Log.e("TransformedResultImpl", stringBuilder.toString());
+                Log.e("TransformedResultImpl", "TransformationResultHandler received unknown message type: " + message.what);
                 return;
         }
     }

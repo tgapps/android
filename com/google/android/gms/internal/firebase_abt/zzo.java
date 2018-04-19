@@ -42,66 +42,67 @@ public final class zzo extends zzd<zzo> {
             int zzd = com_google_android_gms_internal_firebase_abt_zza.zzd();
             switch (zzd) {
                 case 0:
-                    return this;
+                    break;
                 case 10:
                     this.zzaq = com_google_android_gms_internal_firebase_abt_zza.readString();
-                    break;
+                    continue;
                 case 18:
                     this.zzar = com_google_android_gms_internal_firebase_abt_zza.readString();
-                    break;
+                    continue;
                 case RendererCapabilities.ADAPTIVE_SUPPORT_MASK /*24*/:
                     this.zzas = com_google_android_gms_internal_firebase_abt_zza.zze();
-                    break;
+                    continue;
                 case 34:
                     this.zzat = com_google_android_gms_internal_firebase_abt_zza.readString();
-                    break;
+                    continue;
                 case 40:
                     this.zzau = com_google_android_gms_internal_firebase_abt_zza.zze();
-                    break;
+                    continue;
                 case 48:
                     this.zzav = com_google_android_gms_internal_firebase_abt_zza.zze();
-                    break;
+                    continue;
                 case 58:
                     this.zzaw = com_google_android_gms_internal_firebase_abt_zza.readString();
-                    break;
+                    continue;
                 case 66:
                     this.zzax = com_google_android_gms_internal_firebase_abt_zza.readString();
-                    break;
+                    continue;
                 case VoIPService.CALL_MAX_LAYER /*74*/:
                     this.zzay = com_google_android_gms_internal_firebase_abt_zza.readString();
-                    break;
+                    continue;
                 case 82:
                     this.zzaz = com_google_android_gms_internal_firebase_abt_zza.readString();
-                    break;
+                    continue;
                 case 90:
                     this.zzba = com_google_android_gms_internal_firebase_abt_zza.readString();
-                    break;
+                    continue;
                 case 96:
                     this.zzc = com_google_android_gms_internal_firebase_abt_zza.zzf();
-                    break;
+                    continue;
                 case 106:
-                    zzd = zzm.zzb(com_google_android_gms_internal_firebase_abt_zza, 106);
-                    int length = this.zzbb == null ? 0 : this.zzbb.length;
-                    Object obj = new zzn[(zzd + length)];
-                    if (length != 0) {
-                        System.arraycopy(this.zzbb, 0, obj, 0, length);
+                    int zzb = zzm.zzb(com_google_android_gms_internal_firebase_abt_zza, 106);
+                    zzd = this.zzbb == null ? 0 : this.zzbb.length;
+                    Object obj = new zzn[(zzb + zzd)];
+                    if (zzd != 0) {
+                        System.arraycopy(this.zzbb, 0, obj, 0, zzd);
                     }
-                    while (length < obj.length - 1) {
-                        obj[length] = new zzn();
-                        com_google_android_gms_internal_firebase_abt_zza.zza(obj[length]);
+                    while (zzd < obj.length - 1) {
+                        obj[zzd] = new zzn();
+                        com_google_android_gms_internal_firebase_abt_zza.zza(obj[zzd]);
                         com_google_android_gms_internal_firebase_abt_zza.zzd();
-                        length++;
+                        zzd++;
                     }
-                    obj[length] = new zzn();
-                    com_google_android_gms_internal_firebase_abt_zza.zza(obj[length]);
+                    obj[zzd] = new zzn();
+                    com_google_android_gms_internal_firebase_abt_zza.zza(obj[zzd]);
                     this.zzbb = obj;
-                    break;
+                    continue;
                 default:
-                    if (super.zza(com_google_android_gms_internal_firebase_abt_zza, zzd)) {
+                    if (!super.zza(com_google_android_gms_internal_firebase_abt_zza, zzd)) {
                         break;
                     }
-                    return this;
+                    continue;
             }
+            return this;
         }
     }
 }

@@ -1,38 +1,11 @@
 package com.coremedia.iso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import org.telegram.ui.ActionBar.Theme;
 
 public final class IsoTypeReader {
-    public static java.lang.String readString(java.nio.ByteBuffer r1) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: com.coremedia.iso.IsoTypeReader.readString(java.nio.ByteBuffer):java.lang.String
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = new java.io.ByteArrayOutputStream;
-        r0.<init>();
-        r1 = r3.get();
-        r2 = r1;
-        if (r1 != 0) goto L_0x0015;
-    L_0x000c:
-        r1 = r0.toByteArray();
-        r1 = com.coremedia.iso.Utf8.convert(r1);
-        return r1;
-        r0.write(r2);
-        goto L_0x0005;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.coremedia.iso.IsoTypeReader.readString(java.nio.ByteBuffer):java.lang.String");
-    }
-
     public static long readUInt32BE(ByteBuffer bb) {
         return (((((long) readUInt8(bb)) << 24) + (((long) readUInt8(bb)) << 16)) + (((long) readUInt8(bb)) << 8)) + (((long) readUInt8(bb)) << null);
     }
@@ -63,6 +36,17 @@ Caused by: java.lang.NullPointerException
 
     public static int byte2int(byte b) {
         return b < (byte) 0 ? b + 256 : b;
+    }
+
+    public static String readString(ByteBuffer byteBuffer) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        while (true) {
+            int read = byteBuffer.get();
+            if (read == 0) {
+                return Utf8.convert(out.toByteArray());
+            }
+            out.write(read);
+        }
     }
 
     public static String readString(ByteBuffer byteBuffer, int length) {

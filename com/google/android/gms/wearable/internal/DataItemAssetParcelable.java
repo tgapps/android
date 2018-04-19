@@ -34,18 +34,16 @@ public class DataItemAssetParcelable extends AbstractSafeParcelable implements R
     }
 
     public String toString() {
-        String str;
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("DataItemAssetParcelable[");
         stringBuilder.append("@");
         stringBuilder.append(Integer.toHexString(hashCode()));
         if (this.zzdm == null) {
-            str = ",noid";
+            stringBuilder.append(",noid");
         } else {
             stringBuilder.append(",");
-            str = this.zzdm;
+            stringBuilder.append(this.zzdm);
         }
-        stringBuilder.append(str);
         stringBuilder.append(", key=");
         stringBuilder.append(this.zzdn);
         stringBuilder.append("]");
@@ -53,9 +51,9 @@ public class DataItemAssetParcelable extends AbstractSafeParcelable implements R
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, getId(), false);
         SafeParcelWriter.writeString(parcel, 3, getDataItemKey(), false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

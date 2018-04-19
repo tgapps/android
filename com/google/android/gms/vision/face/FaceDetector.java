@@ -50,10 +50,7 @@ public final class FaceDetector extends Detector<Face> {
                 this.zzbo = i;
                 return this;
             }
-            StringBuilder stringBuilder = new StringBuilder(34);
-            stringBuilder.append("Invalid landmark type: ");
-            stringBuilder.append(i);
-            throw new IllegalArgumentException(stringBuilder.toString());
+            throw new IllegalArgumentException("Invalid landmark type: " + i);
         }
 
         public Builder setMode(int i) {
@@ -63,10 +60,7 @@ public final class FaceDetector extends Detector<Face> {
                     this.zzbs = i;
                     return this;
                 default:
-                    StringBuilder stringBuilder = new StringBuilder(25);
-                    stringBuilder.append("Invalid mode: ");
-                    stringBuilder.append(i);
-                    throw new IllegalArgumentException(stringBuilder.toString());
+                    throw new IllegalArgumentException("Invalid mode: " + i);
             }
         }
 
@@ -104,21 +98,20 @@ public final class FaceDetector extends Detector<Face> {
             }
         }
         Set hashSet = new HashSet();
-        int i = 0;
         SparseArray<Face> sparseArray = new SparseArray(zzb.length);
-        int length = zzb.length;
-        int i2 = 0;
-        while (i < length) {
-            Face face = zzb[i];
+        int i = 0;
+        for (Face face : zzb) {
             int id = face.getId();
-            i2 = Math.max(i2, id);
+            int max = Math.max(i, id);
             if (hashSet.contains(Integer.valueOf(id))) {
-                id = i2 + 1;
-                i2 = id;
+                max++;
+                id = max;
+                i = max;
+            } else {
+                i = max;
             }
             hashSet.add(Integer.valueOf(id));
             sparseArray.append(this.zzbm.zzb(id), face);
-            i++;
         }
         return sparseArray;
     }
@@ -131,8 +124,7 @@ public final class FaceDetector extends Detector<Face> {
                     release();
                 }
             }
-            super.finalize();
-        } catch (Throwable th) {
+        } finally {
             super.finalize();
         }
     }

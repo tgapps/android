@@ -26,51 +26,38 @@ final class zzp extends zzs {
     }
 
     protected final void zza(Context context, zzah com_google_android_gms_internal_config_zzah) throws RemoteException {
-        String str;
+        String id;
         String token;
-        String str2;
-        Throwable th;
-        DataHolder dataHolder;
+        Throwable e;
         Builder buildDataHolder = DataBufferSafeParcelable.buildDataHolder();
         for (Entry entry : this.zzn.zzb().entrySet()) {
             DataBufferSafeParcelable.addValue(buildDataHolder, new zzz((String) entry.getKey(), (String) entry.getValue()));
         }
         DataHolder build = buildDataHolder.build(0);
         try {
-            String id = FirebaseInstanceId.getInstance().getId();
+            id = FirebaseInstanceId.getInstance().getId();
             try {
-                str = id;
                 token = FirebaseInstanceId.getInstance().getToken();
-            } catch (Throwable e) {
-                str2 = id;
-                th = e;
+            } catch (IllegalStateException e2) {
+                e = e2;
                 if (Log.isLoggable("ConfigApiImpl", 3)) {
-                    Log.d("ConfigApiImpl", "Cannot retrieve instanceId or instanceIdToken.", th);
+                    Log.d("ConfigApiImpl", "Cannot retrieve instanceId or instanceIdToken.", e);
                 }
                 token = null;
-                str = str2;
-                dataHolder = build;
-                com_google_android_gms_internal_config_zzah.zza(r1.zzo, new zzab(context.getPackageName(), r1.zzn.zza(), dataHolder, r1.zzn.getGmpAppId(), str, token, null, r1.zzn.zzc(), zzn.zzb(context), r1.zzn.zzd(), r1.zzn.zze()));
-                build.close();
+                com_google_android_gms_internal_config_zzah.zza(this.zzo, new zzab(context.getPackageName(), this.zzn.zza(), build, this.zzn.getGmpAppId(), id, token, null, this.zzn.zzc(), zzn.zzb(context), this.zzn.zzd(), this.zzn.zze()));
             }
-        } catch (Throwable e2) {
-            th = e2;
-            str2 = null;
+        } catch (IllegalStateException e3) {
+            e = e3;
+            id = null;
             if (Log.isLoggable("ConfigApiImpl", 3)) {
-                Log.d("ConfigApiImpl", "Cannot retrieve instanceId or instanceIdToken.", th);
+                Log.d("ConfigApiImpl", "Cannot retrieve instanceId or instanceIdToken.", e);
             }
             token = null;
-            str = str2;
-            dataHolder = build;
-            com_google_android_gms_internal_config_zzah.zza(r1.zzo, new zzab(context.getPackageName(), r1.zzn.zza(), dataHolder, r1.zzn.getGmpAppId(), str, token, null, r1.zzn.zzc(), zzn.zzb(context), r1.zzn.zzd(), r1.zzn.zze()));
-            build.close();
+            com_google_android_gms_internal_config_zzah.zza(this.zzo, new zzab(context.getPackageName(), this.zzn.zza(), build, this.zzn.getGmpAppId(), id, token, null, this.zzn.zzc(), zzn.zzb(context), this.zzn.zzd(), this.zzn.zze()));
         }
-        dataHolder = build;
         try {
-            com_google_android_gms_internal_config_zzah.zza(r1.zzo, new zzab(context.getPackageName(), r1.zzn.zza(), dataHolder, r1.zzn.getGmpAppId(), str, token, null, r1.zzn.zzc(), zzn.zzb(context), r1.zzn.zzd(), r1.zzn.zze()));
-            build.close();
-        } catch (Throwable e22) {
-            Throwable th2 = e22;
+            com_google_android_gms_internal_config_zzah.zza(this.zzo, new zzab(context.getPackageName(), this.zzn.zza(), build, this.zzn.getGmpAppId(), id, token, null, this.zzn.zzc(), zzn.zzb(context), this.zzn.zzd(), this.zzn.zze()));
+        } finally {
             build.close();
         }
     }

@@ -38,14 +38,19 @@ public final class zzabn extends zzabd<zzabn> {
     public final /* synthetic */ zzabj zzb(zzaba com_google_android_gms_internal_measurement_zzaba) throws IOException {
         while (true) {
             int zzvo = com_google_android_gms_internal_measurement_zzaba.zzvo();
-            if (zzvo == 0) {
-                return this;
+            switch (zzvo) {
+                case 0:
+                    break;
+                case 10:
+                    this.zzcag = com_google_android_gms_internal_measurement_zzaba.readString();
+                    continue;
+                default:
+                    if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
+                        break;
+                    }
+                    continue;
             }
-            if (zzvo == 10) {
-                this.zzcag = com_google_android_gms_internal_measurement_zzaba.readString();
-            } else if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
-                return this;
-            }
+            return this;
         }
     }
 }

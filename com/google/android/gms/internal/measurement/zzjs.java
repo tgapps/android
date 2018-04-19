@@ -18,11 +18,11 @@ public final class zzjs extends AbstractSafeParcelable {
     private final Double zzaqx;
 
     zzjs(int i, String str, long j, Long l, Float f, String str2, String str3, Double d) {
+        Double d2 = null;
         this.versionCode = i;
         this.name = str;
         this.zzaqu = j;
         this.zzaqv = l;
-        Double d2 = null;
         this.zzaqw = null;
         if (i == 1) {
             if (f != null) {
@@ -72,7 +72,7 @@ public final class zzjs extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 1, this.versionCode);
         SafeParcelWriter.writeString(parcel, 2, this.name, false);
         SafeParcelWriter.writeLong(parcel, 3, this.zzaqu);
@@ -81,6 +81,6 @@ public final class zzjs extends AbstractSafeParcelable {
         SafeParcelWriter.writeString(parcel, 6, this.zzajf, false);
         SafeParcelWriter.writeString(parcel, 7, this.zzaek, false);
         SafeParcelWriter.writeDoubleObject(parcel, 8, this.zzaqx, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

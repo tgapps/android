@@ -5,12 +5,14 @@ import android.media.MediaCodec;
 import android.media.MediaCrypto;
 import android.media.MediaFormat;
 import android.os.Handler;
+import java.nio.ByteBuffer;
 import org.telegram.messenger.exoplayer2.BaseRenderer;
 import org.telegram.messenger.exoplayer2.ExoPlaybackException;
 import org.telegram.messenger.exoplayer2.Format;
 import org.telegram.messenger.exoplayer2.PlaybackParameters;
 import org.telegram.messenger.exoplayer2.audio.AudioRendererEventListener.EventDispatcher;
 import org.telegram.messenger.exoplayer2.audio.AudioSink.ConfigurationException;
+import org.telegram.messenger.exoplayer2.audio.AudioSink.InitializationException;
 import org.telegram.messenger.exoplayer2.audio.AudioSink.Listener;
 import org.telegram.messenger.exoplayer2.audio.AudioSink.WriteException;
 import org.telegram.messenger.exoplayer2.drm.DrmInitData;
@@ -58,62 +60,6 @@ public class MediaCodecAudioRenderer extends MediaCodecRenderer implements Media
         }
     }
 
-    protected boolean processOutputBuffer(long r1, long r3, android.media.MediaCodec r5, java.nio.ByteBuffer r6, int r7, int r8, long r9, boolean r11) throws org.telegram.messenger.exoplayer2.ExoPlaybackException {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.audio.MediaCodecAudioRenderer.processOutputBuffer(long, long, android.media.MediaCodec, java.nio.ByteBuffer, int, int, long, boolean):boolean
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r3.passthroughEnabled;
-        r1 = 0;
-        r2 = 1;
-        if (r0 == 0) goto L_0x000e;
-    L_0x0006:
-        r0 = r11 & 2;
-        if (r0 == 0) goto L_0x000e;
-    L_0x000a:
-        r8.releaseOutputBuffer(r10, r1);
-        return r2;
-    L_0x000e:
-        if (r14 == 0) goto L_0x0020;
-    L_0x0010:
-        r8.releaseOutputBuffer(r10, r1);
-        r0 = r3.decoderCounters;
-        r1 = r0.skippedOutputBufferCount;
-        r1 = r1 + r2;
-        r0.skippedOutputBufferCount = r1;
-        r0 = r3.audioSink;
-        r0.handleDiscontinuity();
-        return r2;
-    L_0x0020:
-        r0 = r3.audioSink;	 Catch:{ InitializationException -> 0x0035, InitializationException -> 0x0035 }
-        r0 = r0.handleBuffer(r9, r12);	 Catch:{ InitializationException -> 0x0035, InitializationException -> 0x0035 }
-        if (r0 == 0) goto L_0x0033;	 Catch:{ InitializationException -> 0x0035, InitializationException -> 0x0035 }
-    L_0x0028:
-        r8.releaseOutputBuffer(r10, r1);	 Catch:{ InitializationException -> 0x0035, InitializationException -> 0x0035 }
-        r0 = r3.decoderCounters;	 Catch:{ InitializationException -> 0x0035, InitializationException -> 0x0035 }
-        r1 = r0.renderedOutputBufferCount;	 Catch:{ InitializationException -> 0x0035, InitializationException -> 0x0035 }
-        r1 = r1 + r2;	 Catch:{ InitializationException -> 0x0035, InitializationException -> 0x0035 }
-        r0.renderedOutputBufferCount = r1;	 Catch:{ InitializationException -> 0x0035, InitializationException -> 0x0035 }
-        return r2;
-        return r1;
-    L_0x0035:
-        r0 = move-exception;
-        r1 = r3.getIndex();
-        r1 = org.telegram.messenger.exoplayer2.ExoPlaybackException.createForRenderer(r0, r1);
-        throw r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.audio.MediaCodecAudioRenderer.processOutputBuffer(long, long, android.media.MediaCodec, java.nio.ByteBuffer, int, int, long, boolean):boolean");
-    }
-
     public MediaCodecAudioRenderer(MediaCodecSelector mediaCodecSelector) {
         this(mediaCodecSelector, null, true);
     }
@@ -142,51 +88,34 @@ Caused by: java.lang.NullPointerException
     }
 
     protected int supportsFormat(MediaCodecSelector mediaCodecSelector, DrmSessionManager<FrameworkMediaCrypto> drmSessionManager, Format format) throws DecoderQueryException {
-        MediaCodecAudioRenderer mediaCodecAudioRenderer = this;
-        MediaCodecSelector mediaCodecSelector2 = mediaCodecSelector;
-        Format format2 = format;
-        String mimeType = format2.sampleMimeType;
+        String mimeType = format.sampleMimeType;
         if (!MimeTypes.isAudio(mimeType)) {
             return 0;
         }
         int tunnelingSupport = Util.SDK_INT >= 21 ? 32 : 0;
-        boolean supportsFormatDrm = BaseRenderer.supportsFormatDrm(drmSessionManager, format2.drmInitData);
+        boolean supportsFormatDrm = BaseRenderer.supportsFormatDrm(drmSessionManager, format.drmInitData);
         if (supportsFormatDrm && allowPassthrough(mimeType) && mediaCodecSelector.getPassthroughDecoderInfo() != null) {
-            return (8 | tunnelingSupport) | 4;
+            return (tunnelingSupport | 8) | 4;
         }
-        boolean z = true;
-        if ((MimeTypes.AUDIO_RAW.equals(mimeType) && !mediaCodecAudioRenderer.audioSink.isEncodingSupported(format2.pcmEncoding)) || !mediaCodecAudioRenderer.audioSink.isEncodingSupported(2)) {
+        if ((MimeTypes.AUDIO_RAW.equals(mimeType) && !this.audioSink.isEncodingSupported(format.pcmEncoding)) || !this.audioSink.isEncodingSupported(2)) {
             return 1;
         }
         boolean requiresSecureDecryption = false;
-        DrmInitData drmInitData = format2.drmInitData;
+        DrmInitData drmInitData = format.drmInitData;
         if (drmInitData != null) {
-            boolean requiresSecureDecryption2 = false;
             for (int i = 0; i < drmInitData.schemeDataCount; i++) {
-                requiresSecureDecryption2 |= drmInitData.get(i).requiresSecureDecryption;
+                requiresSecureDecryption |= drmInitData.get(i).requiresSecureDecryption;
             }
-            requiresSecureDecryption = requiresSecureDecryption2;
         }
-        MediaCodecInfo decoderInfo = mediaCodecSelector2.getDecoderInfo(mimeType, requiresSecureDecryption);
+        MediaCodecInfo decoderInfo = mediaCodecSelector.getDecoderInfo(mimeType, requiresSecureDecryption);
         if (decoderInfo == null) {
-            int i2;
-            if (requiresSecureDecryption && mediaCodecSelector2.getDecoderInfo(mimeType, false) != null) {
-                i2 = 2;
-            }
-            return i2;
-        } else if (!supportsFormatDrm) {
-            return 2;
+            return (!requiresSecureDecryption || mediaCodecSelector.getDecoderInfo(mimeType, false) == null) ? 1 : 2;
         } else {
-            if (Util.SDK_INT >= 21) {
-                if (format2.sampleRate == -1 || decoderInfo.isAudioSampleRateSupportedV21(format2.sampleRate)) {
-                    if (format2.channelCount != -1) {
-                        if (decoderInfo.isAudioChannelCountSupportedV21(format2.channelCount)) {
-                        }
-                    }
-                }
-                z = false;
+            if (!supportsFormatDrm) {
+                return 2;
             }
-            return (8 | tunnelingSupport) | (z ? 4 : 3);
+            boolean decoderCapable = Util.SDK_INT < 21 || ((format.sampleRate == -1 || decoderInfo.isAudioSampleRateSupportedV21(format.sampleRate)) && (format.channelCount == -1 || decoderInfo.isAudioChannelCountSupportedV21(format.channelCount)));
+            return (tunnelingSupport | 8) | (decoderCapable ? 4 : 3);
         }
     }
 
@@ -230,22 +159,28 @@ Caused by: java.lang.NullPointerException
     }
 
     protected void onInputFormatChanged(Format newFormat) throws ExoPlaybackException {
+        int i;
+        int i2 = 0;
         super.onInputFormatChanged(newFormat);
         this.eventDispatcher.inputFormatChanged(newFormat);
         this.pcmEncoding = MimeTypes.AUDIO_RAW.equals(newFormat.sampleMimeType) ? newFormat.pcmEncoding : 2;
         this.channelCount = newFormat.channelCount;
-        int i = 0;
-        this.encoderDelay = newFormat.encoderDelay != -1 ? newFormat.encoderDelay : 0;
-        if (newFormat.encoderPadding != -1) {
-            i = newFormat.encoderPadding;
+        if (newFormat.encoderDelay != -1) {
+            i = newFormat.encoderDelay;
+        } else {
+            i = 0;
         }
-        this.encoderPadding = i;
+        this.encoderDelay = i;
+        if (newFormat.encoderPadding != -1) {
+            i2 = newFormat.encoderPadding;
+        }
+        this.encoderPadding = i2;
     }
 
     protected void onOutputFormatChanged(MediaCodec codec, MediaFormat outputFormat) throws ExoPlaybackException {
         int encoding;
         MediaFormat format;
-        int[] iArr;
+        int[] channelMap;
         if (this.passthroughMediaFormat != null) {
             encoding = MimeTypes.getEncoding(this.passthroughMediaFormat.getString("mime"));
             format = this.passthroughMediaFormat;
@@ -256,15 +191,15 @@ Caused by: java.lang.NullPointerException
         int channelCount = format.getInteger("channel-count");
         int sampleRate = format.getInteger("sample-rate");
         if (this.codecNeedsDiscardChannelsWorkaround && channelCount == 6 && this.channelCount < 6) {
-            iArr = new int[this.channelCount];
+            channelMap = new int[this.channelCount];
             for (int i = 0; i < this.channelCount; i++) {
-                iArr[i] = i;
+                channelMap[i] = i;
             }
         } else {
-            iArr = null;
+            channelMap = null;
         }
         try {
-            this.audioSink.configure(encoding, channelCount, sampleRate, 0, iArr, this.encoderDelay, this.encoderPadding);
+            this.audioSink.configure(encoding, channelCount, sampleRate, 0, channelMap, this.encoderDelay, this.encoderPadding);
         } catch (ConfigurationException e) {
             throw ExoPlaybackException.createForRenderer(e, getIndex());
         }
@@ -330,12 +265,7 @@ Caused by: java.lang.NullPointerException
     }
 
     public boolean isReady() {
-        if (!this.audioSink.hasPendingData()) {
-            if (!super.isReady()) {
-                return false;
-            }
-        }
-        return true;
+        return this.audioSink.hasPendingData() || super.isReady();
     }
 
     public long getPositionUs() {
@@ -351,6 +281,36 @@ Caused by: java.lang.NullPointerException
 
     public PlaybackParameters getPlaybackParameters() {
         return this.audioSink.getPlaybackParameters();
+    }
+
+    protected boolean processOutputBuffer(long positionUs, long elapsedRealtimeUs, MediaCodec codec, ByteBuffer buffer, int bufferIndex, int bufferFlags, long bufferPresentationTimeUs, boolean shouldSkip) throws ExoPlaybackException {
+        Exception e;
+        if (this.passthroughEnabled && (bufferFlags & 2) != 0) {
+            codec.releaseOutputBuffer(bufferIndex, false);
+            return true;
+        } else if (shouldSkip) {
+            codec.releaseOutputBuffer(bufferIndex, false);
+            r2 = this.decoderCounters;
+            r2.skippedOutputBufferCount++;
+            this.audioSink.handleDiscontinuity();
+            return true;
+        } else {
+            try {
+                if (!this.audioSink.handleBuffer(buffer, bufferPresentationTimeUs)) {
+                    return false;
+                }
+                codec.releaseOutputBuffer(bufferIndex, false);
+                r2 = this.decoderCounters;
+                r2.renderedOutputBufferCount++;
+                return true;
+            } catch (InitializationException e2) {
+                e = e2;
+                throw ExoPlaybackException.createForRenderer(e, getIndex());
+            } catch (WriteException e3) {
+                e = e3;
+                throw ExoPlaybackException.createForRenderer(e, getIndex());
+            }
+        }
     }
 
     protected void renderToEndOfStream() throws ExoPlaybackException {
@@ -378,7 +338,10 @@ Caused by: java.lang.NullPointerException
     private void updateCurrentPosition() {
         long newCurrentPositionUs = this.audioSink.getCurrentPositionUs(isEnded());
         if (newCurrentPositionUs != Long.MIN_VALUE) {
-            this.currentPositionUs = this.allowPositionDiscontinuity ? newCurrentPositionUs : Math.max(this.currentPositionUs, newCurrentPositionUs);
+            if (!this.allowPositionDiscontinuity) {
+                newCurrentPositionUs = Math.max(this.currentPositionUs, newCurrentPositionUs);
+            }
+            this.currentPositionUs = newCurrentPositionUs;
             this.allowPositionDiscontinuity = false;
         }
     }

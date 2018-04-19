@@ -3,6 +3,7 @@ package org.telegram.messenger.exoplayer2.extractor.mp4;
 import android.util.Log;
 import com.coremedia.iso.boxes.GenreBox;
 import com.coremedia.iso.boxes.RatingBox;
+import org.telegram.messenger.exoplayer2.metadata.Metadata.Entry;
 import org.telegram.messenger.exoplayer2.metadata.id3.ApicFrame;
 import org.telegram.messenger.exoplayer2.metadata.id3.CommentFrame;
 import org.telegram.messenger.exoplayer2.metadata.id3.Id3Frame;
@@ -44,280 +45,132 @@ final class MetadataUtil {
     private static final int TYPE_TV_SHOW = Util.getIntegerCodeForString("tvsh");
     private static final int TYPE_TV_SORT_SHOW = Util.getIntegerCodeForString("sosn");
 
-    public static org.telegram.messenger.exoplayer2.metadata.Metadata.Entry parseIlstElement(org.telegram.messenger.exoplayer2.util.ParsableByteArray r1) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.extractor.mp4.MetadataUtil.parseIlstElement(org.telegram.messenger.exoplayer2.util.ParsableByteArray):org.telegram.messenger.exoplayer2.metadata.Metadata$Entry
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = r7.getPosition();
-        r1 = r7.readInt();
-        r1 = r1 + r0;
-        r2 = r7.readInt();
-        r3 = r2 >> 24;
-        r3 = r3 & 255;
-        r4 = 169; // 0xa9 float:2.37E-43 double:8.35E-322;
-        if (r3 == r4) goto L_0x0106;
-    L_0x0015:
-        r4 = 65533; // 0xfffd float:9.1831E-41 double:3.23776E-319;
-        if (r3 != r4) goto L_0x001c;
-    L_0x001a:
-        goto L_0x0106;
-    L_0x001c:
-        r4 = TYPE_GENRE;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x0028;	 Catch:{ all -> 0x01c0 }
-    L_0x0020:
-        r4 = parseStandardGenreAttribute(r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x0028:
-        r4 = TYPE_DISK_NUMBER;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x0036;	 Catch:{ all -> 0x01c0 }
-    L_0x002c:
-        r4 = "TPOS";	 Catch:{ all -> 0x01c0 }
-        r4 = parseIndexAndCountAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x0036:
-        r4 = TYPE_TRACK_NUMBER;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x0044;	 Catch:{ all -> 0x01c0 }
-    L_0x003a:
-        r4 = "TRCK";	 Catch:{ all -> 0x01c0 }
-        r4 = parseIndexAndCountAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x0044:
-        r4 = TYPE_TEMPO;	 Catch:{ all -> 0x01c0 }
-        r5 = 0;	 Catch:{ all -> 0x01c0 }
-        r6 = 1;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x0054;	 Catch:{ all -> 0x01c0 }
-    L_0x004a:
-        r4 = "TBPM";	 Catch:{ all -> 0x01c0 }
-        r4 = parseUint8Attribute(r2, r4, r7, r6, r5);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x0054:
-        r4 = TYPE_COMPILATION;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x0062;	 Catch:{ all -> 0x01c0 }
-    L_0x0058:
-        r4 = "TCMP";	 Catch:{ all -> 0x01c0 }
-        r4 = parseUint8Attribute(r2, r4, r7, r6, r6);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x0062:
-        r4 = TYPE_COVER_ART;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x006e;	 Catch:{ all -> 0x01c0 }
-    L_0x0066:
-        r4 = parseCoverArt(r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x006e:
-        r4 = TYPE_ALBUM_ARTIST;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x007c;	 Catch:{ all -> 0x01c0 }
-    L_0x0072:
-        r4 = "TPE2";	 Catch:{ all -> 0x01c0 }
-        r4 = parseTextAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x007c:
-        r4 = TYPE_SORT_TRACK_NAME;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x008a;	 Catch:{ all -> 0x01c0 }
-    L_0x0080:
-        r4 = "TSOT";	 Catch:{ all -> 0x01c0 }
-        r4 = parseTextAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x008a:
-        r4 = TYPE_SORT_ALBUM;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x0098;	 Catch:{ all -> 0x01c0 }
-    L_0x008e:
-        r4 = "TSO2";	 Catch:{ all -> 0x01c0 }
-        r4 = parseTextAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x0098:
-        r4 = TYPE_SORT_ARTIST;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x00a6;	 Catch:{ all -> 0x01c0 }
-    L_0x009c:
-        r4 = "TSOA";	 Catch:{ all -> 0x01c0 }
-        r4 = parseTextAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x00a6:
-        r4 = TYPE_SORT_ALBUM_ARTIST;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x00b4;	 Catch:{ all -> 0x01c0 }
-    L_0x00aa:
-        r4 = "TSOP";	 Catch:{ all -> 0x01c0 }
-        r4 = parseTextAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x00b4:
-        r4 = TYPE_SORT_COMPOSER;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x00c2;	 Catch:{ all -> 0x01c0 }
-    L_0x00b8:
-        r4 = "TSOC";	 Catch:{ all -> 0x01c0 }
-        r4 = parseTextAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x00c2:
-        r4 = TYPE_RATING;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x00d0;	 Catch:{ all -> 0x01c0 }
-    L_0x00c6:
-        r4 = "ITUNESADVISORY";	 Catch:{ all -> 0x01c0 }
-        r4 = parseUint8Attribute(r2, r4, r7, r5, r5);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x00d0:
-        r4 = TYPE_GAPLESS_ALBUM;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x00de;	 Catch:{ all -> 0x01c0 }
-    L_0x00d4:
-        r4 = "ITUNESGAPLESS";	 Catch:{ all -> 0x01c0 }
-        r4 = parseUint8Attribute(r2, r4, r7, r5, r6);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x00de:
-        r4 = TYPE_TV_SORT_SHOW;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x00ec;	 Catch:{ all -> 0x01c0 }
-    L_0x00e2:
-        r4 = "TVSHOWSORT";	 Catch:{ all -> 0x01c0 }
-        r4 = parseTextAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x00ec:
-        r4 = TYPE_TV_SHOW;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x00fa;	 Catch:{ all -> 0x01c0 }
-    L_0x00f0:
-        r4 = "TVSHOW";	 Catch:{ all -> 0x01c0 }
-        r4 = parseTextAttribute(r2, r4, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x00fa:
-        r4 = TYPE_INTERNAL;	 Catch:{ all -> 0x01c0 }
-        if (r2 != r4) goto L_0x018d;	 Catch:{ all -> 0x01c0 }
-    L_0x00fe:
-        r4 = parseInternalAttribute(r7, r1);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r4;
-    L_0x0106:
-        r4 = 16777215; // 0xffffff float:2.3509886E-38 double:8.2890456E-317;
-        r4 = r4 & r2;
-        r5 = SHORT_TYPE_COMMENT;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x0116;	 Catch:{ all -> 0x01c0 }
-    L_0x010e:
-        r5 = parseCommentAttribute(r2, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x0116:
-        r5 = SHORT_TYPE_NAME_1;	 Catch:{ all -> 0x01c0 }
-        if (r4 == r5) goto L_0x01b6;	 Catch:{ all -> 0x01c0 }
-    L_0x011a:
-        r5 = SHORT_TYPE_NAME_2;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x0120;	 Catch:{ all -> 0x01c0 }
-    L_0x011e:
-        goto L_0x01b6;	 Catch:{ all -> 0x01c0 }
-    L_0x0120:
-        r5 = SHORT_TYPE_COMPOSER_1;	 Catch:{ all -> 0x01c0 }
-        if (r4 == r5) goto L_0x01ac;	 Catch:{ all -> 0x01c0 }
-    L_0x0124:
-        r5 = SHORT_TYPE_COMPOSER_2;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x012a;	 Catch:{ all -> 0x01c0 }
-    L_0x0128:
-        goto L_0x01ac;	 Catch:{ all -> 0x01c0 }
-    L_0x012a:
-        r5 = SHORT_TYPE_YEAR;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x0138;	 Catch:{ all -> 0x01c0 }
-    L_0x012e:
-        r5 = "TDRC";	 Catch:{ all -> 0x01c0 }
-        r5 = parseTextAttribute(r2, r5, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x0138:
-        r5 = SHORT_TYPE_ARTIST;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x0146;	 Catch:{ all -> 0x01c0 }
-    L_0x013c:
-        r5 = "TPE1";	 Catch:{ all -> 0x01c0 }
-        r5 = parseTextAttribute(r2, r5, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x0146:
-        r5 = SHORT_TYPE_ENCODER;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x0154;	 Catch:{ all -> 0x01c0 }
-    L_0x014a:
-        r5 = "TSSE";	 Catch:{ all -> 0x01c0 }
-        r5 = parseTextAttribute(r2, r5, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x0154:
-        r5 = SHORT_TYPE_ALBUM;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x0162;	 Catch:{ all -> 0x01c0 }
-    L_0x0158:
-        r5 = "TALB";	 Catch:{ all -> 0x01c0 }
-        r5 = parseTextAttribute(r2, r5, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x0162:
-        r5 = SHORT_TYPE_LYRICS;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x0170;	 Catch:{ all -> 0x01c0 }
-    L_0x0166:
-        r5 = "USLT";	 Catch:{ all -> 0x01c0 }
-        r5 = parseTextAttribute(r2, r5, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x0170:
-        r5 = SHORT_TYPE_GENRE;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x017e;	 Catch:{ all -> 0x01c0 }
-    L_0x0174:
-        r5 = "TCON";	 Catch:{ all -> 0x01c0 }
-        r5 = parseTextAttribute(r2, r5, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x017e:
-        r5 = TYPE_GROUPING;	 Catch:{ all -> 0x01c0 }
-        if (r4 != r5) goto L_0x018c;	 Catch:{ all -> 0x01c0 }
-    L_0x0182:
-        r5 = "TIT1";	 Catch:{ all -> 0x01c0 }
-        r5 = parseTextAttribute(r2, r5, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x018d:
-        r4 = "MetadataUtil";	 Catch:{ all -> 0x01c0 }
-        r5 = new java.lang.StringBuilder;	 Catch:{ all -> 0x01c0 }
-        r5.<init>();	 Catch:{ all -> 0x01c0 }
-        r6 = "Skipped unknown metadata entry: ";	 Catch:{ all -> 0x01c0 }
-        r5.append(r6);	 Catch:{ all -> 0x01c0 }
-        r6 = org.telegram.messenger.exoplayer2.extractor.mp4.Atom.getAtomTypeString(r2);	 Catch:{ all -> 0x01c0 }
-        r5.append(r6);	 Catch:{ all -> 0x01c0 }
-        r5 = r5.toString();	 Catch:{ all -> 0x01c0 }
-        android.util.Log.d(r4, r5);	 Catch:{ all -> 0x01c0 }
-        r4 = 0;
-        r7.setPosition(r1);
-        return r4;
-    L_0x01ac:
-        r5 = "TCOM";	 Catch:{ all -> 0x01c0 }
-        r5 = parseTextAttribute(r2, r5, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x01b6:
-        r5 = "TIT2";	 Catch:{ all -> 0x01c0 }
-        r5 = parseTextAttribute(r2, r5, r7);	 Catch:{ all -> 0x01c0 }
-        r7.setPosition(r1);
-        return r5;
-    L_0x01c0:
-        r4 = move-exception;
-        r7.setPosition(r1);
-        throw r4;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.extractor.mp4.MetadataUtil.parseIlstElement(org.telegram.messenger.exoplayer2.util.ParsableByteArray):org.telegram.messenger.exoplayer2.metadata.Metadata$Entry");
+    private MetadataUtil() {
     }
 
-    private MetadataUtil() {
+    public static Entry parseIlstElement(ParsableByteArray ilst) {
+        int endPosition = ilst.getPosition() + ilst.readInt();
+        int type = ilst.readInt();
+        int typeTopByte = (type >> 24) & 255;
+        Entry parseCommentAttribute;
+        if (typeTopByte == 169 || typeTopByte == 65533) {
+            int shortType = type & 16777215;
+            try {
+                if (shortType == SHORT_TYPE_COMMENT) {
+                    parseCommentAttribute = parseCommentAttribute(type, ilst);
+                    return parseCommentAttribute;
+                } else if (shortType == SHORT_TYPE_NAME_1 || shortType == SHORT_TYPE_NAME_2) {
+                    parseCommentAttribute = parseTextAttribute(type, "TIT2", ilst);
+                    ilst.setPosition(endPosition);
+                    return parseCommentAttribute;
+                } else if (shortType == SHORT_TYPE_COMPOSER_1 || shortType == SHORT_TYPE_COMPOSER_2) {
+                    parseCommentAttribute = parseTextAttribute(type, "TCOM", ilst);
+                    ilst.setPosition(endPosition);
+                    return parseCommentAttribute;
+                } else if (shortType == SHORT_TYPE_YEAR) {
+                    parseCommentAttribute = parseTextAttribute(type, "TDRC", ilst);
+                    ilst.setPosition(endPosition);
+                    return parseCommentAttribute;
+                } else if (shortType == SHORT_TYPE_ARTIST) {
+                    parseCommentAttribute = parseTextAttribute(type, "TPE1", ilst);
+                    ilst.setPosition(endPosition);
+                    return parseCommentAttribute;
+                } else if (shortType == SHORT_TYPE_ENCODER) {
+                    parseCommentAttribute = parseTextAttribute(type, "TSSE", ilst);
+                    ilst.setPosition(endPosition);
+                    return parseCommentAttribute;
+                } else if (shortType == SHORT_TYPE_ALBUM) {
+                    parseCommentAttribute = parseTextAttribute(type, "TALB", ilst);
+                    ilst.setPosition(endPosition);
+                    return parseCommentAttribute;
+                } else if (shortType == SHORT_TYPE_LYRICS) {
+                    parseCommentAttribute = parseTextAttribute(type, "USLT", ilst);
+                    ilst.setPosition(endPosition);
+                    return parseCommentAttribute;
+                } else if (shortType == SHORT_TYPE_GENRE) {
+                    parseCommentAttribute = parseTextAttribute(type, "TCON", ilst);
+                    ilst.setPosition(endPosition);
+                    return parseCommentAttribute;
+                } else if (shortType == TYPE_GROUPING) {
+                    parseCommentAttribute = parseTextAttribute(type, "TIT1", ilst);
+                    ilst.setPosition(endPosition);
+                    return parseCommentAttribute;
+                }
+            } finally {
+                ilst.setPosition(endPosition);
+            }
+        } else if (type == TYPE_GENRE) {
+            parseCommentAttribute = parseStandardGenreAttribute(ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_DISK_NUMBER) {
+            parseCommentAttribute = parseIndexAndCountAttribute(type, "TPOS", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_TRACK_NUMBER) {
+            parseCommentAttribute = parseIndexAndCountAttribute(type, "TRCK", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_TEMPO) {
+            parseCommentAttribute = parseUint8Attribute(type, "TBPM", ilst, true, false);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_COMPILATION) {
+            parseCommentAttribute = parseUint8Attribute(type, "TCMP", ilst, true, true);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_COVER_ART) {
+            parseCommentAttribute = parseCoverArt(ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_ALBUM_ARTIST) {
+            parseCommentAttribute = parseTextAttribute(type, "TPE2", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_SORT_TRACK_NAME) {
+            parseCommentAttribute = parseTextAttribute(type, "TSOT", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_SORT_ALBUM) {
+            parseCommentAttribute = parseTextAttribute(type, "TSO2", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_SORT_ARTIST) {
+            parseCommentAttribute = parseTextAttribute(type, "TSOA", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_SORT_ALBUM_ARTIST) {
+            parseCommentAttribute = parseTextAttribute(type, "TSOP", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_SORT_COMPOSER) {
+            parseCommentAttribute = parseTextAttribute(type, "TSOC", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_RATING) {
+            parseCommentAttribute = parseUint8Attribute(type, "ITUNESADVISORY", ilst, false, false);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_GAPLESS_ALBUM) {
+            parseCommentAttribute = parseUint8Attribute(type, "ITUNESGAPLESS", ilst, false, true);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_TV_SORT_SHOW) {
+            parseCommentAttribute = parseTextAttribute(type, "TVSHOWSORT", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_TV_SHOW) {
+            parseCommentAttribute = parseTextAttribute(type, "TVSHOW", ilst);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        } else if (type == TYPE_INTERNAL) {
+            parseCommentAttribute = parseInternalAttribute(ilst, endPosition);
+            ilst.setPosition(endPosition);
+            return parseCommentAttribute;
+        }
+        Log.d(TAG, "Skipped unknown metadata entry: " + Atom.getAtomTypeString(type));
+        ilst.setPosition(endPosition);
+        return null;
     }
 
     private static TextInformationFrame parseTextAttribute(int type, String id, ParsableByteArray data) {
@@ -326,11 +179,7 @@ Caused by: java.lang.NullPointerException
             data.skipBytes(8);
             return new TextInformationFrame(id, null, data.readNullTerminatedString(atomSize - 16));
         }
-        String str = TAG;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Failed to parse text attribute: ");
-        stringBuilder.append(Atom.getAtomTypeString(type));
-        Log.w(str, stringBuilder.toString());
+        Log.w(TAG, "Failed to parse text attribute: " + Atom.getAtomTypeString(type));
         return null;
     }
 
@@ -341,11 +190,7 @@ Caused by: java.lang.NullPointerException
             String value = data.readNullTerminatedString(atomSize - 16);
             return new CommentFrame("und", value, value);
         }
-        value = TAG;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Failed to parse comment attribute: ");
-        stringBuilder.append(Atom.getAtomTypeString(type));
-        Log.w(value, stringBuilder.toString());
+        Log.w(TAG, "Failed to parse comment attribute: " + Atom.getAtomTypeString(type));
         return null;
     }
 
@@ -354,21 +199,14 @@ Caused by: java.lang.NullPointerException
         if (isBoolean) {
             value = Math.min(1, value);
         }
-        if (value >= 0) {
-            Id3Frame textInformationFrame;
-            if (isTextInformationFrame) {
-                textInformationFrame = new TextInformationFrame(id, null, Integer.toString(value));
-            } else {
-                textInformationFrame = new CommentFrame("und", id, Integer.toString(value));
-            }
-            return textInformationFrame;
+        if (value < 0) {
+            Log.w(TAG, "Failed to parse uint8 attribute: " + Atom.getAtomTypeString(type));
+            return null;
+        } else if (isTextInformationFrame) {
+            return new TextInformationFrame(id, null, Integer.toString(value));
+        } else {
+            return new CommentFrame("und", id, Integer.toString(value));
         }
-        String str = TAG;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Failed to parse uint8 attribute: ");
-        stringBuilder.append(Atom.getAtomTypeString(type));
-        Log.w(str, stringBuilder.toString());
-        return null;
     }
 
     private static TextInformationFrame parseIndexAndCountAttribute(int type, String attributeName, ParsableByteArray data) {
@@ -377,32 +215,26 @@ Caused by: java.lang.NullPointerException
             data.skipBytes(10);
             int index = data.readUnsignedShort();
             if (index > 0) {
-                String value = new StringBuilder();
-                value.append(TtmlNode.ANONYMOUS_REGION_ID);
-                value.append(index);
-                value = value.toString();
+                String value = TtmlNode.ANONYMOUS_REGION_ID + index;
                 int count = data.readUnsignedShort();
                 if (count > 0) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append(value);
-                    stringBuilder.append("/");
-                    stringBuilder.append(count);
-                    value = stringBuilder.toString();
+                    value = value + "/" + count;
                 }
                 return new TextInformationFrame(attributeName, null, value);
             }
         }
-        String str = TAG;
-        StringBuilder stringBuilder2 = new StringBuilder();
-        stringBuilder2.append("Failed to parse index/count attribute: ");
-        stringBuilder2.append(Atom.getAtomTypeString(type));
-        Log.w(str, stringBuilder2.toString());
+        Log.w(TAG, "Failed to parse index/count attribute: " + Atom.getAtomTypeString(type));
         return null;
     }
 
     private static TextInformationFrame parseStandardGenreAttribute(ParsableByteArray data) {
+        String genreString;
         int genreCode = parseUint8AttributeValue(data);
-        String genreString = (genreCode <= 0 || genreCode > STANDARD_GENRES.length) ? null : STANDARD_GENRES[genreCode - 1];
+        if (genreCode <= 0 || genreCode > STANDARD_GENRES.length) {
+            genreString = null;
+        } else {
+            genreString = STANDARD_GENRES[genreCode - 1];
+        }
         if (genreString != null) {
             return new TextInformationFrame("TCON", null, genreString);
         }
@@ -416,11 +248,7 @@ Caused by: java.lang.NullPointerException
             int flags = Atom.parseFullAtomFlags(data.readInt());
             String mimeType = flags == 13 ? "image/jpeg" : flags == 14 ? "image/png" : null;
             if (mimeType == null) {
-                String str = TAG;
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Unrecognized cover art flags: ");
-                stringBuilder.append(flags);
-                Log.w(str, stringBuilder.toString());
+                Log.w(TAG, "Unrecognized cover art flags: " + flags);
                 return null;
             }
             data.skipBytes(4);
@@ -433,9 +261,9 @@ Caused by: java.lang.NullPointerException
     }
 
     private static Id3Frame parseInternalAttribute(ParsableByteArray data, int endPosition) {
-        int dataAtomPosition = -1;
-        String name = null;
         String domain = null;
+        String name = null;
+        int dataAtomPosition = -1;
         int dataAtomSize = -1;
         while (data.getPosition() < endPosition) {
             int atomPosition = data.getPosition();
@@ -454,14 +282,12 @@ Caused by: java.lang.NullPointerException
                 data.skipBytes(atomSize - 12);
             }
         }
-        if ("com.apple.iTunes".equals(domain) && "iTunSMPB".equals(name)) {
-            if (dataAtomPosition != -1) {
-                data.setPosition(dataAtomPosition);
-                data.skipBytes(16);
-                return new CommentFrame("und", name, data.readNullTerminatedString(dataAtomSize - 16));
-            }
+        if (!"com.apple.iTunes".equals(domain) || !"iTunSMPB".equals(name) || dataAtomPosition == -1) {
+            return null;
         }
-        return null;
+        data.setPosition(dataAtomPosition);
+        data.skipBytes(16);
+        return new CommentFrame("und", name, data.readNullTerminatedString(dataAtomSize - 16));
     }
 
     private static int parseUint8AttributeValue(ParsableByteArray data) {

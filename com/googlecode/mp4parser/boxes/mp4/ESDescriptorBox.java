@@ -37,20 +37,16 @@ public class ESDescriptorBox extends AbstractDescriptorBox {
         if (this == o) {
             return true;
         }
-        if (o != null) {
-            if (getClass() == o.getClass()) {
-                ESDescriptorBox that = (ESDescriptorBox) o;
-                if (this.data != null) {
-                    if (!this.data.equals(that.data)) {
-                    }
-                    return true;
-                } else if (that.data != null) {
-                    return false;
-                } else {
-                    return true;
-                }
-                return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ESDescriptorBox that = (ESDescriptorBox) o;
+        if (this.data != null) {
+            if (this.data.equals(that.data)) {
+                return true;
             }
+        } else if (that.data == null) {
+            return true;
         }
         return false;
     }

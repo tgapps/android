@@ -25,8 +25,10 @@ public final class zzd extends AbstractSafeParcelable {
                 IInterface queryLocalInterface = iBinder.queryLocalInterface("com.google.android.gms.wearable.internal.IWearableListener");
                 com_google_android_gms_wearable_internal_zzem = queryLocalInterface instanceof zzem ? (zzem) queryLocalInterface : new zzeo(iBinder);
             }
+            this.zzaz = com_google_android_gms_wearable_internal_zzem;
+        } else {
+            this.zzaz = null;
         }
-        this.zzaz = com_google_android_gms_wearable_internal_zzem;
         this.zzba = intentFilterArr;
         this.zzbb = str;
         this.zzbc = str2;

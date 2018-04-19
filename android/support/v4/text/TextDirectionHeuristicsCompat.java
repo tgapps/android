@@ -40,10 +40,13 @@ public final class TextDirectionHeuristicsCompat {
                         break;
                 }
             }
-            if (haveUnlookedFor) {
-                return this.mLookForRtl;
+            if (!haveUnlookedFor) {
+                return 2;
             }
-            return 2;
+            if (this.mLookForRtl) {
+                return 1;
+            }
+            return 0;
         }
 
         private AnyStrong(boolean lookForRtl) {
@@ -77,15 +80,13 @@ public final class TextDirectionHeuristicsCompat {
         }
 
         public boolean isRtl(CharSequence cs, int start, int count) {
-            if (cs != null && start >= 0 && count >= 0) {
-                if (cs.length() - count >= start) {
-                    if (this.mAlgorithm == null) {
-                        return defaultIsRtl();
-                    }
-                    return doCheck(cs, start, count);
-                }
+            if (cs == null || start < 0 || count < 0 || cs.length() - count < start) {
+                throw new IllegalArgumentException();
+            } else if (this.mAlgorithm == null) {
+                return defaultIsRtl();
+            } else {
+                return doCheck(cs, start, count);
             }
-            throw new IllegalArgumentException();
         }
 
         private boolean doCheck(CharSequence cs, int start, int count) {
@@ -121,7 +122,10 @@ public final class TextDirectionHeuristicsCompat {
         }
 
         protected boolean defaultIsRtl() {
-            return TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == 1;
+            if (TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == 1) {
+                return true;
+            }
+            return false;
         }
     }
 
@@ -137,34 +141,19 @@ public final class TextDirectionHeuristicsCompat {
         }
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    static int isRtlTextOrFormat(int r1) {
-        /*
-        switch(r1) {
-            case 0: goto L_0x000a;
-            case 1: goto L_0x0008;
-            case 2: goto L_0x0008;
-            default: goto L_0x0003;
-        };
-    L_0x0003:
-        switch(r1) {
-            case 14: goto L_0x000a;
-            case 15: goto L_0x000a;
-            case 16: goto L_0x0008;
-            case 17: goto L_0x0008;
-            default: goto L_0x0006;
-        };
-    L_0x0006:
-        r0 = 2;
-        return r0;
-    L_0x0008:
-        r0 = 0;
-        return r0;
-    L_0x000a:
-        r0 = 1;
-        return r0;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: android.support.v4.text.TextDirectionHeuristicsCompat.isRtlTextOrFormat(int):int");
+    static int isRtlTextOrFormat(int directionality) {
+        switch (directionality) {
+            case 0:
+            case 14:
+            case 15:
+                return 1;
+            case 1:
+            case 2:
+            case 16:
+            case 17:
+                return 0;
+            default:
+                return 2;
+        }
     }
 }

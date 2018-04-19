@@ -14,10 +14,10 @@ public class ErrorDialogFragment extends DialogFragment {
 
     public static ErrorDialogFragment newInstance(Dialog dialog, OnCancelListener onCancelListener) {
         ErrorDialogFragment errorDialogFragment = new ErrorDialogFragment();
-        dialog = (Dialog) Preconditions.checkNotNull(dialog, "Cannot display null dialog");
-        dialog.setOnCancelListener(null);
-        dialog.setOnDismissListener(null);
-        errorDialogFragment.mDialog = dialog;
+        Dialog dialog2 = (Dialog) Preconditions.checkNotNull(dialog, "Cannot display null dialog");
+        dialog2.setOnCancelListener(null);
+        dialog2.setOnDismissListener(null);
+        errorDialogFragment.mDialog = dialog2;
         if (onCancelListener != null) {
             errorDialogFragment.zzap = onCancelListener;
         }

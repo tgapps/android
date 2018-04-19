@@ -16,12 +16,12 @@ final class zzu implements zzbq {
             if (this.zzgc.zzfz) {
                 this.zzgc.zzfz = false;
                 this.zzgc.zza(i, z);
-            } else {
-                this.zzgc.zzfz = true;
-                this.zzgc.zzfr.onConnectionSuspended(i);
+                return;
             }
+            this.zzgc.zzfz = true;
+            this.zzgc.zzfr.onConnectionSuspended(i);
             this.zzgc.zzga.unlock();
-        } catch (Throwable th) {
+        } finally {
             this.zzgc.zzga.unlock();
         }
     }

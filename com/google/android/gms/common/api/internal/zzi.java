@@ -28,10 +28,7 @@ public class zzi extends zzk {
 
         public final void onConnectionFailed(ConnectionResult connectionResult) {
             String valueOf = String.valueOf(connectionResult);
-            StringBuilder stringBuilder = new StringBuilder(27 + String.valueOf(valueOf).length());
-            stringBuilder.append("beginFailureResolution for ");
-            stringBuilder.append(valueOf);
-            Log.d("AutoManageHelper", stringBuilder.toString());
+            Log.d("AutoManageHelper", new StringBuilder(String.valueOf(valueOf).length() + 27).append("beginFailureResolution for ").append(valueOf).toString());
             this.zzeh.zzb(connectionResult, this.zzee);
         }
     }
@@ -66,12 +63,7 @@ public class zzi extends zzk {
         super.onStart();
         boolean z = this.mStarted;
         String valueOf = String.valueOf(this.zzed);
-        StringBuilder stringBuilder = new StringBuilder(14 + String.valueOf(valueOf).length());
-        stringBuilder.append("onStart ");
-        stringBuilder.append(z);
-        stringBuilder.append(" ");
-        stringBuilder.append(valueOf);
-        Log.d("AutoManageHelper", stringBuilder.toString());
+        Log.d("AutoManageHelper", new StringBuilder(String.valueOf(valueOf).length() + 14).append("onStart ").append(z).append(" ").append(valueOf).toString());
         if (this.zzer.get() == null) {
             for (int i = 0; i < this.zzed.size(); i++) {
                 zza zzd = zzd(i);
@@ -94,29 +86,15 @@ public class zzi extends zzk {
 
     public final void zza(int i, GoogleApiClient googleApiClient, OnConnectionFailedListener onConnectionFailedListener) {
         Preconditions.checkNotNull(googleApiClient, "GoogleApiClient instance cannot be null");
-        boolean z = this.zzed.indexOfKey(i) < 0;
-        StringBuilder stringBuilder = new StringBuilder(54);
-        stringBuilder.append("Already managing a GoogleApiClient with id ");
-        stringBuilder.append(i);
-        Preconditions.checkState(z, stringBuilder.toString());
+        Preconditions.checkState(this.zzed.indexOfKey(i) < 0, "Already managing a GoogleApiClient with id " + i);
         zzl com_google_android_gms_common_api_internal_zzl = (zzl) this.zzer.get();
-        boolean z2 = this.mStarted;
+        boolean z = this.mStarted;
         String valueOf = String.valueOf(com_google_android_gms_common_api_internal_zzl);
-        StringBuilder stringBuilder2 = new StringBuilder(49 + String.valueOf(valueOf).length());
-        stringBuilder2.append("starting AutoManage for client ");
-        stringBuilder2.append(i);
-        stringBuilder2.append(" ");
-        stringBuilder2.append(z2);
-        stringBuilder2.append(" ");
-        stringBuilder2.append(valueOf);
-        Log.d("AutoManageHelper", stringBuilder2.toString());
+        Log.d("AutoManageHelper", new StringBuilder(String.valueOf(valueOf).length() + 49).append("starting AutoManage for client ").append(i).append(" ").append(z).append(" ").append(valueOf).toString());
         this.zzed.put(i, new zza(this, i, googleApiClient, onConnectionFailedListener));
         if (this.mStarted && com_google_android_gms_common_api_internal_zzl == null) {
             String valueOf2 = String.valueOf(googleApiClient);
-            StringBuilder stringBuilder3 = new StringBuilder(11 + String.valueOf(valueOf2).length());
-            stringBuilder3.append("connecting ");
-            stringBuilder3.append(valueOf2);
-            Log.d("AutoManageHelper", stringBuilder3.toString());
+            Log.d("AutoManageHelper", new StringBuilder(String.valueOf(valueOf2).length() + 11).append("connecting ").append(valueOf2).toString());
             googleApiClient.connect();
         }
     }

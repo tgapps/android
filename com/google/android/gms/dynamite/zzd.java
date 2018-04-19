@@ -11,19 +11,16 @@ final class zzd implements VersionPolicy {
     }
 
     public final SelectionResult selectModule(Context context, String str, IVersions iVersions) throws LoadingException {
-        int i;
         SelectionResult selectionResult = new SelectionResult();
         selectionResult.localVersion = iVersions.getLocalVersion(context, str);
         selectionResult.remoteVersion = iVersions.getRemoteVersion(context, str, true);
         if (selectionResult.localVersion == 0 && selectionResult.remoteVersion == 0) {
-            i = 0;
+            selectionResult.selection = 0;
         } else if (selectionResult.localVersion >= selectionResult.remoteVersion) {
-            i = -1;
+            selectionResult.selection = -1;
         } else {
             selectionResult.selection = 1;
-            return selectionResult;
         }
-        selectionResult.selection = i;
         return selectionResult;
     }
 }

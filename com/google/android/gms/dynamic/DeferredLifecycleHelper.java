@@ -135,9 +135,7 @@ public abstract class DeferredLifecycleHelper<T extends LifecycleDelegate> {
     public void onSaveInstanceState(Bundle bundle) {
         if (this.zzabc != null) {
             this.zzabc.onSaveInstanceState(bundle);
-            return;
-        }
-        if (this.zzabd != null) {
+        } else if (this.zzabd != null) {
             bundle.putAll(this.zzabd);
         }
     }

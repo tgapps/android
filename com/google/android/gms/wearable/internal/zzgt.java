@@ -16,13 +16,11 @@ final class zzgt extends zzgm<GetOutputStreamResult> {
     }
 
     public final void zza(zzdo com_google_android_gms_wearable_internal_zzdo) {
-        OutputStream com_google_android_gms_wearable_internal_zzbl;
+        OutputStream outputStream = null;
         if (com_google_android_gms_wearable_internal_zzdo.zzdr != null) {
-            com_google_android_gms_wearable_internal_zzbl = new zzbl(new AutoCloseOutputStream(com_google_android_gms_wearable_internal_zzdo.zzdr));
-            this.zzeu.zza(new zzbm(com_google_android_gms_wearable_internal_zzbl));
-        } else {
-            com_google_android_gms_wearable_internal_zzbl = null;
+            outputStream = new zzbl(new AutoCloseOutputStream(com_google_android_gms_wearable_internal_zzdo.zzdr));
+            this.zzeu.zza(new zzbm(outputStream));
         }
-        zza(new zzbh(new Status(com_google_android_gms_wearable_internal_zzdo.statusCode), com_google_android_gms_wearable_internal_zzbl));
+        zza(new zzbh(new Status(com_google_android_gms_wearable_internal_zzdo.statusCode), outputStream));
     }
 }

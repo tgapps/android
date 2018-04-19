@@ -25,31 +25,32 @@ public final class zzck {
     }
 
     public final void release() {
+        zzcn com_google_android_gms_common_api_internal_zzcn = null;
         for (PendingResult pendingResult : (BasePendingResult[]) this.zzmo.toArray(zzmn)) {
-            zzcn com_google_android_gms_common_api_internal_zzcn = null;
             pendingResult.zza(com_google_android_gms_common_api_internal_zzcn);
             if (pendingResult.zzo() != null) {
                 pendingResult.setResultCallback(com_google_android_gms_common_api_internal_zzcn);
                 IBinder serviceBrokerBinder = ((Client) this.zzil.get(((ApiMethodImpl) pendingResult).getClientKey())).getServiceBrokerBinder();
                 if (pendingResult.isReady()) {
                     pendingResult.zza(new zzcm(pendingResult, com_google_android_gms_common_api_internal_zzcn, serviceBrokerBinder, com_google_android_gms_common_api_internal_zzcn));
-                } else {
-                    if (serviceBrokerBinder == null || !serviceBrokerBinder.isBinderAlive()) {
-                        pendingResult.zza(com_google_android_gms_common_api_internal_zzcn);
-                    } else {
-                        zzcn com_google_android_gms_common_api_internal_zzcm = new zzcm(pendingResult, com_google_android_gms_common_api_internal_zzcn, serviceBrokerBinder, com_google_android_gms_common_api_internal_zzcn);
-                        pendingResult.zza(com_google_android_gms_common_api_internal_zzcm);
-                        try {
-                            serviceBrokerBinder.linkToDeath(com_google_android_gms_common_api_internal_zzcm, 0);
-                        } catch (RemoteException e) {
-                        }
-                    }
+                } else if (serviceBrokerBinder == null || !serviceBrokerBinder.isBinderAlive()) {
+                    pendingResult.zza(com_google_android_gms_common_api_internal_zzcn);
                     pendingResult.cancel();
                     com_google_android_gms_common_api_internal_zzcn.remove(pendingResult.zzo().intValue());
+                } else {
+                    zzcn com_google_android_gms_common_api_internal_zzcm = new zzcm(pendingResult, com_google_android_gms_common_api_internal_zzcn, serviceBrokerBinder, com_google_android_gms_common_api_internal_zzcn);
+                    pendingResult.zza(com_google_android_gms_common_api_internal_zzcm);
+                    try {
+                        serviceBrokerBinder.linkToDeath(com_google_android_gms_common_api_internal_zzcm, 0);
+                    } catch (RemoteException e) {
+                        pendingResult.cancel();
+                        com_google_android_gms_common_api_internal_zzcn.remove(pendingResult.zzo().intValue());
+                    }
                 }
-            } else if (!pendingResult.zzw()) {
+                this.zzmo.remove(pendingResult);
+            } else if (pendingResult.zzw()) {
+                this.zzmo.remove(pendingResult);
             }
-            this.zzmo.remove(pendingResult);
         }
     }
 

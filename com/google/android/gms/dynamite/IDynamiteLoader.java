@@ -23,9 +23,9 @@ public interface IDynamiteLoader extends IInterface {
                 zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper);
                 obtainAndWriteInterfaceToken.writeString(str);
                 obtainAndWriteInterfaceToken.writeInt(i);
-                Parcel transactAndReadException = transactAndReadException(2, obtainAndWriteInterfaceToken);
-                IObjectWrapper asInterface = com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(transactAndReadException.readStrongBinder());
-                transactAndReadException.recycle();
+                obtainAndWriteInterfaceToken = transactAndReadException(2, obtainAndWriteInterfaceToken);
+                IObjectWrapper asInterface = com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+                obtainAndWriteInterfaceToken.recycle();
                 return asInterface;
             }
 
@@ -33,9 +33,9 @@ public interface IDynamiteLoader extends IInterface {
                 Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
                 zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper);
                 obtainAndWriteInterfaceToken.writeString(str);
-                Parcel transactAndReadException = transactAndReadException(1, obtainAndWriteInterfaceToken);
-                int readInt = transactAndReadException.readInt();
-                transactAndReadException.recycle();
+                obtainAndWriteInterfaceToken = transactAndReadException(1, obtainAndWriteInterfaceToken);
+                int readInt = obtainAndWriteInterfaceToken.readInt();
+                obtainAndWriteInterfaceToken.recycle();
                 return readInt;
             }
 
@@ -44,9 +44,9 @@ public interface IDynamiteLoader extends IInterface {
                 zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper);
                 obtainAndWriteInterfaceToken.writeString(str);
                 zzc.zza(obtainAndWriteInterfaceToken, z);
-                Parcel transactAndReadException = transactAndReadException(3, obtainAndWriteInterfaceToken);
-                int readInt = transactAndReadException.readInt();
-                transactAndReadException.recycle();
+                obtainAndWriteInterfaceToken = transactAndReadException(3, obtainAndWriteInterfaceToken);
+                int readInt = obtainAndWriteInterfaceToken.readInt();
+                obtainAndWriteInterfaceToken.recycle();
                 return readInt;
             }
         }
@@ -60,9 +60,12 @@ public interface IDynamiteLoader extends IInterface {
         }
 
         protected boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+            int moduleVersion;
             switch (i) {
                 case 1:
-                    i = getModuleVersion(com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(parcel.readStrongBinder()), parcel.readString());
+                    moduleVersion = getModuleVersion(com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(parcel.readStrongBinder()), parcel.readString());
+                    parcel2.writeNoException();
+                    parcel2.writeInt(moduleVersion);
                     break;
                 case 2:
                     IInterface createModuleContext = createModuleContext(com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(parcel.readStrongBinder()), parcel.readString(), parcel.readInt());
@@ -70,13 +73,13 @@ public interface IDynamiteLoader extends IInterface {
                     zzc.zza(parcel2, createModuleContext);
                     break;
                 case 3:
-                    i = getModuleVersion2(com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(parcel.readStrongBinder()), parcel.readString(), zzc.zza(parcel));
+                    moduleVersion = getModuleVersion2(com.google.android.gms.dynamic.IObjectWrapper.Stub.asInterface(parcel.readStrongBinder()), parcel.readString(), zzc.zza(parcel));
+                    parcel2.writeNoException();
+                    parcel2.writeInt(moduleVersion);
                     break;
                 default:
                     return false;
             }
-            parcel2.writeNoException();
-            parcel2.writeInt(i);
             return true;
         }
     }

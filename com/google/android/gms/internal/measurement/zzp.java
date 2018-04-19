@@ -19,6 +19,6 @@ public class zzp {
     }
 
     public static void zza(Parcel parcel, boolean z) {
-        parcel.writeInt(z);
+        parcel.writeInt(z ? 1 : 0);
     }
 }

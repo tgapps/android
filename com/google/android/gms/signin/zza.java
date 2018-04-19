@@ -15,9 +15,6 @@ final class zza extends AbstractClientBuilder<SignInClientImpl, SignInOptions> {
 
     public final /* synthetic */ Client buildClient(Context context, Looper looper, ClientSettings clientSettings, Object obj, ConnectionCallbacks connectionCallbacks, OnConnectionFailedListener onConnectionFailedListener) {
         SignInOptions signInOptions = (SignInOptions) obj;
-        if (signInOptions == null) {
-            signInOptions = SignInOptions.DEFAULT;
-        }
-        return new SignInClientImpl(context, looper, true, clientSettings, signInOptions, connectionCallbacks, onConnectionFailedListener);
+        return new SignInClientImpl(context, looper, true, clientSettings, signInOptions == null ? SignInOptions.DEFAULT : signInOptions, connectionCallbacks, onConnectionFailedListener);
     }
 }

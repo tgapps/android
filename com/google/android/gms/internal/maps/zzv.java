@@ -35,9 +35,9 @@ public final class zzv extends zza implements zzt {
     public final boolean zzj(zzt com_google_android_gms_internal_maps_zzt) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         zzc.zza(obtainAndWriteInterfaceToken, (IInterface) com_google_android_gms_internal_maps_zzt);
-        Parcel transactAndReadException = transactAndReadException(16, obtainAndWriteInterfaceToken);
-        boolean zza = zzc.zza(transactAndReadException);
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(16, obtainAndWriteInterfaceToken);
+        boolean zza = zzc.zza(obtainAndWriteInterfaceToken);
+        obtainAndWriteInterfaceToken.recycle();
         return zza;
     }
 }

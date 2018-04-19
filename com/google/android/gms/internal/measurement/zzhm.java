@@ -60,14 +60,13 @@ public final class zzhm extends zzhk {
             long j = conditionalUserProperty.mTriggerTimeout;
             if (TextUtils.isEmpty(conditionalUserProperty.mTriggerEventName) || (j <= 15552000000L && j >= 1)) {
                 j = conditionalUserProperty.mTimeToLive;
-                if (j <= 15552000000L) {
-                    if (j >= 1) {
-                        zzgf().zzc(new zzht(this, conditionalUserProperty));
-                        return;
-                    }
+                if (j > 15552000000L || j < 1) {
+                    zzgg().zzil().zze("Invalid conditional user property time to live", zzgb().zzbg(str), Long.valueOf(j));
+                    return;
+                } else {
+                    zzgf().zzc(new zzht(this, conditionalUserProperty));
+                    return;
                 }
-                zzgg().zzil().zze("Invalid conditional user property time to live", zzgb().zzbg(str), Long.valueOf(j));
-                return;
             }
             zzgg().zzil().zze("Invalid conditional user property timeout", zzgb().zzbg(str), Long.valueOf(j));
         }
@@ -75,38 +74,31 @@ public final class zzhm extends zzhk {
 
     private final void zza(String str, String str2, long j, Bundle bundle, boolean z, boolean z2, boolean z3, String str3) {
         Bundle bundle2;
-        Bundle bundle3 = bundle;
-        if (bundle3 == null) {
+        if (bundle == null) {
             bundle2 = new Bundle();
         } else {
-            Bundle bundle4 = new Bundle(bundle3);
-            for (String str4 : bundle4.keySet()) {
-                Object obj = bundle4.get(str4);
+            bundle2 = new Bundle(bundle);
+            for (String str4 : bundle2.keySet()) {
+                Object obj = bundle2.get(str4);
                 if (obj instanceof Bundle) {
-                    bundle4.putBundle(str4, new Bundle((Bundle) obj));
-                } else {
-                    int i = 0;
-                    if (obj instanceof Parcelable[]) {
-                        Parcelable[] parcelableArr = (Parcelable[]) obj;
-                        while (i < parcelableArr.length) {
-                            if (parcelableArr[i] instanceof Bundle) {
-                                parcelableArr[i] = new Bundle((Bundle) parcelableArr[i]);
-                            }
-                            i++;
+                    bundle2.putBundle(str4, new Bundle((Bundle) obj));
+                } else if (obj instanceof Parcelable[]) {
+                    Parcelable[] parcelableArr = (Parcelable[]) obj;
+                    for (r4 = 0; r4 < parcelableArr.length; r4++) {
+                        if (parcelableArr[r4] instanceof Bundle) {
+                            parcelableArr[r4] = new Bundle((Bundle) parcelableArr[r4]);
                         }
-                    } else if (obj instanceof ArrayList) {
-                        ArrayList arrayList = (ArrayList) obj;
-                        while (i < arrayList.size()) {
-                            Object obj2 = arrayList.get(i);
-                            if (obj2 instanceof Bundle) {
-                                arrayList.set(i, new Bundle((Bundle) obj2));
-                            }
-                            i++;
+                    }
+                } else if (obj instanceof ArrayList) {
+                    ArrayList arrayList = (ArrayList) obj;
+                    for (r4 = 0; r4 < arrayList.size(); r4++) {
+                        Object obj2 = arrayList.get(r4);
+                        if (obj2 instanceof Bundle) {
+                            arrayList.set(r4, new Bundle((Bundle) obj2));
                         }
                     }
                 }
             }
-            bundle2 = bundle4;
         }
         zzgf().zzc(new zzie(this, str, str2, j, bundle2, z, z2, z3, str3));
     }
@@ -147,65 +139,48 @@ public final class zzhm extends zzhk {
     }
 
     private final Map<String, Object> zzb(String str, String str2, String str3, boolean z) {
-        zzfi zzil;
         if (zzgf().zzjg()) {
-            zzil = zzgg().zzil();
-            str2 = "Cannot get user properties from analytics worker thread";
-        } else {
-            zzgf();
-            if (zzgg.isMainThread()) {
-                zzil = zzgg().zzil();
-                str2 = "Cannot get user properties from main thread";
-            } else {
-                AtomicReference atomicReference = new AtomicReference();
-                synchronized (atomicReference) {
-                    this.zzacr.zzgf().zzc(new zzhw(this, atomicReference, str, str2, str3, z));
-                    try {
-                        atomicReference.wait(DefaultRenderersFactory.DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS);
-                    } catch (InterruptedException e) {
-                        zzgg().zzin().zzg("Interrupted waiting for get user properties", e);
-                    }
-                }
-                List<zzjs> list = (List) atomicReference.get();
-                if (list == null) {
-                    zzil = zzgg().zzin();
-                    str2 = "Timed out waiting for get user properties";
-                } else {
-                    Map<String, Object> arrayMap = new ArrayMap(list.size());
-                    for (zzjs com_google_android_gms_internal_measurement_zzjs : list) {
-                        arrayMap.put(com_google_android_gms_internal_measurement_zzjs.name, com_google_android_gms_internal_measurement_zzjs.getValue());
-                    }
-                    return arrayMap;
-                }
+            zzgg().zzil().log("Cannot get user properties from analytics worker thread");
+            return Collections.emptyMap();
+        }
+        zzgf();
+        if (zzgg.isMainThread()) {
+            zzgg().zzil().log("Cannot get user properties from main thread");
+            return Collections.emptyMap();
+        }
+        AtomicReference atomicReference = new AtomicReference();
+        synchronized (atomicReference) {
+            this.zzacr.zzgf().zzc(new zzhw(this, atomicReference, str, str2, str3, z));
+            try {
+                atomicReference.wait(DefaultRenderersFactory.DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS);
+            } catch (InterruptedException e) {
+                zzgg().zzin().zzg("Interrupted waiting for get user properties", e);
             }
         }
-        zzil.log(str2);
-        return Collections.emptyMap();
+        List<zzjs> list = (List) atomicReference.get();
+        if (list == null) {
+            zzgg().zzin().log("Timed out waiting for get user properties");
+            return Collections.emptyMap();
+        }
+        Map<String, Object> arrayMap = new ArrayMap(list.size());
+        for (zzjs com_google_android_gms_internal_measurement_zzjs : list) {
+            arrayMap.put(com_google_android_gms_internal_measurement_zzjs.name, com_google_android_gms_internal_measurement_zzjs.getValue());
+        }
+        return arrayMap;
     }
 
     private final void zzb(ConditionalUserProperty conditionalUserProperty) {
-        ConditionalUserProperty conditionalUserProperty2 = conditionalUserProperty;
         zzab();
         zzch();
         Preconditions.checkNotNull(conditionalUserProperty);
-        Preconditions.checkNotEmpty(conditionalUserProperty2.mName);
-        Preconditions.checkNotEmpty(conditionalUserProperty2.mOrigin);
-        Preconditions.checkNotNull(conditionalUserProperty2.mValue);
+        Preconditions.checkNotEmpty(conditionalUserProperty.mName);
+        Preconditions.checkNotEmpty(conditionalUserProperty.mOrigin);
+        Preconditions.checkNotNull(conditionalUserProperty.mValue);
         if (this.zzacr.isEnabled()) {
-            zzjs com_google_android_gms_internal_measurement_zzjs = new zzjs(conditionalUserProperty2.mName, conditionalUserProperty2.mTriggeredTimestamp, conditionalUserProperty2.mValue, conditionalUserProperty2.mOrigin);
+            zzjs com_google_android_gms_internal_measurement_zzjs = new zzjs(conditionalUserProperty.mName, conditionalUserProperty.mTriggeredTimestamp, conditionalUserProperty.mValue, conditionalUserProperty.mOrigin);
             try {
-                zzeu zza = zzgc().zza(conditionalUserProperty2.mTriggeredEventName, conditionalUserProperty2.mTriggeredEventParams, conditionalUserProperty2.mOrigin, 0, true, false);
-                zzeu zza2 = zzgc().zza(conditionalUserProperty2.mTimedOutEventName, conditionalUserProperty2.mTimedOutEventParams, conditionalUserProperty2.mOrigin, 0, true, false);
-                zzeu zza3 = zzgc().zza(conditionalUserProperty2.mExpiredEventName, conditionalUserProperty2.mExpiredEventParams, conditionalUserProperty2.mOrigin, 0, true, false);
-                String str = conditionalUserProperty2.mAppId;
-                String str2 = conditionalUserProperty2.mOrigin;
-                long j = conditionalUserProperty2.mCreationTimestamp;
-                String str3 = conditionalUserProperty2.mTriggerEventName;
-                long j2 = conditionalUserProperty2.mTriggerTimeout;
-                long j3 = conditionalUserProperty2.mTimeToLive;
-                zzef com_google_android_gms_internal_measurement_zzef = r4;
-                zzef com_google_android_gms_internal_measurement_zzef2 = new zzef(str, str2, com_google_android_gms_internal_measurement_zzjs, j, false, str3, zza2, j2, zza, j3, zza3);
-                zzfx().zzf(com_google_android_gms_internal_measurement_zzef);
+                zzeu zza = zzgc().zza(conditionalUserProperty.mTriggeredEventName, conditionalUserProperty.mTriggeredEventParams, conditionalUserProperty.mOrigin, 0, true, false);
+                zzfx().zzf(new zzef(conditionalUserProperty.mAppId, conditionalUserProperty.mOrigin, com_google_android_gms_internal_measurement_zzjs, conditionalUserProperty.mCreationTimestamp, false, conditionalUserProperty.mTriggerEventName, zzgc().zza(conditionalUserProperty.mTimedOutEventName, conditionalUserProperty.mTimedOutEventParams, conditionalUserProperty.mOrigin, 0, true, false), conditionalUserProperty.mTriggerTimeout, zza, conditionalUserProperty.mTimeToLive, zzgc().zza(conditionalUserProperty.mExpiredEventName, conditionalUserProperty.mExpiredEventParams, conditionalUserProperty.mOrigin, 0, true, false)));
                 return;
             } catch (IllegalArgumentException e) {
                 return;
@@ -215,20 +190,14 @@ public final class zzhm extends zzhk {
     }
 
     private final void zzb(String str, String str2, long j, Bundle bundle, boolean z, boolean z2, boolean z3, String str3) {
-        String str4 = str;
-        String str5 = str2;
-        Bundle bundle2 = bundle;
         Preconditions.checkNotEmpty(str);
         Preconditions.checkNotEmpty(str2);
         Preconditions.checkNotNull(bundle);
         zzab();
         zzch();
         if (this.zzacr.isEnabled()) {
-            String zza;
-            zzig com_google_android_gms_internal_measurement_zzig = null;
-            int i = 0;
-            if (!r1.zzaol) {
-                r1.zzaol = true;
+            if (!this.zzaol) {
+                this.zzaol = true;
                 try {
                     try {
                         Class.forName("com.google.android.gms.tagmanager.TagManagerService").getDeclaredMethod("initialize", new Class[]{Context.class}).invoke(null, new Object[]{getContext()});
@@ -239,169 +208,97 @@ public final class zzhm extends zzhk {
                     zzgg().zzip().log("Tag Manager is not found and thus will not be used");
                 }
             }
-            if (z3 && !"_iap".equals(str5)) {
-                int i2;
-                zzjv zzgc = r1.zzacr.zzgc();
-                if (zzgc.zzq("event", str5)) {
-                    if (!zzgc.zza("event", Event.zzacs, str5)) {
-                        i2 = 13;
-                    } else if (zzgc.zza("event", 40, str5)) {
-                        i2 = 0;
-                    }
-                    if (i2 != 0) {
-                        r1.zzacr.zzgc();
-                        zza = zzjv.zza(str5, 40, true);
-                        if (str5 != null) {
-                            i = str2.length();
-                        }
-                        r1.zzacr.zzgc().zza(i2, "_ev", zza, i);
-                        return;
-                    }
-                }
-                i2 = 2;
-                if (i2 != 0) {
-                    r1.zzacr.zzgc();
-                    zza = zzjv.zza(str5, 40, true);
-                    if (str5 != null) {
-                        i = str2.length();
-                    }
-                    r1.zzacr.zzgc().zza(i2, "_ev", zza, i);
+            if (z3 && !"_iap".equals(str2)) {
+                zzjv zzgc = this.zzacr.zzgc();
+                int i = !zzgc.zzq("event", str2) ? 2 : !zzgc.zza("event", Event.zzacs, str2) ? 13 : !zzgc.zza("event", 40, str2) ? 2 : 0;
+                if (i != 0) {
+                    this.zzacr.zzgc();
+                    this.zzacr.zzgc().zza(i, "_ev", zzjv.zza(str2, 40, true), str2 != null ? str2.length() : 0);
                     return;
                 }
             }
             zzig zzkk = zzfy().zzkk();
-            if (!(zzkk == null || bundle2.containsKey("_sc"))) {
-                zzkk.zzapq = true;
+            if (zzkk != null) {
+                if (!bundle.containsKey("_sc")) {
+                    zzkk.zzapq = true;
+                }
             }
             boolean z4 = z && z3;
-            zzih.zza(zzkk, bundle2, z4);
-            boolean equals = "am".equals(str4);
+            zzih.zza(zzkk, bundle, z4);
+            boolean equals = "am".equals(str);
             z4 = zzjv.zzcb(str2);
-            if (z && r1.zzaoj != null && !z4 && !equals) {
-                zzgg().zziq().zze("Passing event to registered event handler (FE)", zzgb().zzbe(str5), zzgb().zzb(bundle2));
-                r1.zzaoj.interceptEvent(str4, str5, bundle2, j);
+            if (z && this.zzaoj != null && !z4 && !equals) {
+                zzgg().zziq().zze("Passing event to registered event handler (FE)", zzgb().zzbe(str2), zzgb().zzb(bundle));
+                this.zzaoj.interceptEvent(str, str2, bundle, j);
                 return;
-            } else if (r1.zzacr.zzjk()) {
-                int zzbw = zzgc().zzbw(str5);
+            } else if (this.zzacr.zzjk()) {
+                int zzbw = zzgc().zzbw(str2);
                 if (zzbw != 0) {
                     zzgc();
-                    zza = zzjv.zza(str5, 40, true);
-                    if (str5 != null) {
-                        i = str2.length();
-                    }
-                    r1.zzacr.zzgc().zza(str3, zzbw, "_ev", zza, i);
+                    this.zzacr.zzgc().zza(str3, zzbw, "_ev", zzjv.zza(str2, 40, true), str2 != null ? str2.length() : 0);
                     return;
                 }
-                Bundle zza2;
-                long j2;
+                Bundle zza;
                 List listOf = CollectionUtils.listOf("_o", "_sn", "_sc", "_si");
-                Bundle zza3 = zzgc().zza(str5, bundle2, listOf, z3, true);
-                if (zza3 != null && zza3.containsKey("_sc")) {
-                    if (zza3.containsKey("_si")) {
-                        com_google_android_gms_internal_measurement_zzig = new zzik(zza3.getString("_sn"), zza3.getString("_sc"), Long.valueOf(zza3.getLong("_si")).longValue());
-                    }
-                }
-                if (com_google_android_gms_internal_measurement_zzig == null) {
-                    com_google_android_gms_internal_measurement_zzig = zzkk;
-                }
+                Bundle zza2 = zzgc().zza(str2, bundle, listOf, z3, true);
+                zzig com_google_android_gms_internal_measurement_zzik = (zza2 != null && zza2.containsKey("_sc") && zza2.containsKey("_si")) ? new zzik(zza2.getString("_sn"), zza2.getString("_sc"), Long.valueOf(zza2.getLong("_si")).longValue()) : null;
+                zzig com_google_android_gms_internal_measurement_zzig = com_google_android_gms_internal_measurement_zzik == null ? zzkk : com_google_android_gms_internal_measurement_zzik;
                 List arrayList = new ArrayList();
-                arrayList.add(zza3);
+                arrayList.add(zza2);
                 long nextLong = zzgc().zzku().nextLong();
-                String[] strArr = (String[]) zza3.keySet().toArray(new String[bundle.size()]);
+                int i2 = 0;
+                String[] strArr = (String[]) zza2.keySet().toArray(new String[bundle.size()]);
                 Arrays.sort(strArr);
                 int length = strArr.length;
                 int i3 = 0;
-                int i4 = i3;
-                while (i4 < length) {
-                    int i5;
-                    int i6;
-                    String[] strArr2;
-                    String str6 = strArr[i4];
-                    Object obj = zza3.get(str6);
+                while (i3 < length) {
+                    int length2;
+                    String str4 = strArr[i3];
+                    Object obj = zza2.get(str4);
                     zzgc();
                     Bundle[] zze = zzjv.zze(obj);
                     if (zze != null) {
-                        int i7;
-                        i5 = i3;
-                        zza3.putInt(str6, zze.length);
-                        int i8 = i4;
-                        i3 = 0;
-                        while (i3 < zze.length) {
-                            Bundle bundle3 = zze[i3];
-                            i6 = i3;
-                            zzih.zza(com_google_android_gms_internal_measurement_zzig, bundle3, true);
-                            i7 = i5;
-                            int i9 = i6;
-                            i5 = i8;
-                            i6 = length;
-                            long j3 = nextLong;
-                            strArr2 = strArr;
-                            bundle2 = zza3;
-                            zza2 = zzgc().zza("_ep", bundle3, listOf, z3, false);
-                            zza2.putString("_en", str5);
-                            j2 = j3;
-                            zza2.putLong("_eid", j2);
-                            zza2.putString("_gn", str6);
-                            zza2.putInt("_ll", zze.length);
-                            int i10 = i9;
-                            zza2.putInt("_i", i10);
-                            arrayList.add(zza2);
-                            i3 = i10 + 1;
-                            nextLong = j2;
-                            zza3 = bundle2;
-                            i8 = i5;
-                            length = i6;
-                            i5 = i7;
-                            strArr = strArr2;
+                        zza2.putInt(str4, zze.length);
+                        for (int i4 = 0; i4 < zze.length; i4++) {
+                            Bundle bundle2 = zze[i4];
+                            zzih.zza(com_google_android_gms_internal_measurement_zzig, bundle2, true);
+                            zza = zzgc().zza("_ep", bundle2, listOf, z3, false);
+                            zza.putString("_en", str2);
+                            zza.putLong("_eid", nextLong);
+                            zza.putString("_gn", str4);
+                            zza.putInt("_ll", zze.length);
+                            zza.putInt("_i", i4);
+                            arrayList.add(zza);
                         }
-                        i6 = length;
-                        j2 = nextLong;
-                        strArr2 = strArr;
-                        i7 = i5;
-                        i5 = i8;
-                        bundle2 = zza3;
-                        i3 = zze.length + i7;
+                        length2 = zze.length + i2;
                     } else {
-                        i = i3;
-                        i5 = i4;
-                        i6 = length;
-                        j2 = nextLong;
-                        strArr2 = strArr;
-                        bundle2 = zza3;
+                        length2 = i2;
                     }
-                    i4 = i5 + 1;
-                    nextLong = j2;
-                    zza3 = bundle2;
-                    length = i6;
-                    strArr = strArr2;
+                    i3++;
+                    i2 = length2;
                 }
-                i = i3;
-                j2 = nextLong;
-                bundle2 = zza3;
-                if (i != 0) {
-                    bundle2.putLong("_eid", j2);
-                    bundle2.putInt("_epc", i);
+                if (i2 != 0) {
+                    zza2.putLong("_eid", nextLong);
+                    zza2.putInt("_epc", i2);
                 }
-                int i11 = 0;
-                while (i11 < arrayList.size()) {
-                    zza2 = (Bundle) arrayList.get(i11);
-                    String str7 = (i11 != 0 ? 1 : null) != null ? "_ep" : str5;
-                    zza2.putString("_o", str4);
-                    if (z2) {
-                        zza2 = zzgc().zzd(zza2);
-                    }
-                    Bundle bundle4 = zza2;
-                    zzgg().zziq().zze("Logging event (FE)", zzgb().zzbe(str5), zzgb().zzb(bundle4));
-                    zzfx().zzc(new zzeu(str7, new zzer(bundle4), str4, j), str3);
+                int i5 = 0;
+                while (i5 < arrayList.size()) {
+                    zza = (Bundle) arrayList.get(i5);
+                    String str5 = (i5 != 0 ? 1 : null) != null ? "_ep" : str2;
+                    zza.putString("_o", str);
+                    Bundle zzd = z2 ? zzgc().zzd(zza) : zza;
+                    zzgg().zziq().zze("Logging event (FE)", zzgb().zzbe(str2), zzgb().zzb(zzd));
+                    zzfx().zzc(new zzeu(str5, new zzer(zzd), str, j), str3);
                     if (!equals) {
-                        for (OnEventListener onEvent : r1.zzaok) {
-                            onEvent.onEvent(str4, str5, new Bundle(bundle4), j);
+                        for (OnEventListener onEvent : this.zzaok) {
+                            onEvent.onEvent(str, str2, new Bundle(zzd), j);
                         }
                     }
-                    i11++;
+                    i5++;
                 }
-                if (zzfy().zzkk() != null && "_ae".equals(str5)) {
+                if (zzfy().zzkk() != null && "_ae".equals(str2)) {
                     zzge().zzm(true);
+                    return;
                 }
                 return;
             } else {
@@ -412,25 +309,14 @@ public final class zzhm extends zzhk {
     }
 
     private final void zzc(ConditionalUserProperty conditionalUserProperty) {
-        ConditionalUserProperty conditionalUserProperty2 = conditionalUserProperty;
         zzab();
         zzch();
         Preconditions.checkNotNull(conditionalUserProperty);
-        Preconditions.checkNotEmpty(conditionalUserProperty2.mName);
+        Preconditions.checkNotEmpty(conditionalUserProperty.mName);
         if (this.zzacr.isEnabled()) {
-            zzjs com_google_android_gms_internal_measurement_zzjs = new zzjs(conditionalUserProperty2.mName, 0, null, null);
+            zzjs com_google_android_gms_internal_measurement_zzjs = new zzjs(conditionalUserProperty.mName, 0, null, null);
             try {
-                zzeu zza = zzgc().zza(conditionalUserProperty2.mExpiredEventName, conditionalUserProperty2.mExpiredEventParams, conditionalUserProperty2.mOrigin, conditionalUserProperty2.mCreationTimestamp, true, false);
-                String str = conditionalUserProperty2.mAppId;
-                String str2 = conditionalUserProperty2.mOrigin;
-                long j = conditionalUserProperty2.mCreationTimestamp;
-                boolean z = conditionalUserProperty2.mActive;
-                String str3 = conditionalUserProperty2.mTriggerEventName;
-                long j2 = conditionalUserProperty2.mTriggerTimeout;
-                long j3 = conditionalUserProperty2.mTimeToLive;
-                zzef com_google_android_gms_internal_measurement_zzef = r4;
-                zzef com_google_android_gms_internal_measurement_zzef2 = new zzef(str, str2, com_google_android_gms_internal_measurement_zzjs, j, z, str3, null, j2, null, j3, zza);
-                zzfx().zzf(com_google_android_gms_internal_measurement_zzef);
+                zzfx().zzf(new zzef(conditionalUserProperty.mAppId, conditionalUserProperty.mOrigin, com_google_android_gms_internal_measurement_zzjs, conditionalUserProperty.mCreationTimestamp, conditionalUserProperty.mActive, conditionalUserProperty.mTriggerEventName, null, conditionalUserProperty.mTriggerTimeout, null, conditionalUserProperty.mTimeToLive, zzgc().zza(conditionalUserProperty.mExpiredEventName, conditionalUserProperty.mExpiredEventParams, conditionalUserProperty.mOrigin, conditionalUserProperty.mCreationTimestamp, true, false)));
                 return;
             } catch (IllegalArgumentException e) {
                 return;
@@ -440,68 +326,63 @@ public final class zzhm extends zzhk {
     }
 
     private final List<ConditionalUserProperty> zzf(String str, String str2, String str3) {
-        zzfi zzil;
         if (zzgf().zzjg()) {
-            zzil = zzgg().zzil();
-            str2 = "Cannot get conditional user properties from analytics worker thread";
-        } else {
-            zzgf();
-            if (zzgg.isMainThread()) {
-                zzil = zzgg().zzil();
-                str2 = "Cannot get conditional user properties from main thread";
-            } else {
-                AtomicReference atomicReference = new AtomicReference();
-                synchronized (atomicReference) {
-                    this.zzacr.zzgf().zzc(new zzhv(this, atomicReference, str, str2, str3));
-                    try {
-                        atomicReference.wait(DefaultRenderersFactory.DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS);
-                    } catch (InterruptedException e) {
-                        zzgg().zzin().zze("Interrupted waiting for get conditional user properties", str, e);
-                    }
-                }
-                List<zzef> list = (List) atomicReference.get();
-                if (list == null) {
-                    zzgg().zzin().zzg("Timed out waiting for get conditional user properties", str);
-                    return Collections.emptyList();
-                }
-                List<ConditionalUserProperty> arrayList = new ArrayList(list.size());
-                for (zzef com_google_android_gms_internal_measurement_zzef : list) {
-                    ConditionalUserProperty conditionalUserProperty = new ConditionalUserProperty();
-                    conditionalUserProperty.mAppId = str;
-                    conditionalUserProperty.mOrigin = str2;
-                    conditionalUserProperty.mCreationTimestamp = com_google_android_gms_internal_measurement_zzef.zzaem;
-                    conditionalUserProperty.mName = com_google_android_gms_internal_measurement_zzef.zzael.name;
-                    conditionalUserProperty.mValue = com_google_android_gms_internal_measurement_zzef.zzael.getValue();
-                    conditionalUserProperty.mActive = com_google_android_gms_internal_measurement_zzef.zzaen;
-                    conditionalUserProperty.mTriggerEventName = com_google_android_gms_internal_measurement_zzef.zzaeo;
-                    if (com_google_android_gms_internal_measurement_zzef.zzaep != null) {
-                        conditionalUserProperty.mTimedOutEventName = com_google_android_gms_internal_measurement_zzef.zzaep.name;
-                        if (com_google_android_gms_internal_measurement_zzef.zzaep.zzafo != null) {
-                            conditionalUserProperty.mTimedOutEventParams = com_google_android_gms_internal_measurement_zzef.zzaep.zzafo.zzif();
-                        }
-                    }
-                    conditionalUserProperty.mTriggerTimeout = com_google_android_gms_internal_measurement_zzef.zzaeq;
-                    if (com_google_android_gms_internal_measurement_zzef.zzaer != null) {
-                        conditionalUserProperty.mTriggeredEventName = com_google_android_gms_internal_measurement_zzef.zzaer.name;
-                        if (com_google_android_gms_internal_measurement_zzef.zzaer.zzafo != null) {
-                            conditionalUserProperty.mTriggeredEventParams = com_google_android_gms_internal_measurement_zzef.zzaer.zzafo.zzif();
-                        }
-                    }
-                    conditionalUserProperty.mTriggeredTimestamp = com_google_android_gms_internal_measurement_zzef.zzael.zzaqu;
-                    conditionalUserProperty.mTimeToLive = com_google_android_gms_internal_measurement_zzef.zzaes;
-                    if (com_google_android_gms_internal_measurement_zzef.zzaet != null) {
-                        conditionalUserProperty.mExpiredEventName = com_google_android_gms_internal_measurement_zzef.zzaet.name;
-                        if (com_google_android_gms_internal_measurement_zzef.zzaet.zzafo != null) {
-                            conditionalUserProperty.mExpiredEventParams = com_google_android_gms_internal_measurement_zzef.zzaet.zzafo.zzif();
-                        }
-                    }
-                    arrayList.add(conditionalUserProperty);
-                }
-                return arrayList;
+            zzgg().zzil().log("Cannot get conditional user properties from analytics worker thread");
+            return Collections.emptyList();
+        }
+        zzgf();
+        if (zzgg.isMainThread()) {
+            zzgg().zzil().log("Cannot get conditional user properties from main thread");
+            return Collections.emptyList();
+        }
+        AtomicReference atomicReference = new AtomicReference();
+        synchronized (atomicReference) {
+            this.zzacr.zzgf().zzc(new zzhv(this, atomicReference, str, str2, str3));
+            try {
+                atomicReference.wait(DefaultRenderersFactory.DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS);
+            } catch (InterruptedException e) {
+                zzgg().zzin().zze("Interrupted waiting for get conditional user properties", str, e);
             }
         }
-        zzil.log(str2);
-        return Collections.emptyList();
+        List<zzef> list = (List) atomicReference.get();
+        if (list == null) {
+            zzgg().zzin().zzg("Timed out waiting for get conditional user properties", str);
+            return Collections.emptyList();
+        }
+        List<ConditionalUserProperty> arrayList = new ArrayList(list.size());
+        for (zzef com_google_android_gms_internal_measurement_zzef : list) {
+            ConditionalUserProperty conditionalUserProperty = new ConditionalUserProperty();
+            conditionalUserProperty.mAppId = str;
+            conditionalUserProperty.mOrigin = str2;
+            conditionalUserProperty.mCreationTimestamp = com_google_android_gms_internal_measurement_zzef.zzaem;
+            conditionalUserProperty.mName = com_google_android_gms_internal_measurement_zzef.zzael.name;
+            conditionalUserProperty.mValue = com_google_android_gms_internal_measurement_zzef.zzael.getValue();
+            conditionalUserProperty.mActive = com_google_android_gms_internal_measurement_zzef.zzaen;
+            conditionalUserProperty.mTriggerEventName = com_google_android_gms_internal_measurement_zzef.zzaeo;
+            if (com_google_android_gms_internal_measurement_zzef.zzaep != null) {
+                conditionalUserProperty.mTimedOutEventName = com_google_android_gms_internal_measurement_zzef.zzaep.name;
+                if (com_google_android_gms_internal_measurement_zzef.zzaep.zzafo != null) {
+                    conditionalUserProperty.mTimedOutEventParams = com_google_android_gms_internal_measurement_zzef.zzaep.zzafo.zzif();
+                }
+            }
+            conditionalUserProperty.mTriggerTimeout = com_google_android_gms_internal_measurement_zzef.zzaeq;
+            if (com_google_android_gms_internal_measurement_zzef.zzaer != null) {
+                conditionalUserProperty.mTriggeredEventName = com_google_android_gms_internal_measurement_zzef.zzaer.name;
+                if (com_google_android_gms_internal_measurement_zzef.zzaer.zzafo != null) {
+                    conditionalUserProperty.mTriggeredEventParams = com_google_android_gms_internal_measurement_zzef.zzaer.zzafo.zzif();
+                }
+            }
+            conditionalUserProperty.mTriggeredTimestamp = com_google_android_gms_internal_measurement_zzef.zzael.zzaqu;
+            conditionalUserProperty.mTimeToLive = com_google_android_gms_internal_measurement_zzef.zzaes;
+            if (com_google_android_gms_internal_measurement_zzef.zzaet != null) {
+                conditionalUserProperty.mExpiredEventName = com_google_android_gms_internal_measurement_zzef.zzaet.name;
+                if (com_google_android_gms_internal_measurement_zzef.zzaet.zzafo != null) {
+                    conditionalUserProperty.mExpiredEventParams = com_google_android_gms_internal_measurement_zzef.zzaet.zzafo.zzif();
+                }
+            }
+            arrayList.add(conditionalUserProperty);
+        }
+        return arrayList;
     }
 
     private final void zzj(boolean z) {
@@ -623,14 +504,7 @@ public final class zzhm extends zzhk {
     }
 
     public final void zza(String str, String str2, Bundle bundle) {
-        boolean z;
-        if (this.zzaoj != null) {
-            if (!zzjv.zzcb(str2)) {
-                z = false;
-                zza(str, str2, bundle, true, z, false, null);
-            }
-        }
-        z = true;
+        boolean z = this.zzaoj == null || zzjv.zzcb(str2);
         zza(str, str2, bundle, true, z, false, null);
     }
 
@@ -639,37 +513,32 @@ public final class zzhm extends zzhk {
     }
 
     public final void zza(String str, String str2, Bundle bundle, boolean z) {
-        if (this.zzaoj != null) {
-            if (!zzjv.zzcb(str2)) {
-                z = false;
-                zza(str, str2, bundle, true, z, true, null);
-            }
-        }
-        z = true;
-        zza(str, str2, bundle, true, z, true, null);
+        boolean z2 = this.zzaoj == null || zzjv.zzcb(str2);
+        zza(str, str2, bundle, true, z2, true, null);
     }
 
     public final void zza(String str, String str2, Object obj) {
+        int i = 0;
         Preconditions.checkNotEmpty(str);
         long currentTimeMillis = zzbt().currentTimeMillis();
         int zzby = zzgc().zzby(str2);
-        int i = 0;
+        String zza;
         if (zzby != 0) {
             zzgc();
-            str = zzjv.zza(str2, 24, true);
+            zza = zzjv.zza(str2, 24, true);
             if (str2 != null) {
                 i = str2.length();
             }
-            this.zzacr.zzgc().zza(zzby, "_ev", str, i);
+            this.zzacr.zzgc().zza(zzby, "_ev", zza, i);
         } else if (obj != null) {
             zzby = zzgc().zzi(str2, obj);
             if (zzby != 0) {
                 zzgc();
-                str = zzjv.zza(str2, 24, true);
+                zza = zzjv.zza(str2, 24, true);
                 if ((obj instanceof String) || (obj instanceof CharSequence)) {
                     i = String.valueOf(obj).length();
                 }
-                this.zzacr.zzgc().zza(zzby, "_ev", str, i);
+                this.zzacr.zzgc().zza(zzby, "_ev", zza, i);
                 return;
             }
             Object zzj = zzgc().zzj(str2, obj);
@@ -792,37 +661,31 @@ public final class zzhm extends zzhk {
     }
 
     public final List<zzjs> zzk(boolean z) {
-        zzfi zzil;
-        String str;
         zzch();
         zzgg().zziq().log("Fetching user attributes (FE)");
         if (zzgf().zzjg()) {
-            zzil = zzgg().zzil();
-            str = "Cannot get all user properties from analytics worker thread";
-        } else {
-            zzgf();
-            if (zzgg.isMainThread()) {
-                zzil = zzgg().zzil();
-                str = "Cannot get all user properties from main thread";
-            } else {
-                AtomicReference atomicReference = new AtomicReference();
-                synchronized (atomicReference) {
-                    this.zzacr.zzgf().zzc(new zzhp(this, atomicReference, z));
-                    try {
-                        atomicReference.wait(DefaultRenderersFactory.DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS);
-                    } catch (InterruptedException e) {
-                        zzgg().zzin().zzg("Interrupted waiting for get user properties", e);
-                    }
-                }
-                List<zzjs> list = (List) atomicReference.get();
-                if (list != null) {
-                    return list;
-                }
-                zzil = zzgg().zzin();
-                str = "Timed out waiting for get user properties";
+            zzgg().zzil().log("Cannot get all user properties from analytics worker thread");
+            return Collections.emptyList();
+        }
+        zzgf();
+        if (zzgg.isMainThread()) {
+            zzgg().zzil().log("Cannot get all user properties from main thread");
+            return Collections.emptyList();
+        }
+        AtomicReference atomicReference = new AtomicReference();
+        synchronized (atomicReference) {
+            this.zzacr.zzgf().zzc(new zzhp(this, atomicReference, z));
+            try {
+                atomicReference.wait(DefaultRenderersFactory.DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS);
+            } catch (InterruptedException e) {
+                zzgg().zzin().zzg("Interrupted waiting for get user properties", e);
             }
         }
-        zzil.log(str);
+        List<zzjs> list = (List) atomicReference.get();
+        if (list != null) {
+            return list;
+        }
+        zzgg().zzin().log("Timed out waiting for get user properties");
         return Collections.emptyList();
     }
 

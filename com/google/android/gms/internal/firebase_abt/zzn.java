@@ -26,14 +26,19 @@ public final class zzn extends zzd<zzn> {
     public final /* synthetic */ zzj zza(zza com_google_android_gms_internal_firebase_abt_zza) throws IOException {
         while (true) {
             int zzd = com_google_android_gms_internal_firebase_abt_zza.zzd();
-            if (zzd == 0) {
-                return this;
+            switch (zzd) {
+                case 0:
+                    break;
+                case 10:
+                    this.zzaq = com_google_android_gms_internal_firebase_abt_zza.readString();
+                    continue;
+                default:
+                    if (!super.zza(com_google_android_gms_internal_firebase_abt_zza, zzd)) {
+                        break;
+                    }
+                    continue;
             }
-            if (zzd == 10) {
-                this.zzaq = com_google_android_gms_internal_firebase_abt_zza.readString();
-            } else if (!super.zza(com_google_android_gms_internal_firebase_abt_zza, zzd)) {
-                return this;
-            }
+            return this;
         }
     }
 }

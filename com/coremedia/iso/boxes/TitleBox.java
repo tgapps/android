@@ -57,7 +57,7 @@ public class TitleBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (7 + Utf8.utf8StringLengthInBytes(this.title));
+        return (long) (Utf8.utf8StringLengthInBytes(this.title) + 7);
     }
 
     protected void getContent(ByteBuffer byteBuffer) {
@@ -75,11 +75,6 @@ public class TitleBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_4, this, this));
-        StringBuilder stringBuilder = new StringBuilder("TitleBox[language=");
-        stringBuilder.append(getLanguage());
-        stringBuilder.append(";title=");
-        stringBuilder.append(getTitle());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "TitleBox[language=" + getLanguage() + ";title=" + getTitle() + "]";
     }
 }

@@ -14,13 +14,11 @@ public class DataBufferRef {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof DataBufferRef) {
-            DataBufferRef dataBufferRef = (DataBufferRef) obj;
-            if (Objects.equal(Integer.valueOf(dataBufferRef.mDataRow), Integer.valueOf(this.mDataRow)) && Objects.equal(Integer.valueOf(dataBufferRef.zznj), Integer.valueOf(this.zznj)) && dataBufferRef.mDataHolder == this.mDataHolder) {
-                return true;
-            }
+        if (!(obj instanceof DataBufferRef)) {
+            return false;
         }
-        return false;
+        DataBufferRef dataBufferRef = (DataBufferRef) obj;
+        return Objects.equal(Integer.valueOf(dataBufferRef.mDataRow), Integer.valueOf(this.mDataRow)) && Objects.equal(Integer.valueOf(dataBufferRef.zznj), Integer.valueOf(this.zznj)) && dataBufferRef.mDataHolder == this.mDataHolder;
     }
 
     protected byte[] getByteArray(String str) {

@@ -26,11 +26,8 @@ final class zzab {
             jSONObject.put("timestamp", j);
             return jSONObject.toString();
         } catch (JSONException e) {
-            str = String.valueOf(e);
-            StringBuilder stringBuilder = new StringBuilder(24 + String.valueOf(str).length());
-            stringBuilder.append("Failed to encode token: ");
-            stringBuilder.append(str);
-            Log.w("FirebaseInstanceId", stringBuilder.toString());
+            String valueOf = String.valueOf(e);
+            Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 24).append("Failed to encode token: ").append(valueOf).toString());
             return null;
         }
     }
@@ -46,21 +43,13 @@ final class zzab {
             JSONObject jSONObject = new JSONObject(str);
             return new zzab(jSONObject.getString("token"), jSONObject.getString("appVersion"), jSONObject.getLong("timestamp"));
         } catch (JSONException e) {
-            str = String.valueOf(e);
-            StringBuilder stringBuilder = new StringBuilder(23 + String.valueOf(str).length());
-            stringBuilder.append("Failed to parse token: ");
-            stringBuilder.append(str);
-            Log.w("FirebaseInstanceId", stringBuilder.toString());
+            String valueOf = String.valueOf(e);
+            Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 23).append("Failed to parse token: ").append(valueOf).toString());
             return null;
         }
     }
 
     final boolean zzff(String str) {
-        if (System.currentTimeMillis() <= this.timestamp + zzbsa) {
-            if (str.equals(this.zztc)) {
-                return false;
-            }
-        }
-        return true;
+        return System.currentTimeMillis() > this.timestamp + zzbsa || !str.equals(this.zztc);
     }
 }

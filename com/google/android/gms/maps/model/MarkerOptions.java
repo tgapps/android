@@ -29,20 +29,20 @@ public final class MarkerOptions extends AbstractSafeParcelable {
         this.zzdm = str;
         this.zzdn = str2;
         if (iBinder == null) {
-            r0.zzdo = null;
+            this.zzdo = null;
         } else {
-            r0.zzdo = new BitmapDescriptor(Stub.asInterface(iBinder));
+            this.zzdo = new BitmapDescriptor(Stub.asInterface(iBinder));
         }
-        r0.zzda = f;
-        r0.zzdb = f2;
-        r0.zzdp = z;
-        r0.zzcs = z2;
-        r0.zzdq = z3;
-        r0.zzdr = f3;
-        r0.zzds = f4;
-        r0.zzdt = f5;
-        r0.alpha = f6;
-        r0.zzcr = f7;
+        this.zzda = f;
+        this.zzdb = f2;
+        this.zzdp = z;
+        this.zzcs = z2;
+        this.zzdq = z3;
+        this.zzdr = f3;
+        this.zzds = f4;
+        this.zzdt = f5;
+        this.alpha = f6;
+        this.zzcr = f7;
     }
 
     public final MarkerOptions anchor(float f, float f2) {

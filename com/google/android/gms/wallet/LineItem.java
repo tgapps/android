@@ -69,13 +69,13 @@ public final class LineItem extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, this.description, false);
         SafeParcelWriter.writeString(parcel, 3, this.zzca, false);
         SafeParcelWriter.writeString(parcel, 4, this.zzcb, false);
         SafeParcelWriter.writeString(parcel, 5, this.zzan, false);
         SafeParcelWriter.writeInt(parcel, 6, this.zzcc);
         SafeParcelWriter.writeString(parcel, 7, this.zzao, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

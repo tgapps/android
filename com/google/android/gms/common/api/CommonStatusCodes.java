@@ -36,10 +36,7 @@ public class CommonStatusCodes {
             case 18:
                 return "DEAD_CLIENT";
             default:
-                StringBuilder stringBuilder = new StringBuilder(32);
-                stringBuilder.append("unknown status code: ");
-                stringBuilder.append(i);
-                return stringBuilder.toString();
+                return "unknown status code: " + i;
         }
     }
 }

@@ -13,7 +13,7 @@ public class DataBufferIterator<T> implements Iterator<T> {
     }
 
     public boolean hasNext() {
-        return this.mPosition < this.mDataBuffer.getCount() - 1;
+        return this.mPosition < this.mDataBuffer.getCount() + -1;
     }
 
     public T next() {
@@ -23,11 +23,7 @@ public class DataBufferIterator<T> implements Iterator<T> {
             this.mPosition = i;
             return dataBuffer.get(i);
         }
-        i = this.mPosition;
-        StringBuilder stringBuilder = new StringBuilder(46);
-        stringBuilder.append("Cannot advance the iterator beyond ");
-        stringBuilder.append(i);
-        throw new NoSuchElementException(stringBuilder.toString());
+        throw new NoSuchElementException("Cannot advance the iterator beyond " + this.mPosition);
     }
 
     public void remove() {

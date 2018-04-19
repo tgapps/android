@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -104,78 +103,49 @@ public abstract class GoogleApiClient {
         }
 
         public final GoogleApiClient build() {
-            boolean z;
-            boolean z2 = true;
-            Preconditions.checkArgument(this.zzdc.isEmpty() ^ true, "must call addApi() to add at least one API");
+            Preconditions.checkArgument(!this.zzdc.isEmpty(), "must call addApi() to add at least one API");
             ClientSettings buildClientSettings = buildClientSettings();
             Api api = null;
             Map optionalApiSettings = buildClientSettings.getOptionalApiSettings();
             Map arrayMap = new ArrayMap();
             Map arrayMap2 = new ArrayMap();
             ArrayList arrayList = new ArrayList();
-            Iterator it = this.zzdc.keySet().iterator();
-            int i = 0;
-            while (it.hasNext()) {
-                Api api2 = (Api) it.next();
-                Object obj = r1.zzdc.get(api2);
-                boolean z3 = optionalApiSettings.get(api2) != null ? z2 : false;
-                arrayMap.put(api2, Boolean.valueOf(z3));
-                zzp com_google_android_gms_common_api_internal_zzp = new zzp(api2, z3);
+            Object obj = null;
+            for (Api api2 : this.zzdc.keySet()) {
+                Api api22;
+                Object obj2 = this.zzdc.get(api22);
+                boolean z = optionalApiSettings.get(api22) != null;
+                arrayMap.put(api22, Boolean.valueOf(z));
+                ConnectionCallbacks com_google_android_gms_common_api_internal_zzp = new zzp(api22, z);
                 arrayList.add(com_google_android_gms_common_api_internal_zzp);
-                BaseClientBuilder zzk = api2.zzk();
-                BaseClientBuilder baseClientBuilder = zzk;
-                zzp com_google_android_gms_common_api_internal_zzp2 = com_google_android_gms_common_api_internal_zzp;
-                Map map = optionalApiSettings;
-                Api api3 = api2;
-                Iterator it2 = it;
-                Client buildClient = zzk.buildClient(r1.mContext, r1.zzcn, buildClientSettings, obj, com_google_android_gms_common_api_internal_zzp2, com_google_android_gms_common_api_internal_zzp2);
-                arrayMap2.put(api3.getClientKey(), buildClient);
-                if (baseClientBuilder.getPriority() == 1) {
-                    i = obj != null ? 1 : 0;
+                BaseClientBuilder zzk = api22.zzk();
+                Client buildClient = zzk.buildClient(this.mContext, this.zzcn, buildClientSettings, obj2, com_google_android_gms_common_api_internal_zzp, com_google_android_gms_common_api_internal_zzp);
+                arrayMap2.put(api22.getClientKey(), buildClient);
+                Object obj3 = zzk.getPriority() == 1 ? obj2 != null ? 1 : null : obj;
+                if (!buildClient.providesSignIn()) {
+                    api22 = api;
+                } else if (api != null) {
+                    String name = api22.getName();
+                    String name2 = api.getName();
+                    throw new IllegalStateException(new StringBuilder((String.valueOf(name).length() + 21) + String.valueOf(name2).length()).append(name).append(" cannot be used with ").append(name2).toString());
                 }
-                if (buildClient.providesSignIn()) {
-                    if (api != null) {
-                        String name = api3.getName();
-                        String name2 = api.getName();
-                        StringBuilder stringBuilder = new StringBuilder((21 + String.valueOf(name).length()) + String.valueOf(name2).length());
-                        stringBuilder.append(name);
-                        stringBuilder.append(" cannot be used with ");
-                        stringBuilder.append(name2);
-                        throw new IllegalStateException(stringBuilder.toString());
-                    }
-                    api = api3;
+                obj = obj3;
+                api = api22;
+            }
+            if (api != null) {
+                if (obj != null) {
+                    name = api.getName();
+                    throw new IllegalStateException(new StringBuilder(String.valueOf(name).length() + 82).append("With using ").append(name).append(", GamesOptions can only be specified within GoogleSignInOptions.Builder").toString());
                 }
-                optionalApiSettings = map;
-                it = it2;
-                z2 = true;
+                Preconditions.checkState(this.zzs == null, "Must not set an account in GoogleApiClient.Builder when using %s. Set account in GoogleSignInOptions.Builder instead", api.getName());
+                Preconditions.checkState(this.zzcv.equals(this.zzcw), "Must not set scopes in GoogleApiClient.Builder when using %s. Set account in GoogleSignInOptions.Builder instead.", api.getName());
             }
-            if (api == null) {
-                z = true;
-            } else if (i != 0) {
-                name = api.getName();
-                StringBuilder stringBuilder2 = new StringBuilder(82 + String.valueOf(name).length());
-                stringBuilder2.append("With using ");
-                stringBuilder2.append(name);
-                stringBuilder2.append(", GamesOptions can only be specified within GoogleSignInOptions.Builder");
-                throw new IllegalStateException(stringBuilder2.toString());
-            } else {
-                z = true;
-                Preconditions.checkState(r1.zzs == null, "Must not set an account in GoogleApiClient.Builder when using %s. Set account in GoogleSignInOptions.Builder instead", api.getName());
-                Preconditions.checkState(r1.zzcv.equals(r1.zzcw), "Must not set scopes in GoogleApiClient.Builder when using %s. Set account in GoogleSignInOptions.Builder instead.", api.getName());
-            }
-            ClientSettings clientSettings = buildClientSettings;
-            GoogleApiClient com_google_android_gms_common_api_internal_zzav = new zzav(r1.mContext, new ReentrantLock(), r1.zzcn, clientSettings, r1.zzdg, r1.zzdh, arrayMap, r1.zzdi, r1.zzdj, arrayMap2, r1.zzde, zzav.zza(arrayMap2.values(), z), arrayList, false);
+            GoogleApiClient com_google_android_gms_common_api_internal_zzav = new zzav(this.mContext, new ReentrantLock(), this.zzcn, buildClientSettings, this.zzdg, this.zzdh, arrayMap, this.zzdi, this.zzdj, arrayMap2, this.zzde, zzav.zza(arrayMap2.values(), true), arrayList, false);
             synchronized (GoogleApiClient.zzcu) {
-                try {
-                    GoogleApiClient.zzcu.add(com_google_android_gms_common_api_internal_zzav);
-                } catch (Throwable th) {
-                    while (true) {
-                        Throwable th2 = th;
-                    }
-                }
+                GoogleApiClient.zzcu.add(com_google_android_gms_common_api_internal_zzav);
             }
-            if (r1.zzde >= 0) {
-                zzi.zza(r1.zzdd).zza(r1.zzde, com_google_android_gms_common_api_internal_zzav, r1.zzdf);
+            if (this.zzde >= 0) {
+                zzi.zza(this.zzdd).zza(this.zzde, com_google_android_gms_common_api_internal_zzav, this.zzdf);
             }
             return com_google_android_gms_common_api_internal_zzav;
         }

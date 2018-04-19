@@ -74,295 +74,6 @@ public class ActionBar extends FrameLayout {
         }
     }
 
-    protected void onLayout(boolean r1, int r2, int r3, int r4, int r5) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.ActionBar.ActionBar.onLayout(boolean, int, int, int, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r16;
-        r3 = r0.occupyStatusBar;
-        r4 = 0;
-        if (r3 == 0) goto L_0x000a;
-    L_0x0007:
-        r3 = org.telegram.messenger.AndroidUtilities.statusBarHeight;
-        goto L_0x000b;
-    L_0x000a:
-        r3 = r4;
-    L_0x000b:
-        r5 = r0.backButtonImageView;
-        r6 = 8;
-        if (r5 == 0) goto L_0x003b;
-    L_0x0011:
-        r5 = r0.backButtonImageView;
-        r5 = r5.getVisibility();
-        if (r5 == r6) goto L_0x003b;
-    L_0x0019:
-        r5 = r0.backButtonImageView;
-        r7 = r0.backButtonImageView;
-        r7 = r7.getMeasuredWidth();
-        r8 = r0.backButtonImageView;
-        r8 = r8.getMeasuredHeight();
-        r8 = r8 + r3;
-        r5.layout(r4, r3, r7, r8);
-        r5 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r5 == 0) goto L_0x0034;
-    L_0x0031:
-        r5 = 1117782016; // 0x42a00000 float:80.0 double:5.522576936E-315;
-        goto L_0x0036;
-    L_0x0034:
-        r5 = 1116733440; // 0x42900000 float:72.0 double:5.517396283E-315;
-    L_0x0036:
-        r5 = org.telegram.messenger.AndroidUtilities.dp(r5);
-        goto L_0x004a;
-    L_0x003b:
-        r5 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r5 == 0) goto L_0x0044;
-    L_0x0041:
-        r5 = 1104150528; // 0x41d00000 float:26.0 double:5.455228437E-315;
-        goto L_0x0046;
-    L_0x0044:
-        r5 = 1099956224; // 0x41900000 float:18.0 double:5.43450582E-315;
-    L_0x0046:
-        r5 = org.telegram.messenger.AndroidUtilities.dp(r5);
-    L_0x004a:
-        r7 = r0.menu;
-        if (r7 == 0) goto L_0x0086;
-    L_0x004e:
-        r7 = r0.menu;
-        r7 = r7.getVisibility();
-        if (r7 == r6) goto L_0x0086;
-    L_0x0056:
-        r7 = r0.isSearchFieldVisible;
-        if (r7 == 0) goto L_0x006a;
-    L_0x005a:
-        r7 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r7 == 0) goto L_0x0063;
-    L_0x0060:
-        r7 = 1116995584; // 0x42940000 float:74.0 double:5.518691446E-315;
-        goto L_0x0065;
-    L_0x0063:
-        r7 = 1115947008; // 0x42840000 float:66.0 double:5.51351079E-315;
-    L_0x0065:
-        r7 = org.telegram.messenger.AndroidUtilities.dp(r7);
-        goto L_0x0073;
-    L_0x006a:
-        r7 = r20 - r18;
-        r8 = r0.menu;
-        r8 = r8.getMeasuredWidth();
-        r7 = r7 - r8;
-    L_0x0073:
-        r8 = r0.menu;
-        r9 = r0.menu;
-        r9 = r9.getMeasuredWidth();
-        r9 = r9 + r7;
-        r10 = r0.menu;
-        r10 = r10.getMeasuredHeight();
-        r10 = r10 + r3;
-        r8.layout(r7, r3, r9, r10);
-    L_0x0086:
-        r7 = r0.titleTextView;
-        r8 = 2;
-        if (r7 == 0) goto L_0x00ec;
-    L_0x008b:
-        r7 = r0.titleTextView;
-        r7 = r7.getVisibility();
-        if (r7 == r6) goto L_0x00ec;
-    L_0x0093:
-        r7 = r0.subtitleTextView;
-        if (r7 == 0) goto L_0x00c9;
-    L_0x0097:
-        r7 = r0.subtitleTextView;
-        r7 = r7.getVisibility();
-        if (r7 == r6) goto L_0x00c9;
-    L_0x009f:
-        r7 = getCurrentActionBarHeight();
-        r7 = r7 / r8;
-        r9 = r0.titleTextView;
-        r9 = r9.getTextHeight();
-        r7 = r7 - r9;
-        r7 = r7 / r8;
-        r9 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r9 != 0) goto L_0x00c1;
-    L_0x00b2:
-        r9 = r16.getResources();
-        r9 = r9.getConfiguration();
-        r9 = r9.orientation;
-        if (r9 != r8) goto L_0x00c1;
-    L_0x00be:
-        r9 = 1073741824; // 0x40000000 float:2.0 double:5.304989477E-315;
-        goto L_0x00c3;
-    L_0x00c1:
-        r9 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
-    L_0x00c3:
-        r9 = org.telegram.messenger.AndroidUtilities.dp(r9);
-        r7 = r7 + r9;
-        goto L_0x00d5;
-    L_0x00c9:
-        r7 = getCurrentActionBarHeight();
-        r9 = r0.titleTextView;
-        r9 = r9.getTextHeight();
-        r7 = r7 - r9;
-        r7 = r7 / r8;
-    L_0x00d5:
-        r9 = r0.titleTextView;
-        r10 = r3 + r7;
-        r11 = r0.titleTextView;
-        r11 = r11.getMeasuredWidth();
-        r11 = r11 + r5;
-        r12 = r3 + r7;
-        r13 = r0.titleTextView;
-        r13 = r13.getTextHeight();
-        r12 = r12 + r13;
-        r9.layout(r5, r10, r11, r12);
-    L_0x00ec:
-        r7 = r0.subtitleTextView;
-        if (r7 == 0) goto L_0x0139;
-    L_0x00f0:
-        r7 = r0.subtitleTextView;
-        r7 = r7.getVisibility();
-        if (r7 == r6) goto L_0x0139;
-    L_0x00f8:
-        r7 = getCurrentActionBarHeight();
-        r7 = r7 / r8;
-        r9 = getCurrentActionBarHeight();
-        r9 = r9 / r8;
-        r10 = r0.subtitleTextView;
-        r10 = r10.getTextHeight();
-        r9 = r9 - r10;
-        r9 = r9 / r8;
-        r7 = r7 + r9;
-        r9 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r9 != 0) goto L_0x011b;
-    L_0x0111:
-        r9 = r16.getResources();
-        r9 = r9.getConfiguration();
-        r9 = r9.orientation;
-    L_0x011b:
-        r9 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
-        r9 = org.telegram.messenger.AndroidUtilities.dp(r9);
-        r7 = r7 - r9;
-        r9 = r0.subtitleTextView;
-        r10 = r3 + r7;
-        r11 = r0.subtitleTextView;
-        r11 = r11.getMeasuredWidth();
-        r11 = r11 + r5;
-        r12 = r3 + r7;
-        r13 = r0.subtitleTextView;
-        r13 = r13.getTextHeight();
-        r12 = r12 + r13;
-        r9.layout(r5, r10, r11, r12);
-    L_0x0139:
-        r7 = r16.getChildCount();
-        if (r4 >= r7) goto L_0x01d0;
-    L_0x0140:
-        r9 = r0.getChildAt(r4);
-        r10 = r9.getVisibility();
-        if (r10 == r6) goto L_0x01c5;
-    L_0x014a:
-        r10 = r0.titleTextView;
-        if (r9 == r10) goto L_0x01c5;
-    L_0x014e:
-        r10 = r0.subtitleTextView;
-        if (r9 == r10) goto L_0x01c5;
-    L_0x0152:
-        r10 = r0.menu;
-        if (r9 == r10) goto L_0x01c5;
-    L_0x0156:
-        r10 = r0.backButtonImageView;
-        if (r9 != r10) goto L_0x015e;
-    L_0x015b:
-        r14 = r3;
-        goto L_0x01c6;
-    L_0x015e:
-        r10 = r9.getLayoutParams();
-        r10 = (android.widget.FrameLayout.LayoutParams) r10;
-        r11 = r9.getMeasuredWidth();
-        r12 = r9.getMeasuredHeight();
-        r13 = r10.gravity;
-        r6 = -1;
-        if (r13 != r6) goto L_0x0173;
-    L_0x0171:
-        r13 = 51;
-    L_0x0173:
-        r6 = r13 & 7;
-        r8 = r13 & 112;
-        r0 = r6 & 7;
-        r14 = r3;
-        r3 = 1;
-        if (r0 == r3) goto L_0x0189;
-    L_0x017d:
-        r3 = 5;
-        if (r0 == r3) goto L_0x0183;
-    L_0x0180:
-        r0 = r10.leftMargin;
-        goto L_0x0195;
-    L_0x0183:
-        r0 = r20 - r11;
-        r3 = r10.rightMargin;
-        r0 = r0 - r3;
-        goto L_0x0195;
-    L_0x0189:
-        r0 = r20 - r18;
-        r0 = r0 - r11;
-        r3 = 2;
-        r0 = r0 / r3;
-        r3 = r10.leftMargin;
-        r0 = r0 + r3;
-        r3 = r10.rightMargin;
-        r0 = r0 - r3;
-        r3 = 16;
-        if (r8 == r3) goto L_0x01af;
-        r3 = 48;
-        if (r8 == r3) goto L_0x01ac;
-        r3 = 80;
-        if (r8 == r3) goto L_0x01a5;
-        r3 = r10.topMargin;
-        goto L_0x01bc;
-        r3 = r21 - r19;
-        r3 = r3 - r12;
-        r1 = r10.bottomMargin;
-        r3 = r3 - r1;
-        goto L_0x01bc;
-        r3 = r10.topMargin;
-        goto L_0x01bc;
-        r1 = r21 - r19;
-        r1 = r1 - r12;
-        r3 = 2;
-        r1 = r1 / r3;
-        r3 = r10.topMargin;
-        r1 = r1 + r3;
-        r3 = r10.bottomMargin;
-        r3 = r1 - r3;
-        r1 = r3;
-        r3 = r0 + r11;
-        r2 = r1 + r12;
-        r9.layout(r0, r1, r3, r2);
-        goto L_0x01c6;
-    L_0x01c5:
-        r14 = r3;
-    L_0x01c6:
-        r4 = r4 + 1;
-        r3 = r14;
-        r0 = r16;
-        r6 = 8;
-        r8 = 2;
-        goto L_0x013e;
-    L_0x01d0:
-        r14 = r3;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.ActionBar.onLayout(boolean, int, int, int, int):void");
-    }
-
     public ActionBar(Context context) {
         super(context);
         this.occupyStatusBar = VERSION.SDK_INT >= 21;
@@ -390,13 +101,11 @@ Caused by: java.lang.NullPointerException
             addView(this.backButtonImageView, LayoutHelper.createFrame(54, 54, 51));
             this.backButtonImageView.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
-                    if (ActionBar.this.actionModeVisible || !ActionBar.this.isSearchFieldVisible) {
-                        if (ActionBar.this.actionBarMenuOnItemClick != null) {
-                            ActionBar.this.actionBarMenuOnItemClick.onItemClick(-1);
-                        }
-                        return;
+                    if (!ActionBar.this.actionModeVisible && ActionBar.this.isSearchFieldVisible) {
+                        ActionBar.this.closeSearchField();
+                    } else if (ActionBar.this.actionBarMenuOnItemClick != null) {
+                        ActionBar.this.actionBarMenuOnItemClick.onItemClick(-1);
                     }
-                    ActionBar.this.closeSearchField();
                 }
             });
         }
@@ -614,11 +323,18 @@ Caused by: java.lang.NullPointerException
         if (this.actionMode != null) {
             return this.actionMode;
         }
+        int i;
         this.actionMode = new ActionBarMenu(getContext(), this);
         this.actionMode.isActionMode = true;
         this.actionMode.setBackgroundColor(Theme.getColor(Theme.key_actionBarActionModeDefault));
         addView(this.actionMode, indexOfChild(this.backButtonImageView));
-        this.actionMode.setPadding(0, this.occupyStatusBar ? AndroidUtilities.statusBarHeight : 0, 0, 0);
+        ActionBarMenu actionBarMenu = this.actionMode;
+        if (this.occupyStatusBar) {
+            i = AndroidUtilities.statusBarHeight;
+        } else {
+            i = 0;
+        }
+        actionBarMenu.setPadding(0, i, 0, 0);
         LayoutParams layoutParams = (LayoutParams) this.actionMode.getLayoutParams();
         layoutParams.height = -1;
         layoutParams.width = -1;
@@ -640,110 +356,106 @@ Caused by: java.lang.NullPointerException
     }
 
     public void showActionMode() {
-        if (this.actionMode != null) {
-            if (!this.actionModeVisible) {
-                this.actionModeVisible = true;
-                ArrayList<Animator> animators = new ArrayList();
-                animators.add(ObjectAnimator.ofFloat(this.actionMode, "alpha", new float[]{0.0f, 1.0f}));
-                if (this.occupyStatusBar && this.actionModeTop != null) {
-                    animators.add(ObjectAnimator.ofFloat(this.actionModeTop, "alpha", new float[]{0.0f, 1.0f}));
-                }
-                if (this.actionModeAnimation != null) {
-                    this.actionModeAnimation.cancel();
-                }
-                this.actionModeAnimation = new AnimatorSet();
-                this.actionModeAnimation.playTogether(animators);
-                this.actionModeAnimation.setDuration(200);
-                this.actionModeAnimation.addListener(new AnimatorListenerAdapter() {
-                    public void onAnimationStart(Animator animation) {
-                        ActionBar.this.actionMode.setVisibility(0);
-                        if (ActionBar.this.occupyStatusBar && ActionBar.this.actionModeTop != null) {
-                            ActionBar.this.actionModeTop.setVisibility(0);
-                        }
+        if (this.actionMode != null && !this.actionModeVisible) {
+            this.actionModeVisible = true;
+            ArrayList<Animator> animators = new ArrayList();
+            animators.add(ObjectAnimator.ofFloat(this.actionMode, "alpha", new float[]{0.0f, 1.0f}));
+            if (this.occupyStatusBar && this.actionModeTop != null) {
+                animators.add(ObjectAnimator.ofFloat(this.actionModeTop, "alpha", new float[]{0.0f, 1.0f}));
+            }
+            if (this.actionModeAnimation != null) {
+                this.actionModeAnimation.cancel();
+            }
+            this.actionModeAnimation = new AnimatorSet();
+            this.actionModeAnimation.playTogether(animators);
+            this.actionModeAnimation.setDuration(200);
+            this.actionModeAnimation.addListener(new AnimatorListenerAdapter() {
+                public void onAnimationStart(Animator animation) {
+                    ActionBar.this.actionMode.setVisibility(0);
+                    if (ActionBar.this.occupyStatusBar && ActionBar.this.actionModeTop != null) {
+                        ActionBar.this.actionModeTop.setVisibility(0);
                     }
+                }
 
-                    public void onAnimationEnd(Animator animation) {
-                        if (ActionBar.this.actionModeAnimation != null && ActionBar.this.actionModeAnimation.equals(animation)) {
-                            ActionBar.this.actionModeAnimation = null;
-                            if (ActionBar.this.titleTextView != null) {
-                                ActionBar.this.titleTextView.setVisibility(4);
-                            }
-                            if (!(ActionBar.this.subtitleTextView == null || TextUtils.isEmpty(ActionBar.this.subtitleTextView.getText()))) {
-                                ActionBar.this.subtitleTextView.setVisibility(4);
-                            }
-                            if (ActionBar.this.menu != null) {
-                                ActionBar.this.menu.setVisibility(4);
-                            }
+                public void onAnimationEnd(Animator animation) {
+                    if (ActionBar.this.actionModeAnimation != null && ActionBar.this.actionModeAnimation.equals(animation)) {
+                        ActionBar.this.actionModeAnimation = null;
+                        if (ActionBar.this.titleTextView != null) {
+                            ActionBar.this.titleTextView.setVisibility(4);
+                        }
+                        if (!(ActionBar.this.subtitleTextView == null || TextUtils.isEmpty(ActionBar.this.subtitleTextView.getText()))) {
+                            ActionBar.this.subtitleTextView.setVisibility(4);
+                        }
+                        if (ActionBar.this.menu != null) {
+                            ActionBar.this.menu.setVisibility(4);
                         }
                     }
-
-                    public void onAnimationCancel(Animator animation) {
-                        if (ActionBar.this.actionModeAnimation != null && ActionBar.this.actionModeAnimation.equals(animation)) {
-                            ActionBar.this.actionModeAnimation = null;
-                        }
-                    }
-                });
-                this.actionModeAnimation.start();
-                if (this.backButtonImageView != null) {
-                    Drawable drawable = this.backButtonImageView.getDrawable();
-                    if (drawable instanceof BackDrawable) {
-                        ((BackDrawable) drawable).setRotation(1.0f, true);
-                    }
-                    this.backButtonImageView.setBackgroundDrawable(Theme.createSelectorDrawable(this.itemsActionModeBackgroundColor));
                 }
+
+                public void onAnimationCancel(Animator animation) {
+                    if (ActionBar.this.actionModeAnimation != null && ActionBar.this.actionModeAnimation.equals(animation)) {
+                        ActionBar.this.actionModeAnimation = null;
+                    }
+                }
+            });
+            this.actionModeAnimation.start();
+            if (this.backButtonImageView != null) {
+                Drawable drawable = this.backButtonImageView.getDrawable();
+                if (drawable instanceof BackDrawable) {
+                    ((BackDrawable) drawable).setRotation(1.0f, true);
+                }
+                this.backButtonImageView.setBackgroundDrawable(Theme.createSelectorDrawable(this.itemsActionModeBackgroundColor));
             }
         }
     }
 
     public void hideActionMode() {
-        if (this.actionMode != null) {
-            if (this.actionModeVisible) {
-                this.actionModeVisible = false;
-                ArrayList<Animator> animators = new ArrayList();
-                animators.add(ObjectAnimator.ofFloat(this.actionMode, "alpha", new float[]{0.0f}));
-                if (this.occupyStatusBar && this.actionModeTop != null) {
-                    animators.add(ObjectAnimator.ofFloat(this.actionModeTop, "alpha", new float[]{0.0f}));
-                }
-                if (this.actionModeAnimation != null) {
-                    this.actionModeAnimation.cancel();
-                }
-                this.actionModeAnimation = new AnimatorSet();
-                this.actionModeAnimation.playTogether(animators);
-                this.actionModeAnimation.setDuration(200);
-                this.actionModeAnimation.addListener(new AnimatorListenerAdapter() {
-                    public void onAnimationEnd(Animator animation) {
-                        if (ActionBar.this.actionModeAnimation != null && ActionBar.this.actionModeAnimation.equals(animation)) {
-                            ActionBar.this.actionModeAnimation = null;
-                            ActionBar.this.actionMode.setVisibility(4);
-                            if (ActionBar.this.occupyStatusBar && ActionBar.this.actionModeTop != null) {
-                                ActionBar.this.actionModeTop.setVisibility(4);
-                            }
+        if (this.actionMode != null && this.actionModeVisible) {
+            this.actionModeVisible = false;
+            ArrayList<Animator> animators = new ArrayList();
+            animators.add(ObjectAnimator.ofFloat(this.actionMode, "alpha", new float[]{0.0f}));
+            if (this.occupyStatusBar && this.actionModeTop != null) {
+                animators.add(ObjectAnimator.ofFloat(this.actionModeTop, "alpha", new float[]{0.0f}));
+            }
+            if (this.actionModeAnimation != null) {
+                this.actionModeAnimation.cancel();
+            }
+            this.actionModeAnimation = new AnimatorSet();
+            this.actionModeAnimation.playTogether(animators);
+            this.actionModeAnimation.setDuration(200);
+            this.actionModeAnimation.addListener(new AnimatorListenerAdapter() {
+                public void onAnimationEnd(Animator animation) {
+                    if (ActionBar.this.actionModeAnimation != null && ActionBar.this.actionModeAnimation.equals(animation)) {
+                        ActionBar.this.actionModeAnimation = null;
+                        ActionBar.this.actionMode.setVisibility(4);
+                        if (ActionBar.this.occupyStatusBar && ActionBar.this.actionModeTop != null) {
+                            ActionBar.this.actionModeTop.setVisibility(4);
                         }
                     }
+                }
 
-                    public void onAnimationCancel(Animator animation) {
-                        if (ActionBar.this.actionModeAnimation != null && ActionBar.this.actionModeAnimation.equals(animation)) {
-                            ActionBar.this.actionModeAnimation = null;
-                        }
+                public void onAnimationCancel(Animator animation) {
+                    if (ActionBar.this.actionModeAnimation != null && ActionBar.this.actionModeAnimation.equals(animation)) {
+                        ActionBar.this.actionModeAnimation = null;
                     }
-                });
-                this.actionModeAnimation.start();
-                if (this.titleTextView != null) {
-                    this.titleTextView.setVisibility(0);
                 }
-                if (!(this.subtitleTextView == null || TextUtils.isEmpty(this.subtitleTextView.getText()))) {
-                    this.subtitleTextView.setVisibility(0);
+            });
+            this.actionModeAnimation.start();
+            if (this.titleTextView != null) {
+                this.titleTextView.setVisibility(0);
+            }
+            if (!(this.subtitleTextView == null || TextUtils.isEmpty(this.subtitleTextView.getText()))) {
+                this.subtitleTextView.setVisibility(0);
+            }
+            if (this.menu != null) {
+                this.menu.setVisibility(0);
+            }
+            if (this.backButtonImageView != null) {
+                Drawable drawable = this.backButtonImageView.getDrawable();
+                if (drawable instanceof BackDrawable) {
+                    ((BackDrawable) drawable).setRotation(0.0f, true);
                 }
-                if (this.menu != null) {
-                    this.menu.setVisibility(0);
-                }
-                if (this.backButtonImageView != null) {
-                    Drawable drawable = this.backButtonImageView.getDrawable();
-                    if (drawable instanceof BackDrawable) {
-                        ((BackDrawable) drawable).setRotation(0.0f, true);
-                    }
-                    this.backButtonImageView.setBackgroundDrawable(Theme.createSelectorDrawable(this.itemsBackgroundColor));
-                }
+                this.backButtonImageView.setBackgroundDrawable(Theme.createSelectorDrawable(this.itemsBackgroundColor));
             }
         }
     }
@@ -784,15 +496,15 @@ Caused by: java.lang.NullPointerException
     }
 
     protected void onSearchFieldVisibilityChanged(boolean visible) {
+        int i = 4;
         this.isSearchFieldVisible = visible;
-        int i = 0;
         if (this.titleTextView != null) {
             this.titleTextView.setVisibility(visible ? 4 : 0);
         }
         if (!(this.subtitleTextView == null || TextUtils.isEmpty(this.subtitleTextView.getText()))) {
             SimpleTextView simpleTextView = this.subtitleTextView;
-            if (visible) {
-                i = 4;
+            if (!visible) {
+                i = 0;
             }
             simpleTextView.setVisibility(i);
         }
@@ -815,18 +527,14 @@ Caused by: java.lang.NullPointerException
     }
 
     public void closeSearchField(boolean closeKeyboard) {
-        if (this.isSearchFieldVisible) {
-            if (this.menu != null) {
-                this.menu.closeSearchField(closeKeyboard);
-            }
+        if (this.isSearchFieldVisible && this.menu != null) {
+            this.menu.closeSearchField(closeKeyboard);
         }
     }
 
     public void openSearchField(String text) {
-        if (this.menu != null) {
-            if (text != null) {
-                this.menu.openSearchField(this.isSearchFieldVisible ^ 1, text);
-            }
+        if (this.menu != null && text != null) {
+            this.menu.openSearchField(!this.isSearchFieldVisible, text);
         }
     }
 
@@ -836,52 +544,123 @@ Caused by: java.lang.NullPointerException
         int height = MeasureSpec.getSize(heightMeasureSpec);
         int actionBarHeight = getCurrentActionBarHeight();
         int actionBarHeightSpec = MeasureSpec.makeMeasureSpec(actionBarHeight, 1073741824);
-        int i = 0;
-        setMeasuredDimension(width, ((this.occupyStatusBar ? AndroidUtilities.statusBarHeight : 0) + actionBarHeight) + r6.extraHeight);
-        if (r6.backButtonImageView == null || r6.backButtonImageView.getVisibility() == 8) {
+        setMeasuredDimension(width, ((this.occupyStatusBar ? AndroidUtilities.statusBarHeight : 0) + actionBarHeight) + this.extraHeight);
+        if (this.backButtonImageView == null || this.backButtonImageView.getVisibility() == 8) {
             textLeft = AndroidUtilities.dp(AndroidUtilities.isTablet() ? 26.0f : 18.0f);
         } else {
-            r6.backButtonImageView.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(54.0f), 1073741824), actionBarHeightSpec);
-            textLeft = AndroidUtilities.dp(AndroidUtilities.isTablet() ? 1117782016 : 1116733440);
+            this.backButtonImageView.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(54.0f), 1073741824), actionBarHeightSpec);
+            textLeft = AndroidUtilities.dp(AndroidUtilities.isTablet() ? 80.0f : 72.0f);
         }
-        int textLeft2 = textLeft;
-        if (!(r6.menu == null || r6.menu.getVisibility() == 8)) {
-            if (r6.isSearchFieldVisible) {
-                textLeft = MeasureSpec.makeMeasureSpec(width - AndroidUtilities.dp(AndroidUtilities.isTablet() ? 74.0f : 66.0f), 1073741824);
+        if (!(this.menu == null || this.menu.getVisibility() == 8)) {
+            int menuWidth;
+            if (this.isSearchFieldVisible) {
+                menuWidth = MeasureSpec.makeMeasureSpec(width - AndroidUtilities.dp(AndroidUtilities.isTablet() ? 74.0f : 66.0f), 1073741824);
             } else {
-                textLeft = MeasureSpec.makeMeasureSpec(width, Integer.MIN_VALUE);
+                menuWidth = MeasureSpec.makeMeasureSpec(width, Integer.MIN_VALUE);
             }
-            r6.menu.measure(textLeft, actionBarHeightSpec);
+            this.menu.measure(menuWidth, actionBarHeightSpec);
         }
-        if (!((r6.titleTextView == null || r6.titleTextView.getVisibility() == 8) && (r6.subtitleTextView == null || r6.subtitleTextView.getVisibility() == 8))) {
+        if (!((this.titleTextView == null || this.titleTextView.getVisibility() == 8) && (this.subtitleTextView == null || this.subtitleTextView.getVisibility() == 8))) {
             SimpleTextView simpleTextView;
-            textLeft = (((width - (r6.menu != null ? r6.menu.getMeasuredWidth() : 0)) - AndroidUtilities.dp(16.0f)) - textLeft2) - r6.titleRightMargin;
-            if (!(r6.titleTextView == null || r6.titleTextView.getVisibility() == 8)) {
-                simpleTextView = r6.titleTextView;
-                int i2 = (AndroidUtilities.isTablet() || getResources().getConfiguration().orientation != 2) ? 20 : 18;
-                simpleTextView.setTextSize(i2);
-                r6.titleTextView.measure(MeasureSpec.makeMeasureSpec(textLeft, Integer.MIN_VALUE), MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(24.0f), Integer.MIN_VALUE));
+            int i;
+            int availableWidth = (((width - (this.menu != null ? this.menu.getMeasuredWidth() : 0)) - AndroidUtilities.dp(16.0f)) - textLeft) - this.titleRightMargin;
+            if (!(this.titleTextView == null || this.titleTextView.getVisibility() == 8)) {
+                simpleTextView = this.titleTextView;
+                i = (AndroidUtilities.isTablet() || getResources().getConfiguration().orientation != 2) ? 20 : 18;
+                simpleTextView.setTextSize(i);
+                this.titleTextView.measure(MeasureSpec.makeMeasureSpec(availableWidth, Integer.MIN_VALUE), MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(24.0f), Integer.MIN_VALUE));
             }
-            if (!(r6.subtitleTextView == null || r6.subtitleTextView.getVisibility() == 8)) {
-                simpleTextView = r6.subtitleTextView;
-                int i3 = (AndroidUtilities.isTablet() || getResources().getConfiguration().orientation != 2) ? 16 : 14;
-                simpleTextView.setTextSize(i3);
-                r6.subtitleTextView.measure(MeasureSpec.makeMeasureSpec(textLeft, Integer.MIN_VALUE), MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(20.0f), Integer.MIN_VALUE));
+            if (!(this.subtitleTextView == null || this.subtitleTextView.getVisibility() == 8)) {
+                simpleTextView = this.subtitleTextView;
+                i = (AndroidUtilities.isTablet() || getResources().getConfiguration().orientation != 2) ? 16 : 14;
+                simpleTextView.setTextSize(i);
+                this.subtitleTextView.measure(MeasureSpec.makeMeasureSpec(availableWidth, Integer.MIN_VALUE), MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(20.0f), Integer.MIN_VALUE));
             }
         }
         int childCount = getChildCount();
-        while (true) {
-            int i4 = i;
-            if (i4 < childCount) {
-                View child = getChildAt(i4);
-                if (!(child.getVisibility() == 8 || child == r6.titleTextView || child == r6.subtitleTextView || child == r6.menu)) {
-                    if (child != r6.backButtonImageView) {
-                        measureChildWithMargins(child, widthMeasureSpec, 0, MeasureSpec.makeMeasureSpec(getMeasuredHeight(), 1073741824), null);
-                    }
-                }
-                i = i4 + 1;
+        for (int i2 = 0; i2 < childCount; i2++) {
+            View child = getChildAt(i2);
+            if (!(child.getVisibility() == 8 || child == this.titleTextView || child == this.subtitleTextView || child == this.menu || child == this.backButtonImageView)) {
+                measureChildWithMargins(child, widthMeasureSpec, 0, MeasureSpec.makeMeasureSpec(getMeasuredHeight(), 1073741824), 0);
+            }
+        }
+    }
+
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        int textLeft;
+        int textTop;
+        int additionalTop = this.occupyStatusBar ? AndroidUtilities.statusBarHeight : 0;
+        if (this.backButtonImageView == null || this.backButtonImageView.getVisibility() == 8) {
+            textLeft = AndroidUtilities.dp(AndroidUtilities.isTablet() ? 26.0f : 18.0f);
+        } else {
+            this.backButtonImageView.layout(0, additionalTop, this.backButtonImageView.getMeasuredWidth(), this.backButtonImageView.getMeasuredHeight() + additionalTop);
+            textLeft = AndroidUtilities.dp(AndroidUtilities.isTablet() ? 80.0f : 72.0f);
+        }
+        if (!(this.menu == null || this.menu.getVisibility() == 8)) {
+            int menuLeft;
+            if (this.isSearchFieldVisible) {
+                menuLeft = AndroidUtilities.dp(AndroidUtilities.isTablet() ? 74.0f : 66.0f);
             } else {
-                return;
+                menuLeft = (right - left) - this.menu.getMeasuredWidth();
+            }
+            this.menu.layout(menuLeft, additionalTop, this.menu.getMeasuredWidth() + menuLeft, this.menu.getMeasuredHeight() + additionalTop);
+        }
+        if (!(this.titleTextView == null || this.titleTextView.getVisibility() == 8)) {
+            if (this.subtitleTextView == null || this.subtitleTextView.getVisibility() == 8) {
+                textTop = (getCurrentActionBarHeight() - this.titleTextView.getTextHeight()) / 2;
+            } else {
+                int currentActionBarHeight = ((getCurrentActionBarHeight() / 2) - this.titleTextView.getTextHeight()) / 2;
+                float f = (AndroidUtilities.isTablet() || getResources().getConfiguration().orientation != 2) ? 3.0f : 2.0f;
+                textTop = currentActionBarHeight + AndroidUtilities.dp(f);
+            }
+            this.titleTextView.layout(textLeft, additionalTop + textTop, this.titleTextView.getMeasuredWidth() + textLeft, (additionalTop + textTop) + this.titleTextView.getTextHeight());
+        }
+        if (!(this.subtitleTextView == null || this.subtitleTextView.getVisibility() == 8)) {
+            currentActionBarHeight = (((getCurrentActionBarHeight() / 2) - this.subtitleTextView.getTextHeight()) / 2) + (getCurrentActionBarHeight() / 2);
+            f = (AndroidUtilities.isTablet() || getResources().getConfiguration().orientation != 2) ? 1.0f : 1.0f;
+            textTop = currentActionBarHeight - AndroidUtilities.dp(f);
+            this.subtitleTextView.layout(textLeft, additionalTop + textTop, this.subtitleTextView.getMeasuredWidth() + textLeft, (additionalTop + textTop) + this.subtitleTextView.getTextHeight());
+        }
+        int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View child = getChildAt(i);
+            if (!(child.getVisibility() == 8 || child == this.titleTextView || child == this.subtitleTextView || child == this.menu || child == this.backButtonImageView)) {
+                int childLeft;
+                int childTop;
+                LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                int width = child.getMeasuredWidth();
+                int height = child.getMeasuredHeight();
+                int gravity = lp.gravity;
+                if (gravity == -1) {
+                    gravity = 51;
+                }
+                int verticalGravity = gravity & 112;
+                switch ((gravity & 7) & 7) {
+                    case 1:
+                        childLeft = ((((right - left) - width) / 2) + lp.leftMargin) - lp.rightMargin;
+                        break;
+                    case 5:
+                        childLeft = (right - width) - lp.rightMargin;
+                        break;
+                    default:
+                        childLeft = lp.leftMargin;
+                        break;
+                }
+                switch (verticalGravity) {
+                    case 16:
+                        childTop = ((((bottom - top) - height) / 2) + lp.topMargin) - lp.bottomMargin;
+                        break;
+                    case 48:
+                        childTop = lp.topMargin;
+                        break;
+                    case 80:
+                        childTop = ((bottom - top) - height) - lp.bottomMargin;
+                        break;
+                    default:
+                        childTop = lp.topMargin;
+                        break;
+                }
+                child.layout(childLeft, childTop, childLeft + width, childTop + height);
             }
         }
     }
@@ -903,39 +682,42 @@ Caused by: java.lang.NullPointerException
     }
 
     public void setTitleOverlayText(String title, String subtitle, Runnable action) {
-        if (this.allowOverlayTitle) {
-            if (this.parentFragment.parentLayout != null) {
-                SimpleTextView simpleTextView;
-                CharSequence textToSet = title != null ? title : this.lastTitle;
-                if (textToSet != null && this.titleTextView == null) {
-                    createTitleTextView();
-                }
-                int i = 0;
-                if (this.titleTextView != null) {
-                    this.titleOverlayShown = title != null;
-                    if (this.supportsHolidayImage) {
-                        this.titleTextView.invalidate();
-                        invalidate();
-                    }
-                    simpleTextView = this.titleTextView;
-                    int i2 = (textToSet == null || this.isSearchFieldVisible) ? 4 : 0;
-                    simpleTextView.setVisibility(i2);
-                    this.titleTextView.setText(textToSet);
-                }
-                textToSet = subtitle != null ? subtitle : this.lastSubtitle;
-                if (textToSet != null && this.subtitleTextView == null) {
-                    createSubtitleTextView();
-                }
-                if (this.subtitleTextView != null) {
-                    simpleTextView = this.subtitleTextView;
-                    if (TextUtils.isEmpty(textToSet) || this.isSearchFieldVisible) {
-                        i = 8;
-                    }
-                    simpleTextView.setVisibility(i);
-                    this.subtitleTextView.setText(textToSet);
-                }
-                this.titleActionRunnable = action;
+        int i = 0;
+        if (this.allowOverlayTitle && this.parentFragment.parentLayout != null) {
+            CharSequence textToSet = title != null ? title : this.lastTitle;
+            if (textToSet != null && this.titleTextView == null) {
+                createTitleTextView();
             }
+            if (this.titleTextView != null) {
+                boolean z;
+                if (title != null) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                this.titleOverlayShown = z;
+                if (this.supportsHolidayImage) {
+                    this.titleTextView.invalidate();
+                    invalidate();
+                }
+                SimpleTextView simpleTextView = this.titleTextView;
+                int i2 = (textToSet == null || this.isSearchFieldVisible) ? 4 : 0;
+                simpleTextView.setVisibility(i2);
+                this.titleTextView.setText(textToSet);
+            }
+            textToSet = subtitle != null ? subtitle : this.lastSubtitle;
+            if (textToSet != null && this.subtitleTextView == null) {
+                createSubtitleTextView();
+            }
+            if (this.subtitleTextView != null) {
+                SimpleTextView simpleTextView2 = this.subtitleTextView;
+                if (TextUtils.isEmpty(textToSet) || this.isSearchFieldVisible) {
+                    i = 8;
+                }
+                simpleTextView2.setVisibility(i);
+                this.subtitleTextView.setText(textToSet);
+            }
+            this.titleActionRunnable = action;
         }
     }
 
@@ -946,7 +728,14 @@ Caused by: java.lang.NullPointerException
     public void setOccupyStatusBar(boolean value) {
         this.occupyStatusBar = value;
         if (this.actionMode != null) {
-            this.actionMode.setPadding(0, this.occupyStatusBar ? AndroidUtilities.statusBarHeight : 0, 0, 0);
+            int i;
+            ActionBarMenu actionBarMenu = this.actionMode;
+            if (this.occupyStatusBar) {
+                i = AndroidUtilities.statusBarHeight;
+            } else {
+                i = 0;
+            }
+            actionBarMenu.setPadding(0, i, 0, 0);
         }
     }
 
@@ -986,6 +775,7 @@ Caused by: java.lang.NullPointerException
                 drawable = this.backButtonImageView.getDrawable();
                 if (drawable instanceof BackDrawable) {
                     ((BackDrawable) drawable).setRotatedColor(color);
+                    return;
                 }
                 return;
             }
@@ -1013,12 +803,7 @@ Caused by: java.lang.NullPointerException
     }
 
     public boolean onTouchEvent(MotionEvent event) {
-        if (!super.onTouchEvent(event)) {
-            if (!this.interceptTouches) {
-                return false;
-            }
-        }
-        return true;
+        return super.onTouchEvent(event) || this.interceptTouches;
     }
 
     public static int getCurrentActionBarHeight() {

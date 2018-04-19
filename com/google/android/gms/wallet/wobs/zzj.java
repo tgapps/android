@@ -13,10 +13,10 @@ public final class zzj implements Creator<TextModuleData> {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    str = SafeParcelReader.createString(parcel, readHeader);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 3:
-                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -24,7 +24,7 @@ public final class zzj implements Creator<TextModuleData> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new TextModuleData(str, str2);
+        return new TextModuleData(str2, str);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

@@ -11,6 +11,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.ResolveInfo;
 import android.os.Build.VERSION;
 import android.os.Bundle;
+import android.os.DeadObjectException;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.HandlerThread;
@@ -20,6 +21,8 @@ import android.os.RemoteException;
 import android.provider.Settings.Secure;
 import android.support.v4.app.INotificationSideChannel.Stub;
 import android.util.Log;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,122 +68,6 @@ public final class NotificationManagerCompat {
             ListenerRecord(ComponentName componentName) {
                 this.componentName = componentName;
             }
-        }
-
-        private void processListenerQueue(android.support.v4.app.NotificationManagerCompat.SideChannelManager.ListenerRecord r1) {
-            /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: android.support.v4.app.NotificationManagerCompat.SideChannelManager.processListenerQueue(android.support.v4.app.NotificationManagerCompat$SideChannelManager$ListenerRecord):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-            /*
-            r0 = this;
-            r0 = "NotifManCompat";
-            r1 = 3;
-            r0 = android.util.Log.isLoggable(r0, r1);
-            if (r0 == 0) goto L_0x0034;
-        L_0x0009:
-            r0 = "NotifManCompat";
-            r2 = new java.lang.StringBuilder;
-            r2.<init>();
-            r3 = "Processing component ";
-            r2.append(r3);
-            r3 = r6.componentName;
-            r2.append(r3);
-            r3 = ", ";
-            r2.append(r3);
-            r3 = r6.taskQueue;
-            r3 = r3.size();
-            r2.append(r3);
-            r3 = " queued tasks";
-            r2.append(r3);
-            r2 = r2.toString();
-            android.util.Log.d(r0, r2);
-        L_0x0034:
-            r0 = r6.taskQueue;
-            r0 = r0.isEmpty();
-            if (r0 == 0) goto L_0x003d;
-        L_0x003c:
-            return;
-        L_0x003d:
-            r0 = r5.ensureServiceBound(r6);
-            if (r0 == 0) goto L_0x00c6;
-        L_0x0043:
-            r0 = r6.service;
-            if (r0 != 0) goto L_0x0049;
-        L_0x0047:
-            goto L_0x00c6;
-        L_0x0049:
-            r0 = r6.taskQueue;
-            r0 = r0.peek();
-            r0 = (android.support.v4.app.NotificationManagerCompat.Task) r0;
-            if (r0 != 0) goto L_0x0054;
-        L_0x0053:
-            goto L_0x00ba;
-        L_0x0054:
-            r2 = "NotifManCompat";	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r2 = android.util.Log.isLoggable(r2, r1);	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            if (r2 == 0) goto L_0x0072;	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-        L_0x005c:
-            r2 = "NotifManCompat";	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r3 = new java.lang.StringBuilder;	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r3.<init>();	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r4 = "Sending task ";	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r3.append(r4);	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r3.append(r0);	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r3 = r3.toString();	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            android.util.Log.d(r2, r3);	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-        L_0x0072:
-            r2 = r6.service;	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r0.send(r2);	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r2 = r6.taskQueue;	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            r2.remove();	 Catch:{ DeadObjectException -> 0x0098, RemoteException -> 0x007e }
-            goto L_0x0049;
-        L_0x007e:
-            r1 = move-exception;
-            r2 = "NotifManCompat";
-            r3 = new java.lang.StringBuilder;
-            r3.<init>();
-            r4 = "RemoteException communicating with ";
-            r3.append(r4);
-            r4 = r6.componentName;
-            r3.append(r4);
-            r3 = r3.toString();
-            android.util.Log.w(r2, r3, r1);
-            goto L_0x00ba;
-        L_0x0098:
-            r2 = move-exception;
-            r3 = "NotifManCompat";
-            r1 = android.util.Log.isLoggable(r3, r1);
-            if (r1 == 0) goto L_0x00b9;
-        L_0x00a1:
-            r1 = "NotifManCompat";
-            r3 = new java.lang.StringBuilder;
-            r3.<init>();
-            r4 = "Remote service has died: ";
-            r3.append(r4);
-            r4 = r6.componentName;
-            r3.append(r4);
-            r3 = r3.toString();
-            android.util.Log.d(r1, r3);
-        L_0x00ba:
-            r0 = r6.taskQueue;
-            r0 = r0.isEmpty();
-            if (r0 != 0) goto L_0x00c5;
-            r5.scheduleListenerRetry(r6);
-            return;
-        L_0x00c6:
-            r5.scheduleListenerRetry(r6);
-            return;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: android.support.v4.app.NotificationManagerCompat.SideChannelManager.processListenerQueue(android.support.v4.app.NotificationManagerCompat$SideChannelManager$ListenerRecord):void");
         }
 
         SideChannelManager(Context context) {
@@ -247,20 +134,14 @@ Caused by: java.lang.NullPointerException
 
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             if (Log.isLoggable("NotifManCompat", 3)) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Connected to service ");
-                stringBuilder.append(componentName);
-                Log.d("NotifManCompat", stringBuilder.toString());
+                Log.d("NotifManCompat", "Connected to service " + componentName);
             }
             this.mHandler.obtainMessage(1, new ServiceConnectedEvent(componentName, iBinder)).sendToTarget();
         }
 
         public void onServiceDisconnected(ComponentName componentName) {
             if (Log.isLoggable("NotifManCompat", 3)) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Disconnected from service ");
-                stringBuilder.append(componentName);
-                Log.d("NotifManCompat", stringBuilder.toString());
+                Log.d("NotifManCompat", "Disconnected from service " + componentName);
             }
             this.mHandler.obtainMessage(2, componentName).sendToTarget();
         }
@@ -268,19 +149,15 @@ Caused by: java.lang.NullPointerException
         private void updateListenerMap() {
             Set<String> enabledPackages = NotificationManagerCompat.getEnabledListenerPackages(this.mContext);
             if (!enabledPackages.equals(this.mCachedEnabledPackages)) {
-                StringBuilder stringBuilder;
+                ComponentName componentName;
                 this.mCachedEnabledPackages = enabledPackages;
                 List<ResolveInfo> resolveInfos = this.mContext.getPackageManager().queryIntentServices(new Intent().setAction("android.support.BIND_NOTIFICATION_SIDE_CHANNEL"), 0);
                 Set<ComponentName> enabledComponents = new HashSet();
                 for (ResolveInfo resolveInfo : resolveInfos) {
                     if (enabledPackages.contains(resolveInfo.serviceInfo.packageName)) {
-                        ComponentName componentName = new ComponentName(resolveInfo.serviceInfo.packageName, resolveInfo.serviceInfo.name);
+                        componentName = new ComponentName(resolveInfo.serviceInfo.packageName, resolveInfo.serviceInfo.name);
                         if (resolveInfo.serviceInfo.permission != null) {
-                            stringBuilder = new StringBuilder();
-                            stringBuilder.append("Permission present on component ");
-                            stringBuilder.append(componentName);
-                            stringBuilder.append(", not adding listener record.");
-                            Log.w("NotifManCompat", stringBuilder.toString());
+                            Log.w("NotifManCompat", "Permission present on component " + componentName + ", not adding listener record.");
                         } else {
                             enabledComponents.add(componentName);
                         }
@@ -289,10 +166,7 @@ Caused by: java.lang.NullPointerException
                 for (ComponentName componentName2 : enabledComponents) {
                     if (!this.mRecordMap.containsKey(componentName2)) {
                         if (Log.isLoggable("NotifManCompat", 3)) {
-                            StringBuilder stringBuilder2 = new StringBuilder();
-                            stringBuilder2.append("Adding listener record for ");
-                            stringBuilder2.append(componentName2);
-                            Log.d("NotifManCompat", stringBuilder2.toString());
+                            Log.d("NotifManCompat", "Adding listener record for " + componentName2);
                         }
                         this.mRecordMap.put(componentName2, new ListenerRecord(componentName2));
                     }
@@ -302,10 +176,7 @@ Caused by: java.lang.NullPointerException
                     Entry<ComponentName, ListenerRecord> entry = (Entry) it.next();
                     if (!enabledComponents.contains(entry.getKey())) {
                         if (Log.isLoggable("NotifManCompat", 3)) {
-                            stringBuilder = new StringBuilder();
-                            stringBuilder.append("Removing listener record for ");
-                            stringBuilder.append(entry.getKey());
-                            Log.d("NotifManCompat", stringBuilder.toString());
+                            Log.d("NotifManCompat", "Removing listener record for " + entry.getKey());
                         }
                         ensureServiceUnbound((ListenerRecord) entry.getValue());
                         it.remove();
@@ -322,10 +193,7 @@ Caused by: java.lang.NullPointerException
             if (record.bound) {
                 record.retryCount = 0;
             } else {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Unable to bind to listener ");
-                stringBuilder.append(record.componentName);
-                Log.w("NotifManCompat", stringBuilder.toString());
+                Log.w("NotifManCompat", "Unable to bind to listener " + record.componentName);
                 this.mContext.unbindService(this);
             }
             return record.bound;
@@ -343,27 +211,49 @@ Caused by: java.lang.NullPointerException
             if (!this.mHandler.hasMessages(3, record.componentName)) {
                 record.retryCount++;
                 if (record.retryCount > 6) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("Giving up on delivering ");
-                    stringBuilder.append(record.taskQueue.size());
-                    stringBuilder.append(" tasks to ");
-                    stringBuilder.append(record.componentName);
-                    stringBuilder.append(" after ");
-                    stringBuilder.append(record.retryCount);
-                    stringBuilder.append(" retries");
-                    Log.w("NotifManCompat", stringBuilder.toString());
+                    Log.w("NotifManCompat", "Giving up on delivering " + record.taskQueue.size() + " tasks to " + record.componentName + " after " + record.retryCount + " retries");
                     record.taskQueue.clear();
                     return;
                 }
-                int delayMs = 1000 * (1 << (record.retryCount - 1));
+                int delayMs = (1 << (record.retryCount - 1)) * 1000;
                 if (Log.isLoggable("NotifManCompat", 3)) {
-                    StringBuilder stringBuilder2 = new StringBuilder();
-                    stringBuilder2.append("Scheduling retry for ");
-                    stringBuilder2.append(delayMs);
-                    stringBuilder2.append(" ms");
-                    Log.d("NotifManCompat", stringBuilder2.toString());
+                    Log.d("NotifManCompat", "Scheduling retry for " + delayMs + " ms");
                 }
                 this.mHandler.sendMessageDelayed(this.mHandler.obtainMessage(3, record.componentName), (long) delayMs);
+            }
+        }
+
+        private void processListenerQueue(ListenerRecord record) {
+            if (Log.isLoggable("NotifManCompat", 3)) {
+                Log.d("NotifManCompat", "Processing component " + record.componentName + ", " + record.taskQueue.size() + " queued tasks");
+            }
+            if (!record.taskQueue.isEmpty()) {
+                if (!ensureServiceBound(record) || record.service == null) {
+                    scheduleListenerRetry(record);
+                    return;
+                }
+                while (true) {
+                    Task task = (Task) record.taskQueue.peek();
+                    if (task == null) {
+                        break;
+                    }
+                    try {
+                        if (Log.isLoggable("NotifManCompat", 3)) {
+                            Log.d("NotifManCompat", "Sending task " + task);
+                        }
+                        task.send(record.service);
+                        record.taskQueue.remove();
+                    } catch (DeadObjectException e) {
+                        if (Log.isLoggable("NotifManCompat", 3)) {
+                            Log.d("NotifManCompat", "Remote service has died: " + record.componentName);
+                        }
+                    } catch (RemoteException e2) {
+                        Log.w("NotifManCompat", "RemoteException communicating with " + record.componentName, e2);
+                    }
+                }
+                if (!record.taskQueue.isEmpty()) {
+                    scheduleListenerRetry(record);
+                }
             }
         }
     }
@@ -394,14 +284,10 @@ Caused by: java.lang.NullPointerException
 
         public String toString() {
             StringBuilder sb = new StringBuilder("CancelTask[");
-            sb.append("packageName:");
-            sb.append(this.packageName);
-            sb.append(", id:");
-            sb.append(this.id);
-            sb.append(", tag:");
-            sb.append(this.tag);
-            sb.append(", all:");
-            sb.append(this.all);
+            sb.append("packageName:").append(this.packageName);
+            sb.append(", id:").append(this.id);
+            sb.append(", tag:").append(this.tag);
+            sb.append(", all:").append(this.all);
             sb.append("]");
             return sb.toString();
         }
@@ -426,12 +312,9 @@ Caused by: java.lang.NullPointerException
 
         public String toString() {
             StringBuilder sb = new StringBuilder("NotifyTask[");
-            sb.append("packageName:");
-            sb.append(this.packageName);
-            sb.append(", id:");
-            sb.append(this.id);
-            sb.append(", tag:");
-            sb.append(this.tag);
+            sb.append("packageName:").append(this.packageName);
+            sb.append(", id:").append(this.id);
+            sb.append(", tag:").append(this.tag);
             sb.append("]");
             return sb.toString();
         }
@@ -473,7 +356,6 @@ Caused by: java.lang.NullPointerException
         if (VERSION.SDK_INT >= 24) {
             return this.mNotificationManager.areNotificationsEnabled();
         }
-        boolean z = true;
         if (VERSION.SDK_INT < 19) {
             return true;
         }
@@ -482,11 +364,21 @@ Caused by: java.lang.NullPointerException
         String pkg = this.mContext.getApplicationContext().getPackageName();
         int uid = appInfo.uid;
         try {
-            if (((Integer) Class.forName(AppOpsManager.class.getName()).getMethod("checkOpNoThrow", new Class[]{Integer.TYPE, Integer.TYPE, String.class}).invoke(appOps, new Object[]{Integer.valueOf(((Integer) appOpsClass.getDeclaredField("OP_POST_NOTIFICATION").get(Integer.class)).intValue()), Integer.valueOf(uid), pkg})).intValue() != 0) {
-                z = false;
-            }
-            return z;
+            Class<?> appOpsClass = Class.forName(AppOpsManager.class.getName());
+            Method checkOpNoThrowMethod = appOpsClass.getMethod("checkOpNoThrow", new Class[]{Integer.TYPE, Integer.TYPE, String.class});
+            int value = ((Integer) appOpsClass.getDeclaredField("OP_POST_NOTIFICATION").get(Integer.class)).intValue();
+            return ((Integer) checkOpNoThrowMethod.invoke(appOps, new Object[]{Integer.valueOf(value), Integer.valueOf(uid), pkg})).intValue() == 0;
         } catch (ClassNotFoundException e) {
+            return true;
+        } catch (NoSuchMethodException e2) {
+            return true;
+        } catch (NoSuchFieldException e3) {
+            return true;
+        } catch (InvocationTargetException e4) {
+            return true;
+        } catch (IllegalAccessException e5) {
+            return true;
+        } catch (RuntimeException e6) {
             return true;
         }
     }

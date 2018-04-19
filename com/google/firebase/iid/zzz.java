@@ -37,84 +37,69 @@ public final class zzz {
         synchronized (this.zzbrv) {
             str = (String) this.zzbrv.get(intent.getAction());
         }
-        boolean z = false;
         if (str == null) {
             ResolveInfo resolveService = context.getPackageManager().resolveService(intent, 0);
-            if (resolveService != null) {
-                if (resolveService.serviceInfo != null) {
-                    ServiceInfo serviceInfo = resolveService.serviceInfo;
-                    if (context.getPackageName().equals(serviceInfo.packageName)) {
-                        if (serviceInfo.name != null) {
-                            str = serviceInfo.name;
-                            if (str.startsWith(".")) {
-                                String valueOf = String.valueOf(context.getPackageName());
-                                str = String.valueOf(str);
-                                str = str.length() != 0 ? valueOf.concat(str) : new String(valueOf);
-                            }
-                            synchronized (this.zzbrv) {
-                                this.zzbrv.put(intent.getAction(), str);
-                            }
-                        }
-                    }
-                    String str2 = serviceInfo.packageName;
-                    str = serviceInfo.name;
-                    StringBuilder stringBuilder = new StringBuilder((94 + String.valueOf(str2).length()) + String.valueOf(str).length());
-                    stringBuilder.append("Error resolving target intent service, skipping classname enforcement. Resolved service was: ");
-                    stringBuilder.append(str2);
-                    stringBuilder.append("/");
-                    stringBuilder.append(str);
-                    Log.e("FirebaseInstanceId", stringBuilder.toString());
-                    if (this.zzbrw == null) {
-                        if (context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0) {
-                            z = true;
-                        }
-                        this.zzbrw = Boolean.valueOf(z);
-                    }
-                    if (this.zzbrw.booleanValue()) {
-                        startWakefulService = WakefulBroadcastReceiver.startWakefulService(context, intent);
-                    } else {
-                        startWakefulService = context.startService(intent);
-                        Log.d("FirebaseInstanceId", "Missing wake lock permission, service start may be delayed");
-                    }
-                    if (startWakefulService == null) {
-                        return -1;
-                    }
-                    Log.e("FirebaseInstanceId", "Error while delivering the message: ServiceIntent not found.");
-                    return 404;
+            if (resolveService == null || resolveService.serviceInfo == null) {
+                Log.e("FirebaseInstanceId", "Failed to resolve target intent service, skipping classname enforcement");
+                if (this.zzbrw == null) {
+                    this.zzbrw = Boolean.valueOf(context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0);
                 }
-            }
-            Log.e("FirebaseInstanceId", "Failed to resolve target intent service, skipping classname enforcement");
-            if (this.zzbrw == null) {
-                if (context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0) {
-                    z = true;
+                if (this.zzbrw.booleanValue()) {
+                    startWakefulService = WakefulBroadcastReceiver.startWakefulService(context, intent);
+                } else {
+                    startWakefulService = context.startService(intent);
+                    Log.d("FirebaseInstanceId", "Missing wake lock permission, service start may be delayed");
                 }
-                this.zzbrw = Boolean.valueOf(z);
+                if (startWakefulService == null) {
+                    return -1;
+                }
+                Log.e("FirebaseInstanceId", "Error while delivering the message: ServiceIntent not found.");
+                return 404;
             }
-            if (this.zzbrw.booleanValue()) {
-                startWakefulService = context.startService(intent);
-                Log.d("FirebaseInstanceId", "Missing wake lock permission, service start may be delayed");
-            } else {
-                startWakefulService = WakefulBroadcastReceiver.startWakefulService(context, intent);
+            ServiceInfo serviceInfo = resolveService.serviceInfo;
+            if (!context.getPackageName().equals(serviceInfo.packageName) || serviceInfo.name == null) {
+                String str2 = serviceInfo.packageName;
+                str = serviceInfo.name;
+                Log.e("FirebaseInstanceId", new StringBuilder((String.valueOf(str2).length() + 94) + String.valueOf(str).length()).append("Error resolving target intent service, skipping classname enforcement. Resolved service was: ").append(str2).append("/").append(str).toString());
+                if (this.zzbrw == null) {
+                    if (context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0) {
+                    }
+                    this.zzbrw = Boolean.valueOf(context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0);
+                }
+                if (this.zzbrw.booleanValue()) {
+                    startWakefulService = context.startService(intent);
+                    Log.d("FirebaseInstanceId", "Missing wake lock permission, service start may be delayed");
+                } else {
+                    startWakefulService = WakefulBroadcastReceiver.startWakefulService(context, intent);
+                }
+                if (startWakefulService == null) {
+                    return -1;
+                }
+                Log.e("FirebaseInstanceId", "Error while delivering the message: ServiceIntent not found.");
+                return 404;
             }
-            if (startWakefulService == null) {
-                return -1;
+            str = serviceInfo.name;
+            if (str.startsWith(".")) {
+                String valueOf = String.valueOf(context.getPackageName());
+                str = String.valueOf(str);
+                str = str.length() != 0 ? valueOf.concat(str) : new String(valueOf);
             }
-            Log.e("FirebaseInstanceId", "Error while delivering the message: ServiceIntent not found.");
-            return 404;
+            synchronized (this.zzbrv) {
+                this.zzbrv.put(intent.getAction(), str);
+            }
         }
         if (Log.isLoggable("FirebaseInstanceId", 3)) {
-            valueOf = "FirebaseInstanceId";
-            str2 = "Restricting intent to a specific service: ";
-            String valueOf2 = String.valueOf(str);
-            Log.d(valueOf, valueOf2.length() != 0 ? str2.concat(valueOf2) : new String(str2));
+            str2 = "FirebaseInstanceId";
+            String str3 = "Restricting intent to a specific service: ";
+            valueOf = String.valueOf(str);
+            Log.d(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
         }
         intent.setClassName(context.getPackageName(), str);
         try {
             if (this.zzbrw == null) {
                 if (context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0) {
-                    z = true;
                 }
-                this.zzbrw = Boolean.valueOf(z);
+                this.zzbrw = Boolean.valueOf(context.checkCallingOrSelfPermission("android.permission.WAKE_LOCK") == 0);
             }
             if (this.zzbrw.booleanValue()) {
                 startWakefulService = WakefulBroadcastReceiver.startWakefulService(context, intent);
@@ -131,11 +116,8 @@ public final class zzz {
             Log.e("FirebaseInstanceId", "Error while delivering the message to the serviceIntent", e);
             return 401;
         } catch (IllegalStateException e2) {
-            String valueOf3 = String.valueOf(e2);
-            StringBuilder stringBuilder2 = new StringBuilder(45 + String.valueOf(valueOf3).length());
-            stringBuilder2.append("Failed to start service while in background: ");
-            stringBuilder2.append(valueOf3);
-            Log.e("FirebaseInstanceId", stringBuilder2.toString());
+            str = String.valueOf(e2);
+            Log.e("FirebaseInstanceId", new StringBuilder(String.valueOf(str).length() + 45).append("Failed to start service while in background: ").append(str).toString());
             return 402;
         }
     }
@@ -152,79 +134,38 @@ public final class zzz {
     }
 
     public final int zza(Context context, String str, Intent intent) {
-        Object obj;
-        Queue queue;
-        String str2;
-        String str3;
-        int hashCode = str.hashCode();
-        if (hashCode != -842411455) {
-            if (hashCode == 41532704) {
+        Object obj = -1;
+        switch (str.hashCode()) {
+            case -842411455:
+                if (str.equals("com.google.firebase.INSTANCE_ID_EVENT")) {
+                    obj = null;
+                    break;
+                }
+                break;
+            case 41532704:
                 if (str.equals("com.google.firebase.MESSAGING_EVENT")) {
                     obj = 1;
-                    switch (obj) {
-                        case null:
-                            queue = this.zzbrx;
-                            break;
-                        case 1:
-                            queue = this.zzbry;
-                            break;
-                        default:
-                            str2 = "FirebaseInstanceId";
-                            str3 = "Unknown service action: ";
-                            str = String.valueOf(str);
-                            Log.w(str2, str.length() != 0 ? str3.concat(str) : new String(str3));
-                            return 500;
-                    }
-                    queue.offer(intent);
-                    intent = new Intent(str);
-                    intent.setPackage(context.getPackageName());
-                    return zzb(context, intent);
+                    break;
                 }
-            }
-        } else if (str.equals("com.google.firebase.INSTANCE_ID_EVENT")) {
-            obj = null;
-            switch (obj) {
-                case null:
-                    queue = this.zzbrx;
-                    break;
-                case 1:
-                    queue = this.zzbry;
-                    break;
-                default:
-                    str2 = "FirebaseInstanceId";
-                    str3 = "Unknown service action: ";
-                    str = String.valueOf(str);
-                    if (str.length() != 0) {
-                    }
-                    Log.w(str2, str.length() != 0 ? str3.concat(str) : new String(str3));
-                    return 500;
-            }
-            queue.offer(intent);
-            intent = new Intent(str);
-            intent.setPackage(context.getPackageName());
-            return zzb(context, intent);
+                break;
         }
-        obj = -1;
         switch (obj) {
             case null:
-                queue = this.zzbrx;
+                this.zzbrx.offer(intent);
                 break;
             case 1:
-                queue = this.zzbry;
+                this.zzbry.offer(intent);
                 break;
             default:
-                str2 = "FirebaseInstanceId";
-                str3 = "Unknown service action: ";
-                str = String.valueOf(str);
-                if (str.length() != 0) {
-                }
-                Log.w(str2, str.length() != 0 ? str3.concat(str) : new String(str3));
+                String str2 = "FirebaseInstanceId";
+                String str3 = "Unknown service action: ";
+                String valueOf = String.valueOf(str);
+                Log.w(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
                 return 500;
         }
-        queue.offer(intent);
-        intent = new Intent(str);
-        intent.setPackage(context.getPackageName());
-        return zzb(context, intent);
+        Intent intent2 = new Intent(str);
+        intent2.setPackage(context.getPackageName());
+        return zzb(context, intent2);
     }
 
     public final Intent zztb() {

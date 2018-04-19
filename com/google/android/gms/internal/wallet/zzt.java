@@ -20,9 +20,9 @@ public final class zzt extends zza implements zzs {
         zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iFragmentWrapper);
         zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) walletFragmentOptions);
         zzc.zza(obtainAndWriteInterfaceToken, (IInterface) com_google_android_gms_internal_wallet_zzo);
-        Parcel transactAndReadException = transactAndReadException(1, obtainAndWriteInterfaceToken);
-        zzl zza = zzm.zza(transactAndReadException.readStrongBinder());
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(1, obtainAndWriteInterfaceToken);
+        zzl zza = zzm.zza(obtainAndWriteInterfaceToken.readStrongBinder());
+        obtainAndWriteInterfaceToken.recycle();
         return zza;
     }
 }

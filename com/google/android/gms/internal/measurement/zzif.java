@@ -52,12 +52,12 @@ final class zzif implements ActivityLifecycleCallbacks {
         }
         zzih zzfy = this.zzaop.zzfy();
         if (bundle != null) {
-            bundle = bundle.getBundle("com.google.firebase.analytics.screen_service");
-            if (bundle != null) {
+            Bundle bundle2 = bundle.getBundle("com.google.firebase.analytics.screen_service");
+            if (bundle2 != null) {
                 zzik zze = zzfy.zze(activity);
-                zze.zzapb = bundle.getLong(TtmlNode.ATTR_ID);
-                zze.zzug = bundle.getString("name");
-                zze.zzapa = bundle.getString("referrer_name");
+                zze.zzapb = bundle2.getLong(TtmlNode.ATTR_ID);
+                zze.zzug = bundle2.getString("name");
+                zze.zzapa = bundle2.getString("referrer_name");
             }
         }
     }

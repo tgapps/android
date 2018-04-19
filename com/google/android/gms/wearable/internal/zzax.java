@@ -7,10 +7,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public final class zzax implements Creator<zzaw> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        int i = 0;
         zzay com_google_android_gms_wearable_internal_zzay = null;
+        int i = 0;
         int i2 = 0;
-        int i3 = i2;
+        int i3 = 0;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
@@ -18,13 +18,13 @@ public final class zzax implements Creator<zzaw> {
                     com_google_android_gms_wearable_internal_zzay = (zzay) SafeParcelReader.createParcelable(parcel, readHeader, zzay.CREATOR);
                     break;
                 case 3:
-                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    i3 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 4:
                     i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 5:
-                    i3 = SafeParcelReader.readInt(parcel, readHeader);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -32,7 +32,7 @@ public final class zzax implements Creator<zzaw> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new zzaw(com_google_android_gms_wearable_internal_zzay, i, i2, i3);
+        return new zzaw(com_google_android_gms_wearable_internal_zzay, i3, i2, i);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

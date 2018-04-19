@@ -8,6 +8,7 @@ import android.os.Parcelable;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
+import java.io.IOException;
 
 final class zzac implements Runnable {
     private final zzw zzbqn;
@@ -22,100 +23,74 @@ final class zzac implements Runnable {
         this.zzbsd.setReferenceCounted(false);
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private final boolean zzfg(java.lang.String r7) {
-        /*
-        r6 = this;
-        r0 = "!";
-        r7 = r7.split(r0);
-        r0 = 1;
-        r1 = 2;
-        r2 = r7.length;
-        if (r2 != r1) goto L_0x0079;
-    L_0x000b:
-        r1 = 0;
-        r2 = r7[r1];
-        r7 = r7[r0];
-        r3 = -1;
-        r4 = r2.hashCode();	 Catch:{ IOException -> 0x0058 }
-        r5 = 83;
-        if (r4 == r5) goto L_0x0028;
-    L_0x0019:
-        r5 = 85;
-        if (r4 == r5) goto L_0x001e;
-    L_0x001d:
-        goto L_0x0031;
-    L_0x001e:
-        r4 = "U";
-        r2 = r2.equals(r4);	 Catch:{ IOException -> 0x0058 }
-        if (r2 == 0) goto L_0x0031;
-    L_0x0026:
-        r3 = r0;
-        goto L_0x0031;
-    L_0x0028:
-        r4 = "S";
-        r2 = r2.equals(r4);	 Catch:{ IOException -> 0x0058 }
-        if (r2 == 0) goto L_0x0031;
-    L_0x0030:
-        r3 = r1;
-    L_0x0031:
-        switch(r3) {
-            case 0: goto L_0x0048;
-            case 1: goto L_0x0035;
-            default: goto L_0x0034;
-        };	 Catch:{ IOException -> 0x0058 }
-    L_0x0034:
-        return r0;
-    L_0x0035:
-        r2 = r6.zzbse;	 Catch:{ IOException -> 0x0058 }
-        r2.zzex(r7);	 Catch:{ IOException -> 0x0058 }
-        r7 = com.google.firebase.iid.FirebaseInstanceId.zzsj();	 Catch:{ IOException -> 0x0058 }
-        if (r7 == 0) goto L_0x0079;
-    L_0x0040:
-        r7 = "FirebaseInstanceId";
-        r2 = "unsubscribe operation succeeded";
-    L_0x0044:
-        android.util.Log.d(r7, r2);	 Catch:{ IOException -> 0x0058 }
-        return r0;
-    L_0x0048:
-        r2 = r6.zzbse;	 Catch:{ IOException -> 0x0058 }
-        r2.zzew(r7);	 Catch:{ IOException -> 0x0058 }
-        r7 = com.google.firebase.iid.FirebaseInstanceId.zzsj();	 Catch:{ IOException -> 0x0058 }
-        if (r7 == 0) goto L_0x0079;
-    L_0x0053:
-        r7 = "FirebaseInstanceId";
-        r2 = "subscribe operation succeeded";
-        goto L_0x0044;
-    L_0x0058:
-        r7 = move-exception;
-        r0 = "FirebaseInstanceId";
-        r2 = "Topic sync failed: ";
-        r7 = r7.getMessage();
-        r7 = java.lang.String.valueOf(r7);
-        r3 = r7.length();
-        if (r3 == 0) goto L_0x0070;
-    L_0x006b:
-        r7 = r2.concat(r7);
-        goto L_0x0075;
-    L_0x0070:
-        r7 = new java.lang.String;
-        r7.<init>(r2);
-    L_0x0075:
-        android.util.Log.e(r0, r7);
-        return r1;
-    L_0x0079:
-        return r0;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.firebase.iid.zzac.zzfg(java.lang.String):boolean");
+    private final boolean zzfg(String str) {
+        String[] split = str.split("!");
+        if (split.length != 2) {
+            return true;
+        }
+        String str2;
+        String valueOf;
+        String str3 = split[0];
+        String str4 = split[1];
+        int i = -1;
+        try {
+            switch (str3.hashCode()) {
+                case 83:
+                    if (str3.equals("S")) {
+                        i = 0;
+                        break;
+                    }
+                    break;
+                case 85:
+                    if (str3.equals("U")) {
+                        boolean z = true;
+                        break;
+                    }
+                    break;
+            }
+            switch (i) {
+                case 0:
+                    this.zzbse.zzew(str4);
+                    if (!FirebaseInstanceId.zzsj()) {
+                        return true;
+                    }
+                    Log.d("FirebaseInstanceId", "subscribe operation succeeded");
+                    return true;
+                case 1:
+                    this.zzbse.zzex(str4);
+                    if (!FirebaseInstanceId.zzsj()) {
+                        return true;
+                    }
+                    Log.d("FirebaseInstanceId", "unsubscribe operation succeeded");
+                    return true;
+                default:
+                    return true;
+            }
+        } catch (IOException e) {
+            str2 = "FirebaseInstanceId";
+            str3 = "Topic sync failed: ";
+            valueOf = String.valueOf(e.getMessage());
+            Log.e(str2, valueOf.length() == 0 ? new String(str3) : str3.concat(valueOf));
+            return false;
+        }
+        str2 = "FirebaseInstanceId";
+        str3 = "Topic sync failed: ";
+        valueOf = String.valueOf(e.getMessage());
+        if (valueOf.length() == 0) {
+        }
+        Log.e(str2, valueOf.length() == 0 ? new String(str3) : str3.concat(valueOf));
+        return false;
     }
 
     private final boolean zzte() {
+        String zzsh;
+        Exception e;
+        String str;
+        String valueOf;
         zzab zzsg = this.zzbse.zzsg();
         if (zzsg != null && !zzsg.zzff(this.zzbqn.zzsv())) {
             return true;
         }
-        String zzsh;
         try {
             zzsh = this.zzbse.zzsh();
             if (zzsh == null) {
@@ -125,20 +100,31 @@ final class zzac implements Runnable {
             if (Log.isLoggable("FirebaseInstanceId", 3)) {
                 Log.d("FirebaseInstanceId", "Token successfully retrieved");
             }
-            if (zzsg == null || !(zzsg == null || zzsh.equals(zzsg.zzbsb))) {
-                Context context = getContext();
-                Parcelable intent = new Intent("com.google.firebase.iid.TOKEN_REFRESH");
-                Intent intent2 = new Intent("com.google.firebase.INSTANCE_ID_EVENT");
-                intent2.setClass(context, FirebaseInstanceIdReceiver.class);
-                intent2.putExtra("wrapped_intent", intent);
-                context.sendBroadcast(intent2);
+            if (zzsg != null && (zzsg == null || zzsh.equals(zzsg.zzbsb))) {
+                return true;
             }
+            Context context = getContext();
+            Parcelable intent = new Intent("com.google.firebase.iid.TOKEN_REFRESH");
+            Intent intent2 = new Intent("com.google.firebase.INSTANCE_ID_EVENT");
+            intent2.setClass(context, FirebaseInstanceIdReceiver.class);
+            intent2.putExtra("wrapped_intent", intent);
+            context.sendBroadcast(intent2);
             return true;
-        } catch (Exception e) {
-            String str = "FirebaseInstanceId";
+        } catch (IOException e2) {
+            e = e2;
+            str = "FirebaseInstanceId";
             zzsh = "Token retrieval failed: ";
-            String valueOf = String.valueOf(e.getMessage());
-            Log.e(str, valueOf.length() == 0 ? new String(zzsh) : zzsh.concat(valueOf));
+            valueOf = String.valueOf(e.getMessage());
+            Log.e(str, valueOf.length() == 0 ? zzsh.concat(valueOf) : new String(zzsh));
+            return false;
+        } catch (SecurityException e3) {
+            e = e3;
+            str = "FirebaseInstanceId";
+            zzsh = "Token retrieval failed: ";
+            valueOf = String.valueOf(e.getMessage());
+            if (valueOf.length() == 0) {
+            }
+            Log.e(str, valueOf.length() == 0 ? zzsh.concat(valueOf) : new String(zzsh));
             return false;
         }
     }
@@ -149,33 +135,34 @@ final class zzac implements Runnable {
         /*
         r3 = this;
     L_0x0000:
-        r0 = r3.zzbse;
-        monitor-enter(r0);
-        r1 = com.google.firebase.iid.FirebaseInstanceId.zzsi();	 Catch:{ all -> 0x0028 }
-        r1 = r1.zztc();	 Catch:{ all -> 0x0028 }
-        if (r1 != 0) goto L_0x0017;
+        r1 = r3.zzbse;
+        monitor-enter(r1);
+        r0 = com.google.firebase.iid.FirebaseInstanceId.zzsi();	 Catch:{ all -> 0x0022 }
+        r0 = r0.zztc();	 Catch:{ all -> 0x0022 }
+        if (r0 != 0) goto L_0x0019;
     L_0x000d:
-        r1 = "FirebaseInstanceId";
+        r0 = "FirebaseInstanceId";
         r2 = "topic sync succeeded";
-        android.util.Log.d(r1, r2);	 Catch:{ all -> 0x0028 }
-        r1 = 1;
-        monitor-exit(r0);	 Catch:{ all -> 0x0028 }
-        return r1;
-    L_0x0017:
-        monitor-exit(r0);	 Catch:{ all -> 0x0028 }
-        r0 = r3.zzfg(r1);
-        if (r0 != 0) goto L_0x0020;
-    L_0x001e:
-        r0 = 0;
+        android.util.Log.d(r0, r2);	 Catch:{ all -> 0x0022 }
+        r0 = 1;
+        monitor-exit(r1);	 Catch:{ all -> 0x0022 }
+    L_0x0018:
         return r0;
+    L_0x0019:
+        monitor-exit(r1);	 Catch:{ all -> 0x0022 }
+        r1 = r3.zzfg(r0);
+        if (r1 != 0) goto L_0x0025;
     L_0x0020:
-        r0 = com.google.firebase.iid.FirebaseInstanceId.zzsi();
-        r0.zzez(r1);
+        r0 = 0;
+        goto L_0x0018;
+    L_0x0022:
+        r0 = move-exception;
+        monitor-exit(r1);	 Catch:{ all -> 0x0022 }
+        throw r0;
+    L_0x0025:
+        r1 = com.google.firebase.iid.FirebaseInstanceId.zzsi();
+        r1.zzez(r0);
         goto L_0x0000;
-    L_0x0028:
-        r1 = move-exception;
-        monitor-exit(r0);	 Catch:{ all -> 0x0028 }
-        throw r1;
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.firebase.iid.zzac.zztf():boolean");
     }
@@ -185,28 +172,27 @@ final class zzac implements Runnable {
     }
 
     public final void run() {
+        Object obj = 1;
         this.zzbsd.acquire();
         try {
-            FirebaseInstanceId firebaseInstanceId;
-            boolean z = true;
             this.zzbse.zzu(true);
             if (this.zzbqn.zzsu() == 0) {
-                z = false;
+                obj = null;
             }
-            if (z) {
-                if (!zztg()) {
-                    new zzad(this).zzth();
-                } else if (zzte() && zztf()) {
-                    firebaseInstanceId = this.zzbse;
+            if (obj == null) {
+                this.zzbse.zzu(false);
+            } else if (zztg()) {
+                if (zzte() && zztf()) {
+                    this.zzbse.zzu(false);
                 } else {
                     this.zzbse.zzan(this.zzbsc);
                 }
                 this.zzbsd.release();
+            } else {
+                new zzad(this).zzth();
+                this.zzbsd.release();
             }
-            firebaseInstanceId = this.zzbse;
-            firebaseInstanceId.zzu(false);
-            this.zzbsd.release();
-        } catch (Throwable th) {
+        } finally {
             this.zzbsd.release();
         }
     }

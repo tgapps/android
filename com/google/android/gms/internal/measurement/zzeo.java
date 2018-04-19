@@ -104,15 +104,11 @@ public final class zzeo extends zzhk {
 
     protected final boolean zzhh() {
         Calendar instance = Calendar.getInstance();
-        this.zzafk = TimeUnit.MINUTES.convert((long) (instance.get(15) + instance.get(16)), TimeUnit.MILLISECONDS);
+        this.zzafk = TimeUnit.MINUTES.convert((long) (instance.get(16) + instance.get(15)), TimeUnit.MILLISECONDS);
         Locale locale = Locale.getDefault();
         String toLowerCase = locale.getLanguage().toLowerCase(Locale.ENGLISH);
         String toLowerCase2 = locale.getCountry().toLowerCase(Locale.ENGLISH);
-        StringBuilder stringBuilder = new StringBuilder((1 + String.valueOf(toLowerCase).length()) + String.valueOf(toLowerCase2).length());
-        stringBuilder.append(toLowerCase);
-        stringBuilder.append("-");
-        stringBuilder.append(toLowerCase2);
-        this.zzafl = stringBuilder.toString();
+        this.zzafl = new StringBuilder((String.valueOf(toLowerCase).length() + 1) + String.valueOf(toLowerCase2).length()).append(toLowerCase).append("-").append(toLowerCase2).toString();
         return false;
     }
 }

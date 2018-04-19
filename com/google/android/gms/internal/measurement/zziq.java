@@ -18,22 +18,11 @@ final class zziq implements Runnable {
             return;
         }
         try {
-            long j;
-            String str;
-            String str2;
-            String packageName;
             if (this.zzaqa == null) {
-                j = 0;
-                str = null;
-                str2 = null;
-                packageName = this.zzapy.getContext().getPackageName();
+                zzd.zza(0, null, null, this.zzapy.getContext().getPackageName());
             } else {
-                j = this.zzaqa.zzapb;
-                str = this.zzaqa.zzug;
-                str2 = this.zzaqa.zzapa;
-                packageName = this.zzapy.getContext().getPackageName();
+                zzd.zza(this.zzaqa.zzapb, this.zzaqa.zzug, this.zzaqa.zzapa, this.zzapy.getContext().getPackageName());
             }
-            zzd.zza(j, str, str2, packageName);
             this.zzapy.zzcu();
         } catch (RemoteException e) {
             this.zzapy.zzgg().zzil().zzg("Failed to send current screen to the service", e);

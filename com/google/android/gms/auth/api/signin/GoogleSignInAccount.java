@@ -54,7 +54,10 @@ public class GoogleSignInAccount extends AbstractSafeParcelable implements Refle
     }
 
     public static GoogleSignInAccount create(String str, String str2, String str3, String str4, String str5, String str6, Uri uri, Long l, String str7, Set<Scope> set) {
-        return new GoogleSignInAccount(3, str, str2, str3, str4, uri, null, (l == null ? Long.valueOf(sClock.currentTimeMillis() / 1000) : l).longValue(), Preconditions.checkNotEmpty(str7), new ArrayList((Collection) Preconditions.checkNotNull(set)), str5, str6);
+        if (l == null) {
+            l = Long.valueOf(sClock.currentTimeMillis() / 1000);
+        }
+        return new GoogleSignInAccount(3, str, str2, str3, str4, uri, null, l.longValue(), Preconditions.checkNotEmpty(str7), new ArrayList((Collection) Preconditions.checkNotNull(set)), str5, str6);
     }
 
     public static GoogleSignInAccount fromJsonString(String str) throws JSONException {
@@ -136,7 +139,7 @@ public class GoogleSignInAccount extends AbstractSafeParcelable implements Refle
     }
 
     public int hashCode() {
-        return ((527 + getObfuscatedIdentifier().hashCode()) * 31) + getRequestedScopes().hashCode();
+        return ((getObfuscatedIdentifier().hashCode() + 527) * 31) + getRequestedScopes().hashCode();
     }
 
     public GoogleSignInAccount setServerAuthCode(String str) {

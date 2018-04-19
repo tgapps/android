@@ -9,10 +9,10 @@ import com.google.android.gms.wallet.MaskedWalletRequest;
 public final class zzd implements Creator<WalletFragmentInitParams> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        String str = null;
-        MaskedWallet maskedWallet = null;
         int i = -1;
-        MaskedWalletRequest maskedWalletRequest = maskedWallet;
+        MaskedWallet maskedWallet = null;
+        MaskedWalletRequest maskedWalletRequest = null;
+        String str = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {

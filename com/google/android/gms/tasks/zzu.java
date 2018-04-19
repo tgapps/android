@@ -26,7 +26,7 @@ final class zzu<TResult> extends Task<TResult> {
 
     @GuardedBy("mLock")
     private final void zzdr() {
-        Preconditions.checkState(this.zzagf ^ 1, "Task is already complete");
+        Preconditions.checkState(!this.zzagf, "Task is already complete");
     }
 
     @GuardedBy("mLock")
@@ -134,27 +134,31 @@ final class zzu<TResult> extends Task<TResult> {
     }
 
     public final boolean trySetException(Exception exception) {
+        boolean z = true;
         Preconditions.checkNotNull(exception, "Exception must not be null");
         synchronized (this.mLock) {
             if (this.zzagf) {
-                return false;
+                z = false;
+            } else {
+                this.zzagf = true;
+                this.zzagh = exception;
+                this.zzage.zza((Task) this);
             }
-            this.zzagf = true;
-            this.zzagh = exception;
-            this.zzage.zza((Task) this);
-            return true;
         }
+        return z;
     }
 
     public final boolean trySetResult(TResult tResult) {
+        boolean z = true;
         synchronized (this.mLock) {
             if (this.zzagf) {
-                return false;
+                z = false;
+            } else {
+                this.zzagf = true;
+                this.zzagg = tResult;
+                this.zzage.zza((Task) this);
             }
-            this.zzagf = true;
-            this.zzagg = tResult;
-            this.zzage.zza((Task) this);
-            return true;
         }
+        return z;
     }
 }

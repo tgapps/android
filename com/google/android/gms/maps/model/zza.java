@@ -7,10 +7,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public final class zza implements Creator<CameraPosition> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        float f = 0.0f;
         LatLng latLng = null;
+        float f = 0.0f;
         float f2 = 0.0f;
-        float f3 = f2;
+        float f3 = 0.0f;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
@@ -18,13 +18,13 @@ public final class zza implements Creator<CameraPosition> {
                     latLng = (LatLng) SafeParcelReader.createParcelable(parcel, readHeader, LatLng.CREATOR);
                     break;
                 case 3:
-                    f = SafeParcelReader.readFloat(parcel, readHeader);
+                    f3 = SafeParcelReader.readFloat(parcel, readHeader);
                     break;
                 case 4:
                     f2 = SafeParcelReader.readFloat(parcel, readHeader);
                     break;
                 case 5:
-                    f3 = SafeParcelReader.readFloat(parcel, readHeader);
+                    f = SafeParcelReader.readFloat(parcel, readHeader);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -32,7 +32,7 @@ public final class zza implements Creator<CameraPosition> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new CameraPosition(latLng, f, f2, f3);
+        return new CameraPosition(latLng, f3, f2, f);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

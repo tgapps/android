@@ -12,90 +12,90 @@ final /* synthetic */ class zzp implements Runnable {
     public final void run() {
         /*
         r8 = this;
-        r0 = r8.zzbre;
-    L_0x0002:
-        monitor-enter(r0);
-        r1 = r0.state;	 Catch:{ all -> 0x00af }
-        r2 = 2;
-        if (r1 == r2) goto L_0x000a;
+        r7 = 2;
+        r1 = r8.zzbre;
+    L_0x0003:
+        monitor-enter(r1);
+        r0 = r1.state;	 Catch:{ all -> 0x0017 }
+        if (r0 == r7) goto L_0x000a;
     L_0x0008:
-        monitor-exit(r0);	 Catch:{ all -> 0x00af }
+        monitor-exit(r1);	 Catch:{ all -> 0x0017 }
+    L_0x0009:
         return;
     L_0x000a:
-        r1 = r0.zzbrb;	 Catch:{ all -> 0x00af }
-        r1 = r1.isEmpty();	 Catch:{ all -> 0x00af }
-        if (r1 == 0) goto L_0x0017;
+        r0 = r1.zzbrb;	 Catch:{ all -> 0x0017 }
+        r0 = r0.isEmpty();	 Catch:{ all -> 0x0017 }
+        if (r0 == 0) goto L_0x001a;
     L_0x0012:
-        r0.zzsr();	 Catch:{ all -> 0x00af }
-        monitor-exit(r0);	 Catch:{ all -> 0x00af }
-        return;
+        r1.zzsr();	 Catch:{ all -> 0x0017 }
+        monitor-exit(r1);	 Catch:{ all -> 0x0017 }
+        goto L_0x0009;
     L_0x0017:
-        r1 = r0.zzbrb;	 Catch:{ all -> 0x00af }
-        r1 = r1.poll();	 Catch:{ all -> 0x00af }
-        r1 = (com.google.firebase.iid.zzt) r1;	 Catch:{ all -> 0x00af }
-        r3 = r0.zzbrc;	 Catch:{ all -> 0x00af }
-        r4 = r1.zzbrh;	 Catch:{ all -> 0x00af }
-        r3.put(r4, r1);	 Catch:{ all -> 0x00af }
-        r3 = r0.zzbrd;	 Catch:{ all -> 0x00af }
-        r3 = r3.zzbqw;	 Catch:{ all -> 0x00af }
-        r4 = new com.google.firebase.iid.zzq;	 Catch:{ all -> 0x00af }
-        r4.<init>(r0, r1);	 Catch:{ all -> 0x00af }
-        r5 = 30;
-        r7 = java.util.concurrent.TimeUnit.SECONDS;	 Catch:{ all -> 0x00af }
-        r3.schedule(r4, r5, r7);	 Catch:{ all -> 0x00af }
-        monitor-exit(r0);	 Catch:{ all -> 0x00af }
-        r3 = "MessengerIpcClient";
-        r4 = 3;
-        r3 = android.util.Log.isLoggable(r3, r4);
-        if (r3 == 0) goto L_0x0067;
-    L_0x0042:
-        r3 = "MessengerIpcClient";
-        r4 = java.lang.String.valueOf(r1);
-        r5 = 8;
-        r6 = java.lang.String.valueOf(r4);
-        r6 = r6.length();
-        r5 = r5 + r6;
-        r6 = new java.lang.StringBuilder;
-        r6.<init>(r5);
-        r5 = "Sending ";
-        r6.append(r5);
-        r6.append(r4);
-        r4 = r6.toString();
-        android.util.Log.d(r3, r4);
-    L_0x0067:
-        r3 = r0.zzbrd;
-        r3 = r3.zzqs;
-        r4 = r0.zzbqz;
-        r5 = android.os.Message.obtain();
-        r6 = r1.what;
-        r5.what = r6;
-        r6 = r1.zzbrh;
-        r5.arg1 = r6;
-        r5.replyTo = r4;
-        r4 = new android.os.Bundle;
-        r4.<init>();
-        r6 = "oneWay";
-        r7 = r1.zzst();
-        r4.putBoolean(r6, r7);
-        r6 = "pkg";
-        r3 = r3.getPackageName();
-        r4.putString(r6, r3);
-        r3 = "data";
-        r1 = r1.zzbrj;
-        r4.putBundle(r3, r1);
-        r5.setData(r4);
-        r1 = r0.zzbra;	 Catch:{ RemoteException -> 0x00a5 }
-        r1.send(r5);	 Catch:{ RemoteException -> 0x00a5 }
-        goto L_0x0002;
-    L_0x00a5:
-        r1 = move-exception;
-        r1 = r1.getMessage();
-        r0.zzb(r2, r1);
-        goto L_0x0002;
+        r0 = move-exception;
+        monitor-exit(r1);	 Catch:{ all -> 0x0017 }
+        throw r0;
+    L_0x001a:
+        r0 = r1.zzbrb;	 Catch:{ all -> 0x0017 }
+        r0 = r0.poll();	 Catch:{ all -> 0x0017 }
+        r0 = (com.google.firebase.iid.zzt) r0;	 Catch:{ all -> 0x0017 }
+        r2 = r1.zzbrc;	 Catch:{ all -> 0x0017 }
+        r3 = r0.zzbrh;	 Catch:{ all -> 0x0017 }
+        r2.put(r3, r0);	 Catch:{ all -> 0x0017 }
+        r2 = r1.zzbrd;	 Catch:{ all -> 0x0017 }
+        r2 = r2.zzbqw;	 Catch:{ all -> 0x0017 }
+        r3 = new com.google.firebase.iid.zzq;	 Catch:{ all -> 0x0017 }
+        r3.<init>(r1, r0);	 Catch:{ all -> 0x0017 }
+        r4 = 30;
+        r6 = java.util.concurrent.TimeUnit.SECONDS;	 Catch:{ all -> 0x0017 }
+        r2.schedule(r3, r4, r6);	 Catch:{ all -> 0x0017 }
+        monitor-exit(r1);	 Catch:{ all -> 0x0017 }
+        r2 = "MessengerIpcClient";
+        r3 = 3;
+        r2 = android.util.Log.isLoggable(r2, r3);
+        if (r2 == 0) goto L_0x006e;
+    L_0x0046:
+        r2 = "MessengerIpcClient";
+        r3 = java.lang.String.valueOf(r0);
+        r4 = java.lang.String.valueOf(r3);
+        r4 = r4.length();
+        r4 = r4 + 8;
+        r5 = new java.lang.StringBuilder;
+        r5.<init>(r4);
+        r4 = "Sending ";
+        r4 = r5.append(r4);
+        r3 = r4.append(r3);
+        r3 = r3.toString();
+        android.util.Log.d(r2, r3);
+    L_0x006e:
+        r2 = r1.zzbrd;
+        r2 = r2.zzqs;
+        r3 = r1.zzbqz;
+        r4 = android.os.Message.obtain();
+        r5 = r0.what;
+        r4.what = r5;
+        r5 = r0.zzbrh;
+        r4.arg1 = r5;
+        r4.replyTo = r3;
+        r3 = new android.os.Bundle;
+        r3.<init>();
+        r5 = "oneWay";
+        r6 = r0.zzst();
+        r3.putBoolean(r5, r6);
+        r5 = "pkg";
+        r2 = r2.getPackageName();
+        r3.putString(r5, r2);
+        r2 = "data";
+        r0 = r0.zzbrj;
+        r3.putBundle(r2, r0);
+        r4.setData(r3);
+        r0 = r1.zzbra;	 Catch:{ RemoteException -> 0x00af }
+        r0.send(r4);	 Catch:{ RemoteException -> 0x00af }
+        goto L_0x0003;
     L_0x00af:
-        r1 = move-exception;
-        monitor-exit(r0);	 Catch:{ all -> 0x00af }
-        throw r1;
+        r0 = move-exception;
+        r0 = r0.getMessage();
+        r1.zzb(r7, r0);
+        goto L_0x0003;
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.firebase.iid.zzp.run():void");
     }

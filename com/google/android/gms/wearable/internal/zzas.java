@@ -15,12 +15,10 @@ public final class zzas implements ChannelListener {
         if (this == obj) {
             return true;
         }
-        if (obj != null) {
-            if (getClass() == obj.getClass()) {
-                return this.zzch.equals(((zzas) obj).zzch);
-            }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        return this.zzch.equals(((zzas) obj).zzch);
     }
 
     public final int hashCode() {

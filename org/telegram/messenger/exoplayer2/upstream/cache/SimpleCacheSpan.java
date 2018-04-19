@@ -14,14 +14,7 @@ final class SimpleCacheSpan extends CacheSpan {
     private static final String SUFFIX = ".v3.exo";
 
     public static File getCacheFile(File cacheDir, int id, long position, long lastAccessTimestamp) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(id);
-        stringBuilder.append(".");
-        stringBuilder.append(position);
-        stringBuilder.append(".");
-        stringBuilder.append(lastAccessTimestamp);
-        stringBuilder.append(SUFFIX);
-        return new File(cacheDir, stringBuilder.toString());
+        return new File(cacheDir, id + "." + position + "." + lastAccessTimestamp + SUFFIX);
     }
 
     public static SimpleCacheSpan createLookup(String key, long position) {
@@ -37,28 +30,24 @@ final class SimpleCacheSpan extends CacheSpan {
     }
 
     public static SimpleCacheSpan createCacheEntry(File file, CachedContentIndex index) {
-        File file2;
         String name = file.getName();
-        SimpleCacheSpan simpleCacheSpan = null;
-        if (name.endsWith(SUFFIX)) {
-            file2 = file;
-        } else {
-            file2 = upgradeFile(file, index);
-            if (file2 == null) {
+        if (!name.endsWith(SUFFIX)) {
+            file = upgradeFile(file, index);
+            if (file == null) {
                 return null;
             }
-            name = file2.getName();
+            name = file.getName();
         }
         Matcher matcher = CACHE_FILE_PATTERN_V3.matcher(name);
         if (!matcher.matches()) {
             return null;
         }
-        long length = file2.length();
+        long length = file.length();
         String key = index.getKeyForId(Integer.parseInt(matcher.group(1)));
         if (key != null) {
-            SimpleCacheSpan simpleCacheSpan2 = new SimpleCacheSpan(key, Long.parseLong(matcher.group(2)), length, Long.parseLong(matcher.group(3)), file2);
+            return new SimpleCacheSpan(key, Long.parseLong(matcher.group(2)), length, Long.parseLong(matcher.group(3)), file);
         }
-        return simpleCacheSpan;
+        return null;
     }
 
     private static File upgradeFile(File file, CachedContentIndex index) {

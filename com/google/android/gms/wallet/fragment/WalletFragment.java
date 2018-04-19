@@ -204,19 +204,19 @@ public final class WalletFragment extends Fragment {
         }
 
         protected final void handleGooglePlayUnavailable(FrameLayout frameLayout) {
+            int i = -1;
+            int i2 = -2;
             View button = new Button(this.zzfw.zzft.getActivity());
             button.setText(R.string.wallet_buy_button_place_holder);
-            int i = -2;
-            int i2 = -1;
             if (this.zzfw.zzfg != null) {
                 WalletFragmentStyle fragmentStyle = this.zzfw.zzfg.getFragmentStyle();
                 if (fragmentStyle != null) {
                     DisplayMetrics displayMetrics = this.zzfw.zzft.getResources().getDisplayMetrics();
-                    i2 = fragmentStyle.zza("buyButtonWidth", displayMetrics, -1);
-                    i = fragmentStyle.zza("buyButtonHeight", displayMetrics, -2);
+                    i = fragmentStyle.zza("buyButtonWidth", displayMetrics, -1);
+                    i2 = fragmentStyle.zza("buyButtonHeight", displayMetrics, -2);
                 }
             }
-            button.setLayoutParams(new LayoutParams(i2, i));
+            button.setLayoutParams(new LayoutParams(i, i2));
             button.setOnClickListener(this);
             frameLayout.addView(button);
         }
@@ -254,19 +254,17 @@ public final class WalletFragment extends Fragment {
         if (this.zzfp != null) {
             this.zzfp.initialize(walletFragmentInitParams);
             this.zzfh = null;
-            return;
-        }
-        if (this.zzfh == null) {
+        } else if (this.zzfh == null) {
             this.zzfh = walletFragmentInitParams;
             if (this.zzfi != null) {
                 Log.w("WalletFragment", "updateMaskedWalletRequest() was called before initialize()");
             }
             if (this.zzfj != null) {
                 Log.w("WalletFragment", "updateMaskedWallet() was called before initialize()");
-                return;
             }
+        } else {
+            Log.w("WalletFragment", "initialize(WalletFragmentInitParams) was called more than once. Ignoring.");
         }
-        Log.w("WalletFragment", "initialize(WalletFragmentInitParams) was called more than once. Ignoring.");
     }
 
     public final void onActivityResult(int i, int i2, Intent intent) {

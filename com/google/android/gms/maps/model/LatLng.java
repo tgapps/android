@@ -13,9 +13,10 @@ public final class LatLng extends AbstractSafeParcelable implements ReflectedPar
 
     public LatLng(double d, double d2) {
         if (-180.0d > d2 || d2 >= 180.0d) {
-            d2 = ((((d2 - 180.0d) % 360.0d) + 360.0d) % 360.0d) - 180.0d;
+            this.longitude = ((((d2 - 180.0d) % 360.0d) + 360.0d) % 360.0d) - 180.0d;
+        } else {
+            this.longitude = d2;
         }
-        this.longitude = d2;
         this.latitude = Math.max(-90.0d, Math.min(90.0d, d));
     }
 
@@ -39,20 +40,13 @@ public final class LatLng extends AbstractSafeParcelable implements ReflectedPar
 
     public final String toString() {
         double d = this.latitude;
-        double d2 = this.longitude;
-        StringBuilder stringBuilder = new StringBuilder(60);
-        stringBuilder.append("lat/lng: (");
-        stringBuilder.append(d);
-        stringBuilder.append(",");
-        stringBuilder.append(d2);
-        stringBuilder.append(")");
-        return stringBuilder.toString();
+        return "lat/lng: (" + d + "," + this.longitude + ")";
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeDouble(parcel, 2, this.latitude);
         SafeParcelWriter.writeDouble(parcel, 3, this.longitude);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

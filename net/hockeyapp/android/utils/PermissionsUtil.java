@@ -28,18 +28,11 @@ public class PermissionsUtil {
 
     public static boolean isUnknownSourcesEnabled(Context context) {
         if (VERSION.SDK_INT >= 26) {
-            boolean z;
-            if (context.getApplicationInfo().targetSdkVersion >= 26) {
-                if (!context.getPackageManager().canRequestPackageInstalls()) {
-                    z = false;
-                    return z;
-                }
-            }
-            z = true;
-            return z;
-        } else if (VERSION.SDK_INT < 17 || VERSION.SDK_INT >= 21) {
-            return "1".equals(Secure.getString(context.getContentResolver(), "install_non_market_apps"));
+            return context.getApplicationInfo().targetSdkVersion < 26 || context.getPackageManager().canRequestPackageInstalls();
         } else {
+            if (VERSION.SDK_INT < 17 || VERSION.SDK_INT >= 21) {
+                return "1".equals(Secure.getString(context.getContentResolver(), "install_non_market_apps"));
+            }
             return "1".equals(Global.getString(context.getContentResolver(), "install_non_market_apps"));
         }
     }

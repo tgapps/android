@@ -18,24 +18,21 @@ public abstract class EntityBuffer<T> extends AbstractDataBuffer<T> {
                 if (count > 0) {
                     this.zzob.add(Integer.valueOf(0));
                     String primaryDataMarkerColumn = getPrimaryDataMarkerColumn();
-                    Object string = this.mDataHolder.getString(primaryDataMarkerColumn, 0, this.mDataHolder.getWindowIndex(0));
-                    for (int i = 1; i < count; i++) {
+                    String string = this.mDataHolder.getString(primaryDataMarkerColumn, 0, this.mDataHolder.getWindowIndex(0));
+                    int i = 1;
+                    while (i < count) {
                         int windowIndex = this.mDataHolder.getWindowIndex(i);
                         String string2 = this.mDataHolder.getString(primaryDataMarkerColumn, i, windowIndex);
                         if (string2 == null) {
-                            StringBuilder stringBuilder = new StringBuilder(78 + String.valueOf(primaryDataMarkerColumn).length());
-                            stringBuilder.append("Missing value for markerColumn: ");
-                            stringBuilder.append(primaryDataMarkerColumn);
-                            stringBuilder.append(", at row: ");
-                            stringBuilder.append(i);
-                            stringBuilder.append(", for window: ");
-                            stringBuilder.append(windowIndex);
-                            throw new NullPointerException(stringBuilder.toString());
+                            throw new NullPointerException(new StringBuilder(String.valueOf(primaryDataMarkerColumn).length() + 78).append("Missing value for markerColumn: ").append(primaryDataMarkerColumn).append(", at row: ").append(i).append(", for window: ").append(windowIndex).toString());
                         }
-                        if (!string2.equals(string)) {
+                        if (string2.equals(string)) {
+                            string2 = string;
+                        } else {
                             this.zzob.add(Integer.valueOf(i));
-                            string = string2;
                         }
+                        i++;
+                        string = string2;
                     }
                 }
                 this.zzoa = true;
@@ -52,13 +49,14 @@ public abstract class EntityBuffer<T> extends AbstractDataBuffer<T> {
         if (i < 0 || i == this.zzob.size()) {
             return 0;
         }
-        int count = (i == this.zzob.size() - 1 ? this.mDataHolder.getCount() : ((Integer) this.zzob.get(i + 1)).intValue()) - ((Integer) this.zzob.get(i)).intValue();
-        if (count == 1) {
-            i = zzi(i);
-            int windowIndex = this.mDataHolder.getWindowIndex(i);
-            String childDataMarkerColumn = getChildDataMarkerColumn();
-            return (childDataMarkerColumn == null || this.mDataHolder.getString(childDataMarkerColumn, i, windowIndex) != null) ? count : 0;
+        int count = i == this.zzob.size() + -1 ? this.mDataHolder.getCount() - ((Integer) this.zzob.get(i)).intValue() : ((Integer) this.zzob.get(i + 1)).intValue() - ((Integer) this.zzob.get(i)).intValue();
+        if (count != 1) {
+            return count;
         }
+        int zzi = zzi(i);
+        int windowIndex = this.mDataHolder.getWindowIndex(zzi);
+        String childDataMarkerColumn = getChildDataMarkerColumn();
+        return (childDataMarkerColumn == null || this.mDataHolder.getString(childDataMarkerColumn, zzi, windowIndex) != null) ? count : 0;
     }
 
     protected String getChildDataMarkerColumn() {
@@ -75,15 +73,9 @@ public abstract class EntityBuffer<T> extends AbstractDataBuffer<T> {
     protected abstract String getPrimaryDataMarkerColumn();
 
     final int zzi(int i) {
-        if (i >= 0) {
-            if (i < this.zzob.size()) {
-                return ((Integer) this.zzob.get(i)).intValue();
-            }
+        if (i >= 0 && i < this.zzob.size()) {
+            return ((Integer) this.zzob.get(i)).intValue();
         }
-        StringBuilder stringBuilder = new StringBuilder(53);
-        stringBuilder.append("Position ");
-        stringBuilder.append(i);
-        stringBuilder.append(" is out of bounds for this buffer");
-        throw new IllegalArgumentException(stringBuilder.toString());
+        throw new IllegalArgumentException("Position " + i + " is out of bounds for this buffer");
     }
 }

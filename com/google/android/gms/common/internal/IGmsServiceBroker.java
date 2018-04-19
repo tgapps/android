@@ -60,243 +60,227 @@ public interface IGmsServiceBroker extends IInterface {
         public boolean onTransact(int r12, android.os.Parcel r13, android.os.Parcel r14, int r15) throws android.os.RemoteException {
             /*
             r11 = this;
+            r1 = 0;
             r0 = 16777215; // 0xffffff float:2.3509886E-38 double:8.2890456E-317;
-            if (r12 <= r0) goto L_0x000a;
-        L_0x0005:
-            r12 = super.onTransact(r12, r13, r14, r15);
-            return r12;
+            if (r12 <= r0) goto L_0x000b;
+        L_0x0006:
+            r0 = super.onTransact(r12, r13, r14, r15);
         L_0x000a:
-            r15 = "com.google.android.gms.common.internal.IGmsServiceBroker";
-            r13.enforceInterface(r15);
-            r15 = r13.readStrongBinder();
-            r2 = com.google.android.gms.common.internal.IGmsCallbacks.Stub.asInterface(r15);
-            r15 = 46;
-            r0 = 0;
-            if (r12 != r15) goto L_0x0030;
-        L_0x001c:
-            r12 = r13.readInt();
-            if (r12 == 0) goto L_0x002b;
-        L_0x0022:
-            r12 = com.google.android.gms.common.internal.GetServiceRequest.CREATOR;
-            r12 = r12.createFromParcel(r13);
-            r0 = r12;
+            return r0;
+        L_0x000b:
+            r0 = "com.google.android.gms.common.internal.IGmsServiceBroker";
+            r13.enforceInterface(r0);
+            r0 = r13.readStrongBinder();
+            r2 = com.google.android.gms.common.internal.IGmsCallbacks.Stub.asInterface(r0);
+            r0 = 46;
+            if (r12 != r0) goto L_0x0033;
+        L_0x001d:
+            r0 = r13.readInt();
+            if (r0 == 0) goto L_0x0122;
+        L_0x0023:
+            r0 = com.google.android.gms.common.internal.GetServiceRequest.CREATOR;
+            r0 = r0.createFromParcel(r13);
             r0 = (com.google.android.gms.common.internal.GetServiceRequest) r0;
         L_0x002b:
             r11.getService(r2, r0);
-            goto L_0x0142;
-        L_0x0030:
-            r15 = 47;
-            if (r12 != r15) goto L_0x0048;
-        L_0x0034:
-            r12 = r13.readInt();
-            if (r12 == 0) goto L_0x0043;
-        L_0x003a:
-            r12 = com.google.android.gms.common.internal.ValidateAccountRequest.CREATOR;
-            r12 = r12.createFromParcel(r13);
-            r0 = r12;
+        L_0x002e:
+            r14.writeNoException();
+            r0 = 1;
+            goto L_0x000a;
+        L_0x0033:
+            r0 = 47;
+            if (r12 != r0) goto L_0x0049;
+        L_0x0037:
+            r0 = r13.readInt();
+            if (r0 == 0) goto L_0x011f;
+        L_0x003d:
+            r0 = com.google.android.gms.common.internal.ValidateAccountRequest.CREATOR;
+            r0 = r0.createFromParcel(r13);
             r0 = (com.google.android.gms.common.internal.ValidateAccountRequest) r0;
-        L_0x0043:
+        L_0x0045:
             r11.validateAccount(r2, r0);
-            goto L_0x0142;
-        L_0x0048:
+            goto L_0x002e;
+        L_0x0049:
             r3 = r13.readInt();
-            r15 = 4;
-            if (r12 == r15) goto L_0x0055;
-        L_0x004f:
-            r15 = r13.readString();
-            r4 = r15;
-            goto L_0x0056;
-        L_0x0055:
-            r4 = r0;
-        L_0x0056:
-            r15 = 23;
-            if (r12 == r15) goto L_0x0124;
-        L_0x005a:
-            r15 = 25;
-            if (r12 == r15) goto L_0x0124;
-        L_0x005e:
-            r15 = 27;
-            if (r12 == r15) goto L_0x0124;
-        L_0x0062:
-            r15 = 30;
-            if (r12 == r15) goto L_0x0103;
-        L_0x0066:
-            r15 = 34;
-            if (r12 == r15) goto L_0x00fc;
-        L_0x006a:
-            r15 = 41;
-            if (r12 == r15) goto L_0x0124;
-        L_0x006e:
-            r15 = 43;
-            if (r12 == r15) goto L_0x0124;
-        L_0x0072:
+            r0 = 4;
+            if (r12 == r0) goto L_0x011c;
+        L_0x0050:
+            r4 = r13.readString();
+        L_0x0054:
             switch(r12) {
-                case 1: goto L_0x00d8;
-                case 2: goto L_0x0124;
-                default: goto L_0x0075;
+                case 1: goto L_0x007b;
+                case 2: goto L_0x00f1;
+                case 3: goto L_0x0057;
+                case 4: goto L_0x0057;
+                case 5: goto L_0x00f1;
+                case 6: goto L_0x00f1;
+                case 7: goto L_0x00f1;
+                case 8: goto L_0x00f1;
+                case 9: goto L_0x0099;
+                case 10: goto L_0x00d8;
+                case 11: goto L_0x00f1;
+                case 12: goto L_0x00f1;
+                case 13: goto L_0x00f1;
+                case 14: goto L_0x00f1;
+                case 15: goto L_0x00f1;
+                case 16: goto L_0x00f1;
+                case 17: goto L_0x00f1;
+                case 18: goto L_0x00f1;
+                case 19: goto L_0x0063;
+                case 20: goto L_0x00bd;
+                case 21: goto L_0x0057;
+                case 22: goto L_0x0057;
+                case 23: goto L_0x00f1;
+                case 24: goto L_0x0057;
+                case 25: goto L_0x00f1;
+                case 26: goto L_0x0057;
+                case 27: goto L_0x00f1;
+                case 28: goto L_0x0057;
+                case 29: goto L_0x0057;
+                case 30: goto L_0x00bd;
+                case 31: goto L_0x0057;
+                case 32: goto L_0x0057;
+                case 33: goto L_0x0057;
+                case 34: goto L_0x00e6;
+                case 35: goto L_0x0057;
+                case 36: goto L_0x0057;
+                case 37: goto L_0x00f1;
+                case 38: goto L_0x00f1;
+                case 39: goto L_0x0057;
+                case 40: goto L_0x0057;
+                case 41: goto L_0x00f1;
+                case 42: goto L_0x0057;
+                case 43: goto L_0x00f1;
+                default: goto L_0x0057;
             };
-        L_0x0075:
-            switch(r12) {
-                case 5: goto L_0x0124;
-                case 6: goto L_0x0124;
-                case 7: goto L_0x0124;
-                case 8: goto L_0x0124;
-                case 9: goto L_0x00aa;
-                case 10: goto L_0x009d;
-                case 11: goto L_0x0124;
-                case 12: goto L_0x0124;
-                case 13: goto L_0x0124;
-                case 14: goto L_0x0124;
-                case 15: goto L_0x0124;
-                case 16: goto L_0x0124;
-                case 17: goto L_0x0124;
-                case 18: goto L_0x0124;
-                case 19: goto L_0x007d;
-                case 20: goto L_0x0103;
-                default: goto L_0x0078;
-            };
-        L_0x0078:
-            switch(r12) {
-                case 37: goto L_0x0124;
-                case 38: goto L_0x0124;
-                default: goto L_0x007b;
-            };
-        L_0x007b:
-            goto L_0x0137;
-        L_0x007d:
-            r15 = r13.readStrongBinder();
-            r1 = r13.readInt();
-            if (r1 == 0) goto L_0x0096;
-        L_0x0087:
-            r1 = android.os.Bundle.CREATOR;
-            r13 = r1.createFromParcel(r13);
-            r13 = (android.os.Bundle) r13;
-            r7 = r13;
-            r8 = r15;
-            r5 = r0;
-            r6 = r5;
-            r9 = r6;
-            goto L_0x013c;
-        L_0x0096:
-            r8 = r15;
-            r5 = r0;
-            r6 = r5;
-            r7 = r6;
-            r9 = r7;
-            goto L_0x013c;
-        L_0x009d:
-            r15 = r13.readString();
-            r13 = r13.createStringArray();
-            r6 = r13;
-            r5 = r15;
-            r7 = r0;
-            goto L_0x013a;
-        L_0x00aa:
-            r15 = r13.readString();
-            r1 = r13.createStringArray();
-            r5 = r13.readString();
-            r6 = r13.readStrongBinder();
-            r7 = r13.readString();
-            r8 = r13.readInt();
-            if (r8 == 0) goto L_0x00d2;
-        L_0x00c4:
-            r0 = android.os.Bundle.CREATOR;
-            r13 = r0.createFromParcel(r13);
-            r13 = (android.os.Bundle) r13;
-            r9 = r5;
-            r8 = r6;
-            r10 = r7;
-            r7 = r13;
-            r5 = r15;
-            goto L_0x00fa;
-        L_0x00d2:
-            r9 = r5;
-            r8 = r6;
-            r10 = r7;
-            r5 = r15;
-            r7 = r0;
-            goto L_0x00fa;
-        L_0x00d8:
-            r15 = r13.readString();
-            r1 = r13.createStringArray();
-            r5 = r13.readString();
-            r6 = r13.readInt();
-            if (r6 == 0) goto L_0x00f6;
-        L_0x00ea:
-            r6 = android.os.Bundle.CREATOR;
-            r13 = r6.createFromParcel(r13);
-            r13 = (android.os.Bundle) r13;
-            r7 = r13;
-            r9 = r15;
-            r8 = r0;
-            goto L_0x00f9;
-        L_0x00f6:
-            r9 = r15;
-            r7 = r0;
-            r8 = r7;
-        L_0x00f9:
-            r10 = r8;
-        L_0x00fa:
+        L_0x0057:
+            r10 = r1;
+            r9 = r1;
+            r8 = r1;
+            r7 = r1;
             r6 = r1;
-            goto L_0x013d;
-        L_0x00fc:
-            r13 = r13.readString();
-            r5 = r13;
-            r6 = r0;
-            goto L_0x0139;
-        L_0x0103:
-            r15 = r13.createStringArray();
-            r1 = r13.readString();
-            r5 = r13.readInt();
-            if (r5 == 0) goto L_0x011d;
-        L_0x0111:
-            r5 = android.os.Bundle.CREATOR;
-            r13 = r5.createFromParcel(r13);
-            r13 = (android.os.Bundle) r13;
-            r7 = r13;
-            r6 = r15;
-            r8 = r0;
-            goto L_0x0120;
-        L_0x011d:
-            r6 = r15;
-            r7 = r0;
-            r8 = r7;
-        L_0x0120:
-            r9 = r8;
-            r10 = r9;
             r5 = r1;
-            goto L_0x013d;
-        L_0x0124:
-            r15 = r13.readInt();
-            if (r15 == 0) goto L_0x0137;
-        L_0x012a:
-            r15 = android.os.Bundle.CREATOR;
-            r13 = r15.createFromParcel(r13);
-            r13 = (android.os.Bundle) r13;
-            r7 = r13;
-            r5 = r0;
-            r6 = r5;
-            r8 = r6;
-            goto L_0x013b;
-        L_0x0137:
-            r5 = r0;
-            r6 = r5;
-        L_0x0139:
-            r7 = r6;
-        L_0x013a:
-            r8 = r7;
-        L_0x013b:
-            r9 = r8;
-        L_0x013c:
-            r10 = r9;
-        L_0x013d:
+        L_0x005d:
             r0 = r11;
             r1 = r12;
             r0.getLegacyService(r1, r2, r3, r4, r5, r6, r7, r8, r9, r10);
-        L_0x0142:
-            r14.writeNoException();
-            r12 = 1;
-            return r12;
+            goto L_0x002e;
+        L_0x0063:
+            r8 = r13.readStrongBinder();
+            r0 = r13.readInt();
+            if (r0 == 0) goto L_0x0115;
+        L_0x006d:
+            r0 = android.os.Bundle.CREATOR;
+            r0 = r0.createFromParcel(r13);
+            r0 = (android.os.Bundle) r0;
+            r10 = r1;
+            r9 = r1;
+            r7 = r0;
+            r6 = r1;
+            r5 = r1;
+            goto L_0x005d;
+        L_0x007b:
+            r9 = r13.readString();
+            r6 = r13.createStringArray();
+            r5 = r13.readString();
+            r0 = r13.readInt();
+            if (r0 == 0) goto L_0x0110;
+        L_0x008d:
+            r0 = android.os.Bundle.CREATOR;
+            r0 = r0.createFromParcel(r13);
+            r0 = (android.os.Bundle) r0;
+            r10 = r1;
+            r8 = r1;
+            r7 = r0;
+            goto L_0x005d;
+        L_0x0099:
+            r5 = r13.readString();
+            r6 = r13.createStringArray();
+            r9 = r13.readString();
+            r8 = r13.readStrongBinder();
+            r10 = r13.readString();
+            r0 = r13.readInt();
+            if (r0 == 0) goto L_0x010d;
+        L_0x00b3:
+            r0 = android.os.Bundle.CREATOR;
+            r0 = r0.createFromParcel(r13);
+            r0 = (android.os.Bundle) r0;
+            r7 = r0;
+            goto L_0x005d;
+        L_0x00bd:
+            r6 = r13.createStringArray();
+            r5 = r13.readString();
+            r0 = r13.readInt();
+            if (r0 == 0) goto L_0x0107;
+        L_0x00cb:
+            r0 = android.os.Bundle.CREATOR;
+            r0 = r0.createFromParcel(r13);
+            r0 = (android.os.Bundle) r0;
+            r10 = r1;
+            r9 = r1;
+            r8 = r1;
+            r7 = r0;
+            goto L_0x005d;
+        L_0x00d8:
+            r5 = r13.readString();
+            r6 = r13.createStringArray();
+            r10 = r1;
+            r9 = r1;
+            r8 = r1;
+            r7 = r1;
+            goto L_0x005d;
+        L_0x00e6:
+            r5 = r13.readString();
+            r10 = r1;
+            r9 = r1;
+            r8 = r1;
+            r7 = r1;
+            r6 = r1;
+            goto L_0x005d;
+        L_0x00f1:
+            r0 = r13.readInt();
+            if (r0 == 0) goto L_0x0057;
+        L_0x00f7:
+            r0 = android.os.Bundle.CREATOR;
+            r0 = r0.createFromParcel(r13);
+            r0 = (android.os.Bundle) r0;
+            r10 = r1;
+            r9 = r1;
+            r8 = r1;
+            r7 = r0;
+            r6 = r1;
+            r5 = r1;
+            goto L_0x005d;
+        L_0x0107:
+            r10 = r1;
+            r9 = r1;
+            r8 = r1;
+            r7 = r1;
+            goto L_0x005d;
+        L_0x010d:
+            r7 = r1;
+            goto L_0x005d;
+        L_0x0110:
+            r10 = r1;
+            r8 = r1;
+            r7 = r1;
+            goto L_0x005d;
+        L_0x0115:
+            r10 = r1;
+            r9 = r1;
+            r7 = r1;
+            r6 = r1;
+            r5 = r1;
+            goto L_0x005d;
+        L_0x011c:
+            r4 = r1;
+            goto L_0x0054;
+        L_0x011f:
+            r0 = r1;
+            goto L_0x0045;
+        L_0x0122:
+            r0 = r1;
+            goto L_0x002b;
             */
             throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.common.internal.IGmsServiceBroker.Stub.onTransact(int, android.os.Parcel, android.os.Parcel, int):boolean");
         }

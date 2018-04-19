@@ -32,7 +32,7 @@ public class ViewCompat {
         }
 
         public boolean hasAccessibilityDelegate(View v) {
-            boolean z = false;
+            boolean z = true;
             if (sAccessibilityDelegateCheckFailed) {
                 return false;
             }
@@ -46,8 +46,8 @@ public class ViewCompat {
                 }
             }
             try {
-                if (sAccessibilityDelegateField.get(v) != null) {
-                    z = true;
+                if (sAccessibilityDelegateField.get(v) == null) {
+                    z = false;
                 }
                 return z;
             } catch (Throwable th2) {

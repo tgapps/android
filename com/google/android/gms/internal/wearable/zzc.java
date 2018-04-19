@@ -16,7 +16,11 @@ public class zzc {
     }
 
     public static void zza(Parcel parcel, IInterface iInterface) {
-        parcel.writeStrongBinder(iInterface == null ? null : iInterface.asBinder());
+        if (iInterface == null) {
+            parcel.writeStrongBinder(null);
+        } else {
+            parcel.writeStrongBinder(iInterface.asBinder());
+        }
     }
 
     public static void zza(Parcel parcel, Parcelable parcelable) {

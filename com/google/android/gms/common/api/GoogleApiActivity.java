@@ -42,8 +42,6 @@ public class GoogleApiActivity extends Activity implements OnCancelListener {
                     case 0:
                         zzb.zza(new ConnectionResult(13, null), getIntent().getIntExtra("failing_client_id", -1));
                         break;
-                    default:
-                        break;
                 }
             }
         } else if (i == 2) {
@@ -65,33 +63,29 @@ public class GoogleApiActivity extends Activity implements OnCancelListener {
             this.zzct = bundle.getInt("resolution");
         }
         if (this.zzct != 1) {
-            String str;
-            String str2;
-            bundle = getIntent().getExtras();
-            if (bundle == null) {
-                str = "GoogleApiActivity";
-                str2 = "Activity started without extras";
-            } else {
-                PendingIntent pendingIntent = (PendingIntent) bundle.get("pending_intent");
-                Integer num = (Integer) bundle.get("error_code");
-                if (pendingIntent == null && num == null) {
-                    str = "GoogleApiActivity";
-                    str2 = "Activity started without resolution";
-                } else if (pendingIntent != null) {
-                    try {
-                        startIntentSenderForResult(pendingIntent.getIntentSender(), 1, null, 0, 0, 0);
-                        this.zzct = 1;
-                        return;
-                    } catch (Throwable e) {
-                        Log.e("GoogleApiActivity", "Failed to launch pendingIntent", e);
-                    }
-                } else {
-                    GoogleApiAvailability.getInstance().showErrorDialogFragment(this, num.intValue(), 2, this);
-                    this.zzct = 1;
-                }
+            Bundle extras = getIntent().getExtras();
+            if (extras == null) {
+                Log.e("GoogleApiActivity", "Activity started without extras");
+                finish();
+                return;
             }
-            Log.e(str, str2);
-            finish();
+            PendingIntent pendingIntent = (PendingIntent) extras.get("pending_intent");
+            Integer num = (Integer) extras.get("error_code");
+            if (pendingIntent == null && num == null) {
+                Log.e("GoogleApiActivity", "Activity started without resolution");
+                finish();
+            } else if (pendingIntent != null) {
+                try {
+                    startIntentSenderForResult(pendingIntent.getIntentSender(), 1, null, 0, 0, 0);
+                    this.zzct = 1;
+                } catch (Throwable e) {
+                    Log.e("GoogleApiActivity", "Failed to launch pendingIntent", e);
+                    finish();
+                }
+            } else {
+                GoogleApiAvailability.getInstance().showErrorDialogFragment(this, num.intValue(), 2, this);
+                this.zzct = 1;
+            }
         }
     }
 

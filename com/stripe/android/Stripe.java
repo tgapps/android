@@ -45,45 +45,6 @@ public class Stripe {
         void create(Card card, String str, Executor executor, TokenCallback tokenCallback);
     }
 
-    public void createToken(com.stripe.android.model.Card r1, java.lang.String r2, java.util.concurrent.Executor r3, com.stripe.android.TokenCallback r4) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: com.stripe.android.Stripe.createToken(com.stripe.android.model.Card, java.lang.String, java.util.concurrent.Executor, com.stripe.android.TokenCallback):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        if (r3 != 0) goto L_0x000c;
-    L_0x0002:
-        r0 = new java.lang.RuntimeException;	 Catch:{ AuthenticationException -> 0x000a }
-        r1 = "Required Parameter: 'card' is required to create a token";	 Catch:{ AuthenticationException -> 0x000a }
-        r0.<init>(r1);	 Catch:{ AuthenticationException -> 0x000a }
-        throw r0;	 Catch:{ AuthenticationException -> 0x000a }
-    L_0x000a:
-        r0 = move-exception;	 Catch:{ AuthenticationException -> 0x000a }
-        goto L_0x001f;	 Catch:{ AuthenticationException -> 0x000a }
-    L_0x000c:
-        if (r6 != 0) goto L_0x0016;	 Catch:{ AuthenticationException -> 0x000a }
-        r0 = new java.lang.RuntimeException;	 Catch:{ AuthenticationException -> 0x000a }
-        r1 = "Required Parameter: 'callback' is required to use the created token and handle errors";	 Catch:{ AuthenticationException -> 0x000a }
-        r0.<init>(r1);	 Catch:{ AuthenticationException -> 0x000a }
-        throw r0;	 Catch:{ AuthenticationException -> 0x000a }
-        r2.validateKey(r4);	 Catch:{ AuthenticationException -> 0x000a }
-        r0 = r2.tokenCreator;	 Catch:{ AuthenticationException -> 0x000a }
-        r0.create(r3, r4, r5, r6);	 Catch:{ AuthenticationException -> 0x000a }
-        goto L_0x0023;
-        r6.onError(r0);
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.stripe.android.Stripe.createToken(com.stripe.android.model.Card, java.lang.String, java.util.concurrent.Executor, com.stripe.android.TokenCallback):void");
-    }
-
     public Stripe(String publishableKey) throws AuthenticationException {
         setDefaultPublishableKey(publishableKey);
     }
@@ -96,21 +57,32 @@ Caused by: java.lang.NullPointerException
         createToken(card, publishableKey, null, callback);
     }
 
+    public void createToken(Card card, String publishableKey, Executor executor, TokenCallback callback) {
+        if (card == null) {
+            try {
+                throw new RuntimeException("Required Parameter: 'card' is required to create a token");
+            } catch (AuthenticationException e) {
+                callback.onError(e);
+            }
+        } else if (callback == null) {
+            throw new RuntimeException("Required Parameter: 'callback' is required to use the created token and handle errors");
+        } else {
+            validateKey(publishableKey);
+            this.tokenCreator.create(card, publishableKey, executor, callback);
+        }
+    }
+
     public void setDefaultPublishableKey(String publishableKey) throws AuthenticationException {
         validateKey(publishableKey);
         this.defaultPublishableKey = publishableKey;
     }
 
     private void validateKey(String publishableKey) throws AuthenticationException {
-        if (publishableKey != null) {
-            if (publishableKey.length() != 0) {
-                if (publishableKey.startsWith("sk_")) {
-                    throw new AuthenticationException("Invalid Publishable Key: You are using a secret key to create a token, instead of the publishable one. For more info, see https://stripe.com/docs/stripe.js", null, Integer.valueOf(0));
-                }
-                return;
-            }
+        if (publishableKey == null || publishableKey.length() == 0) {
+            throw new AuthenticationException("Invalid Publishable Key: You must use a valid publishable key to create a token.  For more info, see https://stripe.com/docs/stripe.js.", null, Integer.valueOf(0));
+        } else if (publishableKey.startsWith("sk_")) {
+            throw new AuthenticationException("Invalid Publishable Key: You are using a secret key to create a token, instead of the publishable one. For more info, see https://stripe.com/docs/stripe.js", null, Integer.valueOf(0));
         }
-        throw new AuthenticationException("Invalid Publishable Key: You must use a valid publishable key to create a token.  For more info, see https://stripe.com/docs/stripe.js.", null, Integer.valueOf(0));
     }
 
     private void tokenTaskPostExecution(ResponseWrapper result, TokenCallback callback) {

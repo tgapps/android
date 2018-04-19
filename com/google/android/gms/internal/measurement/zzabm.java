@@ -17,9 +17,9 @@ public final class zzabm {
     public static final byte[] zzcae = new byte[0];
 
     public static final int zzb(zzaba com_google_android_gms_internal_measurement_zzaba, int i) throws IOException {
+        int i2 = 1;
         int position = com_google_android_gms_internal_measurement_zzaba.getPosition();
         com_google_android_gms_internal_measurement_zzaba.zzam(i);
-        int i2 = 1;
         while (com_google_android_gms_internal_measurement_zzaba.zzvo() == i) {
             com_google_android_gms_internal_measurement_zzaba.zzam(i);
             i2++;

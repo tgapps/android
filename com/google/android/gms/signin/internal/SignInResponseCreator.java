@@ -9,9 +9,9 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public class SignInResponseCreator implements Creator<SignInResponse> {
     public SignInResponse createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        ConnectionResult connectionResult = null;
         int i = 0;
         ResolveAccountResponse resolveAccountResponse = null;
+        ConnectionResult connectionResult = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {

@@ -17,35 +17,56 @@ public final class zzcc extends Fragment implements LifecycleFragment {
     private int zzlc = 0;
     private Bundle zzld;
 
-    public static zzcc zza(FragmentActivity fragmentActivity) {
-        zzcc com_google_android_gms_common_api_internal_zzcc;
-        WeakReference weakReference = (WeakReference) zzla.get(fragmentActivity);
-        if (weakReference != null) {
-            com_google_android_gms_common_api_internal_zzcc = (zzcc) weakReference.get();
-            if (com_google_android_gms_common_api_internal_zzcc != null) {
-                return com_google_android_gms_common_api_internal_zzcc;
-            }
-        }
-        try {
-            com_google_android_gms_common_api_internal_zzcc = (zzcc) fragmentActivity.getSupportFragmentManager().findFragmentByTag("SupportLifecycleFragmentImpl");
-            if (com_google_android_gms_common_api_internal_zzcc == null || com_google_android_gms_common_api_internal_zzcc.isRemoving()) {
-                com_google_android_gms_common_api_internal_zzcc = new zzcc();
-                fragmentActivity.getSupportFragmentManager().beginTransaction().add(com_google_android_gms_common_api_internal_zzcc, "SupportLifecycleFragmentImpl").commitAllowingStateLoss();
-            }
-            zzla.put(fragmentActivity, new WeakReference(com_google_android_gms_common_api_internal_zzcc));
-            return com_google_android_gms_common_api_internal_zzcc;
-        } catch (Throwable e) {
-            throw new IllegalStateException("Fragment with tag SupportLifecycleFragmentImpl is not a SupportLifecycleFragmentImpl", e);
-        }
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static com.google.android.gms.common.api.internal.zzcc zza(android.support.v4.app.FragmentActivity r3) {
+        /*
+        r0 = zzla;
+        r0 = r0.get(r3);
+        r0 = (java.lang.ref.WeakReference) r0;
+        if (r0 == 0) goto L_0x0013;
+    L_0x000a:
+        r0 = r0.get();
+        r0 = (com.google.android.gms.common.api.internal.zzcc) r0;
+        if (r0 == 0) goto L_0x0013;
+    L_0x0012:
+        return r0;
+    L_0x0013:
+        r0 = r3.getSupportFragmentManager();	 Catch:{ ClassCastException -> 0x004a }
+        r1 = "SupportLifecycleFragmentImpl";
+        r0 = r0.findFragmentByTag(r1);	 Catch:{ ClassCastException -> 0x004a }
+        r0 = (com.google.android.gms.common.api.internal.zzcc) r0;	 Catch:{ ClassCastException -> 0x004a }
+        if (r0 == 0) goto L_0x0028;
+    L_0x0022:
+        r1 = r0.isRemoving();
+        if (r1 == 0) goto L_0x003f;
+    L_0x0028:
+        r0 = new com.google.android.gms.common.api.internal.zzcc;
+        r0.<init>();
+        r1 = r3.getSupportFragmentManager();
+        r1 = r1.beginTransaction();
+        r2 = "SupportLifecycleFragmentImpl";
+        r1 = r1.add(r0, r2);
+        r1.commitAllowingStateLoss();
+    L_0x003f:
+        r1 = zzla;
+        r2 = new java.lang.ref.WeakReference;
+        r2.<init>(r0);
+        r1.put(r3, r2);
+        goto L_0x0012;
+    L_0x004a:
+        r0 = move-exception;
+        r1 = new java.lang.IllegalStateException;
+        r2 = "Fragment with tag SupportLifecycleFragmentImpl is not a SupportLifecycleFragmentImpl";
+        r1.<init>(r2, r0);
+        throw r1;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.common.api.internal.zzcc.zza(android.support.v4.app.FragmentActivity):com.google.android.gms.common.api.internal.zzcc");
     }
 
     public final void addCallback(String str, LifecycleCallback lifecycleCallback) {
         if (this.zzlb.containsKey(str)) {
-            StringBuilder stringBuilder = new StringBuilder(59 + String.valueOf(str).length());
-            stringBuilder.append("LifecycleCallback with tag ");
-            stringBuilder.append(str);
-            stringBuilder.append(" already added to this fragment.");
-            throw new IllegalArgumentException(stringBuilder.toString());
+            throw new IllegalArgumentException(new StringBuilder(String.valueOf(str).length() + 59).append("LifecycleCallback with tag ").append(str).append(" already added to this fragment.").toString());
         }
         this.zzlb.put(str, lifecycleCallback);
         if (this.zzlc > 0) {

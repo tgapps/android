@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -91,28 +93,15 @@ public final class zzjv extends zzhk {
         if (obj instanceof Short) {
             return Long.valueOf((long) ((Short) obj).shortValue());
         }
-        if (obj instanceof Boolean) {
-            return Long.valueOf(((Boolean) obj).booleanValue() ? 1 : 0);
-        } else if (obj instanceof Float) {
-            return Double.valueOf(((Float) obj).doubleValue());
+        if (!(obj instanceof Boolean)) {
+            return obj instanceof Float ? Double.valueOf(((Float) obj).doubleValue()) : ((obj instanceof String) || (obj instanceof Character) || (obj instanceof CharSequence)) ? zza(String.valueOf(obj), i, z) : null;
         } else {
-            if (!((obj instanceof String) || (obj instanceof Character))) {
-                if (!(obj instanceof CharSequence)) {
-                    return null;
-                }
-            }
-            return zza(String.valueOf(obj), i, z);
+            return Long.valueOf(((Boolean) obj).booleanValue() ? 1 : 0);
         }
     }
 
     public static String zza(String str, int i, boolean z) {
-        if (str.codePointCount(0, str.length()) > i) {
-            if (z) {
-                return String.valueOf(str.substring(0, str.offsetByCodePoints(0, i))).concat("...");
-            }
-            str = null;
-        }
-        return str;
+        return str.codePointCount(0, str.length()) > i ? z ? String.valueOf(str.substring(0, str.offsetByCodePoints(0, i))).concat("...") : null : str;
     }
 
     public static String zza(String str, String[] strArr, String[] strArr2) {
@@ -149,51 +138,50 @@ public final class zzjv extends zzhk {
         if (obj == null || (obj instanceof Long) || (obj instanceof Float) || (obj instanceof Integer) || (obj instanceof Byte) || (obj instanceof Short) || (obj instanceof Boolean) || (obj instanceof Double)) {
             return true;
         }
-        if (!((obj instanceof String) || (obj instanceof Character))) {
-            if (!(obj instanceof CharSequence)) {
-                if ((obj instanceof Bundle) && z) {
-                    return true;
-                }
-                int length;
-                Object obj2;
-                if ((obj instanceof Parcelable[]) && z) {
-                    Parcelable[] parcelableArr = (Parcelable[]) obj;
-                    length = parcelableArr.length;
-                    i = 0;
-                    while (i < length) {
-                        obj2 = parcelableArr[i];
-                        if (obj2 instanceof Bundle) {
-                            i++;
-                        } else {
-                            zzgg().zzin().zze("All Parcelable[] elements must be of type Bundle. Value type, name", obj2.getClass(), str2);
-                            return false;
-                        }
-                    }
-                    return true;
-                } else if (!(obj instanceof ArrayList) || !z) {
-                    return false;
-                } else {
-                    ArrayList arrayList = (ArrayList) obj;
-                    length = arrayList.size();
-                    i = 0;
-                    while (i < length) {
-                        obj2 = arrayList.get(i);
-                        i++;
-                        if (!(obj2 instanceof Bundle)) {
-                            zzgg().zzin().zze("All ArrayList elements must be of type Bundle. Value type, name", obj2.getClass(), str2);
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+        if ((obj instanceof String) || (obj instanceof Character) || (obj instanceof CharSequence)) {
+            String valueOf = String.valueOf(obj);
+            if (valueOf.codePointCount(0, valueOf.length()) <= i) {
+                return true;
             }
-        }
-        String valueOf = String.valueOf(obj);
-        if (valueOf.codePointCount(0, valueOf.length()) > i) {
             zzgg().zzin().zzd("Value is too long; discarded. Value kind, name, value length", str, str2, Integer.valueOf(valueOf.length()));
             return false;
+        } else if ((obj instanceof Bundle) && z) {
+            return true;
+        } else {
+            int length;
+            int i2;
+            Object obj2;
+            if ((obj instanceof Parcelable[]) && z) {
+                Parcelable[] parcelableArr = (Parcelable[]) obj;
+                length = parcelableArr.length;
+                i2 = 0;
+                while (i2 < length) {
+                    obj2 = parcelableArr[i2];
+                    if (obj2 instanceof Bundle) {
+                        i2++;
+                    } else {
+                        zzgg().zzin().zze("All Parcelable[] elements must be of type Bundle. Value type, name", obj2.getClass(), str2);
+                        return false;
+                    }
+                }
+                return true;
+            } else if (!(obj instanceof ArrayList) || !z) {
+                return false;
+            } else {
+                ArrayList arrayList = (ArrayList) obj;
+                length = arrayList.size();
+                i2 = 0;
+                while (i2 < length) {
+                    obj2 = arrayList.get(i2);
+                    i2++;
+                    if (!(obj2 instanceof Bundle)) {
+                        zzgg().zzin().zze("All ArrayList elements must be of type Bundle. Value type, name", obj2.getClass(), str2);
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
-        return true;
     }
 
     public static boolean zza(long[] jArr, int i) {
@@ -217,17 +205,17 @@ public final class zzjv extends zzhk {
     public static long[] zza(BitSet bitSet) {
         int length = (bitSet.length() + 63) / 64;
         long[] jArr = new long[length];
-        for (int i = 0; i < length; i++) {
+        int i = 0;
+        while (i < length) {
             jArr[i] = 0;
-            for (int i2 = 0; i2 < 64; i2++) {
-                int i3 = (i << 6) + i2;
-                if (i3 >= bitSet.length()) {
-                    break;
-                }
-                if (bitSet.get(i3)) {
+            int i2 = 0;
+            while (i2 < 64 && (i << 6) + i2 < bitSet.length()) {
+                if (bitSet.get((i << 6) + i2)) {
                     jArr[i] = jArr[i] | (1 << i2);
                 }
+                i2++;
             }
+            i++;
         }
         return jArr;
     }
@@ -244,10 +232,10 @@ public final class zzjv extends zzhk {
                 } else if (obj instanceof String) {
                     com_google_android_gms_internal_measurement_zzkj.zzajf = (String) obj;
                     return com_google_android_gms_internal_measurement_zzkjArr;
+                } else if (!(obj instanceof Double)) {
+                    return com_google_android_gms_internal_measurement_zzkjArr;
                 } else {
-                    if (obj instanceof Double) {
-                        com_google_android_gms_internal_measurement_zzkj.zzaqx = (Double) obj;
-                    }
+                    com_google_android_gms_internal_measurement_zzkj.zzaqx = (Double) obj;
                     return com_google_android_gms_internal_measurement_zzkjArr;
                 }
             }
@@ -285,24 +273,19 @@ public final class zzjv extends zzhk {
 
     static boolean zzbv(String str) {
         Preconditions.checkNotEmpty(str);
-        if (str.charAt(0) == '_') {
-            if (!str.equals("_ep")) {
-                return false;
-            }
-        }
-        return true;
+        return str.charAt(0) != '_' || str.equals("_ep");
     }
 
     static long zzc(byte[] bArr) {
-        Preconditions.checkNotNull(bArr);
         long j = null;
+        Preconditions.checkNotNull(bArr);
         Preconditions.checkState(bArr.length > 0);
         long j2 = 0;
         int length = bArr.length - 1;
         while (length >= 0 && length >= bArr.length - 8) {
+            j2 += (((long) bArr[length]) & 255) << j;
             j += 8;
             length--;
-            j2 += (((long) bArr[length]) & 255) << j;
         }
         return j2;
     }
@@ -314,11 +297,9 @@ public final class zzjv extends zzhk {
                 return false;
             }
             ServiceInfo serviceInfo = packageManager.getServiceInfo(new ComponentName(context, str), 0);
-            if (serviceInfo != null && serviceInfo.enabled) {
-                return true;
-            }
-            return false;
+            return serviceInfo != null && serviceInfo.enabled;
         } catch (NameNotFoundException e) {
+            return false;
         }
     }
 
@@ -335,47 +316,28 @@ public final class zzjv extends zzhk {
     }
 
     static boolean zzcg(String str) {
-        boolean z;
         Preconditions.checkNotEmpty(str);
-        int hashCode = str.hashCode();
-        if (hashCode != 94660) {
-            if (hashCode != 95025) {
-                if (hashCode == 95027) {
-                    if (str.equals("_ui")) {
-                        z = true;
-                        switch (z) {
-                            case false:
-                            case true:
-                            case true:
-                                return true;
-                            default:
-                                return false;
-                        }
-                    }
+        boolean z = true;
+        switch (str.hashCode()) {
+            case 94660:
+                if (str.equals("_in")) {
+                    z = false;
+                    break;
                 }
-            } else if (str.equals("_ug")) {
-                z = true;
-                switch (z) {
-                    case false:
-                    case true:
-                    case true:
-                        return true;
-                    default:
-                        return false;
+                break;
+            case 95025:
+                if (str.equals("_ug")) {
+                    z = true;
+                    break;
                 }
-            }
-        } else if (str.equals("_in")) {
-            z = false;
-            switch (z) {
-                case false:
-                case true:
-                case true:
-                    return true;
-                default:
-                    return false;
-            }
+                break;
+            case 95027:
+                if (str.equals("_ui")) {
+                    z = true;
+                    break;
+                }
+                break;
         }
-        z = true;
         switch (z) {
             case false:
             case true:
@@ -388,36 +350,20 @@ public final class zzjv extends zzhk {
 
     public static boolean zzd(Intent intent) {
         String stringExtra = intent.getStringExtra("android.intent.extra.REFERRER_NAME");
-        if (!("android-app://com.google.android.googlequicksearchbox/https/www.google.com".equals(stringExtra) || "https://www.google.com".equals(stringExtra))) {
-            if (!"android-app://com.google.appcrawler".equals(stringExtra)) {
-                return false;
-            }
-        }
-        return true;
+        return "android-app://com.google.android.googlequicksearchbox/https/www.google.com".equals(stringExtra) || "https://www.google.com".equals(stringExtra) || "android-app://com.google.appcrawler".equals(stringExtra);
     }
 
     private final boolean zze(Context context, String str) {
-        Object e;
-        zzfi zzil;
-        String str2;
         X500Principal x500Principal = new X500Principal("CN=Android Debug,O=Android,C=US");
         try {
             PackageInfo packageInfo = Wrappers.packageManager(context).getPackageInfo(str, 64);
             if (!(packageInfo == null || packageInfo.signatures == null || packageInfo.signatures.length <= 0)) {
                 return ((X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(packageInfo.signatures[0].toByteArray()))).getSubjectX500Principal().equals(x500Principal);
             }
-        } catch (CertificateException e2) {
-            e = e2;
-            zzil = zzgg().zzil();
-            str2 = "Error obtaining certificate";
-            zzil.zzg(str2, e);
-            return true;
-        } catch (NameNotFoundException e3) {
-            e = e3;
-            zzil = zzgg().zzil();
-            str2 = "Package name not found";
-            zzil.zzg(str2, e);
-            return true;
+        } catch (CertificateException e) {
+            zzgg().zzil().zzg("Error obtaining certificate", e);
+        } catch (NameNotFoundException e2) {
+            zzgg().zzil().zzg("Package name not found", e2);
         }
         return true;
     }
@@ -425,85 +371,75 @@ public final class zzjv extends zzhk {
     public static Bundle[] zze(Object obj) {
         if (obj instanceof Bundle) {
             return new Bundle[]{(Bundle) obj};
-        }
-        Object[] copyOf;
-        if (obj instanceof Parcelable[]) {
-            Parcelable[] parcelableArr = (Parcelable[]) obj;
-            copyOf = Arrays.copyOf(parcelableArr, parcelableArr.length, Bundle[].class);
-        } else if (!(obj instanceof ArrayList)) {
-            return null;
+        } else if (obj instanceof Parcelable[]) {
+            return (Bundle[]) Arrays.copyOf((Parcelable[]) obj, ((Parcelable[]) obj).length, Bundle[].class);
         } else {
+            if (!(obj instanceof ArrayList)) {
+                return null;
+            }
             ArrayList arrayList = (ArrayList) obj;
-            copyOf = arrayList.toArray(new Bundle[arrayList.size()]);
+            return (Bundle[]) arrayList.toArray(new Bundle[arrayList.size()]);
         }
-        return (Bundle[]) copyOf;
     }
 
-    public static java.lang.Object zzf(java.lang.Object r4) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dominator for block B:25:0x0043 in {2, 11, 13, 15, 17, 19, 21, 23, 24} preds:[]
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.computeDominators(BlockProcessor.java:129)
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.processBlocksTree(BlockProcessor.java:48)
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.visit(BlockProcessor.java:38)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.ProcessClass.process(ProcessClass.java:37)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-*/
-        /*
-        r0 = 0;
-        if (r4 != 0) goto L_0x0004;
-    L_0x0003:
-        return r0;
-    L_0x0004:
-        r1 = new java.io.ByteArrayOutputStream;	 Catch:{ all -> 0x0032 }
-        r1.<init>();	 Catch:{ all -> 0x0032 }
-        r2 = new java.io.ObjectOutputStream;	 Catch:{ all -> 0x0032 }
-        r2.<init>(r1);	 Catch:{ all -> 0x0032 }
-        r2.writeObject(r4);	 Catch:{ all -> 0x002f }
-        r2.flush();	 Catch:{ all -> 0x002f }
-        r4 = new java.io.ObjectInputStream;	 Catch:{ all -> 0x002f }
-        r3 = new java.io.ByteArrayInputStream;	 Catch:{ all -> 0x002f }
-        r1 = r1.toByteArray();	 Catch:{ all -> 0x002f }
-        r3.<init>(r1);	 Catch:{ all -> 0x002f }
-        r4.<init>(r3);	 Catch:{ all -> 0x002f }
-        r1 = r4.readObject();	 Catch:{ all -> 0x002d }
-        r2.close();	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        r4.close();	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        return r1;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-    L_0x002d:
-        r1 = move-exception;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        goto L_0x0035;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-    L_0x002f:
-        r1 = move-exception;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        r4 = r0;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        goto L_0x0035;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-    L_0x0032:
-        r1 = move-exception;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        r4 = r0;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        r2 = r4;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-    L_0x0035:
-        if (r2 == 0) goto L_0x003d;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-    L_0x0037:
-        r2.close();	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        goto L_0x003d;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-    L_0x003b:
-        r4 = move-exception;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        return r0;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-    L_0x003d:
-        if (r4 == 0) goto L_0x0042;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-    L_0x003f:
-        r4.close();	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-    L_0x0042:
-        throw r1;	 Catch:{ IOException -> 0x003b, IOException -> 0x003b }
-        return r0;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.internal.measurement.zzjv.zzf(java.lang.Object):java.lang.Object");
+    public static Object zzf(Object obj) {
+        ObjectOutputStream objectOutputStream;
+        Throwable th;
+        if (obj == null) {
+            return null;
+        }
+        ObjectInputStream objectInputStream;
+        try {
+            OutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            try {
+                objectOutputStream.writeObject(obj);
+                objectOutputStream.flush();
+                objectInputStream = new ObjectInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+            } catch (Throwable th2) {
+                th = th2;
+                objectInputStream = null;
+                if (objectOutputStream != null) {
+                    objectOutputStream.close();
+                }
+                if (objectInputStream != null) {
+                    objectInputStream.close();
+                }
+                throw th;
+            }
+            try {
+                Object readObject = objectInputStream.readObject();
+                try {
+                    objectOutputStream.close();
+                    objectInputStream.close();
+                    return readObject;
+                } catch (IOException e) {
+                    return null;
+                } catch (ClassNotFoundException e2) {
+                    return null;
+                }
+            } catch (Throwable th3) {
+                th = th3;
+                if (objectOutputStream != null) {
+                    objectOutputStream.close();
+                }
+                if (objectInputStream != null) {
+                    objectInputStream.close();
+                }
+                throw th;
+            }
+        } catch (Throwable th4) {
+            th = th4;
+            objectInputStream = null;
+            objectOutputStream = null;
+            if (objectOutputStream != null) {
+                objectOutputStream.close();
+            }
+            if (objectInputStream != null) {
+                objectInputStream.close();
+            }
+            throw th;
+        }
     }
 
     private final boolean zzr(String str, String str2) {
@@ -543,567 +479,169 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
     }
 
     public final Bundle zza(Uri uri) {
-        if (uri == null) {
-            return null;
-        }
-        try {
-            Object queryParameter;
-            Object queryParameter2;
-            Object queryParameter3;
-            Object queryParameter4;
-            if (uri.isHierarchical()) {
-                queryParameter = uri.getQueryParameter("utm_campaign");
-                queryParameter2 = uri.getQueryParameter("utm_source");
-                queryParameter3 = uri.getQueryParameter("utm_medium");
-                queryParameter4 = uri.getQueryParameter("gclid");
-            } else {
-                queryParameter = null;
-                queryParameter2 = queryParameter;
-                queryParameter3 = queryParameter2;
-                queryParameter4 = queryParameter3;
-            }
-            if (TextUtils.isEmpty(queryParameter) && TextUtils.isEmpty(queryParameter2) && TextUtils.isEmpty(queryParameter3)) {
-                if (TextUtils.isEmpty(queryParameter4)) {
-                    return null;
+        Bundle bundle = null;
+        if (uri != null) {
+            try {
+                Object queryParameter;
+                Object queryParameter2;
+                Object queryParameter3;
+                Object queryParameter4;
+                if (uri.isHierarchical()) {
+                    queryParameter = uri.getQueryParameter("utm_campaign");
+                    queryParameter2 = uri.getQueryParameter("utm_source");
+                    queryParameter3 = uri.getQueryParameter("utm_medium");
+                    queryParameter4 = uri.getQueryParameter("gclid");
+                } else {
+                    queryParameter4 = null;
+                    queryParameter3 = null;
+                    queryParameter2 = null;
+                    queryParameter = null;
                 }
+                if (!(TextUtils.isEmpty(queryParameter) && TextUtils.isEmpty(queryParameter2) && TextUtils.isEmpty(queryParameter3) && TextUtils.isEmpty(queryParameter4))) {
+                    bundle = new Bundle();
+                    if (!TextUtils.isEmpty(queryParameter)) {
+                        bundle.putString("campaign", queryParameter);
+                    }
+                    if (!TextUtils.isEmpty(queryParameter2)) {
+                        bundle.putString("source", queryParameter2);
+                    }
+                    if (!TextUtils.isEmpty(queryParameter3)) {
+                        bundle.putString("medium", queryParameter3);
+                    }
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString("gclid", queryParameter4);
+                    }
+                    queryParameter4 = uri.getQueryParameter("utm_term");
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString("term", queryParameter4);
+                    }
+                    queryParameter4 = uri.getQueryParameter("utm_content");
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString("content", queryParameter4);
+                    }
+                    queryParameter4 = uri.getQueryParameter("aclid");
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString("aclid", queryParameter4);
+                    }
+                    queryParameter4 = uri.getQueryParameter("cp1");
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString("cp1", queryParameter4);
+                    }
+                    queryParameter4 = uri.getQueryParameter("anid");
+                    if (!TextUtils.isEmpty(queryParameter4)) {
+                        bundle.putString("anid", queryParameter4);
+                    }
+                }
+            } catch (UnsupportedOperationException e) {
+                zzgg().zzin().zzg("Install referrer url isn't a hierarchical URI", e);
             }
-            Bundle bundle = new Bundle();
-            if (!TextUtils.isEmpty(queryParameter)) {
-                bundle.putString("campaign", queryParameter);
-            }
-            if (!TextUtils.isEmpty(queryParameter2)) {
-                bundle.putString("source", queryParameter2);
-            }
-            if (!TextUtils.isEmpty(queryParameter3)) {
-                bundle.putString("medium", queryParameter3);
-            }
-            if (!TextUtils.isEmpty(queryParameter4)) {
-                bundle.putString("gclid", queryParameter4);
-            }
-            queryParameter = uri.getQueryParameter("utm_term");
-            if (!TextUtils.isEmpty(queryParameter)) {
-                bundle.putString("term", queryParameter);
-            }
-            queryParameter = uri.getQueryParameter("utm_content");
-            if (!TextUtils.isEmpty(queryParameter)) {
-                bundle.putString("content", queryParameter);
-            }
-            queryParameter = uri.getQueryParameter("aclid");
-            if (!TextUtils.isEmpty(queryParameter)) {
-                bundle.putString("aclid", queryParameter);
-            }
-            queryParameter = uri.getQueryParameter("cp1");
-            if (!TextUtils.isEmpty(queryParameter)) {
-                bundle.putString("cp1", queryParameter);
-            }
-            Object queryParameter5 = uri.getQueryParameter("anid");
-            if (!TextUtils.isEmpty(queryParameter5)) {
-                bundle.putString("anid", queryParameter5);
-            }
-            return bundle;
-        } catch (UnsupportedOperationException e) {
-            zzgg().zzin().zzg("Install referrer url isn't a hierarchical URI", e);
-            return null;
         }
+        return bundle;
     }
 
     public final Bundle zza(String str, Bundle bundle, List<String> list, boolean z, boolean z2) {
-        zzjv com_google_android_gms_internal_measurement_zzjv = this;
-        Bundle bundle2 = bundle;
-        List<String> list2 = list;
-        String[] strArr = null;
-        if (bundle2 == null) {
+        if (bundle == null) {
             return null;
         }
-        Bundle bundle3 = new Bundle(bundle2);
+        Bundle bundle2 = new Bundle(bundle);
         int i = 0;
         for (String str2 : bundle.keySet()) {
-            int i2;
-            Object obj;
-            String str3;
-            boolean z3;
-            int i3;
-            boolean z4;
-            StringBuilder stringBuilder;
-            String str4;
-            String str5;
-            int i4;
-            zzjv com_google_android_gms_internal_measurement_zzjv2;
-            String str6;
-            int i5;
-            if (list2 != null) {
-                if (!list2.contains(str2)) {
-                }
-                i2 = 0;
-                if (i2 == 0) {
-                    if (zza(bundle3, i2)) {
-                        bundle3.putString("_ev", zza(str2, 40, true));
-                        if (i2 == 3) {
-                            zza(bundle3, (Object) str2);
-                        }
-                    }
-                    bundle3.remove(str2);
-                } else {
-                    obj = bundle2.get(str2);
-                    zzab();
-                    if (z2) {
-                        str3 = "param";
-                        if (obj instanceof Parcelable[]) {
-                            if (obj instanceof ArrayList) {
-                                i2 = ((ArrayList) obj).size();
-                            }
-                            z3 = true;
-                            if (!z3) {
-                                i3 = 17;
-                                z4 = true;
-                                if (i3 != 0 || "_ev".equals(str2)) {
-                                    if (zzbv(str2)) {
-                                        i++;
-                                        if (i > 25) {
-                                            stringBuilder = new StringBuilder(48);
-                                            stringBuilder.append("Event can't contain more than 25 params");
-                                            zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                            zza(bundle3, 5);
-                                            bundle3.remove(str2);
-                                        }
-                                    }
-                                    str4 = str;
-                                } else {
-                                    if (zza(bundle3, i3)) {
-                                        bundle3.putString("_ev", zza(str2, 40, z4));
-                                        zza(bundle3, bundle2.get(str2));
-                                    }
-                                    bundle3.remove(str2);
-                                }
-                            }
-                        } else {
-                            i2 = ((Parcelable[]) obj).length;
-                        }
-                        if (i2 > 1000) {
-                            zzgg().zzin().zzd("Parameter array is too long; discarded. Value kind, name, array length", str3, str2, Integer.valueOf(i2));
-                            z3 = false;
-                            if (z3) {
-                                i3 = 17;
-                                z4 = true;
-                                if (i3 != 0) {
-                                }
-                                if (zzbv(str2)) {
-                                    i++;
-                                    if (i > 25) {
-                                        stringBuilder = new StringBuilder(48);
-                                        stringBuilder.append("Event can't contain more than 25 params");
-                                        zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                        zza(bundle3, 5);
-                                        bundle3.remove(str2);
-                                    }
-                                }
-                                str4 = str;
-                            }
-                        }
-                        z3 = true;
-                        if (z3) {
-                            i3 = 17;
-                            z4 = true;
-                            if (i3 != 0) {
-                            }
-                            if (zzbv(str2)) {
-                                i++;
-                                if (i > 25) {
-                                    stringBuilder = new StringBuilder(48);
-                                    stringBuilder.append("Event can't contain more than 25 params");
-                                    zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                    zza(bundle3, 5);
-                                    bundle3.remove(str2);
-                                }
-                            }
-                            str4 = str;
-                        }
-                    }
-                    if ((zzgi().zzd(zzfv().zzah(), zzew.zzahz) || !zzcb(str)) && !zzcb(str2)) {
-                        z4 = true;
-                        str5 = "param";
-                        i4 = 100;
-                        com_google_android_gms_internal_measurement_zzjv2 = com_google_android_gms_internal_measurement_zzjv;
-                        str6 = str2;
-                    } else {
-                        str5 = "param";
-                        i4 = 256;
-                        com_google_android_gms_internal_measurement_zzjv2 = com_google_android_gms_internal_measurement_zzjv;
-                        str6 = str2;
-                        z4 = true;
-                    }
-                    i3 = com_google_android_gms_internal_measurement_zzjv2.zza(str5, str6, i4, obj, z2) ? 0 : 4;
-                    if (i3 != 0) {
-                    }
-                    if (zzbv(str2)) {
-                        i++;
-                        if (i > 25) {
-                            stringBuilder = new StringBuilder(48);
-                            stringBuilder.append("Event can't contain more than 25 params");
-                            zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                            zza(bundle3, 5);
-                            bundle3.remove(str2);
-                        }
-                    }
-                    str4 = str;
-                }
-                strArr = null;
-            }
-            i2 = 14;
-            if (z) {
-                if (zzq("event param", str2)) {
-                    if (!zza("event param", strArr, str2)) {
-                        i5 = 14;
-                        if (i5 == 0) {
-                            if (zzr("event param", str2)) {
-                                if (!zza("event param", strArr, str2)) {
-                                    if (!zza("event param", 40, str2)) {
-                                    }
-                                    i2 = 0;
-                                }
-                            }
-                            i2 = 3;
-                        } else {
-                            i2 = i5;
-                        }
-                        if (i2 == 0) {
-                            obj = bundle2.get(str2);
-                            zzab();
-                            if (z2) {
-                                str3 = "param";
-                                if (obj instanceof Parcelable[]) {
-                                    if (obj instanceof ArrayList) {
-                                        i2 = ((ArrayList) obj).size();
-                                    }
-                                    z3 = true;
-                                    if (z3) {
-                                        i3 = 17;
-                                        z4 = true;
-                                        if (i3 != 0) {
-                                        }
-                                        if (zzbv(str2)) {
-                                            i++;
-                                            if (i > 25) {
-                                                stringBuilder = new StringBuilder(48);
-                                                stringBuilder.append("Event can't contain more than 25 params");
-                                                zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                                zza(bundle3, 5);
-                                                bundle3.remove(str2);
-                                            }
-                                        }
-                                        str4 = str;
-                                    }
-                                } else {
-                                    i2 = ((Parcelable[]) obj).length;
-                                }
-                                if (i2 > 1000) {
-                                    zzgg().zzin().zzd("Parameter array is too long; discarded. Value kind, name, array length", str3, str2, Integer.valueOf(i2));
-                                    z3 = false;
-                                    if (z3) {
-                                        i3 = 17;
-                                        z4 = true;
-                                        if (i3 != 0) {
-                                        }
-                                        if (zzbv(str2)) {
-                                            i++;
-                                            if (i > 25) {
-                                                stringBuilder = new StringBuilder(48);
-                                                stringBuilder.append("Event can't contain more than 25 params");
-                                                zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                                zza(bundle3, 5);
-                                                bundle3.remove(str2);
-                                            }
-                                        }
-                                        str4 = str;
-                                    }
-                                }
-                                z3 = true;
-                                if (z3) {
-                                    i3 = 17;
-                                    z4 = true;
-                                    if (i3 != 0) {
-                                    }
-                                    if (zzbv(str2)) {
-                                        i++;
-                                        if (i > 25) {
-                                            stringBuilder = new StringBuilder(48);
-                                            stringBuilder.append("Event can't contain more than 25 params");
-                                            zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                            zza(bundle3, 5);
-                                            bundle3.remove(str2);
-                                        }
-                                    }
-                                    str4 = str;
-                                }
-                            }
-                            if (zzgi().zzd(zzfv().zzah(), zzew.zzahz)) {
-                            }
-                            z4 = true;
-                            str5 = "param";
-                            i4 = 100;
-                            com_google_android_gms_internal_measurement_zzjv2 = com_google_android_gms_internal_measurement_zzjv;
-                            str6 = str2;
-                            if (com_google_android_gms_internal_measurement_zzjv2.zza(str5, str6, i4, obj, z2)) {
-                            }
-                            if (i3 != 0) {
-                            }
-                            if (zzbv(str2)) {
-                                i++;
-                                if (i > 25) {
-                                    stringBuilder = new StringBuilder(48);
-                                    stringBuilder.append("Event can't contain more than 25 params");
-                                    zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                    zza(bundle3, 5);
-                                    bundle3.remove(str2);
-                                }
-                            }
-                            str4 = str;
-                        } else {
-                            if (zza(bundle3, i2)) {
-                                bundle3.putString("_ev", zza(str2, 40, true));
-                                if (i2 == 3) {
-                                    zza(bundle3, (Object) str2);
-                                }
-                            }
-                            bundle3.remove(str2);
-                        }
-                        strArr = null;
-                    } else if (!zza("event param", 40, str2)) {
-                    }
-                }
-                i5 = 3;
-                if (i5 == 0) {
-                    i2 = i5;
-                } else {
-                    if (zzr("event param", str2)) {
-                        if (!zza("event param", strArr, str2)) {
-                            if (zza("event param", 40, str2)) {
-                            }
-                            i2 = 0;
-                        }
-                    }
-                    i2 = 3;
+            int i2 = 0;
+            if (list == null || !list.contains(str2)) {
+                if (z) {
+                    i2 = !zzq("event param", str2) ? 3 : !zza("event param", null, str2) ? 14 : !zza("event param", 40, str2) ? 3 : 0;
                 }
                 if (i2 == 0) {
-                    if (zza(bundle3, i2)) {
-                        bundle3.putString("_ev", zza(str2, 40, true));
-                        if (i2 == 3) {
-                            zza(bundle3, (Object) str2);
-                        }
-                    }
-                    bundle3.remove(str2);
-                } else {
-                    obj = bundle2.get(str2);
-                    zzab();
-                    if (z2) {
-                        str3 = "param";
-                        if (obj instanceof Parcelable[]) {
-                            i2 = ((Parcelable[]) obj).length;
-                        } else {
-                            if (obj instanceof ArrayList) {
-                                i2 = ((ArrayList) obj).size();
-                            }
-                            z3 = true;
-                            if (z3) {
-                                i3 = 17;
-                                z4 = true;
-                                if (i3 != 0) {
-                                }
-                                if (zzbv(str2)) {
-                                    i++;
-                                    if (i > 25) {
-                                        stringBuilder = new StringBuilder(48);
-                                        stringBuilder.append("Event can't contain more than 25 params");
-                                        zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                        zza(bundle3, 5);
-                                        bundle3.remove(str2);
-                                    }
-                                }
-                                str4 = str;
-                            }
-                        }
-                        if (i2 > 1000) {
-                            zzgg().zzin().zzd("Parameter array is too long; discarded. Value kind, name, array length", str3, str2, Integer.valueOf(i2));
-                            z3 = false;
-                            if (z3) {
-                                i3 = 17;
-                                z4 = true;
-                                if (i3 != 0) {
-                                }
-                                if (zzbv(str2)) {
-                                    i++;
-                                    if (i > 25) {
-                                        stringBuilder = new StringBuilder(48);
-                                        stringBuilder.append("Event can't contain more than 25 params");
-                                        zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                        zza(bundle3, 5);
-                                        bundle3.remove(str2);
-                                    }
-                                }
-                                str4 = str;
-                            }
-                        }
-                        z3 = true;
-                        if (z3) {
-                            i3 = 17;
-                            z4 = true;
-                            if (i3 != 0) {
-                            }
-                            if (zzbv(str2)) {
-                                i++;
-                                if (i > 25) {
-                                    stringBuilder = new StringBuilder(48);
-                                    stringBuilder.append("Event can't contain more than 25 params");
-                                    zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                    zza(bundle3, 5);
-                                    bundle3.remove(str2);
-                                }
-                            }
-                            str4 = str;
-                        }
-                    }
-                    if (zzgi().zzd(zzfv().zzah(), zzew.zzahz)) {
-                    }
-                    z4 = true;
-                    str5 = "param";
-                    i4 = 100;
-                    com_google_android_gms_internal_measurement_zzjv2 = com_google_android_gms_internal_measurement_zzjv;
-                    str6 = str2;
-                    if (com_google_android_gms_internal_measurement_zzjv2.zza(str5, str6, i4, obj, z2)) {
-                    }
-                    if (i3 != 0) {
-                    }
-                    if (zzbv(str2)) {
-                        i++;
-                        if (i > 25) {
-                            stringBuilder = new StringBuilder(48);
-                            stringBuilder.append("Event can't contain more than 25 params");
-                            zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                            zza(bundle3, 5);
-                            bundle3.remove(str2);
-                        }
-                    }
-                    str4 = str;
+                    i2 = !zzr("event param", str2) ? 3 : !zza("event param", null, str2) ? 14 : !zza("event param", 40, str2) ? 3 : 0;
                 }
-                strArr = null;
             }
-            i5 = 0;
-            if (i5 == 0) {
-                if (zzr("event param", str2)) {
-                    if (!zza("event param", strArr, str2)) {
-                        if (zza("event param", 40, str2)) {
-                        }
-                        i2 = 0;
+            if (i2 != 0) {
+                if (zza(bundle2, i2)) {
+                    bundle2.putString("_ev", zza(str2, 40, true));
+                    if (i2 == 3) {
+                        zza(bundle2, (Object) str2);
                     }
                 }
-                i2 = 3;
+                bundle2.remove(str2);
             } else {
-                i2 = i5;
-            }
-            if (i2 == 0) {
-                obj = bundle2.get(str2);
+                Object obj = bundle.get(str2);
                 zzab();
                 if (z2) {
-                    str3 = "param";
+                    Object obj2;
+                    String str3 = "param";
                     if (obj instanceof Parcelable[]) {
-                        if (obj instanceof ArrayList) {
-                            i2 = ((ArrayList) obj).size();
-                        }
-                        z3 = true;
-                        if (z3) {
-                            i3 = 17;
-                            z4 = true;
-                            if (i3 != 0) {
-                            }
-                            if (zzbv(str2)) {
-                                i++;
-                                if (i > 25) {
-                                    stringBuilder = new StringBuilder(48);
-                                    stringBuilder.append("Event can't contain more than 25 params");
-                                    zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                    zza(bundle3, 5);
-                                    bundle3.remove(str2);
-                                }
-                            }
-                            str4 = str;
-                        }
-                    } else {
                         i2 = ((Parcelable[]) obj).length;
+                    } else if (obj instanceof ArrayList) {
+                        i2 = ((ArrayList) obj).size();
+                    } else {
+                        obj2 = 1;
+                        if (obj2 == null) {
+                            i2 = 17;
+                            if (i2 != 0 || "_ev".equals(str2)) {
+                                if (zzbv(str2)) {
+                                    i2 = i + 1;
+                                    if (i2 > 25) {
+                                        zzgg().zzil().zze("Event can't contain more than 25 params", zzgb().zzbe(str), zzgb().zzb(bundle));
+                                        zza(bundle2, 5);
+                                        bundle2.remove(str2);
+                                        i = i2;
+                                    }
+                                } else {
+                                    i2 = i;
+                                }
+                                i = i2;
+                            } else {
+                                if (zza(bundle2, i2)) {
+                                    bundle2.putString("_ev", zza(str2, 40, true));
+                                    zza(bundle2, bundle.get(str2));
+                                }
+                                bundle2.remove(str2);
+                            }
+                        }
                     }
                     if (i2 > 1000) {
                         zzgg().zzin().zzd("Parameter array is too long; discarded. Value kind, name, array length", str3, str2, Integer.valueOf(i2));
-                        z3 = false;
-                        if (z3) {
-                            i3 = 17;
-                            z4 = true;
-                            if (i3 != 0) {
-                            }
-                            if (zzbv(str2)) {
-                                i++;
-                                if (i > 25) {
-                                    stringBuilder = new StringBuilder(48);
-                                    stringBuilder.append("Event can't contain more than 25 params");
-                                    zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                    zza(bundle3, 5);
-                                    bundle3.remove(str2);
-                                }
-                            }
-                            str4 = str;
-                        }
+                        obj2 = null;
+                    } else {
+                        obj2 = 1;
                     }
-                    z3 = true;
-                    if (z3) {
-                        i3 = 17;
-                        z4 = true;
-                        if (i3 != 0) {
+                    if (obj2 == null) {
+                        i2 = 17;
+                        if (i2 != 0) {
                         }
                         if (zzbv(str2)) {
-                            i++;
-                            if (i > 25) {
-                                stringBuilder = new StringBuilder(48);
-                                stringBuilder.append("Event can't contain more than 25 params");
-                                zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                                zza(bundle3, 5);
-                                bundle3.remove(str2);
+                            i2 = i;
+                        } else {
+                            i2 = i + 1;
+                            if (i2 > 25) {
+                                zzgg().zzil().zze("Event can't contain more than 25 params", zzgb().zzbe(str), zzgb().zzb(bundle));
+                                zza(bundle2, 5);
+                                bundle2.remove(str2);
+                                i = i2;
                             }
                         }
-                        str4 = str;
+                        i = i2;
                     }
                 }
-                if (zzgi().zzd(zzfv().zzah(), zzew.zzahz)) {
-                }
-                z4 = true;
-                str5 = "param";
-                i4 = 100;
-                com_google_android_gms_internal_measurement_zzjv2 = com_google_android_gms_internal_measurement_zzjv;
-                str6 = str2;
-                if (com_google_android_gms_internal_measurement_zzjv2.zza(str5, str6, i4, obj, z2)) {
-                }
-                if (i3 != 0) {
+                boolean zza = ((zzgi().zzd(zzfv().zzah(), zzew.zzahz) && zzcb(str)) || zzcb(str2)) ? zza("param", str2, 256, obj, z2) : zza("param", str2, 100, obj, z2);
+                i2 = zza ? 0 : 4;
+                if (i2 != 0) {
                 }
                 if (zzbv(str2)) {
-                    i++;
-                    if (i > 25) {
-                        stringBuilder = new StringBuilder(48);
-                        stringBuilder.append("Event can't contain more than 25 params");
-                        zzgg().zzil().zze(stringBuilder.toString(), zzgb().zzbe(str), zzgb().zzb(bundle2));
-                        zza(bundle3, 5);
-                        bundle3.remove(str2);
+                    i2 = i + 1;
+                    if (i2 > 25) {
+                        zzgg().zzil().zze("Event can't contain more than 25 params", zzgb().zzbe(str), zzgb().zzb(bundle));
+                        zza(bundle2, 5);
+                        bundle2.remove(str2);
+                        i = i2;
                     }
+                } else {
+                    i2 = i;
                 }
-                str4 = str;
-            } else {
-                if (zza(bundle3, i2)) {
-                    bundle3.putString("_ev", zza(str2, 40, true));
-                    if (i2 == 3) {
-                        zza(bundle3, (Object) str2);
-                    }
-                }
-                bundle3.remove(str2);
+                i = i2;
             }
-            strArr = null;
         }
-        return bundle3;
+        return bundle2;
     }
 
     final zzeu zza(String str, Bundle bundle, String str2, long j, boolean z, boolean z2) {
@@ -1116,8 +654,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         }
         Bundle bundle2 = bundle != null ? new Bundle(bundle) : new Bundle();
         bundle2.putString("_o", str2);
-        String str3 = str;
-        return new zzeu(str3, new zzer(zzd(zza(str3, bundle2, CollectionUtils.listOf((Object) "_o"), false, false))), str2, j);
+        return new zzeu(str, new zzer(zzd(zza(str, bundle2, CollectionUtils.listOf((Object) "_o"), false, false))), str2, j);
     }
 
     public final void zza(int i, String str, String str2, int i2) {
@@ -1132,10 +669,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
                 bundle.putString(str, String.valueOf(obj));
             } else if (obj instanceof Double) {
                 bundle.putDouble(str, ((Double) obj).doubleValue());
-            } else {
-                if (str != null) {
-                    zzgg().zzio().zze("Not putting event parameter. Invalid value type. name, type", zzgb().zzbf(str), obj != null ? obj.getClass().getSimpleName() : null);
-                }
+            } else if (str != null) {
+                zzgg().zzio().zze("Not putting event parameter. Invalid value type. name, type", zzgb().zzbf(str), obj != null ? obj.getClass().getSimpleName() : null);
             }
         }
     }
@@ -1187,16 +722,15 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
             return false;
         }
         if (strArr != null) {
-            boolean z2;
             Preconditions.checkNotNull(strArr);
             for (String startsWith2 : strArr) {
                 if (zzs(str2, startsWith2)) {
-                    z2 = true;
+                    z = true;
                     break;
                 }
             }
-            z2 = false;
-            if (z2) {
+            z = false;
+            if (z) {
                 zzgg().zzil().zze("Name is reserved. Type, name", str, str2);
                 return false;
             }
@@ -1262,15 +796,15 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
     }
 
     public final int zzbw(String str) {
-        return !zzr("event", str) ? 2 : !zza("event", Event.zzacs, str) ? 13 : !zza("event", 40, str) ? 2 : 0;
+        return !zzr("event", str) ? 2 : !zza("event", Event.zzacs, str) ? 13 : zza("event", 40, str) ? 0 : 2;
     }
 
     public final int zzbx(String str) {
-        return !zzq("user property", str) ? 6 : !zza("user property", UserProperty.zzacw, str) ? 15 : !zza("user property", 24, str) ? 6 : 0;
+        return !zzq("user property", str) ? 6 : !zza("user property", UserProperty.zzacw, str) ? 15 : zza("user property", 24, str) ? 0 : 6;
     }
 
     public final int zzby(String str) {
-        return !zzr("user property", str) ? 6 : !zza("user property", UserProperty.zzacw, str) ? 15 : !zza("user property", 24, str) ? 6 : 0;
+        return !zzr("user property", str) ? 6 : !zza("user property", UserProperty.zzacw, str) ? 15 : zza("user property", 24, str) ? 0 : 6;
     }
 
     public final boolean zzbz(String str) {
@@ -1417,17 +951,14 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
     }
 
     public final Object zzh(String str, Object obj) {
-        boolean z;
         int i = 256;
         if ("_ev".equals(str)) {
-            z = true;
-        } else {
-            if (!zzcb(str)) {
-                i = 100;
-            }
-            z = false;
+            return zza(256, obj, true);
         }
-        return zza(i, obj, z);
+        if (!zzcb(str)) {
+            i = 100;
+        }
+        return zza(i, obj, false);
     }
 
     protected final boolean zzhh() {
@@ -1452,32 +983,23 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
     }
 
     public final Object zzj(String str, Object obj) {
-        int zzca;
-        boolean z;
-        if ("_ldl".equals(str)) {
-            zzca = zzca(str);
-            z = true;
-        } else {
-            zzca = zzca(str);
-            z = false;
-        }
-        return zza(zzca, obj, z);
+        return "_ldl".equals(str) ? zza(zzca(str), obj, true) : zza(zzca(str), obj, false);
     }
 
     public final long zzkt() {
+        long nextLong;
         if (this.zzara.get() == 0) {
-            long j;
             synchronized (this.zzara) {
-                long nextLong = new Random(System.nanoTime() ^ zzbt().currentTimeMillis()).nextLong();
+                nextLong = new Random(System.nanoTime() ^ zzbt().currentTimeMillis()).nextLong();
                 int i = this.zzarb + 1;
                 this.zzarb = i;
-                j = nextLong + ((long) i);
+                nextLong += (long) i;
             }
-            return j;
-        }
-        synchronized (this.zzara) {
-            this.zzara.compareAndSet(-1, 1);
-            nextLong = this.zzara.getAndIncrement();
+        } else {
+            synchronized (this.zzara) {
+                this.zzara.compareAndSet(-1, 1);
+                nextLong = this.zzara.getAndIncrement();
+            }
         }
         return nextLong;
     }

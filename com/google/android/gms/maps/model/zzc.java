@@ -7,54 +7,53 @@ import java.util.List;
 
 public final class zzc implements Creator<CircleOptions> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        Parcel parcel2 = parcel;
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        float f = 0.0f;
-        float f2 = f;
-        LatLng latLng = null;
-        List list = latLng;
-        int i = 0;
-        int i2 = i;
-        boolean z = i2;
-        boolean z2 = z;
         double d = 0.0d;
+        List list = null;
+        boolean z = false;
+        boolean z2 = false;
+        float f = 0.0f;
+        int i = 0;
+        int i2 = 0;
+        float f2 = 0.0f;
+        LatLng latLng = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    latLng = (LatLng) SafeParcelReader.createParcelable(parcel2, readHeader, LatLng.CREATOR);
+                    latLng = (LatLng) SafeParcelReader.createParcelable(parcel, readHeader, LatLng.CREATOR);
                     break;
                 case 3:
-                    d = SafeParcelReader.readDouble(parcel2, readHeader);
+                    d = SafeParcelReader.readDouble(parcel, readHeader);
                     break;
                 case 4:
-                    f = SafeParcelReader.readFloat(parcel2, readHeader);
+                    f2 = SafeParcelReader.readFloat(parcel, readHeader);
                     break;
                 case 5:
-                    i = SafeParcelReader.readInt(parcel2, readHeader);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 6:
-                    i2 = SafeParcelReader.readInt(parcel2, readHeader);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 7:
-                    f2 = SafeParcelReader.readFloat(parcel2, readHeader);
+                    f = SafeParcelReader.readFloat(parcel, readHeader);
                     break;
                 case 8:
-                    z = SafeParcelReader.readBoolean(parcel2, readHeader);
+                    z2 = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 9:
-                    z2 = SafeParcelReader.readBoolean(parcel2, readHeader);
+                    z = SafeParcelReader.readBoolean(parcel, readHeader);
                     break;
                 case 10:
-                    list = SafeParcelReader.createTypedList(parcel2, readHeader, PatternItem.CREATOR);
+                    list = SafeParcelReader.createTypedList(parcel, readHeader, PatternItem.CREATOR);
                     break;
                 default:
-                    SafeParcelReader.skipUnknownField(parcel2, readHeader);
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
                     break;
             }
         }
-        SafeParcelReader.ensureAtEnd(parcel2, validateObjectHeader);
-        return new CircleOptions(latLng, d, f, i, i2, f2, z, z2, list);
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new CircleOptions(latLng, d, f2, i2, i, f, z2, z, list);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

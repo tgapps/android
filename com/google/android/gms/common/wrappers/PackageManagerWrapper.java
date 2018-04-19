@@ -57,11 +57,12 @@ public class PackageManagerWrapper {
             }
         }
         String[] packagesForUid = this.zzjp.getPackageManager().getPackagesForUid(i);
-        if (!(str == null || packagesForUid == null)) {
-            for (Object equals : packagesForUid) {
-                if (str.equals(equals)) {
-                    return true;
-                }
+        if (str == null || packagesForUid == null) {
+            return false;
+        }
+        for (Object equals : packagesForUid) {
+            if (str.equals(equals)) {
+                return true;
             }
         }
         return false;

@@ -49,36 +49,27 @@ final class zzr implements zzbp {
     private int zzgb = 0;
 
     private zzr(Context context, zzav com_google_android_gms_common_api_internal_zzav, Lock lock, Looper looper, GoogleApiAvailabilityLight googleApiAvailabilityLight, Map<AnyClientKey<?>, Client> map, Map<AnyClientKey<?>, Client> map2, ClientSettings clientSettings, AbstractClientBuilder<? extends SignInClient, SignInOptions> abstractClientBuilder, Client client, ArrayList<zzp> arrayList, ArrayList<zzp> arrayList2, Map<Api<?>, Boolean> map3, Map<Api<?>, Boolean> map4) {
-        Context context2 = context;
-        this.mContext = context2;
+        this.mContext = context;
         this.zzfq = com_google_android_gms_common_api_internal_zzav;
-        Lock lock2 = lock;
-        this.zzga = lock2;
-        Looper looper2 = looper;
-        this.zzcn = looper2;
+        this.zzga = lock;
+        this.zzcn = looper;
         this.zzfv = client;
-        Context context3 = context2;
-        Lock lock3 = lock2;
-        GoogleApiAvailabilityLight googleApiAvailabilityLight2 = googleApiAvailabilityLight;
-        zzbd com_google_android_gms_common_api_internal_zzbd = r3;
-        zzbd com_google_android_gms_common_api_internal_zzbd2 = new zzbd(context3, this.zzfq, lock3, looper2, googleApiAvailabilityLight2, map2, null, map4, null, arrayList2, new zzt());
-        this.zzfr = com_google_android_gms_common_api_internal_zzbd;
-        this.zzfs = new zzbd(context3, this.zzfq, lock3, looper, googleApiAvailabilityLight2, map, clientSettings, map3, abstractClientBuilder, arrayList, new zzu());
+        this.zzfr = new zzbd(context, this.zzfq, lock, looper, googleApiAvailabilityLight, map2, null, map4, null, arrayList2, new zzt());
+        this.zzfs = new zzbd(context, this.zzfq, lock, looper, googleApiAvailabilityLight, map, clientSettings, map3, abstractClientBuilder, arrayList, new zzu());
         Map arrayMap = new ArrayMap();
         for (AnyClientKey put : map2.keySet()) {
-            arrayMap.put(put, r0.zzfr);
+            arrayMap.put(put, this.zzfr);
         }
         for (AnyClientKey put2 : map.keySet()) {
-            arrayMap.put(put2, r0.zzfs);
+            arrayMap.put(put2, this.zzfs);
         }
-        r0.zzft = Collections.unmodifiableMap(arrayMap);
+        this.zzft = Collections.unmodifiableMap(arrayMap);
     }
 
     public static zzr zza(Context context, zzav com_google_android_gms_common_api_internal_zzav, Lock lock, Looper looper, GoogleApiAvailabilityLight googleApiAvailabilityLight, Map<AnyClientKey<?>, Client> map, ClientSettings clientSettings, Map<Api<?>, Boolean> map2, AbstractClientBuilder<? extends SignInClient, SignInOptions> abstractClientBuilder, ArrayList<zzp> arrayList) {
-        Map<Api<?>, Boolean> map3 = map2;
+        Client client = null;
         Map arrayMap = new ArrayMap();
         Map arrayMap2 = new ArrayMap();
-        Client client = null;
         for (Entry entry : map.entrySet()) {
             Client client2 = (Client) entry.getValue();
             if (client2.providesSignIn()) {
@@ -90,15 +81,15 @@ final class zzr implements zzbp {
                 arrayMap2.put((AnyClientKey) entry.getKey(), client2);
             }
         }
-        Preconditions.checkState(arrayMap.isEmpty() ^ 1, "CompositeGoogleApiClient should not be used without any APIs that require sign-in.");
+        Preconditions.checkState(!arrayMap.isEmpty(), "CompositeGoogleApiClient should not be used without any APIs that require sign-in.");
         Map arrayMap3 = new ArrayMap();
         Map arrayMap4 = new ArrayMap();
         for (Api api : map2.keySet()) {
             AnyClientKey clientKey = api.getClientKey();
             if (arrayMap.containsKey(clientKey)) {
-                arrayMap3.put(api, (Boolean) map3.get(api));
+                arrayMap3.put(api, (Boolean) map2.get(api));
             } else if (arrayMap2.containsKey(clientKey)) {
-                arrayMap4.put(api, (Boolean) map3.get(api));
+                arrayMap4.put(api, (Boolean) map2.get(api));
             } else {
                 throw new IllegalStateException("Each API in the isOptionalMap must have a corresponding client in the clients map.");
             }
@@ -133,9 +124,7 @@ final class zzr implements zzbp {
     private final void zza(Bundle bundle) {
         if (this.zzfw == null) {
             this.zzfw = bundle;
-            return;
-        }
-        if (bundle != null) {
+        } else if (bundle != null) {
             this.zzfw.putAll(bundle);
         }
     }
@@ -165,35 +154,32 @@ final class zzr implements zzbp {
     @GuardedBy("mLock")
     private final void zzaa() {
         if (zzb(this.zzfx)) {
-            if (!zzb(this.zzfy)) {
-                if (!zzac()) {
-                    if (this.zzfy != null) {
-                        if (this.zzgb == 1) {
-                            zzab();
-                            return;
-                        }
-                        zza(this.zzfy);
-                        this.zzfr.disconnect();
-                        return;
-                    }
+            if (zzb(this.zzfy) || zzac()) {
+                switch (this.zzgb) {
+                    case 1:
+                        break;
+                    case 2:
+                        this.zzfq.zzb(this.zzfw);
+                        break;
+                    default:
+                        Log.wtf("CompositeGAC", "Attempted to call success callbacks in CONNECTION_MODE_NONE. Callbacks should be disabled via GmsClientSupervisor", new AssertionError());
+                        break;
                 }
+                zzab();
+                this.zzgb = 0;
+            } else if (this.zzfy == null) {
+            } else {
+                if (this.zzgb == 1) {
+                    zzab();
+                    return;
+                }
+                zza(this.zzfy);
+                this.zzfr.disconnect();
             }
-            switch (this.zzgb) {
-                case 1:
-                    break;
-                case 2:
-                    this.zzfq.zzb(this.zzfw);
-                    break;
-                default:
-                    Log.wtf("CompositeGAC", "Attempted to call success callbacks in CONNECTION_MODE_NONE. Callbacks should be disabled via GmsClientSupervisor", new AssertionError());
-                    break;
-            }
-            zzab();
-            this.zzgb = 0;
         } else if (this.zzfx != null && zzb(this.zzfy)) {
             this.zzfs.disconnect();
             zza(this.zzfx);
-        } else if (!(this.zzfx == null || this.zzfy == null)) {
+        } else if (this.zzfx != null && this.zzfy != null) {
             ConnectionResult connectionResult = this.zzfx;
             if (this.zzfs.zzje < this.zzfr.zzje) {
                 connectionResult = this.zzfy;
@@ -280,18 +266,12 @@ final class zzr implements zzbp {
     }
 
     public final boolean isConnected() {
+        boolean z = true;
         this.zzga.lock();
         try {
-            boolean z = true;
-            if (this.zzfr.isConnected()) {
-                if (!(this.zzfs.isConnected() || zzac())) {
-                    if (this.zzgb == 1) {
-                    }
-                }
-                this.zzga.unlock();
-                return z;
+            if (!(this.zzfr.isConnected() && (this.zzfs.isConnected() || zzac() || this.zzgb == 1))) {
+                z = false;
             }
-            z = false;
             this.zzga.unlock();
             return z;
         } catch (Throwable th) {

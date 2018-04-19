@@ -9,16 +9,18 @@ import com.google.android.gms.common.wrappers.Wrappers;
 
 public final class UidVerifier {
     public static boolean isGooglePlayServicesUid(Context context, int i) {
+        boolean z = false;
         if (!uidHasPackageName(context, i, "com.google.android.gms")) {
-            return false;
+            return z;
         }
         try {
             return GoogleSignatureVerifier.getInstance(context).isGooglePublicSignedPackage(context.getPackageManager().getPackageInfo("com.google.android.gms", 64));
         } catch (NameNotFoundException e) {
-            if (Log.isLoggable("UidVerifier", 3)) {
-                Log.d("UidVerifier", "Package manager can't find google play services package, defaulting to false");
+            if (!Log.isLoggable("UidVerifier", 3)) {
+                return z;
             }
-            return false;
+            Log.d("UidVerifier", "Package manager can't find google play services package, defaulting to false");
+            return z;
         }
     }
 

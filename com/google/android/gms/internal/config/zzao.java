@@ -23,7 +23,7 @@ public final class zzao {
     }
 
     public final boolean zzb(String str) {
-        return (str == null || !zzq() || this.zzaw.get(str) == null || ((Map) this.zzaw.get(str)).isEmpty()) ? false : true;
+        return str == null ? false : (!zzq() || this.zzaw.get(str) == null || ((Map) this.zzaw.get(str)).isEmpty()) ? false : true;
     }
 
     public final boolean zzb(String str, String str2) {
@@ -31,12 +31,7 @@ public final class zzao {
     }
 
     public final byte[] zzc(String str, String str2) {
-        if (str != null) {
-            if (zzb(str2)) {
-                return (byte[]) ((Map) this.zzaw.get(str2)).get(str);
-            }
-        }
-        return null;
+        return (str == null || !zzb(str2)) ? null : (byte[]) ((Map) this.zzaw.get(str2)).get(str);
     }
 
     public final List<byte[]> zzg() {

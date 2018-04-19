@@ -10,12 +10,12 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public class AuthAccountRequestCreator implements Creator<AuthAccountRequest> {
     public AuthAccountRequest createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        IBinder iBinder = null;
-        Scope[] scopeArr = iBinder;
-        Integer num = scopeArr;
-        Integer num2 = num;
-        Account account = num2;
         int i = 0;
+        Account account = null;
+        Integer num = null;
+        Integer num2 = null;
+        Scope[] scopeArr = null;
+        IBinder iBinder = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
@@ -29,10 +29,10 @@ public class AuthAccountRequestCreator implements Creator<AuthAccountRequest> {
                     scopeArr = (Scope[]) SafeParcelReader.createTypedArray(parcel, readHeader, Scope.CREATOR);
                     break;
                 case 4:
-                    num = SafeParcelReader.readIntegerObject(parcel, readHeader);
+                    num2 = SafeParcelReader.readIntegerObject(parcel, readHeader);
                     break;
                 case 5:
-                    num2 = SafeParcelReader.readIntegerObject(parcel, readHeader);
+                    num = SafeParcelReader.readIntegerObject(parcel, readHeader);
                     break;
                 case 6:
                     account = (Account) SafeParcelReader.createParcelable(parcel, readHeader, Account.CREATOR);
@@ -43,7 +43,7 @@ public class AuthAccountRequestCreator implements Creator<AuthAccountRequest> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new AuthAccountRequest(i, iBinder, scopeArr, num, num2, account);
+        return new AuthAccountRequest(i, iBinder, scopeArr, num2, num, account);
     }
 
     public AuthAccountRequest[] newArray(int i) {

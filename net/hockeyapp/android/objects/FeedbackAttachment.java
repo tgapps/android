@@ -43,29 +43,10 @@ public class FeedbackAttachment implements Serializable {
     }
 
     public String getCacheId() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(TtmlNode.ANONYMOUS_REGION_ID);
-        stringBuilder.append(this.mMessageId);
-        stringBuilder.append(this.mId);
-        return stringBuilder.toString();
+        return TtmlNode.ANONYMOUS_REGION_ID + this.mMessageId + this.mId;
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\n");
-        stringBuilder.append(FeedbackAttachment.class.getSimpleName());
-        stringBuilder.append("\nid         ");
-        stringBuilder.append(this.mId);
-        stringBuilder.append("\nmessage id ");
-        stringBuilder.append(this.mMessageId);
-        stringBuilder.append("\nfilename   ");
-        stringBuilder.append(this.mFilename);
-        stringBuilder.append("\nurl        ");
-        stringBuilder.append(this.mUrl);
-        stringBuilder.append("\ncreatedAt  ");
-        stringBuilder.append(this.mCreatedAt);
-        stringBuilder.append("\nupdatedAt  ");
-        stringBuilder.append(this.mUpdatedAt);
-        return stringBuilder.toString();
+        return "\n" + FeedbackAttachment.class.getSimpleName() + "\nid         " + this.mId + "\nmessage id " + this.mMessageId + "\nfilename   " + this.mFilename + "\nurl        " + this.mUrl + "\ncreatedAt  " + this.mCreatedAt + "\nupdatedAt  " + this.mUpdatedAt;
     }
 }

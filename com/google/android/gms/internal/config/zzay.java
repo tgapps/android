@@ -19,9 +19,9 @@ public final class zzay {
     private zzay(byte[] bArr, int i, int i2) {
         this.buffer = bArr;
         this.zzbx = 0;
-        i2 += 0;
-        this.zzbz = i2;
-        this.zzby = i2;
+        int i3 = i2 + 0;
+        this.zzbz = i3;
+        this.zzby = i3;
         this.zzcb = 0;
     }
 
@@ -85,7 +85,7 @@ public final class zzay {
             }
             Object obj = new byte[zzz];
             System.arraycopy(this.buffer, this.zzcb, obj, 0, zzz);
-            this.zzcb += zzz;
+            this.zzcb = zzz + this.zzcb;
             return obj;
         }
     }
@@ -98,7 +98,7 @@ public final class zzay {
             throw zzbg.zzag();
         } else {
             String str = new String(this.buffer, this.zzcb, zzz, zzbf.UTF_8);
-            this.zzcb += zzz;
+            this.zzcb = zzz + this.zzcb;
             return str;
         }
     }
@@ -136,23 +136,16 @@ public final class zzay {
     }
 
     public final long zzaa() throws IOException {
-        return (((((((((long) zzac()) & 255) | ((((long) zzac()) & 255) << 8)) | ((((long) zzac()) & 255) << 16)) | ((((long) zzac()) & 255) << 24)) | ((((long) zzac()) & 255) << 32)) | ((((long) zzac()) & 255) << 40)) | ((((long) zzac()) & 255) << 48)) | ((((long) zzac()) & 255) << 56);
+        byte zzac = zzac();
+        byte zzac2 = zzac();
+        return ((((((((((long) zzac2) & 255) << 8) | (((long) zzac) & 255)) | ((((long) zzac()) & 255) << 16)) | ((((long) zzac()) & 255) << 24)) | ((((long) zzac()) & 255) << 32)) | ((((long) zzac()) & 255) << 40)) | ((((long) zzac()) & 255) << 48)) | ((((long) zzac()) & 255) << 56);
     }
 
     final void zzb(int i, int i2) {
         if (i > this.zzcb - this.zzbx) {
-            int i3 = this.zzcb - this.zzbx;
-            StringBuilder stringBuilder = new StringBuilder(50);
-            stringBuilder.append("Position ");
-            stringBuilder.append(i);
-            stringBuilder.append(" is beyond current ");
-            stringBuilder.append(i3);
-            throw new IllegalArgumentException(stringBuilder.toString());
+            throw new IllegalArgumentException("Position " + i + " is beyond current " + (this.zzcb - this.zzbx));
         } else if (i < 0) {
-            StringBuilder stringBuilder2 = new StringBuilder(24);
-            stringBuilder2.append("Bad position ");
-            stringBuilder2.append(i);
-            throw new IllegalArgumentException(stringBuilder2.toString());
+            throw new IllegalArgumentException("Bad position " + i);
         } else {
             this.zzcb = this.zzbx + i;
             this.zzcc = i2;
@@ -212,37 +205,32 @@ public final class zzay {
         if (zzac >= (byte) 0) {
             return zzac;
         }
-        int i;
-        int i2 = zzac & 127;
+        int i = zzac & 127;
         byte zzac2 = zzac();
         if (zzac2 >= (byte) 0) {
-            i = zzac2 << 7;
-        } else {
-            i2 |= (zzac2 & 127) << 7;
-            zzac2 = zzac();
-            if (zzac2 >= (byte) 0) {
-                i = zzac2 << 14;
-            } else {
-                i2 |= (zzac2 & 127) << 14;
-                zzac2 = zzac();
-                if (zzac2 >= (byte) 0) {
-                    i = zzac2 << 21;
-                } else {
-                    i2 |= (zzac2 & 127) << 21;
-                    zzac2 = zzac();
-                    i2 |= zzac2 << 28;
-                    if (zzac2 >= (byte) 0) {
-                        return i2;
-                    }
-                    for (i = 0; i < 5; i++) {
-                        if (zzac() >= (byte) 0) {
-                            return i2;
-                        }
-                    }
-                    throw new zzbg("CodedInputStream encountered a malformed varint.");
-                }
+            return i | (zzac2 << 7);
+        }
+        i |= (zzac2 & 127) << 7;
+        zzac2 = zzac();
+        if (zzac2 >= (byte) 0) {
+            return i | (zzac2 << 14);
+        }
+        i |= (zzac2 & 127) << 14;
+        zzac2 = zzac();
+        if (zzac2 >= (byte) 0) {
+            return i | (zzac2 << 21);
+        }
+        i |= (zzac2 & 127) << 21;
+        zzac2 = zzac();
+        i |= zzac2 << 28;
+        if (zzac2 >= (byte) 0) {
+            return i;
+        }
+        for (int i2 = 0; i2 < 5; i2++) {
+            if (zzac() >= (byte) 0) {
+                return i;
             }
         }
-        return i2 | i;
+        throw new zzbg("CodedInputStream encountered a malformed varint.");
     }
 }

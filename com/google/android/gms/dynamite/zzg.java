@@ -13,16 +13,18 @@ final class zzg implements VersionPolicy {
     public final SelectionResult selectModule(Context context, String str, IVersions iVersions) throws LoadingException {
         SelectionResult selectionResult = new SelectionResult();
         selectionResult.localVersion = iVersions.getLocalVersion(context, str);
-        selectionResult.remoteVersion = selectionResult.localVersion != 0 ? iVersions.getRemoteVersion(context, str, false) : iVersions.getRemoteVersion(context, str, true);
+        if (selectionResult.localVersion != 0) {
+            selectionResult.remoteVersion = iVersions.getRemoteVersion(context, str, false);
+        } else {
+            selectionResult.remoteVersion = iVersions.getRemoteVersion(context, str, true);
+        }
         if (selectionResult.localVersion == 0 && selectionResult.remoteVersion == 0) {
             selectionResult.selection = 0;
-            return selectionResult;
         } else if (selectionResult.remoteVersion >= selectionResult.localVersion) {
             selectionResult.selection = 1;
-            return selectionResult;
         } else {
             selectionResult.selection = -1;
-            return selectionResult;
         }
+        return selectionResult;
     }
 }

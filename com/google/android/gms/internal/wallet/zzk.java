@@ -8,10 +8,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public final class zzk implements Creator<zzj> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        String[] strArr = null;
+        byte[] bArr = null;
+        RemoteViews remoteViews = null;
         int[] iArr = null;
-        RemoteViews remoteViews = iArr;
-        byte[] bArr = remoteViews;
+        String[] strArr = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {

@@ -61,18 +61,7 @@ public final class zzaw extends AbstractSafeParcelable {
                 str2 = Integer.toString(i2);
                 break;
         }
-        int i3 = this.zzcj;
-        StringBuilder stringBuilder = new StringBuilder(((81 + String.valueOf(valueOf).length()) + String.valueOf(str).length()) + String.valueOf(str2).length());
-        stringBuilder.append("ChannelEventParcelable[, channel=");
-        stringBuilder.append(valueOf);
-        stringBuilder.append(", type=");
-        stringBuilder.append(str);
-        stringBuilder.append(", closeReason=");
-        stringBuilder.append(str2);
-        stringBuilder.append(", appErrorCode=");
-        stringBuilder.append(i3);
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return new StringBuilder(((String.valueOf(valueOf).length() + 81) + String.valueOf(str).length()) + String.valueOf(str2).length()).append("ChannelEventParcelable[, channel=").append(valueOf).append(", type=").append(str).append(", closeReason=").append(str2).append(", appErrorCode=").append(this.zzcj).append("]").toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
@@ -99,11 +88,7 @@ public final class zzaw extends AbstractSafeParcelable {
                 channelListener.onOutputClosed(this.zzck, this.zzg, this.zzcj);
                 return;
             default:
-                int i = this.type;
-                StringBuilder stringBuilder = new StringBuilder(25);
-                stringBuilder.append("Unknown type: ");
-                stringBuilder.append(i);
-                Log.w("ChannelEventParcelable", stringBuilder.toString());
+                Log.w("ChannelEventParcelable", "Unknown type: " + this.type);
                 return;
         }
     }

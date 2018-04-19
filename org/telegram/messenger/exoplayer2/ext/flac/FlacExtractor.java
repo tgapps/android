@@ -3,15 +3,21 @@ package org.telegram.messenger.exoplayer2.ext.flac;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import org.telegram.messenger.exoplayer2.Format;
 import org.telegram.messenger.exoplayer2.extractor.Extractor;
 import org.telegram.messenger.exoplayer2.extractor.ExtractorInput;
 import org.telegram.messenger.exoplayer2.extractor.ExtractorOutput;
 import org.telegram.messenger.exoplayer2.extractor.ExtractorsFactory;
+import org.telegram.messenger.exoplayer2.extractor.PositionHolder;
 import org.telegram.messenger.exoplayer2.extractor.SeekMap;
 import org.telegram.messenger.exoplayer2.extractor.SeekMap.SeekPoints;
+import org.telegram.messenger.exoplayer2.extractor.SeekMap.Unseekable;
 import org.telegram.messenger.exoplayer2.extractor.SeekPoint;
 import org.telegram.messenger.exoplayer2.extractor.TrackOutput;
+import org.telegram.messenger.exoplayer2.util.FlacStreamInfo;
+import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.messenger.exoplayer2.util.ParsableByteArray;
+import org.telegram.messenger.exoplayer2.util.Util;
 
 public final class FlacExtractor implements Extractor {
     public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
@@ -49,130 +55,6 @@ public final class FlacExtractor implements Extractor {
         }
     }
 
-    public int read(org.telegram.messenger.exoplayer2.extractor.ExtractorInput r1, org.telegram.messenger.exoplayer2.extractor.PositionHolder r2) throws java.io.IOException, java.lang.InterruptedException {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.ext.flac.FlacExtractor.read(org.telegram.messenger.exoplayer2.extractor.ExtractorInput, org.telegram.messenger.exoplayer2.extractor.PositionHolder):int
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r1 = r22;
-        r2 = r23;
-        r3 = r1.decoderJni;
-        r3.setData(r2);
-        r3 = r1.metadataParsed;
-        r4 = 0;
-        r5 = 0;
-        if (r3 != 0) goto L_0x0096;
-    L_0x0010:
-        r3 = r1.decoderJni;	 Catch:{ IOException -> 0x008b }
-        r3 = r3.decodeMetadata();	 Catch:{ IOException -> 0x008b }
-        if (r3 != 0) goto L_0x0020;	 Catch:{ IOException -> 0x008b }
-    L_0x0018:
-        r4 = new java.io.IOException;	 Catch:{ IOException -> 0x008b }
-        r7 = "Metadata decoding failed";	 Catch:{ IOException -> 0x008b }
-        r4.<init>(r7);	 Catch:{ IOException -> 0x008b }
-        throw r4;	 Catch:{ IOException -> 0x008b }
-        r7 = 1;
-        r1.metadataParsed = r7;
-        r8 = r1.decoderJni;
-        r8 = r8.getSeekPosition(r5);
-        r10 = -1;
-        r12 = (r8 > r10 ? 1 : (r8 == r10 ? 0 : -1));
-        if (r12 == 0) goto L_0x0032;
-        goto L_0x0033;
-        r7 = r4;
-        r8 = r1.extractorOutput;
-        if (r7 == 0) goto L_0x0043;
-        r9 = new org.telegram.messenger.exoplayer2.ext.flac.FlacExtractor$FlacSeekMap;
-        r10 = r3.durationUs();
-        r12 = r1.decoderJni;
-        r9.<init>(r10, r12);
-        goto L_0x004c;
-        r9 = new org.telegram.messenger.exoplayer2.extractor.SeekMap$Unseekable;
-        r10 = r3.durationUs();
-        r9.<init>(r10, r5);
-        r8.seekMap(r9);
-        r10 = 0;
-        r11 = "audio/raw";
-        r12 = 0;
-        r13 = r3.bitRate();
-        r14 = -1;
-        r15 = r3.channels;
-        r8 = r3.sampleRate;
-        r9 = r3.bitsPerSample;
-        r17 = org.telegram.messenger.exoplayer2.util.Util.getPcmEncoding(r9);
-        r18 = 0;
-        r19 = 0;
-        r20 = 0;
-        r21 = 0;
-        r16 = r8;
-        r8 = org.telegram.messenger.exoplayer2.Format.createAudioSampleFormat(r10, r11, r12, r13, r14, r15, r16, r17, r18, r19, r20, r21);
-        r9 = r1.trackOutput;
-        r9.format(r8);
-        r9 = new org.telegram.messenger.exoplayer2.util.ParsableByteArray;
-        r10 = r3.maxDecodedFrameSize();
-        r9.<init>(r10);
-        r1.outputBuffer = r9;
-        r9 = r1.outputBuffer;
-        r9 = r9.data;
-        r9 = java.nio.ByteBuffer.wrap(r9);
-        r1.outputByteBuffer = r9;
-        goto L_0x0096;
-    L_0x008b:
-        r0 = move-exception;
-        r3 = r0;
-        r4 = r1.decoderJni;
-        r4.reset(r5);
-        r2.setRetryPosition(r5, r3);
-        throw r3;
-    L_0x0096:
-        r3 = r1.outputBuffer;
-        r3.reset();
-        r3 = r1.decoderJni;
-        r7 = r3.getDecodePosition();
-        r3 = r1.decoderJni;	 Catch:{ IOException -> 0x00d0 }
-        r9 = r1.outputByteBuffer;	 Catch:{ IOException -> 0x00d0 }
-        r3 = r3.decodeSample(r9);	 Catch:{ IOException -> 0x00d0 }
-        r5 = -1;
-        if (r3 > 0) goto L_0x00af;
-        return r5;
-        r6 = r1.trackOutput;
-        r9 = r1.outputBuffer;
-        r6.sampleData(r9, r3);
-        r9 = r1.trackOutput;
-        r6 = r1.decoderJni;
-        r10 = r6.getLastSampleTimestamp();
-        r12 = 1;
-        r14 = 0;
-        r15 = 0;
-        r13 = r3;
-        r9.sampleMetadata(r10, r12, r13, r14, r15);
-        r6 = r1.decoderJni;
-        r6 = r6.isEndOfData();
-        if (r6 == 0) goto L_0x00cf;
-        r4 = r5;
-        return r4;
-    L_0x00d0:
-        r0 = move-exception;
-        r3 = r0;
-        r4 = (r7 > r5 ? 1 : (r7 == r5 ? 0 : -1));
-        if (r4 < 0) goto L_0x00de;
-        r4 = r1.decoderJni;
-        r4.reset(r7);
-        r2.setRetryPosition(r7, r3);
-        throw r3;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.ext.flac.FlacExtractor.read(org.telegram.messenger.exoplayer2.extractor.ExtractorInput, org.telegram.messenger.exoplayer2.extractor.PositionHolder):int");
-    }
-
     public void init(ExtractorOutput output) {
         this.extractorOutput = output;
         this.trackOutput = this.extractorOutput.track(0, 1);
@@ -188,6 +70,52 @@ Caused by: java.lang.NullPointerException
         byte[] header = new byte[FLAC_SIGNATURE.length];
         input.peekFully(header, 0, FLAC_SIGNATURE.length);
         return Arrays.equals(header, FLAC_SIGNATURE);
+    }
+
+    public int read(ExtractorInput input, PositionHolder seekPosition) throws IOException, InterruptedException {
+        this.decoderJni.setData(input);
+        if (!this.metadataParsed) {
+            try {
+                FlacStreamInfo streamInfo = this.decoderJni.decodeMetadata();
+                if (streamInfo == null) {
+                    throw new IOException("Metadata decoding failed");
+                }
+                SeekMap flacSeekMap;
+                this.metadataParsed = true;
+                boolean isSeekable = this.decoderJni.getSeekPosition(0) != -1;
+                ExtractorOutput extractorOutput = this.extractorOutput;
+                if (isSeekable) {
+                    flacSeekMap = new FlacSeekMap(streamInfo.durationUs(), this.decoderJni);
+                } else {
+                    flacSeekMap = new Unseekable(streamInfo.durationUs(), 0);
+                }
+                extractorOutput.seekMap(flacSeekMap);
+                this.trackOutput.format(Format.createAudioSampleFormat(null, MimeTypes.AUDIO_RAW, null, streamInfo.bitRate(), -1, streamInfo.channels, streamInfo.sampleRate, Util.getPcmEncoding(streamInfo.bitsPerSample), null, null, 0, null));
+                this.outputBuffer = new ParsableByteArray(streamInfo.maxDecodedFrameSize());
+                this.outputByteBuffer = ByteBuffer.wrap(this.outputBuffer.data);
+            } catch (Throwable e) {
+                this.decoderJni.reset(0);
+                input.setRetryPosition(0, e);
+                throw e;
+            }
+        }
+        this.outputBuffer.reset();
+        long lastDecodePosition = this.decoderJni.getDecodePosition();
+        try {
+            int size = this.decoderJni.decodeSample(this.outputByteBuffer);
+            if (size <= 0) {
+                return -1;
+            }
+            this.trackOutput.sampleData(this.outputBuffer, size);
+            this.trackOutput.sampleMetadata(this.decoderJni.getLastSampleTimestamp(), 1, size, 0, null);
+            return this.decoderJni.isEndOfData() ? -1 : 0;
+        } catch (Throwable e2) {
+            if (lastDecodePosition >= 0) {
+                this.decoderJni.reset(lastDecodePosition);
+                input.setRetryPosition(lastDecodePosition, e2);
+            }
+            throw e2;
+        }
     }
 
     public void seek(long position, long timeUs) {

@@ -57,7 +57,7 @@ public class GenreBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (7 + Utf8.utf8StringLengthInBytes(this.genre));
+        return (long) (Utf8.utf8StringLengthInBytes(this.genre) + 7);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -75,11 +75,6 @@ public class GenreBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_4, this, this));
-        StringBuilder stringBuilder = new StringBuilder("GenreBox[language=");
-        stringBuilder.append(getLanguage());
-        stringBuilder.append(";genre=");
-        stringBuilder.append(getGenre());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "GenreBox[language=" + getLanguage() + ";genre=" + getGenre() + "]";
     }
 }

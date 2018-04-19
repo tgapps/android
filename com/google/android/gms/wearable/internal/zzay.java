@@ -63,44 +63,27 @@ public final class zzay extends AbstractSafeParcelable implements Channel, Chann
 
     public final String toString() {
         String substring;
-        char[] toCharArray = this.zzce.toCharArray();
         int i = 0;
-        int i2 = i;
-        while (i < toCharArray.length) {
-            i2 += toCharArray[i];
-            i++;
+        for (char c : this.zzce.toCharArray()) {
+            i += c;
         }
         String trim = this.zzce.trim();
         int length = trim.length();
         if (length > 25) {
             substring = trim.substring(0, 10);
             trim = trim.substring(length - 10, length);
-            StringBuilder stringBuilder = new StringBuilder((16 + String.valueOf(substring).length()) + String.valueOf(trim).length());
-            stringBuilder.append(substring);
-            stringBuilder.append("...");
-            stringBuilder.append(trim);
-            stringBuilder.append("::");
-            stringBuilder.append(i2);
-            trim = stringBuilder.toString();
+            trim = new StringBuilder((String.valueOf(substring).length() + 16) + String.valueOf(trim).length()).append(substring).append("...").append(trim).append("::").append(i).toString();
         }
         substring = this.zzo;
         String str = this.zzcl;
-        StringBuilder stringBuilder2 = new StringBuilder(((31 + String.valueOf(trim).length()) + String.valueOf(substring).length()) + String.valueOf(str).length());
-        stringBuilder2.append("Channel{token=");
-        stringBuilder2.append(trim);
-        stringBuilder2.append(", nodeId=");
-        stringBuilder2.append(substring);
-        stringBuilder2.append(", path=");
-        stringBuilder2.append(str);
-        stringBuilder2.append("}");
-        return stringBuilder2.toString();
+        return new StringBuilder(((String.valueOf(trim).length() + 31) + String.valueOf(substring).length()) + String.valueOf(str).length()).append("Channel{token=").append(trim).append(", nodeId=").append(substring).append(", path=").append(str).append("}").toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, this.zzce, false);
         SafeParcelWriter.writeString(parcel, 3, getNodeId(), false);
         SafeParcelWriter.writeString(parcel, 4, getPath(), false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

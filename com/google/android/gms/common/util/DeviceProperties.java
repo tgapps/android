@@ -10,14 +10,7 @@ public final class DeviceProperties {
 
     public static boolean isIoT(Context context) {
         if (zzzr == null) {
-            boolean z;
-            if (!context.getPackageManager().hasSystemFeature("android.hardware.type.iot")) {
-                if (!context.getPackageManager().hasSystemFeature("android.hardware.type.embedded")) {
-                    z = false;
-                    zzzr = Boolean.valueOf(z);
-                }
-            }
-            z = true;
+            boolean z = context.getPackageManager().hasSystemFeature("android.hardware.type.iot") || context.getPackageManager().hasSystemFeature("android.hardware.type.embedded");
             zzzr = Boolean.valueOf(z);
         }
         return zzzr.booleanValue();

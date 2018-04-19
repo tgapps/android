@@ -13,10 +13,10 @@ public final class zzk implements Creator<TimeInterval> {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 2:
-                    j = SafeParcelReader.readLong(parcel, readHeader);
+                    j2 = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 case 3:
-                    j2 = SafeParcelReader.readLong(parcel, readHeader);
+                    j = SafeParcelReader.readLong(parcel, readHeader);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -24,7 +24,7 @@ public final class zzk implements Creator<TimeInterval> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new TimeInterval(j, j2);
+        return new TimeInterval(j2, j);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

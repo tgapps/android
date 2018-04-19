@@ -20,13 +20,11 @@ public class Feature extends AbstractSafeParcelable {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof Feature) {
-            Feature feature = (Feature) obj;
-            if (((getName() != null && getName().equals(feature.getName())) || (getName() == null && feature.getName() == null)) && getVersion() == feature.getVersion()) {
-                return true;
-            }
+        if (!(obj instanceof Feature)) {
+            return false;
         }
-        return false;
+        Feature feature = (Feature) obj;
+        return ((getName() != null && getName().equals(feature.getName())) || (getName() == null && feature.getName() == null)) && getVersion() == feature.getVersion();
     }
 
     public String getName() {
@@ -46,10 +44,10 @@ public class Feature extends AbstractSafeParcelable {
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 1, getName(), false);
         SafeParcelWriter.writeInt(parcel, 2, this.zzaq);
         SafeParcelWriter.writeLong(parcel, 3, getVersion());
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

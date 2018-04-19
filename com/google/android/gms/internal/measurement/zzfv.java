@@ -43,21 +43,20 @@ public final class zzfv {
         if (str == null) {
             str = TtmlNode.ANONYMOUS_REGION_ID;
         }
-        j = this.zzakp.zziu().getLong(this.zzaks, 0);
-        if (j <= 0) {
+        long j2 = this.zzakp.zziu().getLong(this.zzaks, 0);
+        if (j2 <= 0) {
             Editor edit = this.zzakp.zziu().edit();
             edit.putString(this.zzakt, str);
             edit.putLong(this.zzaks, 1);
             edit.apply();
             return;
         }
-        long j2 = j + 1;
-        Object obj = (this.zzakp.zzgc().zzku().nextLong() & Long.MAX_VALUE) < Long.MAX_VALUE / j2 ? 1 : null;
+        Object obj = (this.zzakp.zzgc().zzku().nextLong() & Long.MAX_VALUE) < Long.MAX_VALUE / (j2 + 1) ? 1 : null;
         Editor edit2 = this.zzakp.zziu().edit();
         if (obj != null) {
             edit2.putString(this.zzakt, str);
         }
-        edit2.putLong(this.zzaks, j2);
+        edit2.putLong(this.zzaks, j2 + 1);
         edit2.apply();
     }
 
@@ -81,11 +80,6 @@ public final class zzfv {
         String string = this.zzakp.zziu().getString(this.zzakt, null);
         long j = this.zzakp.zziu().getLong(this.zzaks, 0);
         zzfg();
-        if (string != null) {
-            if (j > 0) {
-                return new Pair(string, Long.valueOf(j));
-            }
-        }
-        return zzfr.zzajr;
+        return (string == null || j <= 0) ? zzfr.zzajr : new Pair(string, Long.valueOf(j));
     }
 }

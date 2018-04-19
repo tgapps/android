@@ -15,12 +15,9 @@ public class UnknownDescriptor extends BaseDescriptor {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("UnknownDescriptor");
-        sb.append("{tag=");
-        sb.append(this.tag);
-        sb.append(", sizeOfInstance=");
-        sb.append(this.sizeOfInstance);
-        sb.append(", data=");
-        sb.append(this.data);
+        sb.append("{tag=").append(this.tag);
+        sb.append(", sizeOfInstance=").append(this.sizeOfInstance);
+        sb.append(", data=").append(this.data);
         sb.append('}');
         return sb.toString();
     }

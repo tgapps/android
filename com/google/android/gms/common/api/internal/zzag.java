@@ -66,7 +66,6 @@ public final class zzag implements zzbc {
             return t;
         } catch (DeadObjectException e) {
             this.zzhf.zza(new zzah(this, this));
-            return t;
         }
     }
 

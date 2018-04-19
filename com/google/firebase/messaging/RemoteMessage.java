@@ -48,18 +48,15 @@ public final class RemoteMessage extends AbstractSafeParcelable {
                 return Long.parseLong((String) obj);
             } catch (NumberFormatException e) {
                 String valueOf = String.valueOf(obj);
-                StringBuilder stringBuilder = new StringBuilder(19 + String.valueOf(valueOf).length());
-                stringBuilder.append("Invalid sent time: ");
-                stringBuilder.append(valueOf);
-                Log.w("FirebaseMessaging", stringBuilder.toString());
+                Log.w("FirebaseMessaging", new StringBuilder(String.valueOf(valueOf).length() + 19).append("Invalid sent time: ").append(valueOf).toString());
             }
         }
         return 0;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeBundle(parcel, 2, this.zzafw, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

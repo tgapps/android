@@ -25,7 +25,7 @@ public final class zzi extends AbstractSafeParcelable {
             return false;
         }
         zzi com_google_android_gms_wearable_internal_zzi = (zzi) obj;
-        return this.zzbd == com_google_android_gms_wearable_internal_zzi.zzbd && this.zzbe == com_google_android_gms_wearable_internal_zzi.zzbe && this.value.equals(com_google_android_gms_wearable_internal_zzi.value);
+        return this.zzbd != com_google_android_gms_wearable_internal_zzi.zzbd ? false : this.zzbe != com_google_android_gms_wearable_internal_zzi.zzbe ? false : this.value.equals(com_google_android_gms_wearable_internal_zzi.value);
     }
 
     public final int hashCode() {
@@ -36,23 +36,14 @@ public final class zzi extends AbstractSafeParcelable {
         byte b = this.zzbd;
         byte b2 = this.zzbe;
         String str = this.value;
-        StringBuilder stringBuilder = new StringBuilder(73 + String.valueOf(str).length());
-        stringBuilder.append("AmsEntityUpdateParcelable{, mEntityId=");
-        stringBuilder.append(b);
-        stringBuilder.append(", mAttributeId=");
-        stringBuilder.append(b2);
-        stringBuilder.append(", mValue='");
-        stringBuilder.append(str);
-        stringBuilder.append('\'');
-        stringBuilder.append('}');
-        return stringBuilder.toString();
+        return new StringBuilder(String.valueOf(str).length() + 73).append("AmsEntityUpdateParcelable{, mEntityId=").append(b).append(", mAttributeId=").append(b2).append(", mValue='").append(str).append('\'').append('}').toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeByte(parcel, 2, this.zzbd);
         SafeParcelWriter.writeByte(parcel, 3, this.zzbe);
         SafeParcelWriter.writeString(parcel, 4, this.value, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

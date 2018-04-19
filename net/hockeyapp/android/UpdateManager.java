@@ -32,8 +32,10 @@ public class UpdateManager {
         appIdentifier = Util.sanitizeAppIdentifier(appIdentifier);
         Constants.loadFromContext(activity);
         WeakReference<Activity> weakActivity = new WeakReference(activity);
-        if (!(dialogShown(weakActivity) || checkExpiryDate(weakActivity, listener) || ((listener == null || !listener.canUpdateInMarket()) && installedFromMarket(weakActivity)))) {
-            startUpdateTask(weakActivity, urlString, appIdentifier, listener, isDialogRequired);
+        if (!dialogShown(weakActivity) && !checkExpiryDate(weakActivity, listener)) {
+            if ((listener != null && listener.canUpdateInMarket()) || !installedFromMarket(weakActivity)) {
+                startUpdateTask(weakActivity, urlString, appIdentifier, listener, isDialogRequired);
+            }
         }
     }
 
@@ -62,29 +64,30 @@ public class UpdateManager {
             return false;
         }
         Date expiryDate = listener.getExpiryDate();
-        boolean z = expiryDate != null && new Date().compareTo(expiryDate) > 0;
-        return z;
+        return expiryDate != null && new Date().compareTo(expiryDate) > 0;
     }
 
     protected static boolean installedFromMarket(WeakReference<? extends Context> weakContext) {
-        boolean result = false;
         Context context = (Context) weakContext.get();
-        if (context != null) {
-            try {
-                String installer = context.getPackageManager().getInstallerPackageName(context.getPackageName());
-                if (!TextUtils.isEmpty(installer)) {
-                    result = true;
-                    if (VERSION.SDK_INT >= 24 && (TextUtils.equals(installer, "com.google.android.packageinstaller") || TextUtils.equals(installer, "com.android.packageinstaller"))) {
-                        result = false;
-                    }
-                    if (TextUtils.equals(installer, "adb")) {
-                        result = false;
-                    }
-                }
-            } catch (Throwable th) {
-            }
+        if (context == null) {
+            return false;
         }
-        return result;
+        try {
+            String installer = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+            if (TextUtils.isEmpty(installer)) {
+                return false;
+            }
+            boolean result = true;
+            if (VERSION.SDK_INT >= 24 && (TextUtils.equals(installer, "com.google.android.packageinstaller") || TextUtils.equals(installer, "com.android.packageinstaller"))) {
+                result = false;
+            }
+            if (TextUtils.equals(installer, "adb")) {
+                return false;
+            }
+            return result;
+        } catch (Throwable th) {
+            return false;
+        }
     }
 
     private static void startExpiryInfoIntent(WeakReference<Activity> weakActivity) {
@@ -100,27 +103,22 @@ public class UpdateManager {
     }
 
     private static void startUpdateTask(WeakReference<Activity> weakActivity, String urlString, String appIdentifier, UpdateManagerListener listener, boolean isDialogRequired) {
-        if (updateTask != null) {
-            if (updateTask.getStatus() != Status.FINISHED) {
-                updateTask.attach(weakActivity);
-                return;
-            }
+        if (updateTask == null || updateTask.getStatus() == Status.FINISHED) {
+            updateTask = new CheckUpdateTaskWithUI(weakActivity, urlString, appIdentifier, listener, isDialogRequired);
+            AsyncTaskUtils.execute(updateTask);
+            return;
         }
-        updateTask = new CheckUpdateTaskWithUI(weakActivity, urlString, appIdentifier, listener, isDialogRequired);
-        AsyncTaskUtils.execute(updateTask);
+        updateTask.attach(weakActivity);
     }
 
     private static boolean dialogShown(WeakReference<Activity> weakActivity) {
-        boolean z = false;
-        if (weakActivity != null) {
-            Activity activity = (Activity) weakActivity.get();
-            if (activity != null) {
-                if (activity.getFragmentManager().findFragmentByTag(UpdateFragment.FRAGMENT_TAG) != null) {
-                    z = true;
-                }
-                return z;
-            }
+        if (weakActivity == null) {
+            return false;
         }
-        return false;
+        Activity activity = (Activity) weakActivity.get();
+        if (activity == null || activity.getFragmentManager().findFragmentByTag(UpdateFragment.FRAGMENT_TAG) == null) {
+            return false;
+        }
+        return true;
     }
 }

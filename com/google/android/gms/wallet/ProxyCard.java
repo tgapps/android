@@ -21,11 +21,11 @@ public final class ProxyCard extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, this.zzeh, false);
         SafeParcelWriter.writeString(parcel, 3, this.zzei, false);
         SafeParcelWriter.writeInt(parcel, 4, this.zzej);
         SafeParcelWriter.writeInt(parcel, 5, this.zzek);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

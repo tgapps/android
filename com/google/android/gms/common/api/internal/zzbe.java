@@ -14,9 +14,9 @@ abstract class zzbe {
         try {
             if (com_google_android_gms_common_api_internal_zzbd.zzjc == this.zzjg) {
                 zzaq();
+                com_google_android_gms_common_api_internal_zzbd.zzga.unlock();
             }
-            com_google_android_gms_common_api_internal_zzbd.zzga.unlock();
-        } catch (Throwable th) {
+        } finally {
             com_google_android_gms_common_api_internal_zzbd.zzga.unlock();
         }
     }

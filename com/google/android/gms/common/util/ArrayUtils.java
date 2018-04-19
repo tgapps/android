@@ -30,51 +30,49 @@ public final class ArrayUtils {
         if (tArr == null) {
             return null;
         }
-        if (tArr2 != null) {
-            if (tArr2.length != 0) {
-                int i;
-                int i2 = 0;
-                Object[] objArr = (Object[]) Array.newInstance(tArr2.getClass().getComponentType(), tArr.length);
-                int length;
-                if (tArr2.length == 1) {
-                    length = tArr.length;
-                    int i3 = 0;
-                    i = i3;
-                    while (i3 < length) {
-                        Object obj = tArr[i3];
-                        if (!Objects.equal(tArr2[0], obj)) {
-                            int i4 = i + 1;
-                            objArr[i] = obj;
-                            i = i4;
-                        }
-                        i3++;
-                    }
+        if (tArr2 == null || tArr2.length == 0) {
+            return Arrays.copyOf(tArr, tArr.length);
+        }
+        int i;
+        Object[] objArr = (Object[]) Array.newInstance(tArr2.getClass().getComponentType(), tArr.length);
+        int length;
+        int i2;
+        int i3;
+        if (tArr2.length == 1) {
+            length = tArr.length;
+            i2 = 0;
+            i = 0;
+            while (i2 < length) {
+                Object obj = tArr[i2];
+                if (Objects.equal(tArr2[0], obj)) {
+                    i3 = i;
                 } else {
-                    length = tArr.length;
-                    i = 0;
-                    while (i2 < length) {
-                        Object obj2 = tArr[i2];
-                        if (!contains(tArr2, obj2)) {
-                            int i5 = i + 1;
-                            objArr[i] = obj2;
-                            i = i5;
-                        }
-                        i2++;
-                    }
+                    i3 = i + 1;
+                    objArr[i] = obj;
                 }
-                return resize(objArr, i);
+                i2++;
+                i = i3;
+            }
+        } else {
+            length = tArr.length;
+            i2 = 0;
+            i = 0;
+            while (i2 < length) {
+                Object obj2 = tArr[i2];
+                if (contains(tArr2, obj2)) {
+                    i3 = i;
+                } else {
+                    i3 = i + 1;
+                    objArr[i] = obj2;
+                }
+                i2++;
+                i = i3;
             }
         }
-        return Arrays.copyOf(tArr, tArr.length);
+        return resize(objArr, i);
     }
 
     public static <T> T[] resize(T[] tArr, int i) {
-        if (tArr == null) {
-            return null;
-        }
-        if (i != tArr.length) {
-            tArr = Arrays.copyOf(tArr, i);
-        }
-        return tArr;
+        return tArr == null ? null : i != tArr.length ? Arrays.copyOf(tArr, i) : tArr;
     }
 }

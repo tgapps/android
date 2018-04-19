@@ -261,10 +261,7 @@ public class AppMeasurement {
     }
 
     public void logEventInternalNoInterceptor(String str, String str2, Bundle bundle, long j) {
-        if (bundle == null) {
-            bundle = new Bundle();
-        }
-        this.zzacr.zzfu().zza(str, str2, bundle, j);
+        this.zzacr.zzfu().zza(str, str2, bundle == null ? new Bundle() : bundle, j);
     }
 
     public void registerOnMeasurementEventListener(OnEventListener onEventListener) {

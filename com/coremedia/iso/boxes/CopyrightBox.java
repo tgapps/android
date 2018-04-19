@@ -57,7 +57,7 @@ public class CopyrightBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (7 + Utf8.utf8StringLengthInBytes(this.copyright));
+        return (long) (Utf8.utf8StringLengthInBytes(this.copyright) + 7);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -75,11 +75,6 @@ public class CopyrightBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_4, this, this));
-        StringBuilder stringBuilder = new StringBuilder("CopyrightBox[language=");
-        stringBuilder.append(getLanguage());
-        stringBuilder.append(";copyright=");
-        stringBuilder.append(getCopyright());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "CopyrightBox[language=" + getLanguage() + ";copyright=" + getCopyright() + "]";
     }
 }

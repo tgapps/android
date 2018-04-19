@@ -68,11 +68,7 @@ public abstract class BasePendingResult<R extends Result> extends PendingResult<
                     ((BasePendingResult) message.obj).zzb(Status.RESULT_TIMEOUT);
                     return;
                 default:
-                    int i = message.what;
-                    StringBuilder stringBuilder = new StringBuilder(45);
-                    stringBuilder.append("Don't know how to handle message: ");
-                    stringBuilder.append(i);
-                    Log.wtf("BasePendingResult", stringBuilder.toString(), new Exception());
+                    Log.wtf("BasePendingResult", "Don't know how to handle message: " + message.what, new Exception());
                     return;
             }
         }
@@ -118,8 +114,12 @@ public abstract class BasePendingResult<R extends Result> extends PendingResult<
 
     private final R get() {
         R r;
+        boolean z = true;
         synchronized (this.zzfa) {
-            Preconditions.checkState(this.zzfh ^ true, "Result has already been consumed.");
+            if (this.zzfh) {
+                z = false;
+            }
+            Preconditions.checkState(z, "Result has already been consumed.");
             Preconditions.checkState(isReady(), "Result is not ready.");
             r = this.zzdm;
             this.zzdm = null;
@@ -163,10 +163,7 @@ public abstract class BasePendingResult<R extends Result> extends PendingResult<
                 ((Releasable) result).release();
             } catch (Throwable e) {
                 String valueOf = String.valueOf(result);
-                StringBuilder stringBuilder = new StringBuilder(18 + String.valueOf(valueOf).length());
-                stringBuilder.append("Unable to release ");
-                stringBuilder.append(valueOf);
-                Log.w("BasePendingResult", stringBuilder.toString(), e);
+                Log.w("BasePendingResult", new StringBuilder(String.valueOf(valueOf).length() + 18).append("Unable to release ").append(valueOf).toString(), e);
             }
         }
     }
@@ -183,9 +180,9 @@ public abstract class BasePendingResult<R extends Result> extends PendingResult<
     }
 
     public final R await() {
-        Preconditions.checkNotMainThread("await must not be called on the UI thread");
         boolean z = true;
-        Preconditions.checkState(this.zzfh ^ true, "Result has already been consumed");
+        Preconditions.checkNotMainThread("await must not be called on the UI thread");
+        Preconditions.checkState(!this.zzfh, "Result has already been consumed");
         if (this.zzfl != null) {
             z = false;
         }
@@ -200,11 +197,11 @@ public abstract class BasePendingResult<R extends Result> extends PendingResult<
     }
 
     public final R await(long j, TimeUnit timeUnit) {
+        boolean z = true;
         if (j > 0) {
             Preconditions.checkNotMainThread("await must not be called on the UI thread when time is greater than zero.");
         }
-        boolean z = true;
-        Preconditions.checkState(this.zzfh ^ true, "Result has already been consumed.");
+        Preconditions.checkState(!this.zzfh, "Result has already been consumed.");
         if (this.zzfl != null) {
             z = false;
         }
@@ -225,41 +222,40 @@ public abstract class BasePendingResult<R extends Result> extends PendingResult<
     public void cancel() {
         /*
         r2 = this;
-        r0 = r2.zzfa;
-        monitor-enter(r0);
-        r1 = r2.zzfi;	 Catch:{ all -> 0x002c }
-        if (r1 != 0) goto L_0x002a;
+        r1 = r2.zzfa;
+        monitor-enter(r1);
+        r0 = r2.zzfi;	 Catch:{ all -> 0x0029 }
+        if (r0 != 0) goto L_0x000b;
     L_0x0007:
-        r1 = r2.zzfh;	 Catch:{ all -> 0x002c }
-        if (r1 == 0) goto L_0x000c;
+        r0 = r2.zzfh;	 Catch:{ all -> 0x0029 }
+        if (r0 == 0) goto L_0x000d;
     L_0x000b:
-        goto L_0x002a;
+        monitor-exit(r1);	 Catch:{ all -> 0x0029 }
     L_0x000c:
-        r1 = r2.zzfk;	 Catch:{ all -> 0x002c }
-        if (r1 == 0) goto L_0x0017;
-    L_0x0010:
-        r1 = r2.zzfk;	 Catch:{ RemoteException -> 0x0016 }
-        r1.cancel();	 Catch:{ RemoteException -> 0x0016 }
-        goto L_0x0017;
+        return;
+    L_0x000d:
+        r0 = r2.zzfk;	 Catch:{ all -> 0x0029 }
+        if (r0 == 0) goto L_0x0016;
+    L_0x0011:
+        r0 = r2.zzfk;	 Catch:{ RemoteException -> 0x002c }
+        r0.cancel();	 Catch:{ RemoteException -> 0x002c }
     L_0x0016:
-        r1 = move-exception;
-    L_0x0017:
-        r1 = r2.zzdm;	 Catch:{ all -> 0x002c }
-        zzb(r1);	 Catch:{ all -> 0x002c }
-        r1 = 1;
-        r2.zzfi = r1;	 Catch:{ all -> 0x002c }
-        r1 = com.google.android.gms.common.api.Status.RESULT_CANCELED;	 Catch:{ all -> 0x002c }
-        r1 = r2.createFailedResult(r1);	 Catch:{ all -> 0x002c }
-        r2.zza(r1);	 Catch:{ all -> 0x002c }
-        monitor-exit(r0);	 Catch:{ all -> 0x002c }
-        return;
-    L_0x002a:
-        monitor-exit(r0);	 Catch:{ all -> 0x002c }
-        return;
+        r0 = r2.zzdm;	 Catch:{ all -> 0x0029 }
+        zzb(r0);	 Catch:{ all -> 0x0029 }
+        r0 = 1;
+        r2.zzfi = r0;	 Catch:{ all -> 0x0029 }
+        r0 = com.google.android.gms.common.api.Status.RESULT_CANCELED;	 Catch:{ all -> 0x0029 }
+        r0 = r2.createFailedResult(r0);	 Catch:{ all -> 0x0029 }
+        r2.zza(r0);	 Catch:{ all -> 0x0029 }
+        monitor-exit(r1);	 Catch:{ all -> 0x0029 }
+        goto L_0x000c;
+    L_0x0029:
+        r0 = move-exception;
+        monitor-exit(r1);	 Catch:{ all -> 0x0029 }
+        throw r0;
     L_0x002c:
-        r1 = move-exception;
-        monitor-exit(r0);	 Catch:{ all -> 0x002c }
-        throw r1;
+        r0 = move-exception;
+        goto L_0x0016;
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.common.api.internal.BasePendingResult.cancel():void");
     }
@@ -279,70 +275,80 @@ public abstract class BasePendingResult<R extends Result> extends PendingResult<
     }
 
     public final void setResult(R r) {
+        boolean z = true;
         synchronized (this.zzfa) {
             if (this.zzfj || this.zzfi) {
                 zzb((Result) r);
                 return;
             }
-            isReady();
-            Preconditions.checkState(isReady() ^ 1, "Results have already been set");
-            Preconditions.checkState(this.zzfh ^ 1, "Result has already been consumed");
+            if (isReady()) {
+            }
+            Preconditions.checkState(!isReady(), "Results have already been set");
+            if (this.zzfh) {
+                z = false;
+            }
+            Preconditions.checkState(z, "Result has already been consumed");
             zza((Result) r);
         }
     }
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public final void setResultCallback(com.google.android.gms.common.api.ResultCallback<? super R> r5) {
+    public final void setResultCallback(com.google.android.gms.common.api.ResultCallback<? super R> r6) {
         /*
-        r4 = this;
-        r0 = r4.zzfa;
-        monitor-enter(r0);
-        if (r5 != 0) goto L_0x000c;
-    L_0x0005:
-        r5 = 0;
-        r4.zzff = r5;	 Catch:{ all -> 0x000a }
-        monitor-exit(r0);	 Catch:{ all -> 0x000a }
+        r5 = this;
+        r0 = 1;
+        r1 = 0;
+        r3 = r5.zzfa;
+        monitor-enter(r3);
+        if (r6 != 0) goto L_0x000c;
+    L_0x0007:
+        r0 = 0;
+        r5.zzff = r0;	 Catch:{ all -> 0x0029 }
+        monitor-exit(r3);	 Catch:{ all -> 0x0029 }
+    L_0x000b:
         return;
-    L_0x000a:
-        r5 = move-exception;
-        goto L_0x003c;
     L_0x000c:
-        r1 = r4.zzfh;	 Catch:{ all -> 0x000a }
-        r2 = 1;
-        r1 = r1 ^ r2;
-        r3 = "Result has already been consumed.";
-        com.google.android.gms.common.internal.Preconditions.checkState(r1, r3);	 Catch:{ all -> 0x000a }
-        r1 = r4.zzfl;	 Catch:{ all -> 0x000a }
-        if (r1 != 0) goto L_0x001a;
-    L_0x0019:
-        goto L_0x001b;
-    L_0x001a:
-        r2 = 0;
+        r2 = r5.zzfh;	 Catch:{ all -> 0x0029 }
+        if (r2 != 0) goto L_0x002c;
+    L_0x0010:
+        r2 = r0;
+    L_0x0011:
+        r4 = "Result has already been consumed.";
+        com.google.android.gms.common.internal.Preconditions.checkState(r2, r4);	 Catch:{ all -> 0x0029 }
+        r2 = r5.zzfl;	 Catch:{ all -> 0x0029 }
+        if (r2 != 0) goto L_0x002e;
     L_0x001b:
         r1 = "Cannot set callbacks if then() has been called.";
-        com.google.android.gms.common.internal.Preconditions.checkState(r2, r1);	 Catch:{ all -> 0x000a }
-        r1 = r4.isCanceled();	 Catch:{ all -> 0x000a }
-        if (r1 == 0) goto L_0x0028;
-    L_0x0026:
-        monitor-exit(r0);	 Catch:{ all -> 0x000a }
-        return;
-    L_0x0028:
-        r1 = r4.isReady();	 Catch:{ all -> 0x000a }
-        if (r1 == 0) goto L_0x0038;
+        com.google.android.gms.common.internal.Preconditions.checkState(r0, r1);	 Catch:{ all -> 0x0029 }
+        r0 = r5.isCanceled();	 Catch:{ all -> 0x0029 }
+        if (r0 == 0) goto L_0x0030;
+    L_0x0027:
+        monitor-exit(r3);	 Catch:{ all -> 0x0029 }
+        goto L_0x000b;
+    L_0x0029:
+        r0 = move-exception;
+        monitor-exit(r3);	 Catch:{ all -> 0x0029 }
+        throw r0;
+    L_0x002c:
+        r2 = r1;
+        goto L_0x0011;
     L_0x002e:
-        r1 = r4.zzfb;	 Catch:{ all -> 0x000a }
-        r2 = r4.get();	 Catch:{ all -> 0x000a }
-        r1.zza(r5, r2);	 Catch:{ all -> 0x000a }
-        goto L_0x003a;
-    L_0x0038:
-        r4.zzff = r5;	 Catch:{ all -> 0x000a }
-    L_0x003a:
-        monitor-exit(r0);	 Catch:{ all -> 0x000a }
-        return;
-    L_0x003c:
-        monitor-exit(r0);	 Catch:{ all -> 0x000a }
-        throw r5;
+        r0 = r1;
+        goto L_0x001b;
+    L_0x0030:
+        r0 = r5.isReady();	 Catch:{ all -> 0x0029 }
+        if (r0 == 0) goto L_0x0041;
+    L_0x0036:
+        r0 = r5.zzfb;	 Catch:{ all -> 0x0029 }
+        r1 = r5.get();	 Catch:{ all -> 0x0029 }
+        r0.zza(r6, r1);	 Catch:{ all -> 0x0029 }
+    L_0x003f:
+        monitor-exit(r3);	 Catch:{ all -> 0x0029 }
+        goto L_0x000b;
+    L_0x0041:
+        r5.zzff = r6;	 Catch:{ all -> 0x0029 }
+        goto L_0x003f;
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.common.api.internal.BasePendingResult.setResultCallback(com.google.android.gms.common.api.ResultCallback):void");
     }
@@ -376,14 +382,7 @@ public abstract class BasePendingResult<R extends Result> extends PendingResult<
     }
 
     public final void zzx() {
-        boolean z;
-        if (!this.zzfm) {
-            if (!((Boolean) zzez.get()).booleanValue()) {
-                z = false;
-                this.zzfm = z;
-            }
-        }
-        z = true;
+        boolean z = this.zzfm || ((Boolean) zzez.get()).booleanValue();
         this.zzfm = z;
     }
 }

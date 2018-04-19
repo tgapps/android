@@ -35,22 +35,22 @@ public final class zzw {
         if (gcmSenderId != null) {
             return gcmSenderId;
         }
-        String applicationId = firebaseApp.getOptions().getApplicationId();
-        if (!applicationId.startsWith("1:")) {
-            return applicationId;
+        gcmSenderId = firebaseApp.getOptions().getApplicationId();
+        if (!gcmSenderId.startsWith("1:")) {
+            return gcmSenderId;
         }
-        String[] split = applicationId.split(":");
+        String[] split = gcmSenderId.split(":");
         if (split.length < 2) {
             return null;
         }
-        applicationId = split[1];
-        return applicationId.isEmpty() ? null : applicationId;
+        gcmSenderId = split[1];
+        return gcmSenderId.isEmpty() ? null : gcmSenderId;
     }
 
     public static String zza(KeyPair keyPair) {
         try {
             byte[] digest = MessageDigest.getInstance("SHA1").digest(keyPair.getPublic().getEncoded());
-            digest[0] = (byte) (112 + (digest[0] & 15));
+            digest[0] = (byte) ((digest[0] & 15) + 112);
             return Base64.encodeToString(digest, 0, 8, 11);
         } catch (NoSuchAlgorithmException e) {
             Log.w("FirebaseInstanceId", "Unexpected error, device missing required algorithms");
@@ -62,11 +62,8 @@ public final class zzw {
         try {
             return this.zzqs.getPackageManager().getPackageInfo(str, 0);
         } catch (NameNotFoundException e) {
-            str = String.valueOf(e);
-            StringBuilder stringBuilder = new StringBuilder(23 + String.valueOf(str).length());
-            stringBuilder.append("Failed to find package ");
-            stringBuilder.append(str);
-            Log.w("FirebaseInstanceId", stringBuilder.toString());
+            String valueOf = String.valueOf(e);
+            Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 23).append("Failed to find package ").append(valueOf).toString());
             return null;
         }
     }
@@ -80,38 +77,45 @@ public final class zzw {
     }
 
     public final synchronized int zzsu() {
-        if (this.zzbrn != 0) {
-            return this.zzbrn;
-        }
-        PackageManager packageManager = this.zzqs.getPackageManager();
-        if (packageManager.checkPermission("com.google.android.c2dm.permission.SEND", "com.google.android.gms") == -1) {
-            Log.e("FirebaseInstanceId", "Google Play services missing or without correct permission.");
-            return 0;
-        }
-        Intent intent;
-        if (!PlatformVersion.isAtLeastO()) {
-            intent = new Intent("com.google.android.c2dm.intent.REGISTER");
-            intent.setPackage("com.google.android.gms");
-            List queryIntentServices = packageManager.queryIntentServices(intent, 0);
-            if (queryIntentServices != null && queryIntentServices.size() > 0) {
-                this.zzbrn = 1;
-                return this.zzbrn;
-            }
-        }
-        intent = new Intent("com.google.iid.TOKEN_REQUEST");
-        intent.setPackage("com.google.android.gms");
-        List queryBroadcastReceivers = packageManager.queryBroadcastReceivers(intent, 0);
-        if (queryBroadcastReceivers == null || queryBroadcastReceivers.size() <= 0) {
-            Log.w("FirebaseInstanceId", "Failed to resolve IID implementation package, falling back");
-            if (PlatformVersion.isAtLeastO()) {
-                this.zzbrn = 2;
+        int i = 0;
+        synchronized (this) {
+            if (this.zzbrn != 0) {
+                i = this.zzbrn;
             } else {
-                this.zzbrn = 1;
+                PackageManager packageManager = this.zzqs.getPackageManager();
+                if (packageManager.checkPermission("com.google.android.c2dm.permission.SEND", "com.google.android.gms") == -1) {
+                    Log.e("FirebaseInstanceId", "Google Play services missing or without correct permission.");
+                } else {
+                    Intent intent;
+                    List queryIntentServices;
+                    if (!PlatformVersion.isAtLeastO()) {
+                        intent = new Intent("com.google.android.c2dm.intent.REGISTER");
+                        intent.setPackage("com.google.android.gms");
+                        queryIntentServices = packageManager.queryIntentServices(intent, 0);
+                        if (queryIntentServices != null && queryIntentServices.size() > 0) {
+                            this.zzbrn = 1;
+                            i = this.zzbrn;
+                        }
+                    }
+                    intent = new Intent("com.google.iid.TOKEN_REQUEST");
+                    intent.setPackage("com.google.android.gms");
+                    queryIntentServices = packageManager.queryBroadcastReceivers(intent, 0);
+                    if (queryIntentServices == null || queryIntentServices.size() <= 0) {
+                        Log.w("FirebaseInstanceId", "Failed to resolve IID implementation package, falling back");
+                        if (PlatformVersion.isAtLeastO()) {
+                            this.zzbrn = 2;
+                        } else {
+                            this.zzbrn = 1;
+                        }
+                        i = this.zzbrn;
+                    } else {
+                        this.zzbrn = 2;
+                        i = this.zzbrn;
+                    }
+                }
             }
-            return this.zzbrn;
         }
-        this.zzbrn = 2;
-        return this.zzbrn;
+        return i;
     }
 
     public final synchronized String zzsv() {

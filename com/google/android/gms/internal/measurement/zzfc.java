@@ -1,10 +1,15 @@
 package com.google.android.gms.internal.measurement;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteFullException;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.SystemClock;
 import com.google.android.gms.common.util.Clock;
 
 public final class zzfc extends zzhk {
@@ -27,261 +32,98 @@ public final class zzfc extends zzhk {
         return null;
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private final boolean zza(int r20, byte[] r21) {
-        /*
-        r19 = this;
-        r1 = r19;
-        r19.zzab();
-        r2 = r1.zzaih;
-        r3 = 0;
-        if (r2 == 0) goto L_0x000b;
-    L_0x000a:
-        return r3;
-    L_0x000b:
-        r2 = new android.content.ContentValues;
-        r2.<init>();
-        r4 = "type";
-        r5 = java.lang.Integer.valueOf(r20);
-        r2.put(r4, r5);
-        r4 = "entry";
-        r5 = r21;
-        r2.put(r4, r5);
-        r4 = 5;
-        r5 = r3;
-        r6 = r4;
-    L_0x0023:
-        if (r5 >= r4) goto L_0x015e;
-    L_0x0025:
-        r7 = 0;
-        r8 = 1;
-        r9 = r19.getWritableDatabase();	 Catch:{ SQLiteFullException -> 0x012e, SQLiteDatabaseLockedException -> 0x011a, SQLiteException -> 0x00eb, all -> 0x00e4 }
-        if (r9 != 0) goto L_0x0043;
-    L_0x002d:
-        r1.zzaih = r8;	 Catch:{ SQLiteFullException -> 0x003f, SQLiteDatabaseLockedException -> 0x003b, SQLiteException -> 0x0035 }
-        if (r9 == 0) goto L_0x0034;
-    L_0x0031:
-        r9.close();
-    L_0x0034:
-        return r3;
-    L_0x0035:
-        r0 = move-exception;
-        r3 = r0;
-        r12 = r7;
-    L_0x0038:
-        r7 = r9;
-        goto L_0x00ef;
-    L_0x003b:
-        r0 = move-exception;
-        r4 = r7;
-        goto L_0x00de;
-    L_0x003f:
-        r0 = move-exception;
-    L_0x0040:
-        r3 = r0;
-        goto L_0x0132;
-    L_0x0043:
-        r9.beginTransaction();	 Catch:{ SQLiteFullException -> 0x00e0, SQLiteDatabaseLockedException -> 0x003b, SQLiteException -> 0x00d8, all -> 0x00d2 }
-        r10 = 0;
-        r12 = "select count(1) from messages";
-        r12 = r9.rawQuery(r12, r7);	 Catch:{ SQLiteFullException -> 0x00e0, SQLiteDatabaseLockedException -> 0x003b, SQLiteException -> 0x00d8, all -> 0x00d2 }
-        if (r12 == 0) goto L_0x0069;
-    L_0x0050:
-        r13 = r12.moveToFirst();	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        if (r13 == 0) goto L_0x0069;
-    L_0x0056:
-        r10 = r12.getLong(r3);	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        goto L_0x0069;
-    L_0x005b:
-        r0 = move-exception;
-        r2 = r0;
-        goto L_0x0153;
-    L_0x005f:
-        r0 = move-exception;
-        r3 = r0;
-        goto L_0x0038;
-    L_0x0062:
-        r0 = move-exception;
-        goto L_0x00cf;
-    L_0x0064:
-        r0 = move-exception;
-        r3 = r0;
-        r7 = r12;
-        goto L_0x0132;
-    L_0x0069:
-        r13 = 100000; // 0x186a0 float:1.4013E-40 double:4.94066E-319;
-        r15 = (r10 > r13 ? 1 : (r10 == r13 ? 0 : -1));
-        if (r15 < 0) goto L_0x00b7;
-    L_0x0070:
-        r15 = r19.zzgg();	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r15 = r15.zzil();	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r4 = "Data loss, local db full";
-        r15.log(r4);	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r16 = r13 - r10;
-        r10 = 1;
-        r13 = r16 + r10;
-        r4 = "messages";
-        r10 = "rowid in (select rowid from messages order by rowid asc limit ?)";
-        r11 = new java.lang.String[r8];	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r15 = java.lang.Long.toString(r13);	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r11[r3] = r15;	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r4 = r9.delete(r4, r10, r11);	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r10 = (long) r4;	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r4 = (r10 > r13 ? 1 : (r10 == r13 ? 0 : -1));
-        if (r4 == 0) goto L_0x00b7;
-    L_0x0098:
-        r4 = r19.zzgg();	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r4 = r4.zzil();	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r15 = "Different delete count than expected in local db. expected, received, difference";
-        r3 = java.lang.Long.valueOf(r13);	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r8 = java.lang.Long.valueOf(r10);	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r18 = r8;
-        r7 = r13 - r10;
-        r7 = java.lang.Long.valueOf(r7);	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r8 = r18;
-        r4.zzd(r15, r3, r8, r7);	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-    L_0x00b7:
-        r3 = "messages";
-        r4 = 0;
-        r9.insertOrThrow(r3, r4, r2);	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r9.setTransactionSuccessful();	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        r9.endTransaction();	 Catch:{ SQLiteFullException -> 0x0064, SQLiteDatabaseLockedException -> 0x0062, SQLiteException -> 0x005f, all -> 0x005b }
-        if (r12 == 0) goto L_0x00c8;
-    L_0x00c5:
-        r12.close();
-    L_0x00c8:
-        if (r9 == 0) goto L_0x00cd;
-    L_0x00ca:
-        r9.close();
-    L_0x00cd:
-        r2 = 1;
-        return r2;
-    L_0x00cf:
-        r7 = r12;
-        goto L_0x011d;
-    L_0x00d2:
-        r0 = move-exception;
-        r4 = r7;
-        r2 = r0;
-        r12 = r4;
-        goto L_0x0153;
-    L_0x00d8:
-        r0 = move-exception;
-        r4 = r7;
-        r3 = r0;
-        r12 = r4;
-        goto L_0x0038;
-    L_0x00de:
-        r7 = r4;
-        goto L_0x011d;
-    L_0x00e0:
-        r0 = move-exception;
-        r4 = r7;
-        goto L_0x0040;
-    L_0x00e4:
-        r0 = move-exception;
-        r4 = r7;
-        r2 = r0;
-        r9 = r4;
-        r12 = r9;
-        goto L_0x0153;
-    L_0x00eb:
-        r0 = move-exception;
-        r4 = r7;
-        r3 = r0;
-        r12 = r7;
-    L_0x00ef:
-        if (r7 == 0) goto L_0x00ff;
-    L_0x00f1:
-        r4 = r7.inTransaction();	 Catch:{ all -> 0x00fb }
-        if (r4 == 0) goto L_0x00ff;
-    L_0x00f7:
-        r7.endTransaction();	 Catch:{ all -> 0x00fb }
-        goto L_0x00ff;
-    L_0x00fb:
-        r0 = move-exception;
-        r2 = r0;
-        r9 = r7;
-        goto L_0x0153;
-    L_0x00ff:
-        r4 = r19.zzgg();	 Catch:{ all -> 0x00fb }
-        r4 = r4.zzil();	 Catch:{ all -> 0x00fb }
-        r8 = "Error writing entry to local database";
-        r4.zzg(r8, r3);	 Catch:{ all -> 0x00fb }
-        r3 = 1;
-        r1.zzaih = r3;	 Catch:{ all -> 0x00fb }
-        if (r12 == 0) goto L_0x0114;
-    L_0x0111:
-        r12.close();
-    L_0x0114:
-        if (r7 == 0) goto L_0x014a;
-    L_0x0116:
-        r7.close();
-        goto L_0x014a;
-    L_0x011a:
-        r0 = move-exception;
-        r4 = r7;
-        r9 = r7;
-    L_0x011d:
-        r3 = (long) r6;
-        android.os.SystemClock.sleep(r3);	 Catch:{ all -> 0x0150 }
-        r6 = r6 + 20;
-        if (r7 == 0) goto L_0x0128;
-    L_0x0125:
-        r7.close();
-    L_0x0128:
-        if (r9 == 0) goto L_0x014a;
-    L_0x012a:
-        r9.close();
-        goto L_0x014a;
-    L_0x012e:
-        r0 = move-exception;
-        r4 = r7;
-        r3 = r0;
-        r9 = r7;
-    L_0x0132:
-        r4 = r19.zzgg();	 Catch:{ all -> 0x0150 }
-        r4 = r4.zzil();	 Catch:{ all -> 0x0150 }
-        r8 = "Error writing entry to local database";
-        r4.zzg(r8, r3);	 Catch:{ all -> 0x0150 }
-        r3 = 1;
-        r1.zzaih = r3;	 Catch:{ all -> 0x0150 }
-        if (r7 == 0) goto L_0x0147;
-    L_0x0144:
-        r7.close();
-    L_0x0147:
-        if (r9 == 0) goto L_0x014a;
-    L_0x0149:
-        goto L_0x012a;
-    L_0x014a:
-        r5 = r5 + 1;
-        r3 = 0;
-        r4 = 5;
-        goto L_0x0023;
-    L_0x0150:
-        r0 = move-exception;
-        r2 = r0;
-        r12 = r7;
-    L_0x0153:
-        if (r12 == 0) goto L_0x0158;
-    L_0x0155:
-        r12.close();
-    L_0x0158:
-        if (r9 == 0) goto L_0x015d;
-    L_0x015a:
-        r9.close();
-    L_0x015d:
-        throw r2;
-    L_0x015e:
-        r2 = r19.zzgg();
-        r2 = r2.zzin();
-        r3 = "Failed to write entry to local database";
-        r2.log(r3);
-        r2 = 0;
-        return r2;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.internal.measurement.zzfc.zza(int, byte[]):boolean");
+    private final boolean zza(int i, byte[] bArr) {
+        zzab();
+        if (this.zzaih) {
+            return false;
+        }
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("type", Integer.valueOf(i));
+        contentValues.put("entry", bArr);
+        int i2 = 5;
+        int i3 = 0;
+        while (i3 < 5) {
+            SQLiteDatabase sQLiteDatabase = null;
+            Cursor cursor = null;
+            try {
+                sQLiteDatabase = getWritableDatabase();
+                if (sQLiteDatabase == null) {
+                    this.zzaih = true;
+                    if (sQLiteDatabase != null) {
+                        sQLiteDatabase.close();
+                    }
+                    return false;
+                }
+                sQLiteDatabase.beginTransaction();
+                long j = 0;
+                cursor = sQLiteDatabase.rawQuery("select count(1) from messages", null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    j = cursor.getLong(0);
+                }
+                if (j >= 100000) {
+                    zzgg().zzil().log("Data loss, local db full");
+                    j = (100000 - j) + 1;
+                    long delete = (long) sQLiteDatabase.delete("messages", "rowid in (select rowid from messages order by rowid asc limit ?)", new String[]{Long.toString(j)});
+                    if (delete != j) {
+                        zzgg().zzil().zzd("Different delete count than expected in local db. expected, received, difference", Long.valueOf(j), Long.valueOf(delete), Long.valueOf(j - delete));
+                    }
+                }
+                sQLiteDatabase.insertOrThrow("messages", null, contentValues);
+                sQLiteDatabase.setTransactionSuccessful();
+                sQLiteDatabase.endTransaction();
+                if (cursor != null) {
+                    cursor.close();
+                }
+                if (sQLiteDatabase != null) {
+                    sQLiteDatabase.close();
+                }
+                return true;
+            } catch (SQLiteFullException e) {
+                zzgg().zzil().zzg("Error writing entry to local database", e);
+                this.zzaih = true;
+                if (cursor != null) {
+                    cursor.close();
+                }
+                if (sQLiteDatabase != null) {
+                    sQLiteDatabase.close();
+                }
+                i3++;
+            } catch (SQLiteDatabaseLockedException e2) {
+                SystemClock.sleep((long) i2);
+                i2 += 20;
+                if (cursor != null) {
+                    cursor.close();
+                }
+                if (sQLiteDatabase != null) {
+                    sQLiteDatabase.close();
+                }
+                i3++;
+            } catch (SQLiteException e3) {
+                if (sQLiteDatabase != null) {
+                    if (sQLiteDatabase.inTransaction()) {
+                        sQLiteDatabase.endTransaction();
+                    }
+                }
+                zzgg().zzil().zzg("Error writing entry to local database", e3);
+                this.zzaih = true;
+                if (cursor != null) {
+                    cursor.close();
+                }
+                if (sQLiteDatabase != null) {
+                    sQLiteDatabase.close();
+                }
+                i3++;
+            } catch (Throwable th) {
+                if (cursor != null) {
+                    cursor.close();
+                }
+                if (sQLiteDatabase != null) {
+                    sQLiteDatabase.close();
+                }
+            }
+        }
+        zzgg().zzin().log("Failed to write entry to local database");
+        return false;
     }
 
     public final /* bridge */ /* synthetic */ Context getContext() {
@@ -291,7 +133,7 @@ public final class zzfc extends zzhk {
     public final void resetAnalyticsData() {
         zzab();
         try {
-            int delete = 0 + getWritableDatabase().delete("messages", null, null);
+            int delete = getWritableDatabase().delete("messages", null, null) + 0;
             if (delete > 0) {
                 zzgg().zzir().zzg("Reset local analytics data. records", Integer.valueOf(delete));
             }
@@ -422,377 +264,356 @@ public final class zzfc extends zzhk {
         return false;
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public final java.util.List<com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable> zzp(int r22) {
+    public final java.util.List<com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable> zzp(int r14) {
+        /* JADX: method processing error */
+/*
+Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150:0x0138
+	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.modifyBlocksTree(BlockProcessor.java:248)
+	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.processBlocksTree(BlockProcessor.java:52)
+	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.rerun(BlockProcessor.java:44)
+	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.visit(BlockFinallyExtract.java:57)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
+	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
+	at jadx.core.ProcessClass.process(ProcessClass.java:37)
+	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
+	at jadx.core.ProcessClass.process(ProcessClass.java:42)
+	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
+	at jadx.api.JavaClass.decompile(JavaClass.java:62)
+	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
+*/
         /*
-        r21 = this;
-        r1 = r21;
-        r21.zzab();
-        r2 = r1.zzaih;
-        r3 = 0;
-        if (r2 == 0) goto L_0x000b;
-    L_0x000a:
-        return r3;
-    L_0x000b:
-        r2 = new java.util.ArrayList;
-        r2.<init>();
-        r4 = r21.getContext();
-        r5 = "google_app_measurement_local.db";
-        r4 = r4.getDatabasePath(r5);
-        r4 = r4.exists();
-        if (r4 != 0) goto L_0x0021;
-    L_0x0020:
-        return r2;
+        r13 = this;
+        r13.zzab();
+        r0 = r13.zzaih;
+        if (r0 == 0) goto L_0x0009;
+    L_0x0007:
+        r0 = 0;
+    L_0x0008:
+        return r0;
+    L_0x0009:
+        r10 = new java.util.ArrayList;
+        r10.<init>();
+        r0 = r13.getContext();
+        r1 = "google_app_measurement_local.db";
+        r0 = r0.getDatabasePath(r1);
+        r0 = r0.exists();
+        if (r0 != 0) goto L_0x0021;
+    L_0x001f:
+        r0 = r10;
+        goto L_0x0008;
     L_0x0021:
-        r4 = 5;
-        r5 = 0;
-        r7 = r4;
-        r6 = r5;
-    L_0x0025:
-        if (r6 >= r4) goto L_0x0215;
+        r9 = 5;
+        r0 = 0;
+        r12 = r0;
+    L_0x0024:
+        r0 = 5;
+        if (r12 >= r0) goto L_0x01e5;
     L_0x0027:
-        r8 = 1;
-        r15 = r21.getWritableDatabase();	 Catch:{ SQLiteFullException -> 0x01e4, SQLiteDatabaseLockedException -> 0x01cb, SQLiteException -> 0x01a5, all -> 0x019f }
-        if (r15 != 0) goto L_0x0049;
-    L_0x002e:
-        r1.zzaih = r8;	 Catch:{ SQLiteFullException -> 0x0044, SQLiteDatabaseLockedException -> 0x0040, SQLiteException -> 0x003b, all -> 0x0036 }
-        if (r15 == 0) goto L_0x0035;
-    L_0x0032:
-        r15.close();
-    L_0x0035:
-        return r3;
-    L_0x0036:
-        r0 = move-exception;
-        r2 = r0;
-        r9 = r3;
-        goto L_0x0209;
-    L_0x003b:
-        r0 = move-exception;
-        r9 = r3;
-    L_0x003d:
+        r3 = 0;
+        r11 = 0;
+        r0 = r13.getWritableDatabase();	 Catch:{ SQLiteFullException -> 0x0217, SQLiteDatabaseLockedException -> 0x020e, SQLiteException -> 0x0204, all -> 0x01f6 }
+        if (r0 != 0) goto L_0x0039;
+    L_0x002f:
+        r1 = 1;
+        r13.zzaih = r1;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        if (r0 == 0) goto L_0x0037;
+    L_0x0034:
+        r0.close();
+    L_0x0037:
+        r0 = 0;
+        goto L_0x0008;
+    L_0x0039:
+        r0.beginTransaction();	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r1 = "messages";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r2 = 3;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r2 = new java.lang.String[r2];	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r3 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r4 = "rowid";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r2[r3] = r4;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r3 = 1;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r4 = "type";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r2[r3] = r4;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r3 = 2;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r4 = "entry";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r2[r3] = r4;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r3 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r4 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r5 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r6 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r7 = "rowid asc";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r8 = 100;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r8 = java.lang.Integer.toString(r8);	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r2 = r0.query(r1, r2, r3, r4, r5, r6, r7, r8);	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
+        r4 = -1;
+    L_0x0067:
+        r1 = r2.moveToNext();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        if (r1 == 0) goto L_0x01aa;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x006d:
+        r1 = 0;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r4 = r2.getLong(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = 1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = r2.getInt(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r3 = 2;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r6 = r2.getBlob(r3);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        if (r1 != 0) goto L_0x0115;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x007e:
+        r3 = android.os.Parcel.obtain();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = 0;
+        r7 = r6.length;	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r3.unmarshall(r6, r1, r7);	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r1 = 0;	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r3.setDataPosition(r1);	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r1 = com.google.android.gms.internal.measurement.zzeu.CREATOR;	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r1 = r1.createFromParcel(r3);	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r1 = (com.google.android.gms.internal.measurement.zzeu) r1;	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r3.recycle();
+        if (r1 == 0) goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x0098:
+        r10.add(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        goto L_0x0067;
+    L_0x009c:
+        r1 = move-exception;
         r3 = r0;
-        goto L_0x01a9;
-    L_0x0040:
-        r0 = move-exception;
-        r3 = r15;
-        goto L_0x0197;
-    L_0x0044:
-        r0 = move-exception;
-        r9 = r3;
-    L_0x0046:
+    L_0x009e:
+        r0 = r13.zzgg();	 Catch:{ all -> 0x0200 }
+        r0 = r0.zzil();	 Catch:{ all -> 0x0200 }
+        r4 = "Error reading entries from local database";	 Catch:{ all -> 0x0200 }
+        r0.zzg(r4, r1);	 Catch:{ all -> 0x0200 }
+        r0 = 1;	 Catch:{ all -> 0x0200 }
+        r13.zzaih = r0;	 Catch:{ all -> 0x0200 }
+        if (r2 == 0) goto L_0x00b4;
+    L_0x00b1:
+        r2.close();
+    L_0x00b4:
+        if (r3 == 0) goto L_0x0221;
+    L_0x00b6:
+        r3.close();
+        r0 = r9;
+    L_0x00ba:
+        r1 = r12 + 1;
+        r12 = r1;
+        r9 = r0;
+        goto L_0x0024;
+    L_0x00c0:
+        r1 = move-exception;
+        r1 = r13.zzgg();	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r1 = r1.zzil();	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r6 = "Failed to load event from local database";	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r1.log(r6);	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r3.recycle();
+        goto L_0x0067;
+    L_0x00d3:
+        r1 = move-exception;
         r3 = r0;
-        goto L_0x01e8;
-    L_0x0049:
-        r15.beginTransaction();	 Catch:{ SQLiteFullException -> 0x019a, SQLiteDatabaseLockedException -> 0x0040, SQLiteException -> 0x0192, all -> 0x018e }
-        r10 = "messages";
-        r9 = 3;
-        r11 = new java.lang.String[r9];	 Catch:{ SQLiteFullException -> 0x019a, SQLiteDatabaseLockedException -> 0x0040, SQLiteException -> 0x0192, all -> 0x018e }
-        r9 = "rowid";
-        r11[r5] = r9;	 Catch:{ SQLiteFullException -> 0x019a, SQLiteDatabaseLockedException -> 0x0040, SQLiteException -> 0x0192, all -> 0x018e }
-        r9 = "type";
-        r11[r8] = r9;	 Catch:{ SQLiteFullException -> 0x019a, SQLiteDatabaseLockedException -> 0x0040, SQLiteException -> 0x0192, all -> 0x018e }
-        r9 = "entry";
-        r14 = 2;
-        r11[r14] = r9;	 Catch:{ SQLiteFullException -> 0x019a, SQLiteDatabaseLockedException -> 0x0040, SQLiteException -> 0x0192, all -> 0x018e }
-        r12 = 0;
-        r13 = 0;
-        r16 = 0;
-        r17 = 0;
-        r18 = "rowid asc";
-        r9 = 100;
-        r19 = java.lang.Integer.toString(r9);	 Catch:{ SQLiteFullException -> 0x019a, SQLiteDatabaseLockedException -> 0x0040, SQLiteException -> 0x0192, all -> 0x018e }
-        r9 = r15;
-        r4 = r14;
-        r14 = r16;
-        r3 = r15;
-        r15 = r17;
-        r16 = r18;
-        r17 = r19;
-        r9 = r9.query(r10, r11, r12, r13, r14, r15, r16, r17);	 Catch:{ SQLiteFullException -> 0x018b, SQLiteDatabaseLockedException -> 0x0189, SQLiteException -> 0x0186, all -> 0x0184 }
-        r10 = -1;
-    L_0x007d:
-        r12 = r9.moveToNext();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        if (r12 == 0) goto L_0x0140;
-    L_0x0083:
-        r10 = r9.getLong(r5);	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r12 = r9.getInt(r8);	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r13 = r9.getBlob(r4);	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        if (r12 != 0) goto L_0x00c6;
-    L_0x0091:
-        r12 = android.os.Parcel.obtain();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r14 = r13.length;	 Catch:{ ParseException -> 0x00b0 }
-        r12.unmarshall(r13, r5, r14);	 Catch:{ ParseException -> 0x00b0 }
-        r12.setDataPosition(r5);	 Catch:{ ParseException -> 0x00b0 }
-        r13 = com.google.android.gms.internal.measurement.zzeu.CREATOR;	 Catch:{ ParseException -> 0x00b0 }
-        r13 = r13.createFromParcel(r12);	 Catch:{ ParseException -> 0x00b0 }
-        r13 = (com.google.android.gms.internal.measurement.zzeu) r13;	 Catch:{ ParseException -> 0x00b0 }
-        r12.recycle();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        if (r13 == 0) goto L_0x007d;
-    L_0x00a9:
-        r2.add(r13);	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        goto L_0x007d;
-    L_0x00ad:
-        r0 = move-exception;
-        r4 = r0;
-        goto L_0x00c2;
-    L_0x00b0:
-        r0 = move-exception;
-        r13 = r21.zzgg();	 Catch:{ all -> 0x00ad }
-        r13 = r13.zzil();	 Catch:{ all -> 0x00ad }
-        r14 = "Failed to load event from local database";
-        r13.log(r14);	 Catch:{ all -> 0x00ad }
-        r12.recycle();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        goto L_0x007d;
-    L_0x00c2:
-        r12.recycle();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        throw r4;	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-    L_0x00c6:
-        if (r12 != r8) goto L_0x00fb;
-    L_0x00c8:
-        r12 = android.os.Parcel.obtain();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r14 = r13.length;	 Catch:{ ParseException -> 0x00e2 }
-        r12.unmarshall(r13, r5, r14);	 Catch:{ ParseException -> 0x00e2 }
-        r12.setDataPosition(r5);	 Catch:{ ParseException -> 0x00e2 }
-        r13 = com.google.android.gms.internal.measurement.zzjs.CREATOR;	 Catch:{ ParseException -> 0x00e2 }
-        r13 = r13.createFromParcel(r12);	 Catch:{ ParseException -> 0x00e2 }
-        r13 = (com.google.android.gms.internal.measurement.zzjs) r13;	 Catch:{ ParseException -> 0x00e2 }
-        r12.recycle();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        goto L_0x00f4;
-    L_0x00df:
-        r0 = move-exception;
-        r4 = r0;
-        goto L_0x00f7;
+    L_0x00d5:
+        r0 = (long) r9;
+        android.os.SystemClock.sleep(r0);	 Catch:{ all -> 0x0200 }
+        r0 = r9 + 20;
+        if (r2 == 0) goto L_0x00e0;
+    L_0x00dd:
+        r2.close();
+    L_0x00e0:
+        if (r3 == 0) goto L_0x00ba;
     L_0x00e2:
-        r0 = move-exception;
-        r13 = r21.zzgg();	 Catch:{ all -> 0x00df }
-        r13 = r13.zzil();	 Catch:{ all -> 0x00df }
-        r14 = "Failed to load user property from local database";
-        r13.log(r14);	 Catch:{ all -> 0x00df }
-        r12.recycle();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r13 = 0;
-    L_0x00f4:
-        if (r13 == 0) goto L_0x007d;
-    L_0x00f6:
-        goto L_0x00a9;
-    L_0x00f7:
-        r12.recycle();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        throw r4;	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-    L_0x00fb:
-        if (r12 != r4) goto L_0x0131;
-    L_0x00fd:
-        r12 = android.os.Parcel.obtain();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r14 = r13.length;	 Catch:{ ParseException -> 0x0117 }
-        r12.unmarshall(r13, r5, r14);	 Catch:{ ParseException -> 0x0117 }
-        r12.setDataPosition(r5);	 Catch:{ ParseException -> 0x0117 }
-        r13 = com.google.android.gms.internal.measurement.zzef.CREATOR;	 Catch:{ ParseException -> 0x0117 }
-        r13 = r13.createFromParcel(r12);	 Catch:{ ParseException -> 0x0117 }
-        r13 = (com.google.android.gms.internal.measurement.zzef) r13;	 Catch:{ ParseException -> 0x0117 }
-        r12.recycle();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        goto L_0x0129;
-    L_0x0114:
-        r0 = move-exception;
-        r4 = r0;
-        goto L_0x012d;
-    L_0x0117:
-        r0 = move-exception;
-        r13 = r21.zzgg();	 Catch:{ all -> 0x0114 }
-        r13 = r13.zzil();	 Catch:{ all -> 0x0114 }
-        r14 = "Failed to load user property from local database";
-        r13.log(r14);	 Catch:{ all -> 0x0114 }
-        r12.recycle();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r13 = 0;
-    L_0x0129:
-        if (r13 == 0) goto L_0x007d;
-    L_0x012b:
-        goto L_0x00a9;
-    L_0x012d:
-        r12.recycle();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        throw r4;	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
+        r3.close();
+        goto L_0x00ba;
+    L_0x00e6:
+        r1 = move-exception;
+        r3.recycle();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        throw r1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x00eb:
+        r1 = move-exception;
+        r3 = r0;
+    L_0x00ed:
+        if (r3 == 0) goto L_0x00f8;
+    L_0x00ef:
+        r0 = r3.inTransaction();	 Catch:{ all -> 0x0200 }
+        if (r0 == 0) goto L_0x00f8;	 Catch:{ all -> 0x0200 }
+    L_0x00f5:
+        r3.endTransaction();	 Catch:{ all -> 0x0200 }
+    L_0x00f8:
+        r0 = r13.zzgg();	 Catch:{ all -> 0x0200 }
+        r0 = r0.zzil();	 Catch:{ all -> 0x0200 }
+        r4 = "Error reading entries from local database";	 Catch:{ all -> 0x0200 }
+        r0.zzg(r4, r1);	 Catch:{ all -> 0x0200 }
+        r0 = 1;	 Catch:{ all -> 0x0200 }
+        r13.zzaih = r0;	 Catch:{ all -> 0x0200 }
+        if (r2 == 0) goto L_0x010e;
+    L_0x010b:
+        r2.close();
+    L_0x010e:
+        if (r3 == 0) goto L_0x0221;
+    L_0x0110:
+        r3.close();
+        r0 = r9;
+        goto L_0x00ba;
+    L_0x0115:
+        r3 = 1;
+        if (r1 != r3) goto L_0x015e;
+    L_0x0118:
+        r7 = android.os.Parcel.obtain();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r3 = 0;
+        r1 = 0;
+        r8 = r6.length;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r7.unmarshall(r6, r1, r8);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1 = 0;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r7.setDataPosition(r1);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1 = com.google.android.gms.internal.measurement.zzjs.CREATOR;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1 = r1.createFromParcel(r7);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1 = (com.google.android.gms.internal.measurement.zzjs) r1;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r7.recycle();
     L_0x0131:
-        r12 = r21.zzgg();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r12 = r12.zzil();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r13 = "Unknown record type in local database";
-        r12.log(r13);	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        goto L_0x007d;
-    L_0x0140:
-        r4 = "messages";
-        r12 = "rowid <= ?";
-        r13 = new java.lang.String[r8];	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r10 = java.lang.Long.toString(r10);	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r13[r5] = r10;	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r4 = r3.delete(r4, r12, r13);	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r10 = r2.size();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        if (r4 >= r10) goto L_0x0163;
-    L_0x0156:
-        r4 = r21.zzgg();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r4 = r4.zzil();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r10 = "Fewer entries removed from local database than expected";
-        r4.log(r10);	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-    L_0x0163:
-        r3.setTransactionSuccessful();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        r3.endTransaction();	 Catch:{ SQLiteFullException -> 0x0180, SQLiteDatabaseLockedException -> 0x017c, SQLiteException -> 0x0178, all -> 0x0174 }
-        if (r9 == 0) goto L_0x016e;
-    L_0x016b:
-        r9.close();
-    L_0x016e:
-        if (r3 == 0) goto L_0x0173;
-    L_0x0170:
+        if (r1 == 0) goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x0133:
+        r10.add(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        goto L_0x0067;
+    L_0x0138:
+        r1 = move-exception;
+        r3 = r0;
+    L_0x013a:
+        if (r2 == 0) goto L_0x013f;
+    L_0x013c:
+        r2.close();
+    L_0x013f:
+        if (r3 == 0) goto L_0x0144;
+    L_0x0141:
         r3.close();
-    L_0x0173:
-        return r2;
-    L_0x0174:
-        r0 = move-exception;
-        r2 = r0;
-        goto L_0x020a;
-    L_0x0178:
-        r0 = move-exception;
-        r15 = r3;
-        goto L_0x003d;
+    L_0x0144:
+        throw r1;
+    L_0x0145:
+        r1 = move-exception;
+        r1 = r13.zzgg();	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1 = r1.zzil();	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r6 = "Failed to load user property from local database";	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1.log(r6);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r7.recycle();
+        r1 = r3;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        goto L_0x0131;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x0159:
+        r1 = move-exception;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r7.recycle();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        throw r1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x015e:
+        r3 = 2;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        if (r1 != r3) goto L_0x019a;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x0161:
+        r7 = android.os.Parcel.obtain();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r3 = 0;
+        r1 = 0;
+        r8 = r6.length;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r7.unmarshall(r6, r1, r8);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1 = 0;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r7.setDataPosition(r1);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1 = com.google.android.gms.internal.measurement.zzef.CREATOR;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1 = r1.createFromParcel(r7);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1 = (com.google.android.gms.internal.measurement.zzef) r1;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r7.recycle();
+    L_0x017a:
+        if (r1 == 0) goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
     L_0x017c:
-        r0 = move-exception;
-        r4 = r3;
-        r3 = r9;
-        goto L_0x01ce;
-    L_0x0180:
-        r0 = move-exception;
-        r15 = r3;
-        goto L_0x0046;
-    L_0x0184:
-        r0 = move-exception;
-        goto L_0x0190;
-    L_0x0186:
-        r0 = move-exception;
-        r15 = r3;
-        goto L_0x0194;
-    L_0x0189:
-        r0 = move-exception;
-        goto L_0x0197;
-    L_0x018b:
-        r0 = move-exception;
-        r15 = r3;
-        goto L_0x019c;
-    L_0x018e:
-        r0 = move-exception;
-        r3 = r15;
-    L_0x0190:
-        r2 = r0;
-        goto L_0x01a2;
-    L_0x0192:
-        r0 = move-exception;
-        r3 = r15;
-    L_0x0194:
-        r9 = 0;
-        goto L_0x003d;
-    L_0x0197:
-        r4 = r3;
-        r3 = 0;
-        goto L_0x01ce;
+        r10.add(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        goto L_0x0067;
+    L_0x0181:
+        r1 = move-exception;
+        r1 = r13.zzgg();	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1 = r1.zzil();	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r6 = "Failed to load user property from local database";	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1.log(r6);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r7.recycle();
+        r1 = r3;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        goto L_0x017a;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x0195:
+        r1 = move-exception;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r7.recycle();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        throw r1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
     L_0x019a:
-        r0 = move-exception;
-        r3 = r15;
-    L_0x019c:
-        r9 = 0;
-        goto L_0x0046;
-    L_0x019f:
-        r0 = move-exception;
-        r2 = r0;
-        r3 = 0;
-    L_0x01a2:
-        r9 = 0;
-        goto L_0x020a;
-    L_0x01a5:
-        r0 = move-exception;
-        r3 = r0;
-        r9 = 0;
-        r15 = 0;
-    L_0x01a9:
-        if (r15 == 0) goto L_0x01b4;
-    L_0x01ab:
-        r4 = r15.inTransaction();	 Catch:{ all -> 0x0207 }
-        if (r4 == 0) goto L_0x01b4;
-    L_0x01b1:
-        r15.endTransaction();	 Catch:{ all -> 0x0207 }
-    L_0x01b4:
-        r4 = r21.zzgg();	 Catch:{ all -> 0x0207 }
-        r4 = r4.zzil();	 Catch:{ all -> 0x0207 }
-        r10 = "Error reading entries from local database";
-        r4.zzg(r10, r3);	 Catch:{ all -> 0x0207 }
-        r1.zzaih = r8;	 Catch:{ all -> 0x0207 }
-        if (r9 == 0) goto L_0x01c8;
-    L_0x01c5:
-        r9.close();
-    L_0x01c8:
-        if (r15 == 0) goto L_0x0201;
-    L_0x01ca:
-        goto L_0x01fe;
-    L_0x01cb:
-        r0 = move-exception;
-        r3 = 0;
-        r4 = 0;
-    L_0x01ce:
-        r8 = (long) r7;
-        android.os.SystemClock.sleep(r8);	 Catch:{ all -> 0x01df }
-        r7 = r7 + 20;
-        if (r3 == 0) goto L_0x01d9;
-    L_0x01d6:
-        r3.close();
-    L_0x01d9:
-        if (r4 == 0) goto L_0x0201;
-    L_0x01db:
-        r4.close();
-        goto L_0x0201;
+        r1 = r13.zzgg();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = r1.zzil();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r3 = "Unknown record type in local database";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1.log(r3);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x01aa:
+        r1 = "messages";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r3 = "rowid <= ?";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r6 = 1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r6 = new java.lang.String[r6];	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r7 = 0;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r4 = java.lang.Long.toString(r4);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r6[r7] = r4;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = r0.delete(r1, r3, r6);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r3 = r10.size();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        if (r1 >= r3) goto L_0x01d2;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x01c4:
+        r1 = r13.zzgg();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = r1.zzil();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r3 = "Fewer entries removed from local database than expected";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1.log(r3);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+    L_0x01d2:
+        r0.setTransactionSuccessful();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r0.endTransaction();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        if (r2 == 0) goto L_0x01dd;
+    L_0x01da:
+        r2.close();
+    L_0x01dd:
+        if (r0 == 0) goto L_0x01e2;
     L_0x01df:
+        r0.close();
+    L_0x01e2:
+        r0 = r10;
+        goto L_0x0008;
+    L_0x01e5:
+        r0 = r13.zzgg();
+        r0 = r0.zzin();
+        r1 = "Failed to read events from database in reasonable time";
+        r0.log(r1);
+        r0 = 0;
+        goto L_0x0008;
+    L_0x01f6:
         r0 = move-exception;
-        r2 = r0;
-        r9 = r3;
-        r3 = r4;
-        goto L_0x020a;
-    L_0x01e4:
-        r0 = move-exception;
+        r1 = r0;
+        r2 = r11;
+        goto L_0x013a;
+    L_0x01fb:
+        r1 = move-exception;
+        r2 = r11;
         r3 = r0;
-        r9 = 0;
-        r15 = 0;
-    L_0x01e8:
-        r4 = r21.zzgg();	 Catch:{ all -> 0x0207 }
-        r4 = r4.zzil();	 Catch:{ all -> 0x0207 }
-        r10 = "Error reading entries from local database";
-        r4.zzg(r10, r3);	 Catch:{ all -> 0x0207 }
-        r1.zzaih = r8;	 Catch:{ all -> 0x0207 }
-        if (r9 == 0) goto L_0x01fc;
-    L_0x01f9:
-        r9.close();
-    L_0x01fc:
-        if (r15 == 0) goto L_0x0201;
-    L_0x01fe:
-        r15.close();
-    L_0x0201:
-        r6 = r6 + 1;
-        r3 = 0;
-        r4 = 5;
-        goto L_0x0025;
-    L_0x0207:
+        goto L_0x013a;
+    L_0x0200:
         r0 = move-exception;
-        r2 = r0;
+        r1 = r0;
+        goto L_0x013a;
+    L_0x0204:
+        r0 = move-exception;
+        r1 = r0;
+        r2 = r11;
+        goto L_0x00ed;
     L_0x0209:
-        r3 = r15;
-    L_0x020a:
-        if (r9 == 0) goto L_0x020f;
-    L_0x020c:
-        r9.close();
-    L_0x020f:
-        if (r3 == 0) goto L_0x0214;
-    L_0x0211:
-        r3.close();
-    L_0x0214:
-        throw r2;
-    L_0x0215:
-        r2 = r21.zzgg();
-        r2 = r2.zzin();
-        r3 = "Failed to read events from database in reasonable time";
-        r2.log(r3);
-        r2 = 0;
-        return r2;
+        r1 = move-exception;
+        r2 = r11;
+        r3 = r0;
+        goto L_0x00ed;
+    L_0x020e:
+        r0 = move-exception;
+        r2 = r11;
+        goto L_0x00d5;
+    L_0x0212:
+        r1 = move-exception;
+        r2 = r11;
+        r3 = r0;
+        goto L_0x00d5;
+    L_0x0217:
+        r0 = move-exception;
+        r1 = r0;
+        r2 = r11;
+        goto L_0x009e;
+    L_0x021c:
+        r1 = move-exception;
+        r2 = r11;
+        r3 = r0;
+        goto L_0x009e;
+    L_0x0221:
+        r0 = r9;
+        goto L_0x00ba;
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.internal.measurement.zzfc.zzp(int):java.util.List<com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable>");
     }

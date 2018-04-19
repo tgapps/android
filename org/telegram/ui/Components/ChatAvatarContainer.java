@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build.VERSION;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
@@ -11,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
@@ -19,9 +21,14 @@ import org.telegram.messenger.NotificationCenter.NotificationCenterDelegate;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.beta.R;
+import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.Chat;
+import org.telegram.tgnet.TLRPC.ChatFull;
+import org.telegram.tgnet.TLRPC.ChatParticipant;
+import org.telegram.tgnet.TLRPC.TL_channelFull;
+import org.telegram.tgnet.TLRPC.TL_chatFull;
 import org.telegram.tgnet.TLRPC.User;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.SimpleTextView;
@@ -44,368 +51,6 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
     private ImageView timeItem;
     private TimerDrawable timerDrawable;
     private SimpleTextView titleTextView;
-
-    public void updateOnlineCount() {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.ChatAvatarContainer.updateOnlineCount():void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r7.parentFragment;
-        if (r0 != 0) goto L_0x0005;
-    L_0x0004:
-        return;
-    L_0x0005:
-        r0 = 0;
-        r7.onlineCount = r0;
-        r1 = r7.parentFragment;
-        r1 = r1.getCurrentChatInfo();
-        if (r1 != 0) goto L_0x0011;
-    L_0x0010:
-        return;
-    L_0x0011:
-        r2 = r7.currentAccount;
-        r2 = org.telegram.tgnet.ConnectionsManager.getInstance(r2);
-        r2 = r2.getCurrentTime();
-        r3 = r1 instanceof org.telegram.tgnet.TLRPC.TL_chatFull;
-        if (r3 != 0) goto L_0x002d;
-    L_0x001f:
-        r3 = r1 instanceof org.telegram.tgnet.TLRPC.TL_channelFull;
-        if (r3 == 0) goto L_0x007d;
-        r3 = r1.participants_count;
-        r4 = 200; // 0xc8 float:2.8E-43 double:9.9E-322;
-        if (r3 > r4) goto L_0x007d;
-        r3 = r1.participants;
-        if (r3 == 0) goto L_0x007d;
-        r3 = r1.participants;
-        r3 = r3.participants;
-        r3 = r3.size();
-        if (r0 >= r3) goto L_0x007d;
-        r3 = r1.participants;
-        r3 = r3.participants;
-        r3 = r3.get(r0);
-        r3 = (org.telegram.tgnet.TLRPC.ChatParticipant) r3;
-        r4 = r7.currentAccount;
-        r4 = org.telegram.messenger.MessagesController.getInstance(r4);
-        r5 = r3.user_id;
-        r5 = java.lang.Integer.valueOf(r5);
-        r4 = r4.getUser(r5);
-        if (r4 == 0) goto L_0x007a;
-        r5 = r4.status;
-        if (r5 == 0) goto L_0x007a;
-        r5 = r4.status;
-        r5 = r5.expires;
-        if (r5 > r2) goto L_0x006c;
-        r5 = r4.id;
-        r6 = r7.currentAccount;
-        r6 = org.telegram.messenger.UserConfig.getInstance(r6);
-        r6 = r6.getClientUserId();
-        if (r5 != r6) goto L_0x007a;
-        r5 = r4.status;
-        r5 = r5.expires;
-        r6 = 10000; // 0x2710 float:1.4013E-41 double:4.9407E-320;
-        if (r5 <= r6) goto L_0x007a;
-        r5 = r7.onlineCount;
-        r5 = r5 + 1;
-        r7.onlineCount = r5;
-        r0 = r0 + 1;
-        goto L_0x002e;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ChatAvatarContainer.updateOnlineCount():void");
-    }
-
-    public void updateSubtitle() {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.ChatAvatarContainer.updateSubtitle():void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = r11.parentFragment;
-        if (r0 != 0) goto L_0x0005;
-    L_0x0004:
-        return;
-    L_0x0005:
-        r0 = r11.parentFragment;
-        r0 = r0.getCurrentUser();
-        r1 = org.telegram.messenger.UserObject.isUserSelf(r0);
-        if (r1 == 0) goto L_0x0021;
-    L_0x0011:
-        r1 = r11.subtitleTextView;
-        r1 = r1.getVisibility();
-        r2 = 8;
-        if (r1 == r2) goto L_0x0020;
-    L_0x001b:
-        r1 = r11.subtitleTextView;
-        r1.setVisibility(r2);
-    L_0x0020:
-        return;
-    L_0x0021:
-        r1 = r11.parentFragment;
-        r1 = r1.getCurrentChat();
-        r2 = r11.currentAccount;
-        r2 = org.telegram.messenger.MessagesController.getInstance(r2);
-        r2 = r2.printingStrings;
-        r3 = r11.parentFragment;
-        r3 = r3.getDialogId();
-        r2 = r2.get(r3);
-        r2 = (java.lang.CharSequence) r2;
-        r3 = 1;
-        r4 = 0;
-        if (r2 == 0) goto L_0x004f;
-    L_0x003f:
-        r5 = new java.lang.String[r3];
-        r6 = "...";
-        r5[r4] = r6;
-        r6 = new java.lang.String[r3];
-        r7 = "";
-        r6[r4] = r7;
-        r2 = android.text.TextUtils.replace(r2, r5, r6);
-    L_0x004f:
-        if (r2 == 0) goto L_0x0068;
-    L_0x0051:
-        r5 = r2.length();
-        if (r5 == 0) goto L_0x0068;
-    L_0x0057:
-        r5 = org.telegram.messenger.ChatObject.isChannel(r1);
-        if (r5 == 0) goto L_0x0062;
-    L_0x005d:
-        r5 = r1.megagroup;
-        if (r5 != 0) goto L_0x0062;
-    L_0x0061:
-        goto L_0x0068;
-    L_0x0062:
-        r4 = r2;
-        r11.setTypingAnimation(r3);
-        goto L_0x01ee;
-    L_0x0068:
-        r11.setTypingAnimation(r4);
-        if (r1 == 0) goto L_0x018e;
-    L_0x006d:
-        r5 = r11.parentFragment;
-        r5 = r5.getCurrentChatInfo();
-        r6 = org.telegram.messenger.ChatObject.isChannel(r1);
-        r7 = 2;
-        if (r6 == 0) goto L_0x0135;
-    L_0x007a:
-        if (r5 == 0) goto L_0x0101;
-    L_0x007c:
-        r6 = r5.participants_count;
-        if (r6 == 0) goto L_0x0101;
-    L_0x0080:
-        r6 = r1.megagroup;
-        if (r6 == 0) goto L_0x00ba;
-    L_0x0084:
-        r6 = r5.participants_count;
-        r8 = 200; // 0xc8 float:2.8E-43 double:9.9E-322;
-        if (r6 > r8) goto L_0x00ba;
-    L_0x008a:
-        r6 = r11.onlineCount;
-        if (r6 <= r3) goto L_0x00b0;
-    L_0x008e:
-        r6 = r5.participants_count;
-        if (r6 == 0) goto L_0x00b0;
-    L_0x0092:
-        r6 = "%s, %s";
-        r7 = new java.lang.Object[r7];
-        r8 = "Members";
-        r9 = r5.participants_count;
-        r8 = org.telegram.messenger.LocaleController.formatPluralString(r8, r9);
-        r7[r4] = r8;
-        r4 = "OnlineCount";
-        r8 = r11.onlineCount;
-        r4 = org.telegram.messenger.LocaleController.formatPluralString(r4, r8);
-        r7[r3] = r4;
-        r3 = java.lang.String.format(r6, r7);
-        goto L_0x0144;
-    L_0x00b0:
-        r3 = "Members";
-        r4 = r5.participants_count;
-        r3 = org.telegram.messenger.LocaleController.formatPluralString(r3, r4);
-        goto L_0x0144;
-    L_0x00ba:
-        r6 = new int[r3];
-        r7 = r5.participants_count;
-        r7 = org.telegram.messenger.LocaleController.formatShortNumber(r7, r6);
-        r8 = r1.megagroup;
-        if (r8 == 0) goto L_0x00e3;
-    L_0x00c6:
-        r8 = "Members";
-        r9 = r6[r4];
-        r8 = org.telegram.messenger.LocaleController.formatPluralString(r8, r9);
-        r9 = "%d";
-        r3 = new java.lang.Object[r3];
-        r10 = r6[r4];
-        r10 = java.lang.Integer.valueOf(r10);
-        r3[r4] = r10;
-        r3 = java.lang.String.format(r9, r3);
-        r3 = r8.replace(r3, r7);
-        goto L_0x00ff;
-    L_0x00e3:
-        r8 = "Subscribers";
-        r9 = r6[r4];
-        r8 = org.telegram.messenger.LocaleController.formatPluralString(r8, r9);
-        r9 = "%d";
-        r3 = new java.lang.Object[r3];
-        r10 = r6[r4];
-        r10 = java.lang.Integer.valueOf(r10);
-        r3[r4] = r10;
-        r3 = java.lang.String.format(r9, r3);
-        r3 = r8.replace(r3, r7);
-    L_0x00ff:
-        goto L_0x018c;
-    L_0x0101:
-        r3 = r1.megagroup;
-        if (r3 == 0) goto L_0x0113;
-    L_0x0105:
-        r3 = "Loading";
-        r4 = 2131493762; // 0x7f0c0382 float:1.8611013E38 double:1.053097842E-314;
-        r3 = org.telegram.messenger.LocaleController.getString(r3, r4);
-        r3 = r3.toLowerCase();
-        goto L_0x0144;
-    L_0x0113:
-        r3 = r1.flags;
-        r3 = r3 & 64;
-        if (r3 == 0) goto L_0x0127;
-    L_0x0119:
-        r3 = "ChannelPublic";
-        r4 = 2131493200; // 0x7f0c0150 float:1.8609873E38 double:1.0530975645E-314;
-        r3 = org.telegram.messenger.LocaleController.getString(r3, r4);
-        r3 = r3.toLowerCase();
-        goto L_0x0144;
-    L_0x0127:
-        r3 = "ChannelPrivate";
-        r4 = 2131493197; // 0x7f0c014d float:1.8609867E38 double:1.053097563E-314;
-        r3 = org.telegram.messenger.LocaleController.getString(r3, r4);
-        r3 = r3.toLowerCase();
-        goto L_0x0144;
-    L_0x0135:
-        r6 = org.telegram.messenger.ChatObject.isKickedFromChat(r1);
-        if (r6 == 0) goto L_0x0145;
-    L_0x013b:
-        r3 = "YouWereKicked";
-        r4 = 2131494659; // 0x7f0c0703 float:1.8612833E38 double:1.0530982853E-314;
-        r3 = org.telegram.messenger.LocaleController.getString(r3, r4);
-    L_0x0144:
-        goto L_0x018c;
-    L_0x0145:
-        r6 = org.telegram.messenger.ChatObject.isLeftFromChat(r1);
-        if (r6 == 0) goto L_0x0155;
-    L_0x014b:
-        r3 = "YouLeft";
-        r4 = 2131494658; // 0x7f0c0702 float:1.861283E38 double:1.053098285E-314;
-        r3 = org.telegram.messenger.LocaleController.getString(r3, r4);
-        goto L_0x0144;
-    L_0x0155:
-        r6 = r1.participants_count;
-        if (r5 == 0) goto L_0x0165;
-    L_0x0159:
-        r8 = r5.participants;
-        if (r8 == 0) goto L_0x0165;
-    L_0x015d:
-        r8 = r5.participants;
-        r8 = r8.participants;
-        r6 = r8.size();
-    L_0x0165:
-        r8 = r11.onlineCount;
-        if (r8 <= r3) goto L_0x0186;
-    L_0x0169:
-        if (r6 == 0) goto L_0x0186;
-    L_0x016b:
-        r8 = "%s, %s";
-        r7 = new java.lang.Object[r7];
-        r9 = "Members";
-        r9 = org.telegram.messenger.LocaleController.formatPluralString(r9, r6);
-        r7[r4] = r9;
-        r4 = "OnlineCount";
-        r9 = r11.onlineCount;
-        r4 = org.telegram.messenger.LocaleController.formatPluralString(r4, r9);
-        r7[r3] = r4;
-        r3 = java.lang.String.format(r8, r7);
-        goto L_0x0144;
-    L_0x0186:
-        r3 = "Members";
-        r3 = org.telegram.messenger.LocaleController.formatPluralString(r3, r6);
-    L_0x018c:
-        r4 = r3;
-        goto L_0x01ee;
-    L_0x018e:
-        if (r0 == 0) goto L_0x01ec;
-    L_0x0190:
-        r3 = r11.currentAccount;
-        r3 = org.telegram.messenger.MessagesController.getInstance(r3);
-        r4 = r0.id;
-        r4 = java.lang.Integer.valueOf(r4);
-        r3 = r3.getUser(r4);
-        if (r3 == 0) goto L_0x01a3;
-    L_0x01a2:
-        r0 = r3;
-    L_0x01a3:
-        r4 = r0.id;
-        r5 = r11.currentAccount;
-        r5 = org.telegram.messenger.UserConfig.getInstance(r5);
-        r5 = r5.getClientUserId();
-        if (r4 != r5) goto L_0x01bb;
-    L_0x01b1:
-        r4 = "ChatYourSelf";
-        r5 = 2131493233; // 0x7f0c0171 float:1.860994E38 double:1.053097581E-314;
-        r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
-        goto L_0x01e9;
-    L_0x01bb:
-        r4 = r0.id;
-        r5 = 333000; // 0x514c8 float:4.66632E-40 double:1.64524E-318;
-        if (r4 == r5) goto L_0x01df;
-        r4 = r0.id;
-        r5 = 777000; // 0xbdb28 float:1.088809E-39 double:3.83889E-318;
-        if (r4 != r5) goto L_0x01ca;
-        goto L_0x01df;
-        r4 = r0.bot;
-        if (r4 == 0) goto L_0x01d8;
-        r4 = "Bot";
-        r5 = 2131493086; // 0x7f0c00de float:1.8609642E38 double:1.053097508E-314;
-        r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
-        goto L_0x01ba;
-        r4 = r11.currentAccount;
-        r4 = org.telegram.messenger.LocaleController.formatUserStatus(r4, r0);
-        goto L_0x01e9;
-        r4 = "ServiceNotifications";
-        r5 = 2131494365; // 0x7f0c05dd float:1.8612236E38 double:1.05309814E-314;
-        r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
-        goto L_0x01ba;
-        goto L_0x01ee;
-    L_0x01ec:
-        r4 = "";
-    L_0x01ee:
-        r3 = r11.lastSubtitle;
-        if (r3 != 0) goto L_0x01f8;
-        r3 = r11.subtitleTextView;
-        r3.setText(r4);
-        goto L_0x01fa;
-        r11.lastSubtitle = r4;
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ChatAvatarContainer.updateSubtitle():void");
-    }
 
     public ChatAvatarContainer(Context context, ChatActivity chatActivity, boolean needTime) {
         super(context);
@@ -454,15 +99,15 @@ Caused by: java.lang.NullPointerException
                             MediaActivity fragment2 = new MediaActivity(args);
                             fragment2.setChatInfo(ChatAvatarContainer.this.parentFragment.getCurrentChatInfo());
                             ChatAvatarContainer.this.parentFragment.presentFragment(fragment2);
-                        } else {
-                            args.putInt("user_id", user.id);
-                            if (ChatAvatarContainer.this.timeItem != null) {
-                                args.putLong("dialog_id", ChatAvatarContainer.this.parentFragment.getDialogId());
-                            }
-                            fragment = new ProfileActivity(args);
-                            fragment.setPlayProfileAnimation(true);
-                            ChatAvatarContainer.this.parentFragment.presentFragment(fragment);
+                            return;
                         }
+                        args.putInt("user_id", user.id);
+                        if (ChatAvatarContainer.this.timeItem != null) {
+                            args.putLong("dialog_id", ChatAvatarContainer.this.parentFragment.getDialogId());
+                        }
+                        fragment = new ProfileActivity(args);
+                        fragment.setPlayProfileAnimation(true);
+                        ChatAvatarContainer.this.parentFragment.presentFragment(fragment);
                     } else if (chat != null) {
                         args = new Bundle();
                         args.putInt("chat_id", chat.id);
@@ -479,8 +124,14 @@ Caused by: java.lang.NullPointerException
             this.statusDrawables[2] = new SendingFileDrawable();
             this.statusDrawables[3] = new PlayingGameDrawable();
             this.statusDrawables[4] = new RoundStatusDrawable();
-            for (StatusDrawable isChat : this.statusDrawables) {
-                isChat.setIsChat(chat != null);
+            for (StatusDrawable statusDrawable : this.statusDrawables) {
+                boolean z;
+                if (chat != null) {
+                    z = true;
+                } else {
+                    z = false;
+                }
+                statusDrawable.setIsChat(z);
             }
         }
     }
@@ -507,9 +158,9 @@ Caused by: java.lang.NullPointerException
     }
 
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int viewTop = (ActionBar.getCurrentActionBarHeight() - AndroidUtilities.dp(42.0f)) / 2;
+        int currentActionBarHeight = (ActionBar.getCurrentActionBarHeight() - AndroidUtilities.dp(42.0f)) / 2;
         int i = (VERSION.SDK_INT < 21 || !this.occupyStatusBar) ? 0 : AndroidUtilities.statusBarHeight;
-        viewTop += i;
+        int viewTop = currentActionBarHeight + i;
         this.avatarImageView.layout(AndroidUtilities.dp(8.0f), viewTop, AndroidUtilities.dp(50.0f), AndroidUtilities.dp(42.0f) + viewTop);
         if (this.subtitleTextView.getVisibility() == 0) {
             this.titleTextView.layout(AndroidUtilities.dp(62.0f), AndroidUtilities.dp(1.3f) + viewTop, AndroidUtilities.dp(62.0f) + this.titleTextView.getMeasuredWidth(), (this.titleTextView.getTextHeight() + viewTop) + AndroidUtilities.dp(1.3f));
@@ -575,28 +226,112 @@ Caused by: java.lang.NullPointerException
     }
 
     private void setTypingAnimation(boolean start) {
-        int a = 0;
+        int a;
         if (start) {
             try {
                 Integer type = (Integer) MessagesController.getInstance(this.currentAccount).printingStringsTypes.get(this.parentFragment.getDialogId());
                 this.subtitleTextView.setLeftDrawable(this.statusDrawables[type.intValue()]);
-                while (a < this.statusDrawables.length) {
+                for (a = 0; a < this.statusDrawables.length; a++) {
                     if (a == type.intValue()) {
                         this.statusDrawables[a].start();
                     } else {
                         this.statusDrawables[a].stop();
                     }
-                    a++;
                 }
-            } catch (Throwable a2) {
-                FileLog.e(a2);
+                return;
+            } catch (Throwable e) {
+                FileLog.e(e);
+                return;
             }
-            return;
         }
         this.subtitleTextView.setLeftDrawable(null);
-        while (a < this.statusDrawables.length) {
-            this.statusDrawables[a].stop();
-            a++;
+        for (StatusDrawable stop : this.statusDrawables) {
+            stop.stop();
+        }
+    }
+
+    public void updateSubtitle() {
+        if (this.parentFragment != null) {
+            User user = this.parentFragment.getCurrentUser();
+            if (!UserObject.isUserSelf(user)) {
+                CharSequence newSubtitle;
+                Chat chat = this.parentFragment.getCurrentChat();
+                CharSequence printString = (CharSequence) MessagesController.getInstance(this.currentAccount).printingStrings.get(this.parentFragment.getDialogId());
+                if (printString != null) {
+                    printString = TextUtils.replace(printString, new String[]{"..."}, new String[]{TtmlNode.ANONYMOUS_REGION_ID});
+                }
+                if (printString == null || printString.length() == 0 || (ChatObject.isChannel(chat) && !chat.megagroup)) {
+                    setTypingAnimation(false);
+                    if (chat != null) {
+                        ChatFull info = this.parentFragment.getCurrentChatInfo();
+                        if (ChatObject.isChannel(chat)) {
+                            if (info == null || info.participants_count == 0) {
+                                if (chat.megagroup) {
+                                    newSubtitle = LocaleController.getString("Loading", R.string.Loading).toLowerCase();
+                                } else if ((chat.flags & 64) != 0) {
+                                    newSubtitle = LocaleController.getString("ChannelPublic", R.string.ChannelPublic).toLowerCase();
+                                } else {
+                                    newSubtitle = LocaleController.getString("ChannelPrivate", R.string.ChannelPrivate).toLowerCase();
+                                }
+                            } else if (!chat.megagroup || info.participants_count > Callback.DEFAULT_DRAG_ANIMATION_DURATION) {
+                                int[] result = new int[1];
+                                String shortNumber = LocaleController.formatShortNumber(info.participants_count, result);
+                                if (chat.megagroup) {
+                                    newSubtitle = LocaleController.formatPluralString("Members", result[0]).replace(String.format("%d", new Object[]{Integer.valueOf(result[0])}), shortNumber);
+                                } else {
+                                    newSubtitle = LocaleController.formatPluralString("Subscribers", result[0]).replace(String.format("%d", new Object[]{Integer.valueOf(result[0])}), shortNumber);
+                                }
+                            } else if (this.onlineCount <= 1 || info.participants_count == 0) {
+                                newSubtitle = LocaleController.formatPluralString("Members", info.participants_count);
+                            } else {
+                                newSubtitle = String.format("%s, %s", new Object[]{LocaleController.formatPluralString("Members", info.participants_count), LocaleController.formatPluralString("OnlineCount", this.onlineCount)});
+                            }
+                        } else if (ChatObject.isKickedFromChat(chat)) {
+                            newSubtitle = LocaleController.getString("YouWereKicked", R.string.YouWereKicked);
+                        } else if (ChatObject.isLeftFromChat(chat)) {
+                            newSubtitle = LocaleController.getString("YouLeft", R.string.YouLeft);
+                        } else {
+                            int count = chat.participants_count;
+                            if (!(info == null || info.participants == null)) {
+                                count = info.participants.participants.size();
+                            }
+                            if (this.onlineCount <= 1 || count == 0) {
+                                newSubtitle = LocaleController.formatPluralString("Members", count);
+                            } else {
+                                newSubtitle = String.format("%s, %s", new Object[]{LocaleController.formatPluralString("Members", count), LocaleController.formatPluralString("OnlineCount", this.onlineCount)});
+                            }
+                        }
+                    } else if (user != null) {
+                        String newStatus;
+                        User newUser = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(user.id));
+                        if (newUser != null) {
+                            user = newUser;
+                        }
+                        if (user.id == UserConfig.getInstance(this.currentAccount).getClientUserId()) {
+                            newStatus = LocaleController.getString("ChatYourSelf", R.string.ChatYourSelf);
+                        } else if (user.id == 333000 || user.id == 777000) {
+                            newStatus = LocaleController.getString("ServiceNotifications", R.string.ServiceNotifications);
+                        } else if (user.bot) {
+                            newStatus = LocaleController.getString("Bot", R.string.Bot);
+                        } else {
+                            newStatus = LocaleController.formatUserStatus(this.currentAccount, user);
+                        }
+                        Object newSubtitle2 = newStatus;
+                    } else {
+                        newSubtitle = TtmlNode.ANONYMOUS_REGION_ID;
+                    }
+                } else {
+                    newSubtitle = printString;
+                    setTypingAnimation(true);
+                }
+                if (this.lastSubtitle == null) {
+                    this.subtitleTextView.setText(newSubtitle);
+                } else {
+                    this.lastSubtitle = newSubtitle;
+                }
+            } else if (this.subtitleTextView.getVisibility() != 8) {
+                this.subtitleTextView.setVisibility(8);
+            }
         }
     }
 
@@ -644,6 +379,24 @@ Caused by: java.lang.NullPointerException
             }
             if (this.avatarImageView != null) {
                 this.avatarImageView.setImage(newPhoto, "50_50", this.avatarDrawable);
+            }
+        }
+    }
+
+    public void updateOnlineCount() {
+        if (this.parentFragment != null) {
+            this.onlineCount = 0;
+            ChatFull info = this.parentFragment.getCurrentChatInfo();
+            if (info != null) {
+                int currentTime = ConnectionsManager.getInstance(this.currentAccount).getCurrentTime();
+                if ((info instanceof TL_chatFull) || ((info instanceof TL_channelFull) && info.participants_count <= Callback.DEFAULT_DRAG_ANIMATION_DURATION && info.participants != null)) {
+                    for (int a = 0; a < info.participants.participants.size(); a++) {
+                        User user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(((ChatParticipant) info.participants.participants.get(a)).user_id));
+                        if (!(user == null || user.status == null || ((user.status.expires <= currentTime && user.id != UserConfig.getInstance(this.currentAccount).getClientUserId()) || user.status.expires <= 10000))) {
+                            this.onlineCount++;
+                        }
+                    }
+                }
             }
         }
     }

@@ -61,16 +61,7 @@ public class SubSampleInformationBox extends AbstractFullBox {
             }
 
             public String toString() {
-                StringBuilder stringBuilder = new StringBuilder("SubsampleEntry{subsampleSize=");
-                stringBuilder.append(this.subsampleSize);
-                stringBuilder.append(", subsamplePriority=");
-                stringBuilder.append(this.subsamplePriority);
-                stringBuilder.append(", discardable=");
-                stringBuilder.append(this.discardable);
-                stringBuilder.append(", reserved=");
-                stringBuilder.append(this.reserved);
-                stringBuilder.append('}');
-                return stringBuilder.toString();
+                return "SubsampleEntry{subsampleSize=" + this.subsampleSize + ", subsamplePriority=" + this.subsamplePriority + ", discardable=" + this.discardable + ", reserved=" + this.reserved + '}';
             }
         }
 
@@ -91,14 +82,7 @@ public class SubSampleInformationBox extends AbstractFullBox {
         }
 
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder("SampleEntry{sampleDelta=");
-            stringBuilder.append(this.sampleDelta);
-            stringBuilder.append(", subsampleCount=");
-            stringBuilder.append(this.subsampleEntries.size());
-            stringBuilder.append(", subsampleEntries=");
-            stringBuilder.append(this.subsampleEntries);
-            stringBuilder.append('}');
-            return stringBuilder.toString();
+            return "SampleEntry{sampleDelta=" + this.sampleDelta + ", subsampleCount=" + this.subsampleEntries.size() + ", subsampleEntries=" + this.subsampleEntries + '}';
         }
     }
 
@@ -130,19 +114,15 @@ public class SubSampleInformationBox extends AbstractFullBox {
     protected long getContentSize() {
         long size = 8;
         for (SubSampleEntry entry : this.entries) {
-            long size2 = (size + 4) + 2;
-            int j = 0;
-            while (j < entry.getSubsampleEntries().size()) {
-                long size3;
+            size = (size + 4) + 2;
+            for (int j = 0; j < entry.getSubsampleEntries().size(); j++) {
                 if (getVersion() == 1) {
-                    size3 = size2 + 4;
+                    size += 4;
                 } else {
-                    size3 = size2 + 2;
+                    size += 2;
                 }
-                j++;
-                size2 = (size3 + 2) + 4;
+                size = (size + 2) + 4;
             }
-            size = size2;
         }
         return size;
     }
@@ -187,11 +167,6 @@ public class SubSampleInformationBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        StringBuilder stringBuilder = new StringBuilder("SubSampleInformationBox{entryCount=");
-        stringBuilder.append(this.entries.size());
-        stringBuilder.append(", entries=");
-        stringBuilder.append(this.entries);
-        stringBuilder.append('}');
-        return stringBuilder.toString();
+        return "SubSampleInformationBox{entryCount=" + this.entries.size() + ", entries=" + this.entries + '}';
     }
 }

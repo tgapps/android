@@ -37,12 +37,6 @@ public final class ConnectionResult extends AbstractSafeParcelable {
     }
 
     static String zza(int i) {
-        if (i == 99) {
-            return "UNFINISHED";
-        }
-        if (i == 1500) {
-            return "DRIVE_EXTERNAL_STORAGE_REQUIRED";
-        }
         switch (i) {
             case -1:
                 return "UNKNOWN";
@@ -70,33 +64,30 @@ public final class ConnectionResult extends AbstractSafeParcelable {
                 return "DEVELOPER_ERROR";
             case 11:
                 return "LICENSE_CHECK_FAILED";
+            case 13:
+                return "CANCELED";
+            case 14:
+                return "TIMEOUT";
+            case 15:
+                return "INTERRUPTED";
+            case 16:
+                return "API_UNAVAILABLE";
+            case 17:
+                return "SIGN_IN_FAILED";
+            case 18:
+                return "SERVICE_UPDATING";
+            case 19:
+                return "SERVICE_MISSING_PERMISSION";
+            case 20:
+                return "RESTRICTED_PROFILE";
+            case 21:
+                return "API_VERSION_UPDATE_REQUIRED";
+            case 99:
+                return "UNFINISHED";
+            case 1500:
+                return "DRIVE_EXTERNAL_STORAGE_REQUIRED";
             default:
-                switch (i) {
-                    case 13:
-                        return "CANCELED";
-                    case 14:
-                        return "TIMEOUT";
-                    case 15:
-                        return "INTERRUPTED";
-                    case 16:
-                        return "API_UNAVAILABLE";
-                    case 17:
-                        return "SIGN_IN_FAILED";
-                    case 18:
-                        return "SERVICE_UPDATING";
-                    case 19:
-                        return "SERVICE_MISSING_PERMISSION";
-                    case 20:
-                        return "RESTRICTED_PROFILE";
-                    case 21:
-                        return "API_VERSION_UPDATE_REQUIRED";
-                    default:
-                        StringBuilder stringBuilder = new StringBuilder(31);
-                        stringBuilder.append("UNKNOWN_ERROR_CODE(");
-                        stringBuilder.append(i);
-                        stringBuilder.append(")");
-                        return stringBuilder.toString();
-                }
+                return "UNKNOWN_ERROR_CODE(" + i + ")";
         }
     }
 

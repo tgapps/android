@@ -24,11 +24,11 @@ public final class WalletFragmentInitParams extends AbstractSafeParcelable imple
         }
 
         public final WalletFragmentInitParams build() {
-            boolean z = false;
+            boolean z = true;
             boolean z2 = (this.zzfy.zzfj != null && this.zzfy.zzfi == null) || (this.zzfy.zzfj == null && this.zzfy.zzfi != null);
             Preconditions.checkState(z2, "Exactly one of MaskedWallet or MaskedWalletRequest is required");
-            if (this.zzfy.zzfx >= 0) {
-                z = true;
+            if (this.zzfy.zzfx < 0) {
+                z = false;
             }
             Preconditions.checkState(z, "masked wallet request code is required and must be non-negative");
             return this.zzfy;

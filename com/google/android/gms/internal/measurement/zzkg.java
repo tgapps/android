@@ -47,21 +47,14 @@ public final class zzkg extends zzabd<zzkg> {
         } else if (!this.value.equals(com_google_android_gms_internal_measurement_zzkg.value)) {
             return false;
         }
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                return this.zzbzh.equals(com_google_android_gms_internal_measurement_zzkg.zzbzh);
-            }
-        }
-        return com_google_android_gms_internal_measurement_zzkg.zzbzh == null || com_google_android_gms_internal_measurement_zzkg.zzbzh.isEmpty();
+        return (this.zzbzh == null || this.zzbzh.isEmpty()) ? com_google_android_gms_internal_measurement_zzkg.zzbzh == null || com_google_android_gms_internal_measurement_zzkg.zzbzh.isEmpty() : this.zzbzh.equals(com_google_android_gms_internal_measurement_zzkg.zzbzh);
     }
 
     public final int hashCode() {
         int i = 0;
-        int hashCode = (((((527 + getClass().getName().hashCode()) * 31) + (this.zznt == null ? 0 : this.zznt.hashCode())) * 31) + (this.value == null ? 0 : this.value.hashCode())) * 31;
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                i = this.zzbzh.hashCode();
-            }
+        int hashCode = ((this.value == null ? 0 : this.value.hashCode()) + (((this.zznt == null ? 0 : this.zznt.hashCode()) + ((getClass().getName().hashCode() + 527) * 31)) * 31)) * 31;
+        if (!(this.zzbzh == null || this.zzbzh.isEmpty())) {
+            i = this.zzbzh.hashCode();
         }
         return hashCode + i;
     }
@@ -87,16 +80,22 @@ public final class zzkg extends zzabd<zzkg> {
     public final /* synthetic */ zzabj zzb(zzaba com_google_android_gms_internal_measurement_zzaba) throws IOException {
         while (true) {
             int zzvo = com_google_android_gms_internal_measurement_zzaba.zzvo();
-            if (zzvo == 0) {
-                return this;
+            switch (zzvo) {
+                case 0:
+                    break;
+                case 10:
+                    this.zznt = com_google_android_gms_internal_measurement_zzaba.readString();
+                    continue;
+                case 18:
+                    this.value = com_google_android_gms_internal_measurement_zzaba.readString();
+                    continue;
+                default:
+                    if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
+                        break;
+                    }
+                    continue;
             }
-            if (zzvo == 10) {
-                this.zznt = com_google_android_gms_internal_measurement_zzaba.readString();
-            } else if (zzvo == 18) {
-                this.value = com_google_android_gms_internal_measurement_zzaba.readString();
-            } else if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
-                return this;
-            }
+            return this;
         }
     }
 }

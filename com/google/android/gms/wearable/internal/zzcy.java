@@ -23,12 +23,6 @@ public final class zzcy extends DataBufferRef {
     public final String toString() {
         String str = getType() == 1 ? "changed" : getType() == 2 ? "deleted" : "unknown";
         String valueOf = String.valueOf(getDataItem());
-        StringBuilder stringBuilder = new StringBuilder((32 + String.valueOf(str).length()) + String.valueOf(valueOf).length());
-        stringBuilder.append("DataEventRef{ type=");
-        stringBuilder.append(str);
-        stringBuilder.append(", dataitem=");
-        stringBuilder.append(valueOf);
-        stringBuilder.append(" }");
-        return stringBuilder.toString();
+        return new StringBuilder((String.valueOf(str).length() + 32) + String.valueOf(valueOf).length()).append("DataEventRef{ type=").append(str).append(", dataitem=").append(valueOf).append(" }").toString();
     }
 }

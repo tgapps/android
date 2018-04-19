@@ -12,14 +12,14 @@ public abstract class zzabd<M extends zzabd<M>> extends zzabj {
     }
 
     protected int zza() {
-        int i = 0;
         if (this.zzbzh == null) {
             return 0;
         }
+        int i = 0;
         int i2 = 0;
         while (i < this.zzbzh.size()) {
-            i2 += this.zzbzh.zzaw(i).zza();
             i++;
+            i2 = this.zzbzh.zzaw(i).zza() + i2;
         }
         return i2;
     }

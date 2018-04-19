@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.exoplayer2.Format;
 import org.telegram.messenger.exoplayer2.ParserException;
 import org.telegram.messenger.exoplayer2.drm.DrmInitData;
@@ -60,11 +61,11 @@ public class SsManifestParser implements Parser<SsManifest> {
                                 if (skippingElementDepth <= 0) {
                                     if (!handleChildInline(tagName)) {
                                         ElementParser childElementParser = newChildParser(this, tagName, this.baseUri);
-                                        if (childElementParser == null) {
-                                            skippingElementDepth = 1;
-                                        } else {
+                                        if (childElementParser != null) {
                                             addChild(childElementParser.parse(xmlParser));
+                                            break;
                                         }
+                                        skippingElementDepth = 1;
                                         break;
                                     }
                                     parseStartTag(xmlParser);
@@ -157,14 +158,14 @@ public class SsManifestParser implements Parser<SsManifest> {
 
         protected final int parseInt(XmlPullParser parser, String key, int defaultValue) throws ParserException {
             String value = parser.getAttributeValue(null, key);
-            if (value == null) {
-                return defaultValue;
+            if (value != null) {
+                try {
+                    defaultValue = Integer.parseInt(value);
+                } catch (Throwable e) {
+                    throw new ParserException(e);
+                }
             }
-            try {
-                return Integer.parseInt(value);
-            } catch (Throwable e) {
-                throw new ParserException(e);
-            }
+            return defaultValue;
         }
 
         protected final int parseRequiredInt(XmlPullParser parser, String key) throws ParserException {
@@ -181,14 +182,14 @@ public class SsManifestParser implements Parser<SsManifest> {
 
         protected final long parseLong(XmlPullParser parser, String key, long defaultValue) throws ParserException {
             String value = parser.getAttributeValue(null, key);
-            if (value == null) {
-                return defaultValue;
+            if (value != null) {
+                try {
+                    defaultValue = Long.parseLong(value);
+                } catch (Throwable e) {
+                    throw new ParserException(e);
+                }
             }
-            try {
-                return Long.parseLong(value);
-            } catch (Throwable e) {
-                throw new ParserException(e);
-            }
+            return defaultValue;
         }
 
         protected final long parseRequiredLong(XmlPullParser parser, String key) throws ParserException {
@@ -214,10 +215,7 @@ public class SsManifestParser implements Parser<SsManifest> {
 
     public static class MissingFieldException extends ParserException {
         public MissingFieldException(String fieldName) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Missing required field: ");
-            stringBuilder.append(fieldName);
-            super(stringBuilder.toString());
+            super("Missing required field: " + fieldName);
         }
     }
 
@@ -287,27 +285,29 @@ public class SsManifestParser implements Parser<SsManifest> {
         }
 
         public void parseStartTag(XmlPullParser parser) throws ParserException {
-            XmlPullParser xmlPullParser = parser;
             int type = ((Integer) getNormalizedAttribute(KEY_TYPE)).intValue();
-            String id = xmlPullParser.getAttributeValue(null, KEY_INDEX);
-            int bitrate = parseRequiredInt(xmlPullParser, KEY_BITRATE);
-            String sampleMimeType = fourCCToMimeType(parseRequiredString(xmlPullParser, KEY_FOUR_CC));
+            String id = parser.getAttributeValue(null, KEY_INDEX);
+            int bitrate = parseRequiredInt(parser, KEY_BITRATE);
+            String sampleMimeType = fourCCToMimeType(parseRequiredString(parser, KEY_FOUR_CC));
             if (type == 2) {
-                r0.format = Format.createVideoContainerFormat(id, MimeTypes.VIDEO_MP4, sampleMimeType, null, bitrate, parseRequiredInt(xmlPullParser, KEY_MAX_WIDTH), parseRequiredInt(xmlPullParser, KEY_MAX_HEIGHT), -1.0f, buildCodecSpecificData(xmlPullParser.getAttributeValue(null, KEY_CODEC_PRIVATE_DATA)), 0);
+                this.format = Format.createVideoContainerFormat(id, MimeTypes.VIDEO_MP4, sampleMimeType, null, bitrate, parseRequiredInt(parser, KEY_MAX_WIDTH), parseRequiredInt(parser, KEY_MAX_HEIGHT), -1.0f, buildCodecSpecificData(parser.getAttributeValue(null, KEY_CODEC_PRIVATE_DATA)), 0);
             } else if (type == 1) {
-                String sampleMimeType2 = sampleMimeType == null ? MimeTypes.AUDIO_AAC : sampleMimeType;
-                int channels = parseRequiredInt(xmlPullParser, KEY_CHANNELS);
-                int samplingRate = parseRequiredInt(xmlPullParser, KEY_SAMPLING_RATE);
-                List<byte[]> codecSpecificData = buildCodecSpecificData(xmlPullParser.getAttributeValue(null, KEY_CODEC_PRIVATE_DATA));
-                if (codecSpecificData.isEmpty() && MimeTypes.AUDIO_AAC.equals(sampleMimeType2)) {
+                if (sampleMimeType == null) {
+                    sampleMimeType = MimeTypes.AUDIO_AAC;
+                }
+                int channels = parseRequiredInt(parser, KEY_CHANNELS);
+                int samplingRate = parseRequiredInt(parser, KEY_SAMPLING_RATE);
+                List<byte[]> codecSpecificData = buildCodecSpecificData(parser.getAttributeValue(null, KEY_CODEC_PRIVATE_DATA));
+                if (codecSpecificData.isEmpty() && MimeTypes.AUDIO_AAC.equals(sampleMimeType)) {
                     codecSpecificData = Collections.singletonList(CodecSpecificDataUtil.buildAacLcAudioSpecificConfig(samplingRate, channels));
                 }
-                String sampleMimeType3 = sampleMimeType2;
-                r0.format = Format.createAudioContainerFormat(id, MimeTypes.AUDIO_MP4, sampleMimeType2, null, bitrate, channels, samplingRate, codecSpecificData, 0, (String) getNormalizedAttribute(KEY_LANGUAGE));
+                String str = id;
+                this.format = Format.createAudioContainerFormat(str, MimeTypes.AUDIO_MP4, sampleMimeType, null, bitrate, channels, samplingRate, codecSpecificData, 0, (String) getNormalizedAttribute(KEY_LANGUAGE));
             } else if (type == 3) {
-                r0.format = Format.createTextContainerFormat(id, MimeTypes.APPLICATION_MP4, sampleMimeType, null, bitrate, 0, (String) getNormalizedAttribute(KEY_LANGUAGE));
+                String str2 = id;
+                this.format = Format.createTextContainerFormat(str2, MimeTypes.APPLICATION_MP4, sampleMimeType, null, bitrate, 0, (String) getNormalizedAttribute(KEY_LANGUAGE));
             } else {
-                r0.format = Format.createContainerFormat(id, MimeTypes.APPLICATION_MP4, sampleMimeType, null, bitrate, 0, null);
+                this.format = Format.createContainerFormat(id, MimeTypes.APPLICATION_MP4, sampleMimeType, null, bitrate, 0, null);
             }
         }
 
@@ -330,44 +330,34 @@ public class SsManifestParser implements Parser<SsManifest> {
         }
 
         private static String fourCCToMimeType(String fourCC) {
-            if (!(fourCC.equalsIgnoreCase("H264") || fourCC.equalsIgnoreCase("X264") || fourCC.equalsIgnoreCase("AVC1"))) {
-                if (!fourCC.equalsIgnoreCase("DAVC")) {
-                    if (!(fourCC.equalsIgnoreCase("AAC") || fourCC.equalsIgnoreCase("AACL") || fourCC.equalsIgnoreCase("AACH"))) {
-                        if (!fourCC.equalsIgnoreCase("AACP")) {
-                            if (fourCC.equalsIgnoreCase("TTML")) {
-                                return MimeTypes.APPLICATION_TTML;
-                            }
-                            if (!fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE8)) {
-                                if (!fourCC.equalsIgnoreCase("dac3")) {
-                                    if (!fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE9)) {
-                                        if (!fourCC.equalsIgnoreCase("dec3")) {
-                                            if (fourCC.equalsIgnoreCase("dtsc")) {
-                                                return MimeTypes.AUDIO_DTS;
-                                            }
-                                            if (!fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE12)) {
-                                                if (!fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE11)) {
-                                                    if (fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE13)) {
-                                                        return MimeTypes.AUDIO_DTS_EXPRESS;
-                                                    }
-                                                    if (fourCC.equalsIgnoreCase("opus")) {
-                                                        return MimeTypes.AUDIO_OPUS;
-                                                    }
-                                                    return null;
-                                                }
-                                            }
-                                            return MimeTypes.AUDIO_DTS_HD;
-                                        }
-                                    }
-                                    return MimeTypes.AUDIO_E_AC3;
-                                }
-                            }
-                            return MimeTypes.AUDIO_AC3;
-                        }
-                    }
-                    return MimeTypes.AUDIO_AAC;
-                }
+            if (fourCC.equalsIgnoreCase("H264") || fourCC.equalsIgnoreCase("X264") || fourCC.equalsIgnoreCase("AVC1") || fourCC.equalsIgnoreCase("DAVC")) {
+                return "video/avc";
             }
-            return "video/avc";
+            if (fourCC.equalsIgnoreCase("AAC") || fourCC.equalsIgnoreCase("AACL") || fourCC.equalsIgnoreCase("AACH") || fourCC.equalsIgnoreCase("AACP")) {
+                return MimeTypes.AUDIO_AAC;
+            }
+            if (fourCC.equalsIgnoreCase("TTML")) {
+                return MimeTypes.APPLICATION_TTML;
+            }
+            if (fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE8) || fourCC.equalsIgnoreCase("dac3")) {
+                return MimeTypes.AUDIO_AC3;
+            }
+            if (fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE9) || fourCC.equalsIgnoreCase("dec3")) {
+                return MimeTypes.AUDIO_E_AC3;
+            }
+            if (fourCC.equalsIgnoreCase("dtsc")) {
+                return MimeTypes.AUDIO_DTS;
+            }
+            if (fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE12) || fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE11)) {
+                return MimeTypes.AUDIO_DTS_HD;
+            }
+            if (fourCC.equalsIgnoreCase(AudioSampleEntry.TYPE13)) {
+                return MimeTypes.AUDIO_DTS_EXPRESS;
+            }
+            if (fourCC.equalsIgnoreCase("opus")) {
+                return MimeTypes.AUDIO_OPUS;
+            }
+            return null;
         }
     }
 
@@ -463,94 +453,6 @@ public class SsManifestParser implements Parser<SsManifest> {
         private int type;
         private String url;
 
-        private void parseStreamFragmentStartTag(org.xmlpull.v1.XmlPullParser r1) throws org.telegram.messenger.exoplayer2.ParserException {
-            /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.messenger.exoplayer2.source.smoothstreaming.manifest.SsManifestParser.StreamIndexParser.parseStreamFragmentStartTag(org.xmlpull.v1.XmlPullParser):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-            /*
-            r0 = this;
-            r0 = r13.startTimes;
-            r0 = r0.size();
-            r1 = "t";
-            r2 = -9223372036854775807; // 0x8000000000000001 float:1.4E-45 double:-4.9E-324;
-            r4 = r13.parseLong(r14, r1, r2);
-            r1 = (r4 > r2 ? 1 : (r4 == r2 ? 0 : -1));
-            if (r1 != 0) goto L_0x003d;
-        L_0x0015:
-            if (r0 != 0) goto L_0x001a;
-        L_0x0017:
-            r4 = 0;
-            goto L_0x003d;
-        L_0x001a:
-            r6 = r13.lastChunkDuration;
-            r8 = -1;
-            r1 = (r6 > r8 ? 1 : (r6 == r8 ? 0 : -1));
-            if (r1 == 0) goto L_0x0035;
-        L_0x0022:
-            r1 = r13.startTimes;
-            r6 = r0 + -1;
-            r1 = r1.get(r6);
-            r1 = (java.lang.Long) r1;
-            r6 = r1.longValue();
-            r8 = r13.lastChunkDuration;
-            r4 = r6 + r8;
-            goto L_0x003d;
-        L_0x0035:
-            r1 = new org.telegram.messenger.exoplayer2.ParserException;
-            r2 = "Unable to infer start time";
-            r1.<init>(r2);
-            throw r1;
-        L_0x003d:
-            r1 = 1;
-            r0 = r0 + r1;
-            r6 = r13.startTimes;
-            r7 = java.lang.Long.valueOf(r4);
-            r6.add(r7);
-            r6 = "d";
-            r6 = r13.parseLong(r14, r6, r2);
-            r13.lastChunkDuration = r6;
-            r6 = "r";
-            r7 = 1;
-            r9 = r13.parseLong(r14, r6, r7);
-            r6 = (r9 > r7 ? 1 : (r9 == r7 ? 0 : -1));
-            if (r6 <= 0) goto L_0x006a;
-        L_0x005c:
-            r6 = r13.lastChunkDuration;
-            r8 = (r6 > r2 ? 1 : (r6 == r2 ? 0 : -1));
-            if (r8 != 0) goto L_0x006a;
-            r1 = new org.telegram.messenger.exoplayer2.ParserException;
-            r2 = "Repeated chunk with unspecified duration";
-            r1.<init>(r2);
-            throw r1;
-            r2 = (long) r1;
-            r6 = (r2 > r9 ? 1 : (r2 == r9 ? 0 : -1));
-            if (r6 >= 0) goto L_0x0084;
-            r0 = r0 + 1;
-            r2 = r13.startTimes;
-            r6 = r13.lastChunkDuration;
-            r11 = (long) r1;
-            r6 = r6 * r11;
-            r11 = r4 + r6;
-            r3 = java.lang.Long.valueOf(r11);
-            r2.add(r3);
-            r1 = r1 + 1;
-            goto L_0x006b;
-            return;
-            */
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.source.smoothstreaming.manifest.SsManifestParser.StreamIndexParser.parseStreamFragmentStartTag(org.xmlpull.v1.XmlPullParser):void");
-        }
-
         public StreamIndexParser(ElementParser parent, String baseUri) {
             super(parent, baseUri, TAG);
             this.baseUri = baseUri;
@@ -566,6 +468,32 @@ Caused by: java.lang.NullPointerException
             } else {
                 parseStreamElementStartTag(parser);
             }
+        }
+
+        private void parseStreamFragmentStartTag(XmlPullParser parser) throws ParserException {
+            int chunkIndex = this.startTimes.size();
+            long startTime = parseLong(parser, KEY_FRAGMENT_START_TIME, C.TIME_UNSET);
+            if (startTime == C.TIME_UNSET) {
+                if (chunkIndex == 0) {
+                    startTime = 0;
+                } else if (this.lastChunkDuration != -1) {
+                    startTime = ((Long) this.startTimes.get(chunkIndex - 1)).longValue() + this.lastChunkDuration;
+                } else {
+                    throw new ParserException("Unable to infer start time");
+                }
+            }
+            chunkIndex++;
+            this.startTimes.add(Long.valueOf(startTime));
+            this.lastChunkDuration = parseLong(parser, KEY_FRAGMENT_DURATION, C.TIME_UNSET);
+            long repeatCount = parseLong(parser, KEY_FRAGMENT_REPEAT_COUNT, 1);
+            if (repeatCount <= 1 || this.lastChunkDuration != C.TIME_UNSET) {
+                for (int i = 1; ((long) i) < repeatCount; i++) {
+                    chunkIndex++;
+                    this.startTimes.add(Long.valueOf((this.lastChunkDuration * ((long) i)) + startTime));
+                }
+                return;
+            }
+            throw new ParserException("Repeated chunk with unspecified duration");
         }
 
         private void parseStreamElementStartTag(XmlPullParser parser) throws ParserException {
@@ -604,11 +532,7 @@ Caused by: java.lang.NullPointerException
                 if ("text".equalsIgnoreCase(value)) {
                     return 3;
                 }
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Invalid key value[");
-                stringBuilder.append(value);
-                stringBuilder.append("]");
-                throw new ParserException(stringBuilder.toString());
+                throw new ParserException("Invalid key value[" + value + "]");
             }
         }
 

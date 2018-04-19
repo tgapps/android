@@ -60,50 +60,42 @@ public final class zzo implements zzg {
 
     private static Status zzd(int i) {
         String str;
-        if (i == -6508) {
-            str = "SUCCESS_CACHE_STALE";
-        } else if (i != 6507) {
-            switch (i) {
-                case -6506:
-                    str = "SUCCESS_CACHE";
-                    break;
-                case -6505:
-                    str = "SUCCESS_FRESH";
-                    break;
-                default:
-                    switch (i) {
-                        case 6500:
-                            str = "NOT_AUTHORIZED_TO_FETCH";
-                            break;
-                        case 6501:
-                            str = "ANOTHER_FETCH_INFLIGHT";
-                            break;
-                        case 6502:
-                            str = "FETCH_THROTTLED";
-                            break;
-                        case 6503:
-                            str = "NOT_AVAILABLE";
-                            break;
-                        case 6504:
-                            str = "FAILURE_CACHE";
-                            break;
-                        default:
-                            str = CommonStatusCodes.getStatusCodeString(i);
-                            break;
-                    }
-            }
-        } else {
-            str = "FETCH_THROTTLED_STALE";
+        switch (i) {
+            case -6508:
+                str = "SUCCESS_CACHE_STALE";
+                break;
+            case -6506:
+                str = "SUCCESS_CACHE";
+                break;
+            case -6505:
+                str = "SUCCESS_FRESH";
+                break;
+            case 6500:
+                str = "NOT_AUTHORIZED_TO_FETCH";
+                break;
+            case 6501:
+                str = "ANOTHER_FETCH_INFLIGHT";
+                break;
+            case 6502:
+                str = "FETCH_THROTTLED";
+                break;
+            case 6503:
+                str = "NOT_AVAILABLE";
+                break;
+            case 6504:
+                str = "FAILURE_CACHE";
+                break;
+            case 6507:
+                str = "FETCH_THROTTLED_STALE";
+                break;
+            default:
+                str = CommonStatusCodes.getStatusCodeString(i);
+                break;
         }
         return new Status(i, str);
     }
 
     public final PendingResult<zzk> zza(GoogleApiClient googleApiClient, zzi com_google_android_gms_internal_config_zzi) {
-        if (googleApiClient != null) {
-            if (com_google_android_gms_internal_config_zzi != null) {
-                return googleApiClient.enqueue(new zzp(this, googleApiClient, com_google_android_gms_internal_config_zzi));
-            }
-        }
-        return null;
+        return (googleApiClient == null || com_google_android_gms_internal_config_zzi == null) ? null : googleApiClient.enqueue(new zzp(this, googleApiClient, com_google_android_gms_internal_config_zzi));
     }
 }

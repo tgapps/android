@@ -2,7 +2,9 @@ package com.google.android.gms.internal.measurement;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.RemoteException;
+import com.google.android.gms.common.GoogleApiAvailabilityLight;
 import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
 import com.google.android.gms.common.stats.ConnectionTracker;
@@ -10,6 +12,7 @@ import com.google.android.gms.common.util.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.exoplayer2.source.chunk.ChunkedTrackBlacklistUtil;
 
 public final class zzil extends zzhk {
@@ -90,6 +93,7 @@ public final class zzil extends zzhk {
         try {
             ConnectionTracker.getInstance().unbindService(getContext(), this.zzapr);
         } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException e2) {
         }
         this.zzaps = null;
     }
@@ -121,65 +125,50 @@ public final class zzil extends zzhk {
     }
 
     final void zza(zzey com_google_android_gms_internal_measurement_zzey, AbstractSafeParcelable abstractSafeParcelable, zzec com_google_android_gms_internal_measurement_zzec) {
-        zzfi zzil;
-        String str;
         zzab();
         zzch();
-        int i = 0;
-        int i2 = 100;
-        while (i < 1001 && r3 == 100) {
-            int size;
+        int i = 100;
+        for (int i2 = 0; i2 < 1001 && r4 == 100; i2++) {
             List arrayList = new ArrayList();
             Object zzp = zzfz().zzp(100);
             if (zzp != null) {
                 arrayList.addAll(zzp);
-                size = zzp.size();
+                i = zzp.size();
             } else {
-                size = 0;
+                i = 0;
             }
-            if (abstractSafeParcelable != null && size < 100) {
+            if (abstractSafeParcelable != null && r4 < 100) {
                 arrayList.add(abstractSafeParcelable);
             }
             ArrayList arrayList2 = (ArrayList) arrayList;
-            int size2 = arrayList2.size();
+            int size = arrayList2.size();
             int i3 = 0;
-            while (i3 < size2) {
-                Object obj = arrayList2.get(i3);
+            while (i3 < size) {
+                zzp = arrayList2.get(i3);
                 i3++;
-                AbstractSafeParcelable abstractSafeParcelable2 = (AbstractSafeParcelable) obj;
+                AbstractSafeParcelable abstractSafeParcelable2 = (AbstractSafeParcelable) zzp;
                 if (abstractSafeParcelable2 instanceof zzeu) {
                     try {
                         com_google_android_gms_internal_measurement_zzey.zza((zzeu) abstractSafeParcelable2, com_google_android_gms_internal_measurement_zzec);
                     } catch (RemoteException e) {
-                        obj = e;
-                        zzil = zzgg().zzil();
-                        str = "Failed to send event to the service";
-                        zzil.zzg(str, obj);
+                        zzgg().zzil().zzg("Failed to send event to the service", e);
                     }
                 } else if (abstractSafeParcelable2 instanceof zzjs) {
                     try {
                         com_google_android_gms_internal_measurement_zzey.zza((zzjs) abstractSafeParcelable2, com_google_android_gms_internal_measurement_zzec);
                     } catch (RemoteException e2) {
-                        obj = e2;
-                        zzil = zzgg().zzil();
-                        str = "Failed to send attribute to the service";
-                        zzil.zzg(str, obj);
+                        zzgg().zzil().zzg("Failed to send attribute to the service", e2);
                     }
                 } else if (abstractSafeParcelable2 instanceof zzef) {
                     try {
                         com_google_android_gms_internal_measurement_zzey.zza((zzef) abstractSafeParcelable2, com_google_android_gms_internal_measurement_zzec);
-                    } catch (RemoteException e3) {
-                        obj = e3;
-                        zzil = zzgg().zzil();
-                        str = "Failed to send conditional property to the service";
-                        zzil.zzg(str, obj);
+                    } catch (RemoteException e22) {
+                        zzgg().zzil().zzg("Failed to send conditional property to the service", e22);
                     }
                 } else {
                     zzgg().zzil().log("Discarding data. Unrecognized parcel type.");
                 }
             }
-            i++;
-            i2 = size;
         }
     }
 
@@ -234,191 +223,92 @@ public final class zzil extends zzhk {
         zzf(new zzit(this, true, zzfz().zza(com_google_android_gms_internal_measurement_zzeu), com_google_android_gms_internal_measurement_zzeu, zzl(true), str));
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
     final void zzdf() {
-        /*
-        r6 = this;
-        r6.zzab();
-        r6.zzch();
-        r0 = r6.isConnected();
-        if (r0 == 0) goto L_0x000d;
-    L_0x000c:
-        return;
-    L_0x000d:
-        r0 = r6.zzapt;
-        r1 = 0;
-        r2 = 1;
-        if (r0 != 0) goto L_0x00fa;
-    L_0x0013:
-        r6.zzab();
-        r6.zzch();
-        r0 = r6.zzgh();
-        r0 = r0.zzix();
-        if (r0 == 0) goto L_0x002c;
-    L_0x0023:
-        r0 = r0.booleanValue();
-        if (r0 == 0) goto L_0x002c;
-    L_0x0029:
-        r3 = r2;
-        goto L_0x00f4;
-    L_0x002c:
-        r0 = r6.zzfv();
-        r0 = r0.zzij();
-        if (r0 != r2) goto L_0x003a;
-    L_0x0036:
-        r0 = r2;
-    L_0x0037:
-        r3 = r0;
-        goto L_0x00eb;
-    L_0x003a:
-        r0 = r6.zzgg();
-        r0 = r0.zzir();
-        r3 = "Checking service availability";
-        r0.log(r3);
-        r0 = r6.zzgc();
-        r3 = com.google.android.gms.common.GoogleApiAvailabilityLight.getInstance();
-        r0 = r0.getContext();
-        r4 = 12451; // 0x30a3 float:1.7448E-41 double:6.1516E-320;
-        r0 = r3.isGooglePlayServicesAvailable(r0, r4);
-        r3 = 9;
-        if (r0 == r3) goto L_0x00e0;
-    L_0x005d:
-        r3 = 18;
-        if (r0 == r3) goto L_0x00d5;
-    L_0x0061:
-        switch(r0) {
-            case 0: goto L_0x00c6;
-            case 1: goto L_0x00b6;
-            case 2: goto L_0x0085;
-            case 3: goto L_0x0077;
-            default: goto L_0x0064;
-        };
-    L_0x0064:
-        r3 = r6.zzgg();
-        r3 = r3.zzin();
-        r4 = "Unexpected service status";
-        r0 = java.lang.Integer.valueOf(r0);
-        r3.zzg(r4, r0);
-    L_0x0075:
-        r0 = r1;
-        goto L_0x0037;
-    L_0x0077:
-        r0 = r6.zzgg();
-        r0 = r0.zzin();
-        r3 = "Service disabled";
-    L_0x0081:
-        r0.log(r3);
-        goto L_0x0075;
-    L_0x0085:
-        r0 = r6.zzgg();
-        r0 = r0.zziq();
-        r3 = "Service container out of date";
-        r0.log(r3);
-        r0 = r6.zzgc();
-        r0 = r0.zzkv();
-        r3 = 12400; // 0x3070 float:1.7376E-41 double:6.1264E-320;
-        if (r0 >= r3) goto L_0x009f;
-    L_0x009e:
-        goto L_0x00c3;
-    L_0x009f:
-        r0 = r6.zzgh();
-        r0 = r0.zzix();
-        if (r0 == 0) goto L_0x00b2;
-    L_0x00a9:
-        r0 = r0.booleanValue();
-        if (r0 == 0) goto L_0x00b0;
-    L_0x00af:
-        goto L_0x00b2;
-    L_0x00b0:
-        r0 = r1;
-        goto L_0x00b3;
-    L_0x00b2:
-        r0 = r2;
-    L_0x00b3:
-        r3 = r0;
-        r0 = r1;
-        goto L_0x00eb;
-    L_0x00b6:
-        r0 = r6.zzgg();
-        r0 = r0.zzir();
-        r3 = "Service missing";
-        r0.log(r3);
-    L_0x00c3:
-        r3 = r1;
-        r0 = r2;
-        goto L_0x00eb;
-    L_0x00c6:
-        r0 = r6.zzgg();
-        r0 = r0.zzir();
-        r3 = "Service available";
-    L_0x00d0:
-        r0.log(r3);
-        goto L_0x0036;
-    L_0x00d5:
-        r0 = r6.zzgg();
-        r0 = r0.zzin();
-        r3 = "Service updating";
-        goto L_0x00d0;
-    L_0x00e0:
-        r0 = r6.zzgg();
-        r0 = r0.zzin();
-        r3 = "Service invalid";
-        goto L_0x0081;
-    L_0x00eb:
-        if (r0 == 0) goto L_0x00f4;
-    L_0x00ed:
-        r0 = r6.zzgh();
-        r0.zzf(r3);
-    L_0x00f4:
-        r0 = java.lang.Boolean.valueOf(r3);
-        r6.zzapt = r0;
-    L_0x00fa:
-        r0 = r6.zzapt;
-        r0 = r0.booleanValue();
-        if (r0 == 0) goto L_0x0108;
-    L_0x0102:
-        r0 = r6.zzapr;
-        r0.zzkp();
-        return;
-    L_0x0108:
-        r0 = r6.getContext();
-        r0 = r0.getPackageManager();
-        r3 = new android.content.Intent;
-        r3.<init>();
-        r4 = r6.getContext();
-        r5 = "com.google.android.gms.measurement.AppMeasurementService";
-        r3 = r3.setClassName(r4, r5);
-        r4 = 65536; // 0x10000 float:9.18355E-41 double:3.2379E-319;
-        r0 = r0.queryIntentServices(r3, r4);
-        if (r0 == 0) goto L_0x012e;
-    L_0x0127:
-        r0 = r0.size();
-        if (r0 <= 0) goto L_0x012e;
-    L_0x012d:
-        r1 = r2;
-    L_0x012e:
-        if (r1 == 0) goto L_0x014b;
-    L_0x0130:
-        r0 = new android.content.Intent;
-        r1 = "com.google.android.gms.measurement.START";
-        r0.<init>(r1);
-        r1 = new android.content.ComponentName;
-        r2 = r6.getContext();
-        r3 = "com.google.android.gms.measurement.AppMeasurementService";
-        r1.<init>(r2, r3);
-        r0.setComponent(r1);
-        r1 = r6.zzapr;
-        r1.zzc(r0);
-        return;
-    L_0x014b:
-        r0 = r6.zzgg();
-        r0 = r0.zzil();
-        r1 = "Unable to use remote or local measurement implementation. Please register the AppMeasurementService service in the app manifest";
-        r0.log(r1);
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.internal.measurement.zzil.zzdf():void");
+        Object obj = 1;
+        zzab();
+        zzch();
+        if (!isConnected()) {
+            if (this.zzapt == null) {
+                boolean z;
+                zzab();
+                zzch();
+                Boolean zzix = zzgh().zzix();
+                if (zzix == null || !zzix.booleanValue()) {
+                    Object obj2;
+                    if (zzfv().zzij() != 1) {
+                        zzgg().zzir().log("Checking service availability");
+                        int isGooglePlayServicesAvailable = GoogleApiAvailabilityLight.getInstance().isGooglePlayServicesAvailable(zzgc().getContext(), 12451);
+                        int i;
+                        switch (isGooglePlayServicesAvailable) {
+                            case 0:
+                                zzgg().zzir().log("Service available");
+                                i = 1;
+                                z = true;
+                                break;
+                            case 1:
+                                zzgg().zzir().log("Service missing");
+                                i = 1;
+                                z = false;
+                                break;
+                            case 2:
+                                zzgg().zziq().log("Service container out of date");
+                                if (zzgc().zzkv() >= 12400) {
+                                    zzix = zzgh().zzix();
+                                    z = zzix == null || zzix.booleanValue();
+                                    obj2 = null;
+                                    break;
+                                }
+                                i = 1;
+                                z = false;
+                                break;
+                            case 3:
+                                zzgg().zzin().log("Service disabled");
+                                obj2 = null;
+                                z = false;
+                                break;
+                            case 9:
+                                zzgg().zzin().log("Service invalid");
+                                obj2 = null;
+                                z = false;
+                                break;
+                            case 18:
+                                zzgg().zzin().log("Service updating");
+                                i = 1;
+                                z = true;
+                                break;
+                            default:
+                                zzgg().zzin().zzg("Unexpected service status", Integer.valueOf(isGooglePlayServicesAvailable));
+                                obj2 = null;
+                                z = false;
+                                break;
+                        }
+                    }
+                    obj2 = 1;
+                    z = true;
+                    if (obj2 != null) {
+                        zzgh().zzf(z);
+                    }
+                } else {
+                    z = true;
+                }
+                this.zzapt = Boolean.valueOf(z);
+            }
+            if (this.zzapt.booleanValue()) {
+                this.zzapr.zzkp();
+                return;
+            }
+            List queryIntentServices = getContext().getPackageManager().queryIntentServices(new Intent().setClassName(getContext(), "com.google.android.gms.measurement.AppMeasurementService"), C.DEFAULT_BUFFER_SEGMENT_SIZE);
+            if (queryIntentServices == null || queryIntentServices.size() <= 0) {
+                obj = null;
+            }
+            if (obj != null) {
+                Intent intent = new Intent("com.google.android.gms.measurement.START");
+                intent.setComponent(new ComponentName(getContext(), "com.google.android.gms.measurement.AppMeasurementService"));
+                this.zzapr.zzc(intent);
+                return;
+            }
+            zzgg().zzil().log("Unable to use remote or local measurement implementation. Please register the AppMeasurementService service in the app manifest");
+        }
     }
 
     protected final void zzf(zzef com_google_android_gms_internal_measurement_zzef) {

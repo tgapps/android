@@ -19,9 +19,13 @@ final class zzal implements ConnectionProgressReportCallbacks {
     }
 
     public final void onReportServiceBinding(ConnectionResult connectionResult) {
+        boolean z = false;
         zzaj com_google_android_gms_common_api_internal_zzaj = (zzaj) this.zzhw.get();
         if (com_google_android_gms_common_api_internal_zzaj != null) {
-            Preconditions.checkState(Looper.myLooper() == com_google_android_gms_common_api_internal_zzaj.zzhf.zzfq.getLooper(), "onReportServiceBinding must be called on the GoogleApiClient handler thread");
+            if (Looper.myLooper() == com_google_android_gms_common_api_internal_zzaj.zzhf.zzfq.getLooper()) {
+                z = true;
+            }
+            Preconditions.checkState(z, "onReportServiceBinding must be called on the GoogleApiClient handler thread");
             com_google_android_gms_common_api_internal_zzaj.zzga.lock();
             try {
                 if (com_google_android_gms_common_api_internal_zzaj.zze(0)) {
@@ -31,9 +35,9 @@ final class zzal implements ConnectionProgressReportCallbacks {
                     if (com_google_android_gms_common_api_internal_zzaj.zzar()) {
                         com_google_android_gms_common_api_internal_zzaj.zzas();
                     }
+                    com_google_android_gms_common_api_internal_zzaj.zzga.unlock();
                 }
-                com_google_android_gms_common_api_internal_zzaj.zzga.unlock();
-            } catch (Throwable th) {
+            } finally {
                 com_google_android_gms_common_api_internal_zzaj.zzga.unlock();
             }
         }

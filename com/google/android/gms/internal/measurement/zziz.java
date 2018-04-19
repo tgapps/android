@@ -36,6 +36,9 @@ public final class zziz implements ServiceConnection, BaseConnectionCallbacks, B
             } catch (DeadObjectException e) {
                 this.zzaqg = null;
                 this.zzaqf = false;
+            } catch (IllegalStateException e2) {
+                this.zzaqg = null;
+                this.zzaqf = false;
             }
         }
     }
@@ -60,6 +63,7 @@ public final class zziz implements ServiceConnection, BaseConnectionCallbacks, B
     }
 
     public final void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        zzey com_google_android_gms_internal_measurement_zzey;
         Preconditions.checkMainThread("MeasurementServiceConnection.onServiceConnected");
         synchronized (this) {
             if (iBinder == null) {
@@ -67,29 +71,53 @@ public final class zziz implements ServiceConnection, BaseConnectionCallbacks, B
                 this.zzapy.zzgg().zzil().log("Service connected with null binder");
                 return;
             }
-            zzey com_google_android_gms_internal_measurement_zzey = null;
             try {
                 String interfaceDescriptor = iBinder.getInterfaceDescriptor();
                 if ("com.google.android.gms.measurement.internal.IMeasurementService".equals(interfaceDescriptor)) {
-                    if (iBinder != null) {
+                    if (iBinder == null) {
+                        com_google_android_gms_internal_measurement_zzey = null;
+                    } else {
                         IInterface queryLocalInterface = iBinder.queryLocalInterface("com.google.android.gms.measurement.internal.IMeasurementService");
                         com_google_android_gms_internal_measurement_zzey = queryLocalInterface instanceof zzey ? (zzey) queryLocalInterface : new zzfa(iBinder);
                     }
-                    this.zzapy.zzgg().zzir().log("Bound to IMeasurementService interface");
+                    try {
+                        this.zzapy.zzgg().zzir().log("Bound to IMeasurementService interface");
+                    } catch (RemoteException e) {
+                        this.zzapy.zzgg().zzil().log("Service connect failed to get IMeasurementService");
+                        if (com_google_android_gms_internal_measurement_zzey != null) {
+                            this.zzapy.zzgf().zzc(new zzja(this, com_google_android_gms_internal_measurement_zzey));
+                        } else {
+                            this.zzaqf = false;
+                            try {
+                                ConnectionTracker.getInstance().unbindService(this.zzapy.getContext(), this.zzapy.zzapr);
+                            } catch (IllegalArgumentException e2) {
+                            }
+                        }
+                    }
+                    if (com_google_android_gms_internal_measurement_zzey != null) {
+                        this.zzaqf = false;
+                        ConnectionTracker.getInstance().unbindService(this.zzapy.getContext(), this.zzapy.zzapr);
+                    } else {
+                        this.zzapy.zzgf().zzc(new zzja(this, com_google_android_gms_internal_measurement_zzey));
+                    }
+                }
+                this.zzapy.zzgg().zzil().zzg("Got binder with a wrong descriptor", interfaceDescriptor);
+                com_google_android_gms_internal_measurement_zzey = null;
+                if (com_google_android_gms_internal_measurement_zzey != null) {
+                    this.zzapy.zzgf().zzc(new zzja(this, com_google_android_gms_internal_measurement_zzey));
                 } else {
-                    this.zzapy.zzgg().zzil().zzg("Got binder with a wrong descriptor", interfaceDescriptor);
-                }
-            } catch (RemoteException e) {
-                this.zzapy.zzgg().zzil().log("Service connect failed to get IMeasurementService");
-            }
-            if (com_google_android_gms_internal_measurement_zzey == null) {
-                this.zzaqf = false;
-                try {
+                    this.zzaqf = false;
                     ConnectionTracker.getInstance().unbindService(this.zzapy.getContext(), this.zzapy.zzapr);
-                } catch (IllegalArgumentException e2) {
                 }
-            } else {
-                this.zzapy.zzgf().zzc(new zzja(this, com_google_android_gms_internal_measurement_zzey));
+            } catch (RemoteException e3) {
+                com_google_android_gms_internal_measurement_zzey = null;
+                this.zzapy.zzgg().zzil().log("Service connect failed to get IMeasurementService");
+                if (com_google_android_gms_internal_measurement_zzey != null) {
+                    this.zzaqf = false;
+                    ConnectionTracker.getInstance().unbindService(this.zzapy.getContext(), this.zzapy.zzapr);
+                } else {
+                    this.zzapy.zzgf().zzc(new zzja(this, com_google_android_gms_internal_measurement_zzey));
+                }
             }
         }
     }

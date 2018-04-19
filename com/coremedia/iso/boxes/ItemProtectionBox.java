@@ -61,16 +61,9 @@ public class ItemProtectionBox extends AbstractContainerBox implements FullBox {
     }
 
     public long getSize() {
-        int i;
         long s = getContainerSize();
         long j = s + 6;
-        if (!this.largeBox) {
-            if (s + 6 < 4294967296L) {
-                i = 8;
-                return j + ((long) i);
-            }
-        }
-        i = 16;
-        return j + ((long) i);
+        int i = (this.largeBox || s + 6 >= 4294967296L) ? 16 : 8;
+        return ((long) i) + j;
     }
 }

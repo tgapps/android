@@ -20,22 +20,13 @@ public class FirebaseInstanceIdService extends zzb {
         if (stringExtra != null) {
             if (Log.isLoggable("FirebaseInstanceId", 3)) {
                 String valueOf = String.valueOf(intent.getExtras());
-                StringBuilder stringBuilder = new StringBuilder((21 + String.valueOf(stringExtra).length()) + String.valueOf(valueOf).length());
-                stringBuilder.append("Received command: ");
-                stringBuilder.append(stringExtra);
-                stringBuilder.append(" - ");
-                stringBuilder.append(valueOf);
-                Log.d("FirebaseInstanceId", stringBuilder.toString());
+                Log.d("FirebaseInstanceId", new StringBuilder((String.valueOf(stringExtra).length() + 21) + String.valueOf(valueOf).length()).append("Received command: ").append(stringExtra).append(" - ").append(valueOf).toString());
             }
-            if (!"RST".equals(stringExtra)) {
-                if (!"RST_FULL".equals(stringExtra)) {
-                    if ("SYNC".equals(stringExtra)) {
-                        FirebaseInstanceId.getInstance().zzsl();
-                        return;
-                    }
-                }
+            if ("RST".equals(stringExtra) || "RST_FULL".equals(stringExtra)) {
+                FirebaseInstanceId.getInstance().zzsk();
+            } else if ("SYNC".equals(stringExtra)) {
+                FirebaseInstanceId.getInstance().zzsl();
             }
-            FirebaseInstanceId.getInstance().zzsk();
         }
     }
 }

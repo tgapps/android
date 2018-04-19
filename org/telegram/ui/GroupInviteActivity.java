@@ -1,11 +1,19 @@
 package org.telegram.ui;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.ChatObject;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
@@ -62,12 +70,7 @@ public class GroupInviteActivity extends BaseFragment implements NotificationCen
 
         public boolean isEnabled(ViewHolder holder) {
             int position = holder.getAdapterPosition();
-            if (!(position == GroupInviteActivity.this.revokeLinkRow || position == GroupInviteActivity.this.copyLinkRow || position == GroupInviteActivity.this.shareLinkRow)) {
-                if (position != GroupInviteActivity.this.linkRow) {
-                    return false;
-                }
-            }
-            return true;
+            return position == GroupInviteActivity.this.revokeLinkRow || position == GroupInviteActivity.this.copyLinkRow || position == GroupInviteActivity.this.shareLinkRow || position == GroupInviteActivity.this.linkRow;
         }
 
         public int getItemCount() {
@@ -135,18 +138,14 @@ public class GroupInviteActivity extends BaseFragment implements NotificationCen
         }
 
         public int getItemViewType(int position) {
-            if (!(position == GroupInviteActivity.this.copyLinkRow || position == GroupInviteActivity.this.shareLinkRow)) {
-                if (position != GroupInviteActivity.this.revokeLinkRow) {
-                    if (position != GroupInviteActivity.this.shadowRow) {
-                        if (position != GroupInviteActivity.this.linkInfoRow) {
-                            if (position == GroupInviteActivity.this.linkRow) {
-                                return 2;
-                            }
-                            return 0;
-                        }
-                    }
-                    return 1;
-                }
+            if (position == GroupInviteActivity.this.copyLinkRow || position == GroupInviteActivity.this.shareLinkRow || position == GroupInviteActivity.this.revokeLinkRow) {
+                return 0;
+            }
+            if (position == GroupInviteActivity.this.shadowRow || position == GroupInviteActivity.this.linkInfoRow) {
+                return 1;
+            }
+            if (position == GroupInviteActivity.this.linkRow) {
+                return 2;
             }
             return 0;
         }
@@ -212,136 +211,41 @@ public class GroupInviteActivity extends BaseFragment implements NotificationCen
         frameLayout.addView(this.listView, LayoutHelper.createFrame(-1, -1, 51));
         this.listView.setAdapter(this.listAdapter);
         this.listView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(android.view.View r1, int r2) {
-                /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.GroupInviteActivity.2.onItemClick(android.view.View, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-                /*
-                r0 = this;
-                r0 = org.telegram.ui.GroupInviteActivity.this;
-                r0 = r0.getParentActivity();
-                if (r0 != 0) goto L_0x0009;
-            L_0x0008:
-                return;
-            L_0x0009:
-                r0 = org.telegram.ui.GroupInviteActivity.this;
-                r0 = r0.copyLinkRow;
-                if (r7 == r0) goto L_0x00b7;
-            L_0x0011:
-                r0 = org.telegram.ui.GroupInviteActivity.this;
-                r0 = r0.linkRow;
-                if (r7 != r0) goto L_0x001b;
-            L_0x0019:
-                goto L_0x00b7;
-            L_0x001b:
-                r0 = org.telegram.ui.GroupInviteActivity.this;
-                r0 = r0.shareLinkRow;
-                if (r7 != r0) goto L_0x0064;
-            L_0x0023:
-                r0 = org.telegram.ui.GroupInviteActivity.this;
-                r0 = r0.invite;
-                if (r0 != 0) goto L_0x002c;
-            L_0x002b:
-                return;
-            L_0x002c:
-                r0 = new android.content.Intent;	 Catch:{ Exception -> 0x005e }
-                r1 = "android.intent.action.SEND";	 Catch:{ Exception -> 0x005e }
-                r0.<init>(r1);	 Catch:{ Exception -> 0x005e }
-                r1 = "text/plain";	 Catch:{ Exception -> 0x005e }
-                r0.setType(r1);	 Catch:{ Exception -> 0x005e }
-                r1 = "android.intent.extra.TEXT";	 Catch:{ Exception -> 0x005e }
-                r2 = org.telegram.ui.GroupInviteActivity.this;	 Catch:{ Exception -> 0x005e }
-                r2 = r2.invite;	 Catch:{ Exception -> 0x005e }
-                r2 = r2.link;	 Catch:{ Exception -> 0x005e }
-                r0.putExtra(r1, r2);	 Catch:{ Exception -> 0x005e }
-                r1 = org.telegram.ui.GroupInviteActivity.this;	 Catch:{ Exception -> 0x005e }
-                r1 = r1.getParentActivity();	 Catch:{ Exception -> 0x005e }
-                r2 = "InviteToGroupByLink";	 Catch:{ Exception -> 0x005e }
-                r3 = 2131493696; // 0x7f0c0340 float:1.861088E38 double:1.0530978095E-314;	 Catch:{ Exception -> 0x005e }
-                r2 = org.telegram.messenger.LocaleController.getString(r2, r3);	 Catch:{ Exception -> 0x005e }
-                r2 = android.content.Intent.createChooser(r0, r2);	 Catch:{ Exception -> 0x005e }
-                r3 = 500; // 0x1f4 float:7.0E-43 double:2.47E-321;	 Catch:{ Exception -> 0x005e }
-                r1.startActivityForResult(r2, r3);	 Catch:{ Exception -> 0x005e }
-                goto L_0x0062;
-            L_0x005e:
-                r0 = move-exception;
-                org.telegram.messenger.FileLog.e(r0);
-            L_0x0062:
-                goto L_0x00f8;
-            L_0x0064:
-                r0 = org.telegram.ui.GroupInviteActivity.this;
-                r0 = r0.revokeLinkRow;
-                if (r7 != r0) goto L_0x00f8;
-            L_0x006c:
-                r0 = new org.telegram.ui.ActionBar.AlertDialog$Builder;
-                r1 = org.telegram.ui.GroupInviteActivity.this;
-                r1 = r1.getParentActivity();
-                r0.<init>(r1);
-                r1 = "RevokeAlert";
-                r2 = 2131494276; // 0x7f0c0584 float:1.8612056E38 double:1.053098096E-314;
-                r1 = org.telegram.messenger.LocaleController.getString(r1, r2);
-                r0.setMessage(r1);
-                r1 = "RevokeLink";
-                r2 = 2131494279; // 0x7f0c0587 float:1.8612062E38 double:1.0530980976E-314;
-                r1 = org.telegram.messenger.LocaleController.getString(r1, r2);
-                r0.setTitle(r1);
-                r1 = "RevokeButton";
-                r2 = 2131494278; // 0x7f0c0586 float:1.861206E38 double:1.053098097E-314;
-                r1 = org.telegram.messenger.LocaleController.getString(r1, r2);
-                r2 = new org.telegram.ui.GroupInviteActivity$2$1;
-                r2.<init>();
-                r0.setPositiveButton(r1, r2);
-                r1 = "Cancel";
-                r2 = 2131493127; // 0x7f0c0107 float:1.8609725E38 double:1.0530975284E-314;
-                r1 = org.telegram.messenger.LocaleController.getString(r1, r2);
-                r2 = 0;
-                r0.setNegativeButton(r1, r2);
-                r1 = org.telegram.ui.GroupInviteActivity.this;
-                r2 = r0.create();
-                r1.showDialog(r2);
-                goto L_0x00f8;
-            L_0x00b7:
-                r0 = org.telegram.ui.GroupInviteActivity.this;
-                r0 = r0.invite;
-                if (r0 != 0) goto L_0x00c0;
-            L_0x00bf:
-                return;
-            L_0x00c0:
-                r0 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x00f3 }
-                r1 = "clipboard";	 Catch:{ Exception -> 0x00f3 }
-                r0 = r0.getSystemService(r1);	 Catch:{ Exception -> 0x00f3 }
-                r0 = (android.content.ClipboardManager) r0;	 Catch:{ Exception -> 0x00f3 }
-                r1 = "label";	 Catch:{ Exception -> 0x00f3 }
-                r2 = org.telegram.ui.GroupInviteActivity.this;	 Catch:{ Exception -> 0x00f3 }
-                r2 = r2.invite;	 Catch:{ Exception -> 0x00f3 }
-                r2 = r2.link;	 Catch:{ Exception -> 0x00f3 }
-                r1 = android.content.ClipData.newPlainText(r1, r2);	 Catch:{ Exception -> 0x00f3 }
-                r0.setPrimaryClip(r1);	 Catch:{ Exception -> 0x00f3 }
-                r2 = org.telegram.ui.GroupInviteActivity.this;	 Catch:{ Exception -> 0x00f3 }
-                r2 = r2.getParentActivity();	 Catch:{ Exception -> 0x00f3 }
-                r3 = "LinkCopied";	 Catch:{ Exception -> 0x00f3 }
-                r4 = 2131493748; // 0x7f0c0374 float:1.8610985E38 double:1.053097835E-314;	 Catch:{ Exception -> 0x00f3 }
-                r3 = org.telegram.messenger.LocaleController.getString(r3, r4);	 Catch:{ Exception -> 0x00f3 }
-                r4 = 0;	 Catch:{ Exception -> 0x00f3 }
-                r2 = android.widget.Toast.makeText(r2, r3, r4);	 Catch:{ Exception -> 0x00f3 }
-                r2.show();	 Catch:{ Exception -> 0x00f3 }
-                goto L_0x00f7;
-            L_0x00f3:
-                r0 = move-exception;
-                org.telegram.messenger.FileLog.e(r0);
-            L_0x00f8:
-                return;
-                */
-                throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.GroupInviteActivity.2.onItemClick(android.view.View, int):void");
+            public void onItemClick(View view, int position) {
+                if (GroupInviteActivity.this.getParentActivity() != null) {
+                    if (position == GroupInviteActivity.this.copyLinkRow || position == GroupInviteActivity.this.linkRow) {
+                        if (GroupInviteActivity.this.invite != null) {
+                            try {
+                                ((ClipboardManager) ApplicationLoader.applicationContext.getSystemService("clipboard")).setPrimaryClip(ClipData.newPlainText("label", GroupInviteActivity.this.invite.link));
+                                Toast.makeText(GroupInviteActivity.this.getParentActivity(), LocaleController.getString("LinkCopied", R.string.LinkCopied), 0).show();
+                            } catch (Throwable e) {
+                                FileLog.e(e);
+                            }
+                        }
+                    } else if (position == GroupInviteActivity.this.shareLinkRow) {
+                        if (GroupInviteActivity.this.invite != null) {
+                            try {
+                                Intent intent = new Intent("android.intent.action.SEND");
+                                intent.setType("text/plain");
+                                intent.putExtra("android.intent.extra.TEXT", GroupInviteActivity.this.invite.link);
+                                GroupInviteActivity.this.getParentActivity().startActivityForResult(Intent.createChooser(intent, LocaleController.getString("InviteToGroupByLink", R.string.InviteToGroupByLink)), 500);
+                            } catch (Throwable e2) {
+                                FileLog.e(e2);
+                            }
+                        }
+                    } else if (position == GroupInviteActivity.this.revokeLinkRow) {
+                        Builder builder = new Builder(GroupInviteActivity.this.getParentActivity());
+                        builder.setMessage(LocaleController.getString("RevokeAlert", R.string.RevokeAlert));
+                        builder.setTitle(LocaleController.getString("RevokeLink", R.string.RevokeLink));
+                        builder.setPositiveButton(LocaleController.getString("RevokeButton", R.string.RevokeButton), new OnClickListener() {
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                GroupInviteActivity.this.generateLink(true);
+                            }
+                        });
+                        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+                        GroupInviteActivity.this.showDialog(builder.create());
+                    }
+                }
             }
         });
         return this.fragmentView;
@@ -376,12 +280,15 @@ Caused by: java.lang.NullPointerException
     private void generateLink(final boolean newRequest) {
         TLObject request;
         this.loading = true;
+        TLObject req;
         if (ChatObject.isChannel(this.chat_id, this.currentAccount)) {
-            request = new TL_channels_exportInvite();
-            request.channel = MessagesController.getInstance(this.currentAccount).getInputChannel(this.chat_id);
+            req = new TL_channels_exportInvite();
+            req.channel = MessagesController.getInstance(this.currentAccount).getInputChannel(this.chat_id);
+            request = req;
         } else {
-            request = new TL_messages_exportChatInvite();
-            request.chat_id = this.chat_id;
+            req = new TL_messages_exportChatInvite();
+            req.chat_id = this.chat_id;
+            request = req;
         }
         ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(ConnectionsManager.getInstance(this.currentAccount).sendRequest(request, new RequestDelegate() {
             public void run(final TLObject response, final TL_error error) {

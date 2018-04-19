@@ -54,104 +54,91 @@ public final class GoogleMapOptions extends AbstractSafeParcelable implements Re
     }
 
     public static GoogleMapOptions createFromAttributes(Context context, AttributeSet attributeSet) {
-        if (context != null) {
-            if (attributeSet != null) {
-                TypedArray obtainAttributes = context.getResources().obtainAttributes(attributeSet, R.styleable.MapAttrs);
-                GoogleMapOptions googleMapOptions = new GoogleMapOptions();
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_mapType)) {
-                    googleMapOptions.mapType(obtainAttributes.getInt(R.styleable.MapAttrs_mapType, -1));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_zOrderOnTop)) {
-                    googleMapOptions.zOrderOnTop(obtainAttributes.getBoolean(R.styleable.MapAttrs_zOrderOnTop, false));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_useViewLifecycle)) {
-                    googleMapOptions.useViewLifecycleInFragment(obtainAttributes.getBoolean(R.styleable.MapAttrs_useViewLifecycle, false));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiCompass)) {
-                    googleMapOptions.compassEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiCompass, true));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiRotateGestures)) {
-                    googleMapOptions.rotateGesturesEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiRotateGestures, true));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiScrollGestures)) {
-                    googleMapOptions.scrollGesturesEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiScrollGestures, true));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiTiltGestures)) {
-                    googleMapOptions.tiltGesturesEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiTiltGestures, true));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiZoomGestures)) {
-                    googleMapOptions.zoomGesturesEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiZoomGestures, true));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiZoomControls)) {
-                    googleMapOptions.zoomControlsEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiZoomControls, true));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_liteMode)) {
-                    googleMapOptions.liteMode(obtainAttributes.getBoolean(R.styleable.MapAttrs_liteMode, false));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiMapToolbar)) {
-                    googleMapOptions.mapToolbarEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiMapToolbar, true));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_ambientEnabled)) {
-                    googleMapOptions.ambientEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_ambientEnabled, false));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraMinZoomPreference)) {
-                    googleMapOptions.minZoomPreference(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraMinZoomPreference, Float.NEGATIVE_INFINITY));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraMinZoomPreference)) {
-                    googleMapOptions.maxZoomPreference(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraMaxZoomPreference, Float.POSITIVE_INFINITY));
-                }
-                googleMapOptions.latLngBoundsForCameraTarget(zza(context, attributeSet));
-                googleMapOptions.camera(zzb(context, attributeSet));
-                obtainAttributes.recycle();
-                return googleMapOptions;
-            }
+        if (context == null || attributeSet == null) {
+            return null;
         }
-        return null;
+        TypedArray obtainAttributes = context.getResources().obtainAttributes(attributeSet, R.styleable.MapAttrs);
+        GoogleMapOptions googleMapOptions = new GoogleMapOptions();
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_mapType)) {
+            googleMapOptions.mapType(obtainAttributes.getInt(R.styleable.MapAttrs_mapType, -1));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_zOrderOnTop)) {
+            googleMapOptions.zOrderOnTop(obtainAttributes.getBoolean(R.styleable.MapAttrs_zOrderOnTop, false));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_useViewLifecycle)) {
+            googleMapOptions.useViewLifecycleInFragment(obtainAttributes.getBoolean(R.styleable.MapAttrs_useViewLifecycle, false));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiCompass)) {
+            googleMapOptions.compassEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiCompass, true));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiRotateGestures)) {
+            googleMapOptions.rotateGesturesEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiRotateGestures, true));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiScrollGestures)) {
+            googleMapOptions.scrollGesturesEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiScrollGestures, true));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiTiltGestures)) {
+            googleMapOptions.tiltGesturesEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiTiltGestures, true));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiZoomGestures)) {
+            googleMapOptions.zoomGesturesEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiZoomGestures, true));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiZoomControls)) {
+            googleMapOptions.zoomControlsEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiZoomControls, true));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_liteMode)) {
+            googleMapOptions.liteMode(obtainAttributes.getBoolean(R.styleable.MapAttrs_liteMode, false));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_uiMapToolbar)) {
+            googleMapOptions.mapToolbarEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_uiMapToolbar, true));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_ambientEnabled)) {
+            googleMapOptions.ambientEnabled(obtainAttributes.getBoolean(R.styleable.MapAttrs_ambientEnabled, false));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraMinZoomPreference)) {
+            googleMapOptions.minZoomPreference(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraMinZoomPreference, Float.NEGATIVE_INFINITY));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraMinZoomPreference)) {
+            googleMapOptions.maxZoomPreference(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraMaxZoomPreference, Float.POSITIVE_INFINITY));
+        }
+        googleMapOptions.latLngBoundsForCameraTarget(zza(context, attributeSet));
+        googleMapOptions.camera(zzb(context, attributeSet));
+        obtainAttributes.recycle();
+        return googleMapOptions;
     }
 
     public static LatLngBounds zza(Context context, AttributeSet attributeSet) {
-        LatLngBounds latLngBounds = null;
-        if (context != null) {
-            if (attributeSet == null) {
-                return null;
-            }
-            TypedArray obtainAttributes = context.getResources().obtainAttributes(attributeSet, R.styleable.MapAttrs);
-            Float valueOf = obtainAttributes.hasValue(R.styleable.MapAttrs_latLngBoundsSouthWestLatitude) ? Float.valueOf(obtainAttributes.getFloat(R.styleable.MapAttrs_latLngBoundsSouthWestLatitude, 0.0f)) : null;
-            Float valueOf2 = obtainAttributes.hasValue(R.styleable.MapAttrs_latLngBoundsSouthWestLongitude) ? Float.valueOf(obtainAttributes.getFloat(R.styleable.MapAttrs_latLngBoundsSouthWestLongitude, 0.0f)) : null;
-            Float valueOf3 = obtainAttributes.hasValue(R.styleable.MapAttrs_latLngBoundsNorthEastLatitude) ? Float.valueOf(obtainAttributes.getFloat(R.styleable.MapAttrs_latLngBoundsNorthEastLatitude, 0.0f)) : null;
-            Float valueOf4 = obtainAttributes.hasValue(R.styleable.MapAttrs_latLngBoundsNorthEastLongitude) ? Float.valueOf(obtainAttributes.getFloat(R.styleable.MapAttrs_latLngBoundsNorthEastLongitude, 0.0f)) : null;
-            obtainAttributes.recycle();
-            if (!(valueOf == null || valueOf2 == null || valueOf3 == null)) {
-                if (valueOf4 == null) {
-                    return null;
-                }
-                latLngBounds = new LatLngBounds(new LatLng((double) valueOf.floatValue(), (double) valueOf2.floatValue()), new LatLng((double) valueOf3.floatValue(), (double) valueOf4.floatValue()));
-            }
+        if (context == null || attributeSet == null) {
+            return null;
         }
-        return latLngBounds;
+        TypedArray obtainAttributes = context.getResources().obtainAttributes(attributeSet, R.styleable.MapAttrs);
+        Float valueOf = obtainAttributes.hasValue(R.styleable.MapAttrs_latLngBoundsSouthWestLatitude) ? Float.valueOf(obtainAttributes.getFloat(R.styleable.MapAttrs_latLngBoundsSouthWestLatitude, 0.0f)) : null;
+        Float valueOf2 = obtainAttributes.hasValue(R.styleable.MapAttrs_latLngBoundsSouthWestLongitude) ? Float.valueOf(obtainAttributes.getFloat(R.styleable.MapAttrs_latLngBoundsSouthWestLongitude, 0.0f)) : null;
+        Float valueOf3 = obtainAttributes.hasValue(R.styleable.MapAttrs_latLngBoundsNorthEastLatitude) ? Float.valueOf(obtainAttributes.getFloat(R.styleable.MapAttrs_latLngBoundsNorthEastLatitude, 0.0f)) : null;
+        Float valueOf4 = obtainAttributes.hasValue(R.styleable.MapAttrs_latLngBoundsNorthEastLongitude) ? Float.valueOf(obtainAttributes.getFloat(R.styleable.MapAttrs_latLngBoundsNorthEastLongitude, 0.0f)) : null;
+        obtainAttributes.recycle();
+        return (valueOf == null || valueOf2 == null || valueOf3 == null || valueOf4 == null) ? null : new LatLngBounds(new LatLng((double) valueOf.floatValue(), (double) valueOf2.floatValue()), new LatLng((double) valueOf3.floatValue(), (double) valueOf4.floatValue()));
     }
 
     public static CameraPosition zzb(Context context, AttributeSet attributeSet) {
-        if (context != null) {
-            if (attributeSet != null) {
-                TypedArray obtainAttributes = context.getResources().obtainAttributes(attributeSet, R.styleable.MapAttrs);
-                LatLng latLng = new LatLng((double) (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraTargetLat) ? obtainAttributes.getFloat(R.styleable.MapAttrs_cameraTargetLat, 0.0f) : 0.0f), (double) (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraTargetLng) ? obtainAttributes.getFloat(R.styleable.MapAttrs_cameraTargetLng, 0.0f) : 0.0f));
-                Builder builder = CameraPosition.builder();
-                builder.target(latLng);
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraZoom)) {
-                    builder.zoom(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraZoom, 0.0f));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraBearing)) {
-                    builder.bearing(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraBearing, 0.0f));
-                }
-                if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraTilt)) {
-                    builder.tilt(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraTilt, 0.0f));
-                }
-                obtainAttributes.recycle();
-                return builder.build();
-            }
+        if (context == null || attributeSet == null) {
+            return null;
         }
-        return null;
+        TypedArray obtainAttributes = context.getResources().obtainAttributes(attributeSet, R.styleable.MapAttrs);
+        LatLng latLng = new LatLng((double) (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraTargetLat) ? obtainAttributes.getFloat(R.styleable.MapAttrs_cameraTargetLat, 0.0f) : 0.0f), (double) (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraTargetLng) ? obtainAttributes.getFloat(R.styleable.MapAttrs_cameraTargetLng, 0.0f) : 0.0f));
+        Builder builder = CameraPosition.builder();
+        builder.target(latLng);
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraZoom)) {
+            builder.zoom(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraZoom, 0.0f));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraBearing)) {
+            builder.bearing(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraBearing, 0.0f));
+        }
+        if (obtainAttributes.hasValue(R.styleable.MapAttrs_cameraTilt)) {
+            builder.tilt(obtainAttributes.getFloat(R.styleable.MapAttrs_cameraTilt, 0.0f));
+        }
+        obtainAttributes.recycle();
+        return builder.build();
     }
 
     public final GoogleMapOptions ambientEnabled(boolean z) {

@@ -9,21 +9,21 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public class ResolveAccountRequestCreator implements Creator<ResolveAccountRequest> {
     public ResolveAccountRequest createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        Account account = null;
-        int i = 0;
         GoogleSignInAccount googleSignInAccount = null;
+        int i = 0;
+        Account account = null;
         int i2 = 0;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
                 case 1:
-                    i = SafeParcelReader.readInt(parcel, readHeader);
+                    i2 = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 2:
                     account = (Account) SafeParcelReader.createParcelable(parcel, readHeader, Account.CREATOR);
                     break;
                 case 3:
-                    i2 = SafeParcelReader.readInt(parcel, readHeader);
+                    i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 4:
                     googleSignInAccount = (GoogleSignInAccount) SafeParcelReader.createParcelable(parcel, readHeader, GoogleSignInAccount.CREATOR);
@@ -34,7 +34,7 @@ public class ResolveAccountRequestCreator implements Creator<ResolveAccountReque
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new ResolveAccountRequest(i, account, i2, googleSignInAccount);
+        return new ResolveAccountRequest(i2, account, i, googleSignInAccount);
     }
 
     public ResolveAccountRequest[] newArray(int i) {

@@ -77,15 +77,15 @@ public final class zzdx extends zzhj {
                     this.zzada.remove(str);
                     zza(str, longValue, zzkk);
                 }
-                if (this.zzadb.isEmpty()) {
-                    if (this.zzadc == 0) {
-                        zzgg().zzil().log("First ad exposure time was never set");
-                        return;
-                    } else {
-                        zza(j - this.zzadc, zzkk);
-                        this.zzadc = 0;
-                    }
+                if (!this.zzadb.isEmpty()) {
+                    return;
                 }
+                if (this.zzadc == 0) {
+                    zzgg().zzil().log("First ad exposure time was never set");
+                    return;
+                }
+                zza(j - this.zzadc, zzkk);
+                this.zzadc = 0;
                 return;
             }
             this.zzadb.put(str, Integer.valueOf(intValue));
@@ -104,23 +104,19 @@ public final class zzdx extends zzhj {
     }
 
     public final void beginAdUnitExposure(String str) {
-        if (str != null) {
-            if (str.length() != 0) {
-                zzgf().zzc(new zzdy(this, str, zzbt().elapsedRealtime()));
-                return;
-            }
+        if (str == null || str.length() == 0) {
+            zzgg().zzil().log("Ad unit id must be a non-empty string");
+            return;
         }
-        zzgg().zzil().log("Ad unit id must be a non-empty string");
+        zzgf().zzc(new zzdy(this, str, zzbt().elapsedRealtime()));
     }
 
     public final void endAdUnitExposure(String str) {
-        if (str != null) {
-            if (str.length() != 0) {
-                zzgf().zzc(new zzdz(this, str, zzbt().elapsedRealtime()));
-                return;
-            }
+        if (str == null || str.length() == 0) {
+            zzgg().zzil().log("Ad unit id must be a non-empty string");
+            return;
         }
-        zzgg().zzil().log("Ad unit id must be a non-empty string");
+        zzgf().zzc(new zzdz(this, str, zzbt().elapsedRealtime()));
     }
 
     public final /* bridge */ /* synthetic */ Context getContext() {

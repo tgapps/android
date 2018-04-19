@@ -86,7 +86,7 @@ public class AttachmentListView extends ViewGroup {
                 LayoutParams lp = child.getLayoutParams();
                 if (xPos + childWidth > width) {
                     xPos = getPaddingLeft();
-                    yPos += r0.mLineHeight;
+                    yPos += this.mLineHeight;
                 }
                 child.layout(xPos, yPos, xPos + childWidth, yPos + childHeight);
                 xPos += (lp.width + childWidth) + ((AttachmentView) child).getGap();

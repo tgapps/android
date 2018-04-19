@@ -71,7 +71,7 @@ public final class zzew {
         zzagq = zzex.zzd("measurement.config.url_authority", str, str);
         str = "https://app-measurement.com/a";
         zzahb = zzex.zzd("measurement.upload.url", str, str);
-        String str2 = "---";
-        zzaht = zzex.zzd("measurement.test.string_flag", str2, str2);
+        str = "---";
+        zzaht = zzex.zzd("measurement.test.string_flag", str, str);
     }
 }

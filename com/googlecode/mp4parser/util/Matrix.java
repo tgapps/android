@@ -35,37 +35,59 @@ public class Matrix {
         if (this == o) {
             return true;
         }
-        if (o != null) {
-            if (getClass() == o.getClass()) {
-                Matrix matrix = (Matrix) o;
-                if (Double.compare(matrix.a, this.a) == 0 && Double.compare(matrix.b, this.b) == 0 && Double.compare(matrix.c, this.c) == 0 && Double.compare(matrix.d, this.d) == 0 && Double.compare(matrix.tx, this.tx) == 0 && Double.compare(matrix.ty, this.ty) == 0 && Double.compare(matrix.u, this.u) == 0 && Double.compare(matrix.v, this.v) == 0 && Double.compare(matrix.w, this.w) == 0) {
-                    return true;
-                }
-                return false;
-            }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
         }
-        return false;
+        Matrix matrix = (Matrix) o;
+        if (Double.compare(matrix.a, this.a) != 0) {
+            return false;
+        }
+        if (Double.compare(matrix.b, this.b) != 0) {
+            return false;
+        }
+        if (Double.compare(matrix.c, this.c) != 0) {
+            return false;
+        }
+        if (Double.compare(matrix.d, this.d) != 0) {
+            return false;
+        }
+        if (Double.compare(matrix.tx, this.tx) != 0) {
+            return false;
+        }
+        if (Double.compare(matrix.ty, this.ty) != 0) {
+            return false;
+        }
+        if (Double.compare(matrix.u, this.u) != 0) {
+            return false;
+        }
+        if (Double.compare(matrix.v, this.v) != 0) {
+            return false;
+        }
+        if (Double.compare(matrix.w, this.w) != 0) {
+            return false;
+        }
+        return true;
     }
 
     public int hashCode() {
         long temp = Double.doubleToLongBits(this.u);
-        int result = (int) (temp ^ (temp >>> 32));
+        int result = (int) ((temp >>> 32) ^ temp);
         temp = Double.doubleToLongBits(this.v);
-        int result2 = (31 * result) + ((int) (temp ^ (temp >>> 32)));
+        result = (result * 31) + ((int) ((temp >>> 32) ^ temp));
         temp = Double.doubleToLongBits(this.w);
-        result = (31 * result2) + ((int) (temp ^ (temp >>> 32)));
+        result = (result * 31) + ((int) ((temp >>> 32) ^ temp));
         temp = Double.doubleToLongBits(this.a);
-        result2 = (31 * result) + ((int) (temp ^ (temp >>> 32)));
+        result = (result * 31) + ((int) ((temp >>> 32) ^ temp));
         temp = Double.doubleToLongBits(this.b);
-        result = (31 * result2) + ((int) (temp ^ (temp >>> 32)));
+        result = (result * 31) + ((int) ((temp >>> 32) ^ temp));
         temp = Double.doubleToLongBits(this.c);
-        result2 = (31 * result) + ((int) (temp ^ (temp >>> 32)));
+        result = (result * 31) + ((int) ((temp >>> 32) ^ temp));
         temp = Double.doubleToLongBits(this.d);
-        result = (31 * result2) + ((int) (temp ^ (temp >>> 32)));
+        result = (result * 31) + ((int) ((temp >>> 32) ^ temp));
         temp = Double.doubleToLongBits(this.tx);
-        result2 = (31 * result) + ((int) (temp ^ (temp >>> 32)));
+        result = (result * 31) + ((int) ((temp >>> 32) ^ temp));
         temp = Double.doubleToLongBits(this.ty);
-        return (31 * result2) + ((int) (temp ^ (temp >>> 32)));
+        return (result * 31) + ((int) ((temp >>> 32) ^ temp));
     }
 
     public String toString() {
@@ -81,26 +103,7 @@ public class Matrix {
         if (equals(ROTATE_270)) {
             return "Rotate 270°";
         }
-        StringBuilder stringBuilder = new StringBuilder("Matrix{u=");
-        stringBuilder.append(this.u);
-        stringBuilder.append(", v=");
-        stringBuilder.append(this.v);
-        stringBuilder.append(", w=");
-        stringBuilder.append(this.w);
-        stringBuilder.append(", a=");
-        stringBuilder.append(this.a);
-        stringBuilder.append(", b=");
-        stringBuilder.append(this.b);
-        stringBuilder.append(", c=");
-        stringBuilder.append(this.c);
-        stringBuilder.append(", d=");
-        stringBuilder.append(this.d);
-        stringBuilder.append(", tx=");
-        stringBuilder.append(this.tx);
-        stringBuilder.append(", ty=");
-        stringBuilder.append(this.ty);
-        stringBuilder.append('}');
-        return stringBuilder.toString();
+        return "Matrix{u=" + this.u + ", v=" + this.v + ", w=" + this.w + ", a=" + this.a + ", b=" + this.b + ", c=" + this.c + ", d=" + this.d + ", tx=" + this.tx + ", ty=" + this.ty + '}';
     }
 
     public static Matrix fromFileOrder(double a, double b, double u, double c, double d, double v, double tx, double ty, double w) {

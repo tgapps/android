@@ -27,6 +27,7 @@ public class GoogleSignatureVerifier {
     }
 
     private static CertData zza(PackageInfo packageInfo, CertData... certDataArr) {
+        int i = 0;
         if (packageInfo.signatures == null) {
             return null;
         }
@@ -34,7 +35,6 @@ public class GoogleSignatureVerifier {
             Log.w("GoogleSignatureVerifier", "Package has more than one signature.");
             return null;
         }
-        int i = 0;
         zzb com_google_android_gms_common_zzb = new zzb(packageInfo.signatures[0].toByteArray());
         while (i < certDataArr.length) {
             if (certDataArr[i].equals(com_google_android_gms_common_zzb)) {
@@ -52,18 +52,25 @@ public class GoogleSignatureVerifier {
         if (isGooglePublicSignedPackage(packageInfo, false)) {
             return true;
         }
-        if (isGooglePublicSignedPackage(packageInfo, true)) {
-            if (GooglePlayServicesUtilLight.honorsDebugCertificates(this.mContext)) {
-                return true;
-            }
-            Log.w("GoogleSignatureVerifier", "Test-keys aren't accepted on this build.");
+        if (!isGooglePublicSignedPackage(packageInfo, true)) {
+            return false;
         }
+        if (GooglePlayServicesUtilLight.honorsDebugCertificates(this.mContext)) {
+            return true;
+        }
+        Log.w("GoogleSignatureVerifier", "Test-keys aren't accepted on this build.");
         return false;
     }
 
     public boolean isGooglePublicSignedPackage(PackageInfo packageInfo, boolean z) {
         if (!(packageInfo == null || packageInfo.signatures == null)) {
-            if (zza(packageInfo, z ? zzd.zzbg : new CertData[]{zzd.zzbg[0]}) != null) {
+            CertData zza;
+            if (z) {
+                zza = zza(packageInfo, zzd.zzbg);
+            } else {
+                zza = zza(packageInfo, zzd.zzbg[0]);
+            }
+            if (zza != null) {
                 return true;
             }
         }

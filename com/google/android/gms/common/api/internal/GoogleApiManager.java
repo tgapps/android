@@ -86,13 +86,11 @@ public class GoogleApiManager implements Callback {
         }
 
         public final boolean equals(Object obj) {
-            if (obj != null && (obj instanceof zzb)) {
-                zzb com_google_android_gms_common_api_internal_GoogleApiManager_zzb = (zzb) obj;
-                if (Objects.equal(this.zzkn, com_google_android_gms_common_api_internal_GoogleApiManager_zzb.zzkn) && Objects.equal(this.zzdr, com_google_android_gms_common_api_internal_GoogleApiManager_zzb.zzdr)) {
-                    return true;
-                }
+            if (obj == null || !(obj instanceof zzb)) {
+                return false;
             }
-            return false;
+            zzb com_google_android_gms_common_api_internal_GoogleApiManager_zzb = (zzb) obj;
+            return Objects.equal(this.zzkn, com_google_android_gms_common_api_internal_GoogleApiManager_zzb.zzkn) && Objects.equal(this.zzdr, com_google_android_gms_common_api_internal_GoogleApiManager_zzb.zzdr);
         }
 
         public final int hashCode() {
@@ -129,16 +127,14 @@ public class GoogleApiManager implements Callback {
         }
 
         public final void zza(IAccountAccessor iAccountAccessor, Set<Scope> set) {
-            if (iAccountAccessor != null) {
-                if (set != null) {
-                    this.zzko = iAccountAccessor;
-                    this.zzkp = set;
-                    zzbu();
-                    return;
-                }
+            if (iAccountAccessor == null || set == null) {
+                Log.wtf("GoogleApiManager", "Received null response from onSignInSuccess", new Exception());
+                zzg(new ConnectionResult(4));
+                return;
             }
-            Log.wtf("GoogleApiManager", "Received null response from onSignInSuccess", new Exception());
-            zzg(new ConnectionResult(4));
+            this.zzko = iAccountAccessor;
+            this.zzkp = set;
+            zzbu();
         }
 
         public final void zzg(ConnectionResult connectionResult) {
@@ -164,7 +160,11 @@ public class GoogleApiManager implements Callback {
         public zza(GoogleApiManager googleApiManager, GoogleApi<O> googleApi) {
             this.zzjy = googleApiManager;
             this.zzka = googleApi.zza(googleApiManager.handler.getLooper(), this);
-            this.zzkb = this.zzka instanceof SimpleClientAdapter ? ((SimpleClientAdapter) this.zzka).getClient() : this.zzka;
+            if (this.zzka instanceof SimpleClientAdapter) {
+                this.zzkb = ((SimpleClientAdapter) this.zzka).getClient();
+            } else {
+                this.zzkb = this.zzka;
+            }
             this.zzhc = googleApi.zzm();
             this.zzkc = new zzaa();
             this.zzkf = googleApi.getInstanceId();
@@ -176,12 +176,13 @@ public class GoogleApiManager implements Callback {
         }
 
         private final void zza(zzb com_google_android_gms_common_api_internal_GoogleApiManager_zzb) {
-            if (this.zzki.contains(com_google_android_gms_common_api_internal_GoogleApiManager_zzb) && !this.zzkh) {
-                if (this.zzka.isConnected()) {
-                    zzbl();
-                } else {
-                    connect();
-                }
+            if (!this.zzki.contains(com_google_android_gms_common_api_internal_GoogleApiManager_zzb) || this.zzkh) {
+                return;
+            }
+            if (this.zzka.isConnected()) {
+                zzbl();
+            } else {
+                connect();
             }
         }
 
@@ -199,11 +200,11 @@ public class GoogleApiManager implements Callback {
                         }
                     }
                 }
-                arrayList = arrayList;
-                int size = arrayList.size();
+                ArrayList arrayList2 = arrayList;
+                int size = arrayList2.size();
                 int i = 0;
                 while (i < size) {
-                    Object obj = arrayList.get(i);
+                    Object obj = arrayList2.get(i);
                     i++;
                     zzb com_google_android_gms_common_api_internal_zzb2 = (zzb) obj;
                     this.zzjz.remove(com_google_android_gms_common_api_internal_zzb2);
@@ -216,50 +217,42 @@ public class GoogleApiManager implements Callback {
             if (com_google_android_gms_common_api_internal_zzb instanceof zzf) {
                 zzf com_google_android_gms_common_api_internal_zzf = (zzf) com_google_android_gms_common_api_internal_zzb;
                 Feature[] requiredFeatures = com_google_android_gms_common_api_internal_zzf.getRequiredFeatures();
-                if (requiredFeatures != null) {
-                    if (requiredFeatures.length != 0) {
-                        Feature[] availableFeatures = this.zzka.getAvailableFeatures();
-                        if (availableFeatures == null) {
-                            availableFeatures = new Feature[0];
-                        }
-                        Map arrayMap = new ArrayMap(availableFeatures.length);
-                        for (Feature feature : availableFeatures) {
-                            arrayMap.put(feature.getName(), Long.valueOf(feature.getVersion()));
-                        }
-                        int length = requiredFeatures.length;
-                        int i = 0;
-                        while (i < length) {
-                            Feature feature2 = requiredFeatures[i];
-                            if (arrayMap.containsKey(feature2.getName())) {
-                                if (((Long) arrayMap.get(feature2.getName())).longValue() >= feature2.getVersion()) {
-                                    this.zzki.remove(new zzb(this.zzhc, feature2));
-                                    i++;
-                                }
-                            }
-                            if (com_google_android_gms_common_api_internal_zzf.shouldAutoResolveMissingFeatures()) {
-                                zzb com_google_android_gms_common_api_internal_GoogleApiManager_zzb = new zzb(this.zzhc, feature2);
-                                int indexOf = this.zzki.indexOf(com_google_android_gms_common_api_internal_GoogleApiManager_zzb);
-                                if (indexOf >= 0) {
-                                    com_google_android_gms_common_api_internal_GoogleApiManager_zzb = (zzb) this.zzki.get(indexOf);
-                                    this.zzjy.handler.removeMessages(15, com_google_android_gms_common_api_internal_GoogleApiManager_zzb);
-                                    this.zzjy.handler.sendMessageDelayed(Message.obtain(this.zzjy.handler, 15, com_google_android_gms_common_api_internal_GoogleApiManager_zzb), this.zzjy.zzjl);
-                                    return false;
-                                }
+                if (requiredFeatures == null || requiredFeatures.length == 0) {
+                    zzc(com_google_android_gms_common_api_internal_zzb);
+                    return true;
+                }
+                Feature[] availableFeatures = this.zzka.getAvailableFeatures();
+                if (availableFeatures == null) {
+                    availableFeatures = new Feature[0];
+                }
+                Map arrayMap = new ArrayMap(availableFeatures.length);
+                for (Feature feature : availableFeatures) {
+                    arrayMap.put(feature.getName(), Long.valueOf(feature.getVersion()));
+                }
+                for (Feature feature2 : requiredFeatures) {
+                    if (!arrayMap.containsKey(feature2.getName()) || ((Long) arrayMap.get(feature2.getName())).longValue() < feature2.getVersion()) {
+                        if (com_google_android_gms_common_api_internal_zzf.shouldAutoResolveMissingFeatures()) {
+                            zzb com_google_android_gms_common_api_internal_GoogleApiManager_zzb = new zzb(this.zzhc, feature2);
+                            int indexOf = this.zzki.indexOf(com_google_android_gms_common_api_internal_GoogleApiManager_zzb);
+                            if (indexOf >= 0) {
+                                com_google_android_gms_common_api_internal_GoogleApiManager_zzb = (zzb) this.zzki.get(indexOf);
+                                this.zzjy.handler.removeMessages(15, com_google_android_gms_common_api_internal_GoogleApiManager_zzb);
+                                this.zzjy.handler.sendMessageDelayed(Message.obtain(this.zzjy.handler, 15, com_google_android_gms_common_api_internal_GoogleApiManager_zzb), this.zzjy.zzjl);
+                            } else {
                                 this.zzki.add(com_google_android_gms_common_api_internal_GoogleApiManager_zzb);
                                 this.zzjy.handler.sendMessageDelayed(Message.obtain(this.zzjy.handler, 15, com_google_android_gms_common_api_internal_GoogleApiManager_zzb), this.zzjy.zzjl);
                                 this.zzjy.handler.sendMessageDelayed(Message.obtain(this.zzjy.handler, 16, com_google_android_gms_common_api_internal_GoogleApiManager_zzb), this.zzjy.zzjm);
                                 ConnectionResult connectionResult = new ConnectionResult(2, null);
                                 if (!zzh(connectionResult)) {
                                     this.zzjy.zzc(connectionResult, this.zzkf);
-                                    return false;
                                 }
                             }
+                        } else {
                             com_google_android_gms_common_api_internal_zzf.zza(new UnsupportedApiCallException(feature2));
-                            return false;
                         }
-                        zzc(com_google_android_gms_common_api_internal_zzb);
-                        return true;
+                        return false;
                     }
+                    this.zzki.remove(new zzb(this.zzhc, feature2));
                 }
                 zzc(com_google_android_gms_common_api_internal_zzb);
                 return true;
@@ -273,14 +266,15 @@ public class GoogleApiManager implements Callback {
             if (!this.zzka.isConnected() || this.zzke.size() != 0) {
                 return false;
             }
-            if (this.zzkc.zzaj()) {
-                if (z) {
-                    zzbr();
-                }
+            if (!this.zzkc.zzaj()) {
+                this.zzka.disconnect();
+                return true;
+            } else if (!z) {
+                return false;
+            } else {
+                zzbr();
                 return false;
             }
-            this.zzka.disconnect();
-            return true;
         }
 
         private final void zzbj() {
@@ -350,13 +344,16 @@ public class GoogleApiManager implements Callback {
         }
 
         private final boolean zzh(ConnectionResult connectionResult) {
+            boolean z;
             synchronized (GoogleApiManager.lock) {
                 if (this.zzjy.zzjv == null || !this.zzjy.zzjw.contains(this.zzhc)) {
-                    return false;
+                    z = false;
+                } else {
+                    this.zzjy.zzjv.zzb(connectionResult, this.zzkf);
+                    z = true;
                 }
-                this.zzjy.zzjv.zzb(connectionResult, this.zzkf);
-                return true;
             }
+            return z;
         }
 
         private final void zzi(ConnectionResult connectionResult) {
@@ -414,22 +411,16 @@ public class GoogleApiManager implements Callback {
                 zzc(GoogleApiManager.zzjk);
             } else if (this.zzjz.isEmpty()) {
                 this.zzkj = connectionResult;
-            } else {
-                if (!(zzh(connectionResult) || this.zzjy.zzc(connectionResult, this.zzkf))) {
-                    if (connectionResult.getErrorCode() == 18) {
-                        this.zzkh = true;
-                    }
-                    if (this.zzkh) {
-                        this.zzjy.handler.sendMessageDelayed(Message.obtain(this.zzjy.handler, 9, this.zzhc), this.zzjy.zzjl);
-                        return;
-                    }
-                    String zzq = this.zzhc.zzq();
-                    StringBuilder stringBuilder = new StringBuilder(38 + String.valueOf(zzq).length());
-                    stringBuilder.append("API: ");
-                    stringBuilder.append(zzq);
-                    stringBuilder.append(" is not available on this device.");
-                    zzc(new Status(17, stringBuilder.toString()));
+            } else if (!zzh(connectionResult) && !this.zzjy.zzc(connectionResult, this.zzkf)) {
+                if (connectionResult.getErrorCode() == 18) {
+                    this.zzkh = true;
                 }
+                if (this.zzkh) {
+                    this.zzjy.handler.sendMessageDelayed(Message.obtain(this.zzjy.handler, 9, this.zzhc), this.zzjy.zzjl);
+                    return;
+                }
+                String zzq = this.zzhc.zzq();
+                zzc(new Status(17, new StringBuilder(String.valueOf(zzq).length() + 38).append("API: ").append(zzq).append(" is not available on this device.").toString()));
             }
         }
 
@@ -588,18 +579,12 @@ public class GoogleApiManager implements Callback {
     }
 
     public boolean handleMessage(Message message) {
-        long j = 300000;
-        zza com_google_android_gms_common_api_internal_GoogleApiManager_zza;
-        zza com_google_android_gms_common_api_internal_GoogleApiManager_zza2;
-        StringBuilder stringBuilder;
         zzh zzm;
+        zza com_google_android_gms_common_api_internal_GoogleApiManager_zza;
         zzb com_google_android_gms_common_api_internal_GoogleApiManager_zzb;
         switch (message.what) {
             case 1:
-                if (((Boolean) message.obj).booleanValue()) {
-                    j = 10000;
-                }
-                this.zzjn = j;
+                this.zzjn = ((Boolean) message.obj).booleanValue() ? 10000 : 300000;
                 this.handler.removeMessages(12);
                 for (zzh obtainMessage : this.zzju.keySet()) {
                     this.handler.sendMessageDelayed(this.handler.obtainMessage(12, obtainMessage), this.zzjn);
@@ -607,159 +592,130 @@ public class GoogleApiManager implements Callback {
                 break;
             case 2:
                 zzj com_google_android_gms_common_api_internal_zzj = (zzj) message.obj;
-                for (zzh obtainMessage2 : com_google_android_gms_common_api_internal_zzj.zzs()) {
-                    com_google_android_gms_common_api_internal_GoogleApiManager_zza = (zza) this.zzju.get(obtainMessage2);
-                    if (com_google_android_gms_common_api_internal_GoogleApiManager_zza == null) {
-                        com_google_android_gms_common_api_internal_zzj.zza(obtainMessage2, new ConnectionResult(13), null);
-                        return true;
-                    } else if (com_google_android_gms_common_api_internal_GoogleApiManager_zza.isConnected()) {
-                        com_google_android_gms_common_api_internal_zzj.zza(obtainMessage2, ConnectionResult.RESULT_SUCCESS, com_google_android_gms_common_api_internal_GoogleApiManager_zza.zzae().getEndpointPackageName());
-                    } else if (com_google_android_gms_common_api_internal_GoogleApiManager_zza.zzbp() != null) {
-                        com_google_android_gms_common_api_internal_zzj.zza(obtainMessage2, com_google_android_gms_common_api_internal_GoogleApiManager_zza.zzbp(), null);
+                for (zzh zzm2 : com_google_android_gms_common_api_internal_zzj.zzs()) {
+                    zza com_google_android_gms_common_api_internal_GoogleApiManager_zza2 = (zza) this.zzju.get(zzm2);
+                    if (com_google_android_gms_common_api_internal_GoogleApiManager_zza2 == null) {
+                        com_google_android_gms_common_api_internal_zzj.zza(zzm2, new ConnectionResult(13), null);
+                        break;
+                    } else if (com_google_android_gms_common_api_internal_GoogleApiManager_zza2.isConnected()) {
+                        com_google_android_gms_common_api_internal_zzj.zza(zzm2, ConnectionResult.RESULT_SUCCESS, com_google_android_gms_common_api_internal_GoogleApiManager_zza2.zzae().getEndpointPackageName());
+                    } else if (com_google_android_gms_common_api_internal_GoogleApiManager_zza2.zzbp() != null) {
+                        com_google_android_gms_common_api_internal_zzj.zza(zzm2, com_google_android_gms_common_api_internal_GoogleApiManager_zza2.zzbp(), null);
                     } else {
-                        com_google_android_gms_common_api_internal_GoogleApiManager_zza.zza(com_google_android_gms_common_api_internal_zzj);
+                        com_google_android_gms_common_api_internal_GoogleApiManager_zza2.zza(com_google_android_gms_common_api_internal_zzj);
                     }
                 }
                 break;
             case 3:
-                for (zza com_google_android_gms_common_api_internal_GoogleApiManager_zza22 : this.zzju.values()) {
-                    com_google_android_gms_common_api_internal_GoogleApiManager_zza22.zzbo();
-                    com_google_android_gms_common_api_internal_GoogleApiManager_zza22.connect();
+                for (zza com_google_android_gms_common_api_internal_GoogleApiManager_zza3 : this.zzju.values()) {
+                    com_google_android_gms_common_api_internal_GoogleApiManager_zza3.zzbo();
+                    com_google_android_gms_common_api_internal_GoogleApiManager_zza3.connect();
                 }
                 break;
             case 4:
             case 8:
             case 13:
                 zzbu com_google_android_gms_common_api_internal_zzbu = (zzbu) message.obj;
-                com_google_android_gms_common_api_internal_GoogleApiManager_zza22 = (zza) this.zzju.get(com_google_android_gms_common_api_internal_zzbu.zzlr.zzm());
-                if (com_google_android_gms_common_api_internal_GoogleApiManager_zza22 == null) {
+                com_google_android_gms_common_api_internal_GoogleApiManager_zza = (zza) this.zzju.get(com_google_android_gms_common_api_internal_zzbu.zzlr.zzm());
+                if (com_google_android_gms_common_api_internal_GoogleApiManager_zza == null) {
                     zzb(com_google_android_gms_common_api_internal_zzbu.zzlr);
-                    com_google_android_gms_common_api_internal_GoogleApiManager_zza22 = (zza) this.zzju.get(com_google_android_gms_common_api_internal_zzbu.zzlr.zzm());
+                    com_google_android_gms_common_api_internal_GoogleApiManager_zza = (zza) this.zzju.get(com_google_android_gms_common_api_internal_zzbu.zzlr.zzm());
                 }
-                if (!com_google_android_gms_common_api_internal_GoogleApiManager_zza22.requiresSignIn() || this.zzjt.get() == com_google_android_gms_common_api_internal_zzbu.zzlq) {
-                    com_google_android_gms_common_api_internal_GoogleApiManager_zza22.zza(com_google_android_gms_common_api_internal_zzbu.zzlp);
-                    return true;
+                if (com_google_android_gms_common_api_internal_GoogleApiManager_zza.requiresSignIn() && this.zzjt.get() != com_google_android_gms_common_api_internal_zzbu.zzlq) {
+                    com_google_android_gms_common_api_internal_zzbu.zzlp.zza(zzjj);
+                    com_google_android_gms_common_api_internal_GoogleApiManager_zza.zzbm();
+                    break;
                 }
-                com_google_android_gms_common_api_internal_zzbu.zzlp.zza(zzjj);
-                com_google_android_gms_common_api_internal_GoogleApiManager_zza22.zzbm();
-                return true;
+                com_google_android_gms_common_api_internal_GoogleApiManager_zza.zza(com_google_android_gms_common_api_internal_zzbu.zzlp);
+                break;
+                break;
             case 5:
                 String errorString;
                 String errorMessage;
-                StringBuilder stringBuilder2;
                 int i = message.arg1;
                 ConnectionResult connectionResult = (ConnectionResult) message.obj;
-                for (zza com_google_android_gms_common_api_internal_GoogleApiManager_zza3 : this.zzju.values()) {
-                    if (com_google_android_gms_common_api_internal_GoogleApiManager_zza3.getInstanceId() == i) {
-                        if (com_google_android_gms_common_api_internal_GoogleApiManager_zza3 == null) {
-                            errorString = this.zzjq.getErrorString(connectionResult.getErrorCode());
-                            errorMessage = connectionResult.getErrorMessage();
-                            stringBuilder2 = new StringBuilder((69 + String.valueOf(errorString).length()) + String.valueOf(errorMessage).length());
-                            stringBuilder2.append("Error resolution was canceled by the user, original error message: ");
-                            stringBuilder2.append(errorString);
-                            stringBuilder2.append(": ");
-                            stringBuilder2.append(errorMessage);
-                            com_google_android_gms_common_api_internal_GoogleApiManager_zza3.zzc(new Status(17, stringBuilder2.toString()));
-                            return true;
+                for (zza com_google_android_gms_common_api_internal_GoogleApiManager_zza4 : this.zzju.values()) {
+                    if (com_google_android_gms_common_api_internal_GoogleApiManager_zza4.getInstanceId() == i) {
+                        if (com_google_android_gms_common_api_internal_GoogleApiManager_zza4 != null) {
+                            Log.wtf("GoogleApiManager", "Could not find API instance " + i + " while trying to fail enqueued calls.", new Exception());
+                            break;
                         }
-                        stringBuilder = new StringBuilder(76);
-                        stringBuilder.append("Could not find API instance ");
-                        stringBuilder.append(i);
-                        stringBuilder.append(" while trying to fail enqueued calls.");
-                        Log.wtf("GoogleApiManager", stringBuilder.toString(), new Exception());
-                        return true;
+                        errorString = this.zzjq.getErrorString(connectionResult.getErrorCode());
+                        errorMessage = connectionResult.getErrorMessage();
+                        com_google_android_gms_common_api_internal_GoogleApiManager_zza4.zzc(new Status(17, new StringBuilder((String.valueOf(errorString).length() + 69) + String.valueOf(errorMessage).length()).append("Error resolution was canceled by the user, original error message: ").append(errorString).append(": ").append(errorMessage).toString()));
+                        break;
                     }
                 }
-                com_google_android_gms_common_api_internal_GoogleApiManager_zza3 = null;
-                if (com_google_android_gms_common_api_internal_GoogleApiManager_zza3 == null) {
-                    stringBuilder = new StringBuilder(76);
-                    stringBuilder.append("Could not find API instance ");
-                    stringBuilder.append(i);
-                    stringBuilder.append(" while trying to fail enqueued calls.");
-                    Log.wtf("GoogleApiManager", stringBuilder.toString(), new Exception());
-                    return true;
+                com_google_android_gms_common_api_internal_GoogleApiManager_zza4 = null;
+                if (com_google_android_gms_common_api_internal_GoogleApiManager_zza4 != null) {
+                    Log.wtf("GoogleApiManager", "Could not find API instance " + i + " while trying to fail enqueued calls.", new Exception());
+                } else {
+                    errorString = this.zzjq.getErrorString(connectionResult.getErrorCode());
+                    errorMessage = connectionResult.getErrorMessage();
+                    com_google_android_gms_common_api_internal_GoogleApiManager_zza4.zzc(new Status(17, new StringBuilder((String.valueOf(errorString).length() + 69) + String.valueOf(errorMessage).length()).append("Error resolution was canceled by the user, original error message: ").append(errorString).append(": ").append(errorMessage).toString()));
                 }
-                errorString = this.zzjq.getErrorString(connectionResult.getErrorCode());
-                errorMessage = connectionResult.getErrorMessage();
-                stringBuilder2 = new StringBuilder((69 + String.valueOf(errorString).length()) + String.valueOf(errorMessage).length());
-                stringBuilder2.append("Error resolution was canceled by the user, original error message: ");
-                stringBuilder2.append(errorString);
-                stringBuilder2.append(": ");
-                stringBuilder2.append(errorMessage);
-                com_google_android_gms_common_api_internal_GoogleApiManager_zza3.zzc(new Status(17, stringBuilder2.toString()));
-                return true;
             case 6:
                 if (PlatformVersion.isAtLeastIceCreamSandwich() && (this.zzjp.getApplicationContext() instanceof Application)) {
                     BackgroundDetector.initialize((Application) this.zzjp.getApplicationContext());
                     BackgroundDetector.getInstance().addListener(new zzbh(this));
                     if (!BackgroundDetector.getInstance().readCurrentStateIfPossible(true)) {
                         this.zzjn = 300000;
-                        return true;
+                        break;
                     }
                 }
                 break;
             case 7:
                 zzb((GoogleApi) message.obj);
-                return true;
+                break;
             case 9:
                 if (this.zzju.containsKey(message.obj)) {
                     ((zza) this.zzju.get(message.obj)).resume();
-                    return true;
+                    break;
                 }
                 break;
             case 10:
-                for (zzh zzm2 : this.zzjx) {
-                    ((zza) this.zzju.remove(zzm2)).zzbm();
+                for (zzh obtainMessage2 : this.zzjx) {
+                    ((zza) this.zzju.remove(obtainMessage2)).zzbm();
                 }
                 this.zzjx.clear();
-                return true;
+                break;
             case 11:
                 if (this.zzju.containsKey(message.obj)) {
                     ((zza) this.zzju.get(message.obj)).zzay();
-                    return true;
+                    break;
                 }
                 break;
             case 12:
                 if (this.zzju.containsKey(message.obj)) {
                     ((zza) this.zzju.get(message.obj)).zzbs();
-                    return true;
+                    break;
                 }
                 break;
             case 14:
-                TaskCompletionSource zzao;
-                Object valueOf;
                 zzae com_google_android_gms_common_api_internal_zzae = (zzae) message.obj;
                 zzm2 = com_google_android_gms_common_api_internal_zzae.zzm();
-                if (this.zzju.containsKey(zzm2)) {
-                    boolean zza = ((zza) this.zzju.get(zzm2)).zzb(false);
-                    zzao = com_google_android_gms_common_api_internal_zzae.zzao();
-                    valueOf = Boolean.valueOf(zza);
-                } else {
-                    zzao = com_google_android_gms_common_api_internal_zzae.zzao();
-                    valueOf = Boolean.valueOf(false);
+                if (!this.zzju.containsKey(zzm2)) {
+                    com_google_android_gms_common_api_internal_zzae.zzao().setResult(Boolean.valueOf(false));
+                    break;
                 }
-                zzao.setResult(valueOf);
-                return true;
+                com_google_android_gms_common_api_internal_zzae.zzao().setResult(Boolean.valueOf(((zza) this.zzju.get(zzm2)).zzb(false)));
+                break;
             case 15:
                 com_google_android_gms_common_api_internal_GoogleApiManager_zzb = (zzb) message.obj;
                 if (this.zzju.containsKey(com_google_android_gms_common_api_internal_GoogleApiManager_zzb.zzkn)) {
                     ((zza) this.zzju.get(com_google_android_gms_common_api_internal_GoogleApiManager_zzb.zzkn)).zza(com_google_android_gms_common_api_internal_GoogleApiManager_zzb);
-                    return true;
+                    break;
                 }
                 break;
             case 16:
                 com_google_android_gms_common_api_internal_GoogleApiManager_zzb = (zzb) message.obj;
                 if (this.zzju.containsKey(com_google_android_gms_common_api_internal_GoogleApiManager_zzb.zzkn)) {
                     ((zza) this.zzju.get(com_google_android_gms_common_api_internal_GoogleApiManager_zzb.zzkn)).zzb(com_google_android_gms_common_api_internal_GoogleApiManager_zzb);
-                    return true;
+                    break;
                 }
                 break;
             default:
-                int i2 = message.what;
-                stringBuilder = new StringBuilder(31);
-                stringBuilder.append("Unknown message id: ");
-                stringBuilder.append(i2);
-                Log.w("GoogleApiManager", stringBuilder.toString());
+                Log.w("GoogleApiManager", "Unknown message id: " + message.what);
                 return false;
         }
         return true;

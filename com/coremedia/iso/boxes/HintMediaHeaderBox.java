@@ -80,15 +80,6 @@ public class HintMediaHeaderBox extends AbstractMediaHeaderBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_4, this, this));
-        StringBuilder stringBuilder = new StringBuilder("HintMediaHeaderBox{maxPduSize=");
-        stringBuilder.append(this.maxPduSize);
-        stringBuilder.append(", avgPduSize=");
-        stringBuilder.append(this.avgPduSize);
-        stringBuilder.append(", maxBitrate=");
-        stringBuilder.append(this.maxBitrate);
-        stringBuilder.append(", avgBitrate=");
-        stringBuilder.append(this.avgBitrate);
-        stringBuilder.append('}');
-        return stringBuilder.toString();
+        return "HintMediaHeaderBox{maxPduSize=" + this.maxPduSize + ", avgPduSize=" + this.avgPduSize + ", maxBitrate=" + this.maxBitrate + ", avgBitrate=" + this.avgBitrate + '}';
     }
 }

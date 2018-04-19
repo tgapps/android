@@ -8,8 +8,8 @@ public final class zzhl {
 
     public zzhl(Context context) {
         Preconditions.checkNotNull(context);
-        context = context.getApplicationContext();
-        Preconditions.checkNotNull(context);
-        this.zzqs = context;
+        Context applicationContext = context.getApplicationContext();
+        Preconditions.checkNotNull(applicationContext);
+        this.zzqs = applicationContext;
     }
 }

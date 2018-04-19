@@ -18,7 +18,6 @@ public class SimpleMultipartEntity {
     private File mTempFile;
 
     public SimpleMultipartEntity(File tempFile) {
-        int i = 0;
         this.mTempFile = tempFile;
         try {
             this.mOut = new FileOutputStream(this.mTempFile);
@@ -27,9 +26,8 @@ public class SimpleMultipartEntity {
         }
         StringBuilder buffer = new StringBuilder();
         Random rand = new Random();
-        while (i < 30) {
+        for (int i = 0; i < 30; i++) {
             buffer.append(BOUNDARY_CHARS[rand.nextInt(BOUNDARY_CHARS.length)]);
-            i++;
         }
         this.mBoundary = buffer.toString();
     }
@@ -40,12 +38,7 @@ public class SimpleMultipartEntity {
 
     public void writeFirstBoundaryIfNeeds() throws IOException {
         if (!this.mIsSetFirst) {
-            OutputStream outputStream = this.mOut;
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("--");
-            stringBuilder.append(this.mBoundary);
-            stringBuilder.append("\r\n");
-            outputStream.write(stringBuilder.toString().getBytes());
+            this.mOut.write(("--" + this.mBoundary + "\r\n").getBytes());
         }
         this.mIsSetFirst = true;
     }
@@ -53,12 +46,7 @@ public class SimpleMultipartEntity {
     public void writeLastBoundaryIfNeeds() {
         if (!this.mIsSetLast) {
             try {
-                OutputStream outputStream = this.mOut;
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("\r\n--");
-                stringBuilder.append(this.mBoundary);
-                stringBuilder.append("--\r\n");
-                outputStream.write(stringBuilder.toString().getBytes());
+                this.mOut.write(("\r\n--" + this.mBoundary + "--\r\n").getBytes());
                 this.mOut.flush();
                 this.mOut.close();
                 this.mOut = null;
@@ -71,21 +59,11 @@ public class SimpleMultipartEntity {
 
     public void addPart(String key, String value) throws IOException {
         writeFirstBoundaryIfNeeds();
-        OutputStream outputStream = this.mOut;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Content-Disposition: form-data; name=\"");
-        stringBuilder.append(key);
-        stringBuilder.append("\"\r\n");
-        outputStream.write(stringBuilder.toString().getBytes());
+        this.mOut.write(("Content-Disposition: form-data; name=\"" + key + "\"\r\n").getBytes());
         this.mOut.write("Content-Type: text/plain; charset=UTF-8\r\n".getBytes());
         this.mOut.write("Content-Transfer-Encoding: 8bit\r\n\r\n".getBytes());
         this.mOut.write(value.getBytes());
-        outputStream = this.mOut;
-        stringBuilder = new StringBuilder();
-        stringBuilder.append("\r\n--");
-        stringBuilder.append(this.mBoundary);
-        stringBuilder.append("\r\n");
-        outputStream.write(stringBuilder.toString().getBytes());
+        this.mOut.write(("\r\n--" + this.mBoundary + "\r\n").getBytes());
     }
 
     public void addPart(String key, String fileName, InputStream fin, boolean lastFile) throws IOException {
@@ -95,26 +73,14 @@ public class SimpleMultipartEntity {
     public void addPart(String key, String fileName, InputStream fin, String type, boolean lastFile) throws IOException {
         writeFirstBoundaryIfNeeds();
         try {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Content-Type: ");
-            stringBuilder.append(type);
-            stringBuilder.append("\r\n");
-            type = stringBuilder.toString();
-            OutputStream outputStream = this.mOut;
-            StringBuilder stringBuilder2 = new StringBuilder();
-            stringBuilder2.append("Content-Disposition: form-data; name=\"");
-            stringBuilder2.append(key);
-            stringBuilder2.append("\"; filename=\"");
-            stringBuilder2.append(fileName);
-            stringBuilder2.append("\"\r\n");
-            outputStream.write(stringBuilder2.toString().getBytes());
+            type = "Content-Type: " + type + "\r\n";
+            this.mOut.write(("Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + fileName + "\"\r\n").getBytes());
             this.mOut.write(type.getBytes());
             this.mOut.write("Content-Transfer-Encoding: binary\r\n\r\n".getBytes());
             byte[] tmp = new byte[4096];
             while (true) {
-                int read = fin.read(tmp);
-                int l = read;
-                if (read == -1) {
+                int l = fin.read(tmp);
+                if (l == -1) {
                     break;
                 }
                 this.mOut.write(tmp, 0, l);
@@ -123,12 +89,7 @@ public class SimpleMultipartEntity {
             if (lastFile) {
                 writeLastBoundaryIfNeeds();
             } else {
-                OutputStream outputStream2 = this.mOut;
-                StringBuilder stringBuilder3 = new StringBuilder();
-                stringBuilder3.append("\r\n--");
-                stringBuilder3.append(this.mBoundary);
-                stringBuilder3.append("\r\n");
-                outputStream2.write(stringBuilder3.toString().getBytes());
+                this.mOut.write(("\r\n--" + this.mBoundary + "\r\n").getBytes());
             }
         } finally {
             try {
@@ -149,9 +110,8 @@ public class SimpleMultipartEntity {
         BufferedOutputStream outputStream = new BufferedOutputStream(out);
         byte[] tmp = new byte[4096];
         while (true) {
-            int read = fileInputStream.read(tmp);
-            int l = read;
-            if (read != -1) {
+            int l = fileInputStream.read(tmp);
+            if (l != -1) {
                 outputStream.write(tmp, 0, l);
             } else {
                 fileInputStream.close();

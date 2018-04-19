@@ -35,17 +35,19 @@ public class GoogleApiAvailabilityCache {
         if (i != -1) {
             return i;
         }
-        for (int i2 = 0; i2 < this.zzug.size(); i2++) {
+        int i2;
+        for (i2 = 0; i2 < this.zzug.size(); i2++) {
             int keyAt = this.zzug.keyAt(i2);
             if (keyAt > minApkVersion && this.zzug.get(keyAt) == 0) {
-                i = 0;
+                i2 = 0;
                 break;
             }
         }
-        if (i == -1) {
-            i = this.zzuh.isGooglePlayServicesAvailable(context, minApkVersion);
+        i2 = i;
+        if (i2 == -1) {
+            i2 = this.zzuh.isGooglePlayServicesAvailable(context, minApkVersion);
         }
-        this.zzug.put(minApkVersion, i);
-        return i;
+        this.zzug.put(minApkVersion, i2);
+        return i2;
     }
 }

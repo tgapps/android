@@ -71,9 +71,10 @@ public class FirebaseABTesting {
         if (i == 1) {
             return true;
         }
-        if (Log.isLoggable("FirebaseABTesting", 3)) {
-            Log.d("FirebaseABTesting", String.format("Experiment won't be set due to the overflow policy: [%s, %s]", new Object[]{com_google_android_gms_internal_firebase_abt_zzo.zzaq, com_google_android_gms_internal_firebase_abt_zzo.zzar}));
+        if (!Log.isLoggable("FirebaseABTesting", 3)) {
+            return false;
         }
+        Log.d("FirebaseABTesting", String.format("Experiment won't be set due to the overflow policy: [%s, %s]", new Object[]{com_google_android_gms_internal_firebase_abt_zzo.zzaq, com_google_android_gms_internal_firebase_abt_zzo.zzar}));
         return false;
     }
 
@@ -105,14 +106,10 @@ public class FirebaseABTesting {
     }
 
     public void replaceAllExperiments(List<byte[]> list) {
-        String str;
-        String str2;
         if (list == null) {
-            str = "FirebaseABTesting";
-            str2 = "Cannot replace experiments because experimentPayloads is null.";
+            Log.e("FirebaseABTesting", "Cannot replace experiments because experimentPayloads is null.");
         } else if (list.isEmpty()) {
             removeAllExperiments();
-            return;
         } else {
             List arrayList = new ArrayList();
             for (byte[] zza : list) {
@@ -122,81 +119,85 @@ public class FirebaseABTesting {
                 }
             }
             if (arrayList.isEmpty()) {
-                str = "FirebaseABTesting";
-                str2 = "All payloads are either not defined or cannot not be deserialized.";
-            } else {
-                Set hashSet = new HashSet();
-                ArrayList arrayList2 = (ArrayList) arrayList;
-                int size = arrayList2.size();
-                int i = 0;
-                int i2 = 0;
-                while (i2 < size) {
-                    Object obj = arrayList2.get(i2);
-                    i2++;
-                    hashSet.add(((zzo) obj).zzaq);
-                }
-                List<ConditionalUserProperty> zzb = zzb();
-                Set hashSet2 = new HashSet();
-                for (ConditionalUserProperty conditionalUserProperty : zzb) {
-                    hashSet2.add(conditionalUserProperty.mName);
-                }
-                Collection arrayList3 = new ArrayList();
-                for (ConditionalUserProperty conditionalUserProperty2 : zzb) {
-                    if (!hashSet.contains(conditionalUserProperty2.mName)) {
-                        arrayList3.add(conditionalUserProperty2);
-                    }
-                }
-                zza(arrayList3);
-                ArrayList arrayList4 = new ArrayList();
-                size = arrayList2.size();
-                int i3 = 0;
-                while (i3 < size) {
-                    Object obj2 = arrayList2.get(i3);
-                    i3++;
-                    zzo com_google_android_gms_internal_firebase_abt_zzo = (zzo) obj2;
-                    if (!hashSet2.contains(com_google_android_gms_internal_firebase_abt_zzo.zzaq)) {
-                        int i4 = 1;
-                        if (com_google_android_gms_internal_firebase_abt_zzo.zzas <= this.zzd) {
-                            if (Log.isLoggable("FirebaseABTesting", 3)) {
-                                Log.d("FirebaseABTesting", String.format("The experiment [%s, %s, %d] is not new since its startTime is before lastKnownStartTime: %d", new Object[]{com_google_android_gms_internal_firebase_abt_zzo.zzaq, com_google_android_gms_internal_firebase_abt_zzo.zzar, Long.valueOf(com_google_android_gms_internal_firebase_abt_zzo.zzas), Long.valueOf(this.zzd)}));
-                            }
-                            i4 = 0;
-                        }
-                        if (i4 != 0) {
-                            arrayList4.add(com_google_android_gms_internal_firebase_abt_zzo);
-                        }
-                    }
-                }
-                Deque arrayDeque = new ArrayDeque(zzb());
-                i2 = zzc();
-                arrayList4 = arrayList4;
-                i3 = arrayList4.size();
-                int i5 = 0;
-                while (i5 < i3) {
-                    Object obj3 = arrayList4.get(i5);
-                    i5++;
-                    zzo com_google_android_gms_internal_firebase_abt_zzo2 = (zzo) obj3;
-                    if (arrayDeque.size() >= i2) {
-                        if (zza(com_google_android_gms_internal_firebase_abt_zzo2)) {
-                            while (arrayDeque.size() >= i2) {
-                                zza(((ConditionalUserProperty) arrayDeque.pollFirst()).mName);
-                            }
-                        }
-                    }
-                    ConditionalUserProperty zzb2 = zzb(com_google_android_gms_internal_firebase_abt_zzo2);
-                    this.zza.setConditionalUserProperty(zzb2);
-                    arrayDeque.offer(zzb2);
-                }
-                int size2 = arrayList2.size();
-                while (i < size2) {
-                    Object obj4 = arrayList2.get(i);
-                    i++;
-                    this.zzd = Math.max(this.zzd, ((zzo) obj4).zzas);
-                }
-                zza();
+                Log.e("FirebaseABTesting", "All payloads are either not defined or cannot not be deserialized.");
                 return;
             }
+            zzo com_google_android_gms_internal_firebase_abt_zzo;
+            Set hashSet = new HashSet();
+            ArrayList arrayList2 = (ArrayList) arrayList;
+            int size = arrayList2.size();
+            int i = 0;
+            while (i < size) {
+                Object obj = arrayList2.get(i);
+                i++;
+                hashSet.add(((zzo) obj).zzaq);
+            }
+            List<ConditionalUserProperty> zzb = zzb();
+            Set hashSet2 = new HashSet();
+            for (ConditionalUserProperty conditionalUserProperty : zzb) {
+                hashSet2.add(conditionalUserProperty.mName);
+            }
+            Collection arrayList3 = new ArrayList();
+            for (ConditionalUserProperty conditionalUserProperty2 : zzb) {
+                if (!hashSet.contains(conditionalUserProperty2.mName)) {
+                    arrayList3.add(conditionalUserProperty2);
+                }
+            }
+            zza(arrayList3);
+            ArrayList arrayList4 = new ArrayList();
+            arrayList2 = (ArrayList) arrayList;
+            int size2 = arrayList2.size();
+            int i2 = 0;
+            while (i2 < size2) {
+                size = i2 + 1;
+                com_google_android_gms_internal_firebase_abt_zzo = (zzo) arrayList2.get(i2);
+                if (!hashSet2.contains(com_google_android_gms_internal_firebase_abt_zzo.zzaq)) {
+                    Object obj2;
+                    if (com_google_android_gms_internal_firebase_abt_zzo.zzas <= this.zzd) {
+                        if (Log.isLoggable("FirebaseABTesting", 3)) {
+                            Log.d("FirebaseABTesting", String.format("The experiment [%s, %s, %d] is not new since its startTime is before lastKnownStartTime: %d", new Object[]{com_google_android_gms_internal_firebase_abt_zzo.zzaq, com_google_android_gms_internal_firebase_abt_zzo.zzar, Long.valueOf(com_google_android_gms_internal_firebase_abt_zzo.zzas), Long.valueOf(this.zzd)}));
+                        }
+                        obj2 = null;
+                    } else {
+                        obj2 = 1;
+                    }
+                    if (obj2 != null) {
+                        arrayList4.add(com_google_android_gms_internal_firebase_abt_zzo);
+                    }
+                }
+                i2 = size;
+            }
+            Deque arrayDeque = new ArrayDeque(zzb());
+            int zzc = zzc();
+            arrayList2 = arrayList4;
+            size2 = arrayList2.size();
+            i = 0;
+            while (i < size2) {
+                i2 = i + 1;
+                com_google_android_gms_internal_firebase_abt_zzo = (zzo) arrayList2.get(i);
+                if (arrayDeque.size() >= zzc) {
+                    if (zza(com_google_android_gms_internal_firebase_abt_zzo)) {
+                        while (arrayDeque.size() >= zzc) {
+                            zza(((ConditionalUserProperty) arrayDeque.pollFirst()).mName);
+                        }
+                    } else {
+                        i = i2;
+                    }
+                }
+                ConditionalUserProperty zzb2 = zzb(com_google_android_gms_internal_firebase_abt_zzo);
+                this.zza.setConditionalUserProperty(zzb2);
+                arrayDeque.offer(zzb2);
+                i = i2;
+            }
+            ArrayList arrayList5 = (ArrayList) arrayList;
+            i = arrayList5.size();
+            int i3 = 0;
+            while (i3 < i) {
+                Object obj3 = arrayList5.get(i3);
+                i3++;
+                this.zzd = Math.max(this.zzd, ((zzo) obj3).zzas);
+            }
+            zza();
         }
-        Log.e(str, str2);
     }
 }

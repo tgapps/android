@@ -30,54 +30,16 @@ public class zzhp {
         return zzfs;
     }
 
-    private static boolean zza(android.content.pm.PackageInfo r3, boolean r4) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dominator for block B:10:0x002f in {3, 6, 8, 9} preds:[]
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.computeDominators(BlockProcessor.java:129)
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.processBlocksTree(BlockProcessor.java:48)
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.visit(BlockProcessor.java:38)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.ProcessClass.process(ProcessClass.java:37)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-*/
-        /*
-        r0 = r3.signatures;
-        r1 = 1;
-        r2 = 0;
-        r0 = r0.length;
-        if (r0 == r1) goto L_0x000f;
-    L_0x0007:
-        r3 = "WearSignatureVerifier";
-        r4 = "Package has more than one signature.";
-        android.util.Log.w(r3, r4);
-        return r2;
-    L_0x000f:
-        r0 = r3.signatures;
-        r0 = r0[r2];
-        r0.toByteArray();
-        if (r4 == 0) goto L_0x0028;
-    L_0x0018:
-        r4 = 2;
-        r4 = new byte[r4][];
-        r0 = zzfu;
-        r4[r2] = r0;
-        r0 = zzfv;
-        r4[r1] = r0;
-    L_0x0023:
-        r3 = zza(r3, r4);
-        return r3;
-    L_0x0028:
-        r4 = new byte[r1][];
-        r0 = zzfu;
-        r4[r2] = r0;
-        goto L_0x0023;
-        return r3;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.wearable.internal.zzhp.zza(android.content.pm.PackageInfo, boolean):boolean");
+    private static boolean zza(PackageInfo packageInfo, boolean z) {
+        if (packageInfo.signatures.length != 1) {
+            Log.w("WearSignatureVerifier", "Package has more than one signature.");
+            return false;
+        }
+        packageInfo.signatures[0].toByteArray();
+        if (z) {
+            return zza(packageInfo, zzfu, zzfv);
+        }
+        return zza(packageInfo, zzfu);
     }
 
     private static boolean zza(PackageInfo packageInfo, byte[]... bArr) {
@@ -122,9 +84,10 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
             return zza(zzf, true);
         }
         boolean zza = zza(zzf, false);
-        if (!zza && zza(zzf, true)) {
-            Log.w("WearSignatureVerifier", "Test-keys aren't accepted on this build.");
+        if (zza || !zza(zzf, true)) {
+            return zza;
         }
+        Log.w("WearSignatureVerifier", "Test-keys aren't accepted on this build.");
         return zza;
     }
 }

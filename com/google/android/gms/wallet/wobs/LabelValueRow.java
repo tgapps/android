@@ -24,10 +24,10 @@ public final class LabelValueRow extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeString(parcel, 2, this.zzgn, false);
         SafeParcelWriter.writeString(parcel, 3, this.zzgo, false);
         SafeParcelWriter.writeTypedList(parcel, 4, this.zzgp, false);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

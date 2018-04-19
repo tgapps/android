@@ -15,9 +15,8 @@ import java.util.List;
 
 public final class zzc {
     private static Object zza(zzabo com_google_android_gms_internal_measurement_zzabo, String str, zzb com_google_firebase_messaging_zzb) {
-        Throwable e;
-        Object obj = null;
         Object newInstance;
+        Object obj = null;
         try {
             Class cls = Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty");
             Bundle zzw = zzw(com_google_android_gms_internal_measurement_zzabo.zzcag, com_google_android_gms_internal_measurement_zzabo.zzcah);
@@ -39,18 +38,19 @@ public final class zzc {
                 cls.getField("mTimeToLive").set(newInstance, Long.valueOf(com_google_android_gms_internal_measurement_zzabo.zzrp));
                 cls.getField("mExpiredEventName").set(newInstance, !TextUtils.isEmpty(com_google_android_gms_internal_measurement_zzabo.zzbso) ? com_google_android_gms_internal_measurement_zzabo.zzbso : com_google_firebase_messaging_zzb.zztl());
                 cls.getField("mExpiredEventParams").set(newInstance, zzw);
-                return newInstance;
-            } catch (Exception e2) {
-                e = e2;
+            } catch (Exception e) {
+                e = e;
                 Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e);
                 return newInstance;
             }
-        } catch (Exception e3) {
-            e = e3;
+        } catch (Exception e2) {
+            Throwable e3;
+            e3 = e2;
             newInstance = null;
-            Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e);
+            Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e3);
             return newInstance;
         }
+        return newInstance;
     }
 
     private static String zza(zzabo com_google_android_gms_internal_measurement_zzabo, zzb com_google_firebase_messaging_zzb) {
@@ -66,16 +66,10 @@ public final class zzc {
             list = (List) declaredMethod.invoke(appMeasurement, new Object[]{str, TtmlNode.ANONYMOUS_REGION_ID});
         } catch (Throwable e) {
             Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e);
-            list = arrayList;
+            Object obj = arrayList;
         }
         if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-            int size = list.size();
-            StringBuilder stringBuilder = new StringBuilder(55 + String.valueOf(str).length());
-            stringBuilder.append("Number of currently set _Es for origin: ");
-            stringBuilder.append(str);
-            stringBuilder.append(" is ");
-            stringBuilder.append(size);
-            Log.v("FirebaseAbtUtil", stringBuilder.toString());
+            Log.v("FirebaseAbtUtil", new StringBuilder(String.valueOf(str).length() + 55).append("Number of currently set _Es for origin: ").append(str).append(" is ").append(list.size()).toString());
         }
         return list;
     }
@@ -84,8 +78,8 @@ public final class zzc {
         if (Log.isLoggable("FirebaseAbtUtil", 2)) {
             String str5 = "FirebaseAbtUtil";
             String str6 = "_CE(experimentId) called by ";
-            str = String.valueOf(str);
-            Log.v(str5, str.length() != 0 ? str6.concat(str) : new String(str6));
+            String valueOf = String.valueOf(str);
+            Log.v(str5, valueOf.length() != 0 ? str6.concat(valueOf) : new String(str6));
         }
         if (zzy(context)) {
             AppMeasurement zzx = zzx(context);
@@ -93,13 +87,7 @@ public final class zzc {
                 Method declaredMethod = AppMeasurement.class.getDeclaredMethod("clearConditionalUserProperty", new Class[]{String.class, String.class, Bundle.class});
                 declaredMethod.setAccessible(true);
                 if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                    StringBuilder stringBuilder = new StringBuilder((17 + String.valueOf(str2).length()) + String.valueOf(str3).length());
-                    stringBuilder.append("Clearing _E: [");
-                    stringBuilder.append(str2);
-                    stringBuilder.append(", ");
-                    stringBuilder.append(str3);
-                    stringBuilder.append("]");
-                    Log.v("FirebaseAbtUtil", stringBuilder.toString());
+                    Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(str2).length() + 17) + String.valueOf(str3).length()).append("Clearing _E: [").append(str2).append(", ").append(str3).append("]").toString());
                 }
                 declaredMethod.invoke(zzx, new Object[]{str2, str4, zzw(str2, str3)});
             } catch (Throwable e) {
@@ -109,222 +97,127 @@ public final class zzc {
     }
 
     public static void zza(Context context, String str, byte[] bArr, zzb com_google_firebase_messaging_zzb, int i) {
-        Context context2 = context;
-        String str2 = str;
-        zzb com_google_firebase_messaging_zzb2 = com_google_firebase_messaging_zzb;
-        int i2 = 2;
         if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-            String str3 = "FirebaseAbtUtil";
-            String str4 = "_SE called by ";
+            String str2 = "FirebaseAbtUtil";
+            String str3 = "_SE called by ";
             String valueOf = String.valueOf(str);
-            Log.v(str3, valueOf.length() != 0 ? str4.concat(valueOf) : new String(str4));
+            Log.v(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
         }
         if (zzy(context)) {
             AppMeasurement zzx = zzx(context);
             zzabo zzi = zzi(bArr);
-            if (zzi == null) {
-                if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                    Log.v("FirebaseAbtUtil", "_SE failed; either _P was not set, or we couldn't deserialize the _P.");
-                }
-                return;
-            }
-            try {
-                int length;
-                int i3;
-                Object obj;
-                Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty");
-                Object obj2 = null;
-                for (Object next : zza(zzx, str2)) {
-                    String zzs = zzs(next);
-                    String zzt = zzt(next);
-                    long longValue = ((Long) Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty").getField("mCreationTimestamp").get(next)).longValue();
-                    if (zzi.zzcag.equals(zzs) && zzi.zzcah.equals(zzt)) {
-                        if (Log.isLoggable("FirebaseAbtUtil", i2)) {
-                            StringBuilder stringBuilder = new StringBuilder((23 + String.valueOf(zzs).length()) + String.valueOf(zzt).length());
-                            stringBuilder.append("_E is already set. [");
-                            stringBuilder.append(zzs);
-                            stringBuilder.append(", ");
-                            stringBuilder.append(zzt);
-                            stringBuilder.append("]");
-                            Log.v("FirebaseAbtUtil", stringBuilder.toString());
-                        }
-                        obj2 = 1;
-                    } else {
-                        StringBuilder stringBuilder2;
-                        zzabn[] com_google_android_gms_internal_measurement_zzabnArr = zzi.zzcam;
-                        length = com_google_android_gms_internal_measurement_zzabnArr.length;
-                        i3 = 0;
-                        while (i3 < length) {
-                            if (com_google_android_gms_internal_measurement_zzabnArr[i3].zzcag.equals(zzs)) {
-                                if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                                    stringBuilder2 = new StringBuilder((33 + String.valueOf(zzs).length()) + String.valueOf(zzt).length());
-                                    stringBuilder2.append("_E is found in the _OE list. [");
-                                    stringBuilder2.append(zzs);
-                                    stringBuilder2.append(", ");
-                                    stringBuilder2.append(zzt);
-                                    stringBuilder2.append("]");
-                                    Log.v("FirebaseAbtUtil", stringBuilder2.toString());
-                                }
-                                obj = 1;
-                                if (obj == null) {
-                                    if (zzi.zzcai > longValue) {
-                                        if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                                            stringBuilder2 = new StringBuilder((115 + String.valueOf(zzs).length()) + String.valueOf(zzt).length());
-                                            stringBuilder2.append("Clearing _E as it was not in the _OE list, andits start time is older than the start time of the _E to be set. [");
-                                            stringBuilder2.append(zzs);
-                                            stringBuilder2.append(", ");
-                                            stringBuilder2.append(zzt);
-                                            stringBuilder2.append("]");
-                                            Log.v("FirebaseAbtUtil", stringBuilder2.toString());
-                                        }
-                                        zza(context2, str2, zzs, zzt, zza(zzi, com_google_firebase_messaging_zzb2));
-                                    } else if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                                        stringBuilder2 = new StringBuilder((109 + String.valueOf(zzs).length()) + String.valueOf(zzt).length());
-                                        stringBuilder2.append("_E was not found in the _OE list, but not clearing it as it has a new start time than the _E to be set.  [");
-                                        stringBuilder2.append(zzs);
-                                        stringBuilder2.append(", ");
-                                        stringBuilder2.append(zzt);
-                                        stringBuilder2.append("]");
-                                        Log.v("FirebaseAbtUtil", stringBuilder2.toString());
-                                    }
-                                }
-                                i2 = 2;
-                            } else {
-                                i3++;
-                            }
-                        }
-                        obj = null;
-                        if (obj == null) {
-                            if (zzi.zzcai > longValue) {
-                                if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                                    stringBuilder2 = new StringBuilder((115 + String.valueOf(zzs).length()) + String.valueOf(zzt).length());
-                                    stringBuilder2.append("Clearing _E as it was not in the _OE list, andits start time is older than the start time of the _E to be set. [");
-                                    stringBuilder2.append(zzs);
-                                    stringBuilder2.append(", ");
-                                    stringBuilder2.append(zzt);
-                                    stringBuilder2.append("]");
-                                    Log.v("FirebaseAbtUtil", stringBuilder2.toString());
-                                }
-                                zza(context2, str2, zzs, zzt, zza(zzi, com_google_firebase_messaging_zzb2));
-                            } else if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                                stringBuilder2 = new StringBuilder((109 + String.valueOf(zzs).length()) + String.valueOf(zzt).length());
-                                stringBuilder2.append("_E was not found in the _OE list, but not clearing it as it has a new start time than the _E to be set.  [");
-                                stringBuilder2.append(zzs);
-                                stringBuilder2.append(", ");
-                                stringBuilder2.append(zzt);
-                                stringBuilder2.append("]");
-                                Log.v("FirebaseAbtUtil", stringBuilder2.toString());
-                            }
-                        }
-                        i2 = 2;
-                    }
-                }
-                String str5;
-                StringBuilder stringBuilder3;
-                if (obj2 != null) {
-                    if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                        str2 = zzi.zzcag;
-                        str5 = zzi.zzcah;
-                        stringBuilder3 = new StringBuilder((44 + String.valueOf(str2).length()) + String.valueOf(str5).length());
-                        stringBuilder3.append("_E is already set. Not setting it again [");
-                        stringBuilder3.append(str2);
-                        stringBuilder3.append(", ");
-                        stringBuilder3.append(str5);
-                        stringBuilder3.append("]");
-                        Log.v("FirebaseAbtUtil", stringBuilder3.toString());
-                    }
-                    return;
-                }
-                String str6;
-                StringBuilder stringBuilder4;
-                if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                    str6 = zzi.zzcag;
-                    String str7 = zzi.zzcah;
-                    stringBuilder4 = new StringBuilder((7 + String.valueOf(str6).length()) + String.valueOf(str7).length());
-                    stringBuilder4.append("_SEI: ");
-                    stringBuilder4.append(str6);
-                    stringBuilder4.append(" ");
-                    stringBuilder4.append(str7);
-                    Log.v("FirebaseAbtUtil", stringBuilder4.toString());
-                }
+            if (zzi != null) {
                 try {
+                    Object obj;
                     Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty");
-                    List zza = zza(zzx, str2);
-                    if (zza(zzx, str2).size() >= zzb(zzx, str2)) {
-                        if (zzi.zzcal != 0) {
-                            i3 = zzi.zzcal;
-                            length = 1;
-                        } else {
-                            length = 1;
-                            i3 = 1;
-                        }
-                        if (i3 == length) {
-                            obj = zza.get(0);
-                            str6 = zzs(obj);
-                            String zzt2 = zzt(obj);
+                    Object obj2 = null;
+                    for (Object obj3 : zza(zzx, str)) {
+                        String zzs = zzs(obj3);
+                        String zzt = zzt(obj3);
+                        long longValue = ((Long) Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty").getField("mCreationTimestamp").get(obj3)).longValue();
+                        if (zzi.zzcag.equals(zzs) && zzi.zzcah.equals(zzt)) {
                             if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                                stringBuilder4 = new StringBuilder(38 + String.valueOf(str6).length());
-                                stringBuilder4.append("Clearing _E due to overflow policy: [");
-                                stringBuilder4.append(str6);
-                                stringBuilder4.append("]");
-                                Log.v("FirebaseAbtUtil", stringBuilder4.toString());
+                                Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(zzs).length() + 23) + String.valueOf(zzt).length()).append("_E is already set. [").append(zzs).append(", ").append(zzt).append("]").toString());
                             }
-                            zza(context2, str2, str6, zzt2, zza(zzi, com_google_firebase_messaging_zzb2));
+                            obj2 = 1;
                         } else {
-                            if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                                str2 = zzi.zzcag;
-                                str5 = zzi.zzcah;
-                                stringBuilder3 = new StringBuilder((44 + String.valueOf(str2).length()) + String.valueOf(str5).length());
-                                stringBuilder3.append("_E won't be set due to overflow policy. [");
-                                stringBuilder3.append(str2);
-                                stringBuilder3.append(", ");
-                                stringBuilder3.append(str5);
-                                stringBuilder3.append("]");
-                                Log.v("FirebaseAbtUtil", stringBuilder3.toString());
+                            obj3 = null;
+                            zzabn[] com_google_android_gms_internal_measurement_zzabnArr = zzi.zzcam;
+                            int length = com_google_android_gms_internal_measurement_zzabnArr.length;
+                            int i2 = 0;
+                            while (i2 < length) {
+                                if (com_google_android_gms_internal_measurement_zzabnArr[i2].zzcag.equals(zzs)) {
+                                    if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                                        Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(zzs).length() + 33) + String.valueOf(zzt).length()).append("_E is found in the _OE list. [").append(zzs).append(", ").append(zzt).append("]").toString());
+                                    }
+                                    obj3 = 1;
+                                    if (obj3 != null) {
+                                        continue;
+                                    } else if (zzi.zzcai > longValue) {
+                                        if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                                            Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(zzs).length() + 115) + String.valueOf(zzt).length()).append("Clearing _E as it was not in the _OE list, andits start time is older than the start time of the _E to be set. [").append(zzs).append(", ").append(zzt).append("]").toString());
+                                        }
+                                        zza(context, str, zzs, zzt, zza(zzi, com_google_firebase_messaging_zzb));
+                                    } else if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                                        Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(zzs).length() + 109) + String.valueOf(zzt).length()).append("_E was not found in the _OE list, but not clearing it as it has a new start time than the _E to be set.  [").append(zzs).append(", ").append(zzt).append("]").toString());
+                                    }
+                                } else {
+                                    i2++;
+                                }
                             }
-                            return;
+                            if (obj3 != null) {
+                                continue;
+                            } else if (zzi.zzcai > longValue) {
+                                if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                                    Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(zzs).length() + 115) + String.valueOf(zzt).length()).append("Clearing _E as it was not in the _OE list, andits start time is older than the start time of the _E to be set. [").append(zzs).append(", ").append(zzt).append("]").toString());
+                                }
+                                zza(context, str, zzs, zzt, zza(zzi, com_google_firebase_messaging_zzb));
+                            } else if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                                Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(zzs).length() + 109) + String.valueOf(zzt).length()).append("_E was not found in the _OE list, but not clearing it as it has a new start time than the _E to be set.  [").append(zzs).append(", ").append(zzt).append("]").toString());
+                            }
                         }
                     }
-                    for (Object next2 : zza) {
-                        str6 = zzs(next2);
-                        valueOf = zzt(next2);
-                        if (str6.equals(zzi.zzcag) && !valueOf.equals(zzi.zzcah) && Log.isLoggable("FirebaseAbtUtil", 2)) {
-                            stringBuilder4 = new StringBuilder((77 + String.valueOf(str6).length()) + String.valueOf(valueOf).length());
-                            stringBuilder4.append("Clearing _E, as only one _V of the same _E can be set atany given time: [");
-                            stringBuilder4.append(str6);
-                            stringBuilder4.append(", ");
-                            stringBuilder4.append(valueOf);
-                            stringBuilder4.append("].");
-                            Log.v("FirebaseAbtUtil", stringBuilder4.toString());
-                            zza(context2, str2, str6, valueOf, zza(zzi, com_google_firebase_messaging_zzb2));
-                        }
-                    }
-                    if (zza(zzi, str2, com_google_firebase_messaging_zzb2) == null) {
+                    if (obj2 == null) {
                         if (Log.isLoggable("FirebaseAbtUtil", 2)) {
                             str2 = zzi.zzcag;
-                            str5 = zzi.zzcah;
-                            StringBuilder stringBuilder5 = new StringBuilder((42 + String.valueOf(str2).length()) + String.valueOf(str5).length());
-                            stringBuilder5.append("Could not create _CUP for: [");
-                            stringBuilder5.append(str2);
-                            stringBuilder5.append(", ");
-                            stringBuilder5.append(str5);
-                            stringBuilder5.append("]. Skipping.");
-                            Log.v("FirebaseAbtUtil", stringBuilder5.toString());
+                            str3 = zzi.zzcah;
+                            Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(str2).length() + 7) + String.valueOf(str3).length()).append("_SEI: ").append(str2).append(" ").append(str3).toString());
                         }
-                        return;
+                        try {
+                            Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty");
+                            List zza = zza(zzx, str);
+                            if (zza(zzx, str).size() >= zzb(zzx, str)) {
+                                if ((zzi.zzcal != 0 ? zzi.zzcal : 1) == 1) {
+                                    obj3 = zza.get(0);
+                                    str3 = zzs(obj3);
+                                    valueOf = zzt(obj3);
+                                    if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                                        Log.v("FirebaseAbtUtil", new StringBuilder(String.valueOf(str3).length() + 38).append("Clearing _E due to overflow policy: [").append(str3).append("]").toString());
+                                    }
+                                    zza(context, str, str3, valueOf, zza(zzi, com_google_firebase_messaging_zzb));
+                                } else if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                                    str2 = zzi.zzcag;
+                                    str3 = zzi.zzcah;
+                                    Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(str2).length() + 44) + String.valueOf(str3).length()).append("_E won't be set due to overflow policy. [").append(str2).append(", ").append(str3).append("]").toString());
+                                    return;
+                                } else {
+                                    return;
+                                }
+                            }
+                            for (Object next : zza) {
+                                str3 = zzs(next);
+                                str2 = zzt(next);
+                                if (str3.equals(zzi.zzcag) && !str2.equals(zzi.zzcah) && Log.isLoggable("FirebaseAbtUtil", 2)) {
+                                    Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(str3).length() + 77) + String.valueOf(str2).length()).append("Clearing _E, as only one _V of the same _E can be set atany given time: [").append(str3).append(", ").append(str2).append("].").toString());
+                                    zza(context, str, str3, str2, zza(zzi, com_google_firebase_messaging_zzb));
+                                }
+                            }
+                            if (zza(zzi, str, com_google_firebase_messaging_zzb) != null) {
+                                try {
+                                    Method declaredMethod = AppMeasurement.class.getDeclaredMethod("setConditionalUserProperty", new Class[]{Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty")});
+                                    declaredMethod.setAccessible(true);
+                                    declaredMethod.invoke(zzx, new Object[]{obj3});
+                                } catch (Throwable e) {
+                                    Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e);
+                                }
+                            } else if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                                str2 = zzi.zzcag;
+                                str3 = zzi.zzcah;
+                                Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(str2).length() + 42) + String.valueOf(str3).length()).append("Could not create _CUP for: [").append(str2).append(", ").append(str3).append("]. Skipping.").toString());
+                            }
+                        } catch (Throwable e2) {
+                            Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e2);
+                        }
+                    } else if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                        str2 = zzi.zzcag;
+                        str3 = zzi.zzcah;
+                        Log.v("FirebaseAbtUtil", new StringBuilder((String.valueOf(str2).length() + 44) + String.valueOf(str3).length()).append("_E is already set. Not setting it again [").append(str2).append(", ").append(str3).append("]").toString());
                     }
-                    try {
-                        Method declaredMethod = AppMeasurement.class.getDeclaredMethod("setConditionalUserProperty", new Class[]{Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty")});
-                        declaredMethod.setAccessible(true);
-                        declaredMethod.invoke(zzx, new Object[]{r1});
-                    } catch (Throwable e) {
-                        Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e);
-                    }
-                } catch (Throwable e2) {
-                    Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e2);
+                } catch (Throwable e22) {
+                    Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e22);
                 }
-            } catch (Throwable e22) {
-                Log.e("FirebaseAbtUtil", "Could not complete the operation due to an internal error.", e22);
+            } else if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+                Log.v("FirebaseAbtUtil", "_SE failed; either _P was not set, or we couldn't deserialize the _P.");
             }
         }
     }
@@ -371,19 +264,21 @@ public final class zzc {
     }
 
     private static boolean zzy(Context context) {
-        if (zzx(context) == null) {
-            if (Log.isLoggable("FirebaseAbtUtil", 2)) {
-                Log.v("FirebaseAbtUtil", "Firebase Analytics not available");
-            }
-            return false;
-        }
-        try {
-            Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty");
-            return true;
-        } catch (ClassNotFoundException e) {
-            if (Log.isLoggable("FirebaseAbtUtil", 2)) {
+        if (zzx(context) != null) {
+            try {
+                Class.forName("com.google.android.gms.measurement.AppMeasurement$ConditionalUserProperty");
+                return true;
+            } catch (ClassNotFoundException e) {
+                if (!Log.isLoggable("FirebaseAbtUtil", 2)) {
+                    return false;
+                }
                 Log.v("FirebaseAbtUtil", "Firebase Analytics library is missing support for abt. Please update to a more recent version.");
+                return false;
             }
+        } else if (!Log.isLoggable("FirebaseAbtUtil", 2)) {
+            return false;
+        } else {
+            Log.v("FirebaseAbtUtil", "Firebase Analytics not available");
             return false;
         }
     }

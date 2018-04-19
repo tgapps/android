@@ -40,10 +40,17 @@ public class VersionHelper {
             JSONArray versions = new JSONArray(infoJSON);
             int versionCode = this.mCurrentVersionCode;
             for (int index = 0; index < versions.length(); index++) {
+                boolean largerVersionCode;
                 JSONObject entry = versions.getJSONObject(index);
-                boolean newerApkFile = true;
-                boolean largerVersionCode = entry.getInt("version") > versionCode;
-                if (entry.getInt("version") != versionCode || !isNewerThanLastUpdateTime(this.mContext, entry.getLong("timestamp"))) {
+                if (entry.getInt("version") > versionCode) {
+                    largerVersionCode = true;
+                } else {
+                    largerVersionCode = false;
+                }
+                boolean newerApkFile;
+                if (entry.getInt("version") == versionCode && isNewerThanLastUpdateTime(this.mContext, entry.getLong("timestamp"))) {
+                    newerApkFile = true;
+                } else {
                     newerApkFile = false;
                 }
                 if (largerVersionCode || newerApkFile) {
@@ -53,6 +60,7 @@ public class VersionHelper {
                 this.mSortedVersions.add(entry);
             }
         } catch (JSONException e) {
+        } catch (NullPointerException e2) {
         }
     }
 
@@ -62,18 +70,14 @@ public class VersionHelper {
                 try {
                     return object1.getInt("version") > object2.getInt("version") ? 0 : 0;
                 } catch (JSONException e) {
+                } catch (NullPointerException e2) {
                 }
             }
         });
     }
 
     public String getVersionString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(failSafeGetStringFromJSON(this.mNewest, "shortversion", TtmlNode.ANONYMOUS_REGION_ID));
-        stringBuilder.append(" (");
-        stringBuilder.append(failSafeGetStringFromJSON(this.mNewest, "version", TtmlNode.ANONYMOUS_REGION_ID));
-        stringBuilder.append(")");
-        return stringBuilder.toString();
+        return failSafeGetStringFromJSON(this.mNewest, "shortversion", TtmlNode.ANONYMOUS_REGION_ID) + " (" + failSafeGetStringFromJSON(this.mNewest, "version", TtmlNode.ANONYMOUS_REGION_ID) + ")";
     }
 
     @SuppressLint({"SimpleDateFormat"})
@@ -89,18 +93,18 @@ public class VersionHelper {
 
     private static String failSafeGetStringFromJSON(JSONObject json, String name, String defaultValue) {
         try {
-            return json.getString(name);
+            defaultValue = json.getString(name);
         } catch (JSONException e) {
-            return defaultValue;
         }
+        return defaultValue;
     }
 
     private static long failSafeGetLongFromJSON(JSONObject json, String name, long defaultValue) {
         try {
-            return json.getLong(name);
+            defaultValue = json.getLong(name);
         } catch (JSONException e) {
-            return defaultValue;
         }
+        return defaultValue;
     }
 
     public String getReleaseNotes(boolean showRestore) {
@@ -139,11 +143,12 @@ public class VersionHelper {
     }
 
     private String getVersionID(JSONObject version) {
+        String versionID = TtmlNode.ANONYMOUS_REGION_ID;
         try {
-            return version.getString(TtmlNode.ATTR_ID);
+            versionID = version.getString(TtmlNode.ATTR_ID);
         } catch (JSONException e) {
-            return TtmlNode.ANONYMOUS_REGION_ID;
         }
+        return versionID;
     }
 
     private String getVersionLine(int count, JSONObject version) {
@@ -153,8 +158,7 @@ public class VersionHelper {
         String versionName = getVersionName(version);
         result.append("<div style='padding: 20px 10px 10px;'><strong>");
         if (count == 0) {
-            result.append(this.mContext.getString(R.string.hockeyapp_update_newest_version));
-            result.append(':');
+            result.append(this.mContext.getString(R.string.hockeyapp_update_newest_version)).append(':');
         } else {
             String versionString = String.format(this.mContext.getString(R.string.hockeyapp_update_version), new Object[]{versionName});
             result.append(String.format("%s (%s): ", new Object[]{versionString, Integer.valueOf(versionCode)}));
@@ -168,19 +172,21 @@ public class VersionHelper {
     }
 
     private int getVersionCode(JSONObject version) {
+        int versionCode = 0;
         try {
-            return version.getInt("version");
+            versionCode = version.getInt("version");
         } catch (JSONException e) {
-            return 0;
         }
+        return versionCode;
     }
 
     private String getVersionName(JSONObject version) {
+        String versionName = TtmlNode.ANONYMOUS_REGION_ID;
         try {
-            return version.getString("shortversion");
+            versionName = version.getString("shortversion");
         } catch (JSONException e) {
-            return TtmlNode.ANONYMOUS_REGION_ID;
         }
+        return versionName;
     }
 
     private String getVersionNotes(JSONObject version) {
@@ -197,48 +203,45 @@ public class VersionHelper {
     }
 
     public static int compareVersionStrings(String left, String right) {
-        if (left != null) {
-            if (right != null) {
-                try {
-                    Scanner leftScanner = new Scanner(left.replaceAll("\\-.*", TtmlNode.ANONYMOUS_REGION_ID));
-                    Scanner rightScanner = new Scanner(right.replaceAll("\\-.*", TtmlNode.ANONYMOUS_REGION_ID));
-                    leftScanner.useDelimiter("\\.");
-                    rightScanner.useDelimiter("\\.");
-                    while (leftScanner.hasNextInt() && rightScanner.hasNextInt()) {
-                        int leftValue = leftScanner.nextInt();
-                        int rightValue = rightScanner.nextInt();
-                        if (leftValue < rightValue) {
-                            return -1;
-                        }
-                        if (leftValue > rightValue) {
-                            return 1;
-                        }
-                    }
-                    if (leftScanner.hasNextInt()) {
-                        return 1;
-                    }
-                    if (rightScanner.hasNextInt()) {
-                        return -1;
-                    }
-                    return 0;
-                } catch (Exception e) {
-                    return 0;
+        if (left == null || right == null) {
+            return 0;
+        }
+        try {
+            Scanner leftScanner = new Scanner(left.replaceAll("\\-.*", TtmlNode.ANONYMOUS_REGION_ID));
+            Scanner rightScanner = new Scanner(right.replaceAll("\\-.*", TtmlNode.ANONYMOUS_REGION_ID));
+            leftScanner.useDelimiter("\\.");
+            rightScanner.useDelimiter("\\.");
+            while (leftScanner.hasNextInt() && rightScanner.hasNextInt()) {
+                int leftValue = leftScanner.nextInt();
+                int rightValue = rightScanner.nextInt();
+                if (leftValue < rightValue) {
+                    return -1;
+                }
+                if (leftValue > rightValue) {
+                    return 1;
                 }
             }
+            if (leftScanner.hasNextInt()) {
+                return 1;
+            }
+            if (rightScanner.hasNextInt()) {
+                return -1;
+            }
+            return 0;
+        } catch (Exception e) {
+            return 0;
         }
-        return 0;
     }
 
     public static boolean isNewerThanLastUpdateTime(Context context, long timestamp) {
-        boolean z = false;
         if (context == null) {
             return false;
         }
         try {
             if (timestamp > (new File(context.getPackageManager().getApplicationInfo(context.getPackageName(), 0).sourceDir).lastModified() / 1000) + 1800) {
-                z = true;
+                return true;
             }
-            return z;
+            return false;
         } catch (Throwable e) {
             HockeyLog.error("Failed to get application info", e);
             return false;
@@ -246,23 +249,21 @@ public class VersionHelper {
     }
 
     public static String mapGoogleVersion(String version) {
-        if (version != null) {
-            if (!version.equalsIgnoreCase("L")) {
-                if (version.equalsIgnoreCase("M")) {
-                    return "6.0";
-                }
-                if (version.equalsIgnoreCase("N")) {
-                    return "7.0";
-                }
-                if (version.equalsIgnoreCase("O")) {
-                    return "8.0";
-                }
-                if (Pattern.matches("^[a-zA-Z]+", version)) {
-                    return "99.0";
-                }
-                return version;
-            }
+        if (version == null || version.equalsIgnoreCase("L")) {
+            return "5.0";
         }
-        return "5.0";
+        if (version.equalsIgnoreCase("M")) {
+            return "6.0";
+        }
+        if (version.equalsIgnoreCase("N")) {
+            return "7.0";
+        }
+        if (version.equalsIgnoreCase("O")) {
+            return "8.0";
+        }
+        if (Pattern.matches("^[a-zA-Z]+", version)) {
+            return "99.0";
+        }
+        return version;
     }
 }

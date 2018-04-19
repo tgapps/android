@@ -1,10 +1,21 @@
 package org.telegram.ui.Components;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Point;
+import android.net.Uri;
+import android.os.Build.VERSION;
+import android.support.v4.content.FileProvider;
 import java.io.File;
+import java.io.FileOutputStream;
+import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLoader;
+import org.telegram.messenger.FileLog;
+import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
@@ -23,227 +34,50 @@ public class WallpaperUpdater {
         void needOpenColorPicker();
     }
 
-    public void onActivityResult(int r1, int r2, android.content.Intent r3) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.WallpaperUpdater.onActivityResult(int, int, android.content.Intent):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = this;
-        r0 = -1;
-        if (r10 != r0) goto L_0x0096;
-    L_0x0003:
-        r0 = 10;
-        r1 = 87;
-        r2 = 1;
-        r3 = 0;
-        if (r9 != r0) goto L_0x005d;
-    L_0x000b:
-        r0 = r8.currentPicturePath;
-        org.telegram.messenger.AndroidUtilities.addMediaToGallery(r0);
-        r0 = r3;
-        r4 = org.telegram.messenger.AndroidUtilities.getRealScreenSize();	 Catch:{ Exception -> 0x0043 }
-        r5 = r8.currentPicturePath;	 Catch:{ Exception -> 0x0043 }
-        r6 = r4.x;	 Catch:{ Exception -> 0x0043 }
-        r6 = (float) r6;	 Catch:{ Exception -> 0x0043 }
-        r7 = r4.y;	 Catch:{ Exception -> 0x0043 }
-        r7 = (float) r7;	 Catch:{ Exception -> 0x0043 }
-        r2 = org.telegram.messenger.ImageLoader.loadBitmap(r5, r3, r6, r7, r2);	 Catch:{ Exception -> 0x0043 }
-        r5 = new java.io.FileOutputStream;	 Catch:{ Exception -> 0x0043 }
-        r6 = r8.currentWallpaperPath;	 Catch:{ Exception -> 0x0043 }
-        r5.<init>(r6);	 Catch:{ Exception -> 0x0043 }
-        r0 = r5;	 Catch:{ Exception -> 0x0043 }
-        r5 = android.graphics.Bitmap.CompressFormat.JPEG;	 Catch:{ Exception -> 0x0043 }
-        r2.compress(r5, r1, r0);	 Catch:{ Exception -> 0x0043 }
-        r1 = r8.delegate;	 Catch:{ Exception -> 0x0043 }
-        r5 = r8.currentWallpaperPath;	 Catch:{ Exception -> 0x0043 }
-        r1.didSelectWallpaper(r5, r2);	 Catch:{ Exception -> 0x0043 }
-        if (r0 == 0) goto L_0x0040;
-    L_0x0037:
-        r0.close();	 Catch:{ Exception -> 0x003b }
-        goto L_0x0040;
-    L_0x003b:
-        r1 = move-exception;
-        org.telegram.messenger.FileLog.e(r1);
-        goto L_0x004d;
-    L_0x0040:
-        goto L_0x004d;
-    L_0x0041:
-        r1 = move-exception;
-        goto L_0x0050;
-    L_0x0043:
-        r1 = move-exception;
-        org.telegram.messenger.FileLog.e(r1);	 Catch:{ all -> 0x0041 }
-        if (r0 == 0) goto L_0x0040;
-        r0.close();	 Catch:{ Exception -> 0x003b }
-        goto L_0x0040;
-    L_0x004d:
-        r8.currentPicturePath = r3;
-        goto L_0x0096;
-        if (r0 == 0) goto L_0x005c;
-        r0.close();	 Catch:{ Exception -> 0x0057 }
-        goto L_0x005c;
-    L_0x0057:
-        r2 = move-exception;
-        org.telegram.messenger.FileLog.e(r2);
-        throw r1;
-    L_0x005d:
-        r0 = 11;
-        if (r9 != r0) goto L_0x0096;
-        if (r11 == 0) goto L_0x0095;
-        r0 = r11.getData();
-        if (r0 != 0) goto L_0x006a;
-        goto L_0x0095;
-        r0 = org.telegram.messenger.AndroidUtilities.getRealScreenSize();	 Catch:{ Exception -> 0x0090 }
-        r4 = r11.getData();	 Catch:{ Exception -> 0x0090 }
-        r5 = r0.x;	 Catch:{ Exception -> 0x0090 }
-        r5 = (float) r5;	 Catch:{ Exception -> 0x0090 }
-        r6 = r0.y;	 Catch:{ Exception -> 0x0090 }
-        r6 = (float) r6;	 Catch:{ Exception -> 0x0090 }
-        r2 = org.telegram.messenger.ImageLoader.loadBitmap(r3, r4, r5, r6, r2);	 Catch:{ Exception -> 0x0090 }
-        r3 = new java.io.FileOutputStream;	 Catch:{ Exception -> 0x0090 }
-        r4 = r8.currentWallpaperPath;	 Catch:{ Exception -> 0x0090 }
-        r3.<init>(r4);	 Catch:{ Exception -> 0x0090 }
-        r4 = android.graphics.Bitmap.CompressFormat.JPEG;	 Catch:{ Exception -> 0x0090 }
-        r2.compress(r4, r1, r3);	 Catch:{ Exception -> 0x0090 }
-        r1 = r8.delegate;	 Catch:{ Exception -> 0x0090 }
-        r4 = r8.currentWallpaperPath;	 Catch:{ Exception -> 0x0090 }
-        r1.didSelectWallpaper(r4, r2);	 Catch:{ Exception -> 0x0090 }
-        goto L_0x0096;
-    L_0x0090:
-        r0 = move-exception;
-        org.telegram.messenger.FileLog.e(r0);
-        goto L_0x0096;
-        return;
-    L_0x0096:
-        return;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.WallpaperUpdater.onActivityResult(int, int, android.content.Intent):void");
-    }
-
     public WallpaperUpdater(Activity activity, WallpaperUpdaterDelegate wallpaperUpdaterDelegate) {
         this.parentActivity = activity;
         this.delegate = wallpaperUpdaterDelegate;
-        File directory = FileLoader.getDirectory(4);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(Utilities.random.nextInt());
-        stringBuilder.append(".jpg");
-        this.currentWallpaperPath = new File(directory, stringBuilder.toString());
+        this.currentWallpaperPath = new File(FileLoader.getDirectory(4), Utilities.random.nextInt() + ".jpg");
     }
 
     public void showAlert(final boolean fromTheme) {
-        CharSequence[] items;
         Builder builder = new Builder(this.parentActivity);
-        if (fromTheme) {
-            items = new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley), LocaleController.getString("SelectColor", R.string.SelectColor), LocaleController.getString("Default", R.string.Default), LocaleController.getString("Cancel", R.string.Cancel)};
-        } else {
-            items = new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley), LocaleController.getString("Cancel", R.string.Cancel)};
-        }
-        builder.setItems(items, new OnClickListener() {
-            public void onClick(android.content.DialogInterface r1, int r2) {
-                /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: org.telegram.ui.Components.WallpaperUpdater.1.onClick(android.content.DialogInterface, int):void
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:256)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-                /*
-                r0 = this;
-                r0 = 1;
-                r1 = 2;
-                if (r9 != 0) goto L_0x0052;
-            L_0x0004:
-                r2 = new android.content.Intent;	 Catch:{ Exception -> 0x004d }
-                r3 = "android.media.action.IMAGE_CAPTURE";	 Catch:{ Exception -> 0x004d }
-                r2.<init>(r3);	 Catch:{ Exception -> 0x004d }
-                r3 = org.telegram.messenger.AndroidUtilities.generatePicturePath();	 Catch:{ Exception -> 0x004d }
-                if (r3 == 0) goto L_0x0041;	 Catch:{ Exception -> 0x004d }
-            L_0x0011:
-                r4 = android.os.Build.VERSION.SDK_INT;	 Catch:{ Exception -> 0x004d }
-                r5 = 24;	 Catch:{ Exception -> 0x004d }
-                if (r4 < r5) goto L_0x002f;	 Catch:{ Exception -> 0x004d }
-            L_0x0017:
-                r4 = "output";	 Catch:{ Exception -> 0x004d }
-                r5 = org.telegram.ui.Components.WallpaperUpdater.this;	 Catch:{ Exception -> 0x004d }
-                r5 = r5.parentActivity;	 Catch:{ Exception -> 0x004d }
-                r6 = "org.telegram.messenger.beta.provider";	 Catch:{ Exception -> 0x004d }
-                r5 = android.support.v4.content.FileProvider.getUriForFile(r5, r6, r3);	 Catch:{ Exception -> 0x004d }
-                r2.putExtra(r4, r5);	 Catch:{ Exception -> 0x004d }
-                r2.addFlags(r1);	 Catch:{ Exception -> 0x004d }
-                r2.addFlags(r0);	 Catch:{ Exception -> 0x004d }
-                goto L_0x0038;	 Catch:{ Exception -> 0x004d }
-            L_0x002f:
-                r0 = "output";	 Catch:{ Exception -> 0x004d }
-                r1 = android.net.Uri.fromFile(r3);	 Catch:{ Exception -> 0x004d }
-                r2.putExtra(r0, r1);	 Catch:{ Exception -> 0x004d }
-            L_0x0038:
-                r0 = org.telegram.ui.Components.WallpaperUpdater.this;	 Catch:{ Exception -> 0x004d }
-                r1 = r3.getAbsolutePath();	 Catch:{ Exception -> 0x004d }
-                r0.currentPicturePath = r1;	 Catch:{ Exception -> 0x004d }
-            L_0x0041:
-                r0 = org.telegram.ui.Components.WallpaperUpdater.this;	 Catch:{ Exception -> 0x004d }
-                r0 = r0.parentActivity;	 Catch:{ Exception -> 0x004d }
-                r1 = 10;	 Catch:{ Exception -> 0x004d }
-                r0.startActivityForResult(r2, r1);	 Catch:{ Exception -> 0x004d }
-                goto L_0x0051;
-            L_0x004d:
-                r0 = move-exception;
-                org.telegram.messenger.FileLog.e(r0);	 Catch:{ Exception -> 0x006c }
-            L_0x0051:
-                goto L_0x008b;	 Catch:{ Exception -> 0x006c }
-            L_0x0052:
-                if (r9 != r0) goto L_0x006e;	 Catch:{ Exception -> 0x006c }
-            L_0x0054:
-                r0 = new android.content.Intent;	 Catch:{ Exception -> 0x006c }
-                r1 = "android.intent.action.PICK";	 Catch:{ Exception -> 0x006c }
-                r0.<init>(r1);	 Catch:{ Exception -> 0x006c }
-                r1 = "image/*";	 Catch:{ Exception -> 0x006c }
-                r0.setType(r1);	 Catch:{ Exception -> 0x006c }
-                r1 = org.telegram.ui.Components.WallpaperUpdater.this;	 Catch:{ Exception -> 0x006c }
-                r1 = r1.parentActivity;	 Catch:{ Exception -> 0x006c }
-                r2 = 11;	 Catch:{ Exception -> 0x006c }
-                r1.startActivityForResult(r0, r2);	 Catch:{ Exception -> 0x006c }
-                goto L_0x008b;	 Catch:{ Exception -> 0x006c }
-            L_0x006c:
-                r0 = move-exception;	 Catch:{ Exception -> 0x006c }
-                goto L_0x008c;	 Catch:{ Exception -> 0x006c }
-            L_0x006e:
-                r0 = r11;	 Catch:{ Exception -> 0x006c }
-                if (r0 == 0) goto L_0x008b;	 Catch:{ Exception -> 0x006c }
-                if (r9 != r1) goto L_0x007e;	 Catch:{ Exception -> 0x006c }
-                r0 = org.telegram.ui.Components.WallpaperUpdater.this;	 Catch:{ Exception -> 0x006c }
-                r0 = r0.delegate;	 Catch:{ Exception -> 0x006c }
-                r0.needOpenColorPicker();	 Catch:{ Exception -> 0x006c }
-                goto L_0x008b;	 Catch:{ Exception -> 0x006c }
-                r0 = 3;	 Catch:{ Exception -> 0x006c }
-                if (r9 != r0) goto L_0x008b;	 Catch:{ Exception -> 0x006c }
-                r0 = org.telegram.ui.Components.WallpaperUpdater.this;	 Catch:{ Exception -> 0x006c }
-                r0 = r0.delegate;	 Catch:{ Exception -> 0x006c }
-                r1 = 0;	 Catch:{ Exception -> 0x006c }
-                r0.didSelectWallpaper(r1, r1);	 Catch:{ Exception -> 0x006c }
-            L_0x008b:
-                goto L_0x0090;
-                org.telegram.messenger.FileLog.e(r0);
-                return;
-                */
-                throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.WallpaperUpdater.1.onClick(android.content.DialogInterface, int):void");
+        builder.setItems(fromTheme ? new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley), LocaleController.getString("SelectColor", R.string.SelectColor), LocaleController.getString("Default", R.string.Default), LocaleController.getString("Cancel", R.string.Cancel)} : new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley), LocaleController.getString("Cancel", R.string.Cancel)}, new OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (i == 0) {
+                    try {
+                        Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+                        File image = AndroidUtilities.generatePicturePath();
+                        if (image != null) {
+                            if (VERSION.SDK_INT >= 24) {
+                                takePictureIntent.putExtra("output", FileProvider.getUriForFile(WallpaperUpdater.this.parentActivity, "org.telegram.messenger.beta.provider", image));
+                                takePictureIntent.addFlags(2);
+                                takePictureIntent.addFlags(1);
+                            } else {
+                                takePictureIntent.putExtra("output", Uri.fromFile(image));
+                            }
+                            WallpaperUpdater.this.currentPicturePath = image.getAbsolutePath();
+                        }
+                        WallpaperUpdater.this.parentActivity.startActivityForResult(takePictureIntent, 10);
+                    } catch (Throwable e) {
+                        try {
+                            FileLog.e(e);
+                        } catch (Throwable e2) {
+                            FileLog.e(e2);
+                        }
+                    }
+                } else if (i == 1) {
+                    Intent photoPickerIntent = new Intent("android.intent.action.PICK");
+                    photoPickerIntent.setType("image/*");
+                    WallpaperUpdater.this.parentActivity.startActivityForResult(photoPickerIntent, 11);
+                } else if (!fromTheme) {
+                } else {
+                    if (i == 2) {
+                        WallpaperUpdater.this.delegate.needOpenColorPicker();
+                    } else if (i == 3) {
+                        WallpaperUpdater.this.delegate.didSelectWallpaper(null, null);
+                    }
+                }
             }
         });
         builder.show();
@@ -263,5 +97,85 @@ Caused by: java.lang.NullPointerException
 
     public void setCurrentPicturePath(String value) {
         this.currentPicturePath = value;
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Throwable e;
+        Throwable th;
+        if (resultCode != -1) {
+            return;
+        }
+        Point screenSize;
+        Bitmap bitmap;
+        if (requestCode == 10) {
+            AndroidUtilities.addMediaToGallery(this.currentPicturePath);
+            FileOutputStream stream = null;
+            try {
+                screenSize = AndroidUtilities.getRealScreenSize();
+                bitmap = ImageLoader.loadBitmap(this.currentPicturePath, null, (float) screenSize.x, (float) screenSize.y, true);
+                FileOutputStream stream2 = new FileOutputStream(this.currentWallpaperPath);
+                try {
+                    bitmap.compress(CompressFormat.JPEG, 87, stream2);
+                    this.delegate.didSelectWallpaper(this.currentWallpaperPath, bitmap);
+                    if (stream2 != null) {
+                        try {
+                            stream2.close();
+                        } catch (Throwable e2) {
+                            FileLog.e(e2);
+                            stream = stream2;
+                        }
+                    }
+                    stream = stream2;
+                } catch (Exception e3) {
+                    e2 = e3;
+                    stream = stream2;
+                    try {
+                        FileLog.e(e2);
+                        if (stream != null) {
+                            try {
+                                stream.close();
+                            } catch (Throwable e22) {
+                                FileLog.e(e22);
+                            }
+                        }
+                        this.currentPicturePath = null;
+                    } catch (Throwable th2) {
+                        th = th2;
+                        if (stream != null) {
+                            try {
+                                stream.close();
+                            } catch (Throwable e222) {
+                                FileLog.e(e222);
+                            }
+                        }
+                        throw th;
+                    }
+                } catch (Throwable th3) {
+                    th = th3;
+                    stream = stream2;
+                    if (stream != null) {
+                        stream.close();
+                    }
+                    throw th;
+                }
+            } catch (Exception e4) {
+                e222 = e4;
+                FileLog.e(e222);
+                if (stream != null) {
+                    stream.close();
+                }
+                this.currentPicturePath = null;
+            }
+            this.currentPicturePath = null;
+        } else if (requestCode == 11 && data != null && data.getData() != null) {
+            try {
+                screenSize = AndroidUtilities.getRealScreenSize();
+                bitmap = ImageLoader.loadBitmap(null, data.getData(), (float) screenSize.x, (float) screenSize.y, true);
+                bitmap.compress(CompressFormat.JPEG, 87, new FileOutputStream(this.currentWallpaperPath));
+                this.delegate.didSelectWallpaper(this.currentWallpaperPath, bitmap);
+            } catch (Throwable e2222) {
+                FileLog.e(e2222);
+            }
+        }
     }
 }

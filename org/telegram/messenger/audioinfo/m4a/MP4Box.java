@@ -42,6 +42,7 @@ public class MP4Box<I extends PositionInputStream> {
     }
 
     public MP4Atom nextChild() throws IOException {
+        RangeInputStream atomInput;
         if (this.child != null) {
             this.child.skip();
         }
@@ -49,11 +50,10 @@ public class MP4Box<I extends PositionInputStream> {
         byte[] typeBytes = new byte[4];
         this.data.readFully(typeBytes);
         String atomType = new String(typeBytes, ASCII);
-        RangeInputStream rangeInputStream;
         if (atomLength == 1) {
-            rangeInputStream = new RangeInputStream(this.input, 16, this.data.readLong() - 16);
+            atomInput = new RangeInputStream(this.input, 16, this.data.readLong() - 16);
         } else {
-            rangeInputStream = new RangeInputStream(this.input, 8, (long) (atomLength - 8));
+            atomInput = new RangeInputStream(this.input, 8, (long) (atomLength - 8));
         }
         MP4Atom mP4Atom = new MP4Atom(atomInput, this, atomType);
         this.child = mP4Atom;
@@ -65,11 +65,6 @@ public class MP4Box<I extends PositionInputStream> {
         if (atom.getType().matches(expectedTypeExpression)) {
             return atom;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("atom type mismatch, expected ");
-        stringBuilder.append(expectedTypeExpression);
-        stringBuilder.append(", got ");
-        stringBuilder.append(atom.getType());
-        throw new IOException(stringBuilder.toString());
+        throw new IOException("atom type mismatch, expected " + expectedTypeExpression + ", got " + atom.getType());
     }
 }

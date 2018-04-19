@@ -19,7 +19,11 @@ public final class GooglePlayServicesUpdatedReceiver extends BroadcastReceiver {
 
     public final void onReceive(Context context, Intent intent) {
         Uri data = intent.getData();
-        if ("com.google.android.gms".equals(data != null ? data.getSchemeSpecificPart() : null)) {
+        Object obj = null;
+        if (data != null) {
+            obj = data.getSchemeSpecificPart();
+        }
+        if ("com.google.android.gms".equals(obj)) {
             this.zzkt.zzv();
             unregister();
         }

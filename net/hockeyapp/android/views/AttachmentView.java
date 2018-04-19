@@ -145,8 +145,8 @@ public class AttachmentView extends FrameLayout {
         this.mGap = Math.round(TypedValue.applyDimension(1, 10.0f, metrics));
         int layoutMargin = Math.round(TypedValue.applyDimension(1, (float) marginDip, metrics));
         int displayWidth = metrics.widthPixels;
-        int parentWidthLandscape = (displayWidth - (2 * layoutMargin)) - this.mGap;
-        this.mWidthPortrait = ((displayWidth - (2 * layoutMargin)) - (this.mGap * 2)) / 3;
+        int parentWidthLandscape = (displayWidth - (layoutMargin * 2)) - this.mGap;
+        this.mWidthPortrait = ((displayWidth - (layoutMargin * 2)) - (this.mGap * 2)) / 3;
         this.mWidthLandscape = parentWidthLandscape / 2;
         this.mMaxHeightPortrait = this.mWidthPortrait * 2;
         this.mMaxHeightLandscape = this.mWidthLandscape;

@@ -21,15 +21,14 @@ public final class zzaz {
     }
 
     private static int zza(CharSequence charSequence) {
-        int length = charSequence.length();
         int i = 0;
+        int length = charSequence.length();
         int i2 = 0;
         while (i2 < length && charSequence.charAt(i2) < '') {
             i2++;
         }
         int i3 = length;
         while (i2 < length) {
-            StringBuilder stringBuilder;
             char charAt = charSequence.charAt(i2);
             if (charAt < 'ࠀ') {
                 i3 += (127 - charAt) >>> 31;
@@ -44,35 +43,25 @@ public final class zzaz {
                         i += 2;
                         if ('?' <= charAt2 && charAt2 <= '?') {
                             if (Character.codePointAt(charSequence, i2) < C.DEFAULT_BUFFER_SEGMENT_SIZE) {
-                                stringBuilder = new StringBuilder(39);
-                                stringBuilder.append("Unpaired surrogate at index ");
-                                stringBuilder.append(i2);
-                                throw new IllegalArgumentException(stringBuilder.toString());
+                                throw new IllegalArgumentException("Unpaired surrogate at index " + i2);
                             }
                             i2++;
                         }
                     }
                     i2++;
                 }
-                i3 += i;
-                if (i3 < length) {
-                    return i3;
+                i2 = i3 + i;
+                if (i2 < length) {
+                    return i2;
                 }
-                long j = ((long) i3) + 4294967296L;
-                stringBuilder = new StringBuilder(54);
-                stringBuilder.append("UTF-8 length does not fit in int: ");
-                stringBuilder.append(j);
-                throw new IllegalArgumentException(stringBuilder.toString());
+                throw new IllegalArgumentException("UTF-8 length does not fit in int: " + (((long) i2) + 4294967296L));
             }
         }
-        if (i3 < length) {
-            return i3;
+        i2 = i3;
+        if (i2 < length) {
+            return i2;
         }
-        long j2 = ((long) i3) + 4294967296L;
-        stringBuilder = new StringBuilder(54);
-        stringBuilder.append("UTF-8 length does not fit in int: ");
-        stringBuilder.append(j2);
-        throw new IllegalArgumentException(stringBuilder.toString());
+        throw new IllegalArgumentException("UTF-8 length does not fit in int: " + (((long) i2) + 4294967296L));
     }
 
     public static zzaz zza(byte[] bArr) {
@@ -80,163 +69,118 @@ public final class zzaz {
     }
 
     private static void zza(CharSequence charSequence, ByteBuffer byteBuffer) {
-        CharSequence charSequence2 = charSequence;
-        ByteBuffer byteBuffer2 = byteBuffer;
+        int i = 0;
         if (byteBuffer.isReadOnly()) {
             throw new ReadOnlyBufferException();
-        }
-        char c = 'ࠀ';
-        int i;
-        char charAt;
-        int i2;
-        char charAt2;
-        if (byteBuffer.hasArray()) {
+        } else if (byteBuffer.hasArray()) {
             try {
-                int i3;
                 byte[] array = byteBuffer.array();
-                int arrayOffset = byteBuffer.arrayOffset() + byteBuffer.position();
-                int remaining = byteBuffer.remaining();
+                r1 = byteBuffer.arrayOffset() + byteBuffer.position();
+                r2 = byteBuffer.remaining();
                 int length = charSequence.length();
-                remaining += arrayOffset;
-                i = 0;
-                while (i < length) {
-                    i3 = i + arrayOffset;
-                    if (i3 >= remaining) {
+                int i2 = r1 + r2;
+                while (i < length && i + r1 < i2) {
+                    r2 = charSequence.charAt(i);
+                    if (r2 >= '') {
                         break;
                     }
-                    char charAt3 = charSequence2.charAt(i);
-                    if (charAt3 >= '') {
-                        break;
-                    }
-                    array[i3] = (byte) charAt3;
+                    array[r1 + i] = (byte) r2;
                     i++;
                 }
                 if (i == length) {
-                    arrayOffset += length;
+                    i = r1 + length;
                 } else {
-                    arrayOffset += i;
+                    r2 = r1 + i;
                     while (i < length) {
-                        int i4;
-                        charAt = charSequence2.charAt(i);
-                        if (charAt >= '' || arrayOffset >= remaining) {
-                            if (charAt < c && arrayOffset <= remaining - 2) {
-                                i4 = arrayOffset + 1;
-                                array[arrayOffset] = (byte) (960 | (charAt >>> 6));
-                                i2 = i4 + 1;
-                                array[i4] = (byte) ((charAt & 63) | 128);
-                            } else if ((charAt < '?' || '?' < charAt) && arrayOffset <= remaining - 3) {
-                                i4 = arrayOffset + 1;
-                                array[arrayOffset] = (byte) (480 | (charAt >>> 12));
-                                i2 = i4 + 1;
-                                array[i4] = (byte) (((charAt >>> 6) & 63) | 128);
-                                i4 = i2 + 1;
-                                array[i2] = (byte) ((charAt & 63) | 128);
-                            } else if (arrayOffset <= remaining - 4) {
-                                i4 = i + 1;
-                                if (i4 != charSequence.length()) {
-                                    charAt2 = charSequence2.charAt(i4);
-                                    if (Character.isSurrogatePair(charAt, charAt2)) {
-                                        i = Character.toCodePoint(charAt, charAt2);
-                                        i3 = arrayOffset + 1;
-                                        array[arrayOffset] = (byte) (PsExtractor.VIDEO_STREAM_MASK | (i >>> 18));
-                                        i2 = i3 + 1;
-                                        array[i3] = (byte) (((i >>> 12) & 63) | 128);
-                                        i3 = i2 + 1;
-                                        array[i2] = (byte) (((i >>> 6) & 63) | 128);
-                                        i2 = i3 + 1;
-                                        array[i3] = (byte) ((i & 63) | 128);
-                                        i = i4;
-                                    } else {
-                                        i = i4;
-                                    }
+                        char charAt = charSequence.charAt(i);
+                        if (charAt < '' && r2 < i2) {
+                            r1 = r2 + 1;
+                            array[r2] = (byte) charAt;
+                        } else if (charAt < 'ࠀ' && r2 <= i2 - 2) {
+                            r7 = r2 + 1;
+                            array[r2] = (byte) ((charAt >>> 6) | 960);
+                            r1 = r7 + 1;
+                            array[r7] = (byte) ((charAt & 63) | 128);
+                        } else if ((charAt < '?' || '?' < charAt) && r2 <= i2 - 3) {
+                            r1 = r2 + 1;
+                            array[r2] = (byte) ((charAt >>> 12) | 480);
+                            r2 = r1 + 1;
+                            array[r1] = (byte) (((charAt >>> 6) & 63) | 128);
+                            r1 = r2 + 1;
+                            array[r2] = (byte) ((charAt & 63) | 128);
+                        } else if (r2 <= i2 - 4) {
+                            if (i + 1 != charSequence.length()) {
+                                i++;
+                                char charAt2 = charSequence.charAt(i);
+                                if (Character.isSurrogatePair(charAt, charAt2)) {
+                                    int toCodePoint = Character.toCodePoint(charAt, charAt2);
+                                    r1 = r2 + 1;
+                                    array[r2] = (byte) ((toCodePoint >>> 18) | PsExtractor.VIDEO_STREAM_MASK);
+                                    r2 = r1 + 1;
+                                    array[r1] = (byte) (((toCodePoint >>> 12) & 63) | 128);
+                                    r7 = r2 + 1;
+                                    array[r2] = (byte) (((toCodePoint >>> 6) & 63) | 128);
+                                    r1 = r7 + 1;
+                                    array[r7] = (byte) ((toCodePoint & 63) | 128);
                                 }
-                                i--;
-                                StringBuilder stringBuilder = new StringBuilder(39);
-                                stringBuilder.append("Unpaired surrogate at index ");
-                                stringBuilder.append(i);
-                                throw new IllegalArgumentException(stringBuilder.toString());
-                            } else {
-                                StringBuilder stringBuilder2 = new StringBuilder(37);
-                                stringBuilder2.append("Failed writing ");
-                                stringBuilder2.append(charAt);
-                                stringBuilder2.append(" at index ");
-                                stringBuilder2.append(arrayOffset);
-                                throw new ArrayIndexOutOfBoundsException(stringBuilder2.toString());
                             }
-                            arrayOffset = i2;
-                            i++;
-                            c = 'ࠀ';
+                            throw new IllegalArgumentException("Unpaired surrogate at index " + (i - 1));
                         } else {
-                            i4 = arrayOffset + 1;
-                            array[arrayOffset] = (byte) charAt;
+                            throw new ArrayIndexOutOfBoundsException("Failed writing " + charAt + " at index " + r2);
                         }
-                        arrayOffset = i4;
                         i++;
-                        c = 'ࠀ';
+                        r2 = r1;
                     }
+                    i = r2;
                 }
-                byteBuffer2.position(arrayOffset - byteBuffer.arrayOffset());
-                return;
+                byteBuffer.position(i - byteBuffer.arrayOffset());
             } catch (Throwable e) {
-                Throwable th = e;
                 BufferOverflowException bufferOverflowException = new BufferOverflowException();
-                bufferOverflowException.initCause(th);
+                bufferOverflowException.initCause(e);
                 throw bufferOverflowException;
             }
-        }
-        int length2 = charSequence.length();
-        i = 0;
-        while (i < length2) {
-            charAt = charSequence2.charAt(i);
-            if (charAt < '') {
-                byteBuffer2.put((byte) charAt);
-            } else if (charAt < 'ࠀ') {
-                byteBuffer2.put((byte) ((charAt >>> 6) | 960));
-                byteBuffer2.put((byte) ((charAt & 63) | 128));
-            } else {
-                if (charAt >= '?') {
-                    if ('?' >= charAt) {
-                        i2 = i + 1;
-                        if (i2 != charSequence.length()) {
-                            charAt2 = charSequence2.charAt(i2);
-                            if (Character.isSurrogatePair(charAt, charAt2)) {
-                                i = Character.toCodePoint(charAt, charAt2);
-                                byteBuffer2.put((byte) ((i >>> 18) | PsExtractor.VIDEO_STREAM_MASK));
-                                byteBuffer2.put((byte) (((i >>> 12) & 63) | 128));
-                                byteBuffer2.put((byte) (((i >>> 6) & 63) | 128));
-                                byteBuffer2.put((byte) ((i & 63) | 128));
-                                i = i2;
-                                i++;
-                            } else {
-                                i = i2;
-                            }
+        } else {
+            r1 = charSequence.length();
+            while (i < r1) {
+                r2 = charSequence.charAt(i);
+                if (r2 < '') {
+                    byteBuffer.put((byte) r2);
+                } else if (r2 < 'ࠀ') {
+                    byteBuffer.put((byte) ((r2 >>> 6) | 960));
+                    byteBuffer.put((byte) ((r2 & 63) | 128));
+                } else if (r2 < '?' || '?' < r2) {
+                    byteBuffer.put((byte) ((r2 >>> 12) | 480));
+                    byteBuffer.put((byte) (((r2 >>> 6) & 63) | 128));
+                    byteBuffer.put((byte) ((r2 & 63) | 128));
+                } else {
+                    if (i + 1 != charSequence.length()) {
+                        i++;
+                        char charAt3 = charSequence.charAt(i);
+                        if (Character.isSurrogatePair(r2, charAt3)) {
+                            r2 = Character.toCodePoint(r2, charAt3);
+                            byteBuffer.put((byte) ((r2 >>> 18) | PsExtractor.VIDEO_STREAM_MASK));
+                            byteBuffer.put((byte) (((r2 >>> 12) & 63) | 128));
+                            byteBuffer.put((byte) (((r2 >>> 6) & 63) | 128));
+                            byteBuffer.put((byte) ((r2 & 63) | 128));
                         }
-                        i--;
-                        stringBuilder = new StringBuilder(39);
-                        stringBuilder.append("Unpaired surrogate at index ");
-                        stringBuilder.append(i);
-                        throw new IllegalArgumentException(stringBuilder.toString());
                     }
+                    throw new IllegalArgumentException("Unpaired surrogate at index " + (i - 1));
                 }
-                byteBuffer2.put((byte) ((charAt >>> 12) | 480));
-                byteBuffer2.put((byte) (((charAt >>> 6) & 63) | 128));
-                byteBuffer2.put((byte) ((charAt & 63) | 128));
                 i++;
             }
-            i++;
         }
     }
 
     public static int zzb(int i, zzbh com_google_android_gms_internal_config_zzbh) {
-        i = zzl(i);
+        int zzl = zzl(i);
         int zzai = com_google_android_gms_internal_config_zzbh.zzai();
-        return i + (zzn(zzai) + zzai);
+        return zzl + (zzai + zzn(zzai));
     }
 
     public static int zzb(int i, String str) {
-        i = zzl(i);
+        int zzl = zzl(i);
         int zza = zza((CharSequence) str);
-        return i + (zzn(zza) + zza);
+        return zzl + (zza + zzn(zza));
     }
 
     public static int zzb(byte[] bArr) {
@@ -269,7 +213,7 @@ public final class zzaz {
     }
 
     public static int zzn(int i) {
-        return (i & -128) == 0 ? 1 : (i & -16384) == 0 ? 2 : (-2097152 & i) == 0 ? 3 : (i & -268435456) == 0 ? 4 : 5;
+        return (i & -128) == 0 ? 1 : (i & -16384) == 0 ? 2 : (-2097152 & i) == 0 ? 3 : (-268435456 & i) == 0 ? 4 : 5;
     }
 
     public final void zza(byte b) throws IOException {
@@ -300,17 +244,17 @@ public final class zzaz {
     public final void zza(int i, String str) throws IOException {
         zze(i, 2);
         try {
-            i = zzn(str.length());
-            if (i == zzn(str.length() * 3)) {
+            int zzn = zzn(str.length());
+            if (zzn == zzn(str.length() * 3)) {
                 int position = this.zzch.position();
-                if (this.zzch.remaining() < i) {
-                    throw new zzba(position + i, this.zzch.limit());
+                if (this.zzch.remaining() < zzn) {
+                    throw new zzba(zzn + position, this.zzch.limit());
                 }
-                this.zzch.position(position + i);
+                this.zzch.position(position + zzn);
                 zza((CharSequence) str, this.zzch);
                 int position2 = this.zzch.position();
                 this.zzch.position(position);
-                zzm((position2 - position) - i);
+                zzm((position2 - position) - zzn);
                 this.zzch.position(position2);
                 return;
             }
@@ -342,7 +286,7 @@ public final class zzaz {
             return;
         }
         long j = (long) i2;
-        while ((j & -128) != 0) {
+        while ((-128 & j) != 0) {
             byte b = (byte) ((((int) j) & 127) | 128);
             if (this.zzch.hasRemaining()) {
                 this.zzch.put(b);

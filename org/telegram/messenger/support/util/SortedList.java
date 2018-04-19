@@ -125,7 +125,7 @@ public class SortedList<T> {
     }
 
     public void addAll(Collection<T> items) {
-        addAll(items.toArray((Object[]) Array.newInstance(this.mTClass, items.size())), true);
+        addAll(items.toArray((Object[]) ((Object[]) Array.newInstance(this.mTClass, items.size()))), true);
     }
 
     public void replaceAll(T[] items, boolean mayModifyInput) {
@@ -142,7 +142,7 @@ public class SortedList<T> {
     }
 
     public void replaceAll(Collection<T> items) {
-        replaceAll(items.toArray((Object[]) Array.newInstance(this.mTClass, items.size())), true);
+        replaceAll(items.toArray((Object[]) ((Object[]) Array.newInstance(this.mTClass, items.size()))), true);
     }
 
     private void addAllInternal(T[] newItems) {
@@ -152,136 +152,136 @@ public class SortedList<T> {
                 this.mData = newItems;
                 this.mSize = newSize;
                 this.mCallback.onInserted(0, newSize);
-            } else {
-                merge(newItems, newSize);
+                return;
             }
+            merge(newItems, newSize);
         }
     }
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    private void replaceAllInternal(T[] r10) {
+    private void replaceAllInternal(T[] r12) {
         /*
-        r9 = this;
-        r0 = r9.mCallback;
-        r0 = r0 instanceof org.telegram.messenger.support.util.SortedList.BatchedCallback;
-        r1 = 0;
-        r2 = 1;
-        if (r0 != 0) goto L_0x000a;
+        r11 = this;
+        r8 = 1;
+        r7 = 0;
+        r9 = r11.mCallback;
+        r9 = r9 instanceof org.telegram.messenger.support.util.SortedList.BatchedCallback;
+        if (r9 != 0) goto L_0x005d;
     L_0x0008:
-        r0 = r2;
-        goto L_0x000b;
-    L_0x000a:
-        r0 = r1;
+        r0 = r8;
+    L_0x0009:
+        if (r0 == 0) goto L_0x000e;
     L_0x000b:
-        if (r0 == 0) goto L_0x0010;
-    L_0x000d:
-        r9.beginBatchedUpdates();
-    L_0x0010:
-        r9.mOldDataStart = r1;
-        r3 = r9.mSize;
-        r9.mOldDataSize = r3;
-        r3 = r9.mData;
-        r9.mOldData = r3;
-        r9.mNewDataStart = r1;
-        r1 = r9.sortAndDedup(r10);
-        r3 = r9.mTClass;
-        r3 = java.lang.reflect.Array.newInstance(r3, r1);
-        r3 = (java.lang.Object[]) r3;
-        r9.mData = r3;
+        r11.beginBatchedUpdates();
+    L_0x000e:
+        r11.mOldDataStart = r7;
+        r9 = r11.mSize;
+        r11.mOldDataSize = r9;
+        r9 = r11.mData;
+        r11.mOldData = r9;
+        r11.mNewDataStart = r7;
+        r4 = r11.sortAndDedup(r12);
+        r7 = r11.mTClass;
+        r7 = java.lang.reflect.Array.newInstance(r7, r4);
+        r7 = (java.lang.Object[]) r7;
+        r7 = (java.lang.Object[]) r7;
+        r11.mData = r7;
     L_0x002a:
-        r3 = r9.mNewDataStart;
-        if (r3 < r1) goto L_0x0034;
+        r7 = r11.mNewDataStart;
+        if (r7 < r4) goto L_0x0034;
     L_0x002e:
-        r3 = r9.mOldDataStart;
-        r4 = r9.mOldDataSize;
-        if (r3 >= r4) goto L_0x006b;
+        r7 = r11.mOldDataStart;
+        r9 = r11.mOldDataSize;
+        if (r7 >= r9) goto L_0x0054;
     L_0x0034:
-        r3 = r9.mOldDataStart;
-        r4 = r9.mOldDataSize;
-        if (r3 < r4) goto L_0x0055;
+        r7 = r11.mOldDataStart;
+        r9 = r11.mOldDataSize;
+        if (r7 < r9) goto L_0x005f;
     L_0x003a:
-        r2 = r9.mNewDataStart;
-        r3 = r9.mNewDataStart;
-        r3 = r1 - r3;
-        r4 = r9.mData;
-        java.lang.System.arraycopy(r10, r2, r4, r2, r3);
-        r4 = r9.mNewDataStart;
-        r4 = r4 + r3;
-        r9.mNewDataStart = r4;
-        r4 = r9.mSize;
-        r4 = r4 + r3;
-        r9.mSize = r4;
-        r4 = r9.mCallback;
-        r4.onInserted(r2, r3);
-        goto L_0x006b;
-    L_0x0055:
-        r3 = r9.mNewDataStart;
-        if (r3 < r1) goto L_0x0074;
+        r1 = r11.mNewDataStart;
+        r7 = r11.mNewDataStart;
+        r2 = r4 - r7;
+        r7 = r11.mData;
+        java.lang.System.arraycopy(r12, r1, r7, r1, r2);
+        r7 = r11.mNewDataStart;
+        r7 = r7 + r2;
+        r11.mNewDataStart = r7;
+        r7 = r11.mSize;
+        r7 = r7 + r2;
+        r11.mSize = r7;
+        r7 = r11.mCallback;
+        r7.onInserted(r1, r2);
+    L_0x0054:
+        r7 = 0;
+        r11.mOldData = r7;
+        if (r0 == 0) goto L_0x005c;
     L_0x0059:
-        r2 = r9.mOldDataSize;
-        r3 = r9.mOldDataStart;
-        r2 = r2 - r3;
-        r3 = r9.mSize;
-        r3 = r3 - r2;
-        r9.mSize = r3;
-        r3 = r9.mCallback;
-        r4 = r9.mNewDataStart;
-        r3.onRemoved(r4, r2);
-    L_0x006b:
-        r2 = 0;
-        r9.mOldData = r2;
-        if (r0 == 0) goto L_0x0073;
-    L_0x0070:
-        r9.endBatchedUpdates();
-    L_0x0073:
+        r11.endBatchedUpdates();
+    L_0x005c:
         return;
-    L_0x0074:
-        r3 = r9.mOldData;
-        r4 = r9.mOldDataStart;
-        r3 = r3[r4];
-        r4 = r9.mNewDataStart;
-        r4 = r10[r4];
-        r5 = r9.mCallback;
-        r5 = r5.compare(r3, r4);
-        if (r5 >= 0) goto L_0x008a;
-    L_0x0086:
-        r9.replaceAllRemove();
-        goto L_0x00c5;
-    L_0x008a:
-        if (r5 <= 0) goto L_0x0090;
-    L_0x008c:
-        r9.replaceAllInsert(r4);
-        goto L_0x00c5;
-    L_0x0090:
-        r6 = r9.mCallback;
-        r6 = r6.areItemsTheSame(r3, r4);
-        if (r6 != 0) goto L_0x009f;
-    L_0x0098:
-        r9.replaceAllRemove();
-        r9.replaceAllInsert(r4);
-        goto L_0x00c5;
-    L_0x009f:
-        r6 = r9.mData;
-        r7 = r9.mNewDataStart;
-        r6[r7] = r4;
-        r6 = r9.mOldDataStart;
-        r6 = r6 + r2;
-        r9.mOldDataStart = r6;
-        r6 = r9.mNewDataStart;
-        r6 = r6 + r2;
-        r9.mNewDataStart = r6;
-        r6 = r9.mCallback;
-        r6 = r6.areContentsTheSame(r3, r4);
-        if (r6 != 0) goto L_0x00c5;
-    L_0x00b7:
-        r6 = r9.mCallback;
-        r7 = r9.mNewDataStart;
+    L_0x005d:
+        r0 = r7;
+        goto L_0x0009;
+    L_0x005f:
+        r7 = r11.mNewDataStart;
+        if (r7 < r4) goto L_0x0076;
+    L_0x0063:
+        r7 = r11.mOldDataSize;
+        r8 = r11.mOldDataStart;
+        r2 = r7 - r8;
+        r7 = r11.mSize;
         r7 = r7 - r2;
-        r8 = r9.mCallback;
-        r8 = r8.getChangePayload(r3, r4);
-        r6.onChanged(r7, r2, r8);
-    L_0x00c5:
+        r11.mSize = r7;
+        r7 = r11.mCallback;
+        r8 = r11.mNewDataStart;
+        r7.onRemoved(r8, r2);
+        goto L_0x0054;
+    L_0x0076:
+        r7 = r11.mOldData;
+        r9 = r11.mOldDataStart;
+        r5 = r7[r9];
+        r7 = r11.mNewDataStart;
+        r3 = r12[r7];
+        r7 = r11.mCallback;
+        r6 = r7.compare(r5, r3);
+        if (r6 >= 0) goto L_0x008c;
+    L_0x0088:
+        r11.replaceAllRemove();
+        goto L_0x002a;
+    L_0x008c:
+        if (r6 <= 0) goto L_0x0092;
+    L_0x008e:
+        r11.replaceAllInsert(r3);
+        goto L_0x002a;
+    L_0x0092:
+        r7 = r11.mCallback;
+        r7 = r7.areItemsTheSame(r5, r3);
+        if (r7 != 0) goto L_0x00a1;
+    L_0x009a:
+        r11.replaceAllRemove();
+        r11.replaceAllInsert(r3);
+        goto L_0x002a;
+    L_0x00a1:
+        r7 = r11.mData;
+        r9 = r11.mNewDataStart;
+        r7[r9] = r3;
+        r7 = r11.mOldDataStart;
+        r7 = r7 + 1;
+        r11.mOldDataStart = r7;
+        r7 = r11.mNewDataStart;
+        r7 = r7 + 1;
+        r11.mNewDataStart = r7;
+        r7 = r11.mCallback;
+        r7 = r7.areContentsTheSame(r5, r3);
+        if (r7 != 0) goto L_0x002a;
+    L_0x00bb:
+        r7 = r11.mCallback;
+        r9 = r11.mNewDataStart;
+        r9 = r9 + -1;
+        r10 = r11.mCallback;
+        r10 = r10.getChangePayload(r5, r3);
+        r7.onChanged(r9, r8, r10);
         goto L_0x002a;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.util.SortedList.replaceAllInternal(java.lang.Object[]):void");
@@ -341,145 +341,146 @@ public class SortedList<T> {
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    private void merge(T[] r11, int r12) {
+    private void merge(T[] r12, int r13) {
         /*
-        r10 = this;
-        r0 = r10.mCallback;
-        r0 = r0 instanceof org.telegram.messenger.support.util.SortedList.BatchedCallback;
-        r1 = 0;
-        r2 = 1;
-        if (r0 != 0) goto L_0x000a;
+        r11 = this;
+        r8 = 1;
+        r9 = 0;
+        r7 = r11.mCallback;
+        r7 = r7 instanceof org.telegram.messenger.support.util.SortedList.BatchedCallback;
+        if (r7 != 0) goto L_0x005e;
     L_0x0008:
-        r0 = r2;
-        goto L_0x000b;
-    L_0x000a:
-        r0 = r1;
+        r1 = r8;
+    L_0x0009:
+        if (r1 == 0) goto L_0x000e;
     L_0x000b:
-        if (r0 == 0) goto L_0x0010;
-    L_0x000d:
-        r10.beginBatchedUpdates();
-    L_0x0010:
-        r3 = r10.mData;
-        r10.mOldData = r3;
-        r10.mOldDataStart = r1;
-        r3 = r10.mSize;
-        r10.mOldDataSize = r3;
-        r3 = r10.mSize;
-        r3 = r3 + r12;
-        r3 = r3 + 10;
-        r4 = r10.mTClass;
-        r4 = java.lang.reflect.Array.newInstance(r4, r3);
-        r4 = (java.lang.Object[]) r4;
-        r10.mData = r4;
-        r10.mNewDataStart = r1;
+        r11.beginBatchedUpdates();
+    L_0x000e:
+        r7 = r11.mData;
+        r11.mOldData = r7;
+        r11.mOldDataStart = r9;
+        r7 = r11.mSize;
+        r11.mOldDataSize = r7;
+        r7 = r11.mSize;
+        r7 = r7 + r13;
+        r3 = r7 + 10;
+        r7 = r11.mTClass;
+        r7 = java.lang.reflect.Array.newInstance(r7, r3);
+        r7 = (java.lang.Object[]) r7;
+        r7 = (java.lang.Object[]) r7;
+        r11.mData = r7;
+        r11.mNewDataStart = r9;
+        r4 = 0;
     L_0x002c:
-        r4 = r10.mOldDataStart;
-        r5 = r10.mOldDataSize;
-        if (r4 < r5) goto L_0x0034;
+        r7 = r11.mOldDataStart;
+        r9 = r11.mOldDataSize;
+        if (r7 < r9) goto L_0x0034;
     L_0x0032:
-        if (r1 >= r12) goto L_0x006e;
+        if (r4 >= r13) goto L_0x0055;
     L_0x0034:
-        r4 = r10.mOldDataStart;
-        r5 = r10.mOldDataSize;
-        if (r4 != r5) goto L_0x0056;
+        r7 = r11.mOldDataStart;
+        r9 = r11.mOldDataSize;
+        if (r7 != r9) goto L_0x0060;
     L_0x003a:
-        r2 = r12 - r1;
-        r4 = r10.mData;
-        r5 = r10.mNewDataStart;
-        java.lang.System.arraycopy(r11, r1, r4, r5, r2);
-        r4 = r10.mNewDataStart;
-        r4 = r4 + r2;
-        r10.mNewDataStart = r4;
-        r4 = r10.mSize;
-        r4 = r4 + r2;
-        r10.mSize = r4;
-        r4 = r10.mCallback;
-        r5 = r10.mNewDataStart;
-        r5 = r5 - r2;
-        r4.onInserted(r5, r2);
-        goto L_0x006e;
-    L_0x0056:
-        if (r1 != r12) goto L_0x0077;
-    L_0x0058:
-        r2 = r10.mOldDataSize;
-        r4 = r10.mOldDataStart;
-        r2 = r2 - r4;
-        r4 = r10.mOldData;
-        r5 = r10.mOldDataStart;
-        r6 = r10.mData;
-        r7 = r10.mNewDataStart;
-        java.lang.System.arraycopy(r4, r5, r6, r7, r2);
-        r4 = r10.mNewDataStart;
-        r4 = r4 + r2;
-        r10.mNewDataStart = r4;
-    L_0x006e:
-        r2 = 0;
-        r10.mOldData = r2;
-        if (r0 == 0) goto L_0x0076;
-    L_0x0073:
-        r10.endBatchedUpdates();
-    L_0x0076:
-        return;
-    L_0x0077:
-        r4 = r10.mOldData;
-        r5 = r10.mOldDataStart;
-        r4 = r4[r5];
-        r5 = r11[r1];
-        r6 = r10.mCallback;
-        r6 = r6.compare(r4, r5);
-        if (r6 <= 0) goto L_0x00a1;
-    L_0x0087:
-        r7 = r10.mData;
-        r8 = r10.mNewDataStart;
-        r9 = r8 + 1;
-        r10.mNewDataStart = r9;
-        r7[r8] = r5;
-        r7 = r10.mSize;
+        r2 = r13 - r4;
+        r7 = r11.mData;
+        r8 = r11.mNewDataStart;
+        java.lang.System.arraycopy(r12, r4, r7, r8, r2);
+        r7 = r11.mNewDataStart;
         r7 = r7 + r2;
-        r10.mSize = r7;
-        r1 = r1 + 1;
-        r7 = r10.mCallback;
-        r8 = r10.mNewDataStart;
+        r11.mNewDataStart = r7;
+        r7 = r11.mSize;
+        r7 = r7 + r2;
+        r11.mSize = r7;
+        r7 = r11.mCallback;
+        r8 = r11.mNewDataStart;
         r8 = r8 - r2;
         r7.onInserted(r8, r2);
-        goto L_0x00e2;
-    L_0x00a1:
-        if (r6 != 0) goto L_0x00d3;
-    L_0x00a3:
-        r7 = r10.mCallback;
-        r7 = r7.areItemsTheSame(r4, r5);
-        if (r7 == 0) goto L_0x00d3;
-    L_0x00ab:
-        r7 = r10.mData;
-        r8 = r10.mNewDataStart;
-        r9 = r8 + 1;
-        r10.mNewDataStart = r9;
-        r7[r8] = r5;
-        r1 = r1 + 1;
-        r7 = r10.mOldDataStart;
+    L_0x0055:
+        r7 = 0;
+        r11.mOldData = r7;
+        if (r1 == 0) goto L_0x005d;
+    L_0x005a:
+        r11.endBatchedUpdates();
+    L_0x005d:
+        return;
+    L_0x005e:
+        r1 = r9;
+        goto L_0x0009;
+    L_0x0060:
+        if (r4 != r13) goto L_0x0079;
+    L_0x0062:
+        r7 = r11.mOldDataSize;
+        r8 = r11.mOldDataStart;
+        r2 = r7 - r8;
+        r7 = r11.mOldData;
+        r8 = r11.mOldDataStart;
+        r9 = r11.mData;
+        r10 = r11.mNewDataStart;
+        java.lang.System.arraycopy(r7, r8, r9, r10, r2);
+        r7 = r11.mNewDataStart;
         r7 = r7 + r2;
-        r10.mOldDataStart = r7;
-        r7 = r10.mCallback;
-        r7 = r7.areContentsTheSame(r4, r5);
-        if (r7 != 0) goto L_0x00e2;
-    L_0x00c4:
-        r7 = r10.mCallback;
-        r8 = r10.mNewDataStart;
-        r8 = r8 - r2;
-        r9 = r10.mCallback;
-        r9 = r9.getChangePayload(r4, r5);
-        r7.onChanged(r8, r2, r9);
-        goto L_0x00e2;
-    L_0x00d3:
-        r7 = r10.mData;
-        r8 = r10.mNewDataStart;
-        r9 = r8 + 1;
-        r10.mNewDataStart = r9;
-        r7[r8] = r4;
-        r7 = r10.mOldDataStart;
-        r7 = r7 + r2;
-        r10.mOldDataStart = r7;
-    L_0x00e2:
+        r11.mNewDataStart = r7;
+        goto L_0x0055;
+    L_0x0079:
+        r7 = r11.mOldData;
+        r9 = r11.mOldDataStart;
+        r6 = r7[r9];
+        r5 = r12[r4];
+        r7 = r11.mCallback;
+        r0 = r7.compare(r6, r5);
+        if (r0 <= 0) goto L_0x00a5;
+    L_0x0089:
+        r7 = r11.mData;
+        r9 = r11.mNewDataStart;
+        r10 = r9 + 1;
+        r11.mNewDataStart = r10;
+        r7[r9] = r5;
+        r7 = r11.mSize;
+        r7 = r7 + 1;
+        r11.mSize = r7;
+        r4 = r4 + 1;
+        r7 = r11.mCallback;
+        r9 = r11.mNewDataStart;
+        r9 = r9 + -1;
+        r7.onInserted(r9, r8);
+        goto L_0x002c;
+    L_0x00a5:
+        if (r0 != 0) goto L_0x00da;
+    L_0x00a7:
+        r7 = r11.mCallback;
+        r7 = r7.areItemsTheSame(r6, r5);
+        if (r7 == 0) goto L_0x00da;
+    L_0x00af:
+        r7 = r11.mData;
+        r9 = r11.mNewDataStart;
+        r10 = r9 + 1;
+        r11.mNewDataStart = r10;
+        r7[r9] = r5;
+        r4 = r4 + 1;
+        r7 = r11.mOldDataStart;
+        r7 = r7 + 1;
+        r11.mOldDataStart = r7;
+        r7 = r11.mCallback;
+        r7 = r7.areContentsTheSame(r6, r5);
+        if (r7 != 0) goto L_0x002c;
+    L_0x00c9:
+        r7 = r11.mCallback;
+        r9 = r11.mNewDataStart;
+        r9 = r9 + -1;
+        r10 = r11.mCallback;
+        r10 = r10.getChangePayload(r6, r5);
+        r7.onChanged(r9, r8, r10);
+        goto L_0x002c;
+    L_0x00da:
+        r7 = r11.mData;
+        r9 = r11.mNewDataStart;
+        r10 = r9 + 1;
+        r11.mNewDataStart = r10;
+        r7[r9] = r6;
+        r7 = r11.mOldDataStart;
+        r7 = r7 + 1;
+        r11.mOldDataStart = r7;
         goto L_0x002c;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.util.SortedList.merge(java.lang.Object[], int):void");
@@ -518,12 +519,15 @@ public class SortedList<T> {
         } else if (index < this.mSize) {
             T existing = this.mData[index];
             if (this.mCallback.areItemsTheSame(existing, item)) {
+                int i;
                 if (this.mCallback.areContentsTheSame(existing, item)) {
                     this.mData[index] = item;
+                    i = index;
                     return index;
                 }
                 this.mData[index] = item;
                 this.mCallback.onChanged(index, 1, this.mCallback.getChangePayload(existing, item));
+                i = index;
                 return index;
             }
         }
@@ -566,39 +570,28 @@ public class SortedList<T> {
 
     public void updateItemAt(int index, T item) {
         boolean contentsChanged;
-        int newIndex;
         throwIfInMutationOperation();
         T existing = get(index);
-        if (existing != item) {
-            if (this.mCallback.areContentsTheSame(existing, item)) {
-                contentsChanged = false;
-                if (existing == item && this.mCallback.compare(existing, item) == 0) {
-                    this.mData[index] = item;
-                    if (contentsChanged) {
-                        this.mCallback.onChanged(index, 1, this.mCallback.getChangePayload(existing, item));
-                    }
-                    return;
-                }
-                if (contentsChanged) {
-                    this.mCallback.onChanged(index, 1, this.mCallback.getChangePayload(existing, item));
-                }
-                removeItemAtIndex(index, false);
-                newIndex = add(item, false);
-                if (index != newIndex) {
-                    this.mCallback.onMoved(index, newIndex);
-                }
+        if (existing == item || !this.mCallback.areContentsTheSame(existing, item)) {
+            contentsChanged = true;
+        } else {
+            contentsChanged = false;
+        }
+        if (existing == item || this.mCallback.compare(existing, item) != 0) {
+            if (contentsChanged) {
+                this.mCallback.onChanged(index, 1, this.mCallback.getChangePayload(existing, item));
             }
+            removeItemAtIndex(index, false);
+            int newIndex = add(item, false);
+            if (index != newIndex) {
+                this.mCallback.onMoved(index, newIndex);
+                return;
+            }
+            return;
         }
-        contentsChanged = true;
-        if (existing == item) {
-        }
+        this.mData[index] = item;
         if (contentsChanged) {
             this.mCallback.onChanged(index, 1, this.mCallback.getChangePayload(existing, item));
-        }
-        removeItemAtIndex(index, false);
-        newIndex = add(item, false);
-        if (index != newIndex) {
-            this.mCallback.onMoved(index, newIndex);
         }
     }
 
@@ -613,20 +606,13 @@ public class SortedList<T> {
     }
 
     public T get(int index) throws IndexOutOfBoundsException {
-        if (index < this.mSize) {
-            if (index >= 0) {
-                if (this.mOldData == null || index < this.mNewDataStart) {
-                    return this.mData[index];
-                }
-                return this.mOldData[(index - this.mNewDataStart) + this.mOldDataStart];
-            }
+        if (index >= this.mSize || index < 0) {
+            throw new IndexOutOfBoundsException("Asked to get item at " + index + " but size is " + this.mSize);
+        } else if (this.mOldData == null || index < this.mNewDataStart) {
+            return this.mData[index];
+        } else {
+            return this.mOldData[(index - this.mNewDataStart) + this.mOldDataStart];
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Asked to get item at ");
-        stringBuilder.append(index);
-        stringBuilder.append(" but size is ");
-        stringBuilder.append(this.mSize);
-        throw new IndexOutOfBoundsException(stringBuilder.toString());
     }
 
     public int indexOf(T item) {
@@ -636,76 +622,49 @@ public class SortedList<T> {
                 return index;
             }
             index = findIndexOf(item, this.mOldData, this.mOldDataStart, this.mOldDataSize, 4);
-            if (index != -1) {
-                return (index - this.mOldDataStart) + this.mNewDataStart;
-            }
-            return -1;
+            return index != -1 ? (index - this.mOldDataStart) + this.mNewDataStart : -1;
+        } else {
+            return findIndexOf(item, this.mData, 0, this.mSize, 4);
         }
-        return findIndexOf(item, this.mData, 0, this.mSize, 4);
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private int findIndexOf(T r7, T[] r8, int r9, int r10, int r11) {
-        /*
-        r6 = this;
-    L_0x0000:
-        r0 = -1;
-        r1 = 1;
-        if (r9 >= r10) goto L_0x002f;
-    L_0x0004:
-        r2 = r9 + r10;
-        r2 = r2 / 2;
-        r3 = r8[r2];
-        r4 = r6.mCallback;
-        r4 = r4.compare(r3, r7);
-        if (r4 >= 0) goto L_0x0015;
-    L_0x0012:
-        r9 = r2 + 1;
-        goto L_0x002e;
-    L_0x0015:
-        if (r4 != 0) goto L_0x002d;
-    L_0x0017:
-        r5 = r6.mCallback;
-        r5 = r5.areItemsTheSame(r3, r7);
-        if (r5 == 0) goto L_0x0020;
-    L_0x001f:
-        return r2;
-    L_0x0020:
-        r5 = r6.linearEqualitySearch(r7, r2, r9, r10);
-        if (r11 != r1) goto L_0x002c;
-    L_0x0026:
-        if (r5 != r0) goto L_0x002a;
-    L_0x0028:
-        r0 = r2;
-        goto L_0x002b;
-    L_0x002a:
-        r0 = r5;
-    L_0x002b:
-        return r0;
-    L_0x002c:
-        return r5;
-    L_0x002d:
-        r10 = r2;
-    L_0x002e:
-        goto L_0x0000;
-    L_0x002f:
-        if (r11 != r1) goto L_0x0033;
-    L_0x0031:
-        r0 = r9;
-    L_0x0033:
-        return r0;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.support.util.SortedList.findIndexOf(java.lang.Object, java.lang.Object[], int, int, int):int");
+    private int findIndexOf(T item, T[] mData, int left, int right, int reason) {
+        while (left < right) {
+            int middle = (left + right) / 2;
+            T myItem = mData[middle];
+            int cmp = this.mCallback.compare(myItem, item);
+            if (cmp < 0) {
+                left = middle + 1;
+            } else if (cmp != 0) {
+                right = middle;
+            } else if (this.mCallback.areItemsTheSame(myItem, item)) {
+                return middle;
+            } else {
+                int exact = linearEqualitySearch(item, middle, left, right);
+                if (reason != 1) {
+                    return exact;
+                }
+                if (exact != -1) {
+                    return exact;
+                }
+                return middle;
+            }
+        }
+        if (reason != 1) {
+            left = -1;
+        }
+        return left;
     }
 
     private int linearEqualitySearch(T item, int middle, int left, int right) {
+        int i;
         int next = middle - 1;
         while (next >= left) {
             T nextItem = this.mData[next];
             if (this.mCallback.compare(nextItem, item) != 0) {
                 break;
             } else if (this.mCallback.areItemsTheSame(nextItem, item)) {
+                i = next;
                 return next;
             } else {
                 next--;
@@ -717,25 +676,22 @@ public class SortedList<T> {
             if (this.mCallback.compare(nextItem, item) != 0) {
                 break;
             } else if (this.mCallback.areItemsTheSame(nextItem, item)) {
+                i = next;
                 return next;
             } else {
                 next++;
             }
         }
+        i = next;
         return -1;
     }
 
     private void addToData(int index, T item) {
         if (index > this.mSize) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("cannot add item to ");
-            stringBuilder.append(index);
-            stringBuilder.append(" because size is ");
-            stringBuilder.append(this.mSize);
-            throw new IndexOutOfBoundsException(stringBuilder.toString());
+            throw new IndexOutOfBoundsException("cannot add item to " + index + " because size is " + this.mSize);
         }
         if (this.mSize == this.mData.length) {
-            Object[] newData = (Object[]) Array.newInstance(this.mTClass, this.mData.length + 10);
+            Object[] newData = (Object[]) ((Object[]) Array.newInstance(this.mTClass, this.mData.length + 10));
             System.arraycopy(this.mData, 0, newData, 0, index);
             newData[index] = item;
             System.arraycopy(this.mData, index, newData, index + 1, this.mSize - index);
@@ -748,7 +704,7 @@ public class SortedList<T> {
     }
 
     private T[] copyArray(T[] items) {
-        Object[] copy = (Object[]) Array.newInstance(this.mTClass, items.length);
+        Object[] copy = (Object[]) ((Object[]) Array.newInstance(this.mTClass, items.length));
         System.arraycopy(items, 0, copy, 0, items.length);
         return copy;
     }

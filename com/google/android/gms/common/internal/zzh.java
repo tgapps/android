@@ -50,10 +50,7 @@ final class zzh extends GmsClientSupervisor implements Callback {
                     }
                 }
                 String valueOf = String.valueOf(connectionStatusConfig);
-                StringBuilder stringBuilder = new StringBuilder(81 + String.valueOf(valueOf).length());
-                stringBuilder.append("Trying to bind a GmsServiceConnection that was already connected before.  config=");
-                stringBuilder.append(valueOf);
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException(new StringBuilder(String.valueOf(valueOf).length() + 81).append("Trying to bind a GmsServiceConnection that was already connected before.  config=").append(valueOf).toString());
             }
             com_google_android_gms_common_internal_zzi = new zzi(this, connectionStatusConfig);
             com_google_android_gms_common_internal_zzi.zza(serviceConnection, str);
@@ -86,18 +83,12 @@ final class zzh extends GmsClientSupervisor implements Callback {
                     com_google_android_gms_common_internal_zzi = (zzi) this.zztr.get(connectionStatusConfig);
                     if (com_google_android_gms_common_internal_zzi != null && com_google_android_gms_common_internal_zzi.getState() == 3) {
                         String valueOf = String.valueOf(connectionStatusConfig);
-                        StringBuilder stringBuilder = new StringBuilder(47 + String.valueOf(valueOf).length());
-                        stringBuilder.append("Timeout waiting for ServiceConnection callback ");
-                        stringBuilder.append(valueOf);
-                        Log.wtf("GmsClientSupervisor", stringBuilder.toString(), new Exception());
+                        Log.wtf("GmsClientSupervisor", new StringBuilder(String.valueOf(valueOf).length() + 47).append("Timeout waiting for ServiceConnection callback ").append(valueOf).toString(), new Exception());
                         ComponentName componentName = com_google_android_gms_common_internal_zzi.getComponentName();
                         if (componentName == null) {
                             componentName = connectionStatusConfig.getComponentName();
                         }
-                        if (componentName == null) {
-                            componentName = new ComponentName(connectionStatusConfig.getPackage(), "unknown");
-                        }
-                        com_google_android_gms_common_internal_zzi.onServiceDisconnected(componentName);
+                        com_google_android_gms_common_internal_zzi.onServiceDisconnected(componentName == null ? new ComponentName(connectionStatusConfig.getPackage(), "unknown") : componentName);
                     }
                 }
                 return true;
@@ -111,13 +102,9 @@ final class zzh extends GmsClientSupervisor implements Callback {
         synchronized (this.zztr) {
             zzi com_google_android_gms_common_internal_zzi = (zzi) this.zztr.get(connectionStatusConfig);
             String valueOf;
-            StringBuilder stringBuilder;
             if (com_google_android_gms_common_internal_zzi == null) {
                 valueOf = String.valueOf(connectionStatusConfig);
-                stringBuilder = new StringBuilder(50 + String.valueOf(valueOf).length());
-                stringBuilder.append("Nonexistent connection status for service config: ");
-                stringBuilder.append(valueOf);
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException(new StringBuilder(String.valueOf(valueOf).length() + 50).append("Nonexistent connection status for service config: ").append(valueOf).toString());
             } else if (com_google_android_gms_common_internal_zzi.zza(serviceConnection)) {
                 com_google_android_gms_common_internal_zzi.zzb(serviceConnection, str);
                 if (com_google_android_gms_common_internal_zzi.zzcv()) {
@@ -125,10 +112,7 @@ final class zzh extends GmsClientSupervisor implements Callback {
                 }
             } else {
                 valueOf = String.valueOf(connectionStatusConfig);
-                stringBuilder = new StringBuilder(76 + String.valueOf(valueOf).length());
-                stringBuilder.append("Trying to unbind a GmsServiceConnection  that was not bound before.  config=");
-                stringBuilder.append(valueOf);
-                throw new IllegalStateException(stringBuilder.toString());
+                throw new IllegalStateException(new StringBuilder(String.valueOf(valueOf).length() + 76).append("Trying to unbind a GmsServiceConnection  that was not bound before.  config=").append(valueOf).toString());
             }
         }
     }

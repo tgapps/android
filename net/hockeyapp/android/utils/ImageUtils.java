@@ -11,92 +11,77 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class ImageUtils {
-    public static int determineOrientation(android.content.Context r1, android.net.Uri r2) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.DecodeException: Load method exception in method: net.hockeyapp.android.utils.ImageUtils.determineOrientation(android.content.Context, android.net.Uri):int
-	at jadx.core.dex.nodes.MethodNode.load(MethodNode.java:116)
-	at jadx.core.dex.nodes.ClassNode.load(ClassNode.java:249)
-	at jadx.core.ProcessClass.process(ProcessClass.java:34)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-Caused by: java.lang.NullPointerException
-*/
-        /*
-        r0 = 0;
-        r1 = r5.getContentResolver();	 Catch:{ IOException -> 0x001f }
-        r1 = r1.openInputStream(r6);	 Catch:{ IOException -> 0x001f }
-        r0 = r1;	 Catch:{ IOException -> 0x001f }
-        r1 = determineOrientation(r0);	 Catch:{ IOException -> 0x001f }
-        if (r0 == 0) goto L_0x001b;
-    L_0x0010:
-        r0.close();	 Catch:{ IOException -> 0x0014 }
-        goto L_0x001b;
-    L_0x0014:
-        r2 = move-exception;
-        r3 = "Unable to close input stream.";
-        net.hockeyapp.android.utils.HockeyLog.error(r3, r2);
-        goto L_0x001c;
-        return r1;
-    L_0x001d:
-        r1 = move-exception;
-        goto L_0x0035;
-    L_0x001f:
-        r1 = move-exception;
-        r2 = "Unable to determine necessary screen orientation.";	 Catch:{ all -> 0x001d }
-        net.hockeyapp.android.utils.HockeyLog.error(r2, r1);	 Catch:{ all -> 0x001d }
-        r2 = 1;
-        if (r0 == 0) goto L_0x0033;
-        r0.close();	 Catch:{ IOException -> 0x002c }
-        goto L_0x0033;
-    L_0x002c:
-        r3 = move-exception;
-        r4 = "Unable to close input stream.";
-        net.hockeyapp.android.utils.HockeyLog.error(r4, r3);
-        goto L_0x0034;
-        return r2;
-        if (r0 == 0) goto L_0x0043;
-        r0.close();	 Catch:{ IOException -> 0x003c }
-        goto L_0x0043;
-    L_0x003c:
-        r2 = move-exception;
-        r3 = "Unable to close input stream.";
-        net.hockeyapp.android.utils.HockeyLog.error(r3, r2);
-        throw r1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: net.hockeyapp.android.utils.ImageUtils.determineOrientation(android.content.Context, android.net.Uri):int");
-    }
-
     public static int determineOrientation(File file) throws IOException {
+        Throwable th;
         InputStream input = null;
         try {
-            input = new FileInputStream(file);
-            int determineOrientation = determineOrientation(input);
-            return determineOrientation;
-        } finally {
+            InputStream input2 = new FileInputStream(file);
+            try {
+                int determineOrientation = determineOrientation(input2);
+                if (input2 != null) {
+                    input2.close();
+                }
+                return determineOrientation;
+            } catch (Throwable th2) {
+                th = th2;
+                input = input2;
+                if (input != null) {
+                    input.close();
+                }
+                throw th;
+            }
+        } catch (Throwable th3) {
+            th = th3;
             if (input != null) {
                 input.close();
             }
+            throw th;
         }
+    }
+
+    public static int determineOrientation(Context context, Uri uri) {
+        int determineOrientation;
+        InputStream input = null;
+        try {
+            input = context.getContentResolver().openInputStream(uri);
+            determineOrientation = determineOrientation(input);
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (Throwable e) {
+                    HockeyLog.error("Unable to close input stream.", e);
+                }
+            }
+        } catch (Throwable e2) {
+            HockeyLog.error("Unable to determine necessary screen orientation.", e2);
+            determineOrientation = 1;
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (Throwable e22) {
+                    HockeyLog.error("Unable to close input stream.", e22);
+                }
+            }
+        } catch (Throwable th) {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (Throwable e222) {
+                    HockeyLog.error("Unable to close input stream.", e222);
+                }
+            }
+        }
+        return determineOrientation;
     }
 
     public static int determineOrientation(InputStream input) {
         Options options = new Options();
-        int i = 1;
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeStream(input, null, options);
-        if (options.outWidth != -1) {
-            if (options.outHeight != -1) {
-                if (((float) options.outWidth) / ((float) options.outHeight) > 1.0f) {
-                    i = 0;
-                }
-                return i;
-            }
+        if (options.outWidth == -1 || options.outHeight == -1 || ((float) options.outWidth) / ((float) options.outHeight) <= 1.0f) {
+            return 1;
         }
-        return 1;
+        return 0;
     }
 
     public static Bitmap decodeSampledBitmap(File file, int reqWidth, int reqHeight) throws IOException {

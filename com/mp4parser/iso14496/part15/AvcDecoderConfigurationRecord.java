@@ -53,15 +53,15 @@ public class AvcDecoderConfigurationRecord {
             this.hasExts = false;
         }
         if (this.hasExts && (this.avcProfileIndication == 100 || this.avcProfileIndication == 110 || this.avcProfileIndication == 122 || this.avcProfileIndication == 144)) {
-            BitReaderBuffer brb2 = new BitReaderBuffer(content);
-            this.chromaFormatPaddingBits = brb2.readBits(6);
-            this.chromaFormat = brb2.readBits(2);
-            this.bitDepthLumaMinus8PaddingBits = brb2.readBits(5);
-            this.bitDepthLumaMinus8 = brb2.readBits(3);
-            this.bitDepthChromaMinus8PaddingBits = brb2.readBits(5);
-            this.bitDepthChromaMinus8 = brb2.readBits(3);
+            brb = new BitReaderBuffer(content);
+            this.chromaFormatPaddingBits = brb.readBits(6);
+            this.chromaFormat = brb.readBits(2);
+            this.bitDepthLumaMinus8PaddingBits = brb.readBits(5);
+            this.bitDepthLumaMinus8 = brb.readBits(3);
+            this.bitDepthChromaMinus8PaddingBits = brb.readBits(5);
+            this.bitDepthChromaMinus8 = brb.readBits(3);
             long numOfSequenceParameterSetExt = (long) IsoTypeReader.readUInt8(content);
-            for (brb = null; ((long) brb) < numOfSequenceParameterSetExt; brb++) {
+            for (i = 0; ((long) i) < numOfSequenceParameterSetExt; i++) {
                 byte[] sequenceParameterSetExtNALUnit = new byte[IsoTypeReader.readUInt16(content)];
                 content.get(sequenceParameterSetExtNALUnit);
                 this.sequenceParameterSetExts.add(sequenceParameterSetExtNALUnit);
@@ -71,7 +71,6 @@ public class AvcDecoderConfigurationRecord {
         this.chromaFormat = -1;
         this.bitDepthLumaMinus8 = -1;
         this.bitDepthChromaMinus8 = -1;
-        brb2 = brb;
     }
 
     public void getContent(ByteBuffer byteBuffer) {
@@ -97,18 +96,17 @@ public class AvcDecoderConfigurationRecord {
             return;
         }
         if (this.avcProfileIndication == 100 || this.avcProfileIndication == 110 || this.avcProfileIndication == 122 || this.avcProfileIndication == 144) {
-            BitWriterBuffer bwb2 = new BitWriterBuffer(byteBuffer);
-            bwb2.writeBits(this.chromaFormatPaddingBits, 6);
-            bwb2.writeBits(this.chromaFormat, 2);
-            bwb2.writeBits(this.bitDepthLumaMinus8PaddingBits, 5);
-            bwb2.writeBits(this.bitDepthLumaMinus8, 3);
-            bwb2.writeBits(this.bitDepthChromaMinus8PaddingBits, 5);
-            bwb2.writeBits(this.bitDepthChromaMinus8, 3);
-            for (byte[] bwb3 : this.sequenceParameterSetExts) {
-                IsoTypeWriter.writeUInt16(byteBuffer, bwb3.length);
-                byteBuffer.put(bwb3);
+            bwb = new BitWriterBuffer(byteBuffer);
+            bwb.writeBits(this.chromaFormatPaddingBits, 6);
+            bwb.writeBits(this.chromaFormat, 2);
+            bwb.writeBits(this.bitDepthLumaMinus8PaddingBits, 5);
+            bwb.writeBits(this.bitDepthLumaMinus8, 3);
+            bwb.writeBits(this.bitDepthChromaMinus8PaddingBits, 5);
+            bwb.writeBits(this.bitDepthChromaMinus8, 3);
+            for (byte[] sequenceParameterSetExtNALUnit : this.sequenceParameterSetExts) {
+                IsoTypeWriter.writeUInt16(byteBuffer, sequenceParameterSetExtNALUnit.length);
+                byteBuffer.put(sequenceParameterSetExtNALUnit);
             }
-            bwb = bwb2;
         }
     }
 
@@ -117,50 +115,20 @@ public class AvcDecoderConfigurationRecord {
         for (byte[] sequenceParameterSetNALUnit : this.sequenceParameterSets) {
             size = (size + 2) + ((long) sequenceParameterSetNALUnit.length);
         }
-        long size2 = size + 1;
+        size++;
         for (byte[] pictureParameterSetNALUnit : this.pictureParameterSets) {
-            size2 = (size2 + 2) + ((long) pictureParameterSetNALUnit.length);
+            size = (size + 2) + ((long) pictureParameterSetNALUnit.length);
         }
         if (this.hasExts && (this.avcProfileIndication == 100 || this.avcProfileIndication == 110 || this.avcProfileIndication == 122 || this.avcProfileIndication == 144)) {
-            size = size2 + 4;
-            size2 = size;
+            size += 4;
             for (byte[] sequenceParameterSetExtNALUnit : this.sequenceParameterSetExts) {
-                size2 = (size2 + 2) + ((long) sequenceParameterSetExtNALUnit.length);
+                size = (size + 2) + ((long) sequenceParameterSetExtNALUnit.length);
             }
         }
-        return size2;
+        return size;
     }
 
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("AvcDecoderConfigurationRecord{configurationVersion=");
-        stringBuilder.append(this.configurationVersion);
-        stringBuilder.append(", avcProfileIndication=");
-        stringBuilder.append(this.avcProfileIndication);
-        stringBuilder.append(", profileCompatibility=");
-        stringBuilder.append(this.profileCompatibility);
-        stringBuilder.append(", avcLevelIndication=");
-        stringBuilder.append(this.avcLevelIndication);
-        stringBuilder.append(", lengthSizeMinusOne=");
-        stringBuilder.append(this.lengthSizeMinusOne);
-        stringBuilder.append(", hasExts=");
-        stringBuilder.append(this.hasExts);
-        stringBuilder.append(", chromaFormat=");
-        stringBuilder.append(this.chromaFormat);
-        stringBuilder.append(", bitDepthLumaMinus8=");
-        stringBuilder.append(this.bitDepthLumaMinus8);
-        stringBuilder.append(", bitDepthChromaMinus8=");
-        stringBuilder.append(this.bitDepthChromaMinus8);
-        stringBuilder.append(", lengthSizeMinusOnePaddingBits=");
-        stringBuilder.append(this.lengthSizeMinusOnePaddingBits);
-        stringBuilder.append(", numberOfSequenceParameterSetsPaddingBits=");
-        stringBuilder.append(this.numberOfSequenceParameterSetsPaddingBits);
-        stringBuilder.append(", chromaFormatPaddingBits=");
-        stringBuilder.append(this.chromaFormatPaddingBits);
-        stringBuilder.append(", bitDepthLumaMinus8PaddingBits=");
-        stringBuilder.append(this.bitDepthLumaMinus8PaddingBits);
-        stringBuilder.append(", bitDepthChromaMinus8PaddingBits=");
-        stringBuilder.append(this.bitDepthChromaMinus8PaddingBits);
-        stringBuilder.append('}');
-        return stringBuilder.toString();
+        return "AvcDecoderConfigurationRecord{configurationVersion=" + this.configurationVersion + ", avcProfileIndication=" + this.avcProfileIndication + ", profileCompatibility=" + this.profileCompatibility + ", avcLevelIndication=" + this.avcLevelIndication + ", lengthSizeMinusOne=" + this.lengthSizeMinusOne + ", hasExts=" + this.hasExts + ", chromaFormat=" + this.chromaFormat + ", bitDepthLumaMinus8=" + this.bitDepthLumaMinus8 + ", bitDepthChromaMinus8=" + this.bitDepthChromaMinus8 + ", lengthSizeMinusOnePaddingBits=" + this.lengthSizeMinusOnePaddingBits + ", numberOfSequenceParameterSetsPaddingBits=" + this.numberOfSequenceParameterSetsPaddingBits + ", chromaFormatPaddingBits=" + this.chromaFormatPaddingBits + ", bitDepthLumaMinus8PaddingBits=" + this.bitDepthLumaMinus8PaddingBits + ", bitDepthChromaMinus8PaddingBits=" + this.bitDepthChromaMinus8PaddingBits + '}';
     }
 }

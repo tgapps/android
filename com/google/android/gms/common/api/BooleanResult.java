@@ -31,6 +31,6 @@ public class BooleanResult implements Result {
     }
 
     public final int hashCode() {
-        return ((527 + this.mStatus.hashCode()) * 31) + this.zzck;
+        return (this.zzck ? 1 : 0) + ((this.mStatus.hashCode() + 527) * 31);
     }
 }

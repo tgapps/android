@@ -12,12 +12,12 @@ public final class zzby {
             return null;
         }
         bundle.setClassLoader(zzby.class.getClassLoader());
-        bundle = bundle.getBundle("map_state");
-        if (bundle == null) {
+        Bundle bundle2 = bundle.getBundle("map_state");
+        if (bundle2 == null) {
             return null;
         }
-        bundle.setClassLoader(zzby.class.getClassLoader());
-        return bundle.getParcelable(str);
+        bundle2.setClassLoader(zzby.class.getClassLoader());
+        return bundle2.getParcelable(str);
     }
 
     public static void zza(Bundle bundle, Bundle bundle2) {

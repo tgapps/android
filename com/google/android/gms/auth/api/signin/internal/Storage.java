@@ -38,34 +38,30 @@ public class Storage {
     }
 
     private static String zza(String str, String str2) {
-        StringBuilder stringBuilder = new StringBuilder((1 + String.valueOf(str).length()) + String.valueOf(str2).length());
-        stringBuilder.append(str);
-        stringBuilder.append(":");
-        stringBuilder.append(str2);
-        return stringBuilder.toString();
+        return new StringBuilder((String.valueOf(str).length() + 1) + String.valueOf(str2).length()).append(str).append(":").append(str2).toString();
     }
 
     @Nullable
     private final GoogleSignInAccount zzb(String str) {
-        if (TextUtils.isEmpty(str)) {
-            return null;
-        }
-        str = getFromStore(zza("googleSignInAccount", str));
-        if (str != null) {
-            try {
-                return GoogleSignInAccount.fromJsonString(str);
-            } catch (JSONException e) {
+        GoogleSignInAccount googleSignInAccount = null;
+        if (!TextUtils.isEmpty(str)) {
+            String fromStore = getFromStore(zza("googleSignInAccount", str));
+            if (fromStore != null) {
+                try {
+                    googleSignInAccount = GoogleSignInAccount.fromJsonString(fromStore);
+                } catch (JSONException e) {
+                }
             }
         }
-        return null;
+        return googleSignInAccount;
     }
 
     @Nullable
     protected String getFromStore(String str) {
         this.zzah.lock();
         try {
-            str = this.zzai.getString(str, null);
-            return str;
+            String string = this.zzai.getString(str, null);
+            return string;
         } finally {
             this.zzah.unlock();
         }

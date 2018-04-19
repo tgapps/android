@@ -17,24 +17,22 @@ public final class ObjectWrapper<T> extends Stub {
         }
         IBinder asBinder = iObjectWrapper.asBinder();
         Field[] declaredFields = asBinder.getClass().getDeclaredFields();
-        int i = 0;
-        int length = declaredFields.length;
         Field field = null;
+        int length = declaredFields.length;
+        int i = 0;
         int i2 = 0;
         while (i < length) {
             Field field2 = declaredFields[i];
-            if (!field2.isSynthetic()) {
+            if (field2.isSynthetic()) {
+                field2 = field;
+            } else {
                 i2++;
-                field = field2;
             }
             i++;
+            field = field2;
         }
         if (i2 != 1) {
-            int length2 = declaredFields.length;
-            StringBuilder stringBuilder = new StringBuilder(64);
-            stringBuilder.append("Unexpected number of IObjectWrapper declared fields: ");
-            stringBuilder.append(length2);
-            throw new IllegalArgumentException(stringBuilder.toString());
+            throw new IllegalArgumentException("Unexpected number of IObjectWrapper declared fields: " + declaredFields.length);
         } else if (field.isAccessible()) {
             throw new IllegalArgumentException("IObjectWrapper declared field not private!");
         } else {

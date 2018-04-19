@@ -13,7 +13,7 @@ import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.reflect.Factory;
 
 public class CompositionTimeToSample extends AbstractFullBox {
-    static final /* synthetic */ boolean $assertionsDisabled = false;
+    static final /* synthetic */ boolean $assertionsDisabled = (!CompositionTimeToSample.class.desiredAssertionStatus());
     public static final String TYPE = "ctts";
     private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
     private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
@@ -45,12 +45,7 @@ public class CompositionTimeToSample extends AbstractFullBox {
         }
 
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder("Entry{count=");
-            stringBuilder.append(this.count);
-            stringBuilder.append(", offset=");
-            stringBuilder.append(this.offset);
-            stringBuilder.append('}');
-            return stringBuilder.toString();
+            return "Entry{count=" + this.count + ", offset=" + this.offset + '}';
         }
     }
 
@@ -69,7 +64,7 @@ public class CompositionTimeToSample extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (8 + (this.entries.size() * 8));
+        return (long) ((this.entries.size() * 8) + 8);
     }
 
     public List<Entry> getEntries() {
@@ -105,17 +100,20 @@ public class CompositionTimeToSample extends AbstractFullBox {
         for (Entry entry : entries) {
             numOfSamples += (long) entry.getCount();
         }
-        int[] decodingTime = new int[((int) numOfSamples)];
-        int current = 0;
-        for (Entry entry2 : entries) {
-            int i = 0;
-            while (i < entry2.getCount()) {
-                int current2 = current + 1;
-                decodingTime[current] = entry2.getOffset();
-                i++;
-                current = current2;
+        if ($assertionsDisabled || numOfSamples <= 2147483647L) {
+            int[] decodingTime = new int[((int) numOfSamples)];
+            int current = 0;
+            for (Entry entry2 : entries) {
+                int i = 0;
+                while (i < entry2.getCount()) {
+                    int current2 = current + 1;
+                    decodingTime[current] = entry2.getOffset();
+                    i++;
+                    current = current2;
+                }
             }
+            return decodingTime;
         }
-        return decodingTime;
+        throw new AssertionError();
     }
 }

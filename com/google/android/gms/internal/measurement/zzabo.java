@@ -75,14 +75,16 @@ public final class zzabo extends zzabd<zzabo> {
         if (this.zzcal != 0) {
             zza += zzabb.zzf(12, this.zzcal);
         }
-        if (this.zzcam != null && this.zzcam.length > 0) {
-            for (zzabj com_google_android_gms_internal_measurement_zzabj : this.zzcam) {
-                if (com_google_android_gms_internal_measurement_zzabj != null) {
-                    zza += zzabb.zzb(13, com_google_android_gms_internal_measurement_zzabj);
-                }
+        if (this.zzcam == null || this.zzcam.length <= 0) {
+            return zza;
+        }
+        int i = zza;
+        for (zzabj com_google_android_gms_internal_measurement_zzabj : this.zzcam) {
+            if (com_google_android_gms_internal_measurement_zzabj != null) {
+                i += zzabb.zzb(13, com_google_android_gms_internal_measurement_zzabj);
             }
         }
-        return zza;
+        return i;
     }
 
     public final void zza(zzabb com_google_android_gms_internal_measurement_zzabb) throws IOException {
@@ -137,66 +139,67 @@ public final class zzabo extends zzabd<zzabo> {
             int zzvo = com_google_android_gms_internal_measurement_zzaba.zzvo();
             switch (zzvo) {
                 case 0:
-                    return this;
+                    break;
                 case 10:
                     this.zzcag = com_google_android_gms_internal_measurement_zzaba.readString();
-                    break;
+                    continue;
                 case 18:
                     this.zzcah = com_google_android_gms_internal_measurement_zzaba.readString();
-                    break;
+                    continue;
                 case RendererCapabilities.ADAPTIVE_SUPPORT_MASK /*24*/:
                     this.zzcai = com_google_android_gms_internal_measurement_zzaba.zzvp();
-                    break;
+                    continue;
                 case 34:
                     this.zzcaj = com_google_android_gms_internal_measurement_zzaba.readString();
-                    break;
+                    continue;
                 case 40:
                     this.zzcak = com_google_android_gms_internal_measurement_zzaba.zzvp();
-                    break;
+                    continue;
                 case 48:
                     this.zzrp = com_google_android_gms_internal_measurement_zzaba.zzvp();
-                    break;
+                    continue;
                 case 58:
                     this.zzbsl = com_google_android_gms_internal_measurement_zzaba.readString();
-                    break;
+                    continue;
                 case 66:
                     this.zzbsm = com_google_android_gms_internal_measurement_zzaba.readString();
-                    break;
+                    continue;
                 case VoIPService.CALL_MAX_LAYER /*74*/:
                     this.zzbsp = com_google_android_gms_internal_measurement_zzaba.readString();
-                    break;
+                    continue;
                 case 82:
                     this.zzbsn = com_google_android_gms_internal_measurement_zzaba.readString();
-                    break;
+                    continue;
                 case 90:
                     this.zzbso = com_google_android_gms_internal_measurement_zzaba.readString();
-                    break;
+                    continue;
                 case 96:
                     this.zzcal = com_google_android_gms_internal_measurement_zzaba.zzvq();
-                    break;
+                    continue;
                 case 106:
-                    zzvo = zzabm.zzb(com_google_android_gms_internal_measurement_zzaba, 106);
-                    int length = this.zzcam == null ? 0 : this.zzcam.length;
-                    Object obj = new zzabn[(zzvo + length)];
-                    if (length != 0) {
-                        System.arraycopy(this.zzcam, 0, obj, 0, length);
+                    int zzb = zzabm.zzb(com_google_android_gms_internal_measurement_zzaba, 106);
+                    zzvo = this.zzcam == null ? 0 : this.zzcam.length;
+                    Object obj = new zzabn[(zzb + zzvo)];
+                    if (zzvo != 0) {
+                        System.arraycopy(this.zzcam, 0, obj, 0, zzvo);
                     }
-                    while (length < obj.length - 1) {
-                        obj[length] = new zzabn();
-                        com_google_android_gms_internal_measurement_zzaba.zza(obj[length]);
+                    while (zzvo < obj.length - 1) {
+                        obj[zzvo] = new zzabn();
+                        com_google_android_gms_internal_measurement_zzaba.zza(obj[zzvo]);
                         com_google_android_gms_internal_measurement_zzaba.zzvo();
-                        length++;
+                        zzvo++;
                     }
-                    obj[length] = new zzabn();
-                    com_google_android_gms_internal_measurement_zzaba.zza(obj[length]);
+                    obj[zzvo] = new zzabn();
+                    com_google_android_gms_internal_measurement_zzaba.zza(obj[zzvo]);
                     this.zzcam = obj;
-                    break;
+                    continue;
                 default:
-                    if (super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
+                    if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
                         break;
                     }
-                    return this;
+                    continue;
             }
+            return this;
         }
     }
 }

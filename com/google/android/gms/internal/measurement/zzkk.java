@@ -19,27 +19,12 @@ public final class zzkk extends zzabd<zzkk> {
             return false;
         }
         zzkk com_google_android_gms_internal_measurement_zzkk = (zzkk) obj;
-        if (!zzabh.equals(this.zzata, com_google_android_gms_internal_measurement_zzkk.zzata)) {
-            return false;
-        }
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                return this.zzbzh.equals(com_google_android_gms_internal_measurement_zzkk.zzbzh);
-            }
-        }
-        return com_google_android_gms_internal_measurement_zzkk.zzbzh == null || com_google_android_gms_internal_measurement_zzkk.zzbzh.isEmpty();
+        return !zzabh.equals(this.zzata, com_google_android_gms_internal_measurement_zzkk.zzata) ? false : (this.zzbzh == null || this.zzbzh.isEmpty()) ? com_google_android_gms_internal_measurement_zzkk.zzbzh == null || com_google_android_gms_internal_measurement_zzkk.zzbzh.isEmpty() : this.zzbzh.equals(com_google_android_gms_internal_measurement_zzkk.zzbzh);
     }
 
     public final int hashCode() {
-        int hashCode;
-        int hashCode2 = (((527 + getClass().getName().hashCode()) * 31) + zzabh.hashCode(this.zzata)) * 31;
-        if (this.zzbzh != null) {
-            if (!this.zzbzh.isEmpty()) {
-                hashCode = this.zzbzh.hashCode();
-                return hashCode2 + hashCode;
-            }
-        }
-        hashCode = 0;
+        int hashCode = (((getClass().getName().hashCode() + 527) * 31) + zzabh.hashCode(this.zzata)) * 31;
+        int hashCode2 = (this.zzbzh == null || this.zzbzh.isEmpty()) ? 0 : this.zzbzh.hashCode();
         return hashCode2 + hashCode;
     }
 
@@ -69,28 +54,33 @@ public final class zzkk extends zzabd<zzkk> {
     public final /* synthetic */ zzabj zzb(zzaba com_google_android_gms_internal_measurement_zzaba) throws IOException {
         while (true) {
             int zzvo = com_google_android_gms_internal_measurement_zzaba.zzvo();
-            if (zzvo == 0) {
-                return this;
+            switch (zzvo) {
+                case 0:
+                    break;
+                case 10:
+                    int zzb = zzabm.zzb(com_google_android_gms_internal_measurement_zzaba, 10);
+                    zzvo = this.zzata == null ? 0 : this.zzata.length;
+                    Object obj = new zzkl[(zzb + zzvo)];
+                    if (zzvo != 0) {
+                        System.arraycopy(this.zzata, 0, obj, 0, zzvo);
+                    }
+                    while (zzvo < obj.length - 1) {
+                        obj[zzvo] = new zzkl();
+                        com_google_android_gms_internal_measurement_zzaba.zza(obj[zzvo]);
+                        com_google_android_gms_internal_measurement_zzaba.zzvo();
+                        zzvo++;
+                    }
+                    obj[zzvo] = new zzkl();
+                    com_google_android_gms_internal_measurement_zzaba.zza(obj[zzvo]);
+                    this.zzata = obj;
+                    continue;
+                default:
+                    if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
+                        break;
+                    }
+                    continue;
             }
-            if (zzvo == 10) {
-                zzvo = zzabm.zzb(com_google_android_gms_internal_measurement_zzaba, 10);
-                int length = this.zzata == null ? 0 : this.zzata.length;
-                Object obj = new zzkl[(zzvo + length)];
-                if (length != 0) {
-                    System.arraycopy(this.zzata, 0, obj, 0, length);
-                }
-                while (length < obj.length - 1) {
-                    obj[length] = new zzkl();
-                    com_google_android_gms_internal_measurement_zzaba.zza(obj[length]);
-                    com_google_android_gms_internal_measurement_zzaba.zzvo();
-                    length++;
-                }
-                obj[length] = new zzkl();
-                com_google_android_gms_internal_measurement_zzaba.zza(obj[length]);
-                this.zzata = obj;
-            } else if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
-                return this;
-            }
+            return this;
         }
     }
 }

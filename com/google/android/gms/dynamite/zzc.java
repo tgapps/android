@@ -15,11 +15,11 @@ final class zzc implements VersionPolicy {
         selectionResult.localVersion = iVersions.getLocalVersion(context, str);
         if (selectionResult.localVersion != 0) {
             selectionResult.selection = -1;
-            return selectionResult;
-        }
-        selectionResult.remoteVersion = iVersions.getRemoteVersion(context, str, true);
-        if (selectionResult.remoteVersion != 0) {
-            selectionResult.selection = 1;
+        } else {
+            selectionResult.remoteVersion = iVersions.getRemoteVersion(context, str, true);
+            if (selectionResult.remoteVersion != 0) {
+                selectionResult.selection = 1;
+            }
         }
         return selectionResult;
     }

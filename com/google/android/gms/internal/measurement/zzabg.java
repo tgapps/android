@@ -31,44 +31,35 @@ final class zzabg implements Cloneable {
                 com_google_android_gms_internal_measurement_zzabg.zzbzq.addAll(this.zzbzq);
             }
             if (this.value != null) {
-                Object obj;
                 if (this.value instanceof zzabj) {
-                    obj = (zzabj) ((zzabj) this.value).clone();
+                    com_google_android_gms_internal_measurement_zzabg.value = (zzabj) ((zzabj) this.value).clone();
                 } else if (this.value instanceof byte[]) {
-                    obj = ((byte[]) this.value).clone();
-                } else {
-                    int i = 0;
-                    Object obj2;
-                    if (this.value instanceof byte[][]) {
-                        byte[][] bArr = (byte[][]) this.value;
-                        obj2 = new byte[bArr.length][];
-                        com_google_android_gms_internal_measurement_zzabg.value = obj2;
-                        while (i < bArr.length) {
-                            obj2[i] = (byte[]) bArr[i].clone();
-                            i++;
-                        }
-                    } else if (this.value instanceof boolean[]) {
-                        obj = ((boolean[]) this.value).clone();
-                    } else if (this.value instanceof int[]) {
-                        obj = ((int[]) this.value).clone();
-                    } else if (this.value instanceof long[]) {
-                        obj = ((long[]) this.value).clone();
-                    } else if (this.value instanceof float[]) {
-                        obj = ((float[]) this.value).clone();
-                    } else if (this.value instanceof double[]) {
-                        obj = ((double[]) this.value).clone();
-                    } else if (this.value instanceof zzabj[]) {
-                        zzabj[] com_google_android_gms_internal_measurement_zzabjArr = (zzabj[]) this.value;
-                        obj2 = new zzabj[com_google_android_gms_internal_measurement_zzabjArr.length];
-                        com_google_android_gms_internal_measurement_zzabg.value = obj2;
-                        while (i < com_google_android_gms_internal_measurement_zzabjArr.length) {
-                            obj2[i] = (zzabj) com_google_android_gms_internal_measurement_zzabjArr[i].clone();
-                            i++;
-                        }
+                    com_google_android_gms_internal_measurement_zzabg.value = ((byte[]) this.value).clone();
+                } else if (this.value instanceof byte[][]) {
+                    byte[][] bArr = (byte[][]) this.value;
+                    r4 = new byte[bArr.length][];
+                    com_google_android_gms_internal_measurement_zzabg.value = r4;
+                    for (r2 = 0; r2 < bArr.length; r2++) {
+                        r4[r2] = (byte[]) bArr[r2].clone();
+                    }
+                } else if (this.value instanceof boolean[]) {
+                    com_google_android_gms_internal_measurement_zzabg.value = ((boolean[]) this.value).clone();
+                } else if (this.value instanceof int[]) {
+                    com_google_android_gms_internal_measurement_zzabg.value = ((int[]) this.value).clone();
+                } else if (this.value instanceof long[]) {
+                    com_google_android_gms_internal_measurement_zzabg.value = ((long[]) this.value).clone();
+                } else if (this.value instanceof float[]) {
+                    com_google_android_gms_internal_measurement_zzabg.value = ((float[]) this.value).clone();
+                } else if (this.value instanceof double[]) {
+                    com_google_android_gms_internal_measurement_zzabg.value = ((double[]) this.value).clone();
+                } else if (this.value instanceof zzabj[]) {
+                    zzabj[] com_google_android_gms_internal_measurement_zzabjArr = (zzabj[]) this.value;
+                    r4 = new zzabj[com_google_android_gms_internal_measurement_zzabjArr.length];
+                    com_google_android_gms_internal_measurement_zzabg.value = r4;
+                    for (r2 = 0; r2 < com_google_android_gms_internal_measurement_zzabjArr.length; r2++) {
+                        r4[r2] = (zzabj) com_google_android_gms_internal_measurement_zzabjArr[r2].clone();
                     }
                 }
-                com_google_android_gms_internal_measurement_zzabg.value = obj;
-                return com_google_android_gms_internal_measurement_zzabg;
             }
             return com_google_android_gms_internal_measurement_zzabg;
         } catch (CloneNotSupportedException e) {
@@ -89,7 +80,7 @@ final class zzabg implements Cloneable {
         }
         zzabg com_google_android_gms_internal_measurement_zzabg = (zzabg) obj;
         if (this.value != null && com_google_android_gms_internal_measurement_zzabg.value != null) {
-            return this.zzbzp != com_google_android_gms_internal_measurement_zzabg.zzbzp ? false : !this.zzbzp.zzbzi.isArray() ? this.value.equals(com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof byte[] ? Arrays.equals((byte[]) this.value, (byte[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof int[] ? Arrays.equals((int[]) this.value, (int[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof long[] ? Arrays.equals((long[]) this.value, (long[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof float[] ? Arrays.equals((float[]) this.value, (float[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof double[] ? Arrays.equals((double[]) this.value, (double[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof boolean[] ? Arrays.equals((boolean[]) this.value, (boolean[]) com_google_android_gms_internal_measurement_zzabg.value) : Arrays.deepEquals((Object[]) this.value, (Object[]) com_google_android_gms_internal_measurement_zzabg.value);
+            return this.zzbzp == com_google_android_gms_internal_measurement_zzabg.zzbzp ? !this.zzbzp.zzbzi.isArray() ? this.value.equals(com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof byte[] ? Arrays.equals((byte[]) this.value, (byte[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof int[] ? Arrays.equals((int[]) this.value, (int[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof long[] ? Arrays.equals((long[]) this.value, (long[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof float[] ? Arrays.equals((float[]) this.value, (float[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof double[] ? Arrays.equals((double[]) this.value, (double[]) com_google_android_gms_internal_measurement_zzabg.value) : this.value instanceof boolean[] ? Arrays.equals((boolean[]) this.value, (boolean[]) com_google_android_gms_internal_measurement_zzabg.value) : Arrays.deepEquals((Object[]) this.value, (Object[]) com_google_android_gms_internal_measurement_zzabg.value) : false;
         } else {
             if (this.zzbzq != null && com_google_android_gms_internal_measurement_zzabg.zzbzq != null) {
                 return this.zzbzq.equals(com_google_android_gms_internal_measurement_zzabg.zzbzq);
@@ -104,15 +95,14 @@ final class zzabg implements Cloneable {
 
     public final int hashCode() {
         try {
-            return 527 + Arrays.hashCode(toByteArray());
+            return Arrays.hashCode(toByteArray()) + 527;
         } catch (Throwable e) {
             throw new IllegalStateException(e);
         }
     }
 
     final int zza() {
-        int i;
-        int i2 = 0;
+        int i = 0;
         if (this.value != null) {
             zzabe com_google_android_gms_internal_measurement_zzabe = this.zzbzp;
             Object obj = this.value;
@@ -120,18 +110,16 @@ final class zzabg implements Cloneable {
                 return com_google_android_gms_internal_measurement_zzabe.zzx(obj);
             }
             int length = Array.getLength(obj);
-            i = 0;
-            while (i2 < length) {
-                if (Array.get(obj, i2) != null) {
-                    i += com_google_android_gms_internal_measurement_zzabe.zzx(Array.get(obj, i2));
+            int i2 = 0;
+            for (int i3 = 0; i3 < length; i3++) {
+                if (Array.get(obj, i3) != null) {
+                    i2 += com_google_android_gms_internal_measurement_zzabe.zzx(Array.get(obj, i3));
                 }
-                i2++;
             }
-        } else {
-            i = 0;
-            for (zzabl com_google_android_gms_internal_measurement_zzabl : this.zzbzq) {
-                i += (zzabb.zzau(com_google_android_gms_internal_measurement_zzabl.tag) + 0) + com_google_android_gms_internal_measurement_zzabl.zzbto.length;
-            }
+            return i2;
+        }
+        for (zzabl com_google_android_gms_internal_measurement_zzabl : this.zzbzq) {
+            i = (com_google_android_gms_internal_measurement_zzabl.zzbto.length + (zzabb.zzau(com_google_android_gms_internal_measurement_zzabl.tag) + 0)) + i;
         }
         return i;
     }
@@ -176,9 +164,8 @@ final class zzabg implements Cloneable {
         } else if (this.value instanceof zzabj[]) {
             zzabj[] com_google_android_gms_internal_measurement_zzabjArr = (zzabj[]) this.zzbzp.zzi(Collections.singletonList(com_google_android_gms_internal_measurement_zzabl));
             zzabj[] com_google_android_gms_internal_measurement_zzabjArr2 = (zzabj[]) this.value;
-            Object obj = (zzabj[]) Arrays.copyOf(com_google_android_gms_internal_measurement_zzabjArr2, com_google_android_gms_internal_measurement_zzabjArr2.length + com_google_android_gms_internal_measurement_zzabjArr.length);
-            System.arraycopy(com_google_android_gms_internal_measurement_zzabjArr, 0, obj, com_google_android_gms_internal_measurement_zzabjArr2.length, com_google_android_gms_internal_measurement_zzabjArr.length);
-            zzb = obj;
+            zzabj[] com_google_android_gms_internal_measurement_zzabjArr3 = (zzabj[]) Arrays.copyOf(com_google_android_gms_internal_measurement_zzabjArr2, com_google_android_gms_internal_measurement_zzabjArr2.length + com_google_android_gms_internal_measurement_zzabjArr.length);
+            System.arraycopy(com_google_android_gms_internal_measurement_zzabjArr, 0, com_google_android_gms_internal_measurement_zzabjArr3, com_google_android_gms_internal_measurement_zzabjArr2.length, com_google_android_gms_internal_measurement_zzabjArr.length);
         } else {
             zzb = this.zzbzp.zzi(Collections.singletonList(com_google_android_gms_internal_measurement_zzabl));
         }

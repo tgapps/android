@@ -47,7 +47,7 @@ public class DescriptionBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (7 + Utf8.utf8StringLengthInBytes(this.description));
+        return (long) (Utf8.utf8StringLengthInBytes(this.description) + 7);
     }
 
     public void _parseDetails(ByteBuffer content) {
@@ -65,12 +65,7 @@ public class DescriptionBox extends AbstractFullBox {
 
     public String toString() {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
-        StringBuilder stringBuilder = new StringBuilder("DescriptionBox[language=");
-        stringBuilder.append(getLanguage());
-        stringBuilder.append(";description=");
-        stringBuilder.append(getDescription());
-        stringBuilder.append("]");
-        return stringBuilder.toString();
+        return "DescriptionBox[language=" + getLanguage() + ";description=" + getDescription() + "]";
     }
 
     public void setLanguage(String language) {

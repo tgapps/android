@@ -62,11 +62,14 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
 
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view;
-            if (viewType != 0) {
-                view = new TextInfoCell(this.mContext);
-                ((TextInfoCell) view).setText(LocaleController.getString("UnblockText", R.string.UnblockText));
-            } else {
-                view = new UserCell(this.mContext, 1, 0, false);
+            switch (viewType) {
+                case 0:
+                    view = new UserCell(this.mContext, 1, 0, false);
+                    break;
+                default:
+                    view = new TextInfoCell(this.mContext);
+                    ((TextInfoCell) view).setText(LocaleController.getString("UnblockText", R.string.UnblockText));
+                    break;
             }
             return new Holder(view);
         }
@@ -77,19 +80,11 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
                 if (user != null) {
                     String number;
                     if (user.bot) {
-                        number = new StringBuilder();
-                        number.append(LocaleController.getString("Bot", R.string.Bot).substring(0, 1).toUpperCase());
-                        number.append(LocaleController.getString("Bot", R.string.Bot).substring(1));
-                        number = number.toString();
+                        number = LocaleController.getString("Bot", R.string.Bot).substring(0, 1).toUpperCase() + LocaleController.getString("Bot", R.string.Bot).substring(1);
                     } else if (user.phone == null || user.phone.length() == 0) {
                         number = LocaleController.getString("NumberUnknown", R.string.NumberUnknown);
-                        ((UserCell) holder.itemView).setData(user, null, number, 0);
                     } else {
-                        PhoneFormat instance = PhoneFormat.getInstance();
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append("+");
-                        stringBuilder.append(user.phone);
-                        number = instance.format(stringBuilder.toString());
+                        number = PhoneFormat.getInstance().format("+" + user.phone);
                     }
                     ((UserCell) holder.itemView).setData(user, null, number, 0);
                 }
@@ -119,8 +114,8 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
     }
 
     public View createView(Context context) {
-        this.actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         int i = 1;
+        this.actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         this.actionBar.setAllowOverlayTitle(true);
         this.actionBar.setTitle(LocaleController.getString("BlockedUsers", R.string.BlockedUsers));
         this.actionBar.setActionBarMenuOnItemClick(new ActionBarMenuOnItemClick() {
@@ -169,20 +164,17 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
         });
         this.listView.setOnItemLongClickListener(new OnItemLongClickListener() {
             public boolean onItemClick(View view, int position) {
-                if (position < MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.size()) {
-                    if (BlockedUsersActivity.this.getParentActivity() != null) {
-                        BlockedUsersActivity.this.selectedUserId = ((Integer) MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.get(position)).intValue();
-                        Builder builder = new Builder(BlockedUsersActivity.this.getParentActivity());
-                        builder.setItems(new CharSequence[]{LocaleController.getString("Unblock", R.string.Unblock)}, new OnClickListener() {
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if (i == 0) {
-                                    MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).unblockUser(BlockedUsersActivity.this.selectedUserId);
-                                }
+                if (position < MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.size() && BlockedUsersActivity.this.getParentActivity() != null) {
+                    BlockedUsersActivity.this.selectedUserId = ((Integer) MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.get(position)).intValue();
+                    Builder builder = new Builder(BlockedUsersActivity.this.getParentActivity());
+                    builder.setItems(new CharSequence[]{LocaleController.getString("Unblock", R.string.Unblock)}, new OnClickListener() {
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (i == 0) {
+                                MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).unblockUser(BlockedUsersActivity.this.selectedUserId);
                             }
-                        });
-                        BlockedUsersActivity.this.showDialog(builder.create());
-                        return true;
-                    }
+                        }
+                    });
+                    BlockedUsersActivity.this.showDialog(builder.create());
                 }
                 return true;
             }
@@ -198,7 +190,7 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.updateInterfaces) {
             int mask = ((Integer) args[0]).intValue();
-            if (!((mask & 2) == 0 && (mask & 1) == 0)) {
+            if ((mask & 2) != 0 || (mask & 1) != 0) {
                 updateVisibleRows(mask);
             }
         } else if (id == NotificationCenter.blockedUsersDidLoaded) {
@@ -248,28 +240,18 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
                 }
             }
         };
-        ThemeDescription[] themeDescriptionArr = new ThemeDescription[20];
-        themeDescriptionArr[0] = new ThemeDescription(this.fragmentView, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundWhite);
-        themeDescriptionArr[1] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_actionBarDefault);
-        themeDescriptionArr[2] = new ThemeDescription(this.listView, ThemeDescription.FLAG_LISTGLOWCOLOR, null, null, null, null, Theme.key_actionBarDefault);
-        themeDescriptionArr[3] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_ITEMSCOLOR, null, null, null, null, Theme.key_actionBarDefaultIcon);
-        themeDescriptionArr[4] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_TITLECOLOR, null, null, null, null, Theme.key_actionBarDefaultTitle);
-        themeDescriptionArr[5] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_SELECTORCOLOR, null, null, null, null, Theme.key_actionBarDefaultSelector);
-        themeDescriptionArr[6] = new ThemeDescription(this.listView, ThemeDescription.FLAG_SELECTOR, null, null, null, null, Theme.key_listSelector);
-        themeDescriptionArr[7] = new ThemeDescription(this.emptyView, ThemeDescription.FLAG_TEXTCOLOR, null, null, null, null, Theme.key_emptyListPlaceholder);
-        themeDescriptionArr[8] = new ThemeDescription(this.emptyView, ThemeDescription.FLAG_PROGRESSBAR, null, null, null, null, Theme.key_progressCircle);
-        themeDescriptionArr[9] = new ThemeDescription(this.listView, 0, new Class[]{TextInfoCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText5);
-        themeDescriptionArr[10] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"nameTextView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText);
-        themeDescriptionArr[11] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"statusColor"}, null, null, сellDelegate, Theme.key_windowBackgroundWhiteGrayText);
-        themeDescriptionArr[12] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, null, new Drawable[]{Theme.avatar_photoDrawable, Theme.avatar_broadcastDrawable, Theme.avatar_savedDrawable}, null, Theme.key_avatar_text);
-        ThemeDescriptionDelegate themeDescriptionDelegate = сellDelegate;
-        themeDescriptionArr[13] = new ThemeDescription(null, 0, null, null, null, themeDescriptionDelegate, Theme.key_avatar_backgroundRed);
-        themeDescriptionArr[14] = new ThemeDescription(null, 0, null, null, null, themeDescriptionDelegate, Theme.key_avatar_backgroundOrange);
-        themeDescriptionArr[15] = new ThemeDescription(null, 0, null, null, null, themeDescriptionDelegate, Theme.key_avatar_backgroundViolet);
-        themeDescriptionArr[16] = new ThemeDescription(null, 0, null, null, null, themeDescriptionDelegate, Theme.key_avatar_backgroundGreen);
-        themeDescriptionArr[17] = new ThemeDescription(null, 0, null, null, null, themeDescriptionDelegate, Theme.key_avatar_backgroundCyan);
-        themeDescriptionArr[18] = new ThemeDescription(null, 0, null, null, null, themeDescriptionDelegate, Theme.key_avatar_backgroundBlue);
-        themeDescriptionArr[19] = new ThemeDescription(null, 0, null, null, null, themeDescriptionDelegate, Theme.key_avatar_backgroundPink);
-        return themeDescriptionArr;
+        r10 = new ThemeDescription[20];
+        r10[9] = new ThemeDescription(this.listView, 0, new Class[]{TextInfoCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText5);
+        r10[10] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"nameTextView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText);
+        r10[11] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"statusColor"}, null, null, сellDelegate, Theme.key_windowBackgroundWhiteGrayText);
+        r10[12] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, null, new Drawable[]{Theme.avatar_photoDrawable, Theme.avatar_broadcastDrawable, Theme.avatar_savedDrawable}, null, Theme.key_avatar_text);
+        r10[13] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundRed);
+        r10[14] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundOrange);
+        r10[15] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundViolet);
+        r10[16] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundGreen);
+        r10[17] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundCyan);
+        r10[18] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundBlue);
+        r10[19] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundPink);
+        return r10;
     }
 }

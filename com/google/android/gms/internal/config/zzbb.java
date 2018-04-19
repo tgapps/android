@@ -45,14 +45,14 @@ public abstract class zzbb<M extends zzbb<M>> extends zzbh {
     }
 
     protected int zzu() {
-        int i = 0;
         if (this.zzci == null) {
             return 0;
         }
+        int i = 0;
         int i2 = 0;
         while (i < this.zzci.size()) {
-            i2 += this.zzci.zzp(i).zzu();
             i++;
+            i2 = this.zzci.zzp(i).zzu() + i2;
         }
         return i2;
     }

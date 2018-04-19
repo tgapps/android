@@ -16,18 +16,18 @@ public final class zzg extends zza implements zze {
     public final IObjectWrapper zza(int i) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         obtainAndWriteInterfaceToken.writeInt(i);
-        Parcel transactAndReadException = transactAndReadException(1, obtainAndWriteInterfaceToken);
-        IObjectWrapper asInterface = Stub.asInterface(transactAndReadException.readStrongBinder());
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(1, obtainAndWriteInterfaceToken);
+        IObjectWrapper asInterface = Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+        obtainAndWriteInterfaceToken.recycle();
         return asInterface;
     }
 
     public final IObjectWrapper zza(Bitmap bitmap) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) bitmap);
-        Parcel transactAndReadException = transactAndReadException(6, obtainAndWriteInterfaceToken);
-        IObjectWrapper asInterface = Stub.asInterface(transactAndReadException.readStrongBinder());
-        transactAndReadException.recycle();
+        obtainAndWriteInterfaceToken = transactAndReadException(6, obtainAndWriteInterfaceToken);
+        IObjectWrapper asInterface = Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+        obtainAndWriteInterfaceToken.recycle();
         return asInterface;
     }
 }

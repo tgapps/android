@@ -46,7 +46,7 @@ public class AbstractDescriptorBox extends AbstractFullBox {
     }
 
     protected long getContentSize() {
-        return (long) (4 + this.data.limit());
+        return (long) (this.data.limit() + 4);
     }
 
     public void setDescriptor(BaseDescriptor descriptor) {

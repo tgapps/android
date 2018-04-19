@@ -35,7 +35,10 @@ public final class zzax extends zzbb<zzax> {
             return false;
         }
         zzax com_google_android_gms_internal_config_zzax = (zzax) obj;
-        if (this.resourceId != com_google_android_gms_internal_config_zzax.resourceId || this.zzbw != com_google_android_gms_internal_config_zzax.zzbw) {
+        if (this.resourceId != com_google_android_gms_internal_config_zzax.resourceId) {
+            return false;
+        }
+        if (this.zzbw != com_google_android_gms_internal_config_zzax.zzbw) {
             return false;
         }
         if (this.namespace == null) {
@@ -45,21 +48,14 @@ public final class zzax extends zzbb<zzax> {
         } else if (!this.namespace.equals(com_google_android_gms_internal_config_zzax.namespace)) {
             return false;
         }
-        if (this.zzci != null) {
-            if (!this.zzci.isEmpty()) {
-                return this.zzci.equals(com_google_android_gms_internal_config_zzax.zzci);
-            }
-        }
-        return com_google_android_gms_internal_config_zzax.zzci == null || com_google_android_gms_internal_config_zzax.zzci.isEmpty();
+        return (this.zzci == null || this.zzci.isEmpty()) ? com_google_android_gms_internal_config_zzax.zzci == null || com_google_android_gms_internal_config_zzax.zzci.isEmpty() : this.zzci.equals(com_google_android_gms_internal_config_zzax.zzci);
     }
 
     public final int hashCode() {
         int i = 0;
-        int hashCode = (((((((527 + getClass().getName().hashCode()) * 31) + this.resourceId) * 31) + ((int) (this.zzbw ^ (this.zzbw >>> 32)))) * 31) + (this.namespace == null ? 0 : this.namespace.hashCode())) * 31;
-        if (this.zzci != null) {
-            if (!this.zzci.isEmpty()) {
-                i = this.zzci.hashCode();
-            }
+        int hashCode = ((this.namespace == null ? 0 : this.namespace.hashCode()) + ((((((getClass().getName().hashCode() + 527) * 31) + this.resourceId) * 31) + ((int) (this.zzbw ^ (this.zzbw >>> 32)))) * 31)) * 31;
+        if (!(this.zzci == null || this.zzci.isEmpty())) {
+            i = this.zzci.hashCode();
         }
         return hashCode + i;
     }
@@ -67,18 +63,25 @@ public final class zzax extends zzbb<zzax> {
     public final /* synthetic */ zzbh zza(zzay com_google_android_gms_internal_config_zzay) throws IOException {
         while (true) {
             int zzy = com_google_android_gms_internal_config_zzay.zzy();
-            if (zzy == 0) {
-                return this;
+            switch (zzy) {
+                case 0:
+                    break;
+                case 8:
+                    this.resourceId = com_google_android_gms_internal_config_zzay.zzz();
+                    continue;
+                case 17:
+                    this.zzbw = com_google_android_gms_internal_config_zzay.zzaa();
+                    continue;
+                case 26:
+                    this.namespace = com_google_android_gms_internal_config_zzay.readString();
+                    continue;
+                default:
+                    if (!super.zza(com_google_android_gms_internal_config_zzay, zzy)) {
+                        break;
+                    }
+                    continue;
             }
-            if (zzy == 8) {
-                this.resourceId = com_google_android_gms_internal_config_zzay.zzz();
-            } else if (zzy == 17) {
-                this.zzbw = com_google_android_gms_internal_config_zzay.zzaa();
-            } else if (zzy == 26) {
-                this.namespace = com_google_android_gms_internal_config_zzay.readString();
-            } else if (!super.zza(com_google_android_gms_internal_config_zzay, zzy)) {
-                return this;
-            }
+            return this;
         }
     }
 

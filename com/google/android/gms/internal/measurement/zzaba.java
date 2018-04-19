@@ -19,9 +19,9 @@ public final class zzaba {
     private zzaba(byte[] bArr, int i, int i2) {
         this.buffer = bArr;
         this.zzbza = i;
-        i2 += i;
-        this.zzbzc = i2;
-        this.zzbzb = i2;
+        int i3 = i + i2;
+        this.zzbzc = i3;
+        this.zzbzb = i3;
         this.zzbzd = i;
     }
 
@@ -79,7 +79,7 @@ public final class zzaba {
             throw zzabi.zzwb();
         } else {
             String str = new String(this.buffer, this.zzbzd, zzvs, zzabh.UTF_8);
-            this.zzbzd += zzvs;
+            this.zzbzd = zzvs + this.zzbzd;
             return str;
         }
     }
@@ -111,14 +111,14 @@ public final class zzaba {
         if (i < 0) {
             throw zzabi.zzwc();
         }
-        i += this.zzbzd;
-        int i2 = this.zzbtw;
-        if (i > i2) {
+        int i2 = this.zzbzd + i;
+        int i3 = this.zzbtw;
+        if (i2 > i3) {
             throw zzabi.zzwb();
         }
-        this.zzbtw = i;
+        this.zzbtw = i2;
         zzts();
-        return i2;
+        return i3;
     }
 
     public final void zzal(int i) throws zzabi {
@@ -180,18 +180,9 @@ public final class zzaba {
 
     final void zzd(int i, int i2) {
         if (i > this.zzbzd - this.zzbza) {
-            int i3 = this.zzbzd - this.zzbza;
-            StringBuilder stringBuilder = new StringBuilder(50);
-            stringBuilder.append("Position ");
-            stringBuilder.append(i);
-            stringBuilder.append(" is beyond current ");
-            stringBuilder.append(i3);
-            throw new IllegalArgumentException(stringBuilder.toString());
+            throw new IllegalArgumentException("Position " + i + " is beyond current " + (this.zzbzd - this.zzbza));
         } else if (i < 0) {
-            StringBuilder stringBuilder2 = new StringBuilder(24);
-            stringBuilder2.append("Bad position ");
-            stringBuilder2.append(i);
-            throw new IllegalArgumentException(stringBuilder2.toString());
+            throw new IllegalArgumentException("Bad position " + i);
         } else {
             this.zzbzd = this.zzbza + i;
             this.zzbze = i2;
@@ -227,51 +218,43 @@ public final class zzaba {
         if (zzvx >= (byte) 0) {
             return zzvx;
         }
-        int i;
-        int i2 = zzvx & 127;
+        int i = zzvx & 127;
         byte zzvx2 = zzvx();
         if (zzvx2 >= (byte) 0) {
-            i = zzvx2 << 7;
-        } else {
-            i2 |= (zzvx2 & 127) << 7;
-            zzvx2 = zzvx();
-            if (zzvx2 >= (byte) 0) {
-                i = zzvx2 << 14;
-            } else {
-                i2 |= (zzvx2 & 127) << 14;
-                zzvx2 = zzvx();
-                if (zzvx2 >= (byte) 0) {
-                    i = zzvx2 << 21;
-                } else {
-                    i2 |= (zzvx2 & 127) << 21;
-                    zzvx2 = zzvx();
-                    i2 |= zzvx2 << 28;
-                    if (zzvx2 >= (byte) 0) {
-                        return i2;
-                    }
-                    for (i = 0; i < 5; i++) {
-                        if (zzvx() >= (byte) 0) {
-                            return i2;
-                        }
-                    }
-                    throw zzabi.zzwd();
-                }
+            return i | (zzvx2 << 7);
+        }
+        i |= (zzvx2 & 127) << 7;
+        zzvx2 = zzvx();
+        if (zzvx2 >= (byte) 0) {
+            return i | (zzvx2 << 14);
+        }
+        i |= (zzvx2 & 127) << 14;
+        zzvx2 = zzvx();
+        if (zzvx2 >= (byte) 0) {
+            return i | (zzvx2 << 21);
+        }
+        i |= (zzvx2 & 127) << 21;
+        zzvx2 = zzvx();
+        i |= zzvx2 << 28;
+        if (zzvx2 >= (byte) 0) {
+            return i;
+        }
+        for (int i2 = 0; i2 < 5; i2++) {
+            if (zzvx() >= (byte) 0) {
+                return i;
             }
         }
-        return i2 | i;
+        throw zzabi.zzwd();
     }
 
     public final long zzvt() throws IOException {
-        int i = 0;
         long j = 0;
-        while (i < 64) {
+        for (int i = 0; i < 64; i += 7) {
             byte zzvx = zzvx();
-            long j2 = j | (((long) (zzvx & 127)) << i);
+            j |= ((long) (zzvx & 127)) << i;
             if ((zzvx & 128) == 0) {
-                return j2;
+                return j;
             }
-            i += 7;
-            j = j2;
         }
         throw zzabi.zzwd();
     }
@@ -281,7 +264,9 @@ public final class zzaba {
     }
 
     public final long zzvv() throws IOException {
-        return (((((((((long) zzvx()) & 255) | ((((long) zzvx()) & 255) << 8)) | ((((long) zzvx()) & 255) << 16)) | ((((long) zzvx()) & 255) << 24)) | ((((long) zzvx()) & 255) << 32)) | ((((long) zzvx()) & 255) << 40)) | ((((long) zzvx()) & 255) << 48)) | ((((long) zzvx()) & 255) << 56);
+        byte zzvx = zzvx();
+        byte zzvx2 = zzvx();
+        return ((((((((((long) zzvx2) & 255) << 8) | (((long) zzvx) & 255)) | ((((long) zzvx()) & 255) << 16)) | ((((long) zzvx()) & 255) << 24)) | ((((long) zzvx()) & 255) << 32)) | ((((long) zzvx()) & 255) << 40)) | ((((long) zzvx()) & 255) << 48)) | ((((long) zzvx()) & 255) << 56);
     }
 
     public final int zzvw() {

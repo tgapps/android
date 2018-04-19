@@ -71,17 +71,18 @@ public class Frame {
     }
 
     public ByteBuffer getGrayscaleImageData() {
+        int i = 0;
         if (this.mBitmap == null) {
             return this.zzan;
         }
         int width = this.mBitmap.getWidth();
         int height = this.mBitmap.getHeight();
-        int i = width * height;
-        int[] iArr = new int[i];
+        int[] iArr = new int[(width * height)];
         this.mBitmap.getPixels(iArr, 0, width, 0, 0, width, height);
-        byte[] bArr = new byte[i];
-        for (int i2 = 0; i2 < iArr.length; i2++) {
-            bArr[i2] = (byte) ((int) (((((float) Color.red(iArr[i2])) * 0.299f) + (((float) Color.green(iArr[i2])) * 0.587f)) + (((float) Color.blue(iArr[i2])) * 0.114f)));
+        byte[] bArr = new byte[(width * height)];
+        while (i < iArr.length) {
+            bArr[i] = (byte) ((int) (((((float) Color.red(iArr[i])) * 0.299f) + (((float) Color.green(iArr[i])) * 0.587f)) + (((float) Color.blue(iArr[i])) * 0.114f)));
+            i++;
         }
         return ByteBuffer.wrap(bArr);
     }

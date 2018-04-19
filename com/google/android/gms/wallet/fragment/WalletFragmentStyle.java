@@ -32,15 +32,10 @@ public final class WalletFragmentStyle extends AbstractSafeParcelable {
         if (i >= 0) {
             return zza(0, (float) i);
         }
-        if (i != -1) {
-            if (i != -2) {
-                StringBuilder stringBuilder = new StringBuilder(39);
-                stringBuilder.append("Unexpected dimension value: ");
-                stringBuilder.append(i);
-                throw new IllegalArgumentException(stringBuilder.toString());
-            }
+        if (i == -1 || i == -2) {
+            return zzc(TsExtractor.TS_STREAM_TYPE_AC3, i);
         }
-        return zzc(TsExtractor.TS_STREAM_TYPE_AC3, i);
+        throw new IllegalArgumentException("Unexpected dimension value: " + i);
     }
 
     private static long zza(int i, float f) {
@@ -53,10 +48,7 @@ public final class WalletFragmentStyle extends AbstractSafeParcelable {
             case 5:
                 return zzc(i, Float.floatToIntBits(f));
             default:
-                StringBuilder stringBuilder = new StringBuilder(30);
-                stringBuilder.append("Unrecognized unit: ");
-                stringBuilder.append(i);
-                throw new IllegalArgumentException(stringBuilder.toString());
+                throw new IllegalArgumentException("Unrecognized unit: " + i);
         }
     }
 
@@ -66,17 +58,15 @@ public final class WalletFragmentStyle extends AbstractSafeParcelable {
             if (peekValue != null) {
                 long zzc;
                 Bundle bundle = this.zzgb;
-                int i2 = peekValue.type;
-                if (i2 == 5) {
-                    zzc = zzc(128, peekValue.data);
-                } else if (i2 != 16) {
-                    int i3 = peekValue.type;
-                    StringBuilder stringBuilder = new StringBuilder(38);
-                    stringBuilder.append("Unexpected dimension type: ");
-                    stringBuilder.append(i3);
-                    throw new IllegalArgumentException(stringBuilder.toString());
-                } else {
-                    zzc = zza(peekValue.data);
+                switch (peekValue.type) {
+                    case 5:
+                        zzc = zzc(128, peekValue.data);
+                        break;
+                    case 16:
+                        zzc = zza(peekValue.data);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unexpected dimension type: " + peekValue.type);
                 }
                 bundle.putLong(str, zzc);
             }
@@ -86,12 +76,13 @@ public final class WalletFragmentStyle extends AbstractSafeParcelable {
     private final void zza(TypedArray typedArray, int i, String str, String str2) {
         if (!this.zzgb.containsKey(str) && !this.zzgb.containsKey(str2)) {
             TypedValue peekValue = typedArray.peekValue(i);
-            if (peekValue != null) {
-                if (peekValue.type < 28 || peekValue.type > 31) {
-                    this.zzgb.putInt(str2, peekValue.resourceId);
-                } else {
-                    this.zzgb.putInt(str, peekValue.data);
-                }
+            if (peekValue == null) {
+                return;
+            }
+            if (peekValue.type < 28 || peekValue.type > 31) {
+                this.zzgb.putInt(str2, peekValue.resourceId);
+            } else {
+                this.zzgb.putInt(str, peekValue.data);
             }
         }
     }
@@ -130,20 +121,21 @@ public final class WalletFragmentStyle extends AbstractSafeParcelable {
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
-        i = SafeParcelWriter.beginObjectHeader(parcel);
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeBundle(parcel, 2, this.zzgb, false);
         SafeParcelWriter.writeInt(parcel, 3, this.zzgc);
-        SafeParcelWriter.finishObjectHeader(parcel, i);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
     public final int zza(String str, DisplayMetrics displayMetrics, int i) {
         if (!this.zzgb.containsKey(str)) {
             return i;
         }
+        int i2;
         long j = this.zzgb.getLong(str);
-        int i2 = (int) (j >>> 32);
+        int i3 = (int) (j >>> 32);
         i = (int) j;
-        switch (i2) {
+        switch (i3) {
             case 0:
                 i2 = 0;
                 break;
@@ -162,18 +154,12 @@ public final class WalletFragmentStyle extends AbstractSafeParcelable {
             case 5:
                 i2 = 5;
                 break;
+            case 128:
+                return TypedValue.complexToDimensionPixelSize(i, displayMetrics);
+            case TsExtractor.TS_STREAM_TYPE_AC3 /*129*/:
+                return i;
             default:
-                switch (i2) {
-                    case 128:
-                        return TypedValue.complexToDimensionPixelSize(i, displayMetrics);
-                    case TsExtractor.TS_STREAM_TYPE_AC3 /*129*/:
-                        return i;
-                    default:
-                        StringBuilder stringBuilder = new StringBuilder(36);
-                        stringBuilder.append("Unexpected unit or type: ");
-                        stringBuilder.append(i2);
-                        throw new IllegalStateException(stringBuilder.toString());
-                }
+                throw new IllegalStateException("Unexpected unit or type: " + i3);
         }
         return Math.round(TypedValue.applyDimension(i2, Float.intBitsToFloat(i), displayMetrics));
     }

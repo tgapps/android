@@ -10,10 +10,13 @@ public final class zzh implements Creator<CountrySpecification> {
         String str = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
-            if (SafeParcelReader.getFieldId(readHeader) != 2) {
-                SafeParcelReader.skipUnknownField(parcel, readHeader);
-            } else {
-                str = SafeParcelReader.createString(parcel, readHeader);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 2:
+                    str = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);

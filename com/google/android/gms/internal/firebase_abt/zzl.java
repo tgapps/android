@@ -23,6 +23,6 @@ final class zzl {
     }
 
     public final int hashCode() {
-        return ((527 + this.tag) * 31) + Arrays.hashCode(this.zzac);
+        return ((this.tag + 527) * 31) + Arrays.hashCode(this.zzac);
     }
 }

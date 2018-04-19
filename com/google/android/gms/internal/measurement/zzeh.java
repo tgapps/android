@@ -34,16 +34,18 @@ public final class zzeh extends zzhj {
     }
 
     public final long zza(String str, zzex<Long> com_google_android_gms_internal_measurement_zzex_java_lang_Long) {
-        if (str != null) {
-            Object zzm = zzgd().zzm(str, com_google_android_gms_internal_measurement_zzex_java_lang_Long.getKey());
-            if (!TextUtils.isEmpty(zzm)) {
-                try {
-                    return ((Long) com_google_android_gms_internal_measurement_zzex_java_lang_Long.get(Long.valueOf(Long.parseLong(zzm)))).longValue();
-                } catch (NumberFormatException e) {
-                }
-            }
+        if (str == null) {
+            return ((Long) com_google_android_gms_internal_measurement_zzex_java_lang_Long.get()).longValue();
         }
-        return ((Long) com_google_android_gms_internal_measurement_zzex_java_lang_Long.get()).longValue();
+        Object zzm = zzgd().zzm(str, com_google_android_gms_internal_measurement_zzex_java_lang_Long.getKey());
+        if (TextUtils.isEmpty(zzm)) {
+            return ((Long) com_google_android_gms_internal_measurement_zzex_java_lang_Long.get()).longValue();
+        }
+        try {
+            return ((Long) com_google_android_gms_internal_measurement_zzex_java_lang_Long.get(Long.valueOf(Long.parseLong(zzm)))).longValue();
+        } catch (NumberFormatException e) {
+            return ((Long) com_google_android_gms_internal_measurement_zzex_java_lang_Long.get()).longValue();
+        }
     }
 
     public final /* bridge */ /* synthetic */ void zzab() {
@@ -55,26 +57,25 @@ public final class zzeh extends zzhj {
     }
 
     final Boolean zzas(String str) {
+        Boolean bool = null;
         Preconditions.checkNotEmpty(str);
         try {
             if (getContext().getPackageManager() == null) {
                 zzgg().zzil().log("Failed to load metadata: PackageManager is null");
-                return null;
-            }
-            ApplicationInfo applicationInfo = Wrappers.packageManager(getContext()).getApplicationInfo(getContext().getPackageName(), 128);
-            if (applicationInfo == null) {
-                zzgg().zzil().log("Failed to load metadata: ApplicationInfo is null");
-                return null;
-            } else if (applicationInfo.metaData != null) {
-                return !applicationInfo.metaData.containsKey(str) ? null : Boolean.valueOf(applicationInfo.metaData.getBoolean(str));
             } else {
-                zzgg().zzil().log("Failed to load metadata: Metadata bundle is null");
-                return null;
+                ApplicationInfo applicationInfo = Wrappers.packageManager(getContext()).getApplicationInfo(getContext().getPackageName(), 128);
+                if (applicationInfo == null) {
+                    zzgg().zzil().log("Failed to load metadata: ApplicationInfo is null");
+                } else if (applicationInfo.metaData == null) {
+                    zzgg().zzil().log("Failed to load metadata: Metadata bundle is null");
+                } else if (applicationInfo.metaData.containsKey(str)) {
+                    bool = Boolean.valueOf(applicationInfo.metaData.getBoolean(str));
+                }
             }
         } catch (NameNotFoundException e) {
             zzgg().zzil().zzg("Failed to load metadata: Package name not found", e);
-            return null;
         }
+        return bool;
     }
 
     public final boolean zzat(String str) {
@@ -90,16 +91,18 @@ public final class zzeh extends zzhj {
     }
 
     public final int zzb(String str, zzex<Integer> com_google_android_gms_internal_measurement_zzex_java_lang_Integer) {
-        if (str != null) {
-            Object zzm = zzgd().zzm(str, com_google_android_gms_internal_measurement_zzex_java_lang_Integer.getKey());
-            if (!TextUtils.isEmpty(zzm)) {
-                try {
-                    return ((Integer) com_google_android_gms_internal_measurement_zzex_java_lang_Integer.get(Integer.valueOf(Integer.parseInt(zzm)))).intValue();
-                } catch (NumberFormatException e) {
-                }
-            }
+        if (str == null) {
+            return ((Integer) com_google_android_gms_internal_measurement_zzex_java_lang_Integer.get()).intValue();
         }
-        return ((Integer) com_google_android_gms_internal_measurement_zzex_java_lang_Integer.get()).intValue();
+        Object zzm = zzgd().zzm(str, com_google_android_gms_internal_measurement_zzex_java_lang_Integer.getKey());
+        if (TextUtils.isEmpty(zzm)) {
+            return ((Integer) com_google_android_gms_internal_measurement_zzex_java_lang_Integer.get()).intValue();
+        }
+        try {
+            return ((Integer) com_google_android_gms_internal_measurement_zzex_java_lang_Integer.get(Integer.valueOf(Integer.parseInt(zzm)))).intValue();
+        } catch (NumberFormatException e) {
+            return ((Integer) com_google_android_gms_internal_measurement_zzex_java_lang_Integer.get()).intValue();
+        }
     }
 
     public final /* bridge */ /* synthetic */ Clock zzbt() {
@@ -107,29 +110,26 @@ public final class zzeh extends zzhj {
     }
 
     public final double zzc(String str, zzex<Double> com_google_android_gms_internal_measurement_zzex_java_lang_Double) {
-        if (str != null) {
-            Object zzm = zzgd().zzm(str, com_google_android_gms_internal_measurement_zzex_java_lang_Double.getKey());
-            if (!TextUtils.isEmpty(zzm)) {
-                try {
-                    return ((Double) com_google_android_gms_internal_measurement_zzex_java_lang_Double.get(Double.valueOf(Double.parseDouble(zzm)))).doubleValue();
-                } catch (NumberFormatException e) {
-                }
-            }
+        if (str == null) {
+            return ((Double) com_google_android_gms_internal_measurement_zzex_java_lang_Double.get()).doubleValue();
         }
-        return ((Double) com_google_android_gms_internal_measurement_zzex_java_lang_Double.get()).doubleValue();
+        Object zzm = zzgd().zzm(str, com_google_android_gms_internal_measurement_zzex_java_lang_Double.getKey());
+        if (TextUtils.isEmpty(zzm)) {
+            return ((Double) com_google_android_gms_internal_measurement_zzex_java_lang_Double.get()).doubleValue();
+        }
+        try {
+            return ((Double) com_google_android_gms_internal_measurement_zzex_java_lang_Double.get(Double.valueOf(Double.parseDouble(zzm)))).doubleValue();
+        } catch (NumberFormatException e) {
+            return ((Double) com_google_android_gms_internal_measurement_zzex_java_lang_Double.get()).doubleValue();
+        }
     }
 
     public final boolean zzd(String str, zzex<Boolean> com_google_android_gms_internal_measurement_zzex_java_lang_Boolean) {
-        Object zzm;
-        if (str != null) {
-            zzm = zzgd().zzm(str, com_google_android_gms_internal_measurement_zzex_java_lang_Boolean.getKey());
-            if (!TextUtils.isEmpty(zzm)) {
-                zzm = com_google_android_gms_internal_measurement_zzex_java_lang_Boolean.get(Boolean.valueOf(Boolean.parseBoolean(zzm)));
-                return ((Boolean) zzm).booleanValue();
-            }
+        if (str == null) {
+            return ((Boolean) com_google_android_gms_internal_measurement_zzex_java_lang_Boolean.get()).booleanValue();
         }
-        zzm = com_google_android_gms_internal_measurement_zzex_java_lang_Boolean.get();
-        return ((Boolean) zzm).booleanValue();
+        Object zzm = zzgd().zzm(str, com_google_android_gms_internal_measurement_zzex_java_lang_Boolean.getKey());
+        return TextUtils.isEmpty(zzm) ? ((Boolean) com_google_android_gms_internal_measurement_zzex_java_lang_Boolean.get()).booleanValue() : ((Boolean) com_google_android_gms_internal_measurement_zzex_java_lang_Boolean.get(Boolean.valueOf(Boolean.parseBoolean(zzm)))).booleanValue();
     }
 
     public final boolean zzds() {
@@ -235,35 +235,17 @@ public final class zzeh extends zzhj {
     }
 
     public final String zzhl() {
-        Object e;
-        zzfi zzil;
-        String str;
         try {
             return (String) Class.forName("android.os.SystemProperties").getMethod("get", new Class[]{String.class, String.class}).invoke(null, new Object[]{"debug.firebase.analytics.app", TtmlNode.ANONYMOUS_REGION_ID});
-        } catch (ClassNotFoundException e2) {
-            e = e2;
-            zzil = zzgg().zzil();
-            str = "Could not find SystemProperties class";
-            zzil.zzg(str, e);
-            return TtmlNode.ANONYMOUS_REGION_ID;
-        } catch (NoSuchMethodException e3) {
-            e = e3;
-            zzil = zzgg().zzil();
-            str = "Could not find SystemProperties.get() method";
-            zzil.zzg(str, e);
-            return TtmlNode.ANONYMOUS_REGION_ID;
-        } catch (IllegalAccessException e4) {
-            e = e4;
-            zzil = zzgg().zzil();
-            str = "Could not access SystemProperties.get()";
-            zzil.zzg(str, e);
-            return TtmlNode.ANONYMOUS_REGION_ID;
-        } catch (InvocationTargetException e5) {
-            e = e5;
-            zzil = zzgg().zzil();
-            str = "SystemProperties.get() threw an exception";
-            zzil.zzg(str, e);
-            return TtmlNode.ANONYMOUS_REGION_ID;
+        } catch (ClassNotFoundException e) {
+            zzgg().zzil().zzg("Could not find SystemProperties class", e);
+        } catch (NoSuchMethodException e2) {
+            zzgg().zzil().zzg("Could not find SystemProperties.get() method", e2);
+        } catch (IllegalAccessException e3) {
+            zzgg().zzil().zzg("Could not access SystemProperties.get()", e3);
+        } catch (InvocationTargetException e4) {
+            zzgg().zzil().zzg("SystemProperties.get() threw an exception", e4);
         }
+        return TtmlNode.ANONYMOUS_REGION_ID;
     }
 }

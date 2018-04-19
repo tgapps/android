@@ -9,10 +9,8 @@ import com.google.android.gms.wearable.CapabilityApi.GetCapabilityResult;
 public final class zzo implements CapabilityApi {
     public final PendingResult<GetCapabilityResult> getCapability(GoogleApiClient googleApiClient, String str, int i) {
         boolean z = true;
-        if (i != 0) {
-            if (i != 1) {
-                z = false;
-            }
+        if (!(i == 0 || i == 1)) {
+            z = false;
         }
         Preconditions.checkArgument(z);
         return googleApiClient.enqueue(new zzp(this, googleApiClient, str, i));

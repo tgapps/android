@@ -7,10 +7,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 public final class zzff implements Creator<zzfe> {
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        String str = null;
         int i = 0;
+        String str = null;
         byte[] bArr = null;
-        String str2 = bArr;
+        String str2 = null;
         while (parcel.dataPosition() < validateObjectHeader) {
             int readHeader = SafeParcelReader.readHeader(parcel);
             switch (SafeParcelReader.getFieldId(readHeader)) {
@@ -18,13 +18,13 @@ public final class zzff implements Creator<zzfe> {
                     i = SafeParcelReader.readInt(parcel, readHeader);
                     break;
                 case 3:
-                    str = SafeParcelReader.createString(parcel, readHeader);
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 case 4:
                     bArr = SafeParcelReader.createByteArray(parcel, readHeader);
                     break;
                 case 5:
-                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    str = SafeParcelReader.createString(parcel, readHeader);
                     break;
                 default:
                     SafeParcelReader.skipUnknownField(parcel, readHeader);
@@ -32,7 +32,7 @@ public final class zzff implements Creator<zzfe> {
             }
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new zzfe(i, str, bArr, str2);
+        return new zzfe(i, str2, bArr, str);
     }
 
     public final /* synthetic */ Object[] newArray(int i) {

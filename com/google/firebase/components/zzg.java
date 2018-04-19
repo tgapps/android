@@ -24,37 +24,39 @@ public final class zzg implements ComponentContainer {
             zzh com_google_firebase_components_zzh = new zzh(component);
             for (Class put : component.zze()) {
                 if (hashMap.put(put, com_google_firebase_components_zzh) != null) {
-                    throw new IllegalArgumentException(String.format("Multiple components provide %s.", new Object[]{(Class) r1.next()}));
+                    throw new IllegalArgumentException(String.format("Multiple components provide %s.", new Object[]{(Class) r5.next()}));
                 }
             }
         }
         for (zzh com_google_firebase_components_zzh2 : hashMap.values()) {
             for (Dependency dependency : com_google_firebase_components_zzh2.zzk().zzf()) {
+                zzh com_google_firebase_components_zzh3;
                 if (dependency.zzp()) {
-                    zzh com_google_firebase_components_zzh3 = (zzh) hashMap.get(dependency.zzn());
+                    com_google_firebase_components_zzh3 = (zzh) hashMap.get(dependency.zzn());
                     if (com_google_firebase_components_zzh3 != null) {
-                        com_google_firebase_components_zzh2.zza(com_google_firebase_components_zzh3);
-                        com_google_firebase_components_zzh3.zzb(com_google_firebase_components_zzh2);
+                        zzh com_google_firebase_components_zzh22;
+                        com_google_firebase_components_zzh22.zza(com_google_firebase_components_zzh3);
+                        com_google_firebase_components_zzh3.zzb(com_google_firebase_components_zzh22);
                     }
                 }
             }
         }
         Set<zzh> hashSet = new HashSet(hashMap.values());
         Set hashSet2 = new HashSet();
-        for (zzh com_google_firebase_components_zzh4 : hashSet) {
-            if (com_google_firebase_components_zzh4.zzl()) {
-                hashSet2.add(com_google_firebase_components_zzh4);
+        for (zzh com_google_firebase_components_zzh222 : hashSet) {
+            if (com_google_firebase_components_zzh222.zzl()) {
+                hashSet2.add(com_google_firebase_components_zzh222);
             }
         }
         List arrayList2 = new ArrayList();
         while (!hashSet2.isEmpty()) {
-            com_google_firebase_components_zzh4 = (zzh) hashSet2.iterator().next();
-            hashSet2.remove(com_google_firebase_components_zzh4);
-            arrayList2.add(com_google_firebase_components_zzh4.zzk());
-            for (zzh com_google_firebase_components_zzh5 : com_google_firebase_components_zzh4.zzf()) {
-                com_google_firebase_components_zzh5.zzc(com_google_firebase_components_zzh4);
-                if (com_google_firebase_components_zzh5.zzl()) {
-                    hashSet2.add(com_google_firebase_components_zzh5);
+            com_google_firebase_components_zzh222 = (zzh) hashSet2.iterator().next();
+            hashSet2.remove(com_google_firebase_components_zzh222);
+            arrayList2.add(com_google_firebase_components_zzh222.zzk());
+            for (zzh com_google_firebase_components_zzh32 : com_google_firebase_components_zzh222.zzf()) {
+                com_google_firebase_components_zzh32.zzc(com_google_firebase_components_zzh222);
+                if (com_google_firebase_components_zzh32.zzl()) {
+                    hashSet2.add(com_google_firebase_components_zzh32);
                 }
             }
         }
@@ -77,9 +79,9 @@ public final class zzg implements ComponentContainer {
             return;
         }
         List arrayList3 = new ArrayList();
-        for (zzh com_google_firebase_components_zzh6 : hashSet) {
-            if (!(com_google_firebase_components_zzh6.zzl() || com_google_firebase_components_zzh6.zzm())) {
-                arrayList3.add(com_google_firebase_components_zzh6.zzk());
+        for (zzh com_google_firebase_components_zzh2222 : hashSet) {
+            if (!(com_google_firebase_components_zzh2222.zzl() || com_google_firebase_components_zzh2222.zzm())) {
+                arrayList3.add(com_google_firebase_components_zzh2222.zzk());
             }
         }
         throw new DependencyCycleException(arrayList3);

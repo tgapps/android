@@ -46,14 +46,14 @@ public class zzi implements Parcelable {
     }
 
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+        boolean z = false;
+        if (obj != null) {
+            try {
+                z = getBinder().equals(((zzi) obj).getBinder());
+            } catch (ClassCastException e) {
+            }
         }
-        try {
-            return getBinder().equals(((zzi) obj).getBinder());
-        } catch (ClassCastException e) {
-            return false;
-        }
+        return z;
     }
 
     public int hashCode() {
@@ -69,6 +69,10 @@ public class zzi implements Parcelable {
     }
 
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeStrongBinder(this.zzbqg != null ? this.zzbqg.getBinder() : this.zzbqh.asBinder());
+        if (this.zzbqg != null) {
+            parcel.writeStrongBinder(this.zzbqg.getBinder());
+        } else {
+            parcel.writeStrongBinder(this.zzbqh.asBinder());
+        }
     }
 }

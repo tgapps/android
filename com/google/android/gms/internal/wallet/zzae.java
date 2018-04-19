@@ -38,10 +38,7 @@ final class zzae extends zzaf {
             }
         }
         String valueOf = String.valueOf(connectionResult);
-        StringBuilder stringBuilder = new StringBuilder(75 + String.valueOf(valueOf).length());
-        stringBuilder.append("Create Wallet Objects confirmation UI will not be shown connection result: ");
-        stringBuilder.append(valueOf);
-        Log.e("WalletClientImpl", stringBuilder.toString());
+        Log.e("WalletClientImpl", new StringBuilder(String.valueOf(valueOf).length() + 75).append("Create Wallet Objects confirmation UI will not be shown connection result: ").append(valueOf).toString());
         Intent intent = new Intent();
         intent.putExtra("com.google.android.gms.wallet.EXTRA_ERROR_CODE", 413);
         PendingIntent createPendingResult = activity.createPendingResult(this.zzaa, intent, 1073741824);
@@ -76,14 +73,14 @@ final class zzae extends zzaf {
                 return;
             }
         }
+        int i2;
         Intent intent = new Intent();
         if (connectionResult.isSuccess()) {
-            i = -1;
+            i2 = -1;
             intent.putExtra("com.google.android.gms.wallet.EXTRA_FULL_WALLET", fullWallet);
         } else {
-            int i2 = i == 408 ? 0 : 1;
+            i2 = i == 408 ? 0 : 1;
             intent.putExtra("com.google.android.gms.wallet.EXTRA_ERROR_CODE", i);
-            i = i2;
         }
         PendingIntent createPendingResult = activity.createPendingResult(this.zzaa, intent, 1073741824);
         if (createPendingResult == null) {
@@ -91,7 +88,7 @@ final class zzae extends zzaf {
             return;
         }
         try {
-            createPendingResult.send(i);
+            createPendingResult.send(i2);
         } catch (Throwable e2) {
             Log.w("WalletClientImpl", "Exception setting pending result", e2);
         }
@@ -117,14 +114,14 @@ final class zzae extends zzaf {
                 return;
             }
         }
+        int i2;
         Intent intent = new Intent();
         if (connectionResult.isSuccess()) {
-            i = -1;
+            i2 = -1;
             intent.putExtra("com.google.android.gms.wallet.EXTRA_MASKED_WALLET", maskedWallet);
         } else {
-            int i2 = i == 408 ? 0 : 1;
+            i2 = i == 408 ? 0 : 1;
             intent.putExtra("com.google.android.gms.wallet.EXTRA_ERROR_CODE", i);
-            i = i2;
         }
         PendingIntent createPendingResult = activity.createPendingResult(this.zzaa, intent, 1073741824);
         if (createPendingResult == null) {
@@ -132,7 +129,7 @@ final class zzae extends zzaf {
             return;
         }
         try {
-            createPendingResult.send(i);
+            createPendingResult.send(i2);
         } catch (Throwable e2) {
             Log.w("WalletClientImpl", "Exception setting pending result", e2);
         }
