@@ -5,232 +5,232 @@ import org.telegram.tgnet.ConnectionsManager;
 
 public final class zzay {
     private final byte[] buffer;
+    private final int zzbw;
     private final int zzbx;
-    private final int zzby;
+    private int zzby;
     private int zzbz;
     private int zzca;
     private int zzcb;
-    private int zzcc;
-    private int zzcd = ConnectionsManager.DEFAULT_DATACENTER_ID;
-    private int zzce;
-    private int zzcf = 64;
-    private int zzcg = ConnectionsManager.FileTypeFile;
+    private int zzcc = ConnectionsManager.DEFAULT_DATACENTER_ID;
+    private int zzcd;
+    private int zzce = 64;
+    private int zzcf = ConnectionsManager.FileTypeFile;
 
     private zzay(byte[] bArr, int i, int i2) {
         this.buffer = bArr;
-        this.zzbx = 0;
+        this.zzbw = 0;
         int i3 = i2 + 0;
-        this.zzbz = i3;
         this.zzby = i3;
-        this.zzcb = 0;
+        this.zzbx = i3;
+        this.zzca = 0;
     }
 
     public static zzay zza(byte[] bArr, int i, int i2) {
         return new zzay(bArr, 0, i2);
     }
 
-    private final void zzab() {
-        this.zzbz += this.zzca;
-        int i = this.zzbz;
-        if (i > this.zzcd) {
-            this.zzca = i - this.zzcd;
-            this.zzbz -= this.zzca;
+    private final void zzaa() {
+        this.zzby += this.zzbz;
+        int i = this.zzby;
+        if (i > this.zzcc) {
+            this.zzbz = i - this.zzcc;
+            this.zzby -= this.zzbz;
             return;
         }
-        this.zzca = 0;
+        this.zzbz = 0;
     }
 
-    private final byte zzac() throws IOException {
-        if (this.zzcb == this.zzbz) {
-            throw zzbg.zzag();
+    private final byte zzab() throws IOException {
+        if (this.zzca == this.zzby) {
+            throw zzbg.zzaf();
         }
         byte[] bArr = this.buffer;
-        int i = this.zzcb;
-        this.zzcb = i + 1;
+        int i = this.zzca;
+        this.zzca = i + 1;
         return bArr[i];
     }
 
     private final void zzg(int i) throws zzbg {
-        if (this.zzcc != i) {
+        if (this.zzcb != i) {
             throw new zzbg("Protocol message end-group tag did not match expected tag.");
         }
     }
 
     private final void zzi(int i) throws IOException {
         if (i < 0) {
-            throw zzbg.zzah();
-        } else if (this.zzcb + i > this.zzcd) {
-            zzi(this.zzcd - this.zzcb);
             throw zzbg.zzag();
-        } else if (i <= this.zzbz - this.zzcb) {
-            this.zzcb += i;
+        } else if (this.zzca + i > this.zzcc) {
+            zzi(this.zzcc - this.zzca);
+            throw zzbg.zzaf();
+        } else if (i <= this.zzby - this.zzca) {
+            this.zzca += i;
         } else {
-            throw zzbg.zzag();
+            throw zzbg.zzaf();
         }
     }
 
     public final int getPosition() {
-        return this.zzcb - this.zzbx;
+        return this.zzca - this.zzbw;
     }
 
     public final byte[] readBytes() throws IOException {
-        int zzz = zzz();
-        if (zzz < 0) {
-            throw zzbg.zzah();
-        } else if (zzz == 0) {
-            return zzbk.zzde;
+        int zzy = zzy();
+        if (zzy < 0) {
+            throw zzbg.zzag();
+        } else if (zzy == 0) {
+            return zzbk.zzdd;
         } else {
-            if (zzz > this.zzbz - this.zzcb) {
-                throw zzbg.zzag();
+            if (zzy > this.zzby - this.zzca) {
+                throw zzbg.zzaf();
             }
-            Object obj = new byte[zzz];
-            System.arraycopy(this.buffer, this.zzcb, obj, 0, zzz);
-            this.zzcb = zzz + this.zzcb;
+            Object obj = new byte[zzy];
+            System.arraycopy(this.buffer, this.zzca, obj, 0, zzy);
+            this.zzca = zzy + this.zzca;
             return obj;
         }
     }
 
     public final String readString() throws IOException {
-        int zzz = zzz();
-        if (zzz < 0) {
-            throw zzbg.zzah();
-        } else if (zzz > this.zzbz - this.zzcb) {
+        int zzy = zzy();
+        if (zzy < 0) {
             throw zzbg.zzag();
+        } else if (zzy > this.zzby - this.zzca) {
+            throw zzbg.zzaf();
         } else {
-            String str = new String(this.buffer, this.zzcb, zzz, zzbf.UTF_8);
-            this.zzcb = zzz + this.zzcb;
+            String str = new String(this.buffer, this.zzca, zzy, zzbf.UTF_8);
+            this.zzca = zzy + this.zzca;
             return str;
         }
     }
 
     public final void zza(zzbh com_google_android_gms_internal_config_zzbh) throws IOException {
-        int zzz = zzz();
-        if (this.zzce >= this.zzcf) {
+        int zzy = zzy();
+        if (this.zzcd >= this.zzce) {
             throw new zzbg("Protocol message had too many levels of nesting.  May be malicious.  Use CodedInputStream.setRecursionLimit() to increase the depth limit.");
-        } else if (zzz < 0) {
-            throw zzbg.zzah();
+        } else if (zzy < 0) {
+            throw zzbg.zzag();
         } else {
-            zzz += this.zzcb;
-            int i = this.zzcd;
-            if (zzz > i) {
-                throw zzbg.zzag();
+            zzy += this.zzca;
+            int i = this.zzcc;
+            if (zzy > i) {
+                throw zzbg.zzaf();
             }
-            this.zzcd = zzz;
-            zzab();
-            this.zzce++;
+            this.zzcc = zzy;
+            zzaa();
+            this.zzcd++;
             com_google_android_gms_internal_config_zzbh.zza(this);
             zzg(0);
-            this.zzce--;
-            this.zzcd = i;
-            zzab();
+            this.zzcd--;
+            this.zzcc = i;
+            zzaa();
         }
     }
 
     public final byte[] zza(int i, int i2) {
         if (i2 == 0) {
-            return zzbk.zzde;
+            return zzbk.zzdd;
         }
         Object obj = new byte[i2];
-        System.arraycopy(this.buffer, this.zzbx + i, obj, 0, i2);
+        System.arraycopy(this.buffer, this.zzbw + i, obj, 0, i2);
         return obj;
     }
 
-    public final long zzaa() throws IOException {
-        byte zzac = zzac();
-        byte zzac2 = zzac();
-        return ((((((((((long) zzac2) & 255) << 8) | (((long) zzac) & 255)) | ((((long) zzac()) & 255) << 16)) | ((((long) zzac()) & 255) << 24)) | ((((long) zzac()) & 255) << 32)) | ((((long) zzac()) & 255) << 40)) | ((((long) zzac()) & 255) << 48)) | ((((long) zzac()) & 255) << 56);
-    }
-
     final void zzb(int i, int i2) {
-        if (i > this.zzcb - this.zzbx) {
-            throw new IllegalArgumentException("Position " + i + " is beyond current " + (this.zzcb - this.zzbx));
+        if (i > this.zzca - this.zzbw) {
+            throw new IllegalArgumentException("Position " + i + " is beyond current " + (this.zzca - this.zzbw));
         } else if (i < 0) {
             throw new IllegalArgumentException("Bad position " + i);
         } else {
-            this.zzcb = this.zzbx + i;
-            this.zzcc = i2;
+            this.zzca = this.zzbw + i;
+            this.zzcb = i2;
         }
     }
 
     public final boolean zzh(int i) throws IOException {
         switch (i & 7) {
             case 0:
-                zzz();
+                zzy();
                 return true;
             case 1:
-                zzaa();
+                zzz();
                 return true;
             case 2:
-                zzi(zzz());
+                zzi(zzy());
                 return true;
             case 3:
                 break;
             case 4:
                 return false;
             case 5:
-                zzac();
-                zzac();
-                zzac();
-                zzac();
+                zzab();
+                zzab();
+                zzab();
+                zzab();
                 return true;
             default:
                 throw new zzbg("Protocol message tag had invalid wire type.");
         }
-        int zzy;
+        int zzx;
         do {
-            zzy = zzy();
-            if (zzy != 0) {
+            zzx = zzx();
+            if (zzx != 0) {
             }
             zzg(((i >>> 3) << 3) | 4);
             return true;
-        } while (zzh(zzy));
+        } while (zzh(zzx));
         zzg(((i >>> 3) << 3) | 4);
         return true;
     }
 
-    public final int zzy() throws IOException {
-        if (this.zzcb == this.zzbz) {
-            this.zzcc = 0;
+    public final int zzx() throws IOException {
+        if (this.zzca == this.zzby) {
+            this.zzcb = 0;
             return 0;
         }
-        this.zzcc = zzz();
-        if (this.zzcc != 0) {
-            return this.zzcc;
+        this.zzcb = zzy();
+        if (this.zzcb != 0) {
+            return this.zzcb;
         }
         throw new zzbg("Protocol message contained an invalid tag (zero).");
     }
 
-    public final int zzz() throws IOException {
-        byte zzac = zzac();
-        if (zzac >= (byte) 0) {
-            return zzac;
+    public final int zzy() throws IOException {
+        byte zzab = zzab();
+        if (zzab >= (byte) 0) {
+            return zzab;
         }
-        int i = zzac & 127;
-        byte zzac2 = zzac();
-        if (zzac2 >= (byte) 0) {
-            return i | (zzac2 << 7);
+        int i = zzab & 127;
+        byte zzab2 = zzab();
+        if (zzab2 >= (byte) 0) {
+            return i | (zzab2 << 7);
         }
-        i |= (zzac2 & 127) << 7;
-        zzac2 = zzac();
-        if (zzac2 >= (byte) 0) {
-            return i | (zzac2 << 14);
+        i |= (zzab2 & 127) << 7;
+        zzab2 = zzab();
+        if (zzab2 >= (byte) 0) {
+            return i | (zzab2 << 14);
         }
-        i |= (zzac2 & 127) << 14;
-        zzac2 = zzac();
-        if (zzac2 >= (byte) 0) {
-            return i | (zzac2 << 21);
+        i |= (zzab2 & 127) << 14;
+        zzab2 = zzab();
+        if (zzab2 >= (byte) 0) {
+            return i | (zzab2 << 21);
         }
-        i |= (zzac2 & 127) << 21;
-        zzac2 = zzac();
-        i |= zzac2 << 28;
-        if (zzac2 >= (byte) 0) {
+        i |= (zzab2 & 127) << 21;
+        zzab2 = zzab();
+        i |= zzab2 << 28;
+        if (zzab2 >= (byte) 0) {
             return i;
         }
         for (int i2 = 0; i2 < 5; i2++) {
-            if (zzac() >= (byte) 0) {
+            if (zzab() >= (byte) 0) {
                 return i;
             }
         }
         throw new zzbg("CodedInputStream encountered a malformed varint.");
+    }
+
+    public final long zzz() throws IOException {
+        byte zzab = zzab();
+        byte zzab2 = zzab();
+        return ((((((((((long) zzab2) & 255) << 8) | (((long) zzab) & 255)) | ((((long) zzab()) & 255) << 16)) | ((((long) zzab()) & 255) << 24)) | ((((long) zzab()) & 255) << 32)) | ((((long) zzab()) & 255) << 40)) | ((((long) zzab()) & 255) << 48)) | ((((long) zzab()) & 255) << 56);
     }
 }

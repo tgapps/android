@@ -262,6 +262,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                     LocationActivity.this.mapViewClip.setVisibility(8);
                     LocationActivity.this.searchListView.setVisibility(0);
                     LocationActivity.this.searchListView.setEmptyView(LocationActivity.this.emptyView);
+                    LocationActivity.this.emptyView.showTextView();
                 }
 
                 public void onSearchCollapse() {
@@ -282,6 +283,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                         if (text.length() != 0) {
                             LocationActivity.this.searchWas = true;
                         }
+                        LocationActivity.this.emptyView.showProgress();
                         LocationActivity.this.searchAdapter.searchDelayed(text, LocationActivity.this.userLocation);
                     }
                 }
@@ -380,7 +382,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                             if (LocationActivity.this.myLocation != null) {
                                 AndroidUtilities.runOnUIThread(new Runnable() {
                                     public void run() {
-                                        LocationActivity.this.adapter.searchGooglePlacesWithQuery(null, LocationActivity.this.myLocation);
+                                        LocationActivity.this.adapter.searchPlacesWithQuery(null, LocationActivity.this.myLocation, true);
                                     }
                                 });
                             }
@@ -436,11 +438,12 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 }
             }
         });
-        this.adapter.setDelegate(new BaseLocationAdapterDelegate() {
+        this.adapter.setDelegate(this.dialogId, new BaseLocationAdapterDelegate() {
             public void didLoadedSearchResult(ArrayList<TL_messageMediaVenue> places) {
-                if (!LocationActivity.this.wasResults && !places.isEmpty()) {
+                if (!(LocationActivity.this.wasResults || places.isEmpty())) {
                     LocationActivity.this.wasResults = true;
                 }
+                LocationActivity.this.emptyView.showTextView();
             }
         });
         this.adapter.setOverScrollHeight(this.overScrollHeight);
@@ -1033,7 +1036,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             if (this.adapter != null) {
                 if (this.adapter.isPulledUp()) {
-                    this.adapter.searchGooglePlacesWithQuery(null, this.myLocation);
+                    this.adapter.searchPlacesWithQuery(null, this.myLocation, true);
                 }
                 this.adapter.setGpsLocation(this.myLocation);
             }
@@ -1208,6 +1211,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
     public void onResume() {
         super.onResume();
+        AndroidUtilities.requestAdjustResize(getParentActivity(), this.classGuid);
         AndroidUtilities.removeAdjustResize(getParentActivity(), this.classGuid);
         if (this.mapView != null && this.mapsInitialized) {
             try {

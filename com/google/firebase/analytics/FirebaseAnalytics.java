@@ -10,7 +10,7 @@ import com.google.android.gms.tasks.Task;
 
 @Keep
 public final class FirebaseAnalytics {
-    private final zzgl zzacr;
+    private final zzgl zzacw;
 
     public static class Event {
     }
@@ -23,48 +23,48 @@ public final class FirebaseAnalytics {
 
     public FirebaseAnalytics(zzgl com_google_android_gms_internal_measurement_zzgl) {
         Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzgl);
-        this.zzacr = com_google_android_gms_internal_measurement_zzgl;
+        this.zzacw = com_google_android_gms_internal_measurement_zzgl;
     }
 
     @Keep
     public static FirebaseAnalytics getInstance(Context context) {
-        return zzgl.zzg(context).zzjp();
+        return zzgl.zzg(context).zzjs();
     }
 
     public final Task<String> getAppInstanceId() {
-        return this.zzacr.zzfu().getAppInstanceId();
+        return this.zzacw.zzfu().getAppInstanceId();
     }
 
     public final void logEvent(String str, Bundle bundle) {
-        this.zzacr.zzjo().logEvent(str, bundle);
+        this.zzacw.zzjr().logEvent(str, bundle);
     }
 
     public final void resetAnalyticsData() {
-        this.zzacr.zzfu().resetAnalyticsData();
+        this.zzacw.zzfu().resetAnalyticsData();
     }
 
     public final void setAnalyticsCollectionEnabled(boolean z) {
-        this.zzacr.zzjo().setMeasurementEnabled(z);
+        this.zzacw.zzjr().setMeasurementEnabled(z);
     }
 
     @Keep
     public final void setCurrentScreen(Activity activity, String str, String str2) {
-        this.zzacr.zzfy().setCurrentScreen(activity, str, str2);
+        this.zzacw.zzfy().setCurrentScreen(activity, str, str2);
     }
 
     public final void setMinimumSessionDuration(long j) {
-        this.zzacr.zzjo().setMinimumSessionDuration(j);
+        this.zzacw.zzjr().setMinimumSessionDuration(j);
     }
 
     public final void setSessionTimeoutDuration(long j) {
-        this.zzacr.zzjo().setSessionTimeoutDuration(j);
+        this.zzacw.zzjr().setSessionTimeoutDuration(j);
     }
 
     public final void setUserId(String str) {
-        this.zzacr.zzjo().setUserPropertyInternal("app", "_id", str);
+        this.zzacw.zzjr().setUserPropertyInternal("app", "_id", str);
     }
 
     public final void setUserProperty(String str, String str2) {
-        this.zzacr.zzjo().setUserProperty(str, str2);
+        this.zzacw.zzjr().setUserProperty(str, str2);
     }
 }

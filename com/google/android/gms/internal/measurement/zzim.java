@@ -1,14 +1,28 @@
 package com.google.android.gms.internal.measurement;
 
-final class zzim extends zzem {
-    private final /* synthetic */ zzil zzapy;
+import android.os.RemoteException;
 
-    zzim(zzil com_google_android_gms_internal_measurement_zzil, zzgl com_google_android_gms_internal_measurement_zzgl) {
-        this.zzapy = com_google_android_gms_internal_measurement_zzil;
-        super(com_google_android_gms_internal_measurement_zzgl);
+final class zzim implements Runnable {
+    private final /* synthetic */ zzdz zzane;
+    private final /* synthetic */ zzii zzape;
+
+    zzim(zzii com_google_android_gms_internal_measurement_zzii, zzdz com_google_android_gms_internal_measurement_zzdz) {
+        this.zzape = com_google_android_gms_internal_measurement_zzii;
+        this.zzane = com_google_android_gms_internal_measurement_zzdz;
     }
 
     public final void run() {
-        this.zzapy.zzcv();
+        zzey zzd = this.zzape.zzaoy;
+        if (zzd == null) {
+            this.zzape.zzge().zzim().log("Discarding data. Failed to send app launch");
+            return;
+        }
+        try {
+            zzd.zza(this.zzane);
+            this.zzape.zza(zzd, null, this.zzane);
+            this.zzape.zzcu();
+        } catch (RemoteException e) {
+            this.zzape.zzge().zzim().zzg("Failed to send app launch to the service", e);
+        }
     }
 }

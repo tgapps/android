@@ -63,6 +63,11 @@ public class BottomSheet extends Dialog {
     private View customView;
     private DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
     private BottomSheetDelegateInterface delegate;
+    private Runnable dismissRunnable = new Runnable() {
+        public void run() {
+            BottomSheet.this.dismiss();
+        }
+    };
     private boolean dismissed;
     private boolean focusable;
     protected boolean fullWidth;
@@ -216,6 +221,10 @@ public class BottomSheet extends Dialog {
         public Builder setApplyBottomPadding(boolean value) {
             this.bottomSheet.applyBottomPadding = value;
             return this;
+        }
+
+        public Runnable getDismissRunnable() {
+            return this.bottomSheet.dismissRunnable;
         }
 
         public BottomSheet setUseFullWidth(boolean value) {
@@ -706,7 +715,7 @@ public class BottomSheet extends Dialog {
         if (VERSION.SDK_INT >= 18) {
             this.layoutCount = 2;
             this.containerView.setTranslationY((float) this.containerView.getMeasuredHeight());
-            Runnable anonymousClass6 = new Runnable() {
+            Runnable anonymousClass7 = new Runnable() {
                 public void run() {
                     if (BottomSheet.this.startAnimationRunnable == this && !BottomSheet.this.dismissed) {
                         BottomSheet.this.startAnimationRunnable = null;
@@ -714,8 +723,8 @@ public class BottomSheet extends Dialog {
                     }
                 }
             };
-            this.startAnimationRunnable = anonymousClass6;
-            AndroidUtilities.runOnUIThread(anonymousClass6, 150);
+            this.startAnimationRunnable = anonymousClass7;
+            AndroidUtilities.runOnUIThread(anonymousClass7, 150);
             return;
         }
         startOpenAnimation();

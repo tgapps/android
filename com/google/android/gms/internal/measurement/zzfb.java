@@ -11,30 +11,32 @@ import com.google.android.gms.common.api.internal.GoogleServices;
 import com.google.android.gms.common.util.Clock;
 import com.google.android.gms.common.wrappers.InstantApps;
 import com.google.firebase.iid.FirebaseInstanceId;
+import java.math.BigInteger;
+import java.util.Locale;
 
-public final class zzfb extends zzhk {
-    private String zzadh;
-    private String zzado;
-    private long zzads;
-    private int zzaei;
+public final class zzfb extends zzhh {
+    private String zzadm;
+    private String zzadt;
+    private long zzadx;
+    private int zzaen;
     private int zzaie;
     private long zzaif;
-    private String zztb;
-    private String zztc;
-    private String zztd;
+    private String zztg;
+    private String zzth;
+    private String zzti;
 
     zzfb(zzgl com_google_android_gms_internal_measurement_zzgl) {
         super(com_google_android_gms_internal_measurement_zzgl);
     }
 
-    private final String zzgl() {
+    private final String zzgj() {
         String str = null;
         zzab();
-        if (!zzgi().zzd(this.zztd, zzew.zzaib) || this.zzacr.isEnabled()) {
+        if (!zzgg().zzay(this.zzti) || this.zzacw.isEnabled()) {
             try {
                 str = FirebaseInstanceId.getInstance().getId();
             } catch (IllegalStateException e) {
-                zzgg().zzin().log("Failed to retrieve Firebase Instance Id");
+                zzge().zzip().log("Failed to retrieve Firebase Instance Id");
             }
         }
         return str;
@@ -46,7 +48,7 @@ public final class zzfb extends zzhk {
 
     final String getGmpAppId() {
         zzch();
-        return this.zzadh;
+        return this.zzadm;
     }
 
     public final /* bridge */ /* synthetic */ void zzab() {
@@ -55,59 +57,55 @@ public final class zzfb extends zzhk {
 
     final String zzah() {
         zzch();
-        return this.zztd;
+        return this.zzti;
     }
 
-    final zzec zzbd(String str) {
+    final zzdz zzbi(String str) {
         zzab();
         String zzah = zzah();
         String gmpAppId = getGmpAppId();
         zzch();
-        String str2 = this.zztc;
-        long zzii = (long) zzii();
+        String str2 = this.zzth;
+        long zzij = (long) zzij();
         zzch();
-        String str3 = this.zzado;
+        String str3 = this.zzadt;
         zzch();
         zzab();
         if (this.zzaif == 0) {
-            this.zzaif = this.zzacr.zzgc().zzd(getContext(), getContext().getPackageName());
+            this.zzaif = this.zzacw.zzgb().zzd(getContext(), getContext().getPackageName());
         }
         long j = this.zzaif;
-        boolean isEnabled = this.zzacr.isEnabled();
-        boolean z = !zzgh().zzakm;
-        String zzgl = zzgl();
+        boolean isEnabled = this.zzacw.isEnabled();
+        boolean z = !zzgf().zzakn;
+        String zzgj = zzgj();
         zzch();
-        long zzju = this.zzacr.zzju();
-        int zzij = zzij();
-        Boolean zzas = zzgi().zzas("google_analytics_adid_collection_enabled");
+        long zzjt = this.zzacw.zzjt();
+        int zzik = zzik();
+        Boolean zzas = zzgg().zzas("google_analytics_adid_collection_enabled");
         boolean z2 = zzas == null || zzas.booleanValue();
         boolean booleanValue = Boolean.valueOf(z2).booleanValue();
-        zzas = zzgi().zzas("google_analytics_ssaid_collection_enabled");
+        zzas = zzgg().zzas("google_analytics_ssaid_collection_enabled");
         z2 = zzas == null || zzas.booleanValue();
-        return new zzec(zzah, gmpAppId, str2, zzii, str3, 12451, j, str, isEnabled, z, zzgl, 0, zzju, zzij, booleanValue, Boolean.valueOf(z2).booleanValue(), zzgh().zzja());
+        return new zzdz(zzah, gmpAppId, str2, zzij, str3, 12451, j, str, isEnabled, z, zzgj, 0, zzjt, zzik, booleanValue, Boolean.valueOf(z2).booleanValue(), zzgf().zzje());
     }
 
     public final /* bridge */ /* synthetic */ Clock zzbt() {
         return super.zzbt();
     }
 
-    public final /* bridge */ /* synthetic */ void zzfq() {
-        super.zzfq();
-    }
-
     public final /* bridge */ /* synthetic */ void zzfr() {
         super.zzfr();
     }
 
-    public final /* bridge */ /* synthetic */ zzdx zzfs() {
-        return super.zzfs();
+    public final /* bridge */ /* synthetic */ void zzfs() {
+        super.zzfs();
     }
 
-    public final /* bridge */ /* synthetic */ zzee zzft() {
+    public final /* bridge */ /* synthetic */ zzdu zzft() {
         return super.zzft();
     }
 
-    public final /* bridge */ /* synthetic */ zzhm zzfu() {
+    public final /* bridge */ /* synthetic */ zzhk zzfu() {
         return super.zzfu();
     }
 
@@ -119,11 +117,11 @@ public final class zzfb extends zzhk {
         return super.zzfw();
     }
 
-    public final /* bridge */ /* synthetic */ zzil zzfx() {
+    public final /* bridge */ /* synthetic */ zzii zzfx() {
         return super.zzfx();
     }
 
-    public final /* bridge */ /* synthetic */ zzih zzfy() {
+    public final /* bridge */ /* synthetic */ zzif zzfy() {
         return super.zzfy();
     }
 
@@ -131,47 +129,39 @@ public final class zzfb extends zzhk {
         return super.zzfz();
     }
 
-    public final /* bridge */ /* synthetic */ zzei zzga() {
+    public final /* bridge */ /* synthetic */ zzfe zzga() {
         return super.zzga();
     }
 
-    public final /* bridge */ /* synthetic */ zzfe zzgb() {
+    public final /* bridge */ /* synthetic */ zzka zzgb() {
         return super.zzgb();
     }
 
-    public final /* bridge */ /* synthetic */ zzjv zzgc() {
+    public final /* bridge */ /* synthetic */ zzjh zzgc() {
         return super.zzgc();
     }
 
-    public final /* bridge */ /* synthetic */ zzgf zzgd() {
+    public final /* bridge */ /* synthetic */ zzgg zzgd() {
         return super.zzgd();
     }
 
-    public final /* bridge */ /* synthetic */ zzjk zzge() {
+    public final /* bridge */ /* synthetic */ zzfg zzge() {
         return super.zzge();
     }
 
-    public final /* bridge */ /* synthetic */ zzgg zzgf() {
+    public final /* bridge */ /* synthetic */ zzfr zzgf() {
         return super.zzgf();
     }
 
-    public final /* bridge */ /* synthetic */ zzfg zzgg() {
+    public final /* bridge */ /* synthetic */ zzef zzgg() {
         return super.zzgg();
     }
 
-    public final /* bridge */ /* synthetic */ zzfr zzgh() {
-        return super.zzgh();
-    }
-
-    public final /* bridge */ /* synthetic */ zzeh zzgi() {
-        return super.zzgi();
-    }
-
-    protected final boolean zzhh() {
+    protected final boolean zzhf() {
         return true;
     }
 
-    protected final void zzig() {
+    protected final void zzih() {
         int i = 1;
         String str = "unknown";
         String str2 = "Unknown";
@@ -180,12 +170,12 @@ public final class zzfb extends zzhk {
         String packageName = getContext().getPackageName();
         PackageManager packageManager = getContext().getPackageManager();
         if (packageManager == null) {
-            zzgg().zzil().zzg("PackageManager is null, app identity information might be inaccurate. appId", zzfg.zzbh(packageName));
+            zzge().zzim().zzg("PackageManager is null, app identity information might be inaccurate. appId", zzfg.zzbm(packageName));
         } else {
             try {
                 str = packageManager.getInstallerPackageName(packageName);
             } catch (IllegalArgumentException e) {
-                zzgg().zzil().zzg("Error retrieving app installer package name. appId", zzfg.zzbh(packageName));
+                zzge().zzim().zzg("Error retrieving app installer package name. appId", zzfg.zzbm(packageName));
             }
             if (str == null) {
                 str = "manual_install";
@@ -203,73 +193,78 @@ public final class zzfb extends zzhk {
                     i2 = packageInfo.versionCode;
                 }
             } catch (NameNotFoundException e2) {
-                zzgg().zzil().zze("Error retrieving package info. appId, appName", zzfg.zzbh(packageName), str3);
+                zzge().zzim().zze("Error retrieving package info. appId, appName", zzfg.zzbm(packageName), str3);
             }
         }
-        this.zztd = packageName;
-        this.zzado = str;
-        this.zztc = str2;
+        this.zzti = packageName;
+        this.zzadt = str;
+        this.zzth = str2;
         this.zzaie = i2;
-        this.zztb = str3;
+        this.zztg = str3;
         this.zzaif = 0;
         Status initialize = GoogleServices.initialize(getContext());
         int i3 = (initialize == null || !initialize.isSuccess()) ? 0 : 1;
         if (i3 == 0) {
             if (initialize == null) {
-                zzgg().zzil().log("GoogleService failed to initialize (no status)");
+                zzge().zzim().log("GoogleService failed to initialize (no status)");
             } else {
-                zzgg().zzil().zze("GoogleService failed to initialize, status", Integer.valueOf(initialize.getStatusCode()), initialize.getStatusMessage());
+                zzge().zzim().zze("GoogleService failed to initialize, status", Integer.valueOf(initialize.getStatusCode()), initialize.getStatusMessage());
             }
         }
         if (i3 != 0) {
-            Boolean zzas = zzgi().zzas("firebase_analytics_collection_enabled");
-            if (zzgi().zzhi()) {
-                zzgg().zzip().log("Collection disabled with firebase_analytics_collection_deactivated=1");
+            Boolean zzas = zzgg().zzas("firebase_analytics_collection_enabled");
+            if (zzgg().zzhg()) {
+                zzge().zzir().log("Collection disabled with firebase_analytics_collection_deactivated=1");
                 i3 = 0;
             } else if (zzas != null && !zzas.booleanValue()) {
-                zzgg().zzip().log("Collection disabled with firebase_analytics_collection_enabled=0");
+                zzge().zzir().log("Collection disabled with firebase_analytics_collection_enabled=0");
                 i3 = 0;
             } else if (zzas == null && GoogleServices.isMeasurementExplicitlyDisabled()) {
-                zzgg().zzip().log("Collection disabled with google_app_measurement_enable=0");
+                zzge().zzir().log("Collection disabled with google_app_measurement_enable=0");
                 i3 = 0;
             } else {
-                zzgg().zzir().log("Collection enabled");
+                zzge().zzit().log("Collection enabled");
                 i3 = 1;
             }
         } else {
             i3 = 0;
         }
-        this.zzadh = TtmlNode.ANONYMOUS_REGION_ID;
-        this.zzads = 0;
+        this.zzadm = TtmlNode.ANONYMOUS_REGION_ID;
+        this.zzadx = 0;
         try {
             String googleAppId = GoogleServices.getGoogleAppId();
             if (TextUtils.isEmpty(googleAppId)) {
                 googleAppId = TtmlNode.ANONYMOUS_REGION_ID;
             }
-            this.zzadh = googleAppId;
+            this.zzadm = googleAppId;
             if (i3 != 0) {
-                zzgg().zzir().zze("App package, google app id", this.zztd, this.zzadh);
+                zzge().zzit().zze("App package, google app id", this.zzti, this.zzadm);
             }
         } catch (IllegalStateException e3) {
-            zzgg().zzil().zze("getGoogleAppId or isMeasurementEnabled failed with exception. appId", zzfg.zzbh(packageName), e3);
+            zzge().zzim().zze("getGoogleAppId or isMeasurementEnabled failed with exception. appId", zzfg.zzbm(packageName), e3);
         }
         if (VERSION.SDK_INT >= 16) {
             if (!InstantApps.isInstantApp(getContext())) {
                 i = 0;
             }
-            this.zzaei = i;
+            this.zzaen = i;
             return;
         }
-        this.zzaei = 0;
+        this.zzaen = 0;
     }
 
-    final int zzii() {
-        zzch();
-        return this.zzaie;
+    final String zzii() {
+        zzgb().zzlc().nextBytes(new byte[16]);
+        return String.format(Locale.US, "%032x", new Object[]{new BigInteger(1, r0)});
     }
 
     final int zzij() {
         zzch();
-        return this.zzaei;
+        return this.zzaie;
+    }
+
+    final int zzik() {
+        zzch();
+        return this.zzaen;
     }
 }

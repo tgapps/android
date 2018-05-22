@@ -1,16 +1,31 @@
 package com.google.android.gms.internal.measurement;
 
-final class zzic implements Runnable {
-    private final /* synthetic */ zzhm zzaop;
-    private final /* synthetic */ long zzaov;
+import android.os.Bundle;
 
-    zzic(zzhm com_google_android_gms_internal_measurement_zzhm, long j) {
-        this.zzaop = com_google_android_gms_internal_measurement_zzhm;
-        this.zzaov = j;
+final class zzic implements Runnable {
+    private final /* synthetic */ String val$name;
+    private final /* synthetic */ String zzanh;
+    private final /* synthetic */ String zzanj;
+    private final /* synthetic */ zzhk zzanw;
+    private final /* synthetic */ long zzany;
+    private final /* synthetic */ Bundle zzaoe;
+    private final /* synthetic */ boolean zzaof;
+    private final /* synthetic */ boolean zzaog;
+    private final /* synthetic */ boolean zzaoh;
+
+    zzic(zzhk com_google_android_gms_internal_measurement_zzhk, String str, String str2, long j, Bundle bundle, boolean z, boolean z2, boolean z3, String str3) {
+        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
+        this.zzanh = str;
+        this.val$name = str2;
+        this.zzany = j;
+        this.zzaoe = bundle;
+        this.zzaof = z;
+        this.zzaog = z2;
+        this.zzaoh = z3;
+        this.zzanj = str3;
     }
 
     public final void run() {
-        this.zzaop.zzgh().zzakh.set(this.zzaov);
-        this.zzaop.zzgg().zziq().zzg("Minimum session duration set", Long.valueOf(this.zzaov));
+        this.zzanw.zzb(this.zzanh, this.val$name, this.zzany, this.zzaoe, this.zzaof, this.zzaog, this.zzaoh, this.zzanj);
     }
 }

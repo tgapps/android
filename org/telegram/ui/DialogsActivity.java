@@ -12,6 +12,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Outline;
 import android.graphics.PorterDuff.Mode;
@@ -32,6 +33,7 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ContactsController;
@@ -53,6 +55,7 @@ import org.telegram.messenger.support.widget.LinearLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
 import org.telegram.messenger.support.widget.RecyclerView.Adapter;
 import org.telegram.messenger.support.widget.RecyclerView.OnScrollListener;
+import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.Chat;
 import org.telegram.tgnet.TLRPC.ChatInvite;
@@ -103,6 +106,7 @@ import org.telegram.ui.Components.EmptyTextProgressView;
 import org.telegram.ui.Components.FragmentContextView;
 import org.telegram.ui.Components.JoinGroupAlert;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.ProxyDrawable;
 import org.telegram.ui.Components.RadialProgressView;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.RecyclerListView.OnItemClickListener;
@@ -117,6 +121,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
     private boolean cantSendToChannels;
     private boolean checkPermission = true;
     private ChatActivityEnterView commentView;
+    private int currentConnectionState;
     private DialogsActivityDelegate delegate;
     private DialogsAdapter dialogsAdapter;
     private DialogsSearchAdapter dialogsSearchAdapter;
@@ -133,6 +138,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
     private int prevPosition;
     private int prevTop;
     private RadialProgressView progressView;
+    private ProxyDrawable proxyDrawable;
+    private ActionBarMenuItem proxyItem;
+    private boolean proxyItemVisisble;
     private boolean scrollUpdated;
     private EmptyTextProgressView searchEmptyView;
     private String searchString;
@@ -164,6 +172,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
             this.allowSwitchAccount = this.arguments.getBoolean("allowSwitchAccount");
         }
         if (this.searchString == null) {
+            this.currentConnectionState = ConnectionsManager.getInstance(this.currentAccount).getConnectionState();
             NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.dialogsNeedReload);
             NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiDidLoaded);
             NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.updateInterfaces);
@@ -178,6 +187,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
             NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.needReloadRecentDialogsSearch);
             NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.didLoadedReplyMessages);
             NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.reloadHints);
+            NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.didUpdatedConnectionState);
             NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetPasscode);
         }
         if (!dialogsLoaded[this.currentAccount]) {
@@ -209,6 +219,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
             NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.needReloadRecentDialogsSearch);
             NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.didLoadedReplyMessages);
             NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.reloadHints);
+            NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.didUpdatedConnectionState);
             NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetPasscode);
         }
         if (this.commentView != null) {
@@ -233,14 +244,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
         });
         ActionBarMenu menu = this.actionBar.createMenu();
         if (!this.onlySelect && this.searchString == null) {
+            this.proxyDrawable = new ProxyDrawable(context);
+            this.proxyItem = menu.addItem(2, this.proxyDrawable);
             this.passcodeItem = menu.addItem(1, (int) R.drawable.lock_close);
             updatePasscodeButton();
+            updateProxyButton(false);
         }
         menu.addItem(0, (int) R.drawable.ic_ab_search).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItemSearchListener() {
             public void onSearchExpand() {
                 DialogsActivity.this.searching = true;
                 if (DialogsActivity.this.switchItem != null) {
                     DialogsActivity.this.switchItem.setVisibility(8);
+                }
+                if (DialogsActivity.this.proxyItem != null && DialogsActivity.this.proxyItemVisisble) {
+                    DialogsActivity.this.proxyItem.setVisibility(8);
                 }
                 if (DialogsActivity.this.listView != null) {
                     if (DialogsActivity.this.searchString != null) {
@@ -257,6 +274,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
             public boolean canCollapseSearch() {
                 if (DialogsActivity.this.switchItem != null) {
                     DialogsActivity.this.switchItem.setVisibility(0);
+                }
+                if (DialogsActivity.this.proxyItem != null && DialogsActivity.this.proxyItemVisisble) {
+                    DialogsActivity.this.proxyItem.setVisibility(0);
                 }
                 if (DialogsActivity.this.searchString == null) {
                     return true;
@@ -374,6 +394,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
                     SharedConfig.appLocked = z;
                     SharedConfig.saveConfig();
                     DialogsActivity.this.updatePasscodeButton();
+                } else if (id == 2) {
+                    DialogsActivity.this.presentFragment(new ProxyListActivity());
                 } else if (id >= 10 && id < 13 && DialogsActivity.this.getParentActivity() != null) {
                     DialogsActivityDelegate oldDelegate = DialogsActivity.this.delegate;
                     LaunchActivity launchActivity = (LaunchActivity) DialogsActivity.this.getParentActivity();
@@ -654,7 +676,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
                             icons[0] = dialog.pinned ? R.drawable.chats_unpin : R.drawable.chats_pin;
                             icons[1] = R.drawable.chats_clear;
                             icons[2] = R.drawable.chats_leave;
-                            if (chat == null || !chat.megagroup) {
+                            if (MessagesController.getInstance(DialogsActivity.this.currentAccount).isProxyDialog(dialog.id)) {
+                                items = new CharSequence[]{null, LocaleController.getString("ClearHistoryCache", R.string.ClearHistoryCache), null};
+                            } else if (chat == null || !chat.megagroup) {
                                 items = new CharSequence[3];
                                 string = (dialog.pinned || MessagesController.getInstance(DialogsActivity.this.currentAccount).canPinDialog(false)) ? dialog.pinned ? LocaleController.getString("UnpinFromTop", R.string.UnpinFromTop) : LocaleController.getString("PinToTop", R.string.PinToTop) : null;
                                 items[0] = string;
@@ -673,11 +697,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
                                     boolean z = true;
                                     if (which == 0) {
                                         MessagesController instance = MessagesController.getInstance(DialogsActivity.this.currentAccount);
-                                        long access$3700 = DialogsActivity.this.selectedDialog;
+                                        long access$3900 = DialogsActivity.this.selectedDialog;
                                         if (z) {
                                             z = false;
                                         }
-                                        if (instance.pinDialog(access$3700, z, null, 0) && !z) {
+                                        if (instance.pinDialog(access$3900, z, null, 0) && !z) {
                                             DialogsActivity.this.listView.smoothScrollToPosition(0);
                                             return;
                                         }
@@ -748,11 +772,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
                                             boolean z = true;
                                             if (which == 0) {
                                                 MessagesController instance = MessagesController.getInstance(DialogsActivity.this.currentAccount);
-                                                long access$3700 = DialogsActivity.this.selectedDialog;
+                                                long access$3900 = DialogsActivity.this.selectedDialog;
                                                 if (z) {
                                                     z = false;
                                                 }
-                                                if (instance.pinDialog(access$3700, z, null, 0) && !z) {
+                                                if (instance.pinDialog(access$3900, z, null, 0) && !z) {
                                                     DialogsActivity.this.listView.smoothScrollToPosition(0);
                                                     return;
                                                 }
@@ -1164,6 +1188,26 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
         }
     }
 
+    private void updateProxyButton(boolean animated) {
+        boolean z = false;
+        if (this.proxyDrawable != null) {
+            SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0);
+            String proxyAddress = preferences.getString("proxy_ip", TtmlNode.ANONYMOUS_REGION_ID);
+            if (!preferences.getBoolean("proxy_enabled", false) || TextUtils.isEmpty(proxyAddress)) {
+                this.proxyItem.setVisibility(8);
+                this.proxyItemVisisble = false;
+                return;
+            }
+            this.proxyItem.setVisibility(0);
+            ProxyDrawable proxyDrawable = this.proxyDrawable;
+            if (this.currentConnectionState == 3 || this.currentConnectionState == 5) {
+                z = true;
+            }
+            proxyDrawable.setConnected(z, animated);
+            this.proxyItemVisisble = true;
+        }
+    }
+
     private void updateSelectedCount() {
         if (this.commentView != null) {
             AnimatorSet animatorSet;
@@ -1298,7 +1342,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.dialogsNeedReload) {
             if (this.dialogsAdapter != null) {
-                if (this.dialogsAdapter.isDataSetChanged()) {
+                if (this.dialogsAdapter.isDataSetChanged() || args.length > 0) {
                     this.dialogsAdapter.notifyDataSetChanged();
                 } else {
                     updateVisibleRows(2048);
@@ -1359,8 +1403,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
             }
         } else if (id == NotificationCenter.didLoadedReplyMessages) {
             updateVisibleRows(32768);
-        } else if (id == NotificationCenter.reloadHints && this.dialogsSearchAdapter != null) {
-            this.dialogsSearchAdapter.notifyDataSetChanged();
+        } else if (id == NotificationCenter.reloadHints) {
+            if (this.dialogsSearchAdapter != null) {
+                this.dialogsSearchAdapter.notifyDataSetChanged();
+            }
+        } else if (id == NotificationCenter.didUpdatedConnectionState) {
+            int state = ConnectionsManager.getInstance(account).getConnectionState();
+            if (this.currentConnectionState != state) {
+                this.currentConnectionState = state;
+                updateProxyButton(true);
+            }
         }
     }
 
@@ -1545,7 +1597,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
     }
 
     public ThemeDescription[] getThemeDescriptions() {
-        ThemeDescriptionDelegate сellDelegate = new ThemeDescriptionDelegate() {
+        ThemeDescriptionDelegate cellDelegate = new ThemeDescriptionDelegate() {
             public void didSetColor() {
                 int count;
                 int a;
@@ -1594,14 +1646,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
         themeDescriptionArr[15] = new ThemeDescription(this.floatingButton, ThemeDescription.FLAG_BACKGROUNDFILTER, null, null, null, null, Theme.key_chats_actionBackground);
         themeDescriptionArr[16] = new ThemeDescription(this.floatingButton, ThemeDescription.FLAG_BACKGROUNDFILTER | ThemeDescription.FLAG_DRAWABLESELECTEDSTATE, null, null, null, null, Theme.key_chats_actionPressedBackground);
         themeDescriptionArr[17] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class, ProfileSearchCell.class}, null, new Drawable[]{Theme.avatar_photoDrawable, Theme.avatar_broadcastDrawable, Theme.avatar_savedDrawable}, null, Theme.key_avatar_text);
-        themeDescriptionArr[18] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundRed);
-        themeDescriptionArr[19] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundOrange);
-        themeDescriptionArr[20] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundViolet);
-        themeDescriptionArr[21] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundGreen);
-        themeDescriptionArr[22] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundCyan);
-        themeDescriptionArr[23] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundBlue);
-        themeDescriptionArr[24] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundPink);
-        themeDescriptionArr[25] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundSaved);
+        themeDescriptionArr[18] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundRed);
+        themeDescriptionArr[19] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundOrange);
+        themeDescriptionArr[20] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundViolet);
+        themeDescriptionArr[21] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundGreen);
+        themeDescriptionArr[22] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundCyan);
+        themeDescriptionArr[23] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundBlue);
+        themeDescriptionArr[24] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundPink);
+        themeDescriptionArr[25] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundSaved);
         themeDescriptionArr[26] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class}, Theme.dialogs_countPaint, null, null, Theme.key_chats_unreadCounter);
         themeDescriptionArr[27] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class}, Theme.dialogs_countGrayPaint, null, null, Theme.key_chats_unreadCounterMuted);
         themeDescriptionArr[28] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class}, Theme.dialogs_countTextPaint, null, null, Theme.key_chats_unreadCounterText);
@@ -1611,9 +1663,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
         themeDescriptionArr[32] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class, ProfileSearchCell.class}, null, new Drawable[]{Theme.dialogs_groupDrawable, Theme.dialogs_broadcastDrawable, Theme.dialogs_botDrawable}, null, Theme.key_chats_nameIcon);
         themeDescriptionArr[33] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class}, null, new Drawable[]{Theme.dialogs_pinnedDrawable}, null, Theme.key_chats_pinnedIcon);
         themeDescriptionArr[34] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class}, Theme.dialogs_messagePaint, null, null, Theme.key_chats_message);
-        themeDescriptionArr[35] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_chats_nameMessage);
-        themeDescriptionArr[36] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_chats_draft);
-        themeDescriptionArr[37] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_chats_attachMessage);
+        themeDescriptionArr[35] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_chats_nameMessage);
+        themeDescriptionArr[36] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_chats_draft);
+        themeDescriptionArr[37] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_chats_attachMessage);
         themeDescriptionArr[38] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class}, Theme.dialogs_messagePrintingPaint, null, null, Theme.key_chats_actionMessage);
         themeDescriptionArr[39] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class}, Theme.dialogs_timePaint, null, null, Theme.key_chats_date);
         themeDescriptionArr[40] = new ThemeDescription(this.listView, 0, new Class[]{DialogCell.class}, Theme.dialogs_pinnedPaint, null, null, Theme.key_chats_pinnedOverlay);

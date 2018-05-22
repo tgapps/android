@@ -19,9 +19,15 @@ public abstract class Task<TResult> {
 
     public abstract Task<TResult> addOnSuccessListener(Executor executor, OnSuccessListener<? super TResult> onSuccessListener);
 
+    public <TContinuationResult> Task<TContinuationResult> continueWith(Executor executor, Continuation<TResult, TContinuationResult> continuation) {
+        throw new UnsupportedOperationException("continueWith is not implemented");
+    }
+
     public abstract Exception getException();
 
     public abstract TResult getResult();
+
+    public abstract <X extends Throwable> TResult getResult(Class<X> cls) throws Throwable;
 
     public abstract boolean isCanceled();
 

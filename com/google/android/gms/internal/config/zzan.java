@@ -34,22 +34,22 @@ public final class zzan implements Runnable {
                     if (map != null) {
                         for (String str2 : map.keySet()) {
                             zzat com_google_android_gms_internal_config_zzat = new zzat();
-                            com_google_android_gms_internal_config_zzat.zzbj = str2;
-                            com_google_android_gms_internal_config_zzat.zzbk = (byte[]) map.get(str2);
+                            com_google_android_gms_internal_config_zzat.zzbi = str2;
+                            com_google_android_gms_internal_config_zzat.zzbj = (byte[]) map.get(str2);
                             arrayList2.add(com_google_android_gms_internal_config_zzat);
                         }
                     }
                     zzav com_google_android_gms_internal_config_zzav = new zzav();
                     com_google_android_gms_internal_config_zzav.namespace = str;
-                    com_google_android_gms_internal_config_zzav.zzbp = (zzat[]) arrayList2.toArray(new zzat[arrayList2.size()]);
+                    com_google_android_gms_internal_config_zzav.zzbo = (zzat[]) arrayList2.toArray(new zzat[arrayList2.size()]);
                     arrayList.add(com_google_android_gms_internal_config_zzav);
                 }
             }
-            com_google_android_gms_internal_config_zzas.zzbg = (zzav[]) arrayList.toArray(new zzav[arrayList.size()]);
+            com_google_android_gms_internal_config_zzas.zzbf = (zzav[]) arrayList.toArray(new zzav[arrayList.size()]);
         }
         if (com_google_android_gms_internal_config_zzao.zzg() != null) {
             List zzg = com_google_android_gms_internal_config_zzao.zzg();
-            com_google_android_gms_internal_config_zzas.zzbh = (byte[][]) zzg.toArray(new byte[zzg.size()][]);
+            com_google_android_gms_internal_config_zzas.zzbg = (byte[][]) zzg.toArray(new byte[zzg.size()][]);
         }
         com_google_android_gms_internal_config_zzas.timestamp = com_google_android_gms_internal_config_zzao.getTimestamp();
         return com_google_android_gms_internal_config_zzas;
@@ -58,20 +58,19 @@ public final class zzan implements Runnable {
     public final void run() {
         zzbh com_google_android_gms_internal_config_zzaw = new zzaw();
         if (this.zzat != null) {
-            com_google_android_gms_internal_config_zzaw.zzbq = zza(this.zzat);
+            com_google_android_gms_internal_config_zzaw.zzbp = zza(this.zzat);
         }
         if (this.zzau != null) {
-            com_google_android_gms_internal_config_zzaw.zzbr = zza(this.zzau);
+            com_google_android_gms_internal_config_zzaw.zzbq = zza(this.zzau);
         }
         if (this.zzav != null) {
-            com_google_android_gms_internal_config_zzaw.zzbs = zza(this.zzav);
+            com_google_android_gms_internal_config_zzaw.zzbr = zza(this.zzav);
         }
         if (this.zzaj != null) {
             zzau com_google_android_gms_internal_config_zzau = new zzau();
-            com_google_android_gms_internal_config_zzau.zzbl = this.zzaj.getLastFetchStatus();
-            com_google_android_gms_internal_config_zzau.zzbm = this.zzaj.isDeveloperModeEnabled();
-            com_google_android_gms_internal_config_zzau.zzbn = this.zzaj.zzt();
-            com_google_android_gms_internal_config_zzaw.zzbt = com_google_android_gms_internal_config_zzau;
+            com_google_android_gms_internal_config_zzau.zzbk = this.zzaj.getLastFetchStatus();
+            com_google_android_gms_internal_config_zzau.zzbl = this.zzaj.isDeveloperModeEnabled();
+            com_google_android_gms_internal_config_zzaw.zzbs = com_google_android_gms_internal_config_zzau;
         }
         if (!(this.zzaj == null || this.zzaj.zzr() == null)) {
             List arrayList = new ArrayList();
@@ -80,18 +79,18 @@ public final class zzan implements Runnable {
                 if (zzr.get(str) != null) {
                     zzax com_google_android_gms_internal_config_zzax = new zzax();
                     com_google_android_gms_internal_config_zzax.namespace = str;
-                    com_google_android_gms_internal_config_zzax.zzbw = ((zzal) zzr.get(str)).zzo();
+                    com_google_android_gms_internal_config_zzax.zzbv = ((zzal) zzr.get(str)).zzo();
                     com_google_android_gms_internal_config_zzax.resourceId = ((zzal) zzr.get(str)).getResourceId();
                     arrayList.add(com_google_android_gms_internal_config_zzax);
                 }
             }
-            com_google_android_gms_internal_config_zzaw.zzbu = (zzax[]) arrayList.toArray(new zzax[arrayList.size()]);
+            com_google_android_gms_internal_config_zzaw.zzbt = (zzax[]) arrayList.toArray(new zzax[arrayList.size()]);
         }
-        byte[] bArr = new byte[com_google_android_gms_internal_config_zzaw.zzai()];
+        byte[] bArr = new byte[com_google_android_gms_internal_config_zzaw.zzah()];
         try {
             zzaz zzb = zzaz.zzb(bArr, 0, bArr.length);
             com_google_android_gms_internal_config_zzaw.zza(zzb);
-            zzb.zzad();
+            zzb.zzac();
             try {
                 FileOutputStream openFileOutput = this.mContext.openFileOutput("persisted_config", 0);
                 openFileOutput.write(bArr);

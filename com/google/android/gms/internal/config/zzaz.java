@@ -9,11 +9,11 @@ import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.exoplayer2.extractor.ts.PsExtractor;
 
 public final class zzaz {
-    private final ByteBuffer zzch;
+    private final ByteBuffer zzcg;
 
     private zzaz(ByteBuffer byteBuffer) {
-        this.zzch = byteBuffer;
-        this.zzch.order(ByteOrder.LITTLE_ENDIAN);
+        this.zzcg = byteBuffer;
+        this.zzcg.order(ByteOrder.LITTLE_ENDIAN);
     }
 
     private zzaz(byte[] bArr, int i, int i2) {
@@ -173,8 +173,8 @@ public final class zzaz {
 
     public static int zzb(int i, zzbh com_google_android_gms_internal_config_zzbh) {
         int zzl = zzl(i);
-        int zzai = com_google_android_gms_internal_config_zzbh.zzai();
-        return zzl + (zzai + zzn(zzai));
+        int zzah = com_google_android_gms_internal_config_zzbh.zzah();
+        return zzl + (zzah + zzn(zzah));
     }
 
     public static int zzb(int i, String str) {
@@ -201,11 +201,11 @@ public final class zzaz {
 
     private final void zzk(int i) throws IOException {
         byte b = (byte) i;
-        if (this.zzch.hasRemaining()) {
-            this.zzch.put(b);
+        if (this.zzcg.hasRemaining()) {
+            this.zzcg.put(b);
             return;
         }
-        throw new zzba(this.zzch.position(), this.zzch.limit());
+        throw new zzba(this.zzcg.position(), this.zzcg.limit());
     }
 
     public static int zzl(int i) {
@@ -217,27 +217,27 @@ public final class zzaz {
     }
 
     public final void zza(byte b) throws IOException {
-        if (this.zzch.hasRemaining()) {
-            this.zzch.put(b);
+        if (this.zzcg.hasRemaining()) {
+            this.zzcg.put(b);
             return;
         }
-        throw new zzba(this.zzch.position(), this.zzch.limit());
+        throw new zzba(this.zzcg.position(), this.zzcg.limit());
     }
 
     public final void zza(int i, long j) throws IOException {
         zze(i, 1);
-        if (this.zzch.remaining() < 8) {
-            throw new zzba(this.zzch.position(), this.zzch.limit());
+        if (this.zzcg.remaining() < 8) {
+            throw new zzba(this.zzcg.position(), this.zzcg.limit());
         }
-        this.zzch.putLong(j);
+        this.zzcg.putLong(j);
     }
 
     public final void zza(int i, zzbh com_google_android_gms_internal_config_zzbh) throws IOException {
         zze(i, 2);
-        if (com_google_android_gms_internal_config_zzbh.zzcr < 0) {
-            com_google_android_gms_internal_config_zzbh.zzai();
+        if (com_google_android_gms_internal_config_zzbh.zzcq < 0) {
+            com_google_android_gms_internal_config_zzbh.zzah();
         }
-        zzm(com_google_android_gms_internal_config_zzbh.zzcr);
+        zzm(com_google_android_gms_internal_config_zzbh.zzcq);
         com_google_android_gms_internal_config_zzbh.zza(this);
     }
 
@@ -246,22 +246,22 @@ public final class zzaz {
         try {
             int zzn = zzn(str.length());
             if (zzn == zzn(str.length() * 3)) {
-                int position = this.zzch.position();
-                if (this.zzch.remaining() < zzn) {
-                    throw new zzba(zzn + position, this.zzch.limit());
+                int position = this.zzcg.position();
+                if (this.zzcg.remaining() < zzn) {
+                    throw new zzba(zzn + position, this.zzcg.limit());
                 }
-                this.zzch.position(position + zzn);
-                zza((CharSequence) str, this.zzch);
-                int position2 = this.zzch.position();
-                this.zzch.position(position);
+                this.zzcg.position(position + zzn);
+                zza((CharSequence) str, this.zzcg);
+                int position2 = this.zzcg.position();
+                this.zzcg.position(position);
                 zzm((position2 - position) - zzn);
-                this.zzch.position(position2);
+                this.zzcg.position(position2);
                 return;
             }
             zzm(zza((CharSequence) str));
-            zza((CharSequence) str, this.zzch);
+            zza((CharSequence) str, this.zzcg);
         } catch (Throwable e) {
-            zzba com_google_android_gms_internal_config_zzba = new zzba(this.zzch.position(), this.zzch.limit());
+            zzba com_google_android_gms_internal_config_zzba = new zzba(this.zzcg.position(), this.zzcg.limit());
             com_google_android_gms_internal_config_zzba.initCause(e);
             throw com_google_android_gms_internal_config_zzba;
         }
@@ -273,9 +273,9 @@ public final class zzaz {
         zzc(bArr);
     }
 
-    public final void zzad() {
-        if (this.zzch.remaining() != 0) {
-            throw new IllegalStateException(String.format("Did not write as much data as expected, %s bytes remaining.", new Object[]{Integer.valueOf(this.zzch.remaining())}));
+    public final void zzac() {
+        if (this.zzcg.remaining() != 0) {
+            throw new IllegalStateException(String.format("Did not write as much data as expected, %s bytes remaining.", new Object[]{Integer.valueOf(this.zzcg.remaining())}));
         }
     }
 
@@ -288,28 +288,28 @@ public final class zzaz {
         long j = (long) i2;
         while ((-128 & j) != 0) {
             byte b = (byte) ((((int) j) & 127) | 128);
-            if (this.zzch.hasRemaining()) {
-                this.zzch.put(b);
+            if (this.zzcg.hasRemaining()) {
+                this.zzcg.put(b);
                 j >>>= 7;
             } else {
-                throw new zzba(this.zzch.position(), this.zzch.limit());
+                throw new zzba(this.zzcg.position(), this.zzcg.limit());
             }
         }
         byte b2 = (byte) ((int) j);
-        if (this.zzch.hasRemaining()) {
-            this.zzch.put(b2);
+        if (this.zzcg.hasRemaining()) {
+            this.zzcg.put(b2);
             return;
         }
-        throw new zzba(this.zzch.position(), this.zzch.limit());
+        throw new zzba(this.zzcg.position(), this.zzcg.limit());
     }
 
     public final void zzc(byte[] bArr) throws IOException {
         int length = bArr.length;
-        if (this.zzch.remaining() >= length) {
-            this.zzch.put(bArr, 0, length);
+        if (this.zzcg.remaining() >= length) {
+            this.zzcg.put(bArr, 0, length);
             return;
         }
-        throw new zzba(this.zzch.position(), this.zzch.limit());
+        throw new zzba(this.zzcg.position(), this.zzcg.limit());
     }
 
     public final void zze(int i, int i2) throws IOException {

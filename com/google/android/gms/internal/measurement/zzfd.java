@@ -22,22 +22,22 @@ final class zzfd extends SQLiteOpenHelper {
         } catch (SQLiteDatabaseLockedException e) {
             throw e;
         } catch (SQLiteException e2) {
-            this.zzaii.zzgg().zzil().log("Opening the local database failed, dropping and recreating it");
+            this.zzaii.zzge().zzim().log("Opening the local database failed, dropping and recreating it");
             String str = "google_app_measurement_local.db";
             if (!this.zzaii.getContext().getDatabasePath(str).delete()) {
-                this.zzaii.zzgg().zzil().zzg("Failed to delete corrupted local db file", str);
+                this.zzaii.zzge().zzim().zzg("Failed to delete corrupted local db file", str);
             }
             try {
                 return super.getWritableDatabase();
             } catch (SQLiteException e3) {
-                this.zzaii.zzgg().zzil().zzg("Failed to open local database. Events will bypass local storage", e3);
+                this.zzaii.zzge().zzim().zzg("Failed to open local database. Events will bypass local storage", e3);
                 return null;
             }
         }
     }
 
     public final void onCreate(SQLiteDatabase sQLiteDatabase) {
-        zzei.zza(this.zzaii.zzgg(), sQLiteDatabase);
+        zzei.zza(this.zzaii.zzge(), sQLiteDatabase);
     }
 
     public final void onDowngrade(SQLiteDatabase sQLiteDatabase, int i, int i2) {
@@ -70,7 +70,7 @@ final class zzfd extends SQLiteOpenHelper {
                 throw th;
             }
         }
-        zzei.zza(this.zzaii.zzgg(), sQLiteDatabase, "messages", "create table if not exists messages ( type INTEGER NOT NULL, entry BLOB NOT NULL)", "type,entry", null);
+        zzei.zza(this.zzaii.zzge(), sQLiteDatabase, "messages", "create table if not exists messages ( type INTEGER NOT NULL, entry BLOB NOT NULL)", "type,entry", null);
     }
 
     public final void onUpgrade(SQLiteDatabase sQLiteDatabase, int i, int i2) {

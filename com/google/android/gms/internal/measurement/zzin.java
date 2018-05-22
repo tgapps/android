@@ -3,25 +3,29 @@ package com.google.android.gms.internal.measurement;
 import android.os.RemoteException;
 
 final class zzin implements Runnable {
-    private final /* synthetic */ zzec zzanq;
-    private final /* synthetic */ zzil zzapy;
+    private final /* synthetic */ zzie zzaow;
+    private final /* synthetic */ zzii zzape;
 
-    zzin(zzil com_google_android_gms_internal_measurement_zzil, zzec com_google_android_gms_internal_measurement_zzec) {
-        this.zzapy = com_google_android_gms_internal_measurement_zzil;
-        this.zzanq = com_google_android_gms_internal_measurement_zzec;
+    zzin(zzii com_google_android_gms_internal_measurement_zzii, zzie com_google_android_gms_internal_measurement_zzie) {
+        this.zzape = com_google_android_gms_internal_measurement_zzii;
+        this.zzaow = com_google_android_gms_internal_measurement_zzie;
     }
 
     public final void run() {
-        zzey zzd = this.zzapy.zzaps;
+        zzey zzd = this.zzape.zzaoy;
         if (zzd == null) {
-            this.zzapy.zzgg().zzil().log("Failed to reset data on the service; null service");
+            this.zzape.zzge().zzim().log("Failed to send current screen to service");
             return;
         }
         try {
-            zzd.zzd(this.zzanq);
+            if (this.zzaow == null) {
+                zzd.zza(0, null, null, this.zzape.getContext().getPackageName());
+            } else {
+                zzd.zza(this.zzaow.zzaoj, this.zzaow.zzul, this.zzaow.zzaoi, this.zzape.getContext().getPackageName());
+            }
+            this.zzape.zzcu();
         } catch (RemoteException e) {
-            this.zzapy.zzgg().zzil().zzg("Failed to reset data on the service", e);
+            this.zzape.zzge().zzim().zzg("Failed to send current screen to the service", e);
         }
-        this.zzapy.zzcu();
     }
 }

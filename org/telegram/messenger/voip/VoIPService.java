@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telecom.TelecomManager;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
@@ -841,6 +842,7 @@ public class VoIPService extends VoIPBaseService {
             boolean z;
             boolean z2;
             String server;
+            String secret;
             if (BuildVars.LOGS_ENABLED) {
                 FileLog.d("InitCall: keyID=" + this.keyFingerprint);
             }
@@ -923,7 +925,8 @@ public class VoIPService extends VoIPBaseService {
                     if (prefs.getBoolean("proxy_enabled", false)) {
                         if (prefs.getBoolean("proxy_enabled_calls", false)) {
                             server = prefs.getString("proxy_ip", null);
-                            if (server != null) {
+                            secret = prefs.getString("proxy_secret", null);
+                            if (!TextUtils.isEmpty(server) && TextUtils.isEmpty(secret)) {
                                 this.controller.setProxy(server, prefs.getInt("proxy_port", 0), prefs.getString("proxy_user", null), prefs.getString("proxy_pass", null));
                             }
                         }
@@ -952,9 +955,8 @@ public class VoIPService extends VoIPBaseService {
             if (prefs.getBoolean("proxy_enabled", false)) {
                 if (prefs.getBoolean("proxy_enabled_calls", false)) {
                     server = prefs.getString("proxy_ip", null);
-                    if (server != null) {
-                        this.controller.setProxy(server, prefs.getInt("proxy_port", 0), prefs.getString("proxy_user", null), prefs.getString("proxy_pass", null));
-                    }
+                    secret = prefs.getString("proxy_secret", null);
+                    this.controller.setProxy(server, prefs.getInt("proxy_port", 0), prefs.getString("proxy_user", null), prefs.getString("proxy_pass", null));
                 }
             }
             this.controller.start();

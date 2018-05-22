@@ -1,22 +1,22 @@
 package com.google.android.gms.internal.measurement;
 
-import com.google.android.gms.common.internal.Preconditions;
+import java.util.concurrent.Callable;
 
-final class zzju {
-    final String name;
-    final Object value;
-    final String zzaek;
-    final long zzaqu;
-    final String zztd;
+final class zzju implements Callable<String> {
+    private final /* synthetic */ zzdz zzane;
+    private final /* synthetic */ zzjr zzaqu;
 
-    zzju(String str, String str2, String str3, long j, Object obj) {
-        Preconditions.checkNotEmpty(str);
-        Preconditions.checkNotEmpty(str3);
-        Preconditions.checkNotNull(obj);
-        this.zztd = str;
-        this.zzaek = str2;
-        this.name = str3;
-        this.zzaqu = j;
-        this.value = obj;
+    zzju(zzjr com_google_android_gms_internal_measurement_zzjr, zzdz com_google_android_gms_internal_measurement_zzdz) {
+        this.zzaqu = com_google_android_gms_internal_measurement_zzjr;
+        this.zzane = com_google_android_gms_internal_measurement_zzdz;
+    }
+
+    public final /* synthetic */ Object call() throws Exception {
+        zzdy zza = this.zzaqu.zzgg().zzaz(this.zzane.packageName) ? this.zzaqu.zzg(this.zzane) : this.zzaqu.zzix().zzbc(this.zzane.packageName);
+        if (zza != null) {
+            return zza.getAppInstanceId();
+        }
+        this.zzaqu.zzge().zzip().log("App info was null when attempting to get app instance id");
+        return null;
     }
 }

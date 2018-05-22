@@ -2,6 +2,8 @@ package com.google.android.gms.common.util;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
+import com.google.android.gms.common.GooglePlayServicesUtilLight;
 
 public final class DeviceProperties {
     private static Boolean zzzn;
@@ -23,6 +25,10 @@ public final class DeviceProperties {
             zzzo = Boolean.valueOf(z);
         }
         return zzzo.booleanValue();
+    }
+
+    public static boolean isUserBuild() {
+        return GooglePlayServicesUtilLight.sIsTestMode ? GooglePlayServicesUtilLight.sTestIsUserBuild : "user".equals(Build.TYPE);
     }
 
     @TargetApi(20)

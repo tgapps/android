@@ -1,14 +1,17 @@
 package com.google.android.gms.internal.measurement;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import com.google.android.gms.common.util.Clock;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public final class zzeo extends zzhk {
-    private long zzafk;
-    private String zzafl;
+public final class zzeo extends zzhh {
+    private long zzafm;
+    private String zzafn;
+    private Boolean zzafo;
 
     zzeo(zzgl com_google_android_gms_internal_measurement_zzgl) {
         super(com_google_android_gms_internal_measurement_zzgl);
@@ -26,23 +29,34 @@ public final class zzeo extends zzhk {
         return super.zzbt();
     }
 
-    public final /* bridge */ /* synthetic */ void zzfq() {
-        super.zzfq();
+    public final boolean zzf(Context context) {
+        if (this.zzafo == null) {
+            this.zzafo = Boolean.valueOf(false);
+            try {
+                PackageManager packageManager = context.getPackageManager();
+                if (packageManager != null) {
+                    packageManager.getPackageInfo("com.google.android.gms", 128);
+                    this.zzafo = Boolean.valueOf(true);
+                }
+            } catch (NameNotFoundException e) {
+            }
+        }
+        return this.zzafo.booleanValue();
     }
 
     public final /* bridge */ /* synthetic */ void zzfr() {
         super.zzfr();
     }
 
-    public final /* bridge */ /* synthetic */ zzdx zzfs() {
-        return super.zzfs();
+    public final /* bridge */ /* synthetic */ void zzfs() {
+        super.zzfs();
     }
 
-    public final /* bridge */ /* synthetic */ zzee zzft() {
+    public final /* bridge */ /* synthetic */ zzdu zzft() {
         return super.zzft();
     }
 
-    public final /* bridge */ /* synthetic */ zzhm zzfu() {
+    public final /* bridge */ /* synthetic */ zzhk zzfu() {
         return super.zzfu();
     }
 
@@ -54,11 +68,11 @@ public final class zzeo extends zzhk {
         return super.zzfw();
     }
 
-    public final /* bridge */ /* synthetic */ zzil zzfx() {
+    public final /* bridge */ /* synthetic */ zzii zzfx() {
         return super.zzfx();
     }
 
-    public final /* bridge */ /* synthetic */ zzih zzfy() {
+    public final /* bridge */ /* synthetic */ zzif zzfy() {
         return super.zzfy();
     }
 
@@ -66,49 +80,51 @@ public final class zzeo extends zzhk {
         return super.zzfz();
     }
 
-    public final /* bridge */ /* synthetic */ zzei zzga() {
+    public final /* bridge */ /* synthetic */ zzfe zzga() {
         return super.zzga();
     }
 
-    public final /* bridge */ /* synthetic */ zzfe zzgb() {
+    public final /* bridge */ /* synthetic */ zzka zzgb() {
         return super.zzgb();
     }
 
-    public final /* bridge */ /* synthetic */ zzjv zzgc() {
+    public final /* bridge */ /* synthetic */ zzjh zzgc() {
         return super.zzgc();
     }
 
-    public final /* bridge */ /* synthetic */ zzgf zzgd() {
+    public final /* bridge */ /* synthetic */ zzgg zzgd() {
         return super.zzgd();
     }
 
-    public final /* bridge */ /* synthetic */ zzjk zzge() {
+    public final /* bridge */ /* synthetic */ zzfg zzge() {
         return super.zzge();
     }
 
-    public final /* bridge */ /* synthetic */ zzgg zzgf() {
+    public final /* bridge */ /* synthetic */ zzfr zzgf() {
         return super.zzgf();
     }
 
-    public final /* bridge */ /* synthetic */ zzfg zzgg() {
+    public final /* bridge */ /* synthetic */ zzef zzgg() {
         return super.zzgg();
     }
 
-    public final /* bridge */ /* synthetic */ zzfr zzgh() {
-        return super.zzgh();
-    }
-
-    public final /* bridge */ /* synthetic */ zzeh zzgi() {
-        return super.zzgi();
-    }
-
-    protected final boolean zzhh() {
+    protected final boolean zzhf() {
         Calendar instance = Calendar.getInstance();
-        this.zzafk = TimeUnit.MINUTES.convert((long) (instance.get(16) + instance.get(15)), TimeUnit.MILLISECONDS);
+        this.zzafm = TimeUnit.MINUTES.convert((long) (instance.get(16) + instance.get(15)), TimeUnit.MILLISECONDS);
         Locale locale = Locale.getDefault();
         String toLowerCase = locale.getLanguage().toLowerCase(Locale.ENGLISH);
         String toLowerCase2 = locale.getCountry().toLowerCase(Locale.ENGLISH);
-        this.zzafl = new StringBuilder((String.valueOf(toLowerCase).length() + 1) + String.valueOf(toLowerCase2).length()).append(toLowerCase).append("-").append(toLowerCase2).toString();
+        this.zzafn = new StringBuilder((String.valueOf(toLowerCase).length() + 1) + String.valueOf(toLowerCase2).length()).append(toLowerCase).append("-").append(toLowerCase2).toString();
         return false;
+    }
+
+    public final long zzic() {
+        zzch();
+        return this.zzafm;
+    }
+
+    public final String zzid() {
+        zzch();
+        return this.zzafn;
     }
 }

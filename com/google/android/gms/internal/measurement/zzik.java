@@ -1,19 +1,27 @@
 package com.google.android.gms.internal.measurement;
 
-final class zzik extends zzig {
-    public boolean zzapq;
+import android.os.RemoteException;
 
-    public zzik(zzik com_google_android_gms_internal_measurement_zzik) {
-        this.zzug = com_google_android_gms_internal_measurement_zzik.zzug;
-        this.zzapa = com_google_android_gms_internal_measurement_zzik.zzapa;
-        this.zzapb = com_google_android_gms_internal_measurement_zzik.zzapb;
-        this.zzapq = com_google_android_gms_internal_measurement_zzik.zzapq;
+final class zzik implements Runnable {
+    private final /* synthetic */ zzdz zzane;
+    private final /* synthetic */ zzii zzape;
+
+    zzik(zzii com_google_android_gms_internal_measurement_zzii, zzdz com_google_android_gms_internal_measurement_zzdz) {
+        this.zzape = com_google_android_gms_internal_measurement_zzii;
+        this.zzane = com_google_android_gms_internal_measurement_zzdz;
     }
 
-    public zzik(String str, String str2, long j) {
-        this.zzug = str;
-        this.zzapa = str2;
-        this.zzapb = j;
-        this.zzapq = false;
+    public final void run() {
+        zzey zzd = this.zzape.zzaoy;
+        if (zzd == null) {
+            this.zzape.zzge().zzim().log("Failed to reset data on the service; null service");
+            return;
+        }
+        try {
+            zzd.zzd(this.zzane);
+        } catch (RemoteException e) {
+            this.zzape.zzge().zzim().zzg("Failed to reset data on the service", e);
+        }
+        this.zzape.zzcu();
     }
 }

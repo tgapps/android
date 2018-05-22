@@ -5,15 +5,14 @@ import com.google.android.gms.common.internal.Preconditions;
 
 abstract class zzem {
     private static volatile Handler handler;
-    private boolean enabled = true;
-    private final zzgl zzacr;
-    private final Runnable zzxy;
-    private volatile long zzxz;
+    private final zzhi zzafj;
+    private final Runnable zzyd;
+    private volatile long zzye;
 
-    zzem(zzgl com_google_android_gms_internal_measurement_zzgl) {
-        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzgl);
-        this.zzacr = com_google_android_gms_internal_measurement_zzgl;
-        this.zzxy = new zzen(this, com_google_android_gms_internal_measurement_zzgl);
+    zzem(zzhi com_google_android_gms_internal_measurement_zzhi) {
+        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzhi);
+        this.zzafj = com_google_android_gms_internal_measurement_zzhi;
+        this.zzyd = new zzen(this, com_google_android_gms_internal_measurement_zzhi);
     }
 
     private final Handler getHandler() {
@@ -23,30 +22,30 @@ abstract class zzem {
         Handler handler;
         synchronized (zzem.class) {
             if (handler == null) {
-                handler = new Handler(this.zzacr.getContext().getMainLooper());
+                handler = new Handler(this.zzafj.getContext().getMainLooper());
             }
             handler = handler;
         }
         return handler;
     }
 
-    public final void cancel() {
-        this.zzxz = 0;
-        getHandler().removeCallbacks(this.zzxy);
+    final void cancel() {
+        this.zzye = 0;
+        getHandler().removeCallbacks(this.zzyd);
     }
 
     public abstract void run();
 
     public final boolean zzef() {
-        return this.zzxz != 0;
+        return this.zzye != 0;
     }
 
     public final void zzh(long j) {
         cancel();
         if (j >= 0) {
-            this.zzxz = this.zzacr.zzbt().currentTimeMillis();
-            if (!getHandler().postDelayed(this.zzxy, j)) {
-                this.zzacr.zzgg().zzil().zzg("Failed to schedule delayed post. time", Long.valueOf(j));
+            this.zzye = this.zzafj.zzbt().currentTimeMillis();
+            if (!getHandler().postDelayed(this.zzyd, j)) {
+                this.zzafj.zzge().zzim().zzg("Failed to schedule delayed post. time", Long.valueOf(j));
             }
         }
     }

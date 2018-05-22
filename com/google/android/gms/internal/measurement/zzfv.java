@@ -5,81 +5,81 @@ import android.util.Pair;
 import com.google.android.gms.common.internal.Preconditions;
 
 public final class zzfv {
-    private final long zzabe;
-    private final /* synthetic */ zzfr zzakp;
-    private final String zzakr;
+    private final long zzabj;
+    private final /* synthetic */ zzfr zzakq;
     private final String zzaks;
     private final String zzakt;
+    private final String zzaku;
 
     private zzfv(zzfr com_google_android_gms_internal_measurement_zzfr, String str, long j) {
-        this.zzakp = com_google_android_gms_internal_measurement_zzfr;
+        this.zzakq = com_google_android_gms_internal_measurement_zzfr;
         Preconditions.checkNotEmpty(str);
         Preconditions.checkArgument(j > 0);
-        this.zzakr = String.valueOf(str).concat(":start");
-        this.zzaks = String.valueOf(str).concat(":count");
-        this.zzakt = String.valueOf(str).concat(":value");
-        this.zzabe = j;
+        this.zzaks = String.valueOf(str).concat(":start");
+        this.zzakt = String.valueOf(str).concat(":count");
+        this.zzaku = String.valueOf(str).concat(":value");
+        this.zzabj = j;
     }
 
-    private final void zzfg() {
-        this.zzakp.zzab();
-        long currentTimeMillis = this.zzakp.zzbt().currentTimeMillis();
-        Editor edit = this.zzakp.zziu().edit();
-        edit.remove(this.zzaks);
+    private final void zzfh() {
+        this.zzakq.zzab();
+        long currentTimeMillis = this.zzakq.zzbt().currentTimeMillis();
+        Editor edit = this.zzakq.zziy().edit();
         edit.remove(this.zzakt);
-        edit.putLong(this.zzakr, currentTimeMillis);
+        edit.remove(this.zzaku);
+        edit.putLong(this.zzaks, currentTimeMillis);
         edit.apply();
     }
 
-    private final long zzfi() {
-        return this.zzakp.zziu().getLong(this.zzakr, 0);
+    private final long zzfj() {
+        return this.zzakq.zziy().getLong(this.zzaks, 0);
     }
 
     public final void zzc(String str, long j) {
-        this.zzakp.zzab();
-        if (zzfi() == 0) {
-            zzfg();
+        this.zzakq.zzab();
+        if (zzfj() == 0) {
+            zzfh();
         }
         if (str == null) {
             str = TtmlNode.ANONYMOUS_REGION_ID;
         }
-        long j2 = this.zzakp.zziu().getLong(this.zzaks, 0);
+        long j2 = this.zzakq.zziy().getLong(this.zzakt, 0);
         if (j2 <= 0) {
-            Editor edit = this.zzakp.zziu().edit();
-            edit.putString(this.zzakt, str);
-            edit.putLong(this.zzaks, 1);
+            Editor edit = this.zzakq.zziy().edit();
+            edit.putString(this.zzaku, str);
+            edit.putLong(this.zzakt, 1);
             edit.apply();
             return;
         }
-        Object obj = (this.zzakp.zzgc().zzku().nextLong() & Long.MAX_VALUE) < Long.MAX_VALUE / (j2 + 1) ? 1 : null;
-        Editor edit2 = this.zzakp.zziu().edit();
+        Object obj = (this.zzakq.zzgb().zzlc().nextLong() & Long.MAX_VALUE) < Long.MAX_VALUE / (j2 + 1) ? 1 : null;
+        Editor edit2 = this.zzakq.zziy().edit();
         if (obj != null) {
-            edit2.putString(this.zzakt, str);
+            edit2.putString(this.zzaku, str);
         }
-        edit2.putLong(this.zzaks, j2 + 1);
+        edit2.putLong(this.zzakt, j2 + 1);
         edit2.apply();
     }
 
-    public final Pair<String, Long> zzfh() {
-        this.zzakp.zzab();
-        this.zzakp.zzab();
-        long zzfi = zzfi();
-        if (zzfi == 0) {
-            zzfg();
-            zzfi = 0;
+    public final Pair<String, Long> zzfi() {
+        this.zzakq.zzab();
+        this.zzakq.zzab();
+        long zzfj = zzfj();
+        if (zzfj == 0) {
+            zzfh();
+            zzfj = 0;
         } else {
-            zzfi = Math.abs(zzfi - this.zzakp.zzbt().currentTimeMillis());
+            zzfj = Math.abs(zzfj - this.zzakq.zzbt().currentTimeMillis());
         }
-        if (zzfi < this.zzabe) {
+        if (zzfj < this.zzabj) {
             return null;
         }
-        if (zzfi > (this.zzabe << 1)) {
-            zzfg();
+        if (zzfj > (this.zzabj << 1)) {
+            zzfh();
             return null;
         }
-        String string = this.zzakp.zziu().getString(this.zzakt, null);
-        long j = this.zzakp.zziu().getLong(this.zzaks, 0);
-        zzfg();
-        return (string == null || j <= 0) ? zzfr.zzajr : new Pair(string, Long.valueOf(j));
+        String string = this.zzakq.zziy().getString(this.zzaku, null);
+        long j = this.zzakq.zziy().getLong(this.zzakt, 0);
+        zzfh();
+        return (string == null || j <= 0) ? zzfr.zzajs : new Pair(string, Long.valueOf(j));
     }
 }

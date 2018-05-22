@@ -1,55 +1,46 @@
 package com.google.android.gms.internal.measurement;
 
-public final class zzex<V> {
-    private final V zzaid;
-    private final String zznt;
-    private final V zzzw;
+import com.google.android.gms.common.internal.Preconditions;
 
-    private zzex(String str, V v, V v2) {
-        this.zzzw = v;
-        this.zzaid = v2;
-        this.zznt = str;
+public final class zzex<V> {
+    private final zzws<V> zzaid;
+    private final String zzny;
+
+    private zzex(String str, zzws<V> com_google_android_gms_internal_measurement_zzws_V) {
+        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzws_V);
+        this.zzaid = com_google_android_gms_internal_measurement_zzws_V;
+        this.zzny = str;
     }
 
     static zzex<Double> zza(String str, double d, double d2) {
-        zzex<Double> com_google_android_gms_internal_measurement_zzex = new zzex(str, Double.valueOf(-3.0d), Double.valueOf(-3.0d));
-        zzew.zzage.add(com_google_android_gms_internal_measurement_zzex);
-        return com_google_android_gms_internal_measurement_zzex;
+        return new zzex(str, zzew.zzagc.zzb(str, -3.0d));
     }
 
     static zzex<Long> zzb(String str, long j, long j2) {
-        zzex<Long> com_google_android_gms_internal_measurement_zzex = new zzex(str, Long.valueOf(j), Long.valueOf(j2));
-        zzew.zzagb.add(com_google_android_gms_internal_measurement_zzex);
-        return com_google_android_gms_internal_measurement_zzex;
+        return new zzex(str, zzew.zzagc.zze(str, j));
     }
 
     static zzex<Boolean> zzb(String str, boolean z, boolean z2) {
-        zzex<Boolean> com_google_android_gms_internal_measurement_zzex = new zzex(str, Boolean.valueOf(z), Boolean.valueOf(z2));
-        zzew.zzagc.add(com_google_android_gms_internal_measurement_zzex);
-        return com_google_android_gms_internal_measurement_zzex;
+        return new zzex(str, zzew.zzagc.zzf(str, z));
     }
 
     static zzex<Integer> zzc(String str, int i, int i2) {
-        zzex<Integer> com_google_android_gms_internal_measurement_zzex = new zzex(str, Integer.valueOf(i), Integer.valueOf(i2));
-        zzew.zzaga.add(com_google_android_gms_internal_measurement_zzex);
-        return com_google_android_gms_internal_measurement_zzex;
+        return new zzex(str, zzew.zzagc.zzd(str, i));
     }
 
     static zzex<String> zzd(String str, String str2, String str3) {
-        zzex<String> com_google_android_gms_internal_measurement_zzex = new zzex(str, str2, str3);
-        zzew.zzagd.add(com_google_android_gms_internal_measurement_zzex);
-        return com_google_android_gms_internal_measurement_zzex;
+        return new zzex(str, zzew.zzagc.zzv(str, str2));
     }
 
     public final V get() {
-        return this.zzzw;
+        return this.zzaid.get();
     }
 
     public final V get(V v) {
-        return v != null ? v : this.zzzw;
+        return v != null ? v : this.zzaid.get();
     }
 
     public final String getKey() {
-        return this.zznt;
+        return this.zzny;
     }
 }

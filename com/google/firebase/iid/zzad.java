@@ -1,35 +1,22 @@
 package com.google.firebase.iid;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.util.Log;
-import javax.annotation.Nullable;
+import android.os.Bundle;
+import org.telegram.messenger.exoplayer2.upstream.DataSchemeDataSource;
 
-final class zzad extends BroadcastReceiver {
-    @Nullable
-    private zzac zzbsf;
-
-    public zzad(zzac com_google_firebase_iid_zzac) {
-        this.zzbsf = com_google_firebase_iid_zzac;
+final class zzad extends zzab<Bundle> {
+    zzad(int i, int i2, Bundle bundle) {
+        super(i, 1, bundle);
     }
 
-    public final void onReceive(Context context, Intent intent) {
-        if (this.zzbsf != null && this.zzbsf.zztg()) {
-            if (FirebaseInstanceId.zzsj()) {
-                Log.d("FirebaseInstanceId", "Connectivity changed. Starting background sync.");
-            }
-            FirebaseInstanceId.zza(this.zzbsf, 0);
-            this.zzbsf.getContext().unregisterReceiver(this);
-            this.zzbsf = null;
+    final void zzb(Bundle bundle) {
+        Object bundle2 = bundle.getBundle(DataSchemeDataSource.SCHEME_DATA);
+        if (bundle2 == null) {
+            bundle2 = Bundle.EMPTY;
         }
+        finish(bundle2);
     }
 
-    public final void zzth() {
-        if (FirebaseInstanceId.zzsj()) {
-            Log.d("FirebaseInstanceId", "Connectivity change received registered");
-        }
-        this.zzbsf.getContext().registerReceiver(this, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+    final boolean zzw() {
+        return false;
     }
 }

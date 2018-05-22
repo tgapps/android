@@ -3,26 +3,26 @@ package com.google.android.gms.internal.config;
 import java.io.IOException;
 
 public final class zzav extends zzbb<zzav> {
-    private static volatile zzav[] zzbo;
+    private static volatile zzav[] zzbn;
     public String namespace;
-    public zzat[] zzbp;
+    public zzat[] zzbo;
 
     public zzav() {
         this.namespace = TtmlNode.ANONYMOUS_REGION_ID;
-        this.zzbp = zzat.zzv();
-        this.zzci = null;
-        this.zzcr = -1;
+        this.zzbo = zzat.zzu();
+        this.zzch = null;
+        this.zzcq = -1;
     }
 
-    public static zzav[] zzw() {
-        if (zzbo == null) {
-            synchronized (zzbf.zzcq) {
-                if (zzbo == null) {
-                    zzbo = new zzav[0];
+    public static zzav[] zzv() {
+        if (zzbn == null) {
+            synchronized (zzbf.zzcp) {
+                if (zzbn == null) {
+                    zzbn = new zzav[0];
                 }
             }
         }
-        return zzbo;
+        return zzbn;
     }
 
     public final boolean equals(Object obj) {
@@ -40,22 +40,22 @@ public final class zzav extends zzbb<zzav> {
         } else if (!this.namespace.equals(com_google_android_gms_internal_config_zzav.namespace)) {
             return false;
         }
-        return !zzbf.equals(this.zzbp, com_google_android_gms_internal_config_zzav.zzbp) ? false : (this.zzci == null || this.zzci.isEmpty()) ? com_google_android_gms_internal_config_zzav.zzci == null || com_google_android_gms_internal_config_zzav.zzci.isEmpty() : this.zzci.equals(com_google_android_gms_internal_config_zzav.zzci);
+        return !zzbf.equals(this.zzbo, com_google_android_gms_internal_config_zzav.zzbo) ? false : (this.zzch == null || this.zzch.isEmpty()) ? com_google_android_gms_internal_config_zzav.zzch == null || com_google_android_gms_internal_config_zzav.zzch.isEmpty() : this.zzch.equals(com_google_android_gms_internal_config_zzav.zzch);
     }
 
     public final int hashCode() {
         int i = 0;
-        int hashCode = ((((this.namespace == null ? 0 : this.namespace.hashCode()) + ((getClass().getName().hashCode() + 527) * 31)) * 31) + zzbf.hashCode(this.zzbp)) * 31;
-        if (!(this.zzci == null || this.zzci.isEmpty())) {
-            i = this.zzci.hashCode();
+        int hashCode = ((((this.namespace == null ? 0 : this.namespace.hashCode()) + ((getClass().getName().hashCode() + 527) * 31)) * 31) + zzbf.hashCode(this.zzbo)) * 31;
+        if (!(this.zzch == null || this.zzch.isEmpty())) {
+            i = this.zzch.hashCode();
         }
         return hashCode + i;
     }
 
     public final /* synthetic */ zzbh zza(zzay com_google_android_gms_internal_config_zzay) throws IOException {
         while (true) {
-            int zzy = com_google_android_gms_internal_config_zzay.zzy();
-            switch (zzy) {
+            int zzx = com_google_android_gms_internal_config_zzay.zzx();
+            switch (zzx) {
                 case 0:
                     break;
                 case 10:
@@ -63,23 +63,23 @@ public final class zzav extends zzbb<zzav> {
                     continue;
                 case 18:
                     int zzb = zzbk.zzb(com_google_android_gms_internal_config_zzay, 18);
-                    zzy = this.zzbp == null ? 0 : this.zzbp.length;
-                    Object obj = new zzat[(zzb + zzy)];
-                    if (zzy != 0) {
-                        System.arraycopy(this.zzbp, 0, obj, 0, zzy);
+                    zzx = this.zzbo == null ? 0 : this.zzbo.length;
+                    Object obj = new zzat[(zzb + zzx)];
+                    if (zzx != 0) {
+                        System.arraycopy(this.zzbo, 0, obj, 0, zzx);
                     }
-                    while (zzy < obj.length - 1) {
-                        obj[zzy] = new zzat();
-                        com_google_android_gms_internal_config_zzay.zza(obj[zzy]);
-                        com_google_android_gms_internal_config_zzay.zzy();
-                        zzy++;
+                    while (zzx < obj.length - 1) {
+                        obj[zzx] = new zzat();
+                        com_google_android_gms_internal_config_zzay.zza(obj[zzx]);
+                        com_google_android_gms_internal_config_zzay.zzx();
+                        zzx++;
                     }
-                    obj[zzy] = new zzat();
-                    com_google_android_gms_internal_config_zzay.zza(obj[zzy]);
-                    this.zzbp = obj;
+                    obj[zzx] = new zzat();
+                    com_google_android_gms_internal_config_zzay.zza(obj[zzx]);
+                    this.zzbo = obj;
                     continue;
                 default:
-                    if (!super.zza(com_google_android_gms_internal_config_zzay, zzy)) {
+                    if (!super.zza(com_google_android_gms_internal_config_zzay, zzx)) {
                         break;
                     }
                     continue;
@@ -92,8 +92,8 @@ public final class zzav extends zzbb<zzav> {
         if (!(this.namespace == null || this.namespace.equals(TtmlNode.ANONYMOUS_REGION_ID))) {
             com_google_android_gms_internal_config_zzaz.zza(1, this.namespace);
         }
-        if (this.zzbp != null && this.zzbp.length > 0) {
-            for (zzbh com_google_android_gms_internal_config_zzbh : this.zzbp) {
+        if (this.zzbo != null && this.zzbo.length > 0) {
+            for (zzbh com_google_android_gms_internal_config_zzbh : this.zzbo) {
                 if (com_google_android_gms_internal_config_zzbh != null) {
                     com_google_android_gms_internal_config_zzaz.zza(2, com_google_android_gms_internal_config_zzbh);
                 }
@@ -102,16 +102,16 @@ public final class zzav extends zzbb<zzav> {
         super.zza(com_google_android_gms_internal_config_zzaz);
     }
 
-    protected final int zzu() {
-        int zzu = super.zzu();
+    protected final int zzt() {
+        int zzt = super.zzt();
         if (!(this.namespace == null || this.namespace.equals(TtmlNode.ANONYMOUS_REGION_ID))) {
-            zzu += zzaz.zzb(1, this.namespace);
+            zzt += zzaz.zzb(1, this.namespace);
         }
-        if (this.zzbp == null || this.zzbp.length <= 0) {
-            return zzu;
+        if (this.zzbo == null || this.zzbo.length <= 0) {
+            return zzt;
         }
-        int i = zzu;
-        for (zzbh com_google_android_gms_internal_config_zzbh : this.zzbp) {
+        int i = zzt;
+        for (zzbh com_google_android_gms_internal_config_zzbh : this.zzbo) {
             if (com_google_android_gms_internal_config_zzbh != null) {
                 i += zzaz.zzb(2, com_google_android_gms_internal_config_zzbh);
             }

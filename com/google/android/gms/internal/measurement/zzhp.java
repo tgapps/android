@@ -3,17 +3,15 @@ package com.google.android.gms.internal.measurement;
 import java.util.concurrent.atomic.AtomicReference;
 
 final class zzhp implements Runnable {
-    private final /* synthetic */ AtomicReference zzaoo;
-    private final /* synthetic */ zzhm zzaop;
-    private final /* synthetic */ boolean zzaos;
+    private final /* synthetic */ AtomicReference zzanv;
+    private final /* synthetic */ zzhk zzanw;
 
-    zzhp(zzhm com_google_android_gms_internal_measurement_zzhm, AtomicReference atomicReference, boolean z) {
-        this.zzaop = com_google_android_gms_internal_measurement_zzhm;
-        this.zzaoo = atomicReference;
-        this.zzaos = z;
+    zzhp(zzhk com_google_android_gms_internal_measurement_zzhk, AtomicReference atomicReference) {
+        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
+        this.zzanv = atomicReference;
     }
 
     public final void run() {
-        this.zzaop.zzfx().zza(this.zzaoo, this.zzaos);
+        this.zzanw.zzfx().zza(this.zzanv);
     }
 }

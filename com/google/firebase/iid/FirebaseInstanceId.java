@@ -11,42 +11,51 @@ import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.Keep;
-import android.support.v4.util.ArrayMap;
 import android.util.Log;
+import com.google.android.gms.measurement.AppMeasurement;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
 import java.io.IOException;
-import java.security.KeyPair;
-import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.concurrent.GuardedBy;
 
 public class FirebaseInstanceId {
-    private static final long zzbqi = TimeUnit.HOURS.toSeconds(8);
-    private static Map<String, FirebaseInstanceId> zzbqj = new ArrayMap();
-    private static zzaa zzbqk;
+    private static final long zzah = TimeUnit.HOURS.toSeconds(8);
+    private static zzao zzai;
     @GuardedBy("FirebaseInstanceId.class")
-    private static ScheduledThreadPoolExecutor zzbql;
-    private final FirebaseApp zzbqm;
-    private final zzw zzbqn;
-    private final zzx zzbqo;
+    private static ScheduledThreadPoolExecutor zzaj;
+    private final FirebaseApp zzak;
+    private final zzae zzal;
+    private final zzo zzam;
+    private final zzah zzan;
     @GuardedBy("this")
-    private KeyPair zzbqp;
+    private boolean zzao;
     @GuardedBy("this")
-    private boolean zzbqq = false;
-    @GuardedBy("this")
-    private boolean zzbqr;
+    private boolean zzap;
 
-    private FirebaseInstanceId(FirebaseApp firebaseApp, zzw com_google_firebase_iid_zzw) {
-        if (zzw.zza(firebaseApp) == null) {
+    FirebaseInstanceId(FirebaseApp firebaseApp) {
+        this(firebaseApp, new zzae(firebaseApp.getApplicationContext()));
+    }
+
+    private FirebaseInstanceId(FirebaseApp firebaseApp, zzae com_google_firebase_iid_zzae) {
+        this.zzan = new zzah();
+        this.zzao = false;
+        if (zzae.zza(firebaseApp) == null) {
             throw new IllegalStateException("FirebaseInstanceId failed to initialize, FirebaseApp is missing project ID");
         }
-        this.zzbqm = firebaseApp;
-        this.zzbqn = com_google_firebase_iid_zzw;
-        this.zzbqo = new zzx(firebaseApp.getApplicationContext(), com_google_firebase_iid_zzw);
-        this.zzbqr = zzsm();
-        if (zzso()) {
-            zzse();
+        synchronized (FirebaseInstanceId.class) {
+            if (zzai == null) {
+                zzai = new zzao(firebaseApp.getApplicationContext());
+            }
+        }
+        this.zzak = firebaseApp;
+        this.zzal = com_google_firebase_iid_zzae;
+        this.zzam = new zzl(firebaseApp, this, com_google_firebase_iid_zzae);
+        this.zzap = zzm();
+        if (zzo()) {
+            zzd();
         }
     }
 
@@ -58,95 +67,72 @@ public class FirebaseInstanceId {
     public static synchronized FirebaseInstanceId getInstance(FirebaseApp firebaseApp) {
         FirebaseInstanceId firebaseInstanceId;
         synchronized (FirebaseInstanceId.class) {
-            firebaseInstanceId = (FirebaseInstanceId) zzbqj.get(firebaseApp.getOptions().getApplicationId());
-            if (firebaseInstanceId == null) {
-                if (zzbqk == null) {
-                    zzbqk = new zzaa(firebaseApp.getApplicationContext());
-                }
-                firebaseInstanceId = new FirebaseInstanceId(firebaseApp, new zzw(firebaseApp.getApplicationContext()));
-                zzbqj.put(firebaseApp.getOptions().getApplicationId(), firebaseInstanceId);
-            }
+            firebaseInstanceId = (FirebaseInstanceId) firebaseApp.get(FirebaseInstanceId.class);
         }
         return firebaseInstanceId;
     }
 
-    private final synchronized KeyPair getKeyPair() {
-        if (this.zzbqp == null) {
-            this.zzbqp = zzbqk.zzfd(TtmlNode.ANONYMOUS_REGION_ID);
+    private final synchronized void startSync() {
+        if (!this.zzao) {
+            zza(0);
         }
-        if (this.zzbqp == null) {
-            this.zzbqp = zzbqk.zzfb(TtmlNode.ANONYMOUS_REGION_ID);
-        }
-        return this.zzbqp;
     }
 
-    private final synchronized void startSync() {
-        if (!this.zzbqq) {
-            zzan(0);
+    private static <T> T zza(Task<T> task) throws IOException {
+        try {
+            return Tasks.await(task);
+        } catch (Throwable e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof IOException) {
+                throw ((IOException) cause);
+            } else if (cause instanceof RuntimeException) {
+                throw new IOException(cause);
+            } else {
+                throw new IOException(e);
+            }
+        } catch (InterruptedException e2) {
+            throw new IOException("SERVICE_NOT_AVAILABLE");
         }
+    }
+
+    private final String zza(String str, String str2, Bundle bundle) throws IOException {
+        return ((zzl) this.zzam).zza(str, str2, bundle);
     }
 
     static void zza(Runnable runnable, long j) {
         synchronized (FirebaseInstanceId.class) {
-            if (zzbql == null) {
-                zzbql = new ScheduledThreadPoolExecutor(1);
+            if (zzaj == null) {
+                zzaj = new ScheduledThreadPoolExecutor(1);
             }
-            zzbql.schedule(runnable, j, TimeUnit.SECONDS);
+            zzaj.schedule(runnable, j, TimeUnit.SECONDS);
         }
     }
 
-    private final String zzb(String str, String str2, Bundle bundle) throws IOException {
-        bundle.putString("scope", str2);
-        bundle.putString("sender", str);
-        bundle.putString("subtype", str);
-        bundle.putString("appid", getId());
-        bundle.putString("gmp_app_id", this.zzbqm.getOptions().getApplicationId());
-        bundle.putString("gmsv", Integer.toString(this.zzbqn.zzsx()));
-        bundle.putString("osv", Integer.toString(VERSION.SDK_INT));
-        bundle.putString("app_ver", this.zzbqn.zzsv());
-        bundle.putString("app_ver_name", this.zzbqn.zzsw());
-        bundle.putString("cliv", "fiid-12451000");
-        Bundle zzi = this.zzbqo.zzi(bundle);
-        if (zzi == null) {
-            throw new IOException("SERVICE_NOT_AVAILABLE");
-        }
-        String string = zzi.getString("registration_id");
-        if (string == null) {
-            string = zzi.getString("unregistered");
-            if (string == null) {
-                string = zzi.getString("error");
-                if ("RST".equals(string)) {
-                    zzsk();
-                    throw new IOException("INSTANCE_ID_RESET");
-                } else if (string != null) {
-                    throw new IOException(string);
-                } else {
-                    String valueOf = String.valueOf(zzi);
-                    Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 21).append("Unexpected response: ").append(valueOf).toString(), new Throwable());
-                    throw new IOException("SERVICE_NOT_AVAILABLE");
-                }
-            }
-        }
-        return string;
+    private static String zzd(String str) {
+        return (str.isEmpty() || str.equalsIgnoreCase(AppMeasurement.FCM_ORIGIN) || str.equalsIgnoreCase("gcm")) ? "*" : str;
     }
 
-    private final void zzse() {
-        zzab zzsg = zzsg();
-        if (zzsg == null || zzsg.zzff(this.zzbqn.zzsv()) || zzbqk.zztc() != null) {
+    private final void zzd() {
+        zzap zzg = zzg();
+        if (zzg == null || zzg.zzj(this.zzal.zzy()) || zzai.zzaf() != null) {
             startSync();
         }
     }
 
-    static zzaa zzsi() {
-        return zzbqk;
+    static String zzf() {
+        return zzae.zza(zzai.zzg(TtmlNode.ANONYMOUS_REGION_ID).getKeyPair());
     }
 
-    static boolean zzsj() {
+    static zzao zzi() {
+        return zzai;
+    }
+
+    static boolean zzj() {
         return Log.isLoggable("FirebaseInstanceId", 3) || (VERSION.SDK_INT == 23 && Log.isLoggable("FirebaseInstanceId", 3));
     }
 
-    private final boolean zzsm() {
-        Context applicationContext = this.zzbqm.getApplicationContext();
+    private final boolean zzm() {
+        Context applicationContext = this.zzak.getApplicationContext();
         SharedPreferences sharedPreferences = applicationContext.getSharedPreferences("com.google.firebase.messaging", 0);
         if (sharedPreferences.contains("auto_init")) {
             return sharedPreferences.getBoolean("auto_init", true);
@@ -161,15 +147,15 @@ public class FirebaseInstanceId {
             }
         } catch (NameNotFoundException e) {
         }
-        return zzsn();
+        return zzn();
     }
 
-    private final boolean zzsn() {
+    private final boolean zzn() {
         try {
             Class.forName("com.google.firebase.messaging.FirebaseMessaging");
             return true;
         } catch (ClassNotFoundException e) {
-            Context applicationContext = this.zzbqm.getApplicationContext();
+            Context applicationContext = this.zzak.getApplicationContext();
             Intent intent = new Intent("com.google.firebase.MESSAGING_EVENT");
             intent.setPackage(applicationContext.getPackageName());
             ResolveInfo resolveService = applicationContext.getPackageManager().resolveService(intent, 0);
@@ -178,42 +164,45 @@ public class FirebaseInstanceId {
     }
 
     public String getId() {
-        zzse();
-        return zzw.zza(getKeyPair());
+        zzd();
+        return zzf();
     }
 
     public String getToken() {
-        zzab zzsg = zzsg();
-        if (zzsg == null || zzsg.zzff(this.zzbqn.zzsv())) {
+        zzap zzg = zzg();
+        if (zzg == null || zzg.zzj(this.zzal.zzy())) {
             startSync();
         }
-        return zzsg != null ? zzsg.zzbsb : null;
+        return zzg != null ? zzg.zzcu : null;
     }
 
     public String getToken(String str, String str2) throws IOException {
         if (Looper.getMainLooper() == Looper.myLooper()) {
             throw new IOException("MAIN_THREAD");
         }
-        zzab zzj = zzbqk.zzj(TtmlNode.ANONYMOUS_REGION_ID, str, str2);
-        if (zzj != null && !zzj.zzff(this.zzbqn.zzsv())) {
-            return zzj.zzbsb;
-        }
-        String zzb = zzb(str, str2, new Bundle());
-        if (zzb == null) {
-            return zzb;
-        }
-        zzbqk.zza(TtmlNode.ANONYMOUS_REGION_ID, str, str2, zzb, this.zzbqn.zzsv());
-        return zzb;
+        String zzd = zzd(str2);
+        zzap zzb = zzai.zzb(TtmlNode.ANONYMOUS_REGION_ID, str, zzd);
+        return (zzb == null || zzb.zzj(this.zzal.zzy())) ? this.zzan.zza(str, zzd, new zzk(this, str, zzd)) : zzb.zzcu;
     }
 
-    final synchronized void zzan(long j) {
-        zza(new zzac(this, this.zzbqn, Math.min(Math.max(30, j << 1), zzbqi)), j);
-        this.zzbqq = true;
+    final /* synthetic */ String zza(String str, String str2) throws IOException {
+        String str3 = (String) zza(this.zzam.zzb(str, str2));
+        zzai.zza(TtmlNode.ANONYMOUS_REGION_ID, str, str2, str3, this.zzal.zzy());
+        return str3;
     }
 
-    final void zzew(String str) throws IOException {
-        zzab zzsg = zzsg();
-        if (zzsg == null || zzsg.zzff(this.zzbqn.zzsv())) {
+    final synchronized void zza(long j) {
+        zza(new zzaq(this, this.zzal, Math.min(Math.max(30, j << 1), zzah)), j);
+        this.zzao = true;
+    }
+
+    final synchronized void zza(boolean z) {
+        this.zzao = z;
+    }
+
+    final void zzb(String str) throws IOException {
+        zzap zzg = zzg();
+        if (zzg == null || zzg.zzj(this.zzal.zzy())) {
             throw new IOException("token not available");
         }
         Bundle bundle = new Bundle();
@@ -221,15 +210,15 @@ public class FirebaseInstanceId {
         String valueOf = String.valueOf("/topics/");
         String valueOf2 = String.valueOf(str);
         bundle.putString(str2, valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
-        String str3 = zzsg.zzbsb;
+        String str3 = zzg.zzcu;
         str2 = String.valueOf("/topics/");
         valueOf2 = String.valueOf(str);
-        zzb(str3, valueOf2.length() != 0 ? str2.concat(valueOf2) : new String(str2), bundle);
+        zza(str3, valueOf2.length() != 0 ? str2.concat(valueOf2) : new String(str2), bundle);
     }
 
-    final void zzex(String str) throws IOException {
-        zzab zzsg = zzsg();
-        if (zzsg == null || zzsg.zzff(this.zzbqn.zzsv())) {
+    final void zzc(String str) throws IOException {
+        zzap zzg = zzg();
+        if (zzg == null || zzg.zzj(this.zzal.zzy())) {
             throw new IOException("token not available");
         }
         Bundle bundle = new Bundle();
@@ -238,42 +227,37 @@ public class FirebaseInstanceId {
         String valueOf2 = String.valueOf(str);
         bundle.putString(str2, valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
         bundle.putString("delete", "1");
-        String str3 = zzsg.zzbsb;
+        String str3 = zzg.zzcu;
         str2 = String.valueOf("/topics/");
         valueOf2 = String.valueOf(str);
-        zzb(str3, valueOf2.length() != 0 ? str2.concat(valueOf2) : new String(str2), bundle);
+        zza(str3, valueOf2.length() != 0 ? str2.concat(valueOf2) : new String(str2), bundle);
     }
 
-    final FirebaseApp zzsf() {
-        return this.zzbqm;
+    final FirebaseApp zze() {
+        return this.zzak;
     }
 
-    final zzab zzsg() {
-        return zzbqk.zzj(TtmlNode.ANONYMOUS_REGION_ID, zzw.zza(this.zzbqm), "*");
+    final zzap zzg() {
+        return zzai.zzb(TtmlNode.ANONYMOUS_REGION_ID, zzae.zza(this.zzak), "*");
     }
 
-    final String zzsh() throws IOException {
-        return getToken(zzw.zza(this.zzbqm), "*");
+    final String zzh() throws IOException {
+        return getToken(zzae.zza(this.zzak), "*");
     }
 
-    final synchronized void zzsk() {
-        zzbqk.zztd();
-        this.zzbqp = null;
-        if (zzso()) {
+    final synchronized void zzk() {
+        zzai.zzag();
+        if (zzo()) {
             startSync();
         }
     }
 
-    final void zzsl() {
-        zzbqk.zzfc(TtmlNode.ANONYMOUS_REGION_ID);
+    final void zzl() {
+        zzai.zzh(TtmlNode.ANONYMOUS_REGION_ID);
         startSync();
     }
 
-    public final synchronized boolean zzso() {
-        return this.zzbqr;
-    }
-
-    final synchronized void zzu(boolean z) {
-        this.zzbqq = z;
+    public final synchronized boolean zzo() {
+        return this.zzap;
     }
 }

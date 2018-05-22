@@ -1,7 +1,7 @@
 package com.google.android.gms.internal.measurement;
 
 interface zzek {
-    boolean zza(long j, zzki com_google_android_gms_internal_measurement_zzki);
+    boolean zza(long j, zzkn com_google_android_gms_internal_measurement_zzkn);
 
-    void zzb(zzkl com_google_android_gms_internal_measurement_zzkl);
+    void zzb(zzkq com_google_android_gms_internal_measurement_zzkq);
 }

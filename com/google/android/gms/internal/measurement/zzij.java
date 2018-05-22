@@ -1,17 +1,14 @@
 package com.google.android.gms.internal.measurement;
 
-final class zzij implements Runnable {
-    private final /* synthetic */ zzih zzapo;
-    private final /* synthetic */ zzik zzapp;
+final class zzij extends zzem {
+    private final /* synthetic */ zzii zzape;
 
-    zzij(zzih com_google_android_gms_internal_measurement_zzih, zzik com_google_android_gms_internal_measurement_zzik) {
-        this.zzapo = com_google_android_gms_internal_measurement_zzih;
-        this.zzapp = com_google_android_gms_internal_measurement_zzik;
+    zzij(zzii com_google_android_gms_internal_measurement_zzii, zzhi com_google_android_gms_internal_measurement_zzhi) {
+        this.zzape = com_google_android_gms_internal_measurement_zzii;
+        super(com_google_android_gms_internal_measurement_zzhi);
     }
 
     public final void run() {
-        this.zzapo.zza(this.zzapp);
-        this.zzapo.zzapc = null;
-        this.zzapo.zzfx().zza(null);
+        this.zzape.zzcv();
     }
 }

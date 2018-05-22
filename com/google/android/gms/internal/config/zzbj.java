@@ -4,11 +4,11 @@ import java.util.Arrays;
 
 final class zzbj {
     final int tag;
-    final byte[] zzcs;
+    final byte[] zzcr;
 
     zzbj(int i, byte[] bArr) {
         this.tag = i;
-        this.zzcs = bArr;
+        this.zzcr = bArr;
     }
 
     public final boolean equals(Object obj) {
@@ -19,10 +19,10 @@ final class zzbj {
             return false;
         }
         zzbj com_google_android_gms_internal_config_zzbj = (zzbj) obj;
-        return this.tag == com_google_android_gms_internal_config_zzbj.tag && Arrays.equals(this.zzcs, com_google_android_gms_internal_config_zzbj.zzcs);
+        return this.tag == com_google_android_gms_internal_config_zzbj.tag && Arrays.equals(this.zzcr, com_google_android_gms_internal_config_zzbj.zzcr);
     }
 
     public final int hashCode() {
-        return ((this.tag + 527) * 31) + Arrays.hashCode(this.zzcs);
+        return ((this.tag + 527) * 31) + Arrays.hashCode(this.zzcr);
     }
 }

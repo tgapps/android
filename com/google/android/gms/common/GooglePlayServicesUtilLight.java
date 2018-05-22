@@ -77,7 +77,7 @@ public class GooglePlayServicesUtilLight {
     }
 
     public static boolean honorsDebugCertificates(Context context) {
-        return true;
+        return isTestKeysBuild(context) || !isUserBuildDevice();
     }
 
     @Deprecated
@@ -125,6 +125,55 @@ public class GooglePlayServicesUtilLight {
         return false;
     }
 
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    public static boolean isTestKeysBuild(android.content.Context r4) {
+        /*
+        r3 = 1;
+        r0 = zzbs;
+        if (r0 != 0) goto L_0x002b;
+    L_0x0005:
+        r0 = com.google.android.gms.common.wrappers.Wrappers.packageManager(r4);	 Catch:{ NameNotFoundException -> 0x0032 }
+        r1 = "com.google.android.gms";
+        r2 = 64;
+        r0 = r0.getPackageInfo(r1, r2);	 Catch:{ NameNotFoundException -> 0x0032 }
+        r1 = com.google.android.gms.common.GoogleSignatureVerifier.getInstance(r4);	 Catch:{ NameNotFoundException -> 0x0032 }
+        if (r0 == 0) goto L_0x002e;
+    L_0x0018:
+        r2 = 0;
+        r2 = r1.isGooglePublicSignedPackage(r0, r2);	 Catch:{ NameNotFoundException -> 0x0032 }
+        if (r2 != 0) goto L_0x002e;
+    L_0x001f:
+        r2 = 1;
+        r0 = r1.isGooglePublicSignedPackage(r0, r2);	 Catch:{ NameNotFoundException -> 0x0032 }
+        if (r0 == 0) goto L_0x002e;
+    L_0x0026:
+        r0 = 1;
+        zzbr = r0;	 Catch:{ NameNotFoundException -> 0x0032 }
+    L_0x0029:
+        zzbs = r3;
+    L_0x002b:
+        r0 = zzbr;
+        return r0;
+    L_0x002e:
+        r0 = 0;
+        zzbr = r0;	 Catch:{ NameNotFoundException -> 0x0032 }
+        goto L_0x0029;
+    L_0x0032:
+        r0 = move-exception;
+        r1 = "GooglePlayServicesUtil";
+        r2 = "Cannot find Google Play services package name.";
+        android.util.Log.w(r1, r2, r0);	 Catch:{ all -> 0x003f }
+        zzbs = r3;
+        goto L_0x002b;
+    L_0x003f:
+        r0 = move-exception;
+        zzbs = r3;
+        throw r0;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.common.GooglePlayServicesUtilLight.isTestKeysBuild(android.content.Context):boolean");
+    }
+
     @TargetApi(21)
     static boolean isUninstalledAppPossiblyUpdating(Context context, String str) {
         boolean equals = str.equals("com.google.android.gms");
@@ -148,6 +197,11 @@ public class GooglePlayServicesUtilLight {
     }
 
     @Deprecated
+    public static boolean isUserBuildDevice() {
+        return DeviceProperties.isUserBuild();
+    }
+
+    @Deprecated
     public static boolean isUserRecoverableError(int i) {
         switch (i) {
             case 1:
@@ -158,6 +212,12 @@ public class GooglePlayServicesUtilLight {
             default:
                 return false;
         }
+    }
+
+    @TargetApi(19)
+    @Deprecated
+    public static boolean uidHasPackageName(Context context, int i, String str) {
+        return UidVerifier.uidHasPackageName(context, i, str);
     }
 
     private static int zza(Context context, boolean z, int i) {

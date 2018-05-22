@@ -25,6 +25,13 @@ public final class zzl implements ComponentContainer {
         this.zzax = componentContainer;
     }
 
+    public final <T> T get(Class<T> cls) {
+        if (this.zzav.contains(cls)) {
+            return this.zzax.get(cls);
+        }
+        throw new IllegalArgumentException(String.format("Requesting %s is not allowed.", new Object[]{cls}));
+    }
+
     public final <T> Provider<T> getProvider(Class<T> cls) {
         if (this.zzaw.contains(cls)) {
             return this.zzax.getProvider(cls);

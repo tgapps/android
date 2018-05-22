@@ -11,11 +11,29 @@ import com.google.android.gms.common.util.PlatformVersion;
 import javax.annotation.concurrent.GuardedBy;
 
 public final class FirebaseInstanceIdReceiver extends WakefulBroadcastReceiver {
-    private static boolean zzbqs = false;
+    private static boolean zzat = false;
     @GuardedBy("FirebaseInstanceIdReceiver.class")
-    private static zzh zzbqt;
+    private static zzh zzau;
     @GuardedBy("FirebaseInstanceIdReceiver.class")
-    private static zzh zzbqu;
+    private static zzh zzav;
+
+    private static synchronized zzh zza(Context context, String str) {
+        zzh com_google_firebase_iid_zzh;
+        synchronized (FirebaseInstanceIdReceiver.class) {
+            if ("com.google.firebase.MESSAGING_EVENT".equals(str)) {
+                if (zzav == null) {
+                    zzav = new zzh(context, str);
+                }
+                com_google_firebase_iid_zzh = zzav;
+            } else {
+                if (zzau == null) {
+                    zzau = new zzh(context, str);
+                }
+                com_google_firebase_iid_zzh = zzau;
+            }
+        }
+        return com_google_firebase_iid_zzh;
+    }
 
     private final void zza(Context context, Intent intent, String str) {
         String str2 = null;
@@ -46,32 +64,14 @@ public final class FirebaseInstanceIdReceiver extends WakefulBroadcastReceiver {
                 if (isOrderedBroadcast()) {
                     setResultCode(-1);
                 }
-                zzi(context, str2).zza(intent, goAsync());
+                zza(context, str2).zza(intent, goAsync());
             } else {
-                i2 = zzz.zzta().zza(context, str2, intent);
+                i2 = zzan.zzad().zza(context, str2, intent);
             }
         }
         if (isOrderedBroadcast()) {
             setResultCode(i2);
         }
-    }
-
-    private static synchronized zzh zzi(Context context, String str) {
-        zzh com_google_firebase_iid_zzh;
-        synchronized (FirebaseInstanceIdReceiver.class) {
-            if ("com.google.firebase.MESSAGING_EVENT".equals(str)) {
-                if (zzbqu == null) {
-                    zzbqu = new zzh(context, str);
-                }
-                com_google_firebase_iid_zzh = zzbqu;
-            } else {
-                if (zzbqt == null) {
-                    zzbqt = new zzh(context, str);
-                }
-                com_google_firebase_iid_zzh = zzbqt;
-            }
-        }
-        return com_google_firebase_iid_zzh;
     }
 
     public final void onReceive(Context context, Intent intent) {

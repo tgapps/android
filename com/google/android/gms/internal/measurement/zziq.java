@@ -1,31 +1,43 @@
 package com.google.android.gms.internal.measurement;
 
 import android.os.RemoteException;
+import android.text.TextUtils;
 
 final class zziq implements Runnable {
-    private final /* synthetic */ zzil zzapy;
-    private final /* synthetic */ zzig zzaqa;
+    private final /* synthetic */ zzdz zzane;
+    private final /* synthetic */ String zzanj;
+    private final /* synthetic */ zzeu zzank;
+    private final /* synthetic */ zzii zzape;
+    private final /* synthetic */ boolean zzapg = true;
+    private final /* synthetic */ boolean zzaph;
 
-    zziq(zzil com_google_android_gms_internal_measurement_zzil, zzig com_google_android_gms_internal_measurement_zzig) {
-        this.zzapy = com_google_android_gms_internal_measurement_zzil;
-        this.zzaqa = com_google_android_gms_internal_measurement_zzig;
+    zziq(zzii com_google_android_gms_internal_measurement_zzii, boolean z, boolean z2, zzeu com_google_android_gms_internal_measurement_zzeu, zzdz com_google_android_gms_internal_measurement_zzdz, String str) {
+        this.zzape = com_google_android_gms_internal_measurement_zzii;
+        this.zzaph = z2;
+        this.zzank = com_google_android_gms_internal_measurement_zzeu;
+        this.zzane = com_google_android_gms_internal_measurement_zzdz;
+        this.zzanj = str;
     }
 
     public final void run() {
-        zzey zzd = this.zzapy.zzaps;
+        zzey zzd = this.zzape.zzaoy;
         if (zzd == null) {
-            this.zzapy.zzgg().zzil().log("Failed to send current screen to service");
+            this.zzape.zzge().zzim().log("Discarding data. Failed to send event to service");
             return;
         }
-        try {
-            if (this.zzaqa == null) {
-                zzd.zza(0, null, null, this.zzapy.getContext().getPackageName());
-            } else {
-                zzd.zza(this.zzaqa.zzapb, this.zzaqa.zzug, this.zzaqa.zzapa, this.zzapy.getContext().getPackageName());
+        if (this.zzapg) {
+            this.zzape.zza(zzd, this.zzaph ? null : this.zzank, this.zzane);
+        } else {
+            try {
+                if (TextUtils.isEmpty(this.zzanj)) {
+                    zzd.zza(this.zzank, this.zzane);
+                } else {
+                    zzd.zza(this.zzank, this.zzanj, this.zzape.zzge().zziv());
+                }
+            } catch (RemoteException e) {
+                this.zzape.zzge().zzim().zzg("Failed to send event to the service", e);
             }
-            this.zzapy.zzcu();
-        } catch (RemoteException e) {
-            this.zzapy.zzgg().zzil().zzg("Failed to send current screen to the service", e);
         }
+        this.zzape.zzcu();
     }
 }

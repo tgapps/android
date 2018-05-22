@@ -8,21 +8,21 @@ import java.util.concurrent.TimeUnit;
 
 final class zzd {
     final Intent intent;
-    private final PendingResult zzbpu;
-    private boolean zzbpv = false;
-    private final ScheduledFuture<?> zzbpw;
+    private final PendingResult zzs;
+    private boolean zzt = false;
+    private final ScheduledFuture<?> zzu;
 
     zzd(Intent intent, PendingResult pendingResult, ScheduledExecutorService scheduledExecutorService) {
         this.intent = intent;
-        this.zzbpu = pendingResult;
-        this.zzbpw = scheduledExecutorService.schedule(new zze(this, intent), 9500, TimeUnit.MILLISECONDS);
+        this.zzs = pendingResult;
+        this.zzu = scheduledExecutorService.schedule(new zze(this, intent), 9500, TimeUnit.MILLISECONDS);
     }
 
     final synchronized void finish() {
-        if (!this.zzbpv) {
-            this.zzbpu.finish();
-            this.zzbpw.cancel(false);
-            this.zzbpv = true;
+        if (!this.zzt) {
+            this.zzs.finish();
+            this.zzu.cancel(false);
+            this.zzt = true;
         }
     }
 }

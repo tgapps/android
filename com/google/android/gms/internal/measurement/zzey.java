@@ -5,33 +5,35 @@ import android.os.RemoteException;
 import java.util.List;
 
 public interface zzey extends IInterface {
-    List<zzjs> zza(zzec com_google_android_gms_internal_measurement_zzec, boolean z) throws RemoteException;
+    List<zzjx> zza(zzdz com_google_android_gms_internal_measurement_zzdz, boolean z) throws RemoteException;
 
-    List<zzef> zza(String str, String str2, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException;
+    List<zzed> zza(String str, String str2, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
 
-    List<zzjs> zza(String str, String str2, String str3, boolean z) throws RemoteException;
+    List<zzjx> zza(String str, String str2, String str3, boolean z) throws RemoteException;
 
-    List<zzjs> zza(String str, String str2, boolean z, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException;
+    List<zzjx> zza(String str, String str2, boolean z, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
 
     void zza(long j, String str, String str2, String str3) throws RemoteException;
 
-    void zza(zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException;
+    void zza(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
 
-    void zza(zzef com_google_android_gms_internal_measurement_zzef, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException;
+    void zza(zzed com_google_android_gms_internal_measurement_zzed, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
 
-    void zza(zzeu com_google_android_gms_internal_measurement_zzeu, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException;
+    void zza(zzeu com_google_android_gms_internal_measurement_zzeu, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
 
     void zza(zzeu com_google_android_gms_internal_measurement_zzeu, String str, String str2) throws RemoteException;
 
-    void zza(zzjs com_google_android_gms_internal_measurement_zzjs, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException;
+    void zza(zzjx com_google_android_gms_internal_measurement_zzjx, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
 
-    void zzb(zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException;
+    byte[] zza(zzeu com_google_android_gms_internal_measurement_zzeu, String str) throws RemoteException;
 
-    void zzb(zzef com_google_android_gms_internal_measurement_zzef) throws RemoteException;
+    void zzb(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
 
-    String zzc(zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException;
+    void zzb(zzed com_google_android_gms_internal_measurement_zzed) throws RemoteException;
 
-    void zzd(zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException;
+    String zzc(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
 
-    List<zzef> zze(String str, String str2, String str3) throws RemoteException;
+    void zzd(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    List<zzed> zze(String str, String str2, String str3) throws RemoteException;
 }

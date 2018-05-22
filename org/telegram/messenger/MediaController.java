@@ -172,7 +172,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
     private User lastUser;
     private float[] linearAcceleration = new float[3];
     private Sensor linearSensor;
-    private String[] mediaProjections = null;
+    private String[] mediaProjections;
     private PipRoundVideoView pipRoundVideoView;
     private int pipSwitchingState;
     private boolean playMusicAgain;
@@ -3104,7 +3104,7 @@ public class MediaController implements SensorEventListener, OnAudioFocusChangeL
             File file = null;
             if (!(fullPath == null || fullPath.length() == 0)) {
                 file = new File(fullPath);
-                if (!file.exists()) {
+                if (!file.exists() || AndroidUtilities.isInternalUri(Uri.fromFile(file))) {
                     file = null;
                 }
             }

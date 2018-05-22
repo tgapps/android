@@ -6,6 +6,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public final class ArrayUtils {
+    public static <T> T[] concat(T[]... tArr) {
+        if (tArr.length == 0) {
+            return (Object[]) Array.newInstance(tArr.getClass(), 0);
+        }
+        int i;
+        int i2 = 0;
+        for (T[] length : tArr) {
+            i2 += length.length;
+        }
+        Object copyOf = Arrays.copyOf(tArr[0], i2);
+        i2 = tArr[0].length;
+        for (i = 1; i < tArr.length; i++) {
+            Object obj = tArr[i];
+            System.arraycopy(obj, 0, copyOf, i2, obj.length);
+            i2 += obj.length;
+        }
+        return copyOf;
+    }
+
     public static <T> boolean contains(T[] tArr, T t) {
         return indexOf(tArr, t) >= 0;
     }

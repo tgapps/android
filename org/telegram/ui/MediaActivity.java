@@ -5,6 +5,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff.Mode;
@@ -18,7 +19,6 @@ import android.text.TextUtils.TruncateAt;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnPreDrawListener;
@@ -85,9 +85,10 @@ import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarMenuItem.ActionBarMenuItemSearchListener;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow.ActionBarPopupWindowLayout;
-import org.telegram.ui.ActionBar.AlertDialog.Builder;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BackDrawable;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.BottomSheet.Builder;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.Theme.ThemeInfo;
 import org.telegram.ui.ActionBar.ThemeDescription;
@@ -197,6 +198,36 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
     private SparseArray<MessageObject>[] selectedFiles = new SparseArray[]{new SparseArray(), new SparseArray()};
     private NumberTextView selectedMessagesCountTextView;
     private int selectedMode;
+    SharedLinkCellDelegate sharedLinkCellDelegate = new SharedLinkCellDelegate() {
+        public void needOpenWebView(WebPage webPage) {
+            MediaActivity.this.openWebView(webPage);
+        }
+
+        public boolean canPerformActions() {
+            return !MediaActivity.this.actionBar.isActionModeShowed();
+        }
+
+        public void onLinkLongPress(final String urlFinal) {
+            Builder builder = new Builder(MediaActivity.this.getParentActivity());
+            builder.setTitle(urlFinal);
+            builder.setItems(new CharSequence[]{LocaleController.getString("Open", R.string.Open), LocaleController.getString("Copy", R.string.Copy)}, new OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        Browser.openUrl(MediaActivity.this.getParentActivity(), urlFinal, true);
+                    } else if (which == 1) {
+                        String url = urlFinal;
+                        if (url.startsWith("mailto:")) {
+                            url = url.substring(7);
+                        } else if (url.startsWith("tel:")) {
+                            url = url.substring(4);
+                        }
+                        AndroidUtilities.addToClipboard(url);
+                    }
+                }
+            });
+            MediaActivity.this.showDialog(builder.create());
+        }
+    };
     private SharedMediaData[] sharedMediaData = new SharedMediaData[5];
 
     private class SharedMediaData {
@@ -393,8 +424,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                         }
                     }
                     if (MediaSearchAdapter.this.currentType == 1 || MediaSearchAdapter.this.currentType == 4) {
-                        final ArrayList<MessageObject> copy = new ArrayList();
-                        copy.addAll(MediaActivity.this.sharedMediaData[MediaSearchAdapter.this.currentType].messages);
+                        final ArrayList<MessageObject> copy = new ArrayList(MediaActivity.this.sharedMediaData[MediaSearchAdapter.this.currentType].messages);
                         Utilities.searchQueue.postRunnable(new Runnable() {
                             public void run() {
                                 String search1 = query.trim().toLowerCase();
@@ -510,15 +540,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                 view = new SharedDocumentCell(this.mContext);
             } else {
                 view = new SharedLinkCell(this.mContext);
-                ((SharedLinkCell) view).setDelegate(new SharedLinkCellDelegate() {
-                    public void needOpenWebView(WebPage webPage) {
-                        MediaActivity.this.openWebView(webPage);
-                    }
-
-                    public boolean canPerformActions() {
-                        return !MediaActivity.this.actionBar.isActionModeShowed();
-                    }
-                });
+                ((SharedLinkCell) view).setDelegate(MediaActivity.this.sharedLinkCellDelegate);
             }
             return new Holder(view);
         }
@@ -766,15 +788,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                     break;
                 case 1:
                     view = new SharedLinkCell(this.mContext);
-                    ((SharedLinkCell) view).setDelegate(new SharedLinkCellDelegate() {
-                        public void needOpenWebView(WebPage webPage) {
-                            MediaActivity.this.openWebView(webPage);
-                        }
-
-                        public boolean canPerformActions() {
-                            return !MediaActivity.this.actionBar.isActionModeShowed();
-                        }
-                    });
+                    ((SharedLinkCell) view).setDelegate(MediaActivity.this.sharedLinkCellDelegate);
                     break;
                 default:
                     view = new LoadingCell(this.mContext);
@@ -1078,7 +1092,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                 } else if (id == 4) {
                     if (MediaActivity.this.getParentActivity() != null) {
                         final boolean[] zArr;
-                        Builder builder = new Builder(MediaActivity.this.getParentActivity());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MediaActivity.this.getParentActivity());
                         builder.setMessage(LocaleController.formatString("AreYouSureDeleteMessages", R.string.AreYouSureDeleteMessages, LocaleController.formatPluralString("items", MediaActivity.this.selectedFiles[0].size() + MediaActivity.this.selectedFiles[1].size())));
                         builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                         boolean[] deleteForAll = new boolean[1];
@@ -1137,7 +1151,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                                         cell.setPadding(dp, 0, dp2, 0);
                                         frameLayout.addView(cell, LayoutHelper.createFrame(-1, 48.0f, 51, 0.0f, 0.0f, 0.0f, 0.0f));
                                         zArr = deleteForAll;
-                                        cell.setOnClickListener(new OnClickListener() {
+                                        cell.setOnClickListener(new View.OnClickListener() {
                                             public void onClick(View v) {
                                                 boolean z;
                                                 CheckBoxCell cell = (CheckBoxCell) v;
@@ -1157,7 +1171,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                             }
                         }
                         zArr = deleteForAll;
-                        builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 for (int a = 1; a >= 0; a--) {
                                     int b;
@@ -1345,7 +1359,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
             }
         }
         this.actionBar.addView(this.dropDownContainer, 0, LayoutHelper.createFrame(-2, -1.0f, 51, AndroidUtilities.isTablet() ? 64.0f : 56.0f, 0.0f, 40.0f, 0.0f));
-        this.dropDownContainer.setOnClickListener(new OnClickListener() {
+        this.dropDownContainer.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 MediaActivity.this.dropDownContainer.toggleSubMenu();
             }
@@ -1889,6 +1903,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
     }
 
     private void onItemClick(int index, View view, MessageObject message, int a) {
+        AlertDialog.Builder builder;
         if (message != null) {
             if (this.actionBar.isActionModeShowed()) {
                 int loadIndex = message.getDialogId() == this.dialog_id ? 0 : 1;
@@ -1946,14 +1961,13 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                                 f = FileLoader.getPathToMessage(message.messageOwner);
                             }
                             if (f != null && f.exists()) {
-                                Builder builder;
                                 if (f.getName().toLowerCase().endsWith("attheme")) {
                                     ThemeInfo themeInfo = Theme.applyThemeFile(f, message.getDocumentName(), true);
                                     if (themeInfo != null) {
                                         presentFragment(new ThemePreviewActivity(f, themeInfo));
                                         return;
                                     }
-                                    builder = new Builder(getParentActivity());
+                                    builder = new AlertDialog.Builder(getParentActivity());
                                     builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                                     builder.setMessage(LocaleController.getString("IncorrectTheme", R.string.IncorrectTheme));
                                     builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
@@ -1997,7 +2011,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
                                     getParentActivity().startActivityForResult(intent, 500);
                                 } catch (Exception e2) {
                                     if (getParentActivity() != null) {
-                                        builder = new Builder(getParentActivity());
+                                        builder = new AlertDialog.Builder(getParentActivity());
                                         builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                                         builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
                                         builder.setMessage(LocaleController.formatString("NoHandleAppInstalled", R.string.NoHandleAppInstalled, message.getDocument().mime_type));
@@ -2082,7 +2096,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
     }
 
     public ThemeDescription[] getThemeDescriptions() {
-        ThemeDescriptionDelegate сellDelegate = new ThemeDescriptionDelegate() {
+        ThemeDescriptionDelegate cellDelegate = new ThemeDescriptionDelegate() {
             public void didSetColor() {
                 if (MediaActivity.this.listView != null) {
                     int count = MediaActivity.this.listView.getChildCount();
@@ -2142,8 +2156,8 @@ public class MediaActivity extends BaseFragment implements NotificationCenterDel
         themeDescriptionArr[43] = new ThemeDescription(this.listView, ThemeDescription.FLAG_CELLBACKGROUNDCOLOR, new Class[]{SharedMediaSectionCell.class}, null, null, null, Theme.key_windowBackgroundWhite);
         themeDescriptionArr[44] = new ThemeDescription(this.listView, ThemeDescription.FLAG_SECTIONS, new Class[]{SharedMediaSectionCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText);
         themeDescriptionArr[45] = new ThemeDescription(this.listView, 0, new Class[]{SharedMediaSectionCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText);
-        themeDescriptionArr[46] = new ThemeDescription(this.listView, ThemeDescription.FLAG_CHECKBOX, new Class[]{SharedPhotoVideoCell.class}, null, null, сellDelegate, Theme.key_checkbox);
-        themeDescriptionArr[47] = new ThemeDescription(this.listView, ThemeDescription.FLAG_CHECKBOXCHECK, new Class[]{SharedPhotoVideoCell.class}, null, null, сellDelegate, Theme.key_checkboxCheck);
+        themeDescriptionArr[46] = new ThemeDescription(this.listView, ThemeDescription.FLAG_CHECKBOX, new Class[]{SharedPhotoVideoCell.class}, null, null, cellDelegate, Theme.key_checkbox);
+        themeDescriptionArr[47] = new ThemeDescription(this.listView, ThemeDescription.FLAG_CHECKBOXCHECK, new Class[]{SharedPhotoVideoCell.class}, null, null, cellDelegate, Theme.key_checkboxCheck);
         themeDescriptionArr[48] = new ThemeDescription(this.fragmentContextView, ThemeDescription.FLAG_CELLBACKGROUNDCOLOR, new Class[]{FragmentContextView.class}, new String[]{"frameLayout"}, null, null, null, Theme.key_inappPlayerBackground);
         themeDescriptionArr[49] = new ThemeDescription(this.fragmentContextView, 0, new Class[]{FragmentContextView.class}, new String[]{"playButton"}, null, null, null, Theme.key_inappPlayerPlayPause);
         themeDescriptionArr[50] = new ThemeDescription(this.fragmentContextView, ThemeDescription.FLAG_TEXTCOLOR, new Class[]{FragmentContextView.class}, new String[]{"titleTextView"}, null, null, null, Theme.key_inappPlayerTitle);

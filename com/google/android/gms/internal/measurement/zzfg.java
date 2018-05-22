@@ -8,8 +8,8 @@ import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.util.Clock;
 import com.google.android.gms.measurement.AppMeasurement;
 
-public final class zzfg extends zzhk {
-    private long zzadp = -1;
+public final class zzfg extends zzhh {
+    private long zzadu = -1;
     private char zzaim = '\u0000';
     private String zzain;
     private final zzfi zzaio = new zzfi(this, 6, false, false);
@@ -49,14 +49,14 @@ public final class zzfg extends zzhk {
             } else {
                 Throwable th = (Throwable) valueOf;
                 StringBuilder stringBuilder = new StringBuilder(z ? th.getClass().getName() : th.toString());
-                String zzbi = zzbi(AppMeasurement.class.getCanonicalName());
-                String zzbi2 = zzbi(zzgl.class.getCanonicalName());
+                String zzbn = zzbn(AppMeasurement.class.getCanonicalName());
+                String zzbn2 = zzbn(zzgl.class.getCanonicalName());
                 for (StackTraceElement stackTraceElement : th.getStackTrace()) {
                     if (!stackTraceElement.isNativeMethod()) {
                         String className = stackTraceElement.getClassName();
                         if (className != null) {
-                            className = zzbi(className);
-                            if (className.equals(zzbi) || className.equals(zzbi2)) {
+                            className = zzbn(className);
+                            if (className.equals(zzbn) || className.equals(zzbn2)) {
                                 stringBuilder.append(": ");
                                 stringBuilder.append(stackTraceElement);
                                 break;
@@ -101,11 +101,11 @@ public final class zzfg extends zzhk {
         return stringBuilder.toString();
     }
 
-    protected static Object zzbh(String str) {
+    protected static Object zzbm(String str) {
         return str == null ? null : new zzfj(str);
     }
 
-    private static String zzbi(String str) {
+    private static String zzbn(String str) {
         if (TextUtils.isEmpty(str)) {
             return TtmlNode.ANONYMOUS_REGION_ID;
         }
@@ -113,11 +113,11 @@ public final class zzfg extends zzhk {
         return lastIndexOf != -1 ? str.substring(0, lastIndexOf) : str;
     }
 
-    private final String zzis() {
+    private final String zziu() {
         String str;
         synchronized (this) {
             if (this.zzain == null) {
-                this.zzain = (String) zzew.zzagl.get();
+                this.zzain = (String) zzew.zzagi.get();
             }
             str = this.zzain;
         }
@@ -129,11 +129,11 @@ public final class zzfg extends zzhk {
     }
 
     protected final boolean isLoggable(int i) {
-        return Log.isLoggable(zzis(), i);
+        return Log.isLoggable(zziu(), i);
     }
 
     protected final void zza(int i, String str) {
-        Log.println(i, zzis(), str);
+        Log.println(i, zziu(), str);
     }
 
     protected final void zza(int i, boolean z, boolean z2, String str, Object obj, Object obj2, Object obj3) {
@@ -143,17 +143,17 @@ public final class zzfg extends zzhk {
         }
         if (!z2 && i >= 5) {
             Preconditions.checkNotNull(str);
-            zzhk zzjn = this.zzacr.zzjn();
-            if (zzjn == null) {
+            zzhh zzjq = this.zzacw.zzjq();
+            if (zzjq == null) {
                 zza(6, "Scheduler not set. Not logging error/warn");
-            } else if (zzjn.isInitialized()) {
+            } else if (zzjq.isInitialized()) {
                 if (i >= 0) {
                     i2 = i;
                 }
                 if (i2 >= 9) {
                     i2 = 8;
                 }
-                zzjn.zzc(new zzfh(this, i2, str, obj, obj2, obj3));
+                zzjq.zzc(new zzfh(this, i2, str, obj, obj2, obj3));
             } else {
                 zza(6, "Scheduler not initialized. Not logging error/warn");
             }
@@ -168,23 +168,19 @@ public final class zzfg extends zzhk {
         return super.zzbt();
     }
 
-    public final /* bridge */ /* synthetic */ void zzfq() {
-        super.zzfq();
-    }
-
     public final /* bridge */ /* synthetic */ void zzfr() {
         super.zzfr();
     }
 
-    public final /* bridge */ /* synthetic */ zzdx zzfs() {
-        return super.zzfs();
+    public final /* bridge */ /* synthetic */ void zzfs() {
+        super.zzfs();
     }
 
-    public final /* bridge */ /* synthetic */ zzee zzft() {
+    public final /* bridge */ /* synthetic */ zzdu zzft() {
         return super.zzft();
     }
 
-    public final /* bridge */ /* synthetic */ zzhm zzfu() {
+    public final /* bridge */ /* synthetic */ zzhk zzfu() {
         return super.zzfu();
     }
 
@@ -196,11 +192,11 @@ public final class zzfg extends zzhk {
         return super.zzfw();
     }
 
-    public final /* bridge */ /* synthetic */ zzil zzfx() {
+    public final /* bridge */ /* synthetic */ zzii zzfx() {
         return super.zzfx();
     }
 
-    public final /* bridge */ /* synthetic */ zzih zzfy() {
+    public final /* bridge */ /* synthetic */ zzif zzfy() {
         return super.zzfy();
     }
 
@@ -208,81 +204,77 @@ public final class zzfg extends zzhk {
         return super.zzfz();
     }
 
-    public final /* bridge */ /* synthetic */ zzei zzga() {
+    public final /* bridge */ /* synthetic */ zzfe zzga() {
         return super.zzga();
     }
 
-    public final /* bridge */ /* synthetic */ zzfe zzgb() {
+    public final /* bridge */ /* synthetic */ zzka zzgb() {
         return super.zzgb();
     }
 
-    public final /* bridge */ /* synthetic */ zzjv zzgc() {
+    public final /* bridge */ /* synthetic */ zzjh zzgc() {
         return super.zzgc();
     }
 
-    public final /* bridge */ /* synthetic */ zzgf zzgd() {
+    public final /* bridge */ /* synthetic */ zzgg zzgd() {
         return super.zzgd();
     }
 
-    public final /* bridge */ /* synthetic */ zzjk zzge() {
+    public final /* bridge */ /* synthetic */ zzfg zzge() {
         return super.zzge();
     }
 
-    public final /* bridge */ /* synthetic */ zzgg zzgf() {
+    public final /* bridge */ /* synthetic */ zzfr zzgf() {
         return super.zzgf();
     }
 
-    public final /* bridge */ /* synthetic */ zzfg zzgg() {
+    public final /* bridge */ /* synthetic */ zzef zzgg() {
         return super.zzgg();
     }
 
-    public final /* bridge */ /* synthetic */ zzfr zzgh() {
-        return super.zzgh();
-    }
-
-    public final /* bridge */ /* synthetic */ zzeh zzgi() {
-        return super.zzgi();
-    }
-
-    protected final boolean zzhh() {
+    protected final boolean zzhf() {
         return false;
     }
 
-    public final zzfi zzil() {
+    public final zzfi zzim() {
         return this.zzaio;
     }
 
-    public final zzfi zzim() {
+    public final zzfi zzin() {
         return this.zzaip;
     }
 
-    public final zzfi zzin() {
-        return this.zzair;
-    }
-
     public final zzfi zzio() {
-        return this.zzait;
+        return this.zzaiq;
     }
 
     public final zzfi zzip() {
-        return this.zzaiu;
+        return this.zzair;
     }
 
     public final zzfi zziq() {
-        return this.zzaiv;
+        return this.zzait;
     }
 
     public final zzfi zzir() {
+        return this.zzaiu;
+    }
+
+    public final zzfi zzis() {
+        return this.zzaiv;
+    }
+
+    public final zzfi zzit() {
         return this.zzaiw;
     }
 
-    public final String zzit() {
-        Pair zzfh = zzgh().zzajs.zzfh();
-        if (zzfh == null || zzfh == zzfr.zzajr) {
+    public final String zziv() {
+        Pair zzfi = zzgf().zzajt.zzfi();
+        if (zzfi == null || zzfi == zzfr.zzajs) {
             return null;
         }
-        String valueOf = String.valueOf(zzfh.second);
-        String str = (String) zzfh.first;
+        String valueOf = String.valueOf(zzfi.second);
+        String str = (String) zzfi.first;
         return new StringBuilder((String.valueOf(valueOf).length() + 1) + String.valueOf(str).length()).append(valueOf).append(":").append(str).toString();
     }
 }

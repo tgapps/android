@@ -5176,7 +5176,12 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                 venue.title = result.send_message.title;
                 venue.provider = result.send_message.provider;
                 venue.venue_id = result.send_message.venue_id;
-                venue.venue_type = TtmlNode.ANONYMOUS_REGION_ID;
+                String str2 = result.send_message.venue_type;
+                venue.venue_id = str2;
+                venue.venue_type = str2;
+                if (venue.venue_type == null) {
+                    venue.venue_type = TtmlNode.ANONYMOUS_REGION_ID;
+                }
                 getInstance(currentAccount).sendMessage(venue, dialog_id, reply_to_msg, result.send_message.reply_markup, (HashMap) params);
             } else if (result.send_message instanceof TL_botInlineMessageMediaGeo) {
                 MessageMedia location;

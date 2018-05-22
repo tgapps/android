@@ -12,27 +12,27 @@ import java.util.concurrent.Executors;
 
 public abstract class zzb extends Service {
     private final Object lock;
-    final ExecutorService zzall;
-    private Binder zzbpo;
-    private int zzbpp;
-    private int zzbpq;
+    final ExecutorService zzl;
+    private Binder zzm;
+    private int zzn;
+    private int zzo;
 
     public zzb() {
         String str = "Firebase-";
         String valueOf = String.valueOf(getClass().getSimpleName());
-        this.zzall = Executors.newSingleThreadExecutor(new NamedThreadFactory(valueOf.length() != 0 ? str.concat(valueOf) : new String(str)));
+        this.zzl = Executors.newSingleThreadExecutor(new NamedThreadFactory(valueOf.length() != 0 ? str.concat(valueOf) : new String(str)));
         this.lock = new Object();
-        this.zzbpq = 0;
+        this.zzo = 0;
     }
 
-    private final void zze(Intent intent) {
+    private final void zza(Intent intent) {
         if (intent != null) {
             WakefulBroadcastReceiver.completeWakefulIntent(intent);
         }
         synchronized (this.lock) {
-            this.zzbpq--;
-            if (this.zzbpq == 0) {
-                stopSelfResult(this.zzbpp);
+            this.zzo--;
+            if (this.zzo == 0) {
+                stopSelfResult(this.zzn);
             }
         }
     }
@@ -41,37 +41,37 @@ public abstract class zzb extends Service {
         if (Log.isLoggable("EnhancedIntentService", 3)) {
             Log.d("EnhancedIntentService", "Service received bind request");
         }
-        if (this.zzbpo == null) {
-            this.zzbpo = new zzf(this);
+        if (this.zzm == null) {
+            this.zzm = new zzf(this);
         }
-        return this.zzbpo;
+        return this.zzm;
     }
 
     public final int onStartCommand(Intent intent, int i, int i2) {
         synchronized (this.lock) {
-            this.zzbpp = i2;
-            this.zzbpq++;
+            this.zzn = i2;
+            this.zzo++;
         }
-        Intent zzf = zzf(intent);
-        if (zzf == null) {
-            zze(intent);
+        Intent zzb = zzb(intent);
+        if (zzb == null) {
+            zza(intent);
             return 2;
-        } else if (zzg(zzf)) {
-            zze(intent);
+        } else if (zzc(zzb)) {
+            zza(intent);
             return 2;
         } else {
-            this.zzall.execute(new zzc(this, zzf, intent));
+            this.zzl.execute(new zzc(this, zzb, intent));
             return 3;
         }
     }
 
-    protected Intent zzf(Intent intent) {
+    protected Intent zzb(Intent intent) {
         return intent;
     }
 
-    public boolean zzg(Intent intent) {
+    public boolean zzc(Intent intent) {
         return false;
     }
 
-    public abstract void zzh(Intent intent);
+    public abstract void zzd(Intent intent);
 }

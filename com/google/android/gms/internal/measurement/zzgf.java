@@ -13,98 +13,98 @@ import com.google.android.gms.measurement.AppMeasurement.UserProperty;
 import java.io.IOException;
 import java.util.Map;
 
-public final class zzgf extends zzhk {
-    private static int zzald = 65535;
-    private static int zzale = 2;
-    private final Map<String, Map<String, String>> zzalf = new ArrayMap();
-    private final Map<String, Map<String, Boolean>> zzalg = new ArrayMap();
-    private final Map<String, Map<String, Boolean>> zzalh = new ArrayMap();
-    private final Map<String, zzkf> zzali = new ArrayMap();
-    private final Map<String, Map<String, Integer>> zzalj = new ArrayMap();
-    private final Map<String, String> zzalk = new ArrayMap();
+public final class zzgf extends zzjq implements zzeh {
+    private static int zzalf = 65535;
+    private static int zzalg = 2;
+    private final Map<String, Map<String, String>> zzalh = new ArrayMap();
+    private final Map<String, Map<String, Boolean>> zzali = new ArrayMap();
+    private final Map<String, Map<String, Boolean>> zzalj = new ArrayMap();
+    private final Map<String, zzkk> zzalk = new ArrayMap();
+    private final Map<String, Map<String, Integer>> zzall = new ArrayMap();
+    private final Map<String, String> zzalm = new ArrayMap();
 
-    zzgf(zzgl com_google_android_gms_internal_measurement_zzgl) {
-        super(com_google_android_gms_internal_measurement_zzgl);
+    zzgf(zzjr com_google_android_gms_internal_measurement_zzjr) {
+        super(com_google_android_gms_internal_measurement_zzjr);
     }
 
-    private final zzkf zza(String str, byte[] bArr) {
+    private final zzkk zza(String str, byte[] bArr) {
         if (bArr == null) {
-            return new zzkf();
+            return new zzkk();
         }
-        zzaba zza = zzaba.zza(bArr, 0, bArr.length);
-        zzabj com_google_android_gms_internal_measurement_zzkf = new zzkf();
+        zzabv zza = zzabv.zza(bArr, 0, bArr.length);
+        zzace com_google_android_gms_internal_measurement_zzkk = new zzkk();
         try {
-            com_google_android_gms_internal_measurement_zzkf.zzb(zza);
-            zzgg().zzir().zze("Parsed config. version, gmp_app_id", com_google_android_gms_internal_measurement_zzkf.zzask, com_google_android_gms_internal_measurement_zzkf.zzadh);
-            return com_google_android_gms_internal_measurement_zzkf;
+            com_google_android_gms_internal_measurement_zzkk.zzb(zza);
+            zzge().zzit().zze("Parsed config. version, gmp_app_id", com_google_android_gms_internal_measurement_zzkk.zzasp, com_google_android_gms_internal_measurement_zzkk.zzadm);
+            return com_google_android_gms_internal_measurement_zzkk;
         } catch (IOException e) {
-            zzgg().zzin().zze("Unable to merge remote config. appId", zzfg.zzbh(str), e);
-            return new zzkf();
+            zzge().zzip().zze("Unable to merge remote config. appId", zzfg.zzbm(str), e);
+            return new zzkk();
         }
     }
 
-    private static Map<String, String> zza(zzkf com_google_android_gms_internal_measurement_zzkf) {
+    private static Map<String, String> zza(zzkk com_google_android_gms_internal_measurement_zzkk) {
         Map<String, String> arrayMap = new ArrayMap();
-        if (!(com_google_android_gms_internal_measurement_zzkf == null || com_google_android_gms_internal_measurement_zzkf.zzasm == null)) {
-            for (zzkg com_google_android_gms_internal_measurement_zzkg : com_google_android_gms_internal_measurement_zzkf.zzasm) {
-                if (com_google_android_gms_internal_measurement_zzkg != null) {
-                    arrayMap.put(com_google_android_gms_internal_measurement_zzkg.zznt, com_google_android_gms_internal_measurement_zzkg.value);
+        if (!(com_google_android_gms_internal_measurement_zzkk == null || com_google_android_gms_internal_measurement_zzkk.zzasr == null)) {
+            for (zzkl com_google_android_gms_internal_measurement_zzkl : com_google_android_gms_internal_measurement_zzkk.zzasr) {
+                if (com_google_android_gms_internal_measurement_zzkl != null) {
+                    arrayMap.put(com_google_android_gms_internal_measurement_zzkl.zzny, com_google_android_gms_internal_measurement_zzkl.value);
                 }
             }
         }
         return arrayMap;
     }
 
-    private final void zza(String str, zzkf com_google_android_gms_internal_measurement_zzkf) {
+    private final void zza(String str, zzkk com_google_android_gms_internal_measurement_zzkk) {
         Map arrayMap = new ArrayMap();
         Map arrayMap2 = new ArrayMap();
         Map arrayMap3 = new ArrayMap();
-        if (!(com_google_android_gms_internal_measurement_zzkf == null || com_google_android_gms_internal_measurement_zzkf.zzasn == null)) {
-            for (zzke com_google_android_gms_internal_measurement_zzke : com_google_android_gms_internal_measurement_zzkf.zzasn) {
-                if (TextUtils.isEmpty(com_google_android_gms_internal_measurement_zzke.name)) {
-                    zzgg().zzin().log("EventConfig contained null event name");
+        if (!(com_google_android_gms_internal_measurement_zzkk == null || com_google_android_gms_internal_measurement_zzkk.zzass == null)) {
+            for (zzkj com_google_android_gms_internal_measurement_zzkj : com_google_android_gms_internal_measurement_zzkk.zzass) {
+                if (TextUtils.isEmpty(com_google_android_gms_internal_measurement_zzkj.name)) {
+                    zzge().zzip().log("EventConfig contained null event name");
                 } else {
-                    Object zzak = Event.zzak(com_google_android_gms_internal_measurement_zzke.name);
+                    Object zzak = Event.zzak(com_google_android_gms_internal_measurement_zzkj.name);
                     if (!TextUtils.isEmpty(zzak)) {
-                        com_google_android_gms_internal_measurement_zzke.name = zzak;
+                        com_google_android_gms_internal_measurement_zzkj.name = zzak;
                     }
-                    arrayMap.put(com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzash);
-                    arrayMap2.put(com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzasi);
-                    if (com_google_android_gms_internal_measurement_zzke.zzasj != null) {
-                        if (com_google_android_gms_internal_measurement_zzke.zzasj.intValue() < zzale || com_google_android_gms_internal_measurement_zzke.zzasj.intValue() > zzald) {
-                            zzgg().zzin().zze("Invalid sampling rate. Event name, sample rate", com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzasj);
+                    arrayMap.put(com_google_android_gms_internal_measurement_zzkj.name, com_google_android_gms_internal_measurement_zzkj.zzasm);
+                    arrayMap2.put(com_google_android_gms_internal_measurement_zzkj.name, com_google_android_gms_internal_measurement_zzkj.zzasn);
+                    if (com_google_android_gms_internal_measurement_zzkj.zzaso != null) {
+                        if (com_google_android_gms_internal_measurement_zzkj.zzaso.intValue() < zzalg || com_google_android_gms_internal_measurement_zzkj.zzaso.intValue() > zzalf) {
+                            zzge().zzip().zze("Invalid sampling rate. Event name, sample rate", com_google_android_gms_internal_measurement_zzkj.name, com_google_android_gms_internal_measurement_zzkj.zzaso);
                         } else {
-                            arrayMap3.put(com_google_android_gms_internal_measurement_zzke.name, com_google_android_gms_internal_measurement_zzke.zzasj);
+                            arrayMap3.put(com_google_android_gms_internal_measurement_zzkj.name, com_google_android_gms_internal_measurement_zzkj.zzaso);
                         }
                     }
                 }
             }
         }
-        this.zzalg.put(str, arrayMap);
-        this.zzalh.put(str, arrayMap2);
-        this.zzalj.put(str, arrayMap3);
+        this.zzali.put(str, arrayMap);
+        this.zzalj.put(str, arrayMap2);
+        this.zzall.put(str, arrayMap3);
     }
 
-    private final void zzbo(String str) {
+    private final void zzbt(String str) {
         zzch();
         zzab();
         Preconditions.checkNotEmpty(str);
-        if (this.zzali.get(str) == null) {
-            byte[] zzaz = zzga().zzaz(str);
-            if (zzaz == null) {
-                this.zzalf.put(str, null);
-                this.zzalg.put(str, null);
+        if (this.zzalk.get(str) == null) {
+            byte[] zzbe = zzix().zzbe(str);
+            if (zzbe == null) {
                 this.zzalh.put(str, null);
                 this.zzali.put(str, null);
-                this.zzalk.put(str, null);
                 this.zzalj.put(str, null);
+                this.zzalk.put(str, null);
+                this.zzalm.put(str, null);
+                this.zzall.put(str, null);
                 return;
             }
-            zzkf zza = zza(str, zzaz);
-            this.zzalf.put(str, zza(zza));
+            zzkk zza = zza(str, zzbe);
+            this.zzalh.put(str, zza(zza));
             zza(str, zza);
-            this.zzali.put(str, zza);
-            this.zzalk.put(str, null);
+            this.zzalk.put(str, zza);
+            this.zzalm.put(str, null);
         }
     }
 
@@ -116,58 +116,58 @@ public final class zzgf extends zzhk {
         zzch();
         zzab();
         Preconditions.checkNotEmpty(str);
-        zzkf zza = zza(str, bArr);
+        zzkk zza = zza(str, bArr);
         if (zza == null) {
             return false;
         }
         zza(str, zza);
-        this.zzali.put(str, zza);
-        this.zzalk.put(str, str2);
-        this.zzalf.put(str, zza(zza));
-        zzhj zzft = zzft();
-        zzjy[] com_google_android_gms_internal_measurement_zzjyArr = zza.zzaso;
-        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzjyArr);
-        for (zzjy com_google_android_gms_internal_measurement_zzjy : com_google_android_gms_internal_measurement_zzjyArr) {
-            for (zzjz com_google_android_gms_internal_measurement_zzjz : com_google_android_gms_internal_measurement_zzjy.zzari) {
-                String zzak = Event.zzak(com_google_android_gms_internal_measurement_zzjz.zzarl);
+        this.zzalk.put(str, zza);
+        this.zzalm.put(str, str2);
+        this.zzalh.put(str, zza(zza));
+        zzjp zziw = zziw();
+        zzkd[] com_google_android_gms_internal_measurement_zzkdArr = zza.zzast;
+        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzkdArr);
+        for (zzkd com_google_android_gms_internal_measurement_zzkd : com_google_android_gms_internal_measurement_zzkdArr) {
+            for (zzke com_google_android_gms_internal_measurement_zzke : com_google_android_gms_internal_measurement_zzkd.zzarn) {
+                String zzak = Event.zzak(com_google_android_gms_internal_measurement_zzke.zzarq);
                 if (zzak != null) {
-                    com_google_android_gms_internal_measurement_zzjz.zzarl = zzak;
+                    com_google_android_gms_internal_measurement_zzke.zzarq = zzak;
                 }
-                for (zzka com_google_android_gms_internal_measurement_zzka : com_google_android_gms_internal_measurement_zzjz.zzarm) {
-                    String zzak2 = Param.zzak(com_google_android_gms_internal_measurement_zzka.zzart);
+                for (zzkf com_google_android_gms_internal_measurement_zzkf : com_google_android_gms_internal_measurement_zzke.zzarr) {
+                    String zzak2 = Param.zzak(com_google_android_gms_internal_measurement_zzkf.zzary);
                     if (zzak2 != null) {
-                        com_google_android_gms_internal_measurement_zzka.zzart = zzak2;
+                        com_google_android_gms_internal_measurement_zzkf.zzary = zzak2;
                     }
                 }
             }
-            for (zzkc com_google_android_gms_internal_measurement_zzkc : com_google_android_gms_internal_measurement_zzjy.zzarh) {
-                String zzak3 = UserProperty.zzak(com_google_android_gms_internal_measurement_zzkc.zzasa);
+            for (zzkh com_google_android_gms_internal_measurement_zzkh : com_google_android_gms_internal_measurement_zzkd.zzarm) {
+                String zzak3 = UserProperty.zzak(com_google_android_gms_internal_measurement_zzkh.zzasf);
                 if (zzak3 != null) {
-                    com_google_android_gms_internal_measurement_zzkc.zzasa = zzak3;
+                    com_google_android_gms_internal_measurement_zzkh.zzasf = zzak3;
                 }
             }
         }
-        zzft.zzga().zza(str, com_google_android_gms_internal_measurement_zzjyArr);
+        zziw.zzix().zza(str, com_google_android_gms_internal_measurement_zzkdArr);
         try {
-            zza.zzaso = null;
-            byte[] bArr2 = new byte[zza.zzwg()];
-            zza.zza(zzabb.zzb(bArr2, 0, bArr2.length));
+            zza.zzast = null;
+            byte[] bArr2 = new byte[zza.zzvm()];
+            zza.zza(zzabw.zzb(bArr2, 0, bArr2.length));
             bArr = bArr2;
         } catch (IOException e) {
-            zzgg().zzin().zze("Unable to serialize reduced-size config. Storing full config instead. appId", zzfg.zzbh(str), e);
+            zzge().zzip().zze("Unable to serialize reduced-size config. Storing full config instead. appId", zzfg.zzbm(str), e);
         }
-        zzhj zzga = zzga();
+        zzhg zzix = zzix();
         Preconditions.checkNotEmpty(str);
-        zzga.zzab();
-        zzga.zzch();
+        zzix.zzab();
+        zzix.zzch();
         ContentValues contentValues = new ContentValues();
         contentValues.put("remote_config", bArr);
         try {
-            if (((long) zzga.getWritableDatabase().update("apps", contentValues, "app_id = ?", new String[]{str})) == 0) {
-                zzga.zzgg().zzil().zzg("Failed to update remote config (got 0). appId", zzfg.zzbh(str));
+            if (((long) zzix.getWritableDatabase().update("apps", contentValues, "app_id = ?", new String[]{str})) == 0) {
+                zzix.zzge().zzim().zzg("Failed to update remote config (got 0). appId", zzfg.zzbm(str));
             }
         } catch (SQLiteException e2) {
-            zzga.zzgg().zzil().zze("Error storing remote config. appId", zzfg.zzbh(str), e2);
+            zzix.zzge().zzim().zze("Error storing remote config. appId", zzfg.zzbm(str), e2);
         }
         return true;
     }
@@ -176,45 +176,61 @@ public final class zzgf extends zzhk {
         super.zzab();
     }
 
-    protected final zzkf zzbp(String str) {
-        zzch();
-        zzab();
-        Preconditions.checkNotEmpty(str);
-        zzbo(str);
-        return (zzkf) this.zzali.get(str);
-    }
-
-    protected final String zzbq(String str) {
-        zzab();
-        return (String) this.zzalk.get(str);
-    }
-
-    protected final void zzbr(String str) {
-        zzab();
-        this.zzalk.put(str, null);
-    }
-
     public final /* bridge */ /* synthetic */ Clock zzbt() {
         return super.zzbt();
     }
 
-    public final /* bridge */ /* synthetic */ void zzfq() {
-        super.zzfq();
+    protected final zzkk zzbu(String str) {
+        zzch();
+        zzab();
+        Preconditions.checkNotEmpty(str);
+        zzbt(str);
+        return (zzkk) this.zzalk.get(str);
+    }
+
+    protected final String zzbv(String str) {
+        zzab();
+        return (String) this.zzalm.get(str);
+    }
+
+    protected final void zzbw(String str) {
+        zzab();
+        this.zzalm.put(str, null);
+    }
+
+    final void zzbx(String str) {
+        zzab();
+        this.zzalk.remove(str);
+    }
+
+    final boolean zzby(String str) {
+        return "1".equals(zze(str, "measurement.upload.blacklist_internal"));
+    }
+
+    final boolean zzbz(String str) {
+        return "1".equals(zze(str, "measurement.upload.blacklist_public"));
+    }
+
+    public final String zze(String str, String str2) {
+        zzab();
+        zzbt(str);
+        Map map = (Map) this.zzalh.get(str);
+        return map != null ? (String) map.get(str2) : null;
     }
 
     public final /* bridge */ /* synthetic */ void zzfr() {
         super.zzfr();
     }
 
-    public final /* bridge */ /* synthetic */ zzdx zzfs() {
-        return super.zzfs();
+    public final /* bridge */ /* synthetic */ void zzfs() {
+        super.zzfs();
     }
 
-    public final /* bridge */ /* synthetic */ zzee zzft() {
+    public final /* bridge */ /* synthetic */ zzdu zzft() {
         return super.zzft();
     }
 
-    public final /* bridge */ /* synthetic */ zzhm zzfu() {
+    public final /* bridge */ /* synthetic */ zzhk zzfu() {
         return super.zzfu();
     }
 
@@ -226,11 +242,11 @@ public final class zzgf extends zzhk {
         return super.zzfw();
     }
 
-    public final /* bridge */ /* synthetic */ zzil zzfx() {
+    public final /* bridge */ /* synthetic */ zzii zzfx() {
         return super.zzfx();
     }
 
-    public final /* bridge */ /* synthetic */ zzih zzfy() {
+    public final /* bridge */ /* synthetic */ zzif zzfy() {
         return super.zzfy();
     }
 
@@ -238,63 +254,56 @@ public final class zzgf extends zzhk {
         return super.zzfz();
     }
 
-    public final /* bridge */ /* synthetic */ zzei zzga() {
+    public final /* bridge */ /* synthetic */ zzfe zzga() {
         return super.zzga();
     }
 
-    public final /* bridge */ /* synthetic */ zzfe zzgb() {
+    public final /* bridge */ /* synthetic */ zzka zzgb() {
         return super.zzgb();
     }
 
-    public final /* bridge */ /* synthetic */ zzjv zzgc() {
+    public final /* bridge */ /* synthetic */ zzjh zzgc() {
         return super.zzgc();
     }
 
-    public final /* bridge */ /* synthetic */ zzgf zzgd() {
+    public final /* bridge */ /* synthetic */ zzgg zzgd() {
         return super.zzgd();
     }
 
-    public final /* bridge */ /* synthetic */ zzjk zzge() {
+    public final /* bridge */ /* synthetic */ zzfg zzge() {
         return super.zzge();
     }
 
-    public final /* bridge */ /* synthetic */ zzgg zzgf() {
+    public final /* bridge */ /* synthetic */ zzfr zzgf() {
         return super.zzgf();
     }
 
-    public final /* bridge */ /* synthetic */ zzfg zzgg() {
+    public final /* bridge */ /* synthetic */ zzef zzgg() {
         return super.zzgg();
     }
 
-    public final /* bridge */ /* synthetic */ zzfr zzgh() {
-        return super.zzgh();
-    }
-
-    public final /* bridge */ /* synthetic */ zzeh zzgi() {
-        return super.zzgi();
-    }
-
-    protected final boolean zzhh() {
+    protected final boolean zzhf() {
         return false;
     }
 
-    final String zzm(String str, String str2) {
-        zzab();
-        zzbo(str);
-        Map map = (Map) this.zzalf.get(str);
-        return map != null ? (String) map.get(str2) : null;
+    public final /* bridge */ /* synthetic */ zzeb zziw() {
+        return super.zziw();
+    }
+
+    public final /* bridge */ /* synthetic */ zzei zzix() {
+        return super.zzix();
     }
 
     final boolean zzn(String str, String str2) {
         zzab();
-        zzbo(str);
-        if (zzgc().zzce(str) && zzjv.zzcb(str2)) {
+        zzbt(str);
+        if (zzby(str) && zzka.zzci(str2)) {
             return true;
         }
-        if (zzgc().zzcf(str) && zzjv.zzbv(str2)) {
+        if (zzbz(str) && zzka.zzcc(str2)) {
             return true;
         }
-        Map map = (Map) this.zzalg.get(str);
+        Map map = (Map) this.zzali.get(str);
         if (map == null) {
             return false;
         }
@@ -304,11 +313,11 @@ public final class zzgf extends zzhk {
 
     final boolean zzo(String str, String str2) {
         zzab();
-        zzbo(str);
+        zzbt(str);
         if ("ecommerce_purchase".equals(str2)) {
             return true;
         }
-        Map map = (Map) this.zzalh.get(str);
+        Map map = (Map) this.zzalj.get(str);
         if (map == null) {
             return false;
         }
@@ -318,8 +327,8 @@ public final class zzgf extends zzhk {
 
     final int zzp(String str, String str2) {
         zzab();
-        zzbo(str);
-        Map map = (Map) this.zzalj.get(str);
+        zzbt(str);
+        Map map = (Map) this.zzall.get(str);
         if (map == null) {
             return 1;
         }

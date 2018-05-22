@@ -1,23 +1,16 @@
 package com.google.android.gms.internal.measurement;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 final class zzia implements Runnable {
-    private final /* synthetic */ AtomicReference zzaoo;
-    private final /* synthetic */ zzhm zzaop;
+    private final /* synthetic */ zzhk zzanw;
+    private final /* synthetic */ long zzaod;
 
-    zzia(zzhm com_google_android_gms_internal_measurement_zzhm, AtomicReference atomicReference) {
-        this.zzaop = com_google_android_gms_internal_measurement_zzhm;
-        this.zzaoo = atomicReference;
+    zzia(zzhk com_google_android_gms_internal_measurement_zzhk, long j) {
+        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
+        this.zzaod = j;
     }
 
     public final void run() {
-        try {
-            AtomicReference atomicReference = this.zzaoo;
-            zzhj zzgi = this.zzaop.zzgi();
-            atomicReference.set(Double.valueOf(zzgi.zzc(zzgi.zzfv().zzah(), zzew.zzahw)));
-        } finally {
-            this.zzaoo.notify();
-        }
+        this.zzanw.zzgf().zzaki.set(this.zzaod);
+        this.zzanw.zzge().zzis().zzg("Minimum session duration set", Long.valueOf(this.zzaod));
     }
 }

@@ -5,28 +5,28 @@ import com.google.android.gms.common.internal.Preconditions;
 
 public final class zzft {
     private boolean value;
-    private final boolean zzakn = true;
-    private boolean zzako;
-    private final /* synthetic */ zzfr zzakp;
-    private final String zznt;
+    private final boolean zzako = true;
+    private boolean zzakp;
+    private final /* synthetic */ zzfr zzakq;
+    private final String zzny;
 
     public zzft(zzfr com_google_android_gms_internal_measurement_zzfr, String str, boolean z) {
-        this.zzakp = com_google_android_gms_internal_measurement_zzfr;
+        this.zzakq = com_google_android_gms_internal_measurement_zzfr;
         Preconditions.checkNotEmpty(str);
-        this.zznt = str;
+        this.zzny = str;
     }
 
     public final boolean get() {
-        if (!this.zzako) {
-            this.zzako = true;
-            this.value = this.zzakp.zziu().getBoolean(this.zznt, this.zzakn);
+        if (!this.zzakp) {
+            this.zzakp = true;
+            this.value = this.zzakq.zziy().getBoolean(this.zzny, this.zzako);
         }
         return this.value;
     }
 
     public final void set(boolean z) {
-        Editor edit = this.zzakp.zziu().edit();
-        edit.putBoolean(this.zznt, z);
+        Editor edit = this.zzakq.zziy().edit();
+        edit.putBoolean(this.zzny, z);
         edit.apply();
         this.value = z;
     }

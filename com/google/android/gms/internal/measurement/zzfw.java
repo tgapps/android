@@ -5,30 +5,30 @@ import com.google.android.gms.common.internal.Preconditions;
 
 public final class zzfw {
     private String value;
-    private boolean zzako;
-    private final /* synthetic */ zzfr zzakp;
-    private final String zzaku = null;
-    private final String zznt;
+    private boolean zzakp;
+    private final /* synthetic */ zzfr zzakq;
+    private final String zzakv = null;
+    private final String zzny;
 
     public zzfw(zzfr com_google_android_gms_internal_measurement_zzfr, String str, String str2) {
-        this.zzakp = com_google_android_gms_internal_measurement_zzfr;
+        this.zzakq = com_google_android_gms_internal_measurement_zzfr;
         Preconditions.checkNotEmpty(str);
-        this.zznt = str;
+        this.zzny = str;
     }
 
-    public final void zzbn(String str) {
-        if (!zzjv.zzs(str, this.value)) {
-            Editor edit = this.zzakp.zziu().edit();
-            edit.putString(this.zznt, str);
+    public final void zzbs(String str) {
+        if (!zzka.zzs(str, this.value)) {
+            Editor edit = this.zzakq.zziy().edit();
+            edit.putString(this.zzny, str);
             edit.apply();
             this.value = str;
         }
     }
 
-    public final String zzjc() {
-        if (!this.zzako) {
-            this.zzako = true;
-            this.value = this.zzakp.zziu().getString(this.zznt, null);
+    public final String zzjg() {
+        if (!this.zzakp) {
+            this.zzakp = true;
+            this.value = this.zzakq.zziy().getString(this.zzny, null);
         }
         return this.value;
     }

@@ -1,12 +1,17 @@
 package com.google.android.gms.internal.measurement;
 
-import android.content.Context;
-import android.os.Build.VERSION;
-import com.google.android.gms.common.internal.Preconditions;
+final class zzjf implements Runnable {
+    private final /* synthetic */ Runnable zzabt;
+    private final /* synthetic */ zzjr zzapt;
 
-public final class zzjf<T extends Context> {
-    public static boolean zza(Context context, boolean z) {
-        Preconditions.checkNotNull(context);
-        return VERSION.SDK_INT >= 24 ? zzjv.zzc(context, "com.google.android.gms.measurement.AppMeasurementJobService") : zzjv.zzc(context, "com.google.android.gms.measurement.AppMeasurementService");
+    zzjf(zzjc com_google_android_gms_internal_measurement_zzjc, zzjr com_google_android_gms_internal_measurement_zzjr, Runnable runnable) {
+        this.zzapt = com_google_android_gms_internal_measurement_zzjr;
+        this.zzabt = runnable;
+    }
+
+    public final void run() {
+        this.zzapt.zzkx();
+        this.zzapt.zzg(this.zzabt);
+        this.zzapt.zzks();
     }
 }

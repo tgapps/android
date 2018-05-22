@@ -128,7 +128,10 @@ import org.telegram.tgnet.TLRPC.TL_encryptedChatRequested;
 import org.telegram.tgnet.TLRPC.TL_encryptedChatWaiting;
 import org.telegram.tgnet.TLRPC.TL_error;
 import org.telegram.tgnet.TLRPC.TL_help_getAppChangelog;
+import org.telegram.tgnet.TLRPC.TL_help_getProxyData;
 import org.telegram.tgnet.TLRPC.TL_help_getRecentMeUrls;
+import org.telegram.tgnet.TLRPC.TL_help_proxyDataEmpty;
+import org.telegram.tgnet.TLRPC.TL_help_proxyDataPromo;
 import org.telegram.tgnet.TLRPC.TL_help_recentMeUrls;
 import org.telegram.tgnet.TLRPC.TL_inputChannel;
 import org.telegram.tgnet.TLRPC.TL_inputChannelEmpty;
@@ -374,6 +377,8 @@ public class MessagesController implements NotificationCenterDelegate {
     private SparseIntArray channelsPts = new SparseIntArray();
     private ConcurrentHashMap<Integer, Chat> chats = new ConcurrentHashMap(100, 1.0f, 2);
     private SparseBooleanArray checkingLastMessagesDialogs = new SparseBooleanArray();
+    private boolean checkingProxyInfo;
+    private int checkingProxyInfoRequestId;
     private ArrayList<Long> createdDialogIds = new ArrayList();
     private ArrayList<Long> createdDialogMainThreadIds = new ArrayList();
     private int currentAccount;
@@ -436,6 +441,7 @@ public class MessagesController implements NotificationCenterDelegate {
     private SparseBooleanArray gettingUnknownChannels = new SparseBooleanArray();
     public ArrayList<RecentMeUrl> hintDialogs = new ArrayList();
     private String installReferer;
+    private boolean isLeftProxyChannel;
     private ArrayList<Integer> joiningToChannels = new ArrayList();
     private int lastPrintingStringCount;
     private long lastPushRegisterSendTime;
@@ -465,6 +471,7 @@ public class MessagesController implements NotificationCenterDelegate {
     public int minGroupConvertSize = Callback.DEFAULT_DRAG_ANIMATION_DURATION;
     private SparseIntArray needShortPollChannels = new SparseIntArray();
     public int nextDialogsCacheOffset;
+    private int nextProxyInfoCheckTime;
     private SharedPreferences notificationsPreferences;
     private ConcurrentHashMap<String, TLObject> objectsByUsernames = new ConcurrentHashMap(100, 1.0f, 2);
     private boolean offlineSent;
@@ -473,6 +480,8 @@ public class MessagesController implements NotificationCenterDelegate {
     public LongSparseArray<CharSequence> printingStrings = new LongSparseArray();
     public LongSparseArray<Integer> printingStringsTypes = new LongSparseArray();
     public ConcurrentHashMap<Long, ArrayList<PrintingUser>> printingUsers = new ConcurrentHashMap(20, 1.0f, 2);
+    private TL_dialog proxyDialog;
+    private long proxyDialogId;
     public int ratingDecay;
     private ArrayList<ReadTask> readTasks = new ArrayList();
     private LongSparseArray<ReadTask> readTasksMap = new LongSparseArray();
@@ -656,6 +665,7 @@ public class MessagesController implements NotificationCenterDelegate {
         this.revokeTimePmLimit = this.mainPreferences.getInt("revokeTimePmLimit", this.revokeTimePmLimit);
         this.canRevokePmInbox = this.mainPreferences.getBoolean("canRevokePmInbox", this.canRevokePmInbox);
         this.preloadFeaturedStickers = this.mainPreferences.getBoolean("preloadFeaturedStickers", false);
+        this.proxyDialogId = this.mainPreferences.getLong("proxy_dialog", 0);
     }
 
     public void updateConfig(final TL_config config) {
@@ -2347,11 +2357,8 @@ public class MessagesController implements NotificationCenterDelegate {
 
     public void deleteMessages(ArrayList<Integer> messages, ArrayList<Long> randoms, EncryptedChat encryptedChat, int channelId, boolean forAll, long taskId, TLObject taskRequest) {
         TL_channels_deleteMessages req;
-        long newTaskId;
         NativeByteBuffer data;
-        NativeByteBuffer data2;
         Throwable e;
-        final int i;
         if ((messages != null && !messages.isEmpty()) || taskRequest != null) {
             ArrayList<Integer> toSend = null;
             if (taskId == 0) {
@@ -2377,7 +2384,10 @@ public class MessagesController implements NotificationCenterDelegate {
                 MessagesStorage.getInstance(this.currentAccount).updateDialogsWithDeletedMessages(messages, null, true, channelId);
                 NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.messagesDeleted, messages, Integer.valueOf(channelId));
             }
+            long newTaskId;
+            NativeByteBuffer data2;
             if (channelId != 0) {
+                final int i;
                 if (taskRequest != null) {
                     req = (TL_channels_deleteMessages) taskRequest;
                     newTaskId = taskId;
@@ -2525,6 +2535,7 @@ public class MessagesController implements NotificationCenterDelegate {
         }
         if (first) {
             final long j;
+            boolean isProxyDialog = false;
             MessagesStorage.getInstance(this.currentAccount).deleteDialog(did, onlyHistory);
             TL_dialog dialog = (TL_dialog) this.dialogs_dict.get(did);
             if (dialog != null) {
@@ -2532,70 +2543,88 @@ public class MessagesController implements NotificationCenterDelegate {
                     max_id_delete = Math.max(0, dialog.top_message);
                 }
                 if (onlyHistory == 0 || onlyHistory == 3) {
-                    this.dialogs.remove(dialog);
-                    if (this.dialogsServerOnly.remove(dialog) && DialogObject.isChannel(dialog)) {
-                        j = did;
-                        Utilities.stageQueue.postRunnable(new Runnable() {
-                            public void run() {
-                                MessagesController.this.channelsPts.delete(-((int) j));
-                                MessagesController.this.shortPollChannels.delete(-((int) j));
-                                MessagesController.this.needShortPollChannels.delete(-((int) j));
+                    isProxyDialog = this.proxyDialog != null && this.proxyDialog.id == did;
+                    if (isProxyDialog) {
+                        this.isLeftProxyChannel = true;
+                        if (this.proxyDialog.id < 0) {
+                            Chat chat = getChat(Integer.valueOf(-((int) this.proxyDialog.id)));
+                            if (chat != null) {
+                                chat.left = true;
                             }
-                        });
+                        }
+                        sortDialogs(null);
+                    } else {
+                        this.dialogs.remove(dialog);
+                        if (this.dialogsServerOnly.remove(dialog) && DialogObject.isChannel(dialog)) {
+                            j = did;
+                            Utilities.stageQueue.postRunnable(new Runnable() {
+                                public void run() {
+                                    MessagesController.this.channelsPts.delete(-((int) j));
+                                    MessagesController.this.shortPollChannels.delete(-((int) j));
+                                    MessagesController.this.needShortPollChannels.delete(-((int) j));
+                                }
+                            });
+                        }
+                        this.dialogsGroupsOnly.remove(dialog);
+                        this.dialogs_dict.remove(did);
+                        this.dialogs_read_inbox_max.remove(Long.valueOf(did));
+                        this.dialogs_read_outbox_max.remove(Long.valueOf(did));
+                        this.nextDialogsCacheOffset--;
                     }
-                    this.dialogsGroupsOnly.remove(dialog);
-                    this.dialogs_dict.remove(did);
-                    this.dialogs_read_inbox_max.remove(Long.valueOf(did));
-                    this.dialogs_read_outbox_max.remove(Long.valueOf(did));
-                    this.nextDialogsCacheOffset--;
                 } else {
                     dialog.unread_count = 0;
                 }
-                MessageObject object = (MessageObject) this.dialogMessage.get(dialog.id);
-                this.dialogMessage.remove(dialog.id);
-                int lastMessageId;
-                if (object != null) {
-                    lastMessageId = object.getId();
-                    this.dialogMessagesByIds.remove(object.getId());
-                } else {
-                    lastMessageId = dialog.top_message;
-                    object = (MessageObject) this.dialogMessagesByIds.get(dialog.top_message);
-                    this.dialogMessagesByIds.remove(dialog.top_message);
-                }
-                if (!(object == null || object.messageOwner.random_id == 0)) {
-                    this.dialogMessagesByRandomIds.remove(object.messageOwner.random_id);
-                }
-                if (onlyHistory != 1 || lower_part == 0 || lastMessageId <= 0) {
-                    dialog.top_message = 0;
-                } else {
-                    Message message = new TL_messageService();
-                    message.id = dialog.top_message;
-                    message.out = ((long) UserConfig.getInstance(this.currentAccount).getClientUserId()) == did;
-                    message.from_id = UserConfig.getInstance(this.currentAccount).getClientUserId();
-                    message.flags |= 256;
-                    message.action = new TL_messageActionHistoryClear();
-                    message.date = dialog.last_message_date;
-                    if (lower_part > 0) {
-                        message.to_id = new TL_peerUser();
-                        message.to_id.user_id = lower_part;
-                    } else if (ChatObject.isChannel(getChat(Integer.valueOf(-lower_part)))) {
-                        message.to_id = new TL_peerChannel();
-                        message.to_id.channel_id = -lower_part;
+                if (!isProxyDialog) {
+                    MessageObject object = (MessageObject) this.dialogMessage.get(dialog.id);
+                    this.dialogMessage.remove(dialog.id);
+                    int lastMessageId;
+                    if (object != null) {
+                        lastMessageId = object.getId();
+                        this.dialogMessagesByIds.remove(object.getId());
                     } else {
-                        message.to_id = new TL_peerChat();
-                        message.to_id.chat_id = -lower_part;
+                        lastMessageId = dialog.top_message;
+                        object = (MessageObject) this.dialogMessagesByIds.get(dialog.top_message);
+                        this.dialogMessagesByIds.remove(dialog.top_message);
                     }
-                    MessageObject messageObject = new MessageObject(this.currentAccount, message, this.createdDialogIds.contains(Long.valueOf(message.dialog_id)));
-                    ArrayList<MessageObject> objArr = new ArrayList();
-                    objArr.add(messageObject);
-                    ArrayList arr = new ArrayList();
-                    arr.add(message);
-                    updateInterfaceWithMessages(did, objArr);
-                    MessagesStorage.getInstance(this.currentAccount).putMessages(arr, false, true, false, 0);
+                    if (!(object == null || object.messageOwner.random_id == 0)) {
+                        this.dialogMessagesByRandomIds.remove(object.messageOwner.random_id);
+                    }
+                    if (onlyHistory != 1 || lower_part == 0 || lastMessageId <= 0) {
+                        dialog.top_message = 0;
+                    } else {
+                        Message message = new TL_messageService();
+                        message.id = dialog.top_message;
+                        message.out = ((long) UserConfig.getInstance(this.currentAccount).getClientUserId()) == did;
+                        message.from_id = UserConfig.getInstance(this.currentAccount).getClientUserId();
+                        message.flags |= 256;
+                        message.action = new TL_messageActionHistoryClear();
+                        message.date = dialog.last_message_date;
+                        if (lower_part > 0) {
+                            message.to_id = new TL_peerUser();
+                            message.to_id.user_id = lower_part;
+                        } else if (ChatObject.isChannel(getChat(Integer.valueOf(-lower_part)))) {
+                            message.to_id = new TL_peerChannel();
+                            message.to_id.channel_id = -lower_part;
+                        } else {
+                            message.to_id = new TL_peerChat();
+                            message.to_id.chat_id = -lower_part;
+                        }
+                        MessageObject messageObject = new MessageObject(this.currentAccount, message, this.createdDialogIds.contains(Long.valueOf(message.dialog_id)));
+                        ArrayList<MessageObject> objArr = new ArrayList();
+                        objArr.add(messageObject);
+                        ArrayList arr = new ArrayList();
+                        arr.add(message);
+                        updateInterfaceWithMessages(did, objArr);
+                        MessagesStorage.getInstance(this.currentAccount).putMessages(arr, false, true, false, 0);
+                    }
                 }
             }
-            NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload, new Object[0]);
-            NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.removeAllMessagesFromDialog, Long.valueOf(did), Boolean.valueOf(false));
+            if (isProxyDialog) {
+                NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload, Boolean.valueOf(true));
+            } else {
+                NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload, new Object[0]);
+                NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.removeAllMessagesFromDialog, Long.valueOf(did), Boolean.valueOf(false));
+            }
             j = did;
             MessagesStorage.getInstance(this.currentAccount).getStorageQueue().postRunnable(new Runnable() {
                 public void run() {
@@ -2925,6 +2954,240 @@ public class MessagesController implements NotificationCenterDelegate {
             GcmInstanceIDListenerService.sendRegistrationToServer(SharedConfig.pushString);
         }
         LocationController.getInstance(this.currentAccount).update();
+        checkProxyInfoInternal(false);
+    }
+
+    public void checkProxyInfo(final boolean reset) {
+        Utilities.stageQueue.postRunnable(new Runnable() {
+            public void run() {
+                MessagesController.this.checkProxyInfoInternal(reset);
+            }
+        });
+    }
+
+    private void checkProxyInfoInternal(boolean reset) {
+        if (reset && this.checkingProxyInfo) {
+            this.checkingProxyInfo = false;
+        }
+        if ((reset || this.nextProxyInfoCheckTime <= ConnectionsManager.getInstance(this.currentAccount).getCurrentTime()) && !this.checkingProxyInfo) {
+            SharedPreferences preferences = getGlobalMainSettings();
+            boolean enabled = preferences.getBoolean("proxy_enabled", false);
+            String proxyAddress = preferences.getString("proxy_ip", TtmlNode.ANONYMOUS_REGION_ID);
+            String proxySecret = preferences.getString("proxy_secret", TtmlNode.ANONYMOUS_REGION_ID);
+            if (!enabled || TextUtils.isEmpty(proxyAddress) || TextUtils.isEmpty(proxySecret)) {
+                this.nextProxyInfoCheckTime = ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() + 3600;
+                this.checkingProxyInfo = false;
+                if (this.checkingProxyInfoRequestId != 0) {
+                    ConnectionsManager.getInstance(this.currentAccount).cancelRequest(this.checkingProxyInfoRequestId, true);
+                    this.checkingProxyInfoRequestId = 0;
+                }
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    public void run() {
+                        if (MessagesController.this.proxyDialog != null) {
+                            if (MessagesController.this.proxyDialog.id < 0) {
+                                Chat chat = MessagesController.this.getChat(Integer.valueOf(-((int) MessagesController.this.proxyDialog.id)));
+                                if (chat.left || chat.kicked || chat.restricted) {
+                                    MessagesController.this.dialogs_dict.remove(MessagesController.this.proxyDialog.id);
+                                }
+                            }
+                            MessagesController.this.proxyDialog = null;
+                            MessagesController.this.sortDialogs(null);
+                            NotificationCenter.getInstance(MessagesController.this.currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload, new Object[0]);
+                        }
+                    }
+                });
+                return;
+            }
+            this.checkingProxyInfo = true;
+            this.checkingProxyInfoRequestId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_help_getProxyData(), new RequestDelegate() {
+                public void run(TLObject response, TL_error error) {
+                    if (MessagesController.this.checkingProxyInfoRequestId != 0) {
+                        boolean noDialog = false;
+                        if (response instanceof TL_help_proxyDataEmpty) {
+                            MessagesController.this.nextProxyInfoCheckTime = ((TL_help_proxyDataEmpty) response).expires;
+                            noDialog = true;
+                        } else if (response instanceof TL_help_proxyDataPromo) {
+                            long did;
+                            final TL_help_proxyDataPromo res = (TL_help_proxyDataPromo) response;
+                            if (res.peer.user_id != 0) {
+                                did = (long) res.peer.user_id;
+                            } else if (res.peer.chat_id != 0) {
+                                did = (long) (-res.peer.chat_id);
+                                a = 0;
+                                while (a < res.chats.size()) {
+                                    chat = (Chat) res.chats.get(a);
+                                    if (chat.id != res.peer.chat_id) {
+                                        a++;
+                                    } else if (chat.kicked || chat.restricted) {
+                                        noDialog = true;
+                                    }
+                                }
+                            } else {
+                                did = (long) (-res.peer.channel_id);
+                                a = 0;
+                                while (a < res.chats.size()) {
+                                    chat = (Chat) res.chats.get(a);
+                                    if (chat.id != res.peer.channel_id) {
+                                        a++;
+                                    } else if (chat.kicked || chat.restricted) {
+                                        noDialog = true;
+                                    }
+                                }
+                            }
+                            MessagesController.this.nextProxyInfoCheckTime = res.expires;
+                            if (!noDialog) {
+                                AndroidUtilities.runOnUIThread(new Runnable() {
+                                    public void run() {
+                                        MessagesController.this.proxyDialog = (TL_dialog) MessagesController.this.dialogs_dict.get(did);
+                                        if (MessagesController.this.proxyDialog != null) {
+                                            MessagesController.this.checkingProxyInfo = false;
+                                            MessagesController.this.sortDialogs(null);
+                                            NotificationCenter.getInstance(MessagesController.this.currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload, Boolean.valueOf(true));
+                                            return;
+                                        }
+                                        int a;
+                                        SparseArray<User> usersDict = new SparseArray();
+                                        SparseArray<Chat> chatsDict = new SparseArray();
+                                        for (a = 0; a < res.users.size(); a++) {
+                                            User u = (User) res.users.get(a);
+                                            usersDict.put(u.id, u);
+                                        }
+                                        for (a = 0; a < res.chats.size(); a++) {
+                                            Chat c = (Chat) res.chats.get(a);
+                                            chatsDict.put(c.id, c);
+                                        }
+                                        TL_messages_getPeerDialogs req = new TL_messages_getPeerDialogs();
+                                        TL_inputDialogPeer peer = new TL_inputDialogPeer();
+                                        if (res.peer.user_id != 0) {
+                                            peer.peer = new TL_inputPeerUser();
+                                            peer.peer.user_id = res.peer.user_id;
+                                            User user = (User) usersDict.get(res.peer.user_id);
+                                            if (user != null) {
+                                                peer.peer.access_hash = user.access_hash;
+                                            }
+                                        } else if (res.peer.chat_id != 0) {
+                                            peer.peer = new TL_inputPeerChat();
+                                            peer.peer.chat_id = res.peer.chat_id;
+                                            chat = (Chat) chatsDict.get(res.peer.chat_id);
+                                            if (chat != null) {
+                                                peer.peer.access_hash = chat.access_hash;
+                                            }
+                                        } else {
+                                            peer.peer = new TL_inputPeerChannel();
+                                            peer.peer.channel_id = res.peer.channel_id;
+                                            chat = (Chat) chatsDict.get(res.peer.channel_id);
+                                            if (chat != null) {
+                                                peer.peer.access_hash = chat.access_hash;
+                                            }
+                                        }
+                                        req.peers.add(peer);
+                                        ConnectionsManager.getInstance(MessagesController.this.currentAccount).sendRequest(req, new RequestDelegate() {
+                                            public void run(TLObject response, TL_error error) {
+                                                if (MessagesController.this.checkingProxyInfoRequestId != 0) {
+                                                    MessagesController.this.checkingProxyInfoRequestId = 0;
+                                                    final TL_messages_peerDialogs res2 = (TL_messages_peerDialogs) response;
+                                                    if (res2 == null || res2.dialogs.isEmpty()) {
+                                                        AndroidUtilities.runOnUIThread(new Runnable() {
+                                                            public void run() {
+                                                                if (MessagesController.this.proxyDialog != null) {
+                                                                    if (MessagesController.this.proxyDialog.id < 0) {
+                                                                        Chat chat = MessagesController.this.getChat(Integer.valueOf(-((int) MessagesController.this.proxyDialog.id)));
+                                                                        if (chat.left || chat.kicked || chat.restricted) {
+                                                                            MessagesController.this.dialogs_dict.remove(MessagesController.this.proxyDialog.id);
+                                                                        }
+                                                                    }
+                                                                    MessagesController.this.proxyDialog = null;
+                                                                    MessagesController.this.sortDialogs(null);
+                                                                    NotificationCenter.getInstance(MessagesController.this.currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload, new Object[0]);
+                                                                }
+                                                            }
+                                                        });
+                                                    } else {
+                                                        MessagesStorage.getInstance(MessagesController.this.currentAccount).putUsersAndChats(res.users, res.chats, true, true);
+                                                        MessagesStorage.getInstance(MessagesController.this.currentAccount).putUsersAndChats(res2.users, res2.chats, true, true);
+                                                        AndroidUtilities.runOnUIThread(new Runnable() {
+                                                            public void run() {
+                                                                MessagesController.getInstance(MessagesController.this.currentAccount).putUsers(res.users, false);
+                                                                MessagesController.getInstance(MessagesController.this.currentAccount).putChats(res.chats, false);
+                                                                MessagesController.getInstance(MessagesController.this.currentAccount).putUsers(res2.users, false);
+                                                                MessagesController.getInstance(MessagesController.this.currentAccount).putChats(res2.chats, false);
+                                                                MessagesController.this.proxyDialog = (TL_dialog) res2.dialogs.get(0);
+                                                                MessagesController.this.proxyDialog.id = did;
+                                                                if (DialogObject.isChannel(MessagesController.this.proxyDialog)) {
+                                                                    MessagesController.this.channelsPts.put(-((int) MessagesController.this.proxyDialog.id), MessagesController.this.proxyDialog.pts);
+                                                                }
+                                                                Integer value = (Integer) MessagesController.this.dialogs_read_inbox_max.get(Long.valueOf(MessagesController.this.proxyDialog.id));
+                                                                if (value == null) {
+                                                                    value = Integer.valueOf(0);
+                                                                }
+                                                                MessagesController.this.dialogs_read_inbox_max.put(Long.valueOf(MessagesController.this.proxyDialog.id), Integer.valueOf(Math.max(value.intValue(), MessagesController.this.proxyDialog.read_inbox_max_id)));
+                                                                value = (Integer) MessagesController.this.dialogs_read_outbox_max.get(Long.valueOf(MessagesController.this.proxyDialog.id));
+                                                                if (value == null) {
+                                                                    value = Integer.valueOf(0);
+                                                                }
+                                                                MessagesController.this.dialogs_read_outbox_max.put(Long.valueOf(MessagesController.this.proxyDialog.id), Integer.valueOf(Math.max(value.intValue(), MessagesController.this.proxyDialog.read_outbox_max_id)));
+                                                                MessagesController.this.dialogs_dict.put(did, MessagesController.this.proxyDialog);
+                                                                if (!res2.messages.isEmpty()) {
+                                                                    int a;
+                                                                    SparseArray usersDict = new SparseArray();
+                                                                    SparseArray chatsDict = new SparseArray();
+                                                                    for (a = 0; a < res2.users.size(); a++) {
+                                                                        User u = (User) res2.users.get(a);
+                                                                        usersDict.put(u.id, u);
+                                                                    }
+                                                                    for (a = 0; a < res2.chats.size(); a++) {
+                                                                        Chat c = (Chat) res2.chats.get(a);
+                                                                        chatsDict.put(c.id, c);
+                                                                    }
+                                                                    MessageObject messageObject = new MessageObject(MessagesController.this.currentAccount, (Message) res2.messages.get(0), usersDict, chatsDict, false);
+                                                                    MessagesController.this.dialogMessage.put(did, messageObject);
+                                                                    if (MessagesController.this.proxyDialog.last_message_date == 0) {
+                                                                        MessagesController.this.proxyDialog.last_message_date = messageObject.messageOwner.date;
+                                                                    }
+                                                                }
+                                                                MessagesController.this.sortDialogs(null);
+                                                                NotificationCenter.getInstance(MessagesController.this.currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload, Boolean.valueOf(true));
+                                                            }
+                                                        });
+                                                    }
+                                                    MessagesController.this.checkingProxyInfo = false;
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        } else {
+                            MessagesController.this.nextProxyInfoCheckTime = ConnectionsManager.getInstance(MessagesController.this.currentAccount).getCurrentTime() + 3600;
+                            noDialog = true;
+                        }
+                        if (noDialog) {
+                            MessagesController.this.checkingProxyInfoRequestId = 0;
+                            MessagesController.this.checkingProxyInfo = false;
+                            AndroidUtilities.runOnUIThread(new Runnable() {
+                                public void run() {
+                                    if (MessagesController.this.proxyDialog != null) {
+                                        if (MessagesController.this.proxyDialog.id < 0) {
+                                            Chat chat = MessagesController.this.getChat(Integer.valueOf(-((int) MessagesController.this.proxyDialog.id)));
+                                            if (chat.left || chat.kicked || chat.restricted) {
+                                                MessagesController.this.dialogs_dict.remove(MessagesController.this.proxyDialog.id);
+                                            }
+                                        }
+                                        MessagesController.this.proxyDialog = null;
+                                        MessagesController.this.sortDialogs(null);
+                                        NotificationCenter.getInstance(MessagesController.this.currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload, new Object[0]);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    public boolean isProxyDialog(long did) {
+        return this.proxyDialog != null && this.proxyDialog.id == did && this.isLeftProxyChannel;
     }
 
     private String getUserNameForTyping(User user) {
@@ -3411,7 +3674,7 @@ public class MessagesController implements NotificationCenterDelegate {
                         objects.add(messageObject);
                         if (z) {
                             if (message.media instanceof TL_messageMediaUnsupported) {
-                                if (message.media.bytes != null && (message.media.bytes.length == 0 || (message.media.bytes.length == 1 && message.media.bytes[0] < (byte) 76))) {
+                                if (message.media.bytes != null && (message.media.bytes.length == 0 || (message.media.bytes.length == 1 && message.media.bytes[0] < (byte) 78))) {
                                     messagesToReload.add(Integer.valueOf(message.id));
                                 }
                             } else if (message.media instanceof TL_messageMediaWebPage) {
@@ -4060,9 +4323,7 @@ public class MessagesController implements NotificationCenterDelegate {
                     return;
                 }
                 int a;
-                Chat chat;
                 User user;
-                Integer value;
                 final LongSparseArray<TL_dialog> new_dialogs_dict = new LongSparseArray();
                 final LongSparseArray<MessageObject> new_dialogMessage = new LongSparseArray();
                 SparseArray usersDict = new SparseArray();
@@ -4080,6 +4341,7 @@ public class MessagesController implements NotificationCenterDelegate {
                 }
                 Message lastMessage = null;
                 for (a = 0; a < org_telegram_tgnet_TLRPC_messages_Dialogs.messages.size(); a++) {
+                    Chat chat;
                     Message message = (Message) org_telegram_tgnet_TLRPC_messages_Dialogs.messages.get(a);
                     if (lastMessage == null || message.date < lastMessage.date) {
                         lastMessage = message;
@@ -4087,7 +4349,7 @@ public class MessagesController implements NotificationCenterDelegate {
                     MessageObject messageObject;
                     if (message.to_id.channel_id != 0) {
                         chat = (Chat) chatsDict.get(message.to_id.channel_id);
-                        if (chat == null || !chat.left) {
+                        if (chat == null || !chat.left || (MessagesController.this.proxyDialogId != 0 && MessagesController.this.proxyDialogId == ((long) (-chat.id)))) {
                             if (chat != null && chat.megagroup) {
                                 message.flags |= Integer.MIN_VALUE;
                             }
@@ -4151,6 +4413,7 @@ public class MessagesController implements NotificationCenterDelegate {
                 }
                 final ArrayList<TL_dialog> dialogsToReload = new ArrayList();
                 for (a = 0; a < org_telegram_tgnet_TLRPC_messages_Dialogs.dialogs.size(); a++) {
+                    Integer value;
                     TL_dialog d = (TL_dialog) org_telegram_tgnet_TLRPC_messages_Dialogs.dialogs.get(a);
                     if (d.id == 0 && d.peer != null) {
                         if (d.peer.user_id != 0) {
@@ -4162,6 +4425,9 @@ public class MessagesController implements NotificationCenterDelegate {
                         }
                     }
                     if (d.id != 0) {
+                        if (MessagesController.this.proxyDialogId != 0 && MessagesController.this.proxyDialogId == d.id) {
+                            MessagesController.this.proxyDialog = d;
+                        }
                         if (d.last_message_date == 0) {
                             MessageObject mess = (MessageObject) new_dialogMessage.get(d.id);
                             if (mess != null) {
@@ -4176,6 +4442,10 @@ public class MessagesController implements NotificationCenterDelegate {
                                     allowCheck = false;
                                 }
                                 if (chat.left) {
+                                    if (MessagesController.this.proxyDialogId != 0) {
+                                        if (MessagesController.this.proxyDialogId != d.id) {
+                                        }
+                                    }
                                 }
                             }
                             MessagesController.this.channelsPts.put(-((int) d.id), d.pts);
@@ -4640,22 +4910,19 @@ public class MessagesController implements NotificationCenterDelegate {
                 for (a = 0; a < dialogsRes.messages.size(); a++) {
                     Chat chat;
                     Message message = (Message) dialogsRes.messages.get(a);
-                    MessageObject messageObject;
-                    if (message.to_id.channel_id != 0) {
-                        chat = (Chat) chatsDict.get(message.to_id.channel_id);
-                        if (chat != null && chat.left) {
-                        }
-                        messageObject = new MessageObject(MessagesController.this.currentAccount, message, usersDict, chatsDict, false);
-                        new_dialogMessage.put(messageObject.getDialogId(), messageObject);
-                    } else {
-                        if (message.to_id.chat_id != 0) {
+                    if (MessagesController.this.proxyDialog == null || MessagesController.this.proxyDialog.id != message.dialog_id) {
+                        if (message.to_id.channel_id != 0) {
+                            chat = (Chat) chatsDict.get(message.to_id.channel_id);
+                            if (chat != null && chat.left) {
+                            }
+                        } else if (message.to_id.chat_id != 0) {
                             chat = (Chat) chatsDict.get(message.to_id.chat_id);
                             if (!(chat == null || chat.migrated_to == null)) {
                             }
                         }
-                        messageObject = new MessageObject(MessagesController.this.currentAccount, message, usersDict, chatsDict, false);
-                        new_dialogMessage.put(messageObject.getDialogId(), messageObject);
                     }
+                    MessageObject messageObject = new MessageObject(MessagesController.this.currentAccount, message, usersDict, chatsDict, false);
+                    new_dialogMessage.put(messageObject.getDialogId(), messageObject);
                 }
                 for (a = 0; a < dialogsRes.dialogs.size(); a++) {
                     TL_dialog d = (TL_dialog) dialogsRes.dialogs.get(a);
@@ -4668,55 +4935,35 @@ public class MessagesController implements NotificationCenterDelegate {
                             d.id = (long) (-d.peer.channel_id);
                         }
                     }
-                    MessageObject mess;
-                    Integer value;
-                    if (DialogObject.isChannel(d)) {
-                        chat = (Chat) chatsDict.get(-((int) d.id));
-                        if (chat != null && chat.left) {
-                        }
-                        if (d.last_message_date == 0) {
-                            mess = (MessageObject) new_dialogMessage.get(d.id);
-                            if (mess != null) {
-                                d.last_message_date = mess.messageOwner.date;
+                    if (MessagesController.this.proxyDialog == null || MessagesController.this.proxyDialog.id != d.id) {
+                        if (DialogObject.isChannel(d)) {
+                            chat = (Chat) chatsDict.get(-((int) d.id));
+                            if (chat != null && chat.left) {
                             }
-                        }
-                        new_dialogs_dict.put(d.id, d);
-                        dialogsToUpdate.put(d.id, Integer.valueOf(d.unread_count));
-                        value = (Integer) MessagesController.this.dialogs_read_inbox_max.get(Long.valueOf(d.id));
-                        if (value == null) {
-                            value = Integer.valueOf(0);
-                        }
-                        MessagesController.this.dialogs_read_inbox_max.put(Long.valueOf(d.id), Integer.valueOf(Math.max(value.intValue(), d.read_inbox_max_id)));
-                        value = (Integer) MessagesController.this.dialogs_read_outbox_max.get(Long.valueOf(d.id));
-                        if (value == null) {
-                            value = Integer.valueOf(0);
-                        }
-                        MessagesController.this.dialogs_read_outbox_max.put(Long.valueOf(d.id), Integer.valueOf(Math.max(value.intValue(), d.read_outbox_max_id)));
-                    } else {
-                        if (((int) d.id) < 0) {
+                        } else if (((int) d.id) < 0) {
                             chat = (Chat) chatsDict.get(-((int) d.id));
                             if (!(chat == null || chat.migrated_to == null)) {
                             }
                         }
-                        if (d.last_message_date == 0) {
-                            mess = (MessageObject) new_dialogMessage.get(d.id);
-                            if (mess != null) {
-                                d.last_message_date = mess.messageOwner.date;
-                            }
-                        }
-                        new_dialogs_dict.put(d.id, d);
-                        dialogsToUpdate.put(d.id, Integer.valueOf(d.unread_count));
-                        value = (Integer) MessagesController.this.dialogs_read_inbox_max.get(Long.valueOf(d.id));
-                        if (value == null) {
-                            value = Integer.valueOf(0);
-                        }
-                        MessagesController.this.dialogs_read_inbox_max.put(Long.valueOf(d.id), Integer.valueOf(Math.max(value.intValue(), d.read_inbox_max_id)));
-                        value = (Integer) MessagesController.this.dialogs_read_outbox_max.get(Long.valueOf(d.id));
-                        if (value == null) {
-                            value = Integer.valueOf(0);
-                        }
-                        MessagesController.this.dialogs_read_outbox_max.put(Long.valueOf(d.id), Integer.valueOf(Math.max(value.intValue(), d.read_outbox_max_id)));
                     }
+                    if (d.last_message_date == 0) {
+                        MessageObject mess = (MessageObject) new_dialogMessage.get(d.id);
+                        if (mess != null) {
+                            d.last_message_date = mess.messageOwner.date;
+                        }
+                    }
+                    new_dialogs_dict.put(d.id, d);
+                    dialogsToUpdate.put(d.id, Integer.valueOf(d.unread_count));
+                    Integer value = (Integer) MessagesController.this.dialogs_read_inbox_max.get(Long.valueOf(d.id));
+                    if (value == null) {
+                        value = Integer.valueOf(0);
+                    }
+                    MessagesController.this.dialogs_read_inbox_max.put(Long.valueOf(d.id), Integer.valueOf(Math.max(value.intValue(), d.read_inbox_max_id)));
+                    value = (Integer) MessagesController.this.dialogs_read_outbox_max.get(Long.valueOf(d.id));
+                    if (value == null) {
+                        value = Integer.valueOf(0);
+                    }
+                    MessagesController.this.dialogs_read_outbox_max.put(Long.valueOf(d.id), Integer.valueOf(Math.max(value.intValue(), d.read_outbox_max_id)));
                 }
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     public void run() {
@@ -5781,19 +6028,24 @@ public class MessagesController implements NotificationCenterDelegate {
         }
     }
 
-    public void performLogout(boolean byUser) {
+    public void performLogout(int type) {
+        boolean z = true;
         this.notificationsPreferences.edit().clear().commit();
         this.emojiPreferences.edit().putLong("lastGifLoadTime", 0).putLong("lastStickersLoadTime", 0).putLong("lastStickersLoadTimeMask", 0).putLong("lastStickersLoadTimeFavs", 0).commit();
         this.mainPreferences.edit().remove("gifhint").commit();
-        if (byUser) {
+        if (type == 1) {
             unregistedPush();
             ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_auth_logOut(), new RequestDelegate() {
                 public void run(TLObject response, TL_error error) {
-                    ConnectionsManager.getInstance(MessagesController.this.currentAccount).cleanup();
+                    ConnectionsManager.getInstance(MessagesController.this.currentAccount).cleanup(false);
                 }
             });
         } else {
-            ConnectionsManager.getInstance(this.currentAccount).cleanup();
+            ConnectionsManager instance = ConnectionsManager.getInstance(this.currentAccount);
+            if (type != 2) {
+                z = false;
+            }
+            instance.cleanup(z);
         }
         UserConfig.getInstance(this.currentAccount).clearConfig();
         NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.appDidLogout, new Object[0]);
@@ -6091,9 +6343,9 @@ public class MessagesController implements NotificationCenterDelegate {
 
     protected void loadUnknownChannel(final Chat channel, long taskId) {
         Throwable e;
-        long newTaskId;
         if ((channel instanceof TL_channel) && this.gettingUnknownChannels.indexOfKey(channel.id) < 0) {
             if (channel.access_hash != 0) {
+                long newTaskId;
                 TL_inputPeerChannel inputPeer = new TL_inputPeerChannel();
                 inputPeer.channel_id = channel.id;
                 inputPeer.access_hash = channel.access_hash;
@@ -6822,7 +7074,6 @@ public class MessagesController implements NotificationCenterDelegate {
 
     public boolean pinDialog(long did, boolean pin, InputPeer peer, long taskId) {
         Throwable e;
-        long newTaskId;
         int lower_id = (int) did;
         TL_dialog dialog = (TL_dialog) this.dialogs_dict.get(did);
         if (dialog != null && dialog.pinned != pin) {
@@ -6854,6 +7105,7 @@ public class MessagesController implements NotificationCenterDelegate {
                 if (peer instanceof TL_inputPeerEmpty) {
                     return false;
                 }
+                long newTaskId;
                 TL_inputDialogPeer inputDialogPeer = new TL_inputDialogPeer();
                 inputDialogPeer.peer = peer;
                 req.peer = inputDialogPeer;
@@ -8438,7 +8690,7 @@ public class MessagesController implements NotificationCenterDelegate {
                     final TL_updateServiceNotification tL_updateServiceNotification = update15;
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         public void run() {
-                            NotificationCenter.getInstance(MessagesController.this.currentAccount).postNotificationName(NotificationCenter.needShowAlert, Integer.valueOf(2), tL_updateServiceNotification.message);
+                            NotificationCenter.getInstance(MessagesController.this.currentAccount).postNotificationName(NotificationCenter.needShowAlert, Integer.valueOf(2), tL_updateServiceNotification.message, tL_updateServiceNotification.type);
                         }
                     });
                 }
@@ -9020,7 +9272,7 @@ public class MessagesController implements NotificationCenterDelegate {
                                             MessagesController.this.getChannelDifference(tL_updateChannel.channel_id, 1, 0, null);
                                         }
                                     });
-                                } else if (chat.left && dialog != null) {
+                                } else if (chat.left && dialog != null && (MessagesController.this.proxyDialog == null || MessagesController.this.proxyDialog.id != dialog.id)) {
                                     MessagesController.this.deleteDialog(dialog.id, 0);
                                 }
                             }
@@ -9557,12 +9809,20 @@ public class MessagesController implements NotificationCenterDelegate {
     }
 
     public void sortDialogs(SparseArray<Chat> chatsDict) {
+        Chat chat;
         this.dialogsServerOnly.clear();
         this.dialogsGroupsOnly.clear();
         this.dialogsForward.clear();
         boolean selfAdded = false;
         int selfId = UserConfig.getInstance(this.currentAccount).getClientUserId();
         Collections.sort(this.dialogs, this.dialogComparator);
+        this.isLeftProxyChannel = true;
+        if (this.proxyDialog != null && this.proxyDialog.id < 0) {
+            chat = getChat(Integer.valueOf(-((int) this.proxyDialog.id)));
+            if (!(chat == null || chat.left)) {
+                this.isLeftProxyChannel = false;
+            }
+        }
         int a = 0;
         while (a < this.dialogs.size()) {
             TL_dialog d = (TL_dialog) this.dialogs.get(a);
@@ -9576,7 +9836,6 @@ public class MessagesController implements NotificationCenterDelegate {
             }
             if (!(lower_id == 0 || high_id == 1)) {
                 this.dialogsServerOnly.add(d);
-                Chat chat;
                 if (DialogObject.isChannel(d)) {
                     chat = getChat(Integer.valueOf(-lower_id));
                     if (chat != null && ((chat.megagroup && chat.admin_rights != null && (chat.admin_rights.post_messages || chat.admin_rights.add_admins)) || chat.creator)) {
@@ -9588,12 +9847,20 @@ public class MessagesController implements NotificationCenterDelegate {
                         if (!(chat == null || chat.migrated_to == null)) {
                             this.dialogs.remove(a);
                             a--;
+                            a++;
                         }
                     }
                     this.dialogsGroupsOnly.add(d);
                 }
             }
+            if (this.proxyDialog != null && d.id == this.proxyDialog.id && this.isLeftProxyChannel) {
+                this.dialogs.remove(a);
+                a--;
+            }
             a++;
+        }
+        if (this.proxyDialog != null && this.isLeftProxyChannel) {
+            this.dialogs.add(0, this.proxyDialog);
         }
         if (!selfAdded) {
             User user = UserConfig.getInstance(this.currentAccount).getCurrentUser();

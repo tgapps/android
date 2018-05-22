@@ -1,13 +1,7 @@
 package com.google.firebase.iid;
 
-final /* synthetic */ class zzo implements Runnable {
-    private final zzm zzbre;
+import com.google.android.gms.tasks.Task;
 
-    zzo(zzm com_google_firebase_iid_zzm) {
-        this.zzbre = com_google_firebase_iid_zzm;
-    }
-
-    public final void run() {
-        this.zzbre.zzss();
-    }
+interface zzo {
+    Task<String> zzb(String str, String str2);
 }

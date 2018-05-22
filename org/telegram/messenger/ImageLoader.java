@@ -1568,10 +1568,10 @@ public class ImageLoader {
     }
 
     private class HttpImageTask extends AsyncTask<Void, Void, Boolean> {
-        private CacheImage cacheImage = null;
+        private CacheImage cacheImage;
         private boolean canRetry = true;
-        private RandomAccessFile fileOutputStream = null;
-        private HttpURLConnection httpConnection = null;
+        private RandomAccessFile fileOutputStream;
+        private HttpURLConnection httpConnection;
         private int imageSize;
         private long lastProgressTime;
 

@@ -1,18 +1,16 @@
 package com.google.android.gms.internal.measurement;
 
-import java.util.List;
-import java.util.Map;
+final class zzgo implements Runnable {
+    private final /* synthetic */ zzdz zzane;
+    private final /* synthetic */ zzgn zzanf;
 
-final class zzgo implements zzfm {
-    private final /* synthetic */ zzgl zzanp;
-    private final /* synthetic */ String zzanr;
-
-    zzgo(zzgl com_google_android_gms_internal_measurement_zzgl, String str) {
-        this.zzanp = com_google_android_gms_internal_measurement_zzgl;
-        this.zzanr = str;
+    zzgo(zzgn com_google_android_gms_internal_measurement_zzgn, zzdz com_google_android_gms_internal_measurement_zzdz) {
+        this.zzanf = com_google_android_gms_internal_measurement_zzgn;
+        this.zzane = com_google_android_gms_internal_measurement_zzdz;
     }
 
-    public final void zza(String str, int i, Throwable th, byte[] bArr, Map<String, List<String>> map) {
-        this.zzanp.zza(i, th, bArr, this.zzanr);
+    public final void run() {
+        this.zzanf.zzajp.zzkx();
+        this.zzanf.zzajp.zze(this.zzane);
     }
 }

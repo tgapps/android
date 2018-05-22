@@ -1,26 +1,21 @@
 package com.google.android.gms.internal.measurement;
 
 import com.google.android.gms.common.internal.Preconditions;
-import com.google.android.gms.common.util.Clock;
 
-final class zzjp {
-    private long startTime;
-    private final Clock zzrj;
+class zzjp extends zzhg implements zzec {
+    protected final zzjr zzajp;
 
-    public zzjp(Clock clock) {
-        Preconditions.checkNotNull(clock);
-        this.zzrj = clock;
+    zzjp(zzjr com_google_android_gms_internal_measurement_zzjr) {
+        super(com_google_android_gms_internal_measurement_zzjr.zzla());
+        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzjr);
+        this.zzajp = com_google_android_gms_internal_measurement_zzjr;
     }
 
-    public final void clear() {
-        this.startTime = 0;
+    public zzeb zziw() {
+        return this.zzajp.zziw();
     }
 
-    public final void start() {
-        this.startTime = this.zzrj.elapsedRealtime();
-    }
-
-    public final boolean zzj(long j) {
-        return this.startTime == 0 || this.zzrj.elapsedRealtime() - this.startTime >= 3600000;
+    public zzei zzix() {
+        return this.zzajp.zzix();
     }
 }

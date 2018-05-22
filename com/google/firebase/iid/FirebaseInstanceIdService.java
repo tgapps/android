@@ -7,11 +7,11 @@ public class FirebaseInstanceIdService extends zzb {
     public void onTokenRefresh() {
     }
 
-    protected final Intent zzf(Intent intent) {
-        return (Intent) zzz.zzta().zzbrx.poll();
+    protected final Intent zzb(Intent intent) {
+        return (Intent) zzan.zzad().zzco.poll();
     }
 
-    public final void zzh(Intent intent) {
+    public final void zzd(Intent intent) {
         if ("com.google.firebase.iid.TOKEN_REFRESH".equals(intent.getAction())) {
             onTokenRefresh();
             return;
@@ -23,9 +23,9 @@ public class FirebaseInstanceIdService extends zzb {
                 Log.d("FirebaseInstanceId", new StringBuilder((String.valueOf(stringExtra).length() + 21) + String.valueOf(valueOf).length()).append("Received command: ").append(stringExtra).append(" - ").append(valueOf).toString());
             }
             if ("RST".equals(stringExtra) || "RST_FULL".equals(stringExtra)) {
-                FirebaseInstanceId.getInstance().zzsk();
+                FirebaseInstanceId.getInstance().zzk();
             } else if ("SYNC".equals(stringExtra)) {
-                FirebaseInstanceId.getInstance().zzsl();
+                FirebaseInstanceId.getInstance().zzl();
             }
         }
     }

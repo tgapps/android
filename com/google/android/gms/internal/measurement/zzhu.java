@@ -1,17 +1,25 @@
 package com.google.android.gms.internal.measurement;
 
-import com.google.android.gms.measurement.AppMeasurement.ConditionalUserProperty;
+import java.util.concurrent.atomic.AtomicReference;
 
 final class zzhu implements Runnable {
-    private final /* synthetic */ zzhm zzaop;
-    private final /* synthetic */ ConditionalUserProperty zzaot;
+    private final /* synthetic */ String zzanh;
+    private final /* synthetic */ String zzani;
+    private final /* synthetic */ String zzanj;
+    private final /* synthetic */ AtomicReference zzanv;
+    private final /* synthetic */ zzhk zzanw;
+    private final /* synthetic */ boolean zzanz;
 
-    zzhu(zzhm com_google_android_gms_internal_measurement_zzhm, ConditionalUserProperty conditionalUserProperty) {
-        this.zzaop = com_google_android_gms_internal_measurement_zzhm;
-        this.zzaot = conditionalUserProperty;
+    zzhu(zzhk com_google_android_gms_internal_measurement_zzhk, AtomicReference atomicReference, String str, String str2, String str3, boolean z) {
+        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
+        this.zzanv = atomicReference;
+        this.zzanj = str;
+        this.zzanh = str2;
+        this.zzani = str3;
+        this.zzanz = z;
     }
 
     public final void run() {
-        this.zzaop.zzc(this.zzaot);
+        this.zzanw.zzacw.zzfx().zza(this.zzanv, this.zzanj, this.zzanh, this.zzani, this.zzanz);
     }
 }

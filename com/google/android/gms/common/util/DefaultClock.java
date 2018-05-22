@@ -19,4 +19,8 @@ public class DefaultClock implements Clock {
     public long elapsedRealtime() {
         return SystemClock.elapsedRealtime();
     }
+
+    public long nanoTime() {
+        return System.nanoTime();
+    }
 }

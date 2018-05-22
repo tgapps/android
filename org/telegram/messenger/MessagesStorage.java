@@ -770,7 +770,9 @@ public class MessagesStorage {
     }
 
     public void cleanup(final boolean isLogin) {
-        this.storageQueue.cleanupQueue();
+        if (!isLogin) {
+            this.storageQueue.cleanupQueue();
+        }
         this.storageQueue.postRunnable(new Runnable() {
             public void run() {
                 MessagesStorage.this.cleanupInternal();
@@ -5632,7 +5634,6 @@ Error: java.util.NoSuchElementException
         SQLiteCursor cursor;
         int a;
         Integer count;
-        int type;
         if (ifNoLastMessage) {
             try {
                 lastMessage = (Message) messages.get(0);
@@ -5750,12 +5751,12 @@ Error: java.util.NoSuchElementException
             for (a = 0; a < messagesMediaIdsMap.size(); a++) {
                 long key = messagesMediaIdsMap.keyAt(a);
                 long value = ((Long) messagesMediaIdsMap.valueAt(a)).longValue();
-                Integer type2 = (Integer) mediaTypes.get(key);
-                LongSparseArray<Integer> counts = (LongSparseArray) mediaCounts.get(type2.intValue());
+                Integer type = (Integer) mediaTypes.get(key);
+                LongSparseArray<Integer> counts = (LongSparseArray) mediaCounts.get(type.intValue());
                 if (counts == null) {
                     counts = new LongSparseArray();
                     count = Integer.valueOf(0);
-                    mediaCounts.put(type2.intValue(), counts);
+                    mediaCounts.put(type.intValue(), counts);
                 } else {
                     count = (Integer) counts.get(value);
                 }
@@ -5793,6 +5794,7 @@ Error: java.util.NoSuchElementException
         }
         int downloadMediaMask = 0;
         for (a = 0; a < messages.size(); a++) {
+            int type2;
             message = (Message) messages.get(a);
             fixUnsupportedMedia(message);
             state.requery();
@@ -5857,38 +5859,38 @@ Error: java.util.NoSuchElementException
             }
             data.reuse();
             if (downloadMask != 0 && ((message.to_id.channel_id == 0 || message.post) && message.date >= ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() - 3600 && DownloadController.getInstance(this.currentAccount).canDownloadMedia(message) && ((message.media instanceof TL_messageMediaPhoto) || (message.media instanceof TL_messageMediaDocument)))) {
-                type = 0;
+                type2 = 0;
                 long id = 0;
                 MessageMedia object = null;
                 if (MessageObject.isVoiceMessage(message)) {
                     id = message.media.document.id;
-                    type = 2;
+                    type2 = 2;
                     object = new TL_messageMediaDocument();
                     object.document = message.media.document;
                     object.flags |= 1;
                 } else if (MessageObject.isRoundVideoMessage(message)) {
                     id = message.media.document.id;
-                    type = 64;
+                    type2 = 64;
                     object = new TL_messageMediaDocument();
                     object.document = message.media.document;
                     object.flags |= 1;
                 } else if (message.media instanceof TL_messageMediaPhoto) {
                     if (FileLoader.getClosestPhotoSizeWithSize(message.media.photo.sizes, AndroidUtilities.getPhotoSize()) != null) {
                         id = message.media.photo.id;
-                        type = 1;
+                        type2 = 1;
                         object = new TL_messageMediaPhoto();
                         object.photo = message.media.photo;
                         object.flags |= 1;
                     }
                 } else if (MessageObject.isVideoMessage(message)) {
                     id = message.media.document.id;
-                    type = 4;
+                    type2 = 4;
                     object = new TL_messageMediaDocument();
                     object.document = message.media.document;
                     object.flags |= 1;
                 } else if (!(!(message.media instanceof TL_messageMediaDocument) || MessageObject.isMusicMessage(message) || MessageObject.isGifDocument(message.media.document))) {
                     id = message.media.document.id;
-                    type = 8;
+                    type2 = 8;
                     object = new TL_messageMediaDocument();
                     object.document = message.media.document;
                     object.flags |= 1;
@@ -5898,12 +5900,12 @@ Error: java.util.NoSuchElementException
                         object.ttl_seconds = message.media.ttl_seconds;
                         object.flags |= 4;
                     }
-                    downloadMediaMask |= type;
+                    downloadMediaMask |= type2;
                     state4.requery();
                     data = new NativeByteBuffer(object.getObjectSize());
                     object.serializeToStream(data);
                     state4.bindLong(1, id);
-                    state4.bindInteger(2, type);
+                    state4.bindInteger(2, type2);
                     state4.bindInteger(3, message.date);
                     state4.bindByteBuffer(4, data);
                     state4.step();
@@ -5995,13 +5997,13 @@ Error: java.util.NoSuchElementException
         if (mediaCounts != null) {
             state3 = this.database.executeFast("REPLACE INTO media_counts_v2 VALUES(?, ?, ?)");
             for (a = 0; a < mediaCounts.size(); a++) {
-                type = mediaCounts.keyAt(a);
+                type2 = mediaCounts.keyAt(a);
                 LongSparseArray<Integer> value2 = (LongSparseArray) mediaCounts.valueAt(a);
                 for (int b = 0; b < value2.size(); b++) {
                     long uid = value2.keyAt(b);
                     int lower_part = (int) uid;
                     int count2 = -1;
-                    cursor = this.database.queryFinalized(String.format(Locale.US, "SELECT count FROM media_counts_v2 WHERE uid = %d AND type = %d LIMIT 1", new Object[]{Long.valueOf(uid), Integer.valueOf(type)}), new Object[0]);
+                    cursor = this.database.queryFinalized(String.format(Locale.US, "SELECT count FROM media_counts_v2 WHERE uid = %d AND type = %d LIMIT 1", new Object[]{Long.valueOf(uid), Integer.valueOf(type2)}), new Object[0]);
                     if (cursor.next()) {
                         count2 = cursor.intValue(0);
                     }
@@ -6010,7 +6012,7 @@ Error: java.util.NoSuchElementException
                         state3.requery();
                         count2 += ((Integer) value2.valueAt(b)).intValue();
                         state3.bindLong(1, uid);
-                        state3.bindInteger(2, type);
+                        state3.bindInteger(2, type2);
                         state3.bindInteger(3, count2);
                         state3.step();
                     }
@@ -6823,12 +6825,12 @@ Error: java.util.NoSuchElementException
             if (message.media instanceof TL_messageMediaUnsupported_old) {
                 if (message.media.bytes.length == 0) {
                     message.media.bytes = new byte[1];
-                    message.media.bytes[0] = (byte) 76;
+                    message.media.bytes[0] = (byte) 78;
                 }
             } else if (message.media instanceof TL_messageMediaUnsupported) {
                 message.media = new TL_messageMediaUnsupported_old();
                 message.media.bytes = new byte[1];
-                message.media.bytes[0] = (byte) 76;
+                message.media.bytes[0] = (byte) 78;
                 message.flags |= 512;
             }
         }

@@ -12,7 +12,7 @@ import android.os.Parcelable;
 import android.os.SystemClock;
 import com.google.android.gms.common.util.Clock;
 
-public final class zzfc extends zzhk {
+public final class zzfc extends zzhh {
     private final zzfd zzaig = new zzfd(this, getContext(), "google_app_measurement_local.db");
     private boolean zzaih;
 
@@ -61,11 +61,11 @@ public final class zzfc extends zzhk {
                     j = cursor.getLong(0);
                 }
                 if (j >= 100000) {
-                    zzgg().zzil().log("Data loss, local db full");
+                    zzge().zzim().log("Data loss, local db full");
                     j = (100000 - j) + 1;
                     long delete = (long) sQLiteDatabase.delete("messages", "rowid in (select rowid from messages order by rowid asc limit ?)", new String[]{Long.toString(j)});
                     if (delete != j) {
-                        zzgg().zzil().zzd("Different delete count than expected in local db. expected, received, difference", Long.valueOf(j), Long.valueOf(delete), Long.valueOf(j - delete));
+                        zzge().zzim().zzd("Different delete count than expected in local db. expected, received, difference", Long.valueOf(j), Long.valueOf(delete), Long.valueOf(j - delete));
                     }
                 }
                 sQLiteDatabase.insertOrThrow("messages", null, contentValues);
@@ -79,7 +79,7 @@ public final class zzfc extends zzhk {
                 }
                 return true;
             } catch (SQLiteFullException e) {
-                zzgg().zzil().zzg("Error writing entry to local database", e);
+                zzge().zzim().zzg("Error writing entry to local database", e);
                 this.zzaih = true;
                 if (cursor != null) {
                     cursor.close();
@@ -104,7 +104,7 @@ public final class zzfc extends zzhk {
                         sQLiteDatabase.endTransaction();
                     }
                 }
-                zzgg().zzil().zzg("Error writing entry to local database", e3);
+                zzge().zzim().zzg("Error writing entry to local database", e3);
                 this.zzaih = true;
                 if (cursor != null) {
                     cursor.close();
@@ -122,7 +122,7 @@ public final class zzfc extends zzhk {
                 }
             }
         }
-        zzgg().zzin().log("Failed to write entry to local database");
+        zzge().zzip().log("Failed to write entry to local database");
         return false;
     }
 
@@ -135,10 +135,10 @@ public final class zzfc extends zzhk {
         try {
             int delete = getWritableDatabase().delete("messages", null, null) + 0;
             if (delete > 0) {
-                zzgg().zzir().zzg("Reset local analytics data. records", Integer.valueOf(delete));
+                zzge().zzit().zzg("Reset local analytics data. records", Integer.valueOf(delete));
             }
         } catch (SQLiteException e) {
-            zzgg().zzil().zzg("Error resetting local analytics data. error", e);
+            zzge().zzim().zzg("Error resetting local analytics data. error", e);
         }
     }
 
@@ -150,19 +150,19 @@ public final class zzfc extends zzhk {
         if (marshall.length <= 131072) {
             return zza(0, marshall);
         }
-        zzgg().zzin().log("Event is too long for local database. Sending event directly to service");
+        zzge().zzip().log("Event is too long for local database. Sending event directly to service");
         return false;
     }
 
-    public final boolean zza(zzjs com_google_android_gms_internal_measurement_zzjs) {
+    public final boolean zza(zzjx com_google_android_gms_internal_measurement_zzjx) {
         Parcel obtain = Parcel.obtain();
-        com_google_android_gms_internal_measurement_zzjs.writeToParcel(obtain, 0);
+        com_google_android_gms_internal_measurement_zzjx.writeToParcel(obtain, 0);
         byte[] marshall = obtain.marshall();
         obtain.recycle();
         if (marshall.length <= 131072) {
             return zza(1, marshall);
         }
-        zzgg().zzin().log("User property too long for local database. Sending directly to service");
+        zzge().zzip().log("User property too long for local database. Sending directly to service");
         return false;
     }
 
@@ -174,33 +174,29 @@ public final class zzfc extends zzhk {
         return super.zzbt();
     }
 
-    public final boolean zzc(zzef com_google_android_gms_internal_measurement_zzef) {
-        zzgc();
-        byte[] zza = zzjv.zza((Parcelable) com_google_android_gms_internal_measurement_zzef);
+    public final boolean zzc(zzed com_google_android_gms_internal_measurement_zzed) {
+        zzgb();
+        byte[] zza = zzka.zza((Parcelable) com_google_android_gms_internal_measurement_zzed);
         if (zza.length <= 131072) {
             return zza(2, zza);
         }
-        zzgg().zzin().log("Conditional user property too long for local database. Sending directly to service");
+        zzge().zzip().log("Conditional user property too long for local database. Sending directly to service");
         return false;
-    }
-
-    public final /* bridge */ /* synthetic */ void zzfq() {
-        super.zzfq();
     }
 
     public final /* bridge */ /* synthetic */ void zzfr() {
         super.zzfr();
     }
 
-    public final /* bridge */ /* synthetic */ zzdx zzfs() {
-        return super.zzfs();
+    public final /* bridge */ /* synthetic */ void zzfs() {
+        super.zzfs();
     }
 
-    public final /* bridge */ /* synthetic */ zzee zzft() {
+    public final /* bridge */ /* synthetic */ zzdu zzft() {
         return super.zzft();
     }
 
-    public final /* bridge */ /* synthetic */ zzhm zzfu() {
+    public final /* bridge */ /* synthetic */ zzhk zzfu() {
         return super.zzfu();
     }
 
@@ -212,11 +208,11 @@ public final class zzfc extends zzhk {
         return super.zzfw();
     }
 
-    public final /* bridge */ /* synthetic */ zzil zzfx() {
+    public final /* bridge */ /* synthetic */ zzii zzfx() {
         return super.zzfx();
     }
 
-    public final /* bridge */ /* synthetic */ zzih zzfy() {
+    public final /* bridge */ /* synthetic */ zzif zzfy() {
         return super.zzfy();
     }
 
@@ -224,43 +220,35 @@ public final class zzfc extends zzhk {
         return super.zzfz();
     }
 
-    public final /* bridge */ /* synthetic */ zzei zzga() {
+    public final /* bridge */ /* synthetic */ zzfe zzga() {
         return super.zzga();
     }
 
-    public final /* bridge */ /* synthetic */ zzfe zzgb() {
+    public final /* bridge */ /* synthetic */ zzka zzgb() {
         return super.zzgb();
     }
 
-    public final /* bridge */ /* synthetic */ zzjv zzgc() {
+    public final /* bridge */ /* synthetic */ zzjh zzgc() {
         return super.zzgc();
     }
 
-    public final /* bridge */ /* synthetic */ zzgf zzgd() {
+    public final /* bridge */ /* synthetic */ zzgg zzgd() {
         return super.zzgd();
     }
 
-    public final /* bridge */ /* synthetic */ zzjk zzge() {
+    public final /* bridge */ /* synthetic */ zzfg zzge() {
         return super.zzge();
     }
 
-    public final /* bridge */ /* synthetic */ zzgg zzgf() {
+    public final /* bridge */ /* synthetic */ zzfr zzgf() {
         return super.zzgf();
     }
 
-    public final /* bridge */ /* synthetic */ zzfg zzgg() {
+    public final /* bridge */ /* synthetic */ zzef zzgg() {
         return super.zzgg();
     }
 
-    public final /* bridge */ /* synthetic */ zzfr zzgh() {
-        return super.zzgh();
-    }
-
-    public final /* bridge */ /* synthetic */ zzeh zzgi() {
-        return super.zzgi();
-    }
-
-    protected final boolean zzhh() {
+    protected final boolean zzhf() {
         return false;
     }
 
@@ -375,8 +363,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
         r1 = move-exception;
         r3 = r0;
     L_0x009e:
-        r0 = r13.zzgg();	 Catch:{ all -> 0x0200 }
-        r0 = r0.zzil();	 Catch:{ all -> 0x0200 }
+        r0 = r13.zzge();	 Catch:{ all -> 0x0200 }
+        r0 = r0.zzim();	 Catch:{ all -> 0x0200 }
         r4 = "Error reading entries from local database";	 Catch:{ all -> 0x0200 }
         r0.zzg(r4, r1);	 Catch:{ all -> 0x0200 }
         r0 = 1;	 Catch:{ all -> 0x0200 }
@@ -396,8 +384,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
         goto L_0x0024;
     L_0x00c0:
         r1 = move-exception;
-        r1 = r13.zzgg();	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r1 = r1.zzil();	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r1 = r13.zzge();	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
+        r1 = r1.zzim();	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
         r6 = "Failed to load event from local database";	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
         r1.log(r6);	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
         r3.recycle();
@@ -432,8 +420,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
     L_0x00f5:
         r3.endTransaction();	 Catch:{ all -> 0x0200 }
     L_0x00f8:
-        r0 = r13.zzgg();	 Catch:{ all -> 0x0200 }
-        r0 = r0.zzil();	 Catch:{ all -> 0x0200 }
+        r0 = r13.zzge();	 Catch:{ all -> 0x0200 }
+        r0 = r0.zzim();	 Catch:{ all -> 0x0200 }
         r4 = "Error reading entries from local database";	 Catch:{ all -> 0x0200 }
         r0.zzg(r4, r1);	 Catch:{ all -> 0x0200 }
         r0 = 1;	 Catch:{ all -> 0x0200 }
@@ -458,9 +446,9 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
         r7.unmarshall(r6, r1, r8);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
         r1 = 0;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
         r7.setDataPosition(r1);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r1 = com.google.android.gms.internal.measurement.zzjs.CREATOR;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1 = com.google.android.gms.internal.measurement.zzjx.CREATOR;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
         r1 = r1.createFromParcel(r7);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r1 = (com.google.android.gms.internal.measurement.zzjs) r1;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1 = (com.google.android.gms.internal.measurement.zzjx) r1;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
         r7.recycle();
     L_0x0131:
         if (r1 == 0) goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
@@ -482,8 +470,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
         throw r1;
     L_0x0145:
         r1 = move-exception;
-        r1 = r13.zzgg();	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r1 = r1.zzil();	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1 = r13.zzge();	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
+        r1 = r1.zzim();	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
         r6 = "Failed to load user property from local database";	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
         r1.log(r6);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
         r7.recycle();
@@ -504,9 +492,9 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
         r7.unmarshall(r6, r1, r8);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
         r1 = 0;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
         r7.setDataPosition(r1);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r1 = com.google.android.gms.internal.measurement.zzef.CREATOR;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1 = com.google.android.gms.internal.measurement.zzed.CREATOR;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
         r1 = r1.createFromParcel(r7);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r1 = (com.google.android.gms.internal.measurement.zzef) r1;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1 = (com.google.android.gms.internal.measurement.zzed) r1;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
         r7.recycle();
     L_0x017a:
         if (r1 == 0) goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
@@ -515,8 +503,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
         goto L_0x0067;
     L_0x0181:
         r1 = move-exception;
-        r1 = r13.zzgg();	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r1 = r1.zzil();	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1 = r13.zzge();	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
+        r1 = r1.zzim();	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
         r6 = "Failed to load user property from local database";	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
         r1.log(r6);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
         r7.recycle();
@@ -527,8 +515,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
         r7.recycle();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
         throw r1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
     L_0x019a:
-        r1 = r13.zzgg();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1 = r1.zzil();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = r13.zzge();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = r1.zzim();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
         r3 = "Unknown record type in local database";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
         r1.log(r3);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
         goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
@@ -544,8 +532,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
         r3 = r10.size();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
         if (r1 >= r3) goto L_0x01d2;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
     L_0x01c4:
-        r1 = r13.zzgg();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1 = r1.zzil();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = r13.zzge();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
+        r1 = r1.zzim();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
         r3 = "Fewer entries removed from local database than expected";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
         r1.log(r3);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
     L_0x01d2:
@@ -562,8 +550,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150
         r0 = r10;
         goto L_0x0008;
     L_0x01e5:
-        r0 = r13.zzgg();
-        r0 = r0.zzin();
+        r0 = r13.zzge();
+        r0 = r0.zzip();
         r1 = "Failed to read events from database in reasonable time";
         r0.log(r1);
         r0 = 0;

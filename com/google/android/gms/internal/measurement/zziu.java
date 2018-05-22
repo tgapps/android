@@ -1,43 +1,25 @@
 package com.google.android.gms.internal.measurement;
 
-import android.os.RemoteException;
-import android.text.TextUtils;
-
 final class zziu implements Runnable {
-    private final /* synthetic */ zzec zzanq;
-    private final /* synthetic */ zzil zzapy;
-    private final /* synthetic */ boolean zzaqb = true;
-    private final /* synthetic */ boolean zzaqc;
-    private final /* synthetic */ zzef zzaqd;
-    private final /* synthetic */ zzef zzaqe;
+    private final /* synthetic */ zzdz zzane;
+    private final /* synthetic */ zzjx zzanl;
+    private final /* synthetic */ zzii zzape;
+    private final /* synthetic */ boolean zzaph;
 
-    zziu(zzil com_google_android_gms_internal_measurement_zzil, boolean z, boolean z2, zzef com_google_android_gms_internal_measurement_zzef, zzec com_google_android_gms_internal_measurement_zzec, zzef com_google_android_gms_internal_measurement_zzef2) {
-        this.zzapy = com_google_android_gms_internal_measurement_zzil;
-        this.zzaqc = z2;
-        this.zzaqd = com_google_android_gms_internal_measurement_zzef;
-        this.zzanq = com_google_android_gms_internal_measurement_zzec;
-        this.zzaqe = com_google_android_gms_internal_measurement_zzef2;
+    zziu(zzii com_google_android_gms_internal_measurement_zzii, boolean z, zzjx com_google_android_gms_internal_measurement_zzjx, zzdz com_google_android_gms_internal_measurement_zzdz) {
+        this.zzape = com_google_android_gms_internal_measurement_zzii;
+        this.zzaph = z;
+        this.zzanl = com_google_android_gms_internal_measurement_zzjx;
+        this.zzane = com_google_android_gms_internal_measurement_zzdz;
     }
 
     public final void run() {
-        zzey zzd = this.zzapy.zzaps;
+        zzey zzd = this.zzape.zzaoy;
         if (zzd == null) {
-            this.zzapy.zzgg().zzil().log("Discarding data. Failed to send conditional user property to service");
+            this.zzape.zzge().zzim().log("Discarding data. Failed to set user attribute");
             return;
         }
-        if (this.zzaqb) {
-            this.zzapy.zza(zzd, this.zzaqc ? null : this.zzaqd, this.zzanq);
-        } else {
-            try {
-                if (TextUtils.isEmpty(this.zzaqe.packageName)) {
-                    zzd.zza(this.zzaqd, this.zzanq);
-                } else {
-                    zzd.zzb(this.zzaqd);
-                }
-            } catch (RemoteException e) {
-                this.zzapy.zzgg().zzil().zzg("Failed to send conditional user property to the service", e);
-            }
-        }
-        this.zzapy.zzcu();
+        this.zzape.zza(zzd, this.zzaph ? null : this.zzanl, this.zzane);
+        this.zzape.zzcu();
     }
 }

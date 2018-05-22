@@ -402,22 +402,7 @@ public class LoginActivity extends BaseFragment {
                                 LoginActivity.this.needHideProgress();
                                 LoginActivityPasswordView.this.nextPressed = false;
                                 if (error == null) {
-                                    TL_auth_authorization res = response;
-                                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).setUserId(res.user.id);
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).clearConfig();
-                                    MessagesController.getInstance(LoginActivity.this.currentAccount).cleanup();
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).setCurrentUser(res.user);
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).syncContacts = LoginActivity.this.syncContacts;
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).saveConfig(true);
-                                    MessagesStorage.getInstance(LoginActivity.this.currentAccount).cleanup(true);
-                                    ArrayList<User> users = new ArrayList();
-                                    users.add(res.user);
-                                    MessagesStorage.getInstance(LoginActivity.this.currentAccount).putUsersAndChats(users, null, true, true);
-                                    MessagesController.getInstance(LoginActivity.this.currentAccount).putUser(res.user, false);
-                                    ContactsController.getInstance(LoginActivity.this.currentAccount).checkAppAccount();
-                                    MessagesController.getInstance(LoginActivity.this.currentAccount).getBlockedUsers(true);
-                                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).updateDcSettings();
-                                    LoginActivity.this.needFinishActivity();
+                                    LoginActivity.this.onAuthSuccess((TL_auth_authorization) response);
                                 } else if (error.text.equals("PASSWORD_HASH_INVALID")) {
                                     LoginActivityPasswordView.this.onPasscodeError(true);
                                 } else if (error.text.startsWith("FLOOD_WAIT")) {
@@ -624,22 +609,7 @@ public class LoginActivity extends BaseFragment {
                                 LoginActivityRecoverView.this.this$0.needHideProgress();
                                 LoginActivityRecoverView.this.nextPressed = false;
                                 if (error == null) {
-                                    TL_auth_authorization res = response;
-                                    ConnectionsManager.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).setUserId(res.user.id);
-                                    UserConfig.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).clearConfig();
-                                    MessagesController.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).cleanup();
-                                    UserConfig.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).setCurrentUser(res.user);
-                                    UserConfig.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).syncContacts = LoginActivityRecoverView.this.this$0.syncContacts;
-                                    UserConfig.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).saveConfig(true);
-                                    MessagesStorage.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).cleanup(true);
-                                    ArrayList<User> users = new ArrayList();
-                                    users.add(res.user);
-                                    MessagesStorage.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).putUsersAndChats(users, null, true, true);
-                                    MessagesController.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).putUser(res.user, false);
-                                    ContactsController.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).checkAppAccount();
-                                    MessagesController.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).getBlockedUsers(true);
-                                    ConnectionsManager.getInstance(LoginActivityRecoverView.this.this$0.currentAccount).updateDcSettings();
-                                    LoginActivityRecoverView.this.this$0.needFinishActivity();
+                                    LoginActivityRecoverView.this.this$0.onAuthSuccess((TL_auth_authorization) response);
                                 } else if (error.text.startsWith("CODE_INVALID")) {
                                     LoginActivityRecoverView.this.onPasscodeError(true);
                                 } else if (error.text.startsWith("FLOOD_WAIT")) {
@@ -843,22 +813,7 @@ public class LoginActivity extends BaseFragment {
                                 LoginActivityRegisterView.this.nextPressed = false;
                                 LoginActivity.this.needHideProgress();
                                 if (error == null) {
-                                    TL_auth_authorization res = response;
-                                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).setUserId(res.user.id);
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).clearConfig();
-                                    MessagesController.getInstance(LoginActivity.this.currentAccount).cleanup();
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).setCurrentUser(res.user);
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).syncContacts = LoginActivity.this.syncContacts;
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).saveConfig(true);
-                                    MessagesStorage.getInstance(LoginActivity.this.currentAccount).cleanup(true);
-                                    ArrayList<User> users = new ArrayList();
-                                    users.add(res.user);
-                                    MessagesStorage.getInstance(LoginActivity.this.currentAccount).putUsersAndChats(users, null, true, true);
-                                    MessagesController.getInstance(LoginActivity.this.currentAccount).putUser(res.user, false);
-                                    ContactsController.getInstance(LoginActivity.this.currentAccount).checkAppAccount();
-                                    MessagesController.getInstance(LoginActivity.this.currentAccount).getBlockedUsers(true);
-                                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).updateDcSettings();
-                                    LoginActivity.this.needFinishActivity();
+                                    LoginActivity.this.onAuthSuccess((TL_auth_authorization) response);
                                 } else if (error.text.contains("PHONE_NUMBER_INVALID")) {
                                     LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
                                 } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
@@ -1554,24 +1509,9 @@ public class LoginActivity extends BaseFragment {
                                 if (error == null) {
                                     ok = true;
                                     LoginActivity.this.needHideProgress();
-                                    TL_auth_authorization res = response;
-                                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).setUserId(res.user.id);
                                     LoginActivitySmsView.this.destroyTimer();
                                     LoginActivitySmsView.this.destroyCodeTimer();
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).clearConfig();
-                                    MessagesController.getInstance(LoginActivity.this.currentAccount).cleanup();
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).syncContacts = LoginActivity.this.syncContacts;
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).setCurrentUser(res.user);
-                                    UserConfig.getInstance(LoginActivity.this.currentAccount).saveConfig(true);
-                                    MessagesStorage.getInstance(LoginActivity.this.currentAccount).cleanup(true);
-                                    ArrayList<User> users = new ArrayList();
-                                    users.add(res.user);
-                                    MessagesStorage.getInstance(LoginActivity.this.currentAccount).putUsersAndChats(users, null, true, true);
-                                    MessagesController.getInstance(LoginActivity.this.currentAccount).putUser(res.user, false);
-                                    ContactsController.getInstance(LoginActivity.this.currentAccount).checkAppAccount();
-                                    MessagesController.getInstance(LoginActivity.this.currentAccount).getBlockedUsers(true);
-                                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).updateDcSettings();
-                                    LoginActivity.this.needFinishActivity();
+                                    LoginActivity.this.onAuthSuccess((TL_auth_authorization) response);
                                 } else {
                                     LoginActivitySmsView.this.lastError = error.text;
                                     if (error.text.contains("PHONE_NUMBER_UNOCCUPIED")) {
@@ -1907,7 +1847,7 @@ public class LoginActivity extends BaseFragment {
                             }
                             if (textToSet != null) {
                                 PhoneView.this.phoneField.requestFocus();
-                                PhoneView.this.phoneField.setText(textToSet);
+                                editable.replace(0, editable.length(), textToSet);
                                 PhoneView.this.phoneField.setSelection(PhoneView.this.phoneField.length());
                             }
                         }
@@ -2000,7 +1940,7 @@ public class LoginActivity extends BaseFragment {
                                 }
                             }
                         }
-                        PhoneView.this.phoneField.setText(builder);
+                        s.replace(0, s.length(), builder);
                         if (start >= 0) {
                             HintEditText access$800 = PhoneView.this.phoneField;
                             if (start > PhoneView.this.phoneField.length()) {
@@ -2206,8 +2146,6 @@ public class LoginActivity extends BaseFragment {
                 }
                 if (this.countryState == 1) {
                     LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("ChooseCountry", R.string.ChooseCountry));
-                } else if (this.countryState == 2 && !BuildVars.DEBUG_VERSION && !this.codeField.getText().toString().equals("999")) {
-                    LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("WrongCountry", R.string.WrongCountry));
                 } else if (this.codeField.length() == 0) {
                     LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
                 } else {
@@ -2235,7 +2173,7 @@ public class LoginActivity extends BaseFragment {
                             }
                         }
                     }
-                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).cleanup();
+                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).cleanup(false);
                     TLObject req = new TL_auth_sendCode();
                     req.api_hash = BuildVars.APP_HASH;
                     req.api_id = BuildVars.APP_ID;
@@ -2879,6 +2817,25 @@ public class LoginActivity extends BaseFragment {
             ((LaunchActivity) getParentActivity()).switchToAccount(this.currentAccount, false);
             finishFragment();
         }
+    }
+
+    private void onAuthSuccess(TL_auth_authorization res) {
+        ConnectionsManager.getInstance(this.currentAccount).setUserId(res.user.id);
+        UserConfig.getInstance(this.currentAccount).clearConfig();
+        MessagesController.getInstance(this.currentAccount).cleanup();
+        UserConfig.getInstance(this.currentAccount).syncContacts = this.syncContacts;
+        UserConfig.getInstance(this.currentAccount).setCurrentUser(res.user);
+        UserConfig.getInstance(this.currentAccount).saveConfig(true);
+        MessagesStorage.getInstance(this.currentAccount).cleanup(true);
+        ArrayList<User> users = new ArrayList();
+        users.add(res.user);
+        MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(users, null, true, true);
+        MessagesController.getInstance(this.currentAccount).putUser(res.user, false);
+        ContactsController.getInstance(this.currentAccount).checkAppAccount();
+        MessagesController.getInstance(this.currentAccount).getBlockedUsers(true);
+        MessagesController.getInstance(this.currentAccount).checkProxyInfo(true);
+        ConnectionsManager.getInstance(this.currentAccount).updateDcSettings();
+        needFinishActivity();
     }
 
     private void fillNextCodeParams(Bundle params, TL_auth_sentCode res) {

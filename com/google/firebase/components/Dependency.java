@@ -5,6 +5,16 @@ public final class Dependency {
     private final int zzan;
     private final int zzao;
 
+    private Dependency(Class<?> cls, int i, int i2) {
+        this.zzam = (Class) zzk.zza(cls, "Null dependency interface.");
+        this.zzan = i;
+        this.zzao = i2;
+    }
+
+    public static Dependency required(Class<?> cls) {
+        return new Dependency(cls, 1, 0);
+    }
+
     public final boolean equals(Object obj) {
         if (!(obj instanceof Dependency)) {
             return false;

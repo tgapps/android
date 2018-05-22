@@ -6,21 +6,21 @@ import android.os.Parcel;
 import android.os.RemoteException;
 
 public class zzn implements IInterface {
-    private final IBinder zzqd;
-    private final String zzqe;
+    private final IBinder zzqi;
+    private final String zzqj;
 
     protected zzn(IBinder iBinder, String str) {
-        this.zzqd = iBinder;
-        this.zzqe = str;
+        this.zzqi = iBinder;
+        this.zzqj = str;
     }
 
     public IBinder asBinder() {
-        return this.zzqd;
+        return this.zzqi;
     }
 
     protected final Parcel obtainAndWriteInterfaceToken() {
         Parcel obtain = Parcel.obtain();
-        obtain.writeInterfaceToken(this.zzqe);
+        obtain.writeInterfaceToken(this.zzqj);
         return obtain;
     }
 
@@ -28,7 +28,7 @@ public class zzn implements IInterface {
         IBinder iBinder;
         Parcel obtain = Parcel.obtain();
         try {
-            iBinder = this.zzqd;
+            iBinder = this.zzqi;
             iBinder.transact(i, parcel, obtain, 0);
             obtain.readException();
         } catch (RuntimeException e) {
@@ -81,19 +81,11 @@ Caused by: jadx.core.utils.exceptions.CodegenException: MERGE can be used only i
             protected final void transactAndReadExceptionReturnVoid(int i, Parcel parcel) throws RemoteException {
                 Parcel obtain = Parcel.obtain();
                 try {
-                    this.zzqd.transact(i, parcel, obtain, 0);
+                    this.zzqi.transact(i, parcel, obtain, 0);
                     obtain.readException();
                 } finally {
                     parcel.recycle();
                     obtain.recycle();
-                }
-            }
-
-            protected final void transactOneway(int i, Parcel parcel) throws RemoteException {
-                try {
-                    this.zzqd.transact(1, parcel, null, 1);
-                } finally {
-                    parcel.recycle();
                 }
             }
         }

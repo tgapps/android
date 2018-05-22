@@ -73,6 +73,13 @@ final class zzu<TResult> extends Task<TResult> {
         return this;
     }
 
+    public final <TContinuationResult> Task<TContinuationResult> continueWith(Executor executor, Continuation<TResult, TContinuationResult> continuation) {
+        Task com_google_android_gms_tasks_zzu = new zzu();
+        this.zzage.zza(new zzc(executor, continuation, com_google_android_gms_tasks_zzu));
+        zzdt();
+        return com_google_android_gms_tasks_zzu;
+    }
+
     public final Exception getException() {
         Exception exception;
         synchronized (this.mLock) {
@@ -90,6 +97,22 @@ final class zzu<TResult> extends Task<TResult> {
                 throw new RuntimeExecutionException(this.zzagh);
             }
             tResult = this.zzagg;
+        }
+        return tResult;
+    }
+
+    public final <X extends Throwable> TResult getResult(Class<X> cls) throws Throwable {
+        TResult tResult;
+        synchronized (this.mLock) {
+            zzdq();
+            zzds();
+            if (cls.isInstance(this.zzagh)) {
+                throw ((Throwable) cls.cast(this.zzagh));
+            } else if (this.zzagh != null) {
+                throw new RuntimeExecutionException(this.zzagh);
+            } else {
+                tResult = this.zzagg;
+            }
         }
         return tResult;
     }
@@ -156,6 +179,20 @@ final class zzu<TResult> extends Task<TResult> {
             } else {
                 this.zzagf = true;
                 this.zzagg = tResult;
+                this.zzage.zza((Task) this);
+            }
+        }
+        return z;
+    }
+
+    public final boolean zzdp() {
+        boolean z = true;
+        synchronized (this.mLock) {
+            if (this.zzagf) {
+                z = false;
+            } else {
+                this.zzagf = true;
+                this.zzfi = true;
                 this.zzage.zza((Task) this);
             }
         }

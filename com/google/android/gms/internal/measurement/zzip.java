@@ -3,26 +3,25 @@ package com.google.android.gms.internal.measurement;
 import android.os.RemoteException;
 
 final class zzip implements Runnable {
-    private final /* synthetic */ zzec zzanq;
-    private final /* synthetic */ zzil zzapy;
+    private final /* synthetic */ zzdz zzane;
+    private final /* synthetic */ zzii zzape;
 
-    zzip(zzil com_google_android_gms_internal_measurement_zzil, zzec com_google_android_gms_internal_measurement_zzec) {
-        this.zzapy = com_google_android_gms_internal_measurement_zzil;
-        this.zzanq = com_google_android_gms_internal_measurement_zzec;
+    zzip(zzii com_google_android_gms_internal_measurement_zzii, zzdz com_google_android_gms_internal_measurement_zzdz) {
+        this.zzape = com_google_android_gms_internal_measurement_zzii;
+        this.zzane = com_google_android_gms_internal_measurement_zzdz;
     }
 
     public final void run() {
-        zzey zzd = this.zzapy.zzaps;
+        zzey zzd = this.zzape.zzaoy;
         if (zzd == null) {
-            this.zzapy.zzgg().zzil().log("Discarding data. Failed to send app launch");
+            this.zzape.zzge().zzim().log("Failed to send measurementEnabled to service");
             return;
         }
         try {
-            zzd.zza(this.zzanq);
-            this.zzapy.zza(zzd, null, this.zzanq);
-            this.zzapy.zzcu();
+            zzd.zzb(this.zzane);
+            this.zzape.zzcu();
         } catch (RemoteException e) {
-            this.zzapy.zzgg().zzil().zzg("Failed to send app launch to the service", e);
+            this.zzape.zzge().zzim().zzg("Failed to send measurementEnabled to the service", e);
         }
     }
 }

@@ -1,22 +1,16 @@
 package com.google.firebase.iid;
 
-import android.os.Bundle;
-import org.telegram.messenger.exoplayer2.upstream.DataSchemeDataSource;
+import android.os.Handler.Callback;
+import android.os.Message;
 
-final class zzv extends zzt<Bundle> {
-    zzv(int i, int i2, Bundle bundle) {
-        super(i, 1, bundle);
+final /* synthetic */ class zzv implements Callback {
+    private final zzu zzbo;
+
+    zzv(zzu com_google_firebase_iid_zzu) {
+        this.zzbo = com_google_firebase_iid_zzu;
     }
 
-    final void zzh(Bundle bundle) {
-        Object bundle2 = bundle.getBundle(DataSchemeDataSource.SCHEME_DATA);
-        if (bundle2 == null) {
-            bundle2 = Bundle.EMPTY;
-        }
-        finish(bundle2);
-    }
-
-    final boolean zzst() {
-        return false;
+    public final boolean handleMessage(Message message) {
+        return this.zzbo.zza(message);
     }
 }

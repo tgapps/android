@@ -4167,7 +4167,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         if (this.isStreaming && this.parentActivity != null && !this.streamingAlertShown && this.videoPlayer != null && this.currentMessageObject != null) {
             Document document = this.currentMessageObject.getDocument();
             if (document != null && progress < 0.9f) {
-                if ((((float) document.size) * progress >= 5242880.0f || progress >= 0.5f) && Math.abs(SystemClock.elapsedRealtime() - this.startedPlayTime) >= AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS) {
+                if ((((float) document.size) * progress >= 5242880.0f || (progress >= 0.5f && document.size >= 2097152)) && Math.abs(SystemClock.elapsedRealtime() - this.startedPlayTime) >= AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS) {
                     if (this.videoPlayer.getDuration() == C.TIME_UNSET) {
                         Toast.makeText(this.parentActivity, LocaleController.getString("VideoDoesNotSupportStreaming", R.string.VideoDoesNotSupportStreaming), 1).show();
                     }
@@ -5638,75 +5638,75 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    private void onPhotoShow(org.telegram.messenger.MessageObject r23, org.telegram.tgnet.TLRPC.FileLocation r24, java.util.ArrayList<org.telegram.messenger.MessageObject> r25, java.util.ArrayList<java.lang.Object> r26, int r27, org.telegram.ui.PhotoViewer.PlaceProviderObject r28) {
+    private void onPhotoShow(org.telegram.messenger.MessageObject r24, org.telegram.tgnet.TLRPC.FileLocation r25, java.util.ArrayList<org.telegram.messenger.MessageObject> r26, java.util.ArrayList<java.lang.Object> r27, int r28, org.telegram.ui.PhotoViewer.PlaceProviderObject r29) {
         /*
-        r22 = this;
+        r23 = this;
         r3 = org.telegram.tgnet.ConnectionsManager.generateClassGuid();
-        r0 = r22;
+        r0 = r23;
         r0.classGuid = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.currentMessageObject = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.currentFileLocation = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.currentPathObject = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.fromCamera = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.currentBotInlineResult = r3;
         r3 = -1;
-        r0 = r22;
+        r0 = r23;
         r0.currentIndex = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.currentFileNames;
         r4 = 0;
         r5 = 0;
         r3[r4] = r5;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.currentFileNames;
         r4 = 1;
         r5 = 0;
         r3[r4] = r5;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.currentFileNames;
         r4 = 2;
         r5 = 0;
         r3[r4] = r5;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.avatarsDialogId = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.totalImagesCount = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.totalImagesCountMerge = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.currentEditMode = r3;
         r3 = 1;
-        r0 = r22;
+        r0 = r23;
         r0.isFirstLoading = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.needSearchImageInArr = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.loadingMoreImages = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.endReached;
         r4 = 0;
         r5 = 0;
         r3[r4] = r5;
-        r0 = r22;
+        r0 = r23;
         r4 = r0.endReached;
         r5 = 1;
-        r0 = r22;
+        r0 = r23;
         r6 = r0.mergeDialogId;
         r8 = 0;
         r3 = (r6 > r8 ? 1 : (r6 == r8 ? 0 : -1));
@@ -5716,32 +5716,32 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
     L_0x0079:
         r4[r5] = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.opennedFromMedia = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.needCaptionLayout = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.containerView;
         r4 = 1;
         r4 = java.lang.Integer.valueOf(r4);
         r3.setTag(r4);
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.isCurrentVideo = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArr;
         r3.clear();
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArrLocations;
         r3.clear();
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArrLocationsSizes;
         r3.clear();
-        r0 = r22;
+        r0 = r23;
         r3 = r0.avatarsArr;
         r3.clear();
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArrLocals;
         r3.clear();
         r2 = 0;
@@ -5749,11 +5749,11 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r3 = 2;
         if (r2 >= r3) goto L_0x00d4;
     L_0x00bd:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesByIds;
         r3 = r3[r2];
         r3.clear();
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesByIdsTemp;
         r3 = r3[r2];
         r3.clear();
@@ -5763,266 +5763,266 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r3 = 0;
         goto L_0x0079;
     L_0x00d4:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArrTemp;
         r3.clear();
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.currentUserAvatarLocation = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.containerView;
         r4 = 0;
         r5 = 0;
         r6 = 0;
         r7 = 0;
         r3.setPadding(r4, r5, r6, r7);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.currentThumb;
         if (r3 == 0) goto L_0x00f8;
     L_0x00f1:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.currentThumb;
         r3.release();
     L_0x00f8:
-        if (r28 == 0) goto L_0x02f7;
+        if (r29 == 0) goto L_0x02f7;
     L_0x00fa:
-        r0 = r28;
+        r0 = r29;
         r3 = r0.thumb;
     L_0x00fe:
-        r0 = r22;
+        r0 = r23;
         r0.currentThumb = r3;
-        if (r28 == 0) goto L_0x02fa;
+        if (r29 == 0) goto L_0x02fa;
     L_0x0104:
-        r0 = r28;
+        r0 = r29;
         r3 = r0.isEvent;
         if (r3 == 0) goto L_0x02fa;
     L_0x010a:
         r3 = 1;
     L_0x010b:
-        r0 = r22;
+        r0 = r23;
         r0.isEvent = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 0;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.sendItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pipItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.cameraItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.cameraItem;
         r4 = 0;
         r3.setTag(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.bottomLayout;
         r4 = 0;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.bottomLayout;
         r4 = 1;
         r4 = java.lang.Integer.valueOf(r4);
         r3.setTag(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.bottomLayout;
         r4 = 0;
         r3.setTranslationY(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.captionTextView;
         r4 = 0;
         r3.setTranslationY(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.shareButton;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.qualityChooseView;
         if (r3 == 0) goto L_0x0185;
     L_0x016d:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.qualityChooseView;
         r4 = 4;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.qualityPicker;
         r4 = 4;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.qualityChooseView;
         r4 = 0;
         r3.setTag(r4);
     L_0x0185:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.qualityChooseViewAnimation;
         if (r3 == 0) goto L_0x0197;
     L_0x018b:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.qualityChooseViewAnimation;
         r3.cancel();
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.qualityChooseViewAnimation = r3;
     L_0x0197:
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.allowShare = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.slideshowMessageId = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.nameOverride = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.dateOverride = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 2;
         r3.hideSubItem(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 4;
         r3.hideSubItem(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 10;
         r3.hideSubItem(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 11;
         r3.hideSubItem(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.actionBar;
         r4 = 0;
         r3.setTranslationY(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.checkImageView;
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r3.setAlpha(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.checkImageView;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.actionBar;
         r4 = 0;
         r3.setTitleRightMargin(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.photosCounterView;
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r3.setAlpha(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.photosCounterView;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pickerView;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pickerViewSendButton;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pickerViewSendButton;
         r4 = 0;
         r3.setTranslationY(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pickerView;
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r3.setAlpha(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pickerViewSendButton;
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r3.setAlpha(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pickerView;
         r4 = 0;
         r3.setTranslationY(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.paintItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.cropItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.tuneItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.timeItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.videoTimelineView;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.compressItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.captionEditText;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.mentionListView;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.muteItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.actionBar;
         r4 = 0;
         r3.setSubtitle(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.masksItem;
         r4 = 8;
         r3.setVisibility(r4);
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.muteVideo = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.muteItem;
-        r4 = 2131165699; // 0x7f070203 float:1.7945622E38 double:1.0529357575E-314;
+        r4 = 2131165702; // 0x7f070206 float:1.7945629E38 double:1.052935759E-314;
         r3.setImageResource(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.editorDoneLayout;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.captionTextView;
         r4 = 0;
         r3.setTag(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.captionTextView;
         r4 = 4;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.photoCropView;
         if (r3 == 0) goto L_0x02ce;
     L_0x02c5:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.photoCropView;
         r4 = 8;
         r3.setVisibility(r4);
     L_0x02ce:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.photoFilterView;
         if (r3 == 0) goto L_0x02dd;
     L_0x02d4:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.photoFilterView;
         r4 = 8;
         r3.setVisibility(r4);
@@ -6032,12 +6032,12 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r3 = 3;
         if (r2 >= r3) goto L_0x02fd;
     L_0x02e1:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.photoProgressViews;
         r3 = r3[r2];
         if (r3 == 0) goto L_0x02f4;
     L_0x02e9:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.photoProgressViews;
         r3 = r3[r2];
         r4 = -1;
@@ -6053,747 +6053,752 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r3 = 0;
         goto L_0x010b;
     L_0x02fd:
-        if (r23 == 0) goto L_0x04cf;
+        if (r24 == 0) goto L_0x04d5;
     L_0x02ff:
-        if (r25 != 0) goto L_0x04cf;
+        if (r26 != 0) goto L_0x04d5;
     L_0x0301:
-        r0 = r23;
+        r0 = r24;
         r3 = r0.messageOwner;
         r3 = r3.media;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaWebPage;
-        if (r3 == 0) goto L_0x03cb;
+        if (r3 == 0) goto L_0x03d1;
     L_0x030b:
-        r0 = r23;
+        r0 = r24;
         r3 = r0.messageOwner;
         r3 = r3.media;
         r3 = r3.webpage;
-        if (r3 == 0) goto L_0x03cb;
+        if (r3 == 0) goto L_0x03d1;
     L_0x0315:
-        r0 = r23;
+        r0 = r24;
         r3 = r0.messageOwner;
         r3 = r3.media;
         r0 = r3.webpage;
-        r21 = r0;
-        r0 = r21;
+        r22 = r0;
+        r0 = r22;
         r0 = r0.site_name;
-        r19 = r0;
-        if (r19 == 0) goto L_0x03cb;
+        r20 = r0;
+        if (r20 == 0) goto L_0x03d1;
     L_0x0327:
-        r19 = r19.toLowerCase();
+        r20 = r20.toLowerCase();
         r3 = "instagram";
-        r0 = r19;
+        r0 = r20;
         r3 = r0.equals(r3);
         if (r3 != 0) goto L_0x034e;
     L_0x0336:
         r3 = "twitter";
-        r0 = r19;
+        r0 = r20;
         r3 = r0.equals(r3);
         if (r3 != 0) goto L_0x034e;
     L_0x0341:
         r3 = "telegram_album";
-        r0 = r21;
+        r0 = r22;
         r4 = r0.type;
         r3 = r3.equals(r4);
-        if (r3 == 0) goto L_0x03cb;
+        if (r3 == 0) goto L_0x03d1;
     L_0x034e:
-        r0 = r21;
+        r0 = r22;
         r3 = r0.author;
         r3 = android.text.TextUtils.isEmpty(r3);
         if (r3 != 0) goto L_0x0360;
     L_0x0358:
-        r0 = r21;
-        r3 = r0.author;
         r0 = r22;
+        r3 = r0.author;
+        r0 = r23;
         r0.nameOverride = r3;
     L_0x0360:
-        r0 = r21;
+        r0 = r22;
         r3 = r0.cached_page;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_pageFull;
         if (r3 == 0) goto L_0x038d;
     L_0x0368:
         r2 = 0;
     L_0x0369:
-        r0 = r21;
+        r0 = r22;
         r3 = r0.cached_page;
         r3 = r3.blocks;
         r3 = r3.size();
         if (r2 >= r3) goto L_0x038d;
     L_0x0375:
-        r0 = r21;
+        r0 = r22;
         r3 = r0.cached_page;
         r3 = r3.blocks;
         r13 = r3.get(r2);
         r13 = (org.telegram.tgnet.TLRPC.PageBlock) r13;
         r3 = r13 instanceof org.telegram.tgnet.TLRPC.TL_pageBlockAuthorDate;
-        if (r3 == 0) goto L_0x047e;
+        if (r3 == 0) goto L_0x0484;
     L_0x0385:
         r13 = (org.telegram.tgnet.TLRPC.TL_pageBlockAuthorDate) r13;
         r3 = r13.published_date;
-        r0 = r22;
+        r0 = r23;
         r0.dateOverride = r3;
     L_0x038d:
         r3 = 0;
         r4 = 0;
-        r0 = r23;
+        r0 = r24;
         r12 = r0.getWebPagePhotos(r3, r4);
         r3 = r12.isEmpty();
-        if (r3 != 0) goto L_0x03cb;
+        if (r3 != 0) goto L_0x03d1;
     L_0x039b:
-        r3 = r23.getId();
-        r0 = r22;
+        r3 = r24.getId();
+        r0 = r23;
         r0.slideshowMessageId = r3;
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.needSearchImageInArr = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArr;
         r3.addAll(r12);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArr;
         r3 = r3.size();
-        r0 = r22;
+        r0 = r23;
         r0.totalImagesCount = r3;
-        r0 = r22;
-        r3 = r0.imagesArr;
         r0 = r23;
-        r3 = r3.indexOf(r0);
-        r4 = 1;
-        r0 = r22;
-        r0.setImageIndex(r3, r4);
-    L_0x03cb:
-        r0 = r22;
-        r3 = r0.slideshowMessageId;
-        if (r3 != 0) goto L_0x03f6;
+        r3 = r0.imagesArr;
+        r0 = r24;
+        r16 = r3.indexOf(r0);
+        if (r16 >= 0) goto L_0x03c9;
+    L_0x03c7:
+        r16 = 0;
+    L_0x03c9:
+        r3 = 1;
+        r0 = r23;
+        r1 = r16;
+        r0.setImageIndex(r1, r3);
     L_0x03d1:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.slideshowMessageId;
+        if (r3 != 0) goto L_0x03fc;
+    L_0x03d7:
+        r0 = r23;
         r3 = r0.imagesArr;
-        r0 = r23;
+        r0 = r24;
         r3.add(r0);
-        r0 = r22;
-        r3 = r0.currentAnimation;
-        if (r3 != 0) goto L_0x03ea;
-    L_0x03e0:
         r0 = r23;
+        r3 = r0.currentAnimation;
+        if (r3 != 0) goto L_0x03f0;
+    L_0x03e6:
+        r0 = r24;
         r4 = r0.eventId;
         r6 = 0;
         r3 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r3 == 0) goto L_0x0482;
-    L_0x03ea:
+        if (r3 == 0) goto L_0x0488;
+    L_0x03f0:
         r3 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.needSearchImageInArr = r3;
-    L_0x03ef:
+    L_0x03f5:
         r3 = 0;
         r4 = 1;
-        r0 = r22;
+        r0 = r23;
         r0.setImageIndex(r3, r4);
-    L_0x03f6:
-        r0 = r22;
-        r3 = r0.currentAnimation;
-        if (r3 != 0) goto L_0x0446;
     L_0x03fc:
-        r0 = r22;
-        r3 = r0.isEvent;
-        if (r3 != 0) goto L_0x0446;
+        r0 = r23;
+        r3 = r0.currentAnimation;
+        if (r3 != 0) goto L_0x044c;
     L_0x0402:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.isEvent;
+        if (r3 != 0) goto L_0x044c;
+    L_0x0408:
+        r0 = r23;
         r4 = r0.currentDialogId;
         r6 = 0;
         r3 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r3 == 0) goto L_0x077e;
-    L_0x040c:
-        r0 = r22;
-        r3 = r0.totalImagesCount;
-        if (r3 != 0) goto L_0x077e;
+        if (r3 == 0) goto L_0x0784;
     L_0x0412:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.totalImagesCount;
+        if (r3 != 0) goto L_0x0784;
+    L_0x0418:
+        r0 = r23;
         r3 = r0.currentAccount;
         r3 = org.telegram.messenger.DataQuery.getInstance(r3);
-        r0 = r22;
+        r0 = r23;
         r4 = r0.currentDialogId;
         r6 = 0;
-        r0 = r22;
+        r0 = r23;
         r7 = r0.classGuid;
         r8 = 1;
         r3.getMediaCount(r4, r6, r7, r8);
-        r0 = r22;
+        r0 = r23;
         r4 = r0.mergeDialogId;
         r6 = 0;
         r3 = (r4 > r6 ? 1 : (r4 == r6 ? 0 : -1));
-        if (r3 == 0) goto L_0x0446;
-    L_0x0431:
-        r0 = r22;
+        if (r3 == 0) goto L_0x044c;
+    L_0x0437:
+        r0 = r23;
         r3 = r0.currentAccount;
         r3 = org.telegram.messenger.DataQuery.getInstance(r3);
-        r0 = r22;
+        r0 = r23;
         r4 = r0.mergeDialogId;
         r6 = 0;
-        r0 = r22;
+        r0 = r23;
         r7 = r0.classGuid;
         r8 = 1;
         r3.getMediaCount(r4, r6, r7, r8);
-    L_0x0446:
-        r0 = r22;
-        r3 = r0.currentMessageObject;
-        if (r3 == 0) goto L_0x0456;
     L_0x044c:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.currentMessageObject;
+        if (r3 == 0) goto L_0x045c;
+    L_0x0452:
+        r0 = r23;
         r3 = r0.currentMessageObject;
         r3 = r3.isVideo();
-        if (r3 != 0) goto L_0x0477;
-    L_0x0456:
-        r0 = r22;
-        r3 = r0.currentBotInlineResult;
-        if (r3 == 0) goto L_0x079e;
+        if (r3 != 0) goto L_0x047d;
     L_0x045c:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.currentBotInlineResult;
+        if (r3 == 0) goto L_0x07a4;
+    L_0x0462:
+        r0 = r23;
         r3 = r0.currentBotInlineResult;
         r3 = r3.type;
         r4 = "video";
         r3 = r3.equals(r4);
-        if (r3 != 0) goto L_0x0477;
-    L_0x046b:
-        r0 = r22;
+        if (r3 != 0) goto L_0x047d;
+    L_0x0471:
+        r0 = r23;
         r3 = r0.currentBotInlineResult;
         r3 = r3.document;
         r3 = org.telegram.messenger.MessageObject.isVideoDocument(r3);
-        if (r3 == 0) goto L_0x079e;
-    L_0x0477:
-        r3 = 0;
-        r0 = r22;
-        r0.onActionClick(r3);
+        if (r3 == 0) goto L_0x07a4;
     L_0x047d:
+        r3 = 0;
+        r0 = r23;
+        r0.onActionClick(r3);
+    L_0x0483:
         return;
-    L_0x047e:
+    L_0x0484:
         r2 = r2 + 1;
         goto L_0x0369;
-    L_0x0482:
-        r0 = r23;
+    L_0x0488:
+        r0 = r24;
         r3 = r0.messageOwner;
         r3 = r3.media;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaInvoice;
-        if (r3 != 0) goto L_0x03ef;
-    L_0x048c:
-        r0 = r23;
+        if (r3 != 0) goto L_0x03f5;
+    L_0x0492:
+        r0 = r24;
         r3 = r0.messageOwner;
         r3 = r3.media;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_messageMediaWebPage;
-        if (r3 != 0) goto L_0x03ef;
-    L_0x0496:
-        r0 = r23;
+        if (r3 != 0) goto L_0x03f5;
+    L_0x049c:
+        r0 = r24;
         r3 = r0.messageOwner;
         r3 = r3.action;
-        if (r3 == 0) goto L_0x04a8;
-    L_0x049e:
-        r0 = r23;
+        if (r3 == 0) goto L_0x04ae;
+    L_0x04a4:
+        r0 = r24;
         r3 = r0.messageOwner;
         r3 = r3.action;
         r3 = r3 instanceof org.telegram.tgnet.TLRPC.TL_messageActionEmpty;
-        if (r3 == 0) goto L_0x03ef;
-    L_0x04a8:
+        if (r3 == 0) goto L_0x03f5;
+    L_0x04ae:
         r3 = 1;
-        r0 = r22;
+        r0 = r23;
         r0.needSearchImageInArr = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesByIds;
         r4 = 0;
         r3 = r3[r4];
-        r4 = r23.getId();
-        r0 = r23;
+        r4 = r24.getId();
+        r0 = r24;
         r3.put(r4, r0);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 2;
         r3.showSubItem(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.sendItem;
         r4 = 0;
         r3.setVisibility(r4);
-        goto L_0x03ef;
-    L_0x04cf:
-        if (r24 == 0) goto L_0x054b;
-    L_0x04d1:
-        r0 = r28;
+        goto L_0x03f5;
+    L_0x04d5:
+        if (r25 == 0) goto L_0x0551;
+    L_0x04d7:
+        r0 = r29;
         r3 = r0.dialogId;
-        r0 = r22;
+        r0 = r23;
         r0.avatarsDialogId = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArrLocations;
-        r0 = r24;
+        r0 = r25;
         r3.add(r0);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArrLocationsSizes;
-        r0 = r28;
+        r0 = r29;
         r4 = r0.size;
         r4 = java.lang.Integer.valueOf(r4);
         r3.add(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.avatarsArr;
         r4 = new org.telegram.tgnet.TLRPC$TL_photoEmpty;
         r4.<init>();
         r3.add(r4);
-        r0 = r22;
+        r0 = r23;
         r4 = r0.shareButton;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.videoPlayerControlFrameLayout;
         r3 = r3.getVisibility();
-        if (r3 == 0) goto L_0x053e;
-    L_0x050b:
+        if (r3 == 0) goto L_0x0544;
+    L_0x0511:
         r3 = 0;
-    L_0x050c:
+    L_0x0512:
         r4.setVisibility(r3);
         r3 = 1;
-        r0 = r22;
+        r0 = r23;
         r0.allowShare = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 2;
         r3.hideSubItem(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.shareButton;
         r3 = r3.getVisibility();
-        if (r3 != 0) goto L_0x0541;
-    L_0x0526:
-        r0 = r22;
+        if (r3 != 0) goto L_0x0547;
+    L_0x052c:
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 10;
         r3.hideSubItem(r4);
-    L_0x052f:
+    L_0x0535:
         r3 = 0;
         r4 = 1;
-        r0 = r22;
+        r0 = r23;
         r0.setImageIndex(r3, r4);
-        r0 = r24;
-        r1 = r22;
+        r0 = r25;
+        r1 = r23;
         r1.currentUserAvatarLocation = r0;
-        goto L_0x03f6;
-    L_0x053e:
+        goto L_0x03fc;
+    L_0x0544:
         r3 = 8;
-        goto L_0x050c;
-    L_0x0541:
-        r0 = r22;
+        goto L_0x0512;
+    L_0x0547:
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 10;
         r3.showSubItem(r4);
-        goto L_0x052f;
-    L_0x054b:
-        if (r25 == 0) goto L_0x05ab;
-    L_0x054d:
+        goto L_0x0535;
+    L_0x0551:
+        if (r26 == 0) goto L_0x05b1;
+    L_0x0553:
         r3 = 1;
-        r0 = r22;
+        r0 = r23;
         r0.opennedFromMedia = r3;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 4;
         r3.showSubItem(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.sendItem;
         r4 = 0;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArr;
-        r0 = r25;
+        r0 = r26;
         r3.addAll(r0);
         r2 = 0;
-    L_0x056c:
-        r0 = r22;
+    L_0x0572:
+        r0 = r23;
         r3 = r0.imagesArr;
         r3 = r3.size();
-        if (r2 >= r3) goto L_0x05a1;
-    L_0x0576:
-        r0 = r22;
+        if (r2 >= r3) goto L_0x05a7;
+    L_0x057c:
+        r0 = r23;
         r3 = r0.imagesArr;
-        r16 = r3.get(r2);
-        r16 = (org.telegram.messenger.MessageObject) r16;
-        r0 = r22;
+        r17 = r3.get(r2);
+        r17 = (org.telegram.messenger.MessageObject) r17;
+        r0 = r23;
         r4 = r0.imagesByIds;
-        r6 = r16.getDialogId();
-        r0 = r22;
+        r6 = r17.getDialogId();
+        r0 = r23;
         r8 = r0.currentDialogId;
         r3 = (r6 > r8 ? 1 : (r6 == r8 ? 0 : -1));
-        if (r3 != 0) goto L_0x059f;
-    L_0x0590:
+        if (r3 != 0) goto L_0x05a5;
+    L_0x0596:
         r3 = 0;
-    L_0x0591:
+    L_0x0597:
         r3 = r4[r3];
-        r4 = r16.getId();
-        r0 = r16;
+        r4 = r17.getId();
+        r0 = r17;
         r3.put(r4, r0);
         r2 = r2 + 1;
-        goto L_0x056c;
-    L_0x059f:
+        goto L_0x0572;
+    L_0x05a5:
         r3 = 1;
-        goto L_0x0591;
-    L_0x05a1:
+        goto L_0x0597;
+    L_0x05a7:
         r3 = 1;
-        r0 = r22;
-        r1 = r27;
+        r0 = r23;
+        r1 = r28;
         r0.setImageIndex(r1, r3);
-        goto L_0x03f6;
-    L_0x05ab:
-        if (r26 == 0) goto L_0x03f6;
-    L_0x05ad:
-        r0 = r22;
-        r3 = r0.sendPhotoType;
-        if (r3 == 0) goto L_0x05c1;
+        goto L_0x03fc;
+    L_0x05b1:
+        if (r27 == 0) goto L_0x03fc;
     L_0x05b3:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.sendPhotoType;
+        if (r3 == 0) goto L_0x05c7;
+    L_0x05b9:
+        r0 = r23;
         r3 = r0.sendPhotoType;
         r4 = 2;
-        if (r3 != r4) goto L_0x05de;
-    L_0x05ba:
-        r3 = r26.size();
+        if (r3 != r4) goto L_0x05e4;
+    L_0x05c0:
+        r3 = r27.size();
         r4 = 1;
-        if (r3 <= r4) goto L_0x05de;
-    L_0x05c1:
-        r0 = r22;
+        if (r3 <= r4) goto L_0x05e4;
+    L_0x05c7:
+        r0 = r23;
         r3 = r0.checkImageView;
         r4 = 0;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.photosCounterView;
         r4 = 0;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.actionBar;
         r4 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r3.setTitleRightMargin(r4);
-    L_0x05de:
-        r0 = r22;
+    L_0x05e4:
+        r0 = r23;
         r3 = r0.sendPhotoType;
         r4 = 2;
-        if (r3 != r4) goto L_0x05f9;
-    L_0x05e5:
-        r0 = r22;
+        if (r3 != r4) goto L_0x05ff;
+    L_0x05eb:
+        r0 = r23;
         r3 = r0.cameraItem;
         r4 = 0;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.cameraItem;
         r4 = 1;
         r4 = java.lang.Integer.valueOf(r4);
         r3.setTag(r4);
-    L_0x05f9:
-        r0 = r22;
+    L_0x05ff:
+        r0 = r23;
         r3 = r0.menuItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
-        r3 = r0.imagesArrLocals;
-        r0 = r26;
-        r3.addAll(r0);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.imagesArrLocals;
         r0 = r27;
-        r17 = r3.get(r0);
-        r0 = r17;
+        r3.addAll(r0);
+        r0 = r23;
+        r3 = r0.imagesArrLocals;
+        r0 = r28;
+        r18 = r3.get(r0);
+        r0 = r18;
         r3 = r0 instanceof org.telegram.messenger.MediaController.PhotoEntry;
-        if (r3 == 0) goto L_0x073a;
-    L_0x061b:
-        r17 = (org.telegram.messenger.MediaController.PhotoEntry) r17;
-        r0 = r17;
+        if (r3 == 0) goto L_0x0740;
+    L_0x0621:
+        r18 = (org.telegram.messenger.MediaController.PhotoEntry) r18;
+        r0 = r18;
         r3 = r0.isVideo;
-        if (r3 == 0) goto L_0x0730;
-    L_0x0623:
-        r0 = r22;
+        if (r3 == 0) goto L_0x0736;
+    L_0x0629:
+        r0 = r23;
         r3 = r0.cropItem;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.bottomLayout;
         r4 = 0;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.bottomLayout;
         r4 = 1;
         r4 = java.lang.Integer.valueOf(r4);
         r3.setTag(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.bottomLayout;
         r4 = 1111490560; // 0x42400000 float:48.0 double:5.491493014E-315;
         r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
         r4 = -r4;
         r4 = (float) r4;
         r3.setTranslationY(r4);
-    L_0x064f:
+    L_0x0655:
         r10 = 1;
-    L_0x0650:
-        r0 = r22;
-        r3 = r0.parentChatActivity;
-        if (r3 == 0) goto L_0x06cb;
     L_0x0656:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.parentChatActivity;
+        if (r3 == 0) goto L_0x06d1;
+    L_0x065c:
+        r0 = r23;
         r3 = r0.parentChatActivity;
         r3 = r3.currentEncryptedChat;
-        if (r3 == 0) goto L_0x066e;
-    L_0x065e:
-        r0 = r22;
+        if (r3 == 0) goto L_0x0674;
+    L_0x0664:
+        r0 = r23;
         r3 = r0.parentChatActivity;
         r3 = r3.currentEncryptedChat;
         r3 = r3.layer;
         r3 = org.telegram.messenger.AndroidUtilities.getPeerLayerVersion(r3);
         r4 = 46;
-        if (r3 < r4) goto L_0x06cb;
-    L_0x066e:
-        r0 = r22;
+        if (r3 < r4) goto L_0x06d1;
+    L_0x0674:
+        r0 = r23;
         r3 = r0.mentionsAdapter;
-        r0 = r22;
+        r0 = r23;
         r4 = r0.parentChatActivity;
         r4 = r4.info;
         r3.setChatInfo(r4);
-        r0 = r22;
+        r0 = r23;
         r4 = r0.mentionsAdapter;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.parentChatActivity;
         r3 = r3.currentChat;
-        if (r3 == 0) goto L_0x0774;
-    L_0x0687:
+        if (r3 == 0) goto L_0x077a;
+    L_0x068d:
         r3 = 1;
-    L_0x0688:
+    L_0x068e:
         r4.setNeedUsernames(r3);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.mentionsAdapter;
         r4 = 0;
         r3.setNeedBotContext(r4);
-        if (r10 == 0) goto L_0x0777;
-    L_0x0695:
-        r0 = r22;
-        r3 = r0.placeProvider;
-        if (r3 == 0) goto L_0x06ab;
+        if (r10 == 0) goto L_0x077d;
     L_0x069b:
-        r0 = r22;
+        r0 = r23;
         r3 = r0.placeProvider;
-        if (r3 == 0) goto L_0x0777;
+        if (r3 == 0) goto L_0x06b1;
     L_0x06a1:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.placeProvider;
+        if (r3 == 0) goto L_0x077d;
+    L_0x06a7:
+        r0 = r23;
         r3 = r0.placeProvider;
         r3 = r3.allowCaption();
-        if (r3 == 0) goto L_0x0777;
-    L_0x06ab:
+        if (r3 == 0) goto L_0x077d;
+    L_0x06b1:
         r3 = 1;
-    L_0x06ac:
-        r0 = r22;
+    L_0x06b2:
+        r0 = r23;
         r0.needCaptionLayout = r3;
-        r0 = r22;
+        r0 = r23;
         r4 = r0.captionEditText;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.needCaptionLayout;
-        if (r3 == 0) goto L_0x077a;
-    L_0x06ba:
+        if (r3 == 0) goto L_0x0780;
+    L_0x06c0:
         r3 = 0;
-    L_0x06bb:
+    L_0x06c1:
         r4.setVisibility(r3);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.needCaptionLayout;
-        if (r3 == 0) goto L_0x06cb;
-    L_0x06c4:
-        r0 = r22;
+        if (r3 == 0) goto L_0x06d1;
+    L_0x06ca:
+        r0 = r23;
         r3 = r0.captionEditText;
         r3.onCreate();
-    L_0x06cb:
-        r0 = r22;
+    L_0x06d1:
+        r0 = r23;
         r3 = r0.pickerView;
         r4 = 0;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pickerViewSendButton;
         r4 = 0;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pickerViewSendButton;
         r4 = 0;
         r3.setTranslationY(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.pickerViewSendButton;
         r4 = 1065353216; // 0x3f800000 float:1.0 double:5.263544247E-315;
         r3.setAlpha(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.bottomLayout;
         r4 = 8;
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.bottomLayout;
         r4 = 0;
         r3.setTag(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.containerView;
         r4 = 0;
         r3.setTag(r4);
         r3 = 1;
-        r0 = r22;
-        r1 = r27;
+        r0 = r23;
+        r1 = r28;
         r0.setImageIndex(r1, r3);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.paintItem;
-        r0 = r22;
+        r0 = r23;
         r4 = r0.cropItem;
         r4 = r4.getVisibility();
         r3.setVisibility(r4);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.tuneItem;
-        r0 = r22;
+        r0 = r23;
         r4 = r0.cropItem;
         r4 = r4.getVisibility();
         r3.setVisibility(r4);
-        r22.updateSelectedCount();
-        goto L_0x03f6;
-    L_0x0730:
-        r0 = r22;
+        r23.updateSelectedCount();
+        goto L_0x03fc;
+    L_0x0736:
+        r0 = r23;
         r3 = r0.cropItem;
         r4 = 0;
         r3.setVisibility(r4);
-        goto L_0x064f;
-    L_0x073a:
-        r0 = r17;
-        r3 = r0 instanceof org.telegram.tgnet.TLRPC.BotInlineResult;
-        if (r3 == 0) goto L_0x074c;
+        goto L_0x0655;
     L_0x0740:
-        r0 = r22;
+        r0 = r18;
+        r3 = r0 instanceof org.telegram.tgnet.TLRPC.BotInlineResult;
+        if (r3 == 0) goto L_0x0752;
+    L_0x0746:
+        r0 = r23;
         r3 = r0.cropItem;
         r4 = 8;
         r3.setVisibility(r4);
         r10 = 0;
-        goto L_0x0650;
-    L_0x074c:
-        r0 = r22;
+        goto L_0x0656;
+    L_0x0752:
+        r0 = r23;
         r4 = r0.cropItem;
-        r0 = r17;
+        r0 = r18;
         r3 = r0 instanceof org.telegram.messenger.MediaController.SearchImage;
-        if (r3 == 0) goto L_0x076f;
-    L_0x0756:
-        r17 = (org.telegram.messenger.MediaController.SearchImage) r17;
-        r0 = r17;
+        if (r3 == 0) goto L_0x0775;
+    L_0x075c:
+        r18 = (org.telegram.messenger.MediaController.SearchImage) r18;
+        r0 = r18;
         r3 = r0.type;
-        if (r3 != 0) goto L_0x076f;
-    L_0x075e:
+        if (r3 != 0) goto L_0x0775;
+    L_0x0764:
         r3 = 0;
-    L_0x075f:
+    L_0x0765:
         r4.setVisibility(r3);
-        r0 = r22;
+        r0 = r23;
         r3 = r0.cropItem;
         r3 = r3.getVisibility();
-        if (r3 != 0) goto L_0x0772;
-    L_0x076c:
-        r10 = 1;
-    L_0x076d:
-        goto L_0x0650;
-    L_0x076f:
-        r3 = 8;
-        goto L_0x075f;
+        if (r3 != 0) goto L_0x0778;
     L_0x0772:
-        r10 = 0;
-        goto L_0x076d;
-    L_0x0774:
-        r3 = 0;
-        goto L_0x0688;
-    L_0x0777:
-        r3 = 0;
-        goto L_0x06ac;
-    L_0x077a:
+        r10 = 1;
+    L_0x0773:
+        goto L_0x0656;
+    L_0x0775:
         r3 = 8;
-        goto L_0x06bb;
-    L_0x077e:
-        r0 = r22;
-        r3 = r0.avatarsDialogId;
-        if (r3 == 0) goto L_0x0446;
+        goto L_0x0765;
+    L_0x0778:
+        r10 = 0;
+        goto L_0x0773;
+    L_0x077a:
+        r3 = 0;
+        goto L_0x068e;
+    L_0x077d:
+        r3 = 0;
+        goto L_0x06b2;
+    L_0x0780:
+        r3 = 8;
+        goto L_0x06c1;
     L_0x0784:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.avatarsDialogId;
+        if (r3 == 0) goto L_0x044c;
+    L_0x078a:
+        r0 = r23;
         r3 = r0.currentAccount;
         r3 = org.telegram.messenger.MessagesController.getInstance(r3);
-        r0 = r22;
+        r0 = r23;
         r4 = r0.avatarsDialogId;
         r5 = 80;
         r6 = 0;
         r8 = 1;
-        r0 = r22;
+        r0 = r23;
         r9 = r0.classGuid;
         r3.loadDialogPhotos(r4, r5, r6, r8, r9);
-        goto L_0x0446;
-    L_0x079e:
-        r0 = r22;
+        goto L_0x044c;
+    L_0x07a4:
+        r0 = r23;
         r3 = r0.imagesArrLocals;
         r3 = r3.isEmpty();
-        if (r3 != 0) goto L_0x047d;
-    L_0x07a8:
-        r0 = r22;
+        if (r3 != 0) goto L_0x0483;
+    L_0x07ae:
+        r0 = r23;
         r3 = r0.imagesArrLocals;
-        r0 = r27;
+        r0 = r28;
         r15 = r3.get(r0);
         r14 = 0;
-        r0 = r22;
+        r0 = r23;
         r3 = r0.parentChatActivity;
-        if (r3 == 0) goto L_0x0808;
-    L_0x07b9:
-        r0 = r22;
+        if (r3 == 0) goto L_0x080e;
+    L_0x07bf:
+        r0 = r23;
         r3 = r0.parentChatActivity;
-        r20 = r3.getCurrentUser();
-    L_0x07c1:
-        r0 = r22;
-        r3 = r0.parentChatActivity;
-        if (r3 == 0) goto L_0x080b;
+        r21 = r3.getCurrentUser();
     L_0x07c7:
-        r0 = r22;
+        r0 = r23;
+        r3 = r0.parentChatActivity;
+        if (r3 == 0) goto L_0x0811;
+    L_0x07cd:
+        r0 = r23;
         r3 = r0.parentChatActivity;
         r3 = r3.isSecretChat();
-        if (r3 != 0) goto L_0x080b;
-    L_0x07d1:
-        if (r20 == 0) goto L_0x080b;
-    L_0x07d3:
-        r0 = r20;
-        r3 = r0.bot;
-        if (r3 != 0) goto L_0x080b;
+        if (r3 != 0) goto L_0x0811;
+    L_0x07d7:
+        if (r21 == 0) goto L_0x0811;
     L_0x07d9:
+        r0 = r21;
+        r3 = r0.bot;
+        if (r3 != 0) goto L_0x0811;
+    L_0x07df:
         r11 = 1;
-    L_0x07da:
+    L_0x07e0:
         r3 = r15 instanceof org.telegram.messenger.MediaController.PhotoEntry;
-        if (r3 == 0) goto L_0x080d;
-    L_0x07de:
-        r18 = r15;
-        r18 = (org.telegram.messenger.MediaController.PhotoEntry) r18;
-        r0 = r18;
+        if (r3 == 0) goto L_0x0813;
+    L_0x07e4:
+        r19 = r15;
+        r19 = (org.telegram.messenger.MediaController.PhotoEntry) r19;
+        r0 = r19;
         r3 = r0.isVideo;
-        if (r3 == 0) goto L_0x07fc;
-    L_0x07e8:
+        if (r3 == 0) goto L_0x0802;
+    L_0x07ee:
         r3 = new java.io.File;
-        r0 = r18;
+        r0 = r19;
         r4 = r0.path;
         r3.<init>(r4);
         r3 = android.net.Uri.fromFile(r3);
         r4 = 0;
         r5 = 0;
-        r0 = r22;
+        r0 = r23;
         r0.preparePlayer(r3, r4, r5);
-    L_0x07fc:
-        if (r11 == 0) goto L_0x047d;
-    L_0x07fe:
-        r0 = r22;
+    L_0x0802:
+        if (r11 == 0) goto L_0x0483;
+    L_0x0804:
+        r0 = r23;
         r3 = r0.timeItem;
         r4 = 0;
         r3.setVisibility(r4);
-        goto L_0x047d;
-    L_0x0808:
-        r20 = 0;
-        goto L_0x07c1;
-    L_0x080b:
+        goto L_0x0483;
+    L_0x080e:
+        r21 = 0;
+        goto L_0x07c7;
+    L_0x0811:
         r11 = 0;
-        goto L_0x07da;
-    L_0x080d:
-        if (r11 == 0) goto L_0x07fc;
-    L_0x080f:
-        r3 = r15 instanceof org.telegram.messenger.MediaController.SearchImage;
-        if (r3 == 0) goto L_0x07fc;
+        goto L_0x07e0;
     L_0x0813:
+        if (r11 == 0) goto L_0x0802;
+    L_0x0815:
+        r3 = r15 instanceof org.telegram.messenger.MediaController.SearchImage;
+        if (r3 == 0) goto L_0x0802;
+    L_0x0819:
         r15 = (org.telegram.messenger.MediaController.SearchImage) r15;
         r3 = r15.type;
-        if (r3 != 0) goto L_0x081b;
-    L_0x0819:
+        if (r3 != 0) goto L_0x0821;
+    L_0x081f:
         r11 = 1;
-    L_0x081a:
-        goto L_0x07fc;
-    L_0x081b:
+    L_0x0820:
+        goto L_0x0802;
+    L_0x0821:
         r11 = 0;
-        goto L_0x081a;
+        goto L_0x0820;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.onPhotoShow(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, java.util.ArrayList, java.util.ArrayList, int, org.telegram.ui.PhotoViewer$PlaceProviderObject):void");
     }

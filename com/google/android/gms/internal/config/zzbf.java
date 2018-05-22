@@ -7,7 +7,7 @@ import org.telegram.messenger.exoplayer2.C;
 public final class zzbf {
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     protected static final Charset UTF_8 = Charset.forName(C.UTF8_NAME);
-    public static final Object zzcq = new Object();
+    public static final Object zzcp = new Object();
 
     public static boolean equals(Object[] objArr, Object[] objArr2) {
         boolean length = objArr == null ? false : objArr.length;
@@ -61,8 +61,8 @@ public final class zzbf {
     }
 
     public static void zza(zzbb com_google_android_gms_internal_config_zzbb, zzbb com_google_android_gms_internal_config_zzbb2) {
-        if (com_google_android_gms_internal_config_zzbb.zzci != null) {
-            com_google_android_gms_internal_config_zzbb2.zzci = (zzbd) com_google_android_gms_internal_config_zzbb.zzci.clone();
+        if (com_google_android_gms_internal_config_zzbb.zzch != null) {
+            com_google_android_gms_internal_config_zzbb2.zzch = (zzbd) com_google_android_gms_internal_config_zzbb.zzch.clone();
         }
     }
 

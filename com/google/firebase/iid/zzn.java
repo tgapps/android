@@ -1,16 +1,18 @@
 package com.google.firebase.iid;
 
-import android.os.Handler.Callback;
-import android.os.Message;
+import android.os.Bundle;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.Task;
+import java.io.IOException;
 
-final /* synthetic */ class zzn implements Callback {
-    private final zzm zzbre;
+final class zzn implements Continuation<Bundle, String> {
+    private final /* synthetic */ zzl zzbc;
 
-    zzn(zzm com_google_firebase_iid_zzm) {
-        this.zzbre = com_google_firebase_iid_zzm;
+    zzn(zzl com_google_firebase_iid_zzl) {
+        this.zzbc = com_google_firebase_iid_zzl;
     }
 
-    public final boolean handleMessage(Message message) {
-        return this.zzbre.zza(message);
+    public final /* synthetic */ Object then(Task task) throws Exception {
+        return this.zzbc.zza((Bundle) task.getResult(IOException.class));
     }
 }

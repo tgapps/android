@@ -1113,7 +1113,7 @@ public class GcmPushListenerService extends FirebaseMessagingService {
                                                                             messageText = LocaleController.formatString("NotificationActionPinnedInvoice", R.string.NotificationActionPinnedInvoice, args[0], args[1]);
                                                                             break;
                                                                         }
-                                                                    case TLRPC.LAYER /*76*/:
+                                                                    case 76:
                                                                         if (chat_from_id == 0) {
                                                                             messageText = LocaleController.formatString("NotificationActionPinnedGifChannel", R.string.NotificationActionPinnedGifChannel, args[0]);
                                                                             break;
@@ -1122,7 +1122,7 @@ public class GcmPushListenerService extends FirebaseMessagingService {
                                                                             break;
                                                                         }
                                                                     case 77:
-                                                                    case 78:
+                                                                    case TLRPC.LAYER /*78*/:
                                                                     case 79:
                                                                     case 80:
                                                                     case 81:

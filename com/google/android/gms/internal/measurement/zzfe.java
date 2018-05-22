@@ -10,7 +10,7 @@ import com.google.android.gms.measurement.AppMeasurement.UserProperty;
 import java.util.concurrent.atomic.AtomicReference;
 import org.telegram.messenger.NotificationBadge.NewHtcHomeBadger;
 
-public final class zzfe extends zzhk {
+public final class zzfe extends zzhh {
     private static final AtomicReference<String[]> zzaij = new AtomicReference();
     private static final AtomicReference<String[]> zzaik = new AtomicReference();
     private static final AtomicReference<String[]> zzail = new AtomicReference();
@@ -26,7 +26,7 @@ public final class zzfe extends zzhk {
         Preconditions.checkNotNull(atomicReference);
         Preconditions.checkArgument(strArr.length == strArr2.length);
         while (i < strArr.length) {
-            if (zzjv.zzs(str, strArr[i])) {
+            if (zzka.zzs(str, strArr[i])) {
                 synchronized (atomicReference) {
                     String[] strArr3 = (String[]) atomicReference.get();
                     if (strArr3 == null) {
@@ -56,22 +56,22 @@ public final class zzfe extends zzhk {
         }
     }
 
-    private final void zza(StringBuilder stringBuilder, int i, zzka com_google_android_gms_internal_measurement_zzka) {
-        if (com_google_android_gms_internal_measurement_zzka != null) {
+    private final void zza(StringBuilder stringBuilder, int i, zzkf com_google_android_gms_internal_measurement_zzkf) {
+        if (com_google_android_gms_internal_measurement_zzkf != null) {
             zza(stringBuilder, i);
             stringBuilder.append("filter {\n");
-            zza(stringBuilder, i, "complement", com_google_android_gms_internal_measurement_zzka.zzars);
-            zza(stringBuilder, i, "param_name", zzbf(com_google_android_gms_internal_measurement_zzka.zzart));
+            zza(stringBuilder, i, "complement", com_google_android_gms_internal_measurement_zzkf.zzarx);
+            zza(stringBuilder, i, "param_name", zzbk(com_google_android_gms_internal_measurement_zzkf.zzary));
             int i2 = i + 1;
             String str = "string_filter";
-            zzkd com_google_android_gms_internal_measurement_zzkd = com_google_android_gms_internal_measurement_zzka.zzarq;
-            if (com_google_android_gms_internal_measurement_zzkd != null) {
+            zzki com_google_android_gms_internal_measurement_zzki = com_google_android_gms_internal_measurement_zzkf.zzarv;
+            if (com_google_android_gms_internal_measurement_zzki != null) {
                 zza(stringBuilder, i2);
                 stringBuilder.append(str);
                 stringBuilder.append(" {\n");
-                if (com_google_android_gms_internal_measurement_zzkd.zzasc != null) {
+                if (com_google_android_gms_internal_measurement_zzki.zzash != null) {
                     Object obj = "UNKNOWN_MATCH_TYPE";
-                    switch (com_google_android_gms_internal_measurement_zzkd.zzasc.intValue()) {
+                    switch (com_google_android_gms_internal_measurement_zzki.zzash.intValue()) {
                         case 1:
                             obj = "REGEXP";
                             break;
@@ -93,12 +93,12 @@ public final class zzfe extends zzhk {
                     }
                     zza(stringBuilder, i2, "match_type", obj);
                 }
-                zza(stringBuilder, i2, "expression", com_google_android_gms_internal_measurement_zzkd.zzasd);
-                zza(stringBuilder, i2, "case_sensitive", com_google_android_gms_internal_measurement_zzkd.zzase);
-                if (com_google_android_gms_internal_measurement_zzkd.zzasf.length > 0) {
+                zza(stringBuilder, i2, "expression", com_google_android_gms_internal_measurement_zzki.zzasi);
+                zza(stringBuilder, i2, "case_sensitive", com_google_android_gms_internal_measurement_zzki.zzasj);
+                if (com_google_android_gms_internal_measurement_zzki.zzask.length > 0) {
                     zza(stringBuilder, i2 + 1);
                     stringBuilder.append("expression_list {\n");
-                    for (String str2 : com_google_android_gms_internal_measurement_zzkd.zzasf) {
+                    for (String str2 : com_google_android_gms_internal_measurement_zzki.zzask) {
                         zza(stringBuilder, i2 + 2);
                         stringBuilder.append(str2);
                         stringBuilder.append("\n");
@@ -108,20 +108,20 @@ public final class zzfe extends zzhk {
                 zza(stringBuilder, i2);
                 stringBuilder.append("}\n");
             }
-            zza(stringBuilder, i + 1, "number_filter", com_google_android_gms_internal_measurement_zzka.zzarr);
+            zza(stringBuilder, i + 1, "number_filter", com_google_android_gms_internal_measurement_zzkf.zzarw);
             zza(stringBuilder, i);
             stringBuilder.append("}\n");
         }
     }
 
-    private final void zza(StringBuilder stringBuilder, int i, String str, zzkb com_google_android_gms_internal_measurement_zzkb) {
-        if (com_google_android_gms_internal_measurement_zzkb != null) {
+    private final void zza(StringBuilder stringBuilder, int i, String str, zzkg com_google_android_gms_internal_measurement_zzkg) {
+        if (com_google_android_gms_internal_measurement_zzkg != null) {
             zza(stringBuilder, i);
             stringBuilder.append(str);
             stringBuilder.append(" {\n");
-            if (com_google_android_gms_internal_measurement_zzkb.zzaru != null) {
+            if (com_google_android_gms_internal_measurement_zzkg.zzarz != null) {
                 Object obj = "UNKNOWN_COMPARISON_TYPE";
-                switch (com_google_android_gms_internal_measurement_zzkb.zzaru.intValue()) {
+                switch (com_google_android_gms_internal_measurement_zzkg.zzarz.intValue()) {
                     case 1:
                         obj = "LESS_THAN";
                         break;
@@ -137,26 +137,26 @@ public final class zzfe extends zzhk {
                 }
                 zza(stringBuilder, i, "comparison_type", obj);
             }
-            zza(stringBuilder, i, "match_as_float", com_google_android_gms_internal_measurement_zzkb.zzarv);
-            zza(stringBuilder, i, "comparison_value", com_google_android_gms_internal_measurement_zzkb.zzarw);
-            zza(stringBuilder, i, "min_comparison_value", com_google_android_gms_internal_measurement_zzkb.zzarx);
-            zza(stringBuilder, i, "max_comparison_value", com_google_android_gms_internal_measurement_zzkb.zzary);
+            zza(stringBuilder, i, "match_as_float", com_google_android_gms_internal_measurement_zzkg.zzasa);
+            zza(stringBuilder, i, "comparison_value", com_google_android_gms_internal_measurement_zzkg.zzasb);
+            zza(stringBuilder, i, "min_comparison_value", com_google_android_gms_internal_measurement_zzkg.zzasc);
+            zza(stringBuilder, i, "max_comparison_value", com_google_android_gms_internal_measurement_zzkg.zzasd);
             zza(stringBuilder, i);
             stringBuilder.append("}\n");
         }
     }
 
-    private static void zza(StringBuilder stringBuilder, int i, String str, zzkm com_google_android_gms_internal_measurement_zzkm) {
-        if (com_google_android_gms_internal_measurement_zzkm != null) {
+    private static void zza(StringBuilder stringBuilder, int i, String str, zzkr com_google_android_gms_internal_measurement_zzkr) {
+        if (com_google_android_gms_internal_measurement_zzkr != null) {
             int i2;
             int i3;
             zza(stringBuilder, 3);
             stringBuilder.append(str);
             stringBuilder.append(" {\n");
-            if (com_google_android_gms_internal_measurement_zzkm.zzaug != null) {
+            if (com_google_android_gms_internal_measurement_zzkr.zzaul != null) {
                 zza(stringBuilder, 4);
                 stringBuilder.append("results: ");
-                long[] jArr = com_google_android_gms_internal_measurement_zzkm.zzaug;
+                long[] jArr = com_google_android_gms_internal_measurement_zzkr.zzaul;
                 int length = jArr.length;
                 i2 = 0;
                 i3 = 0;
@@ -172,10 +172,10 @@ public final class zzfe extends zzhk {
                 }
                 stringBuilder.append('\n');
             }
-            if (com_google_android_gms_internal_measurement_zzkm.zzauf != null) {
+            if (com_google_android_gms_internal_measurement_zzkr.zzauk != null) {
                 zza(stringBuilder, 4);
                 stringBuilder.append("status: ");
-                long[] jArr2 = com_google_android_gms_internal_measurement_zzkm.zzauf;
+                long[] jArr2 = com_google_android_gms_internal_measurement_zzkr.zzauk;
                 int length2 = jArr2.length;
                 i2 = 0;
                 i3 = 0;
@@ -206,29 +206,51 @@ public final class zzfe extends zzhk {
         }
     }
 
-    private final boolean zzik() {
-        return this.zzacr.zzgg().isLoggable(3);
+    private final String zzb(zzer com_google_android_gms_internal_measurement_zzer) {
+        return com_google_android_gms_internal_measurement_zzer == null ? null : !zzil() ? com_google_android_gms_internal_measurement_zzer.toString() : zzb(com_google_android_gms_internal_measurement_zzer.zzif());
+    }
+
+    private final boolean zzil() {
+        return this.zzacw.zzge().isLoggable(3);
     }
 
     public final /* bridge */ /* synthetic */ Context getContext() {
         return super.getContext();
     }
 
-    protected final String zza(zzjz com_google_android_gms_internal_measurement_zzjz) {
+    protected final String zza(zzep com_google_android_gms_internal_measurement_zzep) {
+        if (com_google_android_gms_internal_measurement_zzep == null) {
+            return null;
+        }
+        if (!zzil()) {
+            return com_google_android_gms_internal_measurement_zzep.toString();
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Event{appId='");
+        stringBuilder.append(com_google_android_gms_internal_measurement_zzep.zzti);
+        stringBuilder.append("', name='");
+        stringBuilder.append(zzbj(com_google_android_gms_internal_measurement_zzep.name));
+        stringBuilder.append("', params=");
+        stringBuilder.append(zzb(com_google_android_gms_internal_measurement_zzep.zzafq));
+        stringBuilder.append("}");
+        return stringBuilder.toString();
+    }
+
+    protected final String zza(zzke com_google_android_gms_internal_measurement_zzke) {
         int i = 0;
-        if (com_google_android_gms_internal_measurement_zzjz == null) {
+        if (com_google_android_gms_internal_measurement_zzke == null) {
             return "null";
         }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\nevent_filter {\n");
-        zza(stringBuilder, 0, "filter_id", com_google_android_gms_internal_measurement_zzjz.zzark);
-        zza(stringBuilder, 0, "event_name", zzbe(com_google_android_gms_internal_measurement_zzjz.zzarl));
-        zza(stringBuilder, 1, "event_count_filter", com_google_android_gms_internal_measurement_zzjz.zzaro);
+        zza(stringBuilder, 0, "filter_id", com_google_android_gms_internal_measurement_zzke.zzarp);
+        zza(stringBuilder, 0, "event_name", zzbj(com_google_android_gms_internal_measurement_zzke.zzarq));
+        zza(stringBuilder, 1, "event_count_filter", com_google_android_gms_internal_measurement_zzke.zzart);
         stringBuilder.append("  filters {\n");
-        zzka[] com_google_android_gms_internal_measurement_zzkaArr = com_google_android_gms_internal_measurement_zzjz.zzarm;
-        int length = com_google_android_gms_internal_measurement_zzkaArr.length;
+        zzkf[] com_google_android_gms_internal_measurement_zzkfArr = com_google_android_gms_internal_measurement_zzke.zzarr;
+        int length = com_google_android_gms_internal_measurement_zzkfArr.length;
         while (i < length) {
-            zza(stringBuilder, 2, com_google_android_gms_internal_measurement_zzkaArr[i]);
+            zza(stringBuilder, 2, com_google_android_gms_internal_measurement_zzkfArr[i]);
             i++;
         }
         zza(stringBuilder, 1);
@@ -236,112 +258,112 @@ public final class zzfe extends zzhk {
         return stringBuilder.toString();
     }
 
-    protected final String zza(zzkc com_google_android_gms_internal_measurement_zzkc) {
-        if (com_google_android_gms_internal_measurement_zzkc == null) {
+    protected final String zza(zzkh com_google_android_gms_internal_measurement_zzkh) {
+        if (com_google_android_gms_internal_measurement_zzkh == null) {
             return "null";
         }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\nproperty_filter {\n");
-        zza(stringBuilder, 0, "filter_id", com_google_android_gms_internal_measurement_zzkc.zzark);
-        zza(stringBuilder, 0, "property_name", zzbg(com_google_android_gms_internal_measurement_zzkc.zzasa));
-        zza(stringBuilder, 1, com_google_android_gms_internal_measurement_zzkc.zzasb);
+        zza(stringBuilder, 0, "filter_id", com_google_android_gms_internal_measurement_zzkh.zzarp);
+        zza(stringBuilder, 0, "property_name", zzbl(com_google_android_gms_internal_measurement_zzkh.zzasf));
+        zza(stringBuilder, 1, com_google_android_gms_internal_measurement_zzkh.zzasg);
         stringBuilder.append("}\n");
         return stringBuilder.toString();
     }
 
-    protected final String zza(zzkk com_google_android_gms_internal_measurement_zzkk) {
+    protected final String zza(zzkp com_google_android_gms_internal_measurement_zzkp) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\nbatch {\n");
-        if (com_google_android_gms_internal_measurement_zzkk.zzata != null) {
-            for (zzkl com_google_android_gms_internal_measurement_zzkl : com_google_android_gms_internal_measurement_zzkk.zzata) {
-                if (!(com_google_android_gms_internal_measurement_zzkl == null || com_google_android_gms_internal_measurement_zzkl == null)) {
+        if (com_google_android_gms_internal_measurement_zzkp.zzatf != null) {
+            for (zzkq com_google_android_gms_internal_measurement_zzkq : com_google_android_gms_internal_measurement_zzkp.zzatf) {
+                if (!(com_google_android_gms_internal_measurement_zzkq == null || com_google_android_gms_internal_measurement_zzkq == null)) {
                     zza(stringBuilder, 1);
                     stringBuilder.append("bundle {\n");
-                    zza(stringBuilder, 1, "protocol_version", com_google_android_gms_internal_measurement_zzkl.zzatc);
-                    zza(stringBuilder, 1, "platform", com_google_android_gms_internal_measurement_zzkl.zzatk);
-                    zza(stringBuilder, 1, "gmp_version", com_google_android_gms_internal_measurement_zzkl.zzato);
-                    zza(stringBuilder, 1, "uploading_gmp_version", com_google_android_gms_internal_measurement_zzkl.zzatp);
-                    zza(stringBuilder, 1, "config_version", com_google_android_gms_internal_measurement_zzkl.zzaua);
-                    zza(stringBuilder, 1, "gmp_app_id", com_google_android_gms_internal_measurement_zzkl.zzadh);
-                    zza(stringBuilder, 1, "app_id", com_google_android_gms_internal_measurement_zzkl.zztd);
-                    zza(stringBuilder, 1, "app_version", com_google_android_gms_internal_measurement_zzkl.zztc);
-                    zza(stringBuilder, 1, "app_version_major", com_google_android_gms_internal_measurement_zzkl.zzatw);
-                    zza(stringBuilder, 1, "firebase_instance_id", com_google_android_gms_internal_measurement_zzkl.zzadj);
-                    zza(stringBuilder, 1, "dev_cert_hash", com_google_android_gms_internal_measurement_zzkl.zzats);
-                    zza(stringBuilder, 1, "app_store", com_google_android_gms_internal_measurement_zzkl.zzado);
-                    zza(stringBuilder, 1, "upload_timestamp_millis", com_google_android_gms_internal_measurement_zzkl.zzatf);
-                    zza(stringBuilder, 1, "start_timestamp_millis", com_google_android_gms_internal_measurement_zzkl.zzatg);
-                    zza(stringBuilder, 1, "end_timestamp_millis", com_google_android_gms_internal_measurement_zzkl.zzath);
-                    zza(stringBuilder, 1, "previous_bundle_start_timestamp_millis", com_google_android_gms_internal_measurement_zzkl.zzati);
-                    zza(stringBuilder, 1, "previous_bundle_end_timestamp_millis", com_google_android_gms_internal_measurement_zzkl.zzatj);
-                    zza(stringBuilder, 1, "app_instance_id", com_google_android_gms_internal_measurement_zzkl.zzadg);
-                    zza(stringBuilder, 1, "resettable_device_id", com_google_android_gms_internal_measurement_zzkl.zzatq);
-                    zza(stringBuilder, 1, "device_id", com_google_android_gms_internal_measurement_zzkl.zzatz);
-                    zza(stringBuilder, 1, "limited_ad_tracking", com_google_android_gms_internal_measurement_zzkl.zzatr);
-                    zza(stringBuilder, 1, "os_version", com_google_android_gms_internal_measurement_zzkl.zzatl);
-                    zza(stringBuilder, 1, "device_model", com_google_android_gms_internal_measurement_zzkl.zzatm);
-                    zza(stringBuilder, 1, "user_default_language", com_google_android_gms_internal_measurement_zzkl.zzafl);
-                    zza(stringBuilder, 1, "time_zone_offset_minutes", com_google_android_gms_internal_measurement_zzkl.zzatn);
-                    zza(stringBuilder, 1, "bundle_sequential_index", com_google_android_gms_internal_measurement_zzkl.zzatt);
-                    zza(stringBuilder, 1, "service_upload", com_google_android_gms_internal_measurement_zzkl.zzatu);
-                    zza(stringBuilder, 1, "health_monitor", com_google_android_gms_internal_measurement_zzkl.zzaef);
-                    if (!(com_google_android_gms_internal_measurement_zzkl.zzaub == null || com_google_android_gms_internal_measurement_zzkl.zzaub.longValue() == 0)) {
-                        zza(stringBuilder, 1, "android_id", com_google_android_gms_internal_measurement_zzkl.zzaub);
+                    zza(stringBuilder, 1, "protocol_version", com_google_android_gms_internal_measurement_zzkq.zzath);
+                    zza(stringBuilder, 1, "platform", com_google_android_gms_internal_measurement_zzkq.zzatp);
+                    zza(stringBuilder, 1, "gmp_version", com_google_android_gms_internal_measurement_zzkq.zzatt);
+                    zza(stringBuilder, 1, "uploading_gmp_version", com_google_android_gms_internal_measurement_zzkq.zzatu);
+                    zza(stringBuilder, 1, "config_version", com_google_android_gms_internal_measurement_zzkq.zzauf);
+                    zza(stringBuilder, 1, "gmp_app_id", com_google_android_gms_internal_measurement_zzkq.zzadm);
+                    zza(stringBuilder, 1, "app_id", com_google_android_gms_internal_measurement_zzkq.zzti);
+                    zza(stringBuilder, 1, "app_version", com_google_android_gms_internal_measurement_zzkq.zzth);
+                    zza(stringBuilder, 1, "app_version_major", com_google_android_gms_internal_measurement_zzkq.zzaub);
+                    zza(stringBuilder, 1, "firebase_instance_id", com_google_android_gms_internal_measurement_zzkq.zzado);
+                    zza(stringBuilder, 1, "dev_cert_hash", com_google_android_gms_internal_measurement_zzkq.zzatx);
+                    zza(stringBuilder, 1, "app_store", com_google_android_gms_internal_measurement_zzkq.zzadt);
+                    zza(stringBuilder, 1, "upload_timestamp_millis", com_google_android_gms_internal_measurement_zzkq.zzatk);
+                    zza(stringBuilder, 1, "start_timestamp_millis", com_google_android_gms_internal_measurement_zzkq.zzatl);
+                    zza(stringBuilder, 1, "end_timestamp_millis", com_google_android_gms_internal_measurement_zzkq.zzatm);
+                    zza(stringBuilder, 1, "previous_bundle_start_timestamp_millis", com_google_android_gms_internal_measurement_zzkq.zzatn);
+                    zza(stringBuilder, 1, "previous_bundle_end_timestamp_millis", com_google_android_gms_internal_measurement_zzkq.zzato);
+                    zza(stringBuilder, 1, "app_instance_id", com_google_android_gms_internal_measurement_zzkq.zzadl);
+                    zza(stringBuilder, 1, "resettable_device_id", com_google_android_gms_internal_measurement_zzkq.zzatv);
+                    zza(stringBuilder, 1, "device_id", com_google_android_gms_internal_measurement_zzkq.zzaue);
+                    zza(stringBuilder, 1, "limited_ad_tracking", com_google_android_gms_internal_measurement_zzkq.zzatw);
+                    zza(stringBuilder, 1, "os_version", com_google_android_gms_internal_measurement_zzkq.zzatq);
+                    zza(stringBuilder, 1, "device_model", com_google_android_gms_internal_measurement_zzkq.zzatr);
+                    zza(stringBuilder, 1, "user_default_language", com_google_android_gms_internal_measurement_zzkq.zzafn);
+                    zza(stringBuilder, 1, "time_zone_offset_minutes", com_google_android_gms_internal_measurement_zzkq.zzats);
+                    zza(stringBuilder, 1, "bundle_sequential_index", com_google_android_gms_internal_measurement_zzkq.zzaty);
+                    zza(stringBuilder, 1, "service_upload", com_google_android_gms_internal_measurement_zzkq.zzatz);
+                    zza(stringBuilder, 1, "health_monitor", com_google_android_gms_internal_measurement_zzkq.zzaek);
+                    if (!(com_google_android_gms_internal_measurement_zzkq.zzaug == null || com_google_android_gms_internal_measurement_zzkq.zzaug.longValue() == 0)) {
+                        zza(stringBuilder, 1, "android_id", com_google_android_gms_internal_measurement_zzkq.zzaug);
                     }
-                    if (com_google_android_gms_internal_measurement_zzkl.zzaue != null) {
-                        zza(stringBuilder, 1, "retry_counter", com_google_android_gms_internal_measurement_zzkl.zzaue);
+                    if (com_google_android_gms_internal_measurement_zzkq.zzauj != null) {
+                        zza(stringBuilder, 1, "retry_counter", com_google_android_gms_internal_measurement_zzkq.zzauj);
                     }
-                    zzkn[] com_google_android_gms_internal_measurement_zzknArr = com_google_android_gms_internal_measurement_zzkl.zzate;
+                    zzks[] com_google_android_gms_internal_measurement_zzksArr = com_google_android_gms_internal_measurement_zzkq.zzatj;
+                    if (com_google_android_gms_internal_measurement_zzksArr != null) {
+                        for (zzks com_google_android_gms_internal_measurement_zzks : com_google_android_gms_internal_measurement_zzksArr) {
+                            if (com_google_android_gms_internal_measurement_zzks != null) {
+                                zza(stringBuilder, 2);
+                                stringBuilder.append("user_property {\n");
+                                zza(stringBuilder, 2, "set_timestamp_millis", com_google_android_gms_internal_measurement_zzks.zzaun);
+                                zza(stringBuilder, 2, "name", zzbl(com_google_android_gms_internal_measurement_zzks.name));
+                                zza(stringBuilder, 2, "string_value", com_google_android_gms_internal_measurement_zzks.zzajf);
+                                zza(stringBuilder, 2, "int_value", com_google_android_gms_internal_measurement_zzks.zzate);
+                                zza(stringBuilder, 2, "double_value", com_google_android_gms_internal_measurement_zzks.zzarc);
+                                zza(stringBuilder, 2);
+                                stringBuilder.append("}\n");
+                            }
+                        }
+                    }
+                    zzkm[] com_google_android_gms_internal_measurement_zzkmArr = com_google_android_gms_internal_measurement_zzkq.zzaua;
+                    if (com_google_android_gms_internal_measurement_zzkmArr != null) {
+                        for (zzkm com_google_android_gms_internal_measurement_zzkm : com_google_android_gms_internal_measurement_zzkmArr) {
+                            if (com_google_android_gms_internal_measurement_zzkm != null) {
+                                zza(stringBuilder, 2);
+                                stringBuilder.append("audience_membership {\n");
+                                zza(stringBuilder, 2, "audience_id", com_google_android_gms_internal_measurement_zzkm.zzarl);
+                                zza(stringBuilder, 2, "new_audience", com_google_android_gms_internal_measurement_zzkm.zzasy);
+                                zza(stringBuilder, 2, "current_data", com_google_android_gms_internal_measurement_zzkm.zzasw);
+                                zza(stringBuilder, 2, "previous_data", com_google_android_gms_internal_measurement_zzkm.zzasx);
+                                zza(stringBuilder, 2);
+                                stringBuilder.append("}\n");
+                            }
+                        }
+                    }
+                    zzkn[] com_google_android_gms_internal_measurement_zzknArr = com_google_android_gms_internal_measurement_zzkq.zzati;
                     if (com_google_android_gms_internal_measurement_zzknArr != null) {
                         for (zzkn com_google_android_gms_internal_measurement_zzkn : com_google_android_gms_internal_measurement_zzknArr) {
                             if (com_google_android_gms_internal_measurement_zzkn != null) {
                                 zza(stringBuilder, 2);
-                                stringBuilder.append("user_property {\n");
-                                zza(stringBuilder, 2, "set_timestamp_millis", com_google_android_gms_internal_measurement_zzkn.zzaui);
-                                zza(stringBuilder, 2, "name", zzbg(com_google_android_gms_internal_measurement_zzkn.name));
-                                zza(stringBuilder, 2, "string_value", com_google_android_gms_internal_measurement_zzkn.zzajf);
-                                zza(stringBuilder, 2, "int_value", com_google_android_gms_internal_measurement_zzkn.zzasz);
-                                zza(stringBuilder, 2, "double_value", com_google_android_gms_internal_measurement_zzkn.zzaqx);
-                                zza(stringBuilder, 2);
-                                stringBuilder.append("}\n");
-                            }
-                        }
-                    }
-                    zzkh[] com_google_android_gms_internal_measurement_zzkhArr = com_google_android_gms_internal_measurement_zzkl.zzatv;
-                    if (com_google_android_gms_internal_measurement_zzkhArr != null) {
-                        for (zzkh com_google_android_gms_internal_measurement_zzkh : com_google_android_gms_internal_measurement_zzkhArr) {
-                            if (com_google_android_gms_internal_measurement_zzkh != null) {
-                                zza(stringBuilder, 2);
-                                stringBuilder.append("audience_membership {\n");
-                                zza(stringBuilder, 2, "audience_id", com_google_android_gms_internal_measurement_zzkh.zzarg);
-                                zza(stringBuilder, 2, "new_audience", com_google_android_gms_internal_measurement_zzkh.zzast);
-                                zza(stringBuilder, 2, "current_data", com_google_android_gms_internal_measurement_zzkh.zzasr);
-                                zza(stringBuilder, 2, "previous_data", com_google_android_gms_internal_measurement_zzkh.zzass);
-                                zza(stringBuilder, 2);
-                                stringBuilder.append("}\n");
-                            }
-                        }
-                    }
-                    zzki[] com_google_android_gms_internal_measurement_zzkiArr = com_google_android_gms_internal_measurement_zzkl.zzatd;
-                    if (com_google_android_gms_internal_measurement_zzkiArr != null) {
-                        for (zzki com_google_android_gms_internal_measurement_zzki : com_google_android_gms_internal_measurement_zzkiArr) {
-                            if (com_google_android_gms_internal_measurement_zzki != null) {
-                                zza(stringBuilder, 2);
                                 stringBuilder.append("event {\n");
-                                zza(stringBuilder, 2, "name", zzbe(com_google_android_gms_internal_measurement_zzki.name));
-                                zza(stringBuilder, 2, "timestamp_millis", com_google_android_gms_internal_measurement_zzki.zzasw);
-                                zza(stringBuilder, 2, "previous_timestamp_millis", com_google_android_gms_internal_measurement_zzki.zzasx);
-                                zza(stringBuilder, 2, NewHtcHomeBadger.COUNT, com_google_android_gms_internal_measurement_zzki.count);
-                                zzkj[] com_google_android_gms_internal_measurement_zzkjArr = com_google_android_gms_internal_measurement_zzki.zzasv;
-                                if (com_google_android_gms_internal_measurement_zzkjArr != null) {
-                                    for (zzkj com_google_android_gms_internal_measurement_zzkj : com_google_android_gms_internal_measurement_zzkjArr) {
-                                        if (com_google_android_gms_internal_measurement_zzkj != null) {
+                                zza(stringBuilder, 2, "name", zzbj(com_google_android_gms_internal_measurement_zzkn.name));
+                                zza(stringBuilder, 2, "timestamp_millis", com_google_android_gms_internal_measurement_zzkn.zzatb);
+                                zza(stringBuilder, 2, "previous_timestamp_millis", com_google_android_gms_internal_measurement_zzkn.zzatc);
+                                zza(stringBuilder, 2, NewHtcHomeBadger.COUNT, com_google_android_gms_internal_measurement_zzkn.count);
+                                zzko[] com_google_android_gms_internal_measurement_zzkoArr = com_google_android_gms_internal_measurement_zzkn.zzata;
+                                if (com_google_android_gms_internal_measurement_zzkoArr != null) {
+                                    for (zzko com_google_android_gms_internal_measurement_zzko : com_google_android_gms_internal_measurement_zzkoArr) {
+                                        if (com_google_android_gms_internal_measurement_zzko != null) {
                                             zza(stringBuilder, 3);
                                             stringBuilder.append("param {\n");
-                                            zza(stringBuilder, 3, "name", zzbf(com_google_android_gms_internal_measurement_zzkj.name));
-                                            zza(stringBuilder, 3, "string_value", com_google_android_gms_internal_measurement_zzkj.zzajf);
-                                            zza(stringBuilder, 3, "int_value", com_google_android_gms_internal_measurement_zzkj.zzasz);
-                                            zza(stringBuilder, 3, "double_value", com_google_android_gms_internal_measurement_zzkj.zzaqx);
+                                            zza(stringBuilder, 3, "name", zzbk(com_google_android_gms_internal_measurement_zzko.name));
+                                            zza(stringBuilder, 3, "string_value", com_google_android_gms_internal_measurement_zzko.zzajf);
+                                            zza(stringBuilder, 3, "int_value", com_google_android_gms_internal_measurement_zzko.zzate);
+                                            zza(stringBuilder, 3, "double_value", com_google_android_gms_internal_measurement_zzko.zzarc);
                                             zza(stringBuilder, 3);
                                             stringBuilder.append("}\n");
                                         }
@@ -369,7 +391,7 @@ public final class zzfe extends zzhk {
         if (bundle == null) {
             return null;
         }
-        if (!zzik()) {
+        if (!zzil()) {
             return bundle.toString();
         }
         StringBuilder stringBuilder = new StringBuilder();
@@ -379,7 +401,7 @@ public final class zzfe extends zzhk {
             } else {
                 stringBuilder.append("Bundle[{");
             }
-            stringBuilder.append(zzbf(str));
+            stringBuilder.append(zzbk(str));
             stringBuilder.append("=");
             stringBuilder.append(bundle.get(str));
         }
@@ -387,23 +409,40 @@ public final class zzfe extends zzhk {
         return stringBuilder.toString();
     }
 
-    protected final String zzbe(String str) {
-        return str == null ? null : zzik() ? zza(str, Event.zzact, Event.zzacs, zzaij) : str;
+    protected final String zzb(zzeu com_google_android_gms_internal_measurement_zzeu) {
+        if (com_google_android_gms_internal_measurement_zzeu == null) {
+            return null;
+        }
+        if (!zzil()) {
+            return com_google_android_gms_internal_measurement_zzeu.toString();
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("origin=");
+        stringBuilder.append(com_google_android_gms_internal_measurement_zzeu.origin);
+        stringBuilder.append(",name=");
+        stringBuilder.append(zzbj(com_google_android_gms_internal_measurement_zzeu.name));
+        stringBuilder.append(",params=");
+        stringBuilder.append(zzb(com_google_android_gms_internal_measurement_zzeu.zzafq));
+        return stringBuilder.toString();
     }
 
-    protected final String zzbf(String str) {
-        return str == null ? null : zzik() ? zza(str, Param.zzacv, Param.zzacu, zzaik) : str;
+    protected final String zzbj(String str) {
+        return str == null ? null : zzil() ? zza(str, Event.zzacy, Event.zzacx, zzaij) : str;
     }
 
-    protected final String zzbg(String str) {
+    protected final String zzbk(String str) {
+        return str == null ? null : zzil() ? zza(str, Param.zzada, Param.zzacz, zzaik) : str;
+    }
+
+    protected final String zzbl(String str) {
         if (str == null) {
             return null;
         }
-        if (!zzik()) {
+        if (!zzil()) {
             return str;
         }
         if (!str.startsWith("_exp_")) {
-            return zza(str, UserProperty.zzacx, UserProperty.zzacw, zzail);
+            return zza(str, UserProperty.zzadc, UserProperty.zzadb, zzail);
         }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("experiment_id");
@@ -417,23 +456,19 @@ public final class zzfe extends zzhk {
         return super.zzbt();
     }
 
-    public final /* bridge */ /* synthetic */ void zzfq() {
-        super.zzfq();
-    }
-
     public final /* bridge */ /* synthetic */ void zzfr() {
         super.zzfr();
     }
 
-    public final /* bridge */ /* synthetic */ zzdx zzfs() {
-        return super.zzfs();
+    public final /* bridge */ /* synthetic */ void zzfs() {
+        super.zzfs();
     }
 
-    public final /* bridge */ /* synthetic */ zzee zzft() {
+    public final /* bridge */ /* synthetic */ zzdu zzft() {
         return super.zzft();
     }
 
-    public final /* bridge */ /* synthetic */ zzhm zzfu() {
+    public final /* bridge */ /* synthetic */ zzhk zzfu() {
         return super.zzfu();
     }
 
@@ -445,11 +480,11 @@ public final class zzfe extends zzhk {
         return super.zzfw();
     }
 
-    public final /* bridge */ /* synthetic */ zzil zzfx() {
+    public final /* bridge */ /* synthetic */ zzii zzfx() {
         return super.zzfx();
     }
 
-    public final /* bridge */ /* synthetic */ zzih zzfy() {
+    public final /* bridge */ /* synthetic */ zzif zzfy() {
         return super.zzfy();
     }
 
@@ -457,43 +492,35 @@ public final class zzfe extends zzhk {
         return super.zzfz();
     }
 
-    public final /* bridge */ /* synthetic */ zzei zzga() {
+    public final /* bridge */ /* synthetic */ zzfe zzga() {
         return super.zzga();
     }
 
-    public final /* bridge */ /* synthetic */ zzfe zzgb() {
+    public final /* bridge */ /* synthetic */ zzka zzgb() {
         return super.zzgb();
     }
 
-    public final /* bridge */ /* synthetic */ zzjv zzgc() {
+    public final /* bridge */ /* synthetic */ zzjh zzgc() {
         return super.zzgc();
     }
 
-    public final /* bridge */ /* synthetic */ zzgf zzgd() {
+    public final /* bridge */ /* synthetic */ zzgg zzgd() {
         return super.zzgd();
     }
 
-    public final /* bridge */ /* synthetic */ zzjk zzge() {
+    public final /* bridge */ /* synthetic */ zzfg zzge() {
         return super.zzge();
     }
 
-    public final /* bridge */ /* synthetic */ zzgg zzgf() {
+    public final /* bridge */ /* synthetic */ zzfr zzgf() {
         return super.zzgf();
     }
 
-    public final /* bridge */ /* synthetic */ zzfg zzgg() {
+    public final /* bridge */ /* synthetic */ zzef zzgg() {
         return super.zzgg();
     }
 
-    public final /* bridge */ /* synthetic */ zzfr zzgh() {
-        return super.zzgh();
-    }
-
-    public final /* bridge */ /* synthetic */ zzeh zzgi() {
-        return super.zzgi();
-    }
-
-    protected final boolean zzhh() {
+    protected final boolean zzhf() {
         return false;
     }
 }

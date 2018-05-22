@@ -1,15 +1,24 @@
 package com.google.android.gms.internal.measurement;
 
-import android.content.Context;
-import com.google.android.gms.common.internal.Preconditions;
+import java.util.concurrent.atomic.AtomicReference;
 
-public final class zzhl {
-    final Context zzqs;
+final class zzhl implements Runnable {
+    private final /* synthetic */ AtomicReference zzanv;
+    private final /* synthetic */ zzhk zzanw;
 
-    public zzhl(Context context) {
-        Preconditions.checkNotNull(context);
-        Context applicationContext = context.getApplicationContext();
-        Preconditions.checkNotNull(applicationContext);
-        this.zzqs = applicationContext;
+    zzhl(zzhk com_google_android_gms_internal_measurement_zzhk, AtomicReference atomicReference) {
+        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
+        this.zzanv = atomicReference;
+    }
+
+    public final void run() {
+        synchronized (this.zzanv) {
+            try {
+                this.zzanv.set(Boolean.valueOf(this.zzanw.zzgg().zzhl()));
+                this.zzanv.notify();
+            } catch (Throwable th) {
+                this.zzanv.notify();
+            }
+        }
     }
 }

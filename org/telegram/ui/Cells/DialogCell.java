@@ -502,12 +502,24 @@ public class DialogCell extends BaseCell {
                     if (this.encryptedChat instanceof TL_encryptedChatRequested) {
                         messageString = LocaleController.getString("EncryptionProcessing", R.string.EncryptionProcessing);
                     } else if (this.encryptedChat instanceof TL_encryptedChatWaiting) {
-                        messageString = (this.user == null || this.user.first_name == null) ? LocaleController.formatString("AwaitingEncryption", R.string.AwaitingEncryption, TtmlNode.ANONYMOUS_REGION_ID) : LocaleController.formatString("AwaitingEncryption", R.string.AwaitingEncryption, this.user.first_name);
+                        if (this.user == null || this.user.first_name == null) {
+                            messageString = LocaleController.formatString("AwaitingEncryption", R.string.AwaitingEncryption, TtmlNode.ANONYMOUS_REGION_ID);
+                        } else {
+                            messageString = LocaleController.formatString("AwaitingEncryption", R.string.AwaitingEncryption, this.user.first_name);
+                        }
                     } else if (this.encryptedChat instanceof TL_encryptedChatDiscarded) {
                         messageString = LocaleController.getString("EncryptionRejected", R.string.EncryptionRejected);
                     } else if (this.encryptedChat instanceof TL_encryptedChat) {
-                        messageString = this.encryptedChat.admin_id == UserConfig.getInstance(this.currentAccount).getClientUserId() ? (this.user == null || this.user.first_name == null) ? LocaleController.formatString("EncryptedChatStartedOutgoing", R.string.EncryptedChatStartedOutgoing, TtmlNode.ANONYMOUS_REGION_ID) : LocaleController.formatString("EncryptedChatStartedOutgoing", R.string.EncryptedChatStartedOutgoing, this.user.first_name) : LocaleController.getString("EncryptedChatStartedIncoming", R.string.EncryptedChatStartedIncoming);
+                        if (this.encryptedChat.admin_id != UserConfig.getInstance(this.currentAccount).getClientUserId()) {
+                            messageString = LocaleController.getString("EncryptedChatStartedIncoming", R.string.EncryptedChatStartedIncoming);
+                        } else if (this.user == null || this.user.first_name == null) {
+                            messageString = LocaleController.formatString("EncryptedChatStartedOutgoing", R.string.EncryptedChatStartedOutgoing, TtmlNode.ANONYMOUS_REGION_ID);
+                        } else {
+                            messageString = LocaleController.formatString("EncryptedChatStartedOutgoing", R.string.EncryptedChatStartedOutgoing, this.user.first_name);
+                        }
                     }
+                } else {
+                    messageString = TtmlNode.ANONYMOUS_REGION_ID;
                 }
             }
             if (this.draftMessage != null) {
@@ -561,6 +573,10 @@ public class DialogCell extends BaseCell {
                     this.drawClock = false;
                     this.drawError = false;
                 }
+            }
+            if (this.dialogsType == 0 && MessagesController.getInstance(this.currentAccount).isProxyDialog(this.currentDialogId)) {
+                this.drawPinBackground = true;
+                timeString = LocaleController.getString("UseProxySponsor", R.string.UseProxySponsor);
             }
             if (this.chat != null) {
                 nameString = this.chat.title;

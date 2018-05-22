@@ -7,7 +7,11 @@ import android.os.Parcel;
 import android.os.RemoteException;
 
 public class zzo extends Binder implements IInterface {
-    private static zzq zzqf = null;
+    private static zzq zzqk = null;
+
+    protected zzo(String str) {
+        attachInterface(this, str);
+    }
 
     public IBinder asBinder() {
         return this;

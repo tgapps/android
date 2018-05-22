@@ -3,10 +3,10 @@ package com.google.android.gms.internal.config;
 import java.io.IOException;
 
 public abstract class zzbh {
-    protected volatile int zzcr = -1;
+    protected volatile int zzcq = -1;
 
     public /* synthetic */ Object clone() throws CloneNotSupportedException {
-        return zzae();
+        return zzad();
     }
 
     public String toString() {
@@ -18,17 +18,17 @@ public abstract class zzbh {
     public void zza(zzaz com_google_android_gms_internal_config_zzaz) throws IOException {
     }
 
-    public zzbh zzae() throws CloneNotSupportedException {
+    public zzbh zzad() throws CloneNotSupportedException {
         return (zzbh) super.clone();
     }
 
-    public final int zzai() {
-        int zzu = zzu();
-        this.zzcr = zzu;
-        return zzu;
+    public final int zzah() {
+        int zzt = zzt();
+        this.zzcq = zzt;
+        return zzt;
     }
 
-    protected int zzu() {
+    protected int zzt() {
         return 0;
     }
 }

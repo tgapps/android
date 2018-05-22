@@ -59,6 +59,9 @@ public class FirebaseRemoteConfig {
 
     private FirebaseRemoteConfig(Context context, zzao com_google_android_gms_internal_config_zzao, zzao com_google_android_gms_internal_config_zzao2, zzao com_google_android_gms_internal_config_zzao3, zzar com_google_android_gms_internal_config_zzar) {
         this.mContext = context;
+        if (com_google_android_gms_internal_config_zzar == null) {
+            com_google_android_gms_internal_config_zzar = new zzar();
+        }
         this.zzaj = com_google_android_gms_internal_config_zzar;
         this.zzaj.zzc(zzd(this.mContext));
         this.zzag = com_google_android_gms_internal_config_zzao;
@@ -78,15 +81,15 @@ public class FirebaseRemoteConfig {
             return null;
         }
         Map hashMap = new HashMap();
-        for (zzav com_google_android_gms_internal_config_zzav : com_google_android_gms_internal_config_zzas.zzbg) {
+        for (zzav com_google_android_gms_internal_config_zzav : com_google_android_gms_internal_config_zzas.zzbf) {
             String str = com_google_android_gms_internal_config_zzav.namespace;
             Map hashMap2 = new HashMap();
-            for (zzat com_google_android_gms_internal_config_zzat : com_google_android_gms_internal_config_zzav.zzbp) {
-                hashMap2.put(com_google_android_gms_internal_config_zzat.zzbj, com_google_android_gms_internal_config_zzat.zzbk);
+            for (zzat com_google_android_gms_internal_config_zzat : com_google_android_gms_internal_config_zzav.zzbo) {
+                hashMap2.put(com_google_android_gms_internal_config_zzat.zzbi, com_google_android_gms_internal_config_zzat.zzbj);
             }
             hashMap.put(str, hashMap2);
         }
-        byte[][] bArr = com_google_android_gms_internal_config_zzas.zzbh;
+        byte[][] bArr = com_google_android_gms_internal_config_zzas.zzbg;
         List arrayList = new ArrayList();
         int length = bArr.length;
         while (i < length) {
@@ -157,40 +160,41 @@ public class FirebaseRemoteConfig {
                 zzao zza;
                 zzao zza2;
                 zzao zza3;
-                zzar com_google_android_gms_internal_config_zzar = new zzar();
+                zzar com_google_android_gms_internal_config_zzar;
                 zzaw zze = zze(context);
                 if (zze != null) {
                     if (Log.isLoggable("FirebaseRemoteConfig", 3)) {
                         Log.d("FirebaseRemoteConfig", "Initializing from persisted config.");
                     }
-                    zza = zza(zze.zzbq);
-                    zza2 = zza(zze.zzbr);
-                    zza3 = zza(zze.zzbs);
-                    zzau com_google_android_gms_internal_config_zzau = zze.zzbt;
+                    zza = zza(zze.zzbp);
+                    zza2 = zza(zze.zzbq);
+                    zza3 = zza(zze.zzbr);
+                    zzau com_google_android_gms_internal_config_zzau = zze.zzbs;
                     if (com_google_android_gms_internal_config_zzau == null) {
                         com_google_android_gms_internal_config_zzar = null;
                     } else {
                         com_google_android_gms_internal_config_zzar = new zzar();
-                        com_google_android_gms_internal_config_zzar.zzf(com_google_android_gms_internal_config_zzau.zzbl);
-                        com_google_android_gms_internal_config_zzar.zza(com_google_android_gms_internal_config_zzau.zzbm);
-                        com_google_android_gms_internal_config_zzar.zzd(com_google_android_gms_internal_config_zzau.zzbn);
+                        com_google_android_gms_internal_config_zzar.zzf(com_google_android_gms_internal_config_zzau.zzbk);
+                        com_google_android_gms_internal_config_zzar.zza(com_google_android_gms_internal_config_zzau.zzbl);
                     }
                     if (com_google_android_gms_internal_config_zzar != null) {
-                        zzax[] com_google_android_gms_internal_config_zzaxArr = zze.zzbu;
+                        zzax[] com_google_android_gms_internal_config_zzaxArr = zze.zzbt;
                         Map hashMap = new HashMap();
                         if (com_google_android_gms_internal_config_zzaxArr != null) {
                             for (zzax com_google_android_gms_internal_config_zzax : com_google_android_gms_internal_config_zzaxArr) {
-                                hashMap.put(com_google_android_gms_internal_config_zzax.namespace, new zzal(com_google_android_gms_internal_config_zzax.resourceId, com_google_android_gms_internal_config_zzax.zzbw));
+                                hashMap.put(com_google_android_gms_internal_config_zzax.namespace, new zzal(com_google_android_gms_internal_config_zzax.resourceId, com_google_android_gms_internal_config_zzax.zzbv));
                             }
                         }
                         com_google_android_gms_internal_config_zzar.zza(hashMap);
                     }
                 } else if (Log.isLoggable("FirebaseRemoteConfig", 3)) {
                     Log.d("FirebaseRemoteConfig", "No persisted config was found. Initializing from scratch.");
+                    com_google_android_gms_internal_config_zzar = null;
                     zza3 = null;
                     zza2 = null;
                     zza = null;
                 } else {
+                    com_google_android_gms_internal_config_zzar = null;
                     zza3 = null;
                     zza2 = null;
                     zza = null;

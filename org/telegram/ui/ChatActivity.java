@@ -427,6 +427,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
     private boolean[] endReached = new boolean[2];
     private boolean first = true;
     private boolean firstLoading = true;
+    boolean firstOpen = true;
     private boolean firstUnreadSent = false;
     private int first_unread_id;
     private boolean fixPaddingsInLayout;
@@ -6525,7 +6526,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                 hideFloatingDateView(true);
                 this.floatingDateView.setTranslationY(0.0f);
             }
-            if (!this.firstLoading) {
+            if (!this.firstLoading && !this.paused) {
                 if (maxPositiveUnreadId != Integer.MIN_VALUE || maxNegativeUnreadId != ConnectionsManager.DEFAULT_DATACENTER_ID) {
                     int counterDicrement = 0;
                     for (a = 0; a < this.messages.size(); a++) {
@@ -9802,18 +9803,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         r0 = r29;
         r0.<init>(r4);
         r4 = "AppName";
-        r5 = 2131492981; // 0x7f0c0075 float:1.860943E38 double:1.0530974563E-314;
+        r5 = 2131492982; // 0x7f0c0076 float:1.8609431E38 double:1.053097457E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
         r0 = r29;
         r0.setTitle(r4);
         r4 = "OK";
-        r5 = 2131494028; // 0x7f0c048c float:1.8611553E38 double:1.0530979736E-314;
+        r5 = 2131494029; // 0x7f0c048d float:1.8611555E38 double:1.053097974E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
         r5 = 0;
         r0 = r29;
         r0.setPositiveButton(r4, r5);
         r4 = "CompatibilityChat";
-        r5 = 2131493280; // 0x7f0c01a0 float:1.8610036E38 double:1.053097604E-314;
+        r5 = 2131493283; // 0x7f0c01a3 float:1.8610042E38 double:1.0530976055E-314;
         r6 = 2;
         r6 = new java.lang.Object[r6];
         r7 = 0;
@@ -13207,20 +13208,20 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         r0 = r29;
         r0.<init>(r4);
         r4 = "AppName";
-        r5 = 2131492981; // 0x7f0c0075 float:1.860943E38 double:1.0530974563E-314;
+        r5 = 2131492982; // 0x7f0c0076 float:1.8609431E38 double:1.053097457E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
         r0 = r29;
         r0.setTitle(r4);
         if (r131 != 0) goto L_0x27bb;
     L_0x276d:
         r4 = "ChannelCantOpenPrivate";
-        r5 = 2131493160; // 0x7f0c0128 float:1.8609792E38 double:1.0530975447E-314;
+        r5 = 2131493162; // 0x7f0c012a float:1.8609796E38 double:1.0530975457E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
         r0 = r29;
         r0.setMessage(r4);
     L_0x277c:
         r4 = "OK";
-        r5 = 2131494028; // 0x7f0c048c float:1.8611553E38 double:1.0530979736E-314;
+        r5 = 2131494029; // 0x7f0c048d float:1.8611555E38 double:1.053097974E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
         r5 = 0;
         r0 = r29;
@@ -13256,7 +13257,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         if (r0 != r4) goto L_0x27d0;
     L_0x27c0:
         r4 = "ChannelCantOpenNa";
-        r5 = 2131493159; // 0x7f0c0127 float:1.860979E38 double:1.053097544E-314;
+        r5 = 2131493161; // 0x7f0c0129 float:1.8609794E38 double:1.053097545E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
         r0 = r29;
         r0.setMessage(r4);
@@ -13267,7 +13268,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         if (r0 != r4) goto L_0x277c;
     L_0x27d5:
         r4 = "ChannelCantOpenBanned";
-        r5 = 2131493158; // 0x7f0c0126 float:1.8609788E38 double:1.0530975437E-314;
+        r5 = 2131493160; // 0x7f0c0128 float:1.8609792E38 double:1.0530975447E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);
         r0 = r29;
         r0.setMessage(r4);
@@ -16218,6 +16219,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         checkRaiseSensors();
         if (this.chatAttachAlert != null) {
             this.chatAttachAlert.onResume();
+        }
+        if (this.firstOpen && MessagesController.getInstance(this.currentAccount).isProxyDialog(this.dialog_id)) {
+            SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+            if (preferences.getLong("proxychannel", 0) != this.dialog_id) {
+                preferences.edit().putLong("proxychannel", this.dialog_id).commit();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+                builder.setMessage(LocaleController.getString("UseProxySponsorInfo", R.string.UseProxySponsorInfo));
+                builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
+                showDialog(builder.create());
+            }
         }
         checkActionBarMenu();
         if (!(this.replyImageLocation == null || this.replyImageView == null)) {

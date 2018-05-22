@@ -1,24 +1,24 @@
 package com.google.android.gms.internal.measurement;
 
 final class zzen implements Runnable {
-    private final /* synthetic */ zzgl zzafi;
-    private final /* synthetic */ zzem zzafj;
+    private final /* synthetic */ zzhi zzafk;
+    private final /* synthetic */ zzem zzafl;
 
-    zzen(zzem com_google_android_gms_internal_measurement_zzem, zzgl com_google_android_gms_internal_measurement_zzgl) {
-        this.zzafj = com_google_android_gms_internal_measurement_zzem;
-        this.zzafi = com_google_android_gms_internal_measurement_zzgl;
+    zzen(zzem com_google_android_gms_internal_measurement_zzem, zzhi com_google_android_gms_internal_measurement_zzhi) {
+        this.zzafl = com_google_android_gms_internal_measurement_zzem;
+        this.zzafk = com_google_android_gms_internal_measurement_zzhi;
     }
 
     public final void run() {
-        this.zzafi.zzgf();
+        this.zzafk.zzgd();
         if (zzgg.isMainThread()) {
-            this.zzafj.zzacr.zzgf().zzc((Runnable) this);
+            this.zzafk.zzgd().zzc((Runnable) this);
             return;
         }
-        boolean zzef = this.zzafj.zzef();
-        this.zzafj.zzxz = 0;
-        if (zzef && this.zzafj.enabled) {
-            this.zzafj.run();
+        boolean zzef = this.zzafl.zzef();
+        this.zzafl.zzye = 0;
+        if (zzef) {
+            this.zzafl.run();
         }
     }
 }

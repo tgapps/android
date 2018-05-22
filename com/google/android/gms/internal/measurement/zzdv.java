@@ -1,20 +1,17 @@
 package com.google.android.gms.internal.measurement;
 
-import android.os.IBinder;
-import android.os.IInterface;
-import android.os.Parcel;
-import android.os.RemoteException;
+final class zzdv implements Runnable {
+    private final /* synthetic */ String zzadi;
+    private final /* synthetic */ long zzadj;
+    private final /* synthetic */ zzdu zzadk;
 
-public abstract class zzdv extends zzo implements zzdu {
-    public static zzdu zzb(IBinder iBinder) {
-        if (iBinder == null) {
-            return null;
-        }
-        IInterface queryLocalInterface = iBinder.queryLocalInterface("com.google.android.gms.iid.IMessengerCompat");
-        return queryLocalInterface instanceof zzdu ? (zzdu) queryLocalInterface : new zzdw(iBinder);
+    zzdv(zzdu com_google_android_gms_internal_measurement_zzdu, String str, long j) {
+        this.zzadk = com_google_android_gms_internal_measurement_zzdu;
+        this.zzadi = str;
+        this.zzadj = j;
     }
 
-    protected final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        throw new NoSuchMethodError();
+    public final void run() {
+        this.zzadk.zza(this.zzadi, this.zzadj);
     }
 }

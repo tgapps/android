@@ -18,27 +18,27 @@ final class zzfh implements Runnable {
     }
 
     public final void run() {
-        zzhk zzgh = this.zzajc.zzacr.zzgh();
-        if (zzgh.isInitialized()) {
+        zzhh zzgf = this.zzajc.zzacw.zzgf();
+        if (zzgf.isInitialized()) {
             if (this.zzajc.zzaim == '\u0000') {
-                if (this.zzajc.zzgi().zzds()) {
+                if (this.zzajc.zzgg().zzds()) {
                     this.zzajc.zzaim = 'C';
                 } else {
                     this.zzajc.zzaim = 'c';
                 }
             }
-            if (this.zzajc.zzadp < 0) {
-                this.zzajc.zzadp = 12451;
+            if (this.zzajc.zzadu < 0) {
+                this.zzajc.zzadu = 12451;
             }
             char charAt = "01VDIWEA?".charAt(this.zzaix);
             char zza = this.zzajc.zzaim;
-            long zzb = this.zzajc.zzadp;
+            long zzb = this.zzajc.zzadu;
             String zza2 = zzfg.zza(true, this.zzaiy, this.zzaiz, this.zzaja, this.zzajb);
             String stringBuilder = new StringBuilder(String.valueOf(zza2).length() + 24).append("2").append(charAt).append(zza).append(zzb).append(":").append(zza2).toString();
             if (stringBuilder.length() > 1024) {
                 stringBuilder = this.zzaiy.substring(0, 1024);
             }
-            zzgh.zzajs.zzc(stringBuilder, 1);
+            zzgf.zzajt.zzc(stringBuilder, 1);
             return;
         }
         this.zzajc.zza(6, "Persisted config not initialized. Not logging error/warn");

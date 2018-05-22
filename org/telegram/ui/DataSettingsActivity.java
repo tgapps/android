@@ -530,7 +530,7 @@ public class DataSettingsActivity extends BaseFragment {
                 } else if (position == DataSettingsActivity.this.wifiUsageRow) {
                     DataSettingsActivity.this.presentFragment(new DataUsageActivity(1));
                 } else if (position == DataSettingsActivity.this.proxyRow) {
-                    DataSettingsActivity.this.presentFragment(new ProxySettingsActivity());
+                    DataSettingsActivity.this.presentFragment(new ProxyListActivity());
                 } else if (position == DataSettingsActivity.this.enableStreamRow) {
                     SharedConfig.toggleStreamMedia();
                     ((TextCheckCell) view).setChecked(SharedConfig.streamMedia);

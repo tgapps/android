@@ -11,47 +11,47 @@ public final class zzfa extends zzn implements zzey {
         super(iBinder, "com.google.android.gms.measurement.internal.IMeasurementService");
     }
 
-    public final List<zzjs> zza(zzec com_google_android_gms_internal_measurement_zzec, boolean z) throws RemoteException {
+    public final List<zzjx> zza(zzdz com_google_android_gms_internal_measurement_zzdz, boolean z) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         zzp.zza(obtainAndWriteInterfaceToken, z);
         obtainAndWriteInterfaceToken = transactAndReadException(7, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzjs.CREATOR);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzjx.CREATOR);
         obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }
 
-    public final List<zzef> zza(String str, String str2, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
+    public final List<zzed> zza(String str, String str2, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         obtainAndWriteInterfaceToken.writeString(str);
         obtainAndWriteInterfaceToken.writeString(str2);
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         obtainAndWriteInterfaceToken = transactAndReadException(16, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzef.CREATOR);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzed.CREATOR);
         obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }
 
-    public final List<zzjs> zza(String str, String str2, String str3, boolean z) throws RemoteException {
+    public final List<zzjx> zza(String str, String str2, String str3, boolean z) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         obtainAndWriteInterfaceToken.writeString(str);
         obtainAndWriteInterfaceToken.writeString(str2);
         obtainAndWriteInterfaceToken.writeString(str3);
         zzp.zza(obtainAndWriteInterfaceToken, z);
         obtainAndWriteInterfaceToken = transactAndReadException(15, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzjs.CREATOR);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzjx.CREATOR);
         obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }
 
-    public final List<zzjs> zza(String str, String str2, boolean z, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
+    public final List<zzjx> zza(String str, String str2, boolean z, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         obtainAndWriteInterfaceToken.writeString(str);
         obtainAndWriteInterfaceToken.writeString(str2);
         zzp.zza(obtainAndWriteInterfaceToken, z);
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         obtainAndWriteInterfaceToken = transactAndReadException(14, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzjs.CREATOR);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzjx.CREATOR);
         obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }
@@ -65,23 +65,23 @@ public final class zzfa extends zzn implements zzey {
         transactAndReadExceptionReturnVoid(10, obtainAndWriteInterfaceToken);
     }
 
-    public final void zza(zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
+    public final void zza(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         transactAndReadExceptionReturnVoid(4, obtainAndWriteInterfaceToken);
     }
 
-    public final void zza(zzef com_google_android_gms_internal_measurement_zzef, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
+    public final void zza(zzed com_google_android_gms_internal_measurement_zzed, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzef);
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzed);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         transactAndReadExceptionReturnVoid(12, obtainAndWriteInterfaceToken);
     }
 
-    public final void zza(zzeu com_google_android_gms_internal_measurement_zzeu, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
+    public final void zza(zzeu com_google_android_gms_internal_measurement_zzeu, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzeu);
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         transactAndReadExceptionReturnVoid(1, obtainAndWriteInterfaceToken);
     }
 
@@ -93,47 +93,57 @@ public final class zzfa extends zzn implements zzey {
         transactAndReadExceptionReturnVoid(5, obtainAndWriteInterfaceToken);
     }
 
-    public final void zza(zzjs com_google_android_gms_internal_measurement_zzjs, zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
+    public final void zza(zzjx com_google_android_gms_internal_measurement_zzjx, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzjs);
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzjx);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         transactAndReadExceptionReturnVoid(2, obtainAndWriteInterfaceToken);
     }
 
-    public final void zzb(zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
+    public final byte[] zza(zzeu com_google_android_gms_internal_measurement_zzeu, String str) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzeu);
+        obtainAndWriteInterfaceToken.writeString(str);
+        obtainAndWriteInterfaceToken = transactAndReadException(9, obtainAndWriteInterfaceToken);
+        byte[] createByteArray = obtainAndWriteInterfaceToken.createByteArray();
+        obtainAndWriteInterfaceToken.recycle();
+        return createByteArray;
+    }
+
+    public final void zzb(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         transactAndReadExceptionReturnVoid(6, obtainAndWriteInterfaceToken);
     }
 
-    public final void zzb(zzef com_google_android_gms_internal_measurement_zzef) throws RemoteException {
+    public final void zzb(zzed com_google_android_gms_internal_measurement_zzed) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzef);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzed);
         transactAndReadExceptionReturnVoid(13, obtainAndWriteInterfaceToken);
     }
 
-    public final String zzc(zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
+    public final String zzc(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         obtainAndWriteInterfaceToken = transactAndReadException(11, obtainAndWriteInterfaceToken);
         String readString = obtainAndWriteInterfaceToken.readString();
         obtainAndWriteInterfaceToken.recycle();
         return readString;
     }
 
-    public final void zzd(zzec com_google_android_gms_internal_measurement_zzec) throws RemoteException {
+    public final void zzd(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzec);
+        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) com_google_android_gms_internal_measurement_zzdz);
         transactAndReadExceptionReturnVoid(18, obtainAndWriteInterfaceToken);
     }
 
-    public final List<zzef> zze(String str, String str2, String str3) throws RemoteException {
+    public final List<zzed> zze(String str, String str2, String str3) throws RemoteException {
         Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
         obtainAndWriteInterfaceToken.writeString(str);
         obtainAndWriteInterfaceToken.writeString(str2);
         obtainAndWriteInterfaceToken.writeString(str3);
         obtainAndWriteInterfaceToken = transactAndReadException(17, obtainAndWriteInterfaceToken);
-        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzef.CREATOR);
+        List createTypedArrayList = obtainAndWriteInterfaceToken.createTypedArrayList(zzed.CREATOR);
         obtainAndWriteInterfaceToken.recycle();
         return createTypedArrayList;
     }

@@ -14,12 +14,12 @@ import java.net.URLConnection;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
-public final class zzfk extends zzhk {
+public final class zzfk extends zzjq {
     private final SSLSocketFactory zzajg;
 
-    public zzfk(zzgl com_google_android_gms_internal_measurement_zzgl) {
-        super(com_google_android_gms_internal_measurement_zzgl);
-        this.zzajg = VERSION.SDK_INT < 19 ? new zzjw() : null;
+    public zzfk(zzjr com_google_android_gms_internal_measurement_zzjr) {
+        super(com_google_android_gms_internal_measurement_zzjr);
+        this.zzajg = VERSION.SDK_INT < 19 ? new zzkb() : null;
     }
 
     private static byte[] zzb(HttpURLConnection httpURLConnection) throws IOException {
@@ -73,7 +73,7 @@ public final class zzfk extends zzhk {
         return super.zzbt();
     }
 
-    public final boolean zzew() {
+    public final boolean zzex() {
         NetworkInfo activeNetworkInfo;
         zzch();
         try {
@@ -84,23 +84,19 @@ public final class zzfk extends zzhk {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public final /* bridge */ /* synthetic */ void zzfq() {
-        super.zzfq();
-    }
-
     public final /* bridge */ /* synthetic */ void zzfr() {
         super.zzfr();
     }
 
-    public final /* bridge */ /* synthetic */ zzdx zzfs() {
-        return super.zzfs();
+    public final /* bridge */ /* synthetic */ void zzfs() {
+        super.zzfs();
     }
 
-    public final /* bridge */ /* synthetic */ zzee zzft() {
+    public final /* bridge */ /* synthetic */ zzdu zzft() {
         return super.zzft();
     }
 
-    public final /* bridge */ /* synthetic */ zzhm zzfu() {
+    public final /* bridge */ /* synthetic */ zzhk zzfu() {
         return super.zzfu();
     }
 
@@ -112,11 +108,11 @@ public final class zzfk extends zzhk {
         return super.zzfw();
     }
 
-    public final /* bridge */ /* synthetic */ zzil zzfx() {
+    public final /* bridge */ /* synthetic */ zzii zzfx() {
         return super.zzfx();
     }
 
-    public final /* bridge */ /* synthetic */ zzih zzfy() {
+    public final /* bridge */ /* synthetic */ zzif zzfy() {
         return super.zzfy();
     }
 
@@ -124,43 +120,43 @@ public final class zzfk extends zzhk {
         return super.zzfz();
     }
 
-    public final /* bridge */ /* synthetic */ zzei zzga() {
+    public final /* bridge */ /* synthetic */ zzfe zzga() {
         return super.zzga();
     }
 
-    public final /* bridge */ /* synthetic */ zzfe zzgb() {
+    public final /* bridge */ /* synthetic */ zzka zzgb() {
         return super.zzgb();
     }
 
-    public final /* bridge */ /* synthetic */ zzjv zzgc() {
+    public final /* bridge */ /* synthetic */ zzjh zzgc() {
         return super.zzgc();
     }
 
-    public final /* bridge */ /* synthetic */ zzgf zzgd() {
+    public final /* bridge */ /* synthetic */ zzgg zzgd() {
         return super.zzgd();
     }
 
-    public final /* bridge */ /* synthetic */ zzjk zzge() {
+    public final /* bridge */ /* synthetic */ zzfg zzge() {
         return super.zzge();
     }
 
-    public final /* bridge */ /* synthetic */ zzgg zzgf() {
+    public final /* bridge */ /* synthetic */ zzfr zzgf() {
         return super.zzgf();
     }
 
-    public final /* bridge */ /* synthetic */ zzfg zzgg() {
+    public final /* bridge */ /* synthetic */ zzef zzgg() {
         return super.zzgg();
     }
 
-    public final /* bridge */ /* synthetic */ zzfr zzgh() {
-        return super.zzgh();
-    }
-
-    public final /* bridge */ /* synthetic */ zzeh zzgi() {
-        return super.zzgi();
-    }
-
-    protected final boolean zzhh() {
+    protected final boolean zzhf() {
         return false;
+    }
+
+    public final /* bridge */ /* synthetic */ zzeb zziw() {
+        return super.zziw();
+    }
+
+    public final /* bridge */ /* synthetic */ zzei zzix() {
+        return super.zzix();
     }
 }

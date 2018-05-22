@@ -8,26 +8,26 @@ import java.util.List;
 
 final class zzbe implements Cloneable {
     private Object value;
-    private zzbc<?, ?> zzco;
-    private List<zzbj> zzcp = new ArrayList();
+    private zzbc<?, ?> zzcn;
+    private List<zzbj> zzco = new ArrayList();
 
     zzbe() {
     }
 
     private final byte[] toByteArray() throws IOException {
-        byte[] bArr = new byte[zzu()];
+        byte[] bArr = new byte[zzt()];
         zza(zzaz.zza(bArr));
         return bArr;
     }
 
-    private final zzbe zzaf() {
+    private final zzbe zzae() {
         zzbe com_google_android_gms_internal_config_zzbe = new zzbe();
         try {
-            com_google_android_gms_internal_config_zzbe.zzco = this.zzco;
-            if (this.zzcp == null) {
-                com_google_android_gms_internal_config_zzbe.zzcp = null;
+            com_google_android_gms_internal_config_zzbe.zzcn = this.zzcn;
+            if (this.zzco == null) {
+                com_google_android_gms_internal_config_zzbe.zzco = null;
             } else {
-                com_google_android_gms_internal_config_zzbe.zzcp.addAll(this.zzcp);
+                com_google_android_gms_internal_config_zzbe.zzco.addAll(this.zzco);
             }
             if (this.value != null) {
                 if (this.value instanceof zzbh) {
@@ -67,7 +67,7 @@ final class zzbe implements Cloneable {
     }
 
     public final /* synthetic */ Object clone() throws CloneNotSupportedException {
-        return zzaf();
+        return zzae();
     }
 
     public final boolean equals(Object obj) {
@@ -79,10 +79,10 @@ final class zzbe implements Cloneable {
         }
         zzbe com_google_android_gms_internal_config_zzbe = (zzbe) obj;
         if (this.value != null && com_google_android_gms_internal_config_zzbe.value != null) {
-            return this.zzco == com_google_android_gms_internal_config_zzbe.zzco ? !this.zzco.zzcj.isArray() ? this.value.equals(com_google_android_gms_internal_config_zzbe.value) : this.value instanceof byte[] ? Arrays.equals((byte[]) this.value, (byte[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof int[] ? Arrays.equals((int[]) this.value, (int[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof long[] ? Arrays.equals((long[]) this.value, (long[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof float[] ? Arrays.equals((float[]) this.value, (float[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof double[] ? Arrays.equals((double[]) this.value, (double[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof boolean[] ? Arrays.equals((boolean[]) this.value, (boolean[]) com_google_android_gms_internal_config_zzbe.value) : Arrays.deepEquals((Object[]) this.value, (Object[]) com_google_android_gms_internal_config_zzbe.value) : false;
+            return this.zzcn == com_google_android_gms_internal_config_zzbe.zzcn ? !this.zzcn.zzci.isArray() ? this.value.equals(com_google_android_gms_internal_config_zzbe.value) : this.value instanceof byte[] ? Arrays.equals((byte[]) this.value, (byte[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof int[] ? Arrays.equals((int[]) this.value, (int[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof long[] ? Arrays.equals((long[]) this.value, (long[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof float[] ? Arrays.equals((float[]) this.value, (float[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof double[] ? Arrays.equals((double[]) this.value, (double[]) com_google_android_gms_internal_config_zzbe.value) : this.value instanceof boolean[] ? Arrays.equals((boolean[]) this.value, (boolean[]) com_google_android_gms_internal_config_zzbe.value) : Arrays.deepEquals((Object[]) this.value, (Object[]) com_google_android_gms_internal_config_zzbe.value) : false;
         } else {
-            if (this.zzcp != null && com_google_android_gms_internal_config_zzbe.zzcp != null) {
-                return this.zzcp.equals(com_google_android_gms_internal_config_zzbe.zzcp);
+            if (this.zzco != null && com_google_android_gms_internal_config_zzbe.zzco != null) {
+                return this.zzco.equals(com_google_android_gms_internal_config_zzbe.zzco);
             }
             try {
                 return Arrays.equals(toByteArray(), com_google_android_gms_internal_config_zzbe.toByteArray());
@@ -104,26 +104,26 @@ final class zzbe implements Cloneable {
         if (this.value != null) {
             throw new NoSuchMethodError();
         }
-        for (zzbj com_google_android_gms_internal_config_zzbj : this.zzcp) {
+        for (zzbj com_google_android_gms_internal_config_zzbj : this.zzco) {
             com_google_android_gms_internal_config_zzaz.zzm(com_google_android_gms_internal_config_zzbj.tag);
-            com_google_android_gms_internal_config_zzaz.zzc(com_google_android_gms_internal_config_zzbj.zzcs);
+            com_google_android_gms_internal_config_zzaz.zzc(com_google_android_gms_internal_config_zzbj.zzcr);
         }
     }
 
     final void zza(zzbj com_google_android_gms_internal_config_zzbj) throws IOException {
-        if (this.zzcp != null) {
-            this.zzcp.add(com_google_android_gms_internal_config_zzbj);
+        if (this.zzco != null) {
+            this.zzco.add(com_google_android_gms_internal_config_zzbj);
         } else if (this.value instanceof zzbh) {
-            byte[] bArr = com_google_android_gms_internal_config_zzbj.zzcs;
+            byte[] bArr = com_google_android_gms_internal_config_zzbj.zzcr;
             zzay zza = zzay.zza(bArr, 0, bArr.length);
-            int zzz = zza.zzz();
-            if (zzz != bArr.length - zzaz.zzj(zzz)) {
-                throw zzbg.zzag();
+            int zzy = zza.zzy();
+            if (zzy != bArr.length - zzaz.zzj(zzy)) {
+                throw zzbg.zzaf();
             }
             zzbh zza2 = ((zzbh) this.value).zza(zza);
-            this.zzco = this.zzco;
+            this.zzcn = this.zzcn;
             this.value = zza2;
-            this.zzcp = null;
+            this.zzco = null;
         } else if (this.value instanceof zzbh[]) {
             Collections.singletonList(com_google_android_gms_internal_config_zzbj);
             throw new NoSuchMethodError();
@@ -133,13 +133,13 @@ final class zzbe implements Cloneable {
         }
     }
 
-    final int zzu() {
+    final int zzt() {
         if (this.value != null) {
             throw new NoSuchMethodError();
         }
         int i = 0;
-        for (zzbj com_google_android_gms_internal_config_zzbj : this.zzcp) {
-            i = (com_google_android_gms_internal_config_zzbj.zzcs.length + (zzaz.zzn(com_google_android_gms_internal_config_zzbj.tag) + 0)) + i;
+        for (zzbj com_google_android_gms_internal_config_zzbj : this.zzco) {
+            i = (com_google_android_gms_internal_config_zzbj.zzcr.length + (zzaz.zzn(com_google_android_gms_internal_config_zzbj.tag) + 0)) + i;
         }
         return i;
     }

@@ -29,7 +29,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import com.google.android.gms.common.util.PlatformVersion;
-import com.google.firebase.iid.zzz;
+import com.google.firebase.iid.zzan;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -39,20 +39,20 @@ import org.json.JSONException;
 import org.telegram.tgnet.ConnectionsManager;
 
 final class zza {
-    private static zza zzbsg;
-    private Bundle zzbsh;
-    private Method zzbsi;
-    private Method zzbsj;
-    private final AtomicInteger zzbsk = new AtomicInteger((int) SystemClock.elapsedRealtime());
-    private final Context zzqs;
+    private static zza zzcz;
+    private Bundle zzda;
+    private Method zzdb;
+    private Method zzdc;
+    private final AtomicInteger zzdd = new AtomicInteger((int) SystemClock.elapsedRealtime());
+    private final Context zzz;
 
     private zza(Context context) {
-        this.zzqs = context.getApplicationContext();
+        this.zzz = context.getApplicationContext();
     }
 
     @TargetApi(26)
     private final Notification zza(CharSequence charSequence, String str, int i, Integer num, Uri uri, PendingIntent pendingIntent, PendingIntent pendingIntent2, String str2) {
-        Builder smallIcon = new Builder(this.zzqs).setAutoCancel(true).setSmallIcon(i);
+        Builder smallIcon = new Builder(this.zzz).setAutoCancel(true).setSmallIcon(i);
         if (!TextUtils.isEmpty(charSequence)) {
             smallIcon.setContentTitle(charSequence);
         }
@@ -73,17 +73,17 @@ final class zza {
             smallIcon.setDeleteIntent(pendingIntent2);
         }
         if (str2 != null) {
-            if (this.zzbsi == null) {
-                this.zzbsi = zzfh("setChannelId");
+            if (this.zzdb == null) {
+                this.zzdb = zzl("setChannelId");
             }
-            if (this.zzbsi == null) {
-                this.zzbsi = zzfh("setChannel");
+            if (this.zzdb == null) {
+                this.zzdb = zzl("setChannel");
             }
-            if (this.zzbsi == null) {
+            if (this.zzdb == null) {
                 Log.e("FirebaseMessaging", "Error while setting the notification channel");
             } else {
                 try {
-                    this.zzbsi.invoke(smallIcon, new Object[]{str2});
+                    this.zzdb.invoke(smallIcon, new Object[]{str2});
                 } catch (Throwable e) {
                     Log.e("FirebaseMessaging", "Error while setting the notification channel", e);
                 } catch (Throwable e2) {
@@ -111,13 +111,35 @@ final class zza {
         }
     }
 
+    private final Bundle zzal() {
+        if (this.zzda != null) {
+            return this.zzda;
+        }
+        ApplicationInfo applicationInfo = null;
+        try {
+            applicationInfo = this.zzz.getPackageManager().getApplicationInfo(this.zzz.getPackageName(), 128);
+        } catch (NameNotFoundException e) {
+        }
+        if (applicationInfo == null || applicationInfo.metaData == null) {
+            return Bundle.EMPTY;
+        }
+        this.zzda = applicationInfo.metaData;
+        return this.zzda;
+    }
+
+    static String zzb(Bundle bundle, String str) {
+        String valueOf = String.valueOf(str);
+        String valueOf2 = String.valueOf("_loc_key");
+        return zza(bundle, valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
+    }
+
     @TargetApi(26)
-    private final boolean zzaf(int i) {
+    private final boolean zzb(int i) {
         if (VERSION.SDK_INT != 26) {
             return true;
         }
         try {
-            if (!(this.zzqs.getResources().getDrawable(i, null) instanceof AdaptiveIconDrawable)) {
+            if (!(this.zzz.getResources().getDrawable(i, null) instanceof AdaptiveIconDrawable)) {
                 return true;
             }
             Log.e("FirebaseMessaging", "Adaptive icons cannot be used in notifications. Ignoring icon id: " + i);
@@ -125,12 +147,6 @@ final class zza {
         } catch (NotFoundException e) {
             return false;
         }
-    }
-
-    static String zzb(Bundle bundle, String str) {
-        String valueOf = String.valueOf(str);
-        String valueOf2 = String.valueOf("_loc_key");
-        return zza(bundle, valueOf2.length() != 0 ? valueOf.concat(valueOf2) : new String(valueOf));
     }
 
     static Object[] zzc(Bundle bundle, String str) {
@@ -157,6 +173,17 @@ final class zza {
         }
     }
 
+    static synchronized zza zzd(Context context) {
+        zza com_google_firebase_messaging_zza;
+        synchronized (zza.class) {
+            if (zzcz == null) {
+                zzcz = new zza(context);
+            }
+            com_google_firebase_messaging_zza = zzcz;
+        }
+        return com_google_firebase_messaging_zza;
+    }
+
     private final String zzd(Bundle bundle, String str) {
         Object zza = zza(bundle, str);
         if (!TextUtils.isEmpty(zza)) {
@@ -166,8 +193,8 @@ final class zza {
         if (TextUtils.isEmpty(zzb)) {
             return null;
         }
-        Resources resources = this.zzqs.getResources();
-        int identifier = resources.getIdentifier(zzb, "string", this.zzqs.getPackageName());
+        Resources resources = this.zzz.getResources();
+        int identifier = resources.getIdentifier(zzb, "string", this.zzz.getPackageName());
         if (identifier == 0) {
             String str2 = "FirebaseMessaging";
             String valueOf = String.valueOf(str);
@@ -189,8 +216,25 @@ final class zza {
         }
     }
 
+    static boolean zzf(Bundle bundle) {
+        return "1".equals(zza(bundle, "gcm.n.e")) || zza(bundle, "gcm.n.icon") != null;
+    }
+
+    static Uri zzg(Bundle bundle) {
+        Object zza = zza(bundle, "gcm.n.link_android");
+        if (TextUtils.isEmpty(zza)) {
+            zza = zza(bundle, "gcm.n.link");
+        }
+        return !TextUtils.isEmpty(zza) ? Uri.parse(zza) : null;
+    }
+
+    static String zzi(Bundle bundle) {
+        Object zza = zza(bundle, "gcm.n.sound2");
+        return TextUtils.isEmpty(zza) ? zza(bundle, "gcm.n.sound") : zza;
+    }
+
     @TargetApi(26)
-    private static Method zzfh(String str) {
+    private static Method zzl(String str) {
         try {
             return Builder.class.getMethod(str, new Class[]{String.class});
         } catch (NoSuchMethodException e) {
@@ -200,7 +244,7 @@ final class zza {
         }
     }
 
-    private final Integer zzfi(String str) {
+    private final Integer zzm(String str) {
         Integer num = null;
         if (VERSION.SDK_INT >= 21) {
             if (!TextUtils.isEmpty(str)) {
@@ -210,10 +254,10 @@ final class zza {
                     Log.w("FirebaseMessaging", new StringBuilder(String.valueOf(str).length() + 54).append("Color ").append(str).append(" not valid. Notification will use default color.").toString());
                 }
             }
-            int i = zzti().getInt("com.google.firebase.messaging.default_notification_color", 0);
+            int i = zzal().getInt("com.google.firebase.messaging.default_notification_color", 0);
             if (i != 0) {
                 try {
-                    num = Integer.valueOf(ContextCompat.getColor(this.zzqs, i));
+                    num = Integer.valueOf(ContextCompat.getColor(this.zzz, i));
                 } catch (NotFoundException e2) {
                     Log.w("FirebaseMessaging", "Cannot find the color resource referenced in AndroidManifest.");
                 }
@@ -223,32 +267,32 @@ final class zza {
     }
 
     @TargetApi(26)
-    private final String zzfj(String str) {
+    private final String zzn(String str) {
         if (!PlatformVersion.isAtLeastO()) {
             return null;
         }
-        NotificationManager notificationManager = (NotificationManager) this.zzqs.getSystemService(NotificationManager.class);
+        NotificationManager notificationManager = (NotificationManager) this.zzz.getSystemService(NotificationManager.class);
         try {
-            if (this.zzbsj == null) {
-                this.zzbsj = notificationManager.getClass().getMethod("getNotificationChannel", new Class[]{String.class});
+            if (this.zzdc == null) {
+                this.zzdc = notificationManager.getClass().getMethod("getNotificationChannel", new Class[]{String.class});
             }
             if (!TextUtils.isEmpty(str)) {
-                if (this.zzbsj.invoke(notificationManager, new Object[]{str}) != null) {
+                if (this.zzdc.invoke(notificationManager, new Object[]{str}) != null) {
                     return str;
                 }
                 Log.w("FirebaseMessaging", new StringBuilder(String.valueOf(str).length() + 122).append("Notification Channel requested (").append(str).append(") has not been created by the app. Manifest configuration, or default, value will be used.").toString());
             }
-            Object string = zzti().getString("com.google.firebase.messaging.default_notification_channel_id");
+            Object string = zzal().getString("com.google.firebase.messaging.default_notification_channel_id");
             if (TextUtils.isEmpty(string)) {
                 Log.w("FirebaseMessaging", "Missing Default Notification Channel metadata in AndroidManifest. Default value will be used.");
             } else {
-                if (this.zzbsj.invoke(notificationManager, new Object[]{string}) != null) {
+                if (this.zzdc.invoke(notificationManager, new Object[]{string}) != null) {
                     return string;
                 }
                 Log.w("FirebaseMessaging", "Notification Channel set in AndroidManifest.xml has not been created by the app. Default value will be used.");
             }
-            if (this.zzbsj.invoke(notificationManager, new Object[]{"fcm_fallback_notification_channel"}) == null) {
-                Object newInstance = Class.forName("android.app.NotificationChannel").getConstructor(new Class[]{String.class, CharSequence.class, Integer.TYPE}).newInstance(new Object[]{"fcm_fallback_notification_channel", this.zzqs.getString(R.string.fcm_fallback_notification_channel_label), Integer.valueOf(3)});
+            if (this.zzdc.invoke(notificationManager, new Object[]{"fcm_fallback_notification_channel"}) == null) {
+                Object newInstance = Class.forName("android.app.NotificationChannel").getConstructor(new Class[]{String.class, CharSequence.class, Integer.TYPE}).newInstance(new Object[]{"fcm_fallback_notification_channel", this.zzz.getString(R.string.fcm_fallback_notification_channel_label), Integer.valueOf(3)});
                 notificationManager.getClass().getMethod("createNotificationChannel", new Class[]{r2}).invoke(notificationManager, new Object[]{newInstance});
             }
             return "fcm_fallback_notification_channel";
@@ -279,51 +323,7 @@ final class zza {
         }
     }
 
-    static boolean zzl(Bundle bundle) {
-        return "1".equals(zza(bundle, "gcm.n.e")) || zza(bundle, "gcm.n.icon") != null;
-    }
-
-    static Uri zzm(Bundle bundle) {
-        Object zza = zza(bundle, "gcm.n.link_android");
-        if (TextUtils.isEmpty(zza)) {
-            zza = zza(bundle, "gcm.n.link");
-        }
-        return !TextUtils.isEmpty(zza) ? Uri.parse(zza) : null;
-    }
-
-    static String zzo(Bundle bundle) {
-        Object zza = zza(bundle, "gcm.n.sound2");
-        return TextUtils.isEmpty(zza) ? zza(bundle, "gcm.n.sound") : zza;
-    }
-
-    private final Bundle zzti() {
-        if (this.zzbsh != null) {
-            return this.zzbsh;
-        }
-        ApplicationInfo applicationInfo = null;
-        try {
-            applicationInfo = this.zzqs.getPackageManager().getApplicationInfo(this.zzqs.getPackageName(), 128);
-        } catch (NameNotFoundException e) {
-        }
-        if (applicationInfo == null || applicationInfo.metaData == null) {
-            return Bundle.EMPTY;
-        }
-        this.zzbsh = applicationInfo.metaData;
-        return this.zzbsh;
-    }
-
-    static synchronized zza zzw(Context context) {
-        zza com_google_firebase_messaging_zza;
-        synchronized (zza.class) {
-            if (zzbsg == null) {
-                zzbsg = new zza(context);
-            }
-            com_google_firebase_messaging_zza = zzbsg;
-        }
-        return com_google_firebase_messaging_zza;
-    }
-
-    final boolean zzn(Bundle bundle) {
+    final boolean zzh(Bundle bundle) {
         PendingIntent pendingIntent = null;
         if ("1".equals(zza(bundle, "gcm.n.noui"))) {
             return true;
@@ -334,10 +334,10 @@ final class zza {
         String zza;
         Resources resources;
         int identifier;
-        Integer zzfi;
+        Integer zzm;
         Uri uri;
         Object zza2;
-        Uri zzm;
+        Uri zzg;
         Intent intent;
         Intent intent2;
         Parcelable parcelable;
@@ -349,12 +349,12 @@ final class zza {
         String zza4;
         NotificationManager notificationManager;
         int i;
-        if (!((KeyguardManager) this.zzqs.getSystemService("keyguard")).inKeyguardRestrictedInputMode()) {
+        if (!((KeyguardManager) this.zzz.getSystemService("keyguard")).inKeyguardRestrictedInputMode()) {
             if (!PlatformVersion.isAtLeastLollipop()) {
                 SystemClock.sleep(10);
             }
             int myPid = Process.myPid();
-            List<RunningAppProcessInfo> runningAppProcesses = ((ActivityManager) this.zzqs.getSystemService("activity")).getRunningAppProcesses();
+            List<RunningAppProcessInfo> runningAppProcesses = ((ActivityManager) this.zzz.getSystemService("activity")).getRunningAppProcesses();
             if (runningAppProcesses != null) {
                 for (RunningAppProcessInfo runningAppProcessInfo : runningAppProcesses) {
                     if (runningAppProcessInfo.pid == myPid) {
@@ -364,39 +364,39 @@ final class zza {
                         }
                         zzd = zzd(bundle, "gcm.n.title");
                         if (TextUtils.isEmpty(zzd)) {
-                            zzd = this.zzqs.getApplicationInfo().loadLabel(this.zzqs.getPackageManager());
+                            zzd = this.zzz.getApplicationInfo().loadLabel(this.zzz.getPackageManager());
                         }
                         zzd2 = zzd(bundle, "gcm.n.body");
                         zza = zza(bundle, "gcm.n.icon");
                         if (!TextUtils.isEmpty(zza)) {
-                            resources = this.zzqs.getResources();
-                            identifier = resources.getIdentifier(zza, "drawable", this.zzqs.getPackageName());
-                            if (identifier == 0 || !zzaf(identifier)) {
-                                identifier = resources.getIdentifier(zza, "mipmap", this.zzqs.getPackageName());
-                                if (identifier == 0 || !zzaf(identifier)) {
+                            resources = this.zzz.getResources();
+                            identifier = resources.getIdentifier(zza, "drawable", this.zzz.getPackageName());
+                            if (identifier == 0 || !zzb(identifier)) {
+                                identifier = resources.getIdentifier(zza, "mipmap", this.zzz.getPackageName());
+                                if (identifier == 0 || !zzb(identifier)) {
                                     Log.w("FirebaseMessaging", new StringBuilder(String.valueOf(zza).length() + 61).append("Icon resource ").append(zza).append(" not found. Notification will use default icon.").toString());
                                 }
                             }
-                            zzfi = zzfi(zza(bundle, "gcm.n.color"));
-                            zza = zzo(bundle);
+                            zzm = zzm(zza(bundle, "gcm.n.color"));
+                            zza = zzi(bundle);
                             if (TextUtils.isEmpty(zza)) {
                                 uri = null;
-                            } else if (!"default".equals(zza) || this.zzqs.getResources().getIdentifier(zza, "raw", this.zzqs.getPackageName()) == 0) {
+                            } else if (!"default".equals(zza) || this.zzz.getResources().getIdentifier(zza, "raw", this.zzz.getPackageName()) == 0) {
                                 uri = RingtoneManager.getDefaultUri(2);
                             } else {
-                                String packageName = this.zzqs.getPackageName();
+                                String packageName = this.zzz.getPackageName();
                                 uri = Uri.parse(new StringBuilder((String.valueOf(packageName).length() + 24) + String.valueOf(zza).length()).append("android.resource://").append(packageName).append("/raw/").append(zza).toString());
                             }
                             zza2 = zza(bundle, "gcm.n.click_action");
                             if (TextUtils.isEmpty(zza2)) {
-                                zzm = zzm(bundle);
-                                if (zzm != null) {
+                                zzg = zzg(bundle);
+                                if (zzg != null) {
                                     intent = new Intent("android.intent.action.VIEW");
-                                    intent.setPackage(this.zzqs.getPackageName());
-                                    intent.setData(zzm);
+                                    intent.setPackage(this.zzz.getPackageName());
+                                    intent.setData(zzg);
                                     intent2 = intent;
                                 } else {
-                                    intent = this.zzqs.getPackageManager().getLaunchIntentForPackage(this.zzqs.getPackageName());
+                                    intent = this.zzz.getPackageManager().getLaunchIntentForPackage(this.zzz.getPackageName());
                                     if (intent == null) {
                                         Log.w("FirebaseMessaging", "No activity found to launch app");
                                     }
@@ -404,7 +404,7 @@ final class zza {
                                 }
                             } else {
                                 intent = new Intent(zza2);
-                                intent.setPackage(this.zzqs.getPackageName());
+                                intent.setPackage(this.zzz.getPackageName());
                                 intent.setFlags(268435456);
                                 intent2 = intent;
                             }
@@ -413,28 +413,28 @@ final class zza {
                             } else {
                                 intent2.addFlags(ConnectionsManager.FileTypeFile);
                                 bundle2 = new Bundle(bundle);
-                                FirebaseMessagingService.zzp(bundle2);
+                                FirebaseMessagingService.zzj(bundle2);
                                 intent2.putExtras(bundle2);
                                 for (String zza5 : bundle2.keySet()) {
                                     if (!zza5.startsWith("gcm.n.") || zza5.startsWith("gcm.notification.")) {
                                         intent2.removeExtra(zza5);
                                     }
                                 }
-                                parcelable = PendingIntent.getActivity(this.zzqs, this.zzbsk.incrementAndGet(), intent2, 1073741824);
+                                parcelable = PendingIntent.getActivity(this.zzz, this.zzdd.incrementAndGet(), intent2, 1073741824);
                             }
-                            if (FirebaseMessagingService.zzq(bundle)) {
+                            if (FirebaseMessagingService.zzk(bundle)) {
                                 intent2 = new Intent("com.google.firebase.messaging.NOTIFICATION_OPEN");
                                 zza(intent2, bundle);
                                 intent2.putExtra("pending_intent", parcelable);
-                                zza3 = zzz.zza(this.zzqs, this.zzbsk.incrementAndGet(), intent2, 1073741824);
+                                zza3 = zzan.zza(this.zzz, this.zzdd.incrementAndGet(), intent2, 1073741824);
                                 intent = new Intent("com.google.firebase.messaging.NOTIFICATION_DISMISS");
                                 zza(intent, bundle);
-                                pendingIntent = zzz.zza(this.zzqs, this.zzbsk.incrementAndGet(), intent, 1073741824);
+                                pendingIntent = zzan.zza(this.zzz, this.zzdd.incrementAndGet(), intent, 1073741824);
                             } else {
                                 parcelable2 = parcelable;
                             }
-                            if (PlatformVersion.isAtLeastO() || this.zzqs.getApplicationInfo().targetSdkVersion <= 25) {
-                                smallIcon = new NotificationCompat.Builder(this.zzqs).setAutoCancel(true).setSmallIcon(identifier);
+                            if (PlatformVersion.isAtLeastO() || this.zzz.getApplicationInfo().targetSdkVersion <= 25) {
+                                smallIcon = new NotificationCompat.Builder(this.zzz).setAutoCancel(true).setSmallIcon(identifier);
                                 if (!TextUtils.isEmpty(zzd)) {
                                     smallIcon.setContentTitle(zzd);
                                 }
@@ -442,8 +442,8 @@ final class zza {
                                     smallIcon.setContentText(zzd2);
                                     smallIcon.setStyle(new NotificationCompat.BigTextStyle().bigText(zzd2));
                                 }
-                                if (zzfi != null) {
-                                    smallIcon.setColor(zzfi.intValue());
+                                if (zzm != null) {
+                                    smallIcon.setColor(zzm.intValue());
                                 }
                                 if (uri != null) {
                                     smallIcon.setSound(uri);
@@ -456,29 +456,29 @@ final class zza {
                                 }
                                 build = smallIcon.build();
                             } else {
-                                build = zza(zzd, zzd2, identifier, zzfi, uri, zza3, pendingIntent, zzfj(zza(bundle, "gcm.n.android_channel_id")));
+                                build = zza(zzd, zzd2, identifier, zzm, uri, zza3, pendingIntent, zzn(zza(bundle, "gcm.n.android_channel_id")));
                             }
                             zza4 = zza(bundle, "gcm.n.tag");
                             if (Log.isLoggable("FirebaseMessaging", 3)) {
                                 Log.d("FirebaseMessaging", "Showing notification");
                             }
-                            notificationManager = (NotificationManager) this.zzqs.getSystemService("notification");
+                            notificationManager = (NotificationManager) this.zzz.getSystemService("notification");
                             if (TextUtils.isEmpty(zza4)) {
                                 zza4 = "FCM-Notification:" + SystemClock.uptimeMillis();
                             }
                             notificationManager.notify(zza4, 0, build);
                             return true;
                         }
-                        i = zzti().getInt("com.google.firebase.messaging.default_notification_icon", 0);
-                        if (i == 0 || !zzaf(i)) {
-                            i = this.zzqs.getApplicationInfo().icon;
+                        i = zzal().getInt("com.google.firebase.messaging.default_notification_icon", 0);
+                        if (i == 0 || !zzb(i)) {
+                            i = this.zzz.getApplicationInfo().icon;
                         }
-                        if (i == 0 || !zzaf(i)) {
+                        if (i == 0 || !zzb(i)) {
                             i = 17301651;
                         }
                         identifier = i;
-                        zzfi = zzfi(zza(bundle, "gcm.n.color"));
-                        zza5 = zzo(bundle);
+                        zzm = zzm(zza(bundle, "gcm.n.color"));
+                        zza5 = zzi(bundle);
                         if (TextUtils.isEmpty(zza5)) {
                             if ("default".equals(zza5)) {
                             }
@@ -488,53 +488,53 @@ final class zza {
                         }
                         zza2 = zza(bundle, "gcm.n.click_action");
                         if (TextUtils.isEmpty(zza2)) {
-                            zzm = zzm(bundle);
-                            if (zzm != null) {
-                                intent = this.zzqs.getPackageManager().getLaunchIntentForPackage(this.zzqs.getPackageName());
+                            zzg = zzg(bundle);
+                            if (zzg != null) {
+                                intent = this.zzz.getPackageManager().getLaunchIntentForPackage(this.zzz.getPackageName());
                                 if (intent == null) {
                                     Log.w("FirebaseMessaging", "No activity found to launch app");
                                 }
                                 intent2 = intent;
                             } else {
                                 intent = new Intent("android.intent.action.VIEW");
-                                intent.setPackage(this.zzqs.getPackageName());
-                                intent.setData(zzm);
+                                intent.setPackage(this.zzz.getPackageName());
+                                intent.setData(zzg);
                                 intent2 = intent;
                             }
                         } else {
                             intent = new Intent(zza2);
-                            intent.setPackage(this.zzqs.getPackageName());
+                            intent.setPackage(this.zzz.getPackageName());
                             intent.setFlags(268435456);
                             intent2 = intent;
                         }
                         if (intent2 == null) {
                             intent2.addFlags(ConnectionsManager.FileTypeFile);
                             bundle2 = new Bundle(bundle);
-                            FirebaseMessagingService.zzp(bundle2);
+                            FirebaseMessagingService.zzj(bundle2);
                             intent2.putExtras(bundle2);
                             for (String zza52 : bundle2.keySet()) {
                                 if (zza52.startsWith("gcm.n.")) {
                                 }
                                 intent2.removeExtra(zza52);
                             }
-                            parcelable = PendingIntent.getActivity(this.zzqs, this.zzbsk.incrementAndGet(), intent2, 1073741824);
+                            parcelable = PendingIntent.getActivity(this.zzz, this.zzdd.incrementAndGet(), intent2, 1073741824);
                         } else {
                             parcelable = null;
                         }
-                        if (FirebaseMessagingService.zzq(bundle)) {
+                        if (FirebaseMessagingService.zzk(bundle)) {
                             parcelable2 = parcelable;
                         } else {
                             intent2 = new Intent("com.google.firebase.messaging.NOTIFICATION_OPEN");
                             zza(intent2, bundle);
                             intent2.putExtra("pending_intent", parcelable);
-                            zza3 = zzz.zza(this.zzqs, this.zzbsk.incrementAndGet(), intent2, 1073741824);
+                            zza3 = zzan.zza(this.zzz, this.zzdd.incrementAndGet(), intent2, 1073741824);
                             intent = new Intent("com.google.firebase.messaging.NOTIFICATION_DISMISS");
                             zza(intent, bundle);
-                            pendingIntent = zzz.zza(this.zzqs, this.zzbsk.incrementAndGet(), intent, 1073741824);
+                            pendingIntent = zzan.zza(this.zzz, this.zzdd.incrementAndGet(), intent, 1073741824);
                         }
                         if (PlatformVersion.isAtLeastO()) {
                         }
-                        smallIcon = new NotificationCompat.Builder(this.zzqs).setAutoCancel(true).setSmallIcon(identifier);
+                        smallIcon = new NotificationCompat.Builder(this.zzz).setAutoCancel(true).setSmallIcon(identifier);
                         if (TextUtils.isEmpty(zzd)) {
                             smallIcon.setContentTitle(zzd);
                         }
@@ -542,8 +542,8 @@ final class zza {
                             smallIcon.setContentText(zzd2);
                             smallIcon.setStyle(new NotificationCompat.BigTextStyle().bigText(zzd2));
                         }
-                        if (zzfi != null) {
-                            smallIcon.setColor(zzfi.intValue());
+                        if (zzm != null) {
+                            smallIcon.setColor(zzm.intValue());
                         }
                         if (uri != null) {
                             smallIcon.setSound(uri);
@@ -559,7 +559,7 @@ final class zza {
                         if (Log.isLoggable("FirebaseMessaging", 3)) {
                             Log.d("FirebaseMessaging", "Showing notification");
                         }
-                        notificationManager = (NotificationManager) this.zzqs.getSystemService("notification");
+                        notificationManager = (NotificationManager) this.zzz.getSystemService("notification");
                         if (TextUtils.isEmpty(zza4)) {
                             zza4 = "FCM-Notification:" + SystemClock.uptimeMillis();
                         }
@@ -575,22 +575,22 @@ final class zza {
         }
         zzd = zzd(bundle, "gcm.n.title");
         if (TextUtils.isEmpty(zzd)) {
-            zzd = this.zzqs.getApplicationInfo().loadLabel(this.zzqs.getPackageManager());
+            zzd = this.zzz.getApplicationInfo().loadLabel(this.zzz.getPackageManager());
         }
         zzd2 = zzd(bundle, "gcm.n.body");
         zza52 = zza(bundle, "gcm.n.icon");
         if (TextUtils.isEmpty(zza52)) {
-            resources = this.zzqs.getResources();
-            identifier = resources.getIdentifier(zza52, "drawable", this.zzqs.getPackageName());
-            identifier = resources.getIdentifier(zza52, "mipmap", this.zzqs.getPackageName());
+            resources = this.zzz.getResources();
+            identifier = resources.getIdentifier(zza52, "drawable", this.zzz.getPackageName());
+            identifier = resources.getIdentifier(zza52, "mipmap", this.zzz.getPackageName());
             Log.w("FirebaseMessaging", new StringBuilder(String.valueOf(zza52).length() + 61).append("Icon resource ").append(zza52).append(" not found. Notification will use default icon.").toString());
         }
-        i = zzti().getInt("com.google.firebase.messaging.default_notification_icon", 0);
-        i = this.zzqs.getApplicationInfo().icon;
+        i = zzal().getInt("com.google.firebase.messaging.default_notification_icon", 0);
+        i = this.zzz.getApplicationInfo().icon;
         i = 17301651;
         identifier = i;
-        zzfi = zzfi(zza(bundle, "gcm.n.color"));
-        zza52 = zzo(bundle);
+        zzm = zzm(zza(bundle, "gcm.n.color"));
+        zza52 = zzi(bundle);
         if (TextUtils.isEmpty(zza52)) {
             uri = null;
         } else {
@@ -601,18 +601,18 @@ final class zza {
         zza2 = zza(bundle, "gcm.n.click_action");
         if (TextUtils.isEmpty(zza2)) {
             intent = new Intent(zza2);
-            intent.setPackage(this.zzqs.getPackageName());
+            intent.setPackage(this.zzz.getPackageName());
             intent.setFlags(268435456);
             intent2 = intent;
         } else {
-            zzm = zzm(bundle);
-            if (zzm != null) {
+            zzg = zzg(bundle);
+            if (zzg != null) {
                 intent = new Intent("android.intent.action.VIEW");
-                intent.setPackage(this.zzqs.getPackageName());
-                intent.setData(zzm);
+                intent.setPackage(this.zzz.getPackageName());
+                intent.setData(zzg);
                 intent2 = intent;
             } else {
-                intent = this.zzqs.getPackageManager().getLaunchIntentForPackage(this.zzqs.getPackageName());
+                intent = this.zzz.getPackageManager().getLaunchIntentForPackage(this.zzz.getPackageName());
                 if (intent == null) {
                     Log.w("FirebaseMessaging", "No activity found to launch app");
                 }
@@ -624,29 +624,29 @@ final class zza {
         } else {
             intent2.addFlags(ConnectionsManager.FileTypeFile);
             bundle2 = new Bundle(bundle);
-            FirebaseMessagingService.zzp(bundle2);
+            FirebaseMessagingService.zzj(bundle2);
             intent2.putExtras(bundle2);
             for (String zza522 : bundle2.keySet()) {
                 if (zza522.startsWith("gcm.n.")) {
                 }
                 intent2.removeExtra(zza522);
             }
-            parcelable = PendingIntent.getActivity(this.zzqs, this.zzbsk.incrementAndGet(), intent2, 1073741824);
+            parcelable = PendingIntent.getActivity(this.zzz, this.zzdd.incrementAndGet(), intent2, 1073741824);
         }
-        if (FirebaseMessagingService.zzq(bundle)) {
+        if (FirebaseMessagingService.zzk(bundle)) {
             intent2 = new Intent("com.google.firebase.messaging.NOTIFICATION_OPEN");
             zza(intent2, bundle);
             intent2.putExtra("pending_intent", parcelable);
-            zza3 = zzz.zza(this.zzqs, this.zzbsk.incrementAndGet(), intent2, 1073741824);
+            zza3 = zzan.zza(this.zzz, this.zzdd.incrementAndGet(), intent2, 1073741824);
             intent = new Intent("com.google.firebase.messaging.NOTIFICATION_DISMISS");
             zza(intent, bundle);
-            pendingIntent = zzz.zza(this.zzqs, this.zzbsk.incrementAndGet(), intent, 1073741824);
+            pendingIntent = zzan.zza(this.zzz, this.zzdd.incrementAndGet(), intent, 1073741824);
         } else {
             parcelable2 = parcelable;
         }
         if (PlatformVersion.isAtLeastO()) {
         }
-        smallIcon = new NotificationCompat.Builder(this.zzqs).setAutoCancel(true).setSmallIcon(identifier);
+        smallIcon = new NotificationCompat.Builder(this.zzz).setAutoCancel(true).setSmallIcon(identifier);
         if (TextUtils.isEmpty(zzd)) {
             smallIcon.setContentTitle(zzd);
         }
@@ -654,8 +654,8 @@ final class zza {
             smallIcon.setContentText(zzd2);
             smallIcon.setStyle(new NotificationCompat.BigTextStyle().bigText(zzd2));
         }
-        if (zzfi != null) {
-            smallIcon.setColor(zzfi.intValue());
+        if (zzm != null) {
+            smallIcon.setColor(zzm.intValue());
         }
         if (uri != null) {
             smallIcon.setSound(uri);
@@ -671,7 +671,7 @@ final class zza {
         if (Log.isLoggable("FirebaseMessaging", 3)) {
             Log.d("FirebaseMessaging", "Showing notification");
         }
-        notificationManager = (NotificationManager) this.zzqs.getSystemService("notification");
+        notificationManager = (NotificationManager) this.zzz.getSystemService("notification");
         if (TextUtils.isEmpty(zza4)) {
             zza4 = "FCM-Notification:" + SystemClock.uptimeMillis();
         }

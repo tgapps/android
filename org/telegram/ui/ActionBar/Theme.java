@@ -3315,12 +3315,12 @@ public class Theme {
             Utilities.searchQueue.postRunnable(new Runnable() {
                 public void run() {
                     Throwable e;
-                    int i;
-                    File toFile;
+                    SharedPreferences preferences;
                     Throwable th;
                     synchronized (Theme.wallpaperSync) {
-                        SharedPreferences preferences;
+                        int i;
                         int selectedBackground;
+                        File toFile;
                         if (!MessagesController.getGlobalMainSettings().getBoolean("overrideThemeWallpaper", false)) {
                             Integer backgroundColor = (Integer) Theme.currentColors.get(Theme.key_chat_wallpaper);
                             if (backgroundColor != null) {

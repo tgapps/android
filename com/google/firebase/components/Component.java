@@ -32,6 +32,26 @@ public final class Component<T> {
             Collections.addAll(this.zzab, clsArr);
         }
 
+        private final Builder<T> zza(int i) {
+            zzk.checkState(this.zzad == 0, "Instantiation type has already been set.");
+            this.zzad = i;
+            return this;
+        }
+
+        public Builder<T> add(Dependency dependency) {
+            zzk.zza(dependency, "Null dependency");
+            String str = "Components are not allowed to depend on interfaces they themselves provide.";
+            if ((!this.zzab.contains(dependency.zzn()) ? 1 : null) == null) {
+                throw new IllegalArgumentException(str);
+            }
+            this.zzac.add(dependency);
+            return this;
+        }
+
+        public Builder<T> alwaysEager() {
+            return zza(1);
+        }
+
         public Component<T> build() {
             zzk.checkState(this.zzae != null, "Missing required property: factory.");
             return new Component(new HashSet(this.zzab), new HashSet(this.zzac), this.zzad, this.zzae);

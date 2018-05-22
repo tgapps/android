@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build.VERSION;
 import android.os.Bundle;
+import android.os.Process;
 import android.util.Log;
 import android.util.TypedValue;
 import java.io.File;
@@ -58,6 +59,13 @@ public class ContextCompat {
             return context.getColor(id);
         }
         return context.getResources().getColor(id);
+    }
+
+    public static int checkSelfPermission(Context context, String permission) {
+        if (permission != null) {
+            return context.checkPermission(permission, Process.myPid(), Process.myUid());
+        }
+        throw new IllegalArgumentException("permission is null");
     }
 
     public static File getNoBackupFilesDir(Context context) {

@@ -5,16 +5,16 @@ import android.app.PendingIntent.CanceledException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import com.google.firebase.iid.zzan;
 import com.google.firebase.iid.zzb;
-import com.google.firebase.iid.zzz;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.Queue;
 
 public class FirebaseMessagingService extends zzb {
-    private static final Queue<String> zzbss = new ArrayDeque(10);
+    private static final Queue<String> zzdg = new ArrayDeque(10);
 
-    static void zzp(Bundle bundle) {
+    static void zzj(Bundle bundle) {
         Iterator it = bundle.keySet().iterator();
         while (it.hasNext()) {
             String str = (String) it.next();
@@ -24,7 +24,7 @@ public class FirebaseMessagingService extends zzb {
         }
     }
 
-    static boolean zzq(Bundle bundle) {
+    static boolean zzk(Bundle bundle) {
         return bundle == null ? false : "1".equals(bundle.getString("google.c.a.e"));
     }
 
@@ -40,11 +40,11 @@ public class FirebaseMessagingService extends zzb {
     public void onSendError(String str, Exception exception) {
     }
 
-    protected final Intent zzf(Intent intent) {
-        return zzz.zzta().zztb();
+    protected final Intent zzb(Intent intent) {
+        return zzan.zzad().zzae();
     }
 
-    public final boolean zzg(Intent intent) {
+    public final boolean zzc(Intent intent) {
         if (!"com.google.firebase.messaging.NOTIFICATION_OPEN".equals(intent.getAction())) {
             return false;
         }
@@ -56,15 +56,15 @@ public class FirebaseMessagingService extends zzb {
                 Log.e("FirebaseMessaging", "Notification pending intent canceled");
             }
         }
-        if (zzq(intent.getExtras())) {
-            zzd.zzd(this, intent);
+        if (zzk(intent.getExtras())) {
+            zzb.zzd(this, intent);
         }
         return true;
     }
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public final void zzh(android.content.Intent r11) {
+    public final void zzd(android.content.Intent r11) {
         /*
         r10 = this;
         r6 = 3;
@@ -194,11 +194,11 @@ public class FirebaseMessagingService extends zzb {
         r0.<init>();
         r7 = "google.message_id";
         r0.putString(r7, r1);
-        r7 = com.google.firebase.iid.zzk.zzv(r10);
+        r7 = com.google.firebase.iid.zzs.zzc(r10);
         r0 = r7.zza(r5, r0);
         goto L_0x005d;
     L_0x00db:
-        r7 = zzbss;
+        r7 = zzdg;
         r7 = r7.contains(r1);
         if (r7 == 0) goto L_0x010c;
     L_0x00e3:
@@ -223,15 +223,15 @@ public class FirebaseMessagingService extends zzb {
         r1.<init>(r8);
         goto L_0x0100;
     L_0x010c:
-        r7 = zzbss;
+        r7 = zzdg;
         r7 = r7.size();
         r8 = 10;
         if (r7 < r8) goto L_0x011b;
     L_0x0116:
-        r7 = zzbss;
+        r7 = zzdg;
         r7.remove();
     L_0x011b:
-        r7 = zzbss;
+        r7 = zzdg;
         r7.add(r1);
         r1 = r2;
         goto L_0x0064;
@@ -264,10 +264,10 @@ public class FirebaseMessagingService extends zzb {
         goto L_0x007a;
     L_0x0152:
         r1 = r11.getExtras();
-        r1 = zzq(r1);
+        r1 = zzk(r1);
         if (r1 == 0) goto L_0x015f;
     L_0x015c:
-        com.google.firebase.messaging.zzd.zzc(r10, r11);
+        com.google.firebase.messaging.zzb.zzc(r10, r11);
     L_0x015f:
         r1 = r11.getExtras();
         if (r1 != 0) goto L_0x016a;
@@ -277,17 +277,17 @@ public class FirebaseMessagingService extends zzb {
     L_0x016a:
         r2 = "android.support.content.wakelockid";
         r1.remove(r2);
-        r2 = com.google.firebase.messaging.zza.zzl(r1);
+        r2 = com.google.firebase.messaging.zza.zzf(r1);
         if (r2 == 0) goto L_0x0189;
     L_0x0176:
-        r2 = com.google.firebase.messaging.zza.zzw(r10);
-        r2 = r2.zzn(r1);
+        r2 = com.google.firebase.messaging.zza.zzd(r10);
+        r2 = r2.zzh(r1);
         if (r2 != 0) goto L_0x0094;
     L_0x0180:
-        r2 = zzq(r1);
+        r2 = zzk(r1);
         if (r2 == 0) goto L_0x0189;
     L_0x0186:
-        com.google.firebase.messaging.zzd.zzf(r10, r11);
+        com.google.firebase.messaging.zzb.zzf(r10, r11);
     L_0x0189:
         r2 = new com.google.firebase.messaging.RemoteMessage;
         r2.<init>(r1);
@@ -321,10 +321,10 @@ public class FirebaseMessagingService extends zzb {
         goto L_0x0091;
     L_0x01cc:
         r0 = r11.getExtras();
-        r0 = zzq(r0);
+        r0 = zzk(r0);
         if (r0 == 0) goto L_0x0034;
     L_0x01d6:
-        com.google.firebase.messaging.zzd.zze(r10, r11);
+        com.google.firebase.messaging.zzb.zze(r10, r11);
         goto L_0x0034;
     L_0x01db:
         r0 = new java.lang.String;
@@ -337,6 +337,6 @@ public class FirebaseMessagingService extends zzb {
         r0 = move-exception;
         goto L_0x009d;
         */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.firebase.messaging.FirebaseMessagingService.zzh(android.content.Intent):void");
+        throw new UnsupportedOperationException("Method not decompiled: com.google.firebase.messaging.FirebaseMessagingService.zzd(android.content.Intent):void");
     }
 }

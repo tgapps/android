@@ -1,55 +1,46 @@
 package com.google.firebase.iid;
 
-import android.text.TextUtils;
+import android.os.Bundle;
 import android.util.Log;
-import java.util.concurrent.TimeUnit;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.tasks.TaskCompletionSource;
 
-final class zzab {
-    private static final long zzbsa = TimeUnit.DAYS.toMillis(7);
-    private final long timestamp;
-    final String zzbsb;
-    private final String zztc;
+abstract class zzab<T> {
+    final int what;
+    final int zzbr;
+    final TaskCompletionSource<T> zzbs = new TaskCompletionSource();
+    final Bundle zzbt;
 
-    private zzab(String str, String str2, long j) {
-        this.zzbsb = str;
-        this.zztc = str2;
-        this.timestamp = j;
+    zzab(int i, int i2, Bundle bundle) {
+        this.zzbr = i;
+        this.what = i2;
+        this.zzbt = bundle;
     }
 
-    static String zza(String str, String str2, long j) {
-        try {
-            JSONObject jSONObject = new JSONObject();
-            jSONObject.put("token", str);
-            jSONObject.put("appVersion", str2);
-            jSONObject.put("timestamp", j);
-            return jSONObject.toString();
-        } catch (JSONException e) {
-            String valueOf = String.valueOf(e);
-            Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 24).append("Failed to encode token: ").append(valueOf).toString());
-            return null;
+    final void finish(T t) {
+        if (Log.isLoggable("MessengerIpcClient", 3)) {
+            String valueOf = String.valueOf(this);
+            String valueOf2 = String.valueOf(t);
+            Log.d("MessengerIpcClient", new StringBuilder((String.valueOf(valueOf).length() + 16) + String.valueOf(valueOf2).length()).append("Finishing ").append(valueOf).append(" with ").append(valueOf2).toString());
         }
+        this.zzbs.setResult(t);
     }
 
-    static zzab zzfe(String str) {
-        if (TextUtils.isEmpty(str)) {
-            return null;
-        }
-        if (!str.startsWith("{")) {
-            return new zzab(str, null, 0);
-        }
-        try {
-            JSONObject jSONObject = new JSONObject(str);
-            return new zzab(jSONObject.getString("token"), jSONObject.getString("appVersion"), jSONObject.getLong("timestamp"));
-        } catch (JSONException e) {
-            String valueOf = String.valueOf(e);
-            Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 23).append("Failed to parse token: ").append(valueOf).toString());
-            return null;
-        }
+    public String toString() {
+        int i = this.what;
+        int i2 = this.zzbr;
+        return "Request { what=" + i + " id=" + i2 + " oneWay=" + zzw() + "}";
     }
 
-    final boolean zzff(String str) {
-        return System.currentTimeMillis() > this.timestamp + zzbsa || !str.equals(this.zztc);
+    final void zza(zzac com_google_firebase_iid_zzac) {
+        if (Log.isLoggable("MessengerIpcClient", 3)) {
+            String valueOf = String.valueOf(this);
+            String valueOf2 = String.valueOf(com_google_firebase_iid_zzac);
+            Log.d("MessengerIpcClient", new StringBuilder((String.valueOf(valueOf).length() + 14) + String.valueOf(valueOf2).length()).append("Failing ").append(valueOf).append(" with ").append(valueOf2).toString());
+        }
+        this.zzbs.setException(com_google_firebase_iid_zzac);
     }
+
+    abstract void zzb(Bundle bundle);
+
+    abstract boolean zzw();
 }

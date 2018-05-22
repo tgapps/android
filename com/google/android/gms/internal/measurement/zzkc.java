@@ -1,124 +1,270 @@
 package com.google.android.gms.internal.measurement;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 
-public final class zzkc extends zzabd<zzkc> {
-    private static volatile zzkc[] zzarz;
-    public Integer zzark;
-    public String zzasa;
-    public zzka zzasb;
+final class zzkc extends SSLSocket {
+    private final SSLSocket zzarj;
 
-    public zzkc() {
-        this.zzark = null;
-        this.zzasa = null;
-        this.zzasb = null;
-        this.zzbzh = null;
-        this.zzbzs = -1;
+    zzkc(zzkb com_google_android_gms_internal_measurement_zzkb, SSLSocket sSLSocket) {
+        this.zzarj = sSLSocket;
     }
 
-    public static zzkc[] zzkz() {
-        if (zzarz == null) {
-            synchronized (zzabh.zzbzr) {
-                if (zzarz == null) {
-                    zzarz = new zzkc[0];
-                }
-            }
-        }
-        return zzarz;
+    public final void addHandshakeCompletedListener(HandshakeCompletedListener handshakeCompletedListener) {
+        this.zzarj.addHandshakeCompletedListener(handshakeCompletedListener);
+    }
+
+    public final void bind(SocketAddress socketAddress) throws IOException {
+        this.zzarj.bind(socketAddress);
+    }
+
+    public final synchronized void close() throws IOException {
+        this.zzarj.close();
+    }
+
+    public final void connect(SocketAddress socketAddress) throws IOException {
+        this.zzarj.connect(socketAddress);
+    }
+
+    public final void connect(SocketAddress socketAddress, int i) throws IOException {
+        this.zzarj.connect(socketAddress, i);
     }
 
     public final boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof zzkc)) {
-            return false;
-        }
-        zzkc com_google_android_gms_internal_measurement_zzkc = (zzkc) obj;
-        if (this.zzark == null) {
-            if (com_google_android_gms_internal_measurement_zzkc.zzark != null) {
-                return false;
-            }
-        } else if (!this.zzark.equals(com_google_android_gms_internal_measurement_zzkc.zzark)) {
-            return false;
-        }
-        if (this.zzasa == null) {
-            if (com_google_android_gms_internal_measurement_zzkc.zzasa != null) {
-                return false;
-            }
-        } else if (!this.zzasa.equals(com_google_android_gms_internal_measurement_zzkc.zzasa)) {
-            return false;
-        }
-        if (this.zzasb == null) {
-            if (com_google_android_gms_internal_measurement_zzkc.zzasb != null) {
-                return false;
-            }
-        } else if (!this.zzasb.equals(com_google_android_gms_internal_measurement_zzkc.zzasb)) {
-            return false;
-        }
-        return (this.zzbzh == null || this.zzbzh.isEmpty()) ? com_google_android_gms_internal_measurement_zzkc.zzbzh == null || com_google_android_gms_internal_measurement_zzkc.zzbzh.isEmpty() : this.zzbzh.equals(com_google_android_gms_internal_measurement_zzkc.zzbzh);
+        return this.zzarj.equals(obj);
     }
 
-    public final int hashCode() {
-        int i = 0;
-        int hashCode = (this.zzasa == null ? 0 : this.zzasa.hashCode()) + (((this.zzark == null ? 0 : this.zzark.hashCode()) + ((getClass().getName().hashCode() + 527) * 31)) * 31);
-        zzka com_google_android_gms_internal_measurement_zzka = this.zzasb;
-        hashCode = ((com_google_android_gms_internal_measurement_zzka == null ? 0 : com_google_android_gms_internal_measurement_zzka.hashCode()) + (hashCode * 31)) * 31;
-        if (!(this.zzbzh == null || this.zzbzh.isEmpty())) {
-            i = this.zzbzh.hashCode();
-        }
-        return hashCode + i;
+    public final SocketChannel getChannel() {
+        return this.zzarj.getChannel();
     }
 
-    protected final int zza() {
-        int zza = super.zza();
-        if (this.zzark != null) {
-            zza += zzabb.zzf(1, this.zzark.intValue());
-        }
-        if (this.zzasa != null) {
-            zza += zzabb.zzd(2, this.zzasa);
-        }
-        return this.zzasb != null ? zza + zzabb.zzb(3, this.zzasb) : zza;
+    public final boolean getEnableSessionCreation() {
+        return this.zzarj.getEnableSessionCreation();
     }
 
-    public final void zza(zzabb com_google_android_gms_internal_measurement_zzabb) throws IOException {
-        if (this.zzark != null) {
-            com_google_android_gms_internal_measurement_zzabb.zze(1, this.zzark.intValue());
-        }
-        if (this.zzasa != null) {
-            com_google_android_gms_internal_measurement_zzabb.zzc(2, this.zzasa);
-        }
-        if (this.zzasb != null) {
-            com_google_android_gms_internal_measurement_zzabb.zza(3, this.zzasb);
-        }
-        super.zza(com_google_android_gms_internal_measurement_zzabb);
+    public final String[] getEnabledCipherSuites() {
+        return this.zzarj.getEnabledCipherSuites();
     }
 
-    public final /* synthetic */ zzabj zzb(zzaba com_google_android_gms_internal_measurement_zzaba) throws IOException {
-        while (true) {
-            int zzvo = com_google_android_gms_internal_measurement_zzaba.zzvo();
-            switch (zzvo) {
-                case 0:
-                    break;
-                case 8:
-                    this.zzark = Integer.valueOf(com_google_android_gms_internal_measurement_zzaba.zzvs());
-                    continue;
-                case 18:
-                    this.zzasa = com_google_android_gms_internal_measurement_zzaba.readString();
-                    continue;
-                case 26:
-                    if (this.zzasb == null) {
-                        this.zzasb = new zzka();
-                    }
-                    com_google_android_gms_internal_measurement_zzaba.zza(this.zzasb);
-                    continue;
-                default:
-                    if (!super.zza(com_google_android_gms_internal_measurement_zzaba, zzvo)) {
-                        break;
-                    }
-                    continue;
+    public final String[] getEnabledProtocols() {
+        return this.zzarj.getEnabledProtocols();
+    }
+
+    public final InetAddress getInetAddress() {
+        return this.zzarj.getInetAddress();
+    }
+
+    public final InputStream getInputStream() throws IOException {
+        return this.zzarj.getInputStream();
+    }
+
+    public final boolean getKeepAlive() throws SocketException {
+        return this.zzarj.getKeepAlive();
+    }
+
+    public final InetAddress getLocalAddress() {
+        return this.zzarj.getLocalAddress();
+    }
+
+    public final int getLocalPort() {
+        return this.zzarj.getLocalPort();
+    }
+
+    public final SocketAddress getLocalSocketAddress() {
+        return this.zzarj.getLocalSocketAddress();
+    }
+
+    public final boolean getNeedClientAuth() {
+        return this.zzarj.getNeedClientAuth();
+    }
+
+    public final boolean getOOBInline() throws SocketException {
+        return this.zzarj.getOOBInline();
+    }
+
+    public final OutputStream getOutputStream() throws IOException {
+        return this.zzarj.getOutputStream();
+    }
+
+    public final int getPort() {
+        return this.zzarj.getPort();
+    }
+
+    public final synchronized int getReceiveBufferSize() throws SocketException {
+        return this.zzarj.getReceiveBufferSize();
+    }
+
+    public final SocketAddress getRemoteSocketAddress() {
+        return this.zzarj.getRemoteSocketAddress();
+    }
+
+    public final boolean getReuseAddress() throws SocketException {
+        return this.zzarj.getReuseAddress();
+    }
+
+    public final synchronized int getSendBufferSize() throws SocketException {
+        return this.zzarj.getSendBufferSize();
+    }
+
+    public final SSLSession getSession() {
+        return this.zzarj.getSession();
+    }
+
+    public final int getSoLinger() throws SocketException {
+        return this.zzarj.getSoLinger();
+    }
+
+    public final synchronized int getSoTimeout() throws SocketException {
+        return this.zzarj.getSoTimeout();
+    }
+
+    public final String[] getSupportedCipherSuites() {
+        return this.zzarj.getSupportedCipherSuites();
+    }
+
+    public final String[] getSupportedProtocols() {
+        return this.zzarj.getSupportedProtocols();
+    }
+
+    public final boolean getTcpNoDelay() throws SocketException {
+        return this.zzarj.getTcpNoDelay();
+    }
+
+    public final int getTrafficClass() throws SocketException {
+        return this.zzarj.getTrafficClass();
+    }
+
+    public final boolean getUseClientMode() {
+        return this.zzarj.getUseClientMode();
+    }
+
+    public final boolean getWantClientAuth() {
+        return this.zzarj.getWantClientAuth();
+    }
+
+    public final boolean isBound() {
+        return this.zzarj.isBound();
+    }
+
+    public final boolean isClosed() {
+        return this.zzarj.isClosed();
+    }
+
+    public final boolean isConnected() {
+        return this.zzarj.isConnected();
+    }
+
+    public final boolean isInputShutdown() {
+        return this.zzarj.isInputShutdown();
+    }
+
+    public final boolean isOutputShutdown() {
+        return this.zzarj.isOutputShutdown();
+    }
+
+    public final void removeHandshakeCompletedListener(HandshakeCompletedListener handshakeCompletedListener) {
+        this.zzarj.removeHandshakeCompletedListener(handshakeCompletedListener);
+    }
+
+    public final void sendUrgentData(int i) throws IOException {
+        this.zzarj.sendUrgentData(i);
+    }
+
+    public final void setEnableSessionCreation(boolean z) {
+        this.zzarj.setEnableSessionCreation(z);
+    }
+
+    public final void setEnabledCipherSuites(String[] strArr) {
+        this.zzarj.setEnabledCipherSuites(strArr);
+    }
+
+    public final void setEnabledProtocols(String[] strArr) {
+        if (strArr != null && Arrays.asList(strArr).contains("SSLv3")) {
+            List arrayList = new ArrayList(Arrays.asList(this.zzarj.getEnabledProtocols()));
+            if (arrayList.size() > 1) {
+                arrayList.remove("SSLv3");
             }
-            return this;
+            strArr = (String[]) arrayList.toArray(new String[arrayList.size()]);
         }
+        this.zzarj.setEnabledProtocols(strArr);
+    }
+
+    public final void setKeepAlive(boolean z) throws SocketException {
+        this.zzarj.setKeepAlive(z);
+    }
+
+    public final void setNeedClientAuth(boolean z) {
+        this.zzarj.setNeedClientAuth(z);
+    }
+
+    public final void setOOBInline(boolean z) throws SocketException {
+        this.zzarj.setOOBInline(z);
+    }
+
+    public final void setPerformancePreferences(int i, int i2, int i3) {
+        this.zzarj.setPerformancePreferences(i, i2, i3);
+    }
+
+    public final synchronized void setReceiveBufferSize(int i) throws SocketException {
+        this.zzarj.setReceiveBufferSize(i);
+    }
+
+    public final void setReuseAddress(boolean z) throws SocketException {
+        this.zzarj.setReuseAddress(z);
+    }
+
+    public final synchronized void setSendBufferSize(int i) throws SocketException {
+        this.zzarj.setSendBufferSize(i);
+    }
+
+    public final void setSoLinger(boolean z, int i) throws SocketException {
+        this.zzarj.setSoLinger(z, i);
+    }
+
+    public final synchronized void setSoTimeout(int i) throws SocketException {
+        this.zzarj.setSoTimeout(i);
+    }
+
+    public final void setTcpNoDelay(boolean z) throws SocketException {
+        this.zzarj.setTcpNoDelay(z);
+    }
+
+    public final void setTrafficClass(int i) throws SocketException {
+        this.zzarj.setTrafficClass(i);
+    }
+
+    public final void setUseClientMode(boolean z) {
+        this.zzarj.setUseClientMode(z);
+    }
+
+    public final void setWantClientAuth(boolean z) {
+        this.zzarj.setWantClientAuth(z);
+    }
+
+    public final void shutdownInput() throws IOException {
+        this.zzarj.shutdownInput();
+    }
+
+    public final void shutdownOutput() throws IOException {
+        this.zzarj.shutdownOutput();
+    }
+
+    public final void startHandshake() throws IOException {
+        this.zzarj.startHandshake();
+    }
+
+    public final String toString() {
+        return this.zzarj.toString();
     }
 }

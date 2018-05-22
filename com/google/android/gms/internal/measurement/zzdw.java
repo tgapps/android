@@ -1,19 +1,17 @@
 package com.google.android.gms.internal.measurement;
 
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.RemoteException;
+final class zzdw implements Runnable {
+    private final /* synthetic */ String zzadi;
+    private final /* synthetic */ long zzadj;
+    private final /* synthetic */ zzdu zzadk;
 
-public final class zzdw extends zzn implements zzdu {
-    zzdw(IBinder iBinder) {
-        super(iBinder, "com.google.android.gms.iid.IMessengerCompat");
+    zzdw(zzdu com_google_android_gms_internal_measurement_zzdu, String str, long j) {
+        this.zzadk = com_google_android_gms_internal_measurement_zzdu;
+        this.zzadi = str;
+        this.zzadj = j;
     }
 
-    public final void send(Message message) throws RemoteException {
-        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
-        zzp.zza(obtainAndWriteInterfaceToken, (Parcelable) message);
-        transactOneway(1, obtainAndWriteInterfaceToken);
+    public final void run() {
+        this.zzadk.zzb(this.zzadi, this.zzadj);
     }
 }

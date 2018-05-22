@@ -605,13 +605,13 @@ public class NotificationsController {
             final boolean z2 = isLast;
             notificationsQueue.postRunnable(new Runnable() {
                 public void run() {
-                    long dialog_id;
                     boolean added = false;
                     LongSparseArray<Boolean> settingsCache = new LongSparseArray();
                     SharedPreferences preferences = MessagesController.getNotificationsSettings(NotificationsController.this.currentAccount);
                     boolean allowPinned = preferences.getBoolean("PinnedMessages", true);
                     int popup = 0;
                     for (int a = 0; a < arrayList.size(); a++) {
+                        long dialog_id;
                         MessageObject messageObject = (MessageObject) arrayList.get(a);
                         long mid = (long) messageObject.getId();
                         if (messageObject.messageOwner.to_id.channel_id != 0) {
@@ -2119,7 +2119,7 @@ public class NotificationsController {
         if (r5 == 0) goto L_0x09b2;
     L_0x0420:
         r5 = "AppName";
-        r77 = 2131492981; // 0x7f0c0075 float:1.860943E38 double:1.0530974563E-314;
+        r77 = 2131492982; // 0x7f0c0076 float:1.8609431E38 double:1.053097457E-314;
         r0 = r77;
         r51 = org.telegram.messenger.LocaleController.getString(r5, r0);	 Catch:{ Exception -> 0x0058 }
         r64 = 0;
@@ -2888,7 +2888,7 @@ public class NotificationsController {
         r0 = r27;
         r5 = r5.append(r0);	 Catch:{ Exception -> 0x0058 }
         r77 = "NotificationMessagesPeopleDisplayOrder";
-        r78 = 2131494002; // 0x7f0c0472 float:1.86115E38 double:1.0530979607E-314;
+        r78 = 2131494003; // 0x7f0c0473 float:1.8611502E38 double:1.053097961E-314;
         r79 = 2;
         r0 = r79;
         r0 = new java.lang.Object[r0];	 Catch:{ Exception -> 0x0058 }
@@ -3281,7 +3281,7 @@ public class NotificationsController {
     L_0x0ce1:
         r5 = 2131165355; // 0x7f0700ab float:1.7944925E38 double:1.0529355875E-314;
         r77 = "Reply";
-        r78 = 2131494235; // 0x7f0c055b float:1.8611973E38 double:1.053098076E-314;
+        r78 = 2131494239; // 0x7f0c055f float:1.861198E38 double:1.053098078E-314;
         r77 = org.telegram.messenger.LocaleController.getString(r77, r78);	 Catch:{ Exception -> 0x0058 }
         r78 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0058 }
         r79 = 2;
@@ -3319,7 +3319,7 @@ public class NotificationsController {
     L_0x0d31:
         r5 = 2131165354; // 0x7f0700aa float:1.7944923E38 double:1.052935587E-314;
         r77 = "Reply";
-        r78 = 2131494235; // 0x7f0c055b float:1.8611973E38 double:1.053098076E-314;
+        r78 = 2131494239; // 0x7f0c055f float:1.861198E38 double:1.053098078E-314;
         r77 = org.telegram.messenger.LocaleController.getString(r77, r78);	 Catch:{ Exception -> 0x0058 }
         r78 = org.telegram.messenger.ApplicationLoader.applicationContext;	 Catch:{ Exception -> 0x0058 }
         r79 = 2;

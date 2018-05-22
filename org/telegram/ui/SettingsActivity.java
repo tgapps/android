@@ -726,7 +726,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                     builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new OnClickListener() {
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            MessagesController.getInstance(SettingsActivity.this.currentAccount).performLogout(true);
+                            MessagesController.getInstance(SettingsActivity.this.currentAccount).performLogout(1);
                         }
                     });
                     builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);

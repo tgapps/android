@@ -9,18 +9,34 @@ import java.util.Iterator;
 
 public final class zzer extends AbstractSafeParcelable implements Iterable<String> {
     public static final Creator<zzer> CREATOR = new zzet();
-    private final Bundle zzafw;
+    private final Bundle zzafy;
 
     zzer(Bundle bundle) {
-        this.zzafw = bundle;
+        this.zzafy = bundle;
+    }
+
+    final Object get(String str) {
+        return this.zzafy.get(str);
+    }
+
+    final Long getLong(String str) {
+        return Long.valueOf(this.zzafy.getLong(str));
+    }
+
+    final String getString(String str) {
+        return this.zzafy.getString(str);
     }
 
     public final Iterator<String> iterator() {
         return new zzes(this);
     }
 
+    public final int size() {
+        return this.zzafy.size();
+    }
+
     public final String toString() {
-        return this.zzafw.toString();
+        return this.zzafy.toString();
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
@@ -29,7 +45,11 @@ public final class zzer extends AbstractSafeParcelable implements Iterable<Strin
         SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
+    final Double zzbh(String str) {
+        return Double.valueOf(this.zzafy.getDouble(str));
+    }
+
     public final Bundle zzif() {
-        return new Bundle(this.zzafw);
+        return new Bundle(this.zzafy);
     }
 }
