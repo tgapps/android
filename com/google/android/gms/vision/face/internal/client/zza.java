@@ -9,19 +9,19 @@ import android.util.Log;
 import com.google.android.gms.dynamic.ObjectWrapper;
 import com.google.android.gms.dynamite.DynamiteModule;
 import com.google.android.gms.dynamite.DynamiteModule.LoadingException;
-import com.google.android.gms.internal.vision.zzj;
-import com.google.android.gms.internal.vision.zzk;
+import com.google.android.gms.internal.vision.zzl;
+import com.google.android.gms.internal.vision.zzm;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.Landmark;
 import java.nio.ByteBuffer;
 
-public final class zza extends zzj<zze> {
-    private final zzc zzbw;
+public final class zza extends zzl<zze> {
+    private final zzc zzce;
 
     public zza(Context context, zzc com_google_android_gms_vision_face_internal_client_zzc) {
-        super(context, "FaceNativeHandle");
-        this.zzbw = com_google_android_gms_vision_face_internal_client_zzc;
-        zzh();
+        super(context, "FaceNativeHandle", "face");
+        this.zzce = com_google_android_gms_vision_face_internal_client_zzc;
+        zzp();
     }
 
     protected final /* synthetic */ Object zza(DynamiteModule dynamiteModule, Context context) throws RemoteException, LoadingException {
@@ -33,15 +33,15 @@ public final class zza extends zzj<zze> {
             IInterface queryLocalInterface = instantiate.queryLocalInterface("com.google.android.gms.vision.face.internal.client.INativeFaceDetectorCreator");
             com_google_android_gms_vision_face_internal_client_zzg = queryLocalInterface instanceof zzg ? (zzg) queryLocalInterface : new zzh(instantiate);
         }
-        return com_google_android_gms_vision_face_internal_client_zzg == null ? null : com_google_android_gms_vision_face_internal_client_zzg.zza(ObjectWrapper.wrap(context), this.zzbw);
+        return com_google_android_gms_vision_face_internal_client_zzg == null ? null : com_google_android_gms_vision_face_internal_client_zzg.zza(ObjectWrapper.wrap(context), this.zzce);
     }
 
-    public final Face[] zzb(ByteBuffer byteBuffer, zzk com_google_android_gms_internal_vision_zzk) {
+    public final Face[] zzb(ByteBuffer byteBuffer, zzm com_google_android_gms_internal_vision_zzm) {
         if (!isOperational()) {
             return new Face[0];
         }
         try {
-            FaceParcel[] zzc = ((zze) zzh()).zzc(ObjectWrapper.wrap(byteBuffer), com_google_android_gms_internal_vision_zzk);
+            FaceParcel[] zzc = ((zze) zzp()).zzc(ObjectWrapper.wrap(byteBuffer), com_google_android_gms_internal_vision_zzm);
             Face[] faceArr = new Face[zzc.length];
             for (int i = 0; i < zzc.length; i++) {
                 Landmark[] landmarkArr;
@@ -50,9 +50,9 @@ public final class zza extends zzj<zze> {
                 PointF pointF = new PointF(faceParcel.centerX, faceParcel.centerY);
                 float f = faceParcel.width;
                 float f2 = faceParcel.height;
-                float f3 = faceParcel.zzbx;
-                float f4 = faceParcel.zzby;
-                LandmarkParcel[] landmarkParcelArr = faceParcel.zzbz;
+                float f3 = faceParcel.zzcf;
+                float f4 = faceParcel.zzcg;
+                LandmarkParcel[] landmarkParcelArr = faceParcel.zzch;
                 if (landmarkParcelArr == null) {
                     landmarkArr = new Landmark[0];
                 } else {
@@ -63,7 +63,7 @@ public final class zza extends zzj<zze> {
                     }
                     landmarkArr = landmarkArr2;
                 }
-                faceArr[i] = new Face(i2, pointF, f, f2, f3, f4, landmarkArr, faceParcel.zzca, faceParcel.zzcb, faceParcel.zzcc);
+                faceArr[i] = new Face(i2, pointF, f, f2, f3, f4, landmarkArr, faceParcel.zzbs, faceParcel.zzbt, faceParcel.zzbu);
             }
             return faceArr;
         } catch (Throwable e) {
@@ -72,7 +72,7 @@ public final class zza extends zzj<zze> {
         }
     }
 
-    protected final void zze() throws RemoteException {
-        ((zze) zzh()).zzf();
+    protected final void zzm() throws RemoteException {
+        ((zze) zzp()).zzn();
     }
 }

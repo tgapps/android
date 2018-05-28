@@ -6,30 +6,30 @@ import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 import com.google.android.gms.vision.Frame;
 
-public final class zzk extends AbstractSafeParcelable {
-    public static final Creator<zzk> CREATOR = new zzl();
+public final class zzm extends AbstractSafeParcelable {
+    public static final Creator<zzm> CREATOR = new zzn();
     public int height;
     private int id;
     public int rotation;
     public int width;
-    private long zzck;
+    private long zzat;
 
-    public zzk(int i, int i2, int i3, long j, int i4) {
+    public zzm(int i, int i2, int i3, long j, int i4) {
         this.width = i;
         this.height = i2;
         this.id = i3;
-        this.zzck = j;
+        this.zzat = j;
         this.rotation = i4;
     }
 
-    public static zzk zzc(Frame frame) {
-        zzk com_google_android_gms_internal_vision_zzk = new zzk();
-        com_google_android_gms_internal_vision_zzk.width = frame.getMetadata().getWidth();
-        com_google_android_gms_internal_vision_zzk.height = frame.getMetadata().getHeight();
-        com_google_android_gms_internal_vision_zzk.rotation = frame.getMetadata().getRotation();
-        com_google_android_gms_internal_vision_zzk.id = frame.getMetadata().getId();
-        com_google_android_gms_internal_vision_zzk.zzck = frame.getMetadata().getTimestampMillis();
-        return com_google_android_gms_internal_vision_zzk;
+    public static zzm zzc(Frame frame) {
+        zzm com_google_android_gms_internal_vision_zzm = new zzm();
+        com_google_android_gms_internal_vision_zzm.width = frame.getMetadata().getWidth();
+        com_google_android_gms_internal_vision_zzm.height = frame.getMetadata().getHeight();
+        com_google_android_gms_internal_vision_zzm.rotation = frame.getMetadata().getRotation();
+        com_google_android_gms_internal_vision_zzm.id = frame.getMetadata().getId();
+        com_google_android_gms_internal_vision_zzm.zzat = frame.getMetadata().getTimestampMillis();
+        return com_google_android_gms_internal_vision_zzm;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
@@ -37,7 +37,7 @@ public final class zzk extends AbstractSafeParcelable {
         SafeParcelWriter.writeInt(parcel, 2, this.width);
         SafeParcelWriter.writeInt(parcel, 3, this.height);
         SafeParcelWriter.writeInt(parcel, 4, this.id);
-        SafeParcelWriter.writeLong(parcel, 5, this.zzck);
+        SafeParcelWriter.writeLong(parcel, 5, this.zzat);
         SafeParcelWriter.writeInt(parcel, 6, this.rotation);
         SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }

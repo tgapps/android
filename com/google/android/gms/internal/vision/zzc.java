@@ -4,10 +4,10 @@ import android.os.IInterface;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class zzb {
-    private static final ClassLoader zzc = zzb.class.getClassLoader();
+public class zzc {
+    private static final ClassLoader zzd = zzc.class.getClassLoader();
 
-    private zzb() {
+    private zzc() {
     }
 
     public static void zza(Parcel parcel, IInterface iInterface) {

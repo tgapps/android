@@ -44,6 +44,7 @@ import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.MessagesStorage.IntCallback;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.NotificationCenter.NotificationCenterDelegate;
 import org.telegram.messenger.SharedConfig;
@@ -97,6 +98,7 @@ import org.telegram.ui.Cells.HintDialogCell;
 import org.telegram.ui.Cells.LoadingCell;
 import org.telegram.ui.Cells.ProfileSearchCell;
 import org.telegram.ui.Cells.UserCell;
+import org.telegram.ui.Components.AlertsCreator;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.ChatActivityEnterView;
@@ -118,6 +120,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
     public static boolean[] dialogsLoaded = new boolean[3];
     private String addToGroupAlertString;
     private boolean allowSwitchAccount;
+    private boolean askAboutContacts = true;
     private boolean cantSendToChannels;
     private boolean checkPermission = true;
     private ChatActivityEnterView commentView;
@@ -170,6 +173,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
             this.selectAlertStringGroup = this.arguments.getString("selectAlertStringGroup");
             this.addToGroupAlertString = this.arguments.getString("addToGroupAlertString");
             this.allowSwitchAccount = this.arguments.getBoolean("allowSwitchAccount");
+        }
+        if (this.dialogsType == 0) {
+            this.askAboutContacts = MessagesController.getGlobalNotificationsSettings().getBoolean("askAboutContacts", true);
         }
         if (this.searchString == null) {
             this.currentConnectionState = ConnectionsManager.getInstance(this.currentAccount).getConnectionState();
@@ -1155,18 +1161,26 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
             if (activity != null) {
                 this.checkPermission = false;
                 if (activity.checkSelfPermission("android.permission.READ_CONTACTS") != 0 || activity.checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE") != 0) {
-                    AlertDialog.Builder builder;
                     Dialog create;
-                    if (activity.shouldShowRequestPermissionRationale("android.permission.READ_CONTACTS")) {
-                        builder = new AlertDialog.Builder(activity);
-                        builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
-                        builder.setMessage(LocaleController.getString("PermissionContacts", R.string.PermissionContacts));
-                        builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
-                        create = builder.create();
+                    if (UserConfig.getInstance(this.currentAccount).syncContacts && activity.shouldShowRequestPermissionRationale("android.permission.READ_CONTACTS")) {
+                        create = AlertsCreator.createContactsPermissionDialog(activity, new IntCallback() {
+                            public void run(int param) {
+                                boolean z;
+                                DialogsActivity dialogsActivity = DialogsActivity.this;
+                                if (param != 0) {
+                                    z = true;
+                                } else {
+                                    z = false;
+                                }
+                                dialogsActivity.askAboutContacts = z;
+                                MessagesController.getGlobalNotificationsSettings().edit().putBoolean("askAboutContacts", DialogsActivity.this.askAboutContacts).commit();
+                                DialogsActivity.this.askForPermissons(false);
+                            }
+                        }).create();
                         this.permissionDialog = create;
                         showDialog(create);
                     } else if (activity.shouldShowRequestPermissionRationale("android.permission.WRITE_EXTERNAL_STORAGE")) {
-                        builder = new AlertDialog.Builder(activity);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                         builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                         builder.setMessage(LocaleController.getString("PermissionStorage", R.string.PermissionStorage));
                         builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
@@ -1174,7 +1188,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
                         this.permissionDialog = create;
                         showDialog(create);
                     } else {
-                        askForPermissons();
+                        askForPermissons(true);
                     }
                 }
             }
@@ -1260,11 +1274,30 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
     }
 
     @TargetApi(23)
-    private void askForPermissons() {
+    private void askForPermissons(boolean alert) {
         Activity activity = getParentActivity();
         if (activity != null) {
             ArrayList<String> permissons = new ArrayList();
-            if (activity.checkSelfPermission("android.permission.READ_CONTACTS") != 0) {
+            if (UserConfig.getInstance(this.currentAccount).syncContacts && this.askAboutContacts && activity.checkSelfPermission("android.permission.READ_CONTACTS") != 0) {
+                if (alert) {
+                    Dialog create = AlertsCreator.createContactsPermissionDialog(activity, new IntCallback() {
+                        public void run(int param) {
+                            boolean z;
+                            DialogsActivity dialogsActivity = DialogsActivity.this;
+                            if (param != 0) {
+                                z = true;
+                            } else {
+                                z = false;
+                            }
+                            dialogsActivity.askAboutContacts = z;
+                            MessagesController.getGlobalNotificationsSettings().edit().putBoolean("askAboutContacts", DialogsActivity.this.askAboutContacts).commit();
+                            DialogsActivity.this.askForPermissons(false);
+                        }
+                    }).create();
+                    this.permissionDialog = create;
+                    showDialog(create);
+                    return;
+                }
                 permissons.add("android.permission.READ_CONTACTS");
                 permissons.add("android.permission.WRITE_CONTACTS");
                 permissons.add("android.permission.GET_ACCOUNTS");
@@ -1273,9 +1306,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
                 permissons.add("android.permission.READ_EXTERNAL_STORAGE");
                 permissons.add("android.permission.WRITE_EXTERNAL_STORAGE");
             }
-            try {
-                activity.requestPermissions((String[]) permissons.toArray(new String[permissons.size()]), 1);
-            } catch (Exception e) {
+            if (!permissons.isEmpty()) {
+                try {
+                    activity.requestPermissions((String[]) permissons.toArray(new String[permissons.size()]), 1);
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -1283,7 +1318,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenterD
     protected void onDialogDismiss(Dialog dialog) {
         super.onDialogDismiss(dialog);
         if (this.permissionDialog != null && dialog == this.permissionDialog && getParentActivity() != null) {
-            askForPermissons();
+            askForPermissons(false);
         }
     }
 

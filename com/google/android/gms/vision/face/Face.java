@@ -5,47 +5,47 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Face {
-    private int mId;
-    private PointF zzbd;
-    private float zzbe;
-    private float zzbf;
-    private float zzbg;
-    private float zzbh;
-    private List<Landmark> zzbi;
-    private float zzbj;
-    private float zzbk;
-    private float zzbl;
+    private float height;
+    private int id;
+    private float width;
+    private PointF zzbo;
+    private float zzbp;
+    private float zzbq;
+    private List<Landmark> zzbr;
+    private float zzbs;
+    private float zzbt;
+    private float zzbu;
 
     public Face(int i, PointF pointF, float f, float f2, float f3, float f4, Landmark[] landmarkArr, float f5, float f6, float f7) {
-        this.mId = i;
-        this.zzbd = pointF;
-        this.zzbe = f;
-        this.zzbf = f2;
-        this.zzbg = f3;
-        this.zzbh = f4;
-        this.zzbi = Arrays.asList(landmarkArr);
+        this.id = i;
+        this.zzbo = pointF;
+        this.width = f;
+        this.height = f2;
+        this.zzbp = f3;
+        this.zzbq = f4;
+        this.zzbr = Arrays.asList(landmarkArr);
         if (f5 < 0.0f || f5 > 1.0f) {
-            this.zzbj = -1.0f;
+            this.zzbs = -1.0f;
         } else {
-            this.zzbj = f5;
+            this.zzbs = f5;
         }
         if (f6 < 0.0f || f6 > 1.0f) {
-            this.zzbk = -1.0f;
+            this.zzbt = -1.0f;
         } else {
-            this.zzbk = f6;
+            this.zzbt = f6;
         }
         if (f7 < 0.0f || f7 > 1.0f) {
-            this.zzbl = -1.0f;
+            this.zzbu = -1.0f;
         } else {
-            this.zzbl = f7;
+            this.zzbu = f7;
         }
     }
 
     public int getId() {
-        return this.mId;
+        return this.id;
     }
 
     public List<Landmark> getLandmarks() {
-        return this.zzbi;
+        return this.zzbr;
     }
 }

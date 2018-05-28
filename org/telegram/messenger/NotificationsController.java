@@ -605,13 +605,13 @@ public class NotificationsController {
             final boolean z2 = isLast;
             notificationsQueue.postRunnable(new Runnable() {
                 public void run() {
+                    long dialog_id;
                     boolean added = false;
                     LongSparseArray<Boolean> settingsCache = new LongSparseArray();
                     SharedPreferences preferences = MessagesController.getNotificationsSettings(NotificationsController.this.currentAccount);
                     boolean allowPinned = preferences.getBoolean("PinnedMessages", true);
                     int popup = 0;
                     for (int a = 0; a < arrayList.size(); a++) {
-                        long dialog_id;
                         MessageObject messageObject = (MessageObject) arrayList.get(a);
                         long mid = (long) messageObject.getId();
                         if (messageObject.messageOwner.to_id.channel_id != 0) {

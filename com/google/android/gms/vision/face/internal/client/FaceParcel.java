@@ -15,12 +15,12 @@ public class FaceParcel extends AbstractSafeParcelable {
     public final int id;
     private final int versionCode;
     public final float width;
-    public final float zzbx;
-    public final float zzby;
-    public final LandmarkParcel[] zzbz;
-    public final float zzca;
-    public final float zzcb;
-    public final float zzcc;
+    public final float zzbs;
+    public final float zzbt;
+    public final float zzbu;
+    public final float zzcf;
+    public final float zzcg;
+    public final LandmarkParcel[] zzch;
 
     public FaceParcel(int i, int i2, float f, float f2, float f3, float f4, float f5, float f6, LandmarkParcel[] landmarkParcelArr, float f7, float f8, float f9) {
         this.versionCode = i;
@@ -29,12 +29,12 @@ public class FaceParcel extends AbstractSafeParcelable {
         this.centerY = f2;
         this.width = f3;
         this.height = f4;
-        this.zzbx = f5;
-        this.zzby = f6;
-        this.zzbz = landmarkParcelArr;
-        this.zzca = f7;
-        this.zzcb = f8;
-        this.zzcc = f9;
+        this.zzcf = f5;
+        this.zzcg = f6;
+        this.zzch = landmarkParcelArr;
+        this.zzbs = f7;
+        this.zzbt = f8;
+        this.zzbu = f9;
     }
 
     public void writeToParcel(Parcel parcel, int i) {
@@ -45,12 +45,12 @@ public class FaceParcel extends AbstractSafeParcelable {
         SafeParcelWriter.writeFloat(parcel, 4, this.centerY);
         SafeParcelWriter.writeFloat(parcel, 5, this.width);
         SafeParcelWriter.writeFloat(parcel, 6, this.height);
-        SafeParcelWriter.writeFloat(parcel, 7, this.zzbx);
-        SafeParcelWriter.writeFloat(parcel, 8, this.zzby);
-        SafeParcelWriter.writeTypedArray(parcel, 9, this.zzbz, i, false);
-        SafeParcelWriter.writeFloat(parcel, 10, this.zzca);
-        SafeParcelWriter.writeFloat(parcel, 11, this.zzcb);
-        SafeParcelWriter.writeFloat(parcel, 12, this.zzcc);
+        SafeParcelWriter.writeFloat(parcel, 7, this.zzcf);
+        SafeParcelWriter.writeFloat(parcel, 8, this.zzcg);
+        SafeParcelWriter.writeTypedArray(parcel, 9, this.zzch, i, false);
+        SafeParcelWriter.writeFloat(parcel, 10, this.zzbs);
+        SafeParcelWriter.writeFloat(parcel, 11, this.zzbt);
+        SafeParcelWriter.writeFloat(parcel, 12, this.zzbu);
         SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

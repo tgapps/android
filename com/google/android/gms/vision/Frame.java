@@ -5,16 +5,16 @@ import android.graphics.Color;
 import java.nio.ByteBuffer;
 
 public class Frame {
-    private Bitmap mBitmap;
-    private Metadata zzam;
-    private ByteBuffer zzan;
+    private Metadata zzap;
+    private ByteBuffer zzaq;
+    private Bitmap zzar;
 
     public static class Builder {
-        private Frame zzao = new Frame();
+        private Frame zzas = new Frame();
 
         public Frame build() {
-            if (this.zzao.zzan != null || this.zzao.mBitmap != null) {
-                return this.zzao;
+            if (this.zzas.zzaq != null || this.zzas.zzar != null) {
+                return this.zzas;
             }
             throw new IllegalStateException("Missing image data.  Call either setBitmap or setImageData to specify the image");
         }
@@ -22,63 +22,63 @@ public class Frame {
         public Builder setBitmap(Bitmap bitmap) {
             int width = bitmap.getWidth();
             int height = bitmap.getHeight();
-            this.zzao.mBitmap = bitmap;
-            Metadata metadata = this.zzao.getMetadata();
-            metadata.zzap = width;
-            metadata.zzaq = height;
+            this.zzas.zzar = bitmap;
+            Metadata metadata = this.zzas.getMetadata();
+            metadata.width = width;
+            metadata.height = height;
             return this;
         }
 
         public Builder setRotation(int i) {
-            this.zzao.getMetadata().zzg = i;
+            this.zzas.getMetadata().rotation = i;
             return this;
         }
     }
 
     public static class Metadata {
         private int format = -1;
-        private int mId;
-        private int zzap;
-        private int zzaq;
-        private long zzar;
-        private int zzg;
+        private int height;
+        private int id;
+        private int rotation;
+        private int width;
+        private long zzat;
 
         public int getHeight() {
-            return this.zzaq;
+            return this.height;
         }
 
         public int getId() {
-            return this.mId;
+            return this.id;
         }
 
         public int getRotation() {
-            return this.zzg;
+            return this.rotation;
         }
 
         public long getTimestampMillis() {
-            return this.zzar;
+            return this.zzat;
         }
 
         public int getWidth() {
-            return this.zzap;
+            return this.width;
         }
     }
 
     private Frame() {
-        this.zzam = new Metadata();
-        this.zzan = null;
-        this.mBitmap = null;
+        this.zzap = new Metadata();
+        this.zzaq = null;
+        this.zzar = null;
     }
 
     public ByteBuffer getGrayscaleImageData() {
         int i = 0;
-        if (this.mBitmap == null) {
-            return this.zzan;
+        if (this.zzar == null) {
+            return this.zzaq;
         }
-        int width = this.mBitmap.getWidth();
-        int height = this.mBitmap.getHeight();
+        int width = this.zzar.getWidth();
+        int height = this.zzar.getHeight();
         int[] iArr = new int[(width * height)];
-        this.mBitmap.getPixels(iArr, 0, width, 0, 0, width, height);
+        this.zzar.getPixels(iArr, 0, width, 0, 0, width, height);
         byte[] bArr = new byte[(width * height)];
         while (i < iArr.length) {
             bArr[i] = (byte) ((int) (((((float) Color.red(iArr[i])) * 0.299f) + (((float) Color.green(iArr[i])) * 0.587f)) + (((float) Color.blue(iArr[i])) * 0.114f)));
@@ -88,6 +88,6 @@ public class Frame {
     }
 
     public Metadata getMetadata() {
-        return this.zzam;
+        return this.zzap;
     }
 }

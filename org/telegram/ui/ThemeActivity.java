@@ -165,10 +165,10 @@ public class ThemeActivity extends BaseFragment implements NotificationCenterDel
                                     Builder builder = new Builder(ThemeActivity.this.getParentActivity());
                                     builder.setItems(themeInfo.pathToFile == null ? new CharSequence[]{LocaleController.getString("ShareFile", R.string.ShareFile)} : new CharSequence[]{LocaleController.getString("ShareFile", R.string.ShareFile), LocaleController.getString("Edit", R.string.Edit), LocaleController.getString("Delete", R.string.Delete)}, new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
+                                            File currentFile;
                                             Throwable e;
                                             Throwable th;
                                             if (which == 0) {
-                                                File currentFile;
                                                 File finalFile;
                                                 Intent intent;
                                                 if (themeInfo.pathToFile == null && themeInfo.assetName == null) {

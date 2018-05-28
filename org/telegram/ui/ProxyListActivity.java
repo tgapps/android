@@ -163,6 +163,9 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                     } else {
                         this.valueTextView.setText(LocaleController.getString("Connected", R.string.Connected));
                     }
+                    if (!(this.currentInfo.checking || this.currentInfo.available)) {
+                        this.currentInfo.availableCheckTime = 0;
+                    }
                 } else {
                     colorKey = Theme.key_windowBackgroundWhiteGrayText2;
                     this.valueTextView.setText(LocaleController.getString("Connecting", R.string.Connecting));
@@ -502,6 +505,10 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                 builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         SharedConfig.deleteProxy(info);
+                        if (SharedConfig.currentProxy == null) {
+                            ProxyListActivity.this.useProxyForCalls = false;
+                            ProxyListActivity.this.useProxySettings = false;
+                        }
                         ProxyListActivity.this.updateRows(true);
                     }
                 });

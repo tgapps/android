@@ -34,6 +34,7 @@ import org.telegram.tgnet.TLRPC.PrivacyRule;
 import org.telegram.tgnet.TLRPC.TL_account_getAccountTTL;
 import org.telegram.tgnet.TLRPC.TL_account_getPrivacy;
 import org.telegram.tgnet.TLRPC.TL_account_privacyRules;
+import org.telegram.tgnet.TLRPC.TL_boolTrue;
 import org.telegram.tgnet.TLRPC.TL_contact;
 import org.telegram.tgnet.TLRPC.TL_contactStatus;
 import org.telegram.tgnet.TLRPC.TL_contacts_contactsNotModified;
@@ -349,6 +350,69 @@ public class ContactsController {
                     FileLog.d("sync contacts by alert");
                 }
                 ContactsController.this.performSyncPhoneBook(hashMap, true, z, z2, false, false, z3);
+            }
+        });
+    }
+
+    public void deleteAllContacts(final Runnable runnable) {
+        resetImportedContacts();
+        TL_contacts_deleteContacts req = new TL_contacts_deleteContacts();
+        int size = this.contacts.size();
+        for (int a = 0; a < size; a++) {
+            req.id.add(MessagesController.getInstance(this.currentAccount).getInputUser(((TL_contact) this.contacts.get(a)).user_id));
+        }
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
+            public void run(TLObject response, TL_error error) {
+                if (response instanceof TL_boolTrue) {
+                    ContactsController.this.contactsBookSPhones.clear();
+                    ContactsController.this.contactsBook.clear();
+                    ContactsController.this.completedRequestsCount = 0;
+                    ContactsController.this.migratingContacts = false;
+                    ContactsController.this.contactsSyncInProgress = false;
+                    ContactsController.this.contactsLoaded = false;
+                    ContactsController.this.loadingContacts = false;
+                    ContactsController.this.contactsBookLoaded = false;
+                    ContactsController.this.lastContactsVersions = TtmlNode.ANONYMOUS_REGION_ID;
+                    AndroidUtilities.runOnUIThread(new Runnable() {
+                        public void run() {
+                            AccountManager am = AccountManager.get(ApplicationLoader.applicationContext);
+                            try {
+                                Account[] accounts = am.getAccountsByType("org.telegram.messenger");
+                                ContactsController.this.systemAccount = null;
+                                for (Account acc : accounts) {
+                                    for (int b = 0; b < 3; b++) {
+                                        User user = UserConfig.getInstance(b).getCurrentUser();
+                                        if (user != null && acc.name.equals(TtmlNode.ANONYMOUS_REGION_ID + user.id)) {
+                                            am.removeAccount(acc, null, null);
+                                            break;
+                                        }
+                                    }
+                                }
+                            } catch (Throwable th) {
+                            }
+                            try {
+                                ContactsController.this.systemAccount = new Account(TtmlNode.ANONYMOUS_REGION_ID + UserConfig.getInstance(ContactsController.this.currentAccount).getClientUserId(), "org.telegram.messenger");
+                                am.addAccountExplicitly(ContactsController.this.systemAccount, TtmlNode.ANONYMOUS_REGION_ID, null);
+                            } catch (Exception e) {
+                            }
+                            MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(new HashMap(), false, true);
+                            MessagesStorage.getInstance(ContactsController.this.currentAccount).putContacts(new ArrayList(), true);
+                            ContactsController.this.phoneBookContacts.clear();
+                            ContactsController.this.contacts.clear();
+                            ContactsController.this.contactsDict.clear();
+                            ContactsController.this.usersSectionsDict.clear();
+                            ContactsController.this.usersMutualSectionsDict.clear();
+                            ContactsController.this.sortedUsersSectionsArray.clear();
+                            ContactsController.this.delayedContactsUpdate.clear();
+                            ContactsController.this.sortedUsersMutualSectionsArray.clear();
+                            ContactsController.this.contactsByPhone.clear();
+                            ContactsController.this.contactsByShortPhone.clear();
+                            NotificationCenter.getInstance(ContactsController.this.currentAccount).postNotificationName(NotificationCenter.contactsDidLoaded, new Object[0]);
+                            ContactsController.this.loadContacts(false, 0);
+                            runnable.run();
+                        }
+                    });
+                }
             }
         });
     }
@@ -1028,7 +1092,7 @@ public class ContactsController {
                     if (BuildVars.LOGS_ENABLED) {
                         FileLog.d("migrated contacts " + migratedMap.size() + " of " + contactHashMap.size());
                     }
-                    MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(migratedMap, true);
+                    MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(migratedMap, true, false);
                 }
             }
         });
@@ -1199,7 +1263,7 @@ public class ContactsController {
                             return;
                         } else if (!(!z2 || hashMap.isEmpty() || contactsMap.isEmpty())) {
                             if (toImport.isEmpty()) {
-                                MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(contactsMap, false);
+                                MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(contactsMap, false, false);
                             }
                             if (!(true || hashMap.isEmpty())) {
                                 AndroidUtilities.runOnUIThread(new Runnable() {
@@ -1302,7 +1366,7 @@ public class ContactsController {
                             }
                         });
                         if (!contactsMap.isEmpty()) {
-                            MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(contactsMap, false);
+                            MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(contactsMap, false, false);
                         }
                     } else if (toImport.isEmpty()) {
                         Utilities.stageQueue.postRunnable(new Runnable() {
@@ -1365,7 +1429,7 @@ public class ContactsController {
                                         ContactsController.this.applyContactsUpdates(ContactsController.this.delayedContactsUpdate, null, null, null);
                                         ContactsController.this.delayedContactsUpdate.clear();
                                     }
-                                    MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(contactsMap, false);
+                                    MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(contactsMap, false, false);
                                     AndroidUtilities.runOnUIThread(new Runnable() {
                                         public void run() {
                                             ContactsController.this.updateUnregisteredContacts(ContactsController.this.contacts);
@@ -1433,7 +1497,7 @@ public class ContactsController {
                                         }
                                         if (ContactsController.this.completedRequestsCount == count) {
                                             if (!contactsMapToSave.isEmpty()) {
-                                                MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(contactsMapToSave, false);
+                                                MessagesStorage.getInstance(ContactsController.this.currentAccount).putCachedPhoneBook(contactsMapToSave, false, false);
                                             }
                                             Utilities.stageQueue.postRunnable(new Runnable() {
                                                 public void run() {
@@ -1931,8 +1995,7 @@ public class ContactsController {
     }
 
     private void performWriteContactsToPhoneBook() {
-        final ArrayList<TL_contact> contactsArray = new ArrayList();
-        contactsArray.addAll(this.contacts);
+        final ArrayList<TL_contact> contactsArray = new ArrayList(this.contacts);
         Utilities.phoneBookQueue.postRunnable(new Runnable() {
             public void run() {
                 ContactsController.this.performWriteContactsToPhoneBookInternal(contactsArray);
@@ -1943,16 +2006,16 @@ public class ContactsController {
     private void applyContactsUpdates(ArrayList<Integer> ids, ConcurrentHashMap<Integer, User> userDict, ArrayList<TL_contact> newC, ArrayList<Integer> contactsTD) {
         int a;
         Integer uid;
-        int index;
+        Contact contact;
         if (newC == null || contactsTD == null) {
             newC = new ArrayList();
             contactsTD = new ArrayList();
             for (a = 0; a < ids.size(); a++) {
                 uid = (Integer) ids.get(a);
                 if (uid.intValue() > 0) {
-                    TL_contact contact = new TL_contact();
-                    contact.user_id = uid.intValue();
-                    newC.add(contact);
+                    TL_contact contact2 = new TL_contact();
+                    contact2.user_id = uid.intValue();
+                    newC.add(contact2);
                 } else if (uid.intValue() < 0) {
                     contactsTD.add(Integer.valueOf(-uid.intValue()));
                 }
@@ -1965,7 +2028,7 @@ public class ContactsController {
         StringBuilder toDelete = new StringBuilder();
         boolean reloadContacts = false;
         for (a = 0; a < newC.size(); a++) {
-            Contact contact2;
+            int index;
             TL_contact newContact = (TL_contact) newC.get(a);
             User user = null;
             if (userDict != null) {
@@ -1979,11 +2042,11 @@ public class ContactsController {
             if (user == null || TextUtils.isEmpty(user.phone)) {
                 reloadContacts = true;
             } else {
-                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact2 != null) {
-                    index = contact2.shortPhones.indexOf(user.phone);
+                contact = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact != null) {
+                    index = contact.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact2.phoneDeleted.set(index, Integer.valueOf(0));
+                        contact.phoneDeleted.set(index, Integer.valueOf(0));
                     }
                 }
                 if (toAdd.length() != 0) {
@@ -2011,11 +2074,11 @@ public class ContactsController {
             if (user == null) {
                 reloadContacts = true;
             } else if (!TextUtils.isEmpty(user.phone)) {
-                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact2 != null) {
-                    index = contact2.shortPhones.indexOf(user.phone);
+                contact = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact != null) {
+                    index = contact.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact2.phoneDeleted.set(index, Integer.valueOf(1));
+                        contact.phoneDeleted.set(index, Integer.valueOf(1));
                     }
                 }
                 if (toDelete.length() != 0) {

@@ -24,7 +24,6 @@ final class zzaq implements Runnable {
     }
 
     private final boolean zzah() {
-        String zzh;
         Exception e;
         String str;
         String valueOf;
@@ -32,6 +31,7 @@ final class zzaq implements Runnable {
         if (zzg != null && !zzg.zzj(this.zzal.zzy())) {
             return true;
         }
+        String zzh;
         try {
             zzh = this.zzaw.zzh();
             if (zzh == null) {

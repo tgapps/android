@@ -547,13 +547,13 @@ public class AlertsCreator {
         goto L_0x03c4;
     L_0x03e8:
         r0 = "UsernameInvalid";
-        r1 = 2131494576; // 0x7f0c06b0 float:1.8612664E38 double:1.0530982443E-314;
+        r1 = 2131494581; // 0x7f0c06b5 float:1.8612674E38 double:1.053098247E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
     L_0x03f7:
         r0 = "UsernameInUse";
-        r1 = 2131494575; // 0x7f0c06af float:1.8612662E38 double:1.053098244E-314;
+        r1 = 2131494580; // 0x7f0c06b4 float:1.8612672E38 double:1.0530982463E-314;
         r0 = org.telegram.messenger.LocaleController.getString(r0, r1);
         showSimpleAlert(r9, r0);
         goto L_0x003e;
@@ -1306,6 +1306,23 @@ public class AlertsCreator {
         });
         builder.setNeutralButton(LocaleController.getString("Cancel", R.string.Cancel), null);
         return builder.create();
+    }
+
+    public static Builder createContactsPermissionDialog(Activity parentActivity, final IntCallback callback) {
+        Builder builder = new Builder((Context) parentActivity);
+        builder.setTopImage((int) R.drawable.permissions_contacts, Theme.getColor(Theme.key_dialogTopBackground));
+        builder.setMessage(AndroidUtilities.replaceTags(LocaleController.getString("ContactsPermissionAlert", R.string.ContactsPermissionAlert)));
+        builder.setPositiveButton(LocaleController.getString("ContactsPermissionAlertContinue", R.string.ContactsPermissionAlertContinue), new OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                callback.run(1);
+            }
+        });
+        builder.setNegativeButton(LocaleController.getString("ContactsPermissionAlertNotNow", R.string.ContactsPermissionAlertNotNow), new OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                callback.run(0);
+            }
+        });
+        return builder;
     }
 
     public static Dialog createFreeSpaceDialog(LaunchActivity parentActivity) {

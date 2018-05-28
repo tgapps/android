@@ -3,9 +3,9 @@ package com.google.android.gms.vision;
 import javax.annotation.concurrent.GuardedBy;
 
 public abstract class Detector<T> {
-    private final Object zzac = new Object();
-    @GuardedBy("mProcessorLock")
-    private Processor<T> zzad;
+    private final Object zzad = new Object();
+    @GuardedBy("processorLock")
+    private Processor<T> zzae;
 
     public interface Processor<T> {
         void release();
@@ -16,10 +16,10 @@ public abstract class Detector<T> {
     }
 
     public void release() {
-        synchronized (this.zzac) {
-            if (this.zzad != null) {
-                this.zzad.release();
-                this.zzad = null;
+        synchronized (this.zzad) {
+            if (this.zzae != null) {
+                this.zzae.release();
+                this.zzae = null;
             }
         }
     }

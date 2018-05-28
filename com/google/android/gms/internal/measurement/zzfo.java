@@ -29,17 +29,17 @@ final class zzfo implements Runnable {
     }
 
     public final void run() {
+        OutputStream outputStream;
         Throwable e;
         Map map;
         int i;
         HttpURLConnection httpURLConnection;
         Throwable th;
         Map map2;
-        OutputStream outputStream;
+        OutputStream outputStream2;
         this.zzajo.zzfs();
         int i2 = 0;
         HttpURLConnection zzb;
-        OutputStream outputStream2;
         try {
             zzb = this.zzajo.zzb(this.url);
             try {
@@ -55,18 +55,18 @@ final class zzfo implements Runnable {
                     zzb.addRequestProperty("Content-Encoding", "gzip");
                     zzb.setFixedLengthStreamingMode(zza.length);
                     zzb.connect();
-                    outputStream2 = zzb.getOutputStream();
+                    outputStream = zzb.getOutputStream();
                     try {
-                        outputStream2.write(zza);
-                        outputStream2.close();
+                        outputStream.write(zza);
+                        outputStream.close();
                     } catch (IOException e2) {
                         e = e2;
                         map = null;
                         i = 0;
                         httpURLConnection = zzb;
-                        if (outputStream2 != null) {
+                        if (outputStream != null) {
                             try {
-                                outputStream2.close();
+                                outputStream.close();
                             } catch (IOException e3) {
                                 this.zzajo.zzge().zzim().zze("Error closing HTTP compressed POST connection output stream. appId", zzfg.zzbm(this.packageName), e3);
                             }
@@ -78,10 +78,10 @@ final class zzfo implements Runnable {
                     } catch (Throwable th2) {
                         th = th2;
                         map2 = null;
-                        outputStream = outputStream2;
-                        if (outputStream != null) {
+                        outputStream2 = outputStream;
+                        if (outputStream2 != null) {
                             try {
-                                outputStream.close();
+                                outputStream2.close();
                             } catch (IOException e32) {
                                 this.zzajo.zzge().zzim().zze("Error closing HTTP compressed POST connection output stream. appId", zzfg.zzbm(this.packageName), e32);
                             }
@@ -99,10 +99,10 @@ final class zzfo implements Runnable {
                 e = e4;
                 map = null;
                 i = i2;
-                outputStream2 = null;
+                outputStream = null;
                 httpURLConnection = zzb;
-                if (outputStream2 != null) {
-                    outputStream2.close();
+                if (outputStream != null) {
+                    outputStream.close();
                 }
                 if (httpURLConnection != null) {
                     httpURLConnection.disconnect();
@@ -111,9 +111,9 @@ final class zzfo implements Runnable {
             } catch (Throwable th3) {
                 th = th3;
                 map2 = null;
-                outputStream = null;
-                if (outputStream != null) {
-                    outputStream.close();
+                outputStream2 = null;
+                if (outputStream2 != null) {
+                    outputStream2.close();
                 }
                 if (zzb != null) {
                     zzb.disconnect();
@@ -131,10 +131,10 @@ final class zzfo implements Runnable {
                 e = e5;
                 map = map2;
                 i = i2;
-                outputStream2 = null;
+                outputStream = null;
                 httpURLConnection = zzb;
-                if (outputStream2 != null) {
-                    outputStream2.close();
+                if (outputStream != null) {
+                    outputStream.close();
                 }
                 if (httpURLConnection != null) {
                     httpURLConnection.disconnect();
@@ -142,9 +142,9 @@ final class zzfo implements Runnable {
                 this.zzajo.zzgd().zzc(new zzfn(this.packageName, this.zzajm, i, e, null, map));
             } catch (Throwable th32) {
                 th = th32;
-                outputStream = null;
-                if (outputStream != null) {
-                    outputStream.close();
+                outputStream2 = null;
+                if (outputStream2 != null) {
+                    outputStream2.close();
                 }
                 if (zzb != null) {
                     zzb.disconnect();
@@ -156,10 +156,10 @@ final class zzfo implements Runnable {
             e = e6;
             map = null;
             i = 0;
-            outputStream2 = null;
+            outputStream = null;
             httpURLConnection = null;
-            if (outputStream2 != null) {
-                outputStream2.close();
+            if (outputStream != null) {
+                outputStream.close();
             }
             if (httpURLConnection != null) {
                 httpURLConnection.disconnect();
@@ -168,10 +168,10 @@ final class zzfo implements Runnable {
         } catch (Throwable th322) {
             th = th322;
             map2 = null;
-            outputStream = null;
+            outputStream2 = null;
             zzb = null;
-            if (outputStream != null) {
-                outputStream.close();
+            if (outputStream2 != null) {
+                outputStream2.close();
             }
             if (zzb != null) {
                 zzb.disconnect();

@@ -8,29 +8,29 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 public final class zzc extends AbstractSafeParcelable {
     public static final Creator<zzc> CREATOR = new zzd();
     public int mode;
-    public int zzcd;
-    public int zzce;
-    public boolean zzcf;
-    public boolean zzcg;
-    public float zzch;
+    public int zzby;
+    public boolean zzbz;
+    public int zzca;
+    public boolean zzcb;
+    public float zzcc;
 
     public zzc(int i, int i2, int i3, boolean z, boolean z2, float f) {
         this.mode = i;
-        this.zzcd = i2;
-        this.zzce = i3;
-        this.zzcf = z;
-        this.zzcg = z2;
-        this.zzch = f;
+        this.zzby = i2;
+        this.zzca = i3;
+        this.zzbz = z;
+        this.zzcb = z2;
+        this.zzcc = f;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
         int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
         SafeParcelWriter.writeInt(parcel, 2, this.mode);
-        SafeParcelWriter.writeInt(parcel, 3, this.zzcd);
-        SafeParcelWriter.writeInt(parcel, 4, this.zzce);
-        SafeParcelWriter.writeBoolean(parcel, 5, this.zzcf);
-        SafeParcelWriter.writeBoolean(parcel, 6, this.zzcg);
-        SafeParcelWriter.writeFloat(parcel, 7, this.zzch);
+        SafeParcelWriter.writeInt(parcel, 3, this.zzby);
+        SafeParcelWriter.writeInt(parcel, 4, this.zzca);
+        SafeParcelWriter.writeBoolean(parcel, 5, this.zzbz);
+        SafeParcelWriter.writeBoolean(parcel, 6, this.zzcb);
+        SafeParcelWriter.writeFloat(parcel, 7, this.zzcc);
         SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

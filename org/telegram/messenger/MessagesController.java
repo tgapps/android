@@ -2356,9 +2356,9 @@ public class MessagesController implements NotificationCenterDelegate {
     }
 
     public void deleteMessages(ArrayList<Integer> messages, ArrayList<Long> randoms, EncryptedChat encryptedChat, int channelId, boolean forAll, long taskId, TLObject taskRequest) {
-        TL_channels_deleteMessages req;
         NativeByteBuffer data;
         Throwable e;
+        final int i;
         if ((messages != null && !messages.isEmpty()) || taskRequest != null) {
             ArrayList<Integer> toSend = null;
             if (taskId == 0) {
@@ -2387,7 +2387,7 @@ public class MessagesController implements NotificationCenterDelegate {
             long newTaskId;
             NativeByteBuffer data2;
             if (channelId != 0) {
-                final int i;
+                TL_channels_deleteMessages req;
                 if (taskRequest != null) {
                     req = (TL_channels_deleteMessages) taskRequest;
                     newTaskId = taskId;
@@ -4016,6 +4016,7 @@ public class MessagesController implements NotificationCenterDelegate {
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     public void run() {
                         int a;
+                        MessageObject messageObject;
                         MessagesController.this.resetingDialogs = false;
                         MessagesController.this.applyDialogsNotificationsSettings(org_telegram_tgnet_TLRPC_messages_Dialogs.dialogs);
                         if (!UserConfig.getInstance(MessagesController.this.currentAccount).draftsLoaded) {
@@ -4024,7 +4025,6 @@ public class MessagesController implements NotificationCenterDelegate {
                         MessagesController.this.putUsers(org_telegram_tgnet_TLRPC_messages_Dialogs.users, false);
                         MessagesController.this.putChats(org_telegram_tgnet_TLRPC_messages_Dialogs.chats, false);
                         for (a = 0; a < MessagesController.this.dialogs.size(); a++) {
-                            MessageObject messageObject;
                             TL_dialog oldDialog = (TL_dialog) MessagesController.this.dialogs.get(a);
                             if (((int) oldDialog.id) != 0) {
                                 MessagesController.this.dialogs_dict.remove(oldDialog.id);
@@ -4782,8 +4782,6 @@ public class MessagesController implements NotificationCenterDelegate {
 
     protected void checkLastDialogMessage(TL_dialog dialog, InputPeer peer, long taskId) {
         Throwable e;
-        long newTaskId;
-        final TL_dialog tL_dialog;
         final int lower_id = (int) dialog.id;
         if (lower_id != 0 && this.checkingLastMessagesDialogs.indexOfKey(lower_id) < 0) {
             InputPeer inputPeer;
@@ -4795,6 +4793,8 @@ public class MessagesController implements NotificationCenterDelegate {
             }
             req.peer = inputPeer;
             if (req.peer != null && !(req.peer instanceof TL_inputPeerChannel)) {
+                long newTaskId;
+                final TL_dialog tL_dialog;
                 req.limit = 1;
                 this.checkingLastMessagesDialogs.put(lower_id, true);
                 if (taskId == 0) {
@@ -4894,6 +4894,7 @@ public class MessagesController implements NotificationCenterDelegate {
         Utilities.stageQueue.postRunnable(new Runnable() {
             public void run() {
                 int a;
+                Chat chat;
                 final LongSparseArray<TL_dialog> new_dialogs_dict = new LongSparseArray();
                 final LongSparseArray<MessageObject> new_dialogMessage = new LongSparseArray();
                 SparseArray usersDict = new SparseArray(dialogsRes.users.size());
@@ -4908,7 +4909,6 @@ public class MessagesController implements NotificationCenterDelegate {
                     chatsDict.put(c.id, c);
                 }
                 for (a = 0; a < dialogsRes.messages.size(); a++) {
-                    Chat chat;
                     Message message = (Message) dialogsRes.messages.get(a);
                     if (MessagesController.this.proxyDialog == null || MessagesController.this.proxyDialog.id != message.dialog_id) {
                         if (message.to_id.channel_id != 0) {
@@ -6343,9 +6343,9 @@ public class MessagesController implements NotificationCenterDelegate {
 
     protected void loadUnknownChannel(final Chat channel, long taskId) {
         Throwable e;
+        long newTaskId;
         if ((channel instanceof TL_channel) && this.gettingUnknownChannels.indexOfKey(channel.id) < 0) {
             if (channel.access_hash != 0) {
-                long newTaskId;
                 TL_inputPeerChannel inputPeer = new TL_inputPeerChannel();
                 inputPeer.channel_id = channel.id;
                 inputPeer.access_hash = channel.access_hash;
@@ -6429,6 +6429,10 @@ public class MessagesController implements NotificationCenterDelegate {
 
     protected void getChannelDifference(int channelId, int newDialogType, long taskId, InputChannel inputChannel) {
         Throwable e;
+        long newTaskId;
+        TL_updates_getChannelDifference req;
+        final int i;
+        final int i2;
         if (!this.gettingDifferenceChannels.get(channelId)) {
             int channelPts;
             int limit = 100;
@@ -6463,10 +6467,6 @@ public class MessagesController implements NotificationCenterDelegate {
                 inputChannel = getInputChannel(chat);
             }
             if (inputChannel != null && inputChannel.access_hash != 0) {
-                long newTaskId;
-                TL_updates_getChannelDifference req;
-                final int i;
-                final int i2;
                 if (taskId == 0) {
                     NativeByteBuffer data = null;
                     try {
@@ -7074,6 +7074,7 @@ public class MessagesController implements NotificationCenterDelegate {
 
     public boolean pinDialog(long did, boolean pin, InputPeer peer, long taskId) {
         Throwable e;
+        long newTaskId;
         int lower_id = (int) did;
         TL_dialog dialog = (TL_dialog) this.dialogs_dict.get(did);
         if (dialog != null && dialog.pinned != pin) {
@@ -7105,7 +7106,6 @@ public class MessagesController implements NotificationCenterDelegate {
                 if (peer instanceof TL_inputPeerEmpty) {
                     return false;
                 }
-                long newTaskId;
                 TL_inputDialogPeer inputDialogPeer = new TL_inputDialogPeer();
                 inputDialogPeer.peer = peer;
                 req.peer = inputDialogPeer;
@@ -9480,7 +9480,6 @@ public class MessagesController implements NotificationCenterDelegate {
                     public void run() {
                         int size;
                         int b;
-                        int key;
                         MessageObject obj;
                         int a;
                         int updateMask = 0;
@@ -9493,6 +9492,7 @@ public class MessagesController implements NotificationCenterDelegate {
                                 Editor editor = MessagesController.this.notificationsPreferences.edit();
                                 size = markAsReadMessagesInboxFinal.size();
                                 for (b = 0; b < size; b++) {
+                                    int key;
                                     key = markAsReadMessagesInboxFinal.keyAt(b);
                                     messageId = (int) markAsReadMessagesInboxFinal.valueAt(b);
                                     dialog = (TL_dialog) MessagesController.this.dialogs_dict.get((long) key);

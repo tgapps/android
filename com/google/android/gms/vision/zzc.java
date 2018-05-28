@@ -4,25 +4,25 @@ import android.util.SparseArray;
 import javax.annotation.concurrent.GuardedBy;
 
 public final class zzc {
-    private static final Object sLock = new Object();
-    @GuardedBy("sLock")
-    private static int zzas = 0;
-    @GuardedBy("sLock")
-    private SparseArray<Integer> zzat = new SparseArray();
-    @GuardedBy("sLock")
-    private SparseArray<Integer> zzau = new SparseArray();
+    private static final Object lock = new Object();
+    @GuardedBy("lock")
+    private static int zzau = 0;
+    @GuardedBy("lock")
+    private SparseArray<Integer> zzav = new SparseArray();
+    @GuardedBy("lock")
+    private SparseArray<Integer> zzaw = new SparseArray();
 
     public final int zzb(int i) {
         int intValue;
-        synchronized (sLock) {
-            Integer num = (Integer) this.zzat.get(i);
+        synchronized (lock) {
+            Integer num = (Integer) this.zzav.get(i);
             if (num != null) {
                 intValue = num.intValue();
             } else {
-                intValue = zzas;
-                zzas++;
-                this.zzat.append(i, Integer.valueOf(intValue));
-                this.zzau.append(intValue, Integer.valueOf(i));
+                intValue = zzau;
+                zzau++;
+                this.zzav.append(i, Integer.valueOf(intValue));
+                this.zzaw.append(intValue, Integer.valueOf(i));
             }
         }
         return intValue;
