@@ -4268,9 +4268,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                             ChatActivity.this.editTextItem.setVisibility(0);
                             ChatActivity.this.headerItem.setVisibility(8);
                             ChatActivity.this.attachItem.setVisibility(8);
-                            ChatActivity.this.editTextStart = start;
-                            ChatActivity.this.editTextEnd = end;
                         }
+                        ChatActivity.this.editTextStart = start;
+                        ChatActivity.this.editTextEnd = end;
                     } else if (ChatActivity.this.editTextItem.getTag() != null) {
                         ChatActivity.this.editTextItem.setTag(null);
                         ChatActivity.this.editTextItem.setVisibility(8);
@@ -17959,10 +17959,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
     }
 
     private void processSelectedOption(int option) {
-        File file;
         if (this.selectedObject != null && getParentActivity() != null) {
             int a;
             Bundle args;
+            File file;
             AlertDialog.Builder builder;
             String path;
             Intent intent;

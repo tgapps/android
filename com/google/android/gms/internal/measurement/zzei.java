@@ -175,13 +175,13 @@ final class zzei extends zzjq {
     }
 
     private static boolean zza(zzfg com_google_android_gms_internal_measurement_zzfg, SQLiteDatabase sQLiteDatabase, String str) {
+        Cursor query;
         Object e;
         Throwable th;
         Cursor cursor = null;
         if (com_google_android_gms_internal_measurement_zzfg == null) {
             throw new IllegalArgumentException("Monitor must not be null");
         }
-        Cursor query;
         try {
             SQLiteDatabase sQLiteDatabase2 = sQLiteDatabase;
             query = sQLiteDatabase2.query("SQLITE_MASTER", new String[]{"name"}, "name=?", new String[]{str}, null, null, null);
@@ -470,7 +470,6 @@ final class zzei extends zzjq {
     }
 
     public final zzej zza(long j, String str, boolean z, boolean z2, boolean z3, boolean z4, boolean z5) {
-        Cursor query;
         Object e;
         Throwable th;
         Preconditions.checkNotEmpty(str);
@@ -478,6 +477,7 @@ final class zzei extends zzjq {
         zzch();
         String[] strArr = new String[]{str};
         zzej com_google_android_gms_internal_measurement_zzej = new zzej();
+        Cursor query;
         try {
             SQLiteDatabase writableDatabase = getWritableDatabase();
             query = writableDatabase.query("apps", new String[]{"day", "daily_events_count", "daily_public_events_count", "daily_conversions_count", "daily_error_events_count", "daily_realtime_events_count"}, "app_id=?", new String[]{str}, null, null, null);
@@ -1137,13 +1137,13 @@ final class zzei extends zzjq {
     }
 
     public final List<zzed> zzb(String str, String[] strArr) {
+        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
         zzab();
         zzch();
         List<zzed> arrayList = new ArrayList();
-        Cursor query;
         try {
             query = getWritableDatabase().query("conditional_properties", new String[]{"app_id", TtmlNode.ATTR_TTS_ORIGIN, "name", "value", "active", "trigger_event_name", "trigger_timeout", "timed_out_event", "creation_timestamp", "triggered_event", "triggered_timestamp", "time_to_live", "expired_event"}, str, strArr, null, null, "rowid", "1001");
             try {
@@ -1281,12 +1281,12 @@ final class zzei extends zzjq {
     }
 
     public final zzdy zzbc(String str) {
-        Cursor query;
         Object e;
         Throwable th;
         Preconditions.checkNotEmpty(str);
         zzab();
         zzch();
+        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"app_instance_id", "gmp_app_id", "resettable_device_id_hash", "last_bundle_index", "last_bundle_start_timestamp", "last_bundle_end_timestamp", "app_version", "app_store", "gmp_version", "dev_cert_hash", "measurement_enabled", "day", "daily_public_events_count", "daily_events_count", "daily_conversions_count", "config_fetched_time", "failed_config_fetch_time", "app_version_int", "firebase_instance_id", "daily_error_events_count", "daily_realtime_events_count", "health_monitor_sample", "android_id", "adid_reporting_enabled", "ssaid_reporting_enabled"}, "app_id=?", new String[]{str}, null, null, null);
             try {
@@ -1383,12 +1383,12 @@ final class zzei extends zzjq {
     }
 
     public final byte[] zzbe(String str) {
-        Cursor query;
         Object e;
         Throwable th;
         Preconditions.checkNotEmpty(str);
         zzab();
         zzch();
+        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"remote_config"}, "app_id=?", new String[]{str}, null, null, null);
             try {
@@ -1442,12 +1442,12 @@ final class zzei extends zzjq {
     }
 
     final Map<Integer, zzkr> zzbf(String str) {
+        Cursor query;
         Object e;
         Throwable th;
         zzch();
         zzab();
         Preconditions.checkNotEmpty(str);
-        Cursor query;
         try {
             query = getWritableDatabase().query("audience_filter_values", new String[]{"audience_id", "current_results"}, "app_id=?", new String[]{str}, null, null, null);
             if (query.moveToFirst()) {
@@ -1712,10 +1712,10 @@ final class zzei extends zzjq {
     }
 
     public final String zzhn() {
+        Cursor rawQuery;
         Object e;
         Throwable th;
         String str = null;
-        Cursor rawQuery;
         try {
             rawQuery = getWritableDatabase().rawQuery("select app_id from queue order by has_realtime desc, rowid asc limit 1;", null);
             try {

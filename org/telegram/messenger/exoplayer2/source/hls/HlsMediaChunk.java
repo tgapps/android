@@ -118,9 +118,9 @@ final class HlsMediaChunk extends MediaChunk {
     }
 
     private void maybeLoadInitData() throws IOException, InterruptedException {
+        ExtractorInput input;
         if (!this.initLoadCompleted && this.initDataSpec != null) {
             DataSpec initSegmentDataSpec = this.initDataSpec.subrange((long) this.initSegmentBytesLoaded);
-            ExtractorInput input;
             try {
                 input = new DefaultExtractorInput(this.initDataSource, initSegmentDataSpec.absoluteStreamPosition, this.initDataSource.open(initSegmentDataSpec));
                 int result = 0;
@@ -140,6 +140,7 @@ final class HlsMediaChunk extends MediaChunk {
 
     private void loadMedia() throws IOException, InterruptedException {
         DataSpec loadDataSpec;
+        ExtractorInput input;
         boolean skipLoadedBytes = true;
         if (this.isEncrypted) {
             loadDataSpec = this.dataSpec;
@@ -155,7 +156,6 @@ final class HlsMediaChunk extends MediaChunk {
         } else if (this.timestampAdjuster.getFirstSampleTimestampUs() == Long.MAX_VALUE) {
             this.timestampAdjuster.setFirstSampleTimestampUs(this.startTimeUs);
         }
-        ExtractorInput input;
         try {
             input = new DefaultExtractorInput(this.dataSource, loadDataSpec.absoluteStreamPosition, this.dataSource.open(loadDataSpec));
             if (this.isPackedAudioExtractor && !this.id3TimestampPeeked) {

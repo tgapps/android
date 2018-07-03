@@ -8,30 +8,38 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.graphics.Canvas;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Drawable.Callback;
+import android.os.Build.VERSION;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnScrollChangedListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.AndroidUtilities.LinkMovementMethodMy;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.beta.R;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.LineProgressView;
+import org.telegram.ui.Components.RadialProgressView;
 
 public class AlertDialog extends Dialog implements Callback {
     private Rect backgroundPaddings = new Rect();
@@ -250,1075 +258,451 @@ public class AlertDialog extends Dialog implements Callback {
         this.progressViewStyle = progressStyle;
     }
 
-    /* JADX WARNING: inconsistent code. */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    protected void onCreate(android.os.Bundle r25) {
-        /*
-        r24 = this;
-        super.onCreate(r25);
-        r12 = new org.telegram.ui.ActionBar.AlertDialog$2;
-        r2 = r24.getContext();
-        r0 = r24;
-        r12.<init>(r2);
-        r2 = 1;
-        r12.setOrientation(r2);
-        r0 = r24;
-        r2 = r0.shadowDrawable;
-        r12.setBackgroundDrawable(r2);
-        r2 = android.os.Build.VERSION.SDK_INT;
-        r3 = 21;
-        if (r2 < r3) goto L_0x03a3;
-    L_0x001f:
-        r2 = 1;
-    L_0x0020:
-        r12.setFitsSystemWindows(r2);
-        r0 = r24;
-        r0.setContentView(r12);
-        r0 = r24;
-        r2 = r0.positiveButtonText;
-        if (r2 != 0) goto L_0x003a;
-    L_0x002e:
-        r0 = r24;
-        r2 = r0.negativeButtonText;
-        if (r2 != 0) goto L_0x003a;
-    L_0x0034:
-        r0 = r24;
-        r2 = r0.neutralButtonText;
-        if (r2 == 0) goto L_0x03a6;
-    L_0x003a:
-        r13 = 1;
-    L_0x003b:
-        r0 = r24;
-        r2 = r0.topResId;
-        if (r2 != 0) goto L_0x0047;
-    L_0x0041:
-        r0 = r24;
-        r2 = r0.topDrawable;
-        if (r2 == 0) goto L_0x00c2;
-    L_0x0047:
-        r2 = new android.widget.ImageView;
-        r3 = r24.getContext();
-        r2.<init>(r3);
-        r0 = r24;
-        r0.topImageView = r2;
-        r0 = r24;
-        r2 = r0.topDrawable;
-        if (r2 == 0) goto L_0x03a9;
-    L_0x005a:
-        r0 = r24;
-        r2 = r0.topImageView;
-        r0 = r24;
-        r3 = r0.topDrawable;
-        r2.setImageDrawable(r3);
-    L_0x0065:
-        r0 = r24;
-        r2 = r0.topImageView;
-        r3 = android.widget.ImageView.ScaleType.CENTER;
-        r2.setScaleType(r3);
-        r0 = r24;
-        r2 = r0.topImageView;
-        r3 = r24.getContext();
-        r3 = r3.getResources();
-        r4 = 2131165617; // 0x7f0701b1 float:1.7945456E38 double:1.052935717E-314;
-        r3 = r3.getDrawable(r4);
-        r2.setBackgroundDrawable(r3);
-        r0 = r24;
-        r2 = r0.topImageView;
-        r2 = r2.getBackground();
-        r3 = new android.graphics.PorterDuffColorFilter;
-        r0 = r24;
-        r4 = r0.topBackgroundColor;
-        r5 = android.graphics.PorterDuff.Mode.MULTIPLY;
-        r3.<init>(r4, r5);
-        r2.setColorFilter(r3);
-        r0 = r24;
-        r2 = r0.topImageView;
-        r3 = 0;
-        r4 = 0;
-        r5 = 0;
-        r6 = 0;
-        r2.setPadding(r3, r4, r5, r6);
-        r0 = r24;
-        r0 = r0.topImageView;
-        r22 = r0;
-        r2 = -1;
-        r3 = 132; // 0x84 float:1.85E-43 double:6.5E-322;
-        r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x03b6;
-    L_0x00b2:
-        r4 = 5;
-    L_0x00b3:
-        r4 = r4 | 48;
-        r5 = -8;
-        r6 = -8;
-        r7 = 0;
-        r8 = 0;
-        r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
-        r0 = r22;
-        r12.addView(r0, r2);
-    L_0x00c2:
-        r0 = r24;
-        r2 = r0.title;
-        if (r2 == 0) goto L_0x013b;
-    L_0x00c8:
-        r2 = new android.widget.TextView;
-        r3 = r24.getContext();
-        r2.<init>(r3);
-        r0 = r24;
-        r0.titleTextView = r2;
-        r0 = r24;
-        r2 = r0.titleTextView;
-        r0 = r24;
-        r3 = r0.title;
-        r2.setText(r3);
-        r0 = r24;
-        r2 = r0.titleTextView;
-        r3 = "dialogTextBlack";
-        r0 = r24;
-        r3 = r0.getThemeColor(r3);
-        r2.setTextColor(r3);
-        r0 = r24;
-        r2 = r0.titleTextView;
-        r3 = 1;
-        r4 = 1101004800; // 0x41a00000 float:20.0 double:5.439686476E-315;
-        r2.setTextSize(r3, r4);
-        r0 = r24;
-        r2 = r0.titleTextView;
-        r3 = "fonts/rmedium.ttf";
-        r3 = org.telegram.messenger.AndroidUtilities.getTypeface(r3);
-        r2.setTypeface(r3);
-        r0 = r24;
-        r3 = r0.titleTextView;
-        r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x03b9;
-    L_0x0110:
-        r2 = 5;
-    L_0x0111:
-        r2 = r2 | 48;
-        r3.setGravity(r2);
-        r0 = r24;
-        r0 = r0.titleTextView;
-        r22 = r0;
-        r2 = -2;
-        r3 = -2;
-        r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x03bc;
-    L_0x0122:
-        r4 = 5;
-    L_0x0123:
-        r4 = r4 | 48;
-        r5 = 24;
-        r6 = 19;
-        r7 = 24;
-        r0 = r24;
-        r8 = r0.subtitle;
-        if (r8 == 0) goto L_0x03bf;
-    L_0x0131:
-        r8 = 2;
-    L_0x0132:
-        r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
-        r0 = r22;
-        r12.addView(r0, r2);
-    L_0x013b:
-        r0 = r24;
-        r2 = r0.subtitle;
-        if (r2 == 0) goto L_0x01a6;
-    L_0x0141:
-        r2 = new android.widget.TextView;
-        r3 = r24.getContext();
-        r2.<init>(r3);
-        r0 = r24;
-        r0.subtitleTextView = r2;
-        r0 = r24;
-        r2 = r0.subtitleTextView;
-        r0 = r24;
-        r3 = r0.subtitle;
-        r2.setText(r3);
-        r0 = r24;
-        r2 = r0.subtitleTextView;
-        r3 = "dialogIcon";
-        r0 = r24;
-        r3 = r0.getThemeColor(r3);
-        r2.setTextColor(r3);
-        r0 = r24;
-        r2 = r0.subtitleTextView;
-        r3 = 1;
-        r4 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
-        r2.setTextSize(r3, r4);
-        r0 = r24;
-        r3 = r0.subtitleTextView;
-        r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x03cd;
-    L_0x017b:
-        r2 = 5;
-    L_0x017c:
-        r2 = r2 | 48;
-        r3.setGravity(r2);
-        r0 = r24;
-        r0 = r0.subtitleTextView;
-        r22 = r0;
-        r2 = -2;
-        r3 = -2;
-        r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x03d0;
-    L_0x018d:
-        r4 = 5;
-    L_0x018e:
-        r4 = r4 | 48;
-        r5 = 24;
-        r6 = 0;
-        r7 = 24;
-        r0 = r24;
-        r8 = r0.items;
-        if (r8 == 0) goto L_0x03d3;
-    L_0x019b:
-        r8 = 14;
-    L_0x019d:
-        r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
-        r0 = r22;
-        r12.addView(r0, r2);
-    L_0x01a6:
-        r0 = r24;
-        r2 = r0.progressViewStyle;
-        if (r2 != 0) goto L_0x0271;
-    L_0x01ac:
-        r0 = r24;
-        r3 = r0.shadow;
-        r4 = 0;
-        r2 = r24.getContext();
-        r2 = r2.getResources();
-        r5 = 2131165343; // 0x7f07009f float:1.79449E38 double:1.0529355816E-314;
-        r2 = r2.getDrawable(r5);
-        r2 = r2.mutate();
-        r2 = (android.graphics.drawable.BitmapDrawable) r2;
-        r3[r4] = r2;
-        r0 = r24;
-        r3 = r0.shadow;
-        r4 = 1;
-        r2 = r24.getContext();
-        r2 = r2.getResources();
-        r5 = 2131165344; // 0x7f0700a0 float:1.7944902E38 double:1.052935582E-314;
-        r2 = r2.getDrawable(r5);
-        r2 = r2.mutate();
-        r2 = (android.graphics.drawable.BitmapDrawable) r2;
-        r3[r4] = r2;
-        r0 = r24;
-        r2 = r0.shadow;
-        r3 = 0;
-        r2 = r2[r3];
-        r3 = 0;
-        r2.setAlpha(r3);
-        r0 = r24;
-        r2 = r0.shadow;
-        r3 = 1;
-        r2 = r2[r3];
-        r3 = 0;
-        r2.setAlpha(r3);
-        r0 = r24;
-        r2 = r0.shadow;
-        r3 = 0;
-        r2 = r2[r3];
-        r0 = r24;
-        r2.setCallback(r0);
-        r0 = r24;
-        r2 = r0.shadow;
-        r3 = 1;
-        r2 = r2[r3];
-        r0 = r24;
-        r2.setCallback(r0);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$3;
-        r3 = r24.getContext();
-        r0 = r24;
-        r2.<init>(r3);
-        r0 = r24;
-        r0.contentScrollView = r2;
-        r0 = r24;
-        r2 = r0.contentScrollView;
-        r3 = 0;
-        r2.setVerticalScrollBarEnabled(r3);
-        r0 = r24;
-        r2 = r0.contentScrollView;
-        r3 = "dialogScrollGlow";
-        r0 = r24;
-        r3 = r0.getThemeColor(r3);
-        org.telegram.messenger.AndroidUtilities.setScrollViewEdgeEffectColor(r2, r3);
-        r0 = r24;
-        r8 = r0.contentScrollView;
-        r2 = -1;
-        r3 = -2;
-        r4 = 0;
-        r5 = 0;
-        r6 = 0;
-        r7 = 0;
-        r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7);
-        r12.addView(r8, r2);
-        r2 = new android.widget.LinearLayout;
-        r3 = r24.getContext();
-        r2.<init>(r3);
-        r0 = r24;
-        r0.scrollContainer = r2;
-        r0 = r24;
-        r2 = r0.scrollContainer;
-        r3 = 1;
-        r2.setOrientation(r3);
-        r0 = r24;
-        r2 = r0.contentScrollView;
-        r0 = r24;
-        r3 = r0.scrollContainer;
-        r4 = new android.widget.FrameLayout$LayoutParams;
-        r5 = -1;
-        r6 = -2;
-        r4.<init>(r5, r6);
-        r2.addView(r3, r4);
-    L_0x0271:
-        r2 = new android.widget.TextView;
-        r3 = r24.getContext();
-        r2.<init>(r3);
-        r0 = r24;
-        r0.messageTextView = r2;
-        r0 = r24;
-        r2 = r0.messageTextView;
-        r3 = "dialogTextBlack";
-        r0 = r24;
-        r3 = r0.getThemeColor(r3);
-        r2.setTextColor(r3);
-        r0 = r24;
-        r2 = r0.messageTextView;
-        r3 = 1;
-        r4 = 1098907648; // 0x41800000 float:16.0 double:5.42932517E-315;
-        r2.setTextSize(r3, r4);
-        r0 = r24;
-        r2 = r0.messageTextView;
-        r3 = new org.telegram.messenger.AndroidUtilities$LinkMovementMethodMy;
-        r3.<init>();
-        r2.setMovementMethod(r3);
-        r0 = r24;
-        r2 = r0.messageTextView;
-        r3 = "dialogTextLink";
-        r0 = r24;
-        r3 = r0.getThemeColor(r3);
-        r2.setLinkTextColor(r3);
-        r0 = r24;
-        r3 = r0.messageTextView;
-        r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x03d7;
-    L_0x02bc:
-        r2 = 5;
-    L_0x02bd:
-        r2 = r2 | 48;
-        r3.setGravity(r2);
-        r0 = r24;
-        r2 = r0.progressViewStyle;
-        r3 = 1;
-        if (r2 != r3) goto L_0x03ea;
-    L_0x02c9:
-        r2 = new android.widget.FrameLayout;
-        r3 = r24.getContext();
-        r2.<init>(r3);
-        r0 = r24;
-        r0.progressViewContainer = r2;
-        r0 = r24;
-        r0 = r0.progressViewContainer;
-        r22 = r0;
-        r2 = -1;
-        r3 = 44;
-        r4 = 51;
-        r5 = 23;
-        r0 = r24;
-        r6 = r0.title;
-        if (r6 != 0) goto L_0x03da;
-    L_0x02e9:
-        r6 = 24;
-    L_0x02eb:
-        r7 = 23;
-        r8 = 24;
-        r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
-        r0 = r22;
-        r12.addView(r0, r2);
-        r17 = new org.telegram.ui.Components.RadialProgressView;
-        r2 = r24.getContext();
-        r0 = r17;
-        r0.<init>(r2);
-        r2 = "dialogProgressCircle";
-        r0 = r24;
-        r2 = r0.getThemeColor(r2);
-        r0 = r17;
-        r0.setProgressColor(r2);
-        r0 = r24;
-        r3 = r0.progressViewContainer;
-        r4 = 44;
-        r5 = 44;
-        r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x03dd;
-    L_0x031d:
-        r2 = 5;
-    L_0x031e:
-        r2 = r2 | 48;
-        r2 = org.telegram.ui.Components.LayoutHelper.createFrame(r4, r5, r2);
-        r0 = r17;
-        r3.addView(r0, r2);
-        r0 = r24;
-        r2 = r0.messageTextView;
-        r3 = 1;
-        r2.setLines(r3);
-        r0 = r24;
-        r2 = r0.messageTextView;
-        r3 = android.text.TextUtils.TruncateAt.END;
-        r2.setEllipsize(r3);
-        r0 = r24;
-        r0 = r0.progressViewContainer;
-        r22 = r0;
-        r0 = r24;
-        r0 = r0.messageTextView;
-        r23 = r0;
-        r2 = -2;
-        r3 = -1073741824; // 0xffffffffc0000000 float:-2.0 double:NaN;
-        r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x03e0;
-    L_0x034d:
-        r4 = 5;
-    L_0x034e:
-        r4 = r4 | 16;
-        r5 = org.telegram.messenger.LocaleController.isRTL;
-        if (r5 == 0) goto L_0x03e3;
-    L_0x0354:
-        r5 = 0;
-    L_0x0355:
-        r5 = (float) r5;
-        r6 = 0;
-        r7 = org.telegram.messenger.LocaleController.isRTL;
-        if (r7 == 0) goto L_0x03e7;
-    L_0x035b:
-        r7 = 62;
-    L_0x035d:
-        r7 = (float) r7;
-        r8 = 0;
-        r2 = org.telegram.ui.Components.LayoutHelper.createFrame(r2, r3, r4, r5, r6, r7, r8);
-        r0 = r22;
-        r1 = r23;
-        r0.addView(r1, r2);
-    L_0x036a:
-        r0 = r24;
-        r2 = r0.message;
-        r2 = android.text.TextUtils.isEmpty(r2);
-        if (r2 != 0) goto L_0x0519;
-    L_0x0374:
-        r0 = r24;
-        r2 = r0.messageTextView;
-        r0 = r24;
-        r3 = r0.message;
-        r2.setText(r3);
-        r0 = r24;
-        r2 = r0.messageTextView;
-        r3 = 0;
-        r2.setVisibility(r3);
-    L_0x0387:
-        r0 = r24;
-        r2 = r0.items;
-        if (r2 == 0) goto L_0x0565;
-    L_0x038d:
-        r18 = 0;
-        r14 = 0;
-        r9 = 0;
-    L_0x0391:
-        r0 = r24;
-        r2 = r0.items;
-        r2 = r2.length;
-        if (r9 >= r2) goto L_0x0565;
-    L_0x0398:
-        r0 = r24;
-        r2 = r0.items;
-        r2 = r2[r9];
-        if (r2 != 0) goto L_0x0524;
-    L_0x03a0:
-        r9 = r9 + 1;
-        goto L_0x0391;
-    L_0x03a3:
-        r2 = 0;
-        goto L_0x0020;
-    L_0x03a6:
-        r13 = 0;
-        goto L_0x003b;
-    L_0x03a9:
-        r0 = r24;
-        r2 = r0.topImageView;
-        r0 = r24;
-        r3 = r0.topResId;
-        r2.setImageResource(r3);
-        goto L_0x0065;
-    L_0x03b6:
-        r4 = 3;
-        goto L_0x00b3;
-    L_0x03b9:
-        r2 = 3;
-        goto L_0x0111;
-    L_0x03bc:
-        r4 = 3;
-        goto L_0x0123;
-    L_0x03bf:
-        r0 = r24;
-        r8 = r0.items;
-        if (r8 == 0) goto L_0x03c9;
-    L_0x03c5:
-        r8 = 14;
-        goto L_0x0132;
-    L_0x03c9:
-        r8 = 10;
-        goto L_0x0132;
-    L_0x03cd:
-        r2 = 3;
-        goto L_0x017c;
-    L_0x03d0:
-        r4 = 3;
-        goto L_0x018e;
-    L_0x03d3:
-        r8 = 10;
-        goto L_0x019d;
-    L_0x03d7:
-        r2 = 3;
-        goto L_0x02bd;
-    L_0x03da:
-        r6 = 0;
-        goto L_0x02eb;
-    L_0x03dd:
-        r2 = 3;
-        goto L_0x031e;
-    L_0x03e0:
-        r4 = 3;
-        goto L_0x034e;
-    L_0x03e3:
-        r5 = 62;
-        goto L_0x0355;
-    L_0x03e7:
-        r7 = 0;
-        goto L_0x035d;
-    L_0x03ea:
-        r0 = r24;
-        r2 = r0.progressViewStyle;
-        r3 = 2;
-        if (r2 != r3) goto L_0x04de;
-    L_0x03f1:
-        r0 = r24;
-        r0 = r0.messageTextView;
-        r22 = r0;
-        r2 = -2;
-        r3 = -2;
-        r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x04d4;
-    L_0x03fd:
-        r4 = 5;
-    L_0x03fe:
-        r4 = r4 | 48;
-        r5 = 24;
-        r0 = r24;
-        r6 = r0.title;
-        if (r6 != 0) goto L_0x04d7;
-    L_0x0408:
-        r6 = 19;
-    L_0x040a:
-        r7 = 24;
-        r8 = 20;
-        r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
-        r0 = r22;
-        r12.addView(r0, r2);
-        r2 = new org.telegram.ui.Components.LineProgressView;
-        r3 = r24.getContext();
-        r2.<init>(r3);
-        r0 = r24;
-        r0.lineProgressView = r2;
-        r0 = r24;
-        r2 = r0.lineProgressView;
-        r0 = r24;
-        r3 = r0.currentProgress;
-        r3 = (float) r3;
-        r4 = 1120403456; // 0x42c80000 float:100.0 double:5.53552857E-315;
-        r3 = r3 / r4;
-        r4 = 0;
-        r2.setProgress(r3, r4);
-        r0 = r24;
-        r2 = r0.lineProgressView;
-        r3 = "dialogLineProgress";
-        r0 = r24;
-        r3 = r0.getThemeColor(r3);
-        r2.setProgressColor(r3);
-        r0 = r24;
-        r2 = r0.lineProgressView;
-        r3 = "dialogLineProgressBackground";
-        r0 = r24;
-        r3 = r0.getThemeColor(r3);
-        r2.setBackColor(r3);
-        r0 = r24;
-        r0 = r0.lineProgressView;
-        r22 = r0;
-        r2 = -1;
-        r3 = 4;
-        r4 = 19;
-        r5 = 24;
-        r6 = 0;
-        r7 = 24;
-        r8 = 0;
-        r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
-        r0 = r22;
-        r12.addView(r0, r2);
-        r2 = new android.widget.TextView;
-        r3 = r24.getContext();
-        r2.<init>(r3);
-        r0 = r24;
-        r0.lineProgressViewPercent = r2;
-        r0 = r24;
-        r2 = r0.lineProgressViewPercent;
-        r3 = "fonts/rmedium.ttf";
-        r3 = org.telegram.messenger.AndroidUtilities.getTypeface(r3);
-        r2.setTypeface(r3);
-        r0 = r24;
-        r3 = r0.lineProgressViewPercent;
-        r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x04da;
-    L_0x0490:
-        r2 = 5;
-    L_0x0491:
-        r2 = r2 | 48;
-        r3.setGravity(r2);
-        r0 = r24;
-        r2 = r0.lineProgressViewPercent;
-        r3 = "dialogTextGray2";
-        r0 = r24;
-        r3 = r0.getThemeColor(r3);
-        r2.setTextColor(r3);
-        r0 = r24;
-        r2 = r0.lineProgressViewPercent;
-        r3 = 1;
-        r4 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
-        r2.setTextSize(r3, r4);
-        r0 = r24;
-        r0 = r0.lineProgressViewPercent;
-        r22 = r0;
-        r2 = -2;
-        r3 = -2;
-        r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x04dc;
-    L_0x04bc:
-        r4 = 5;
-    L_0x04bd:
-        r4 = r4 | 48;
-        r5 = 23;
-        r6 = 4;
-        r7 = 23;
-        r8 = 24;
-        r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
-        r0 = r22;
-        r12.addView(r0, r2);
-        r24.updateLineProgressTextView();
-        goto L_0x036a;
-    L_0x04d4:
-        r4 = 3;
-        goto L_0x03fe;
-    L_0x04d7:
-        r6 = 0;
-        goto L_0x040a;
-    L_0x04da:
-        r2 = 3;
-        goto L_0x0491;
-    L_0x04dc:
-        r4 = 3;
-        goto L_0x04bd;
-    L_0x04de:
-        r0 = r24;
-        r0 = r0.scrollContainer;
-        r22 = r0;
-        r0 = r24;
-        r0 = r0.messageTextView;
-        r23 = r0;
-        r2 = -2;
-        r3 = -2;
-        r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x0515;
-    L_0x04f0:
-        r4 = 5;
-    L_0x04f1:
-        r4 = r4 | 48;
-        r5 = 24;
-        r6 = 0;
-        r7 = 24;
-        r0 = r24;
-        r8 = r0.customView;
-        if (r8 != 0) goto L_0x0504;
-    L_0x04fe:
-        r0 = r24;
-        r8 = r0.items;
-        if (r8 == 0) goto L_0x0517;
-    L_0x0504:
-        r0 = r24;
-        r8 = r0.customViewOffset;
-    L_0x0508:
-        r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
-        r0 = r22;
-        r1 = r23;
-        r0.addView(r1, r2);
-        goto L_0x036a;
-    L_0x0515:
-        r4 = 3;
-        goto L_0x04f1;
-    L_0x0517:
-        r8 = 0;
-        goto L_0x0508;
-    L_0x0519:
-        r0 = r24;
-        r2 = r0.messageTextView;
-        r3 = 8;
-        r2.setVisibility(r3);
-        goto L_0x0387;
-    L_0x0524:
-        r11 = new org.telegram.ui.ActionBar.AlertDialog$AlertDialogCell;
-        r2 = r24.getContext();
-        r11.<init>(r2);
-        r0 = r24;
-        r2 = r0.items;
-        r3 = r2[r9];
-        r0 = r24;
-        r2 = r0.itemIcons;
-        if (r2 == 0) goto L_0x0563;
-    L_0x0539:
-        r0 = r24;
-        r2 = r0.itemIcons;
-        r2 = r2[r9];
-    L_0x053f:
-        r11.setTextAndIcon(r3, r2);
-        r0 = r24;
-        r2 = r0.scrollContainer;
-        r3 = -1;
-        r4 = 48;
-        r3 = org.telegram.ui.Components.LayoutHelper.createLinear(r3, r4);
-        r2.addView(r11, r3);
-        r2 = java.lang.Integer.valueOf(r9);
-        r11.setTag(r2);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$4;
-        r0 = r24;
-        r2.<init>();
-        r11.setOnClickListener(r2);
-        goto L_0x03a0;
-    L_0x0563:
-        r2 = 0;
-        goto L_0x053f;
-    L_0x0565:
-        r0 = r24;
-        r2 = r0.customView;
-        if (r2 == 0) goto L_0x0599;
-    L_0x056b:
-        r0 = r24;
-        r2 = r0.customView;
-        r2 = r2.getParent();
-        if (r2 == 0) goto L_0x0588;
-    L_0x0575:
-        r0 = r24;
-        r2 = r0.customView;
-        r20 = r2.getParent();
-        r20 = (android.view.ViewGroup) r20;
-        r0 = r24;
-        r2 = r0.customView;
-        r0 = r20;
-        r0.removeView(r2);
-    L_0x0588:
-        r0 = r24;
-        r2 = r0.scrollContainer;
-        r0 = r24;
-        r3 = r0.customView;
-        r4 = -1;
-        r5 = -2;
-        r4 = org.telegram.ui.Components.LayoutHelper.createLinear(r4, r5);
-        r2.addView(r3, r4);
-    L_0x0599:
-        if (r13 == 0) goto L_0x07ab;
-    L_0x059b:
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$5;
-        r3 = r24.getContext();
-        r0 = r24;
-        r2.<init>(r3);
-        r0 = r24;
-        r0.buttonsLayout = r2;
-        r0 = r24;
-        r2 = r0.buttonsLayout;
-        r3 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
-        r3 = org.telegram.messenger.AndroidUtilities.dp(r3);
-        r4 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-        r5 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
-        r5 = org.telegram.messenger.AndroidUtilities.dp(r5);
-        r6 = 1090519040; // 0x41000000 float:8.0 double:5.38787994E-315;
-        r6 = org.telegram.messenger.AndroidUtilities.dp(r6);
-        r2.setPadding(r3, r4, r5, r6);
-        r0 = r24;
-        r2 = r0.buttonsLayout;
-        r3 = -1;
-        r4 = 52;
-        r3 = org.telegram.ui.Components.LayoutHelper.createLinear(r3, r4);
-        r12.addView(r2, r3);
-        r0 = r24;
-        r2 = r0.positiveButtonText;
-        if (r2 == 0) goto L_0x0673;
-    L_0x05dd:
-        r19 = new org.telegram.ui.ActionBar.AlertDialog$6;
-        r2 = r24.getContext();
-        r0 = r19;
-        r1 = r24;
-        r0.<init>(r2);
-        r2 = 1115684864; // 0x42800000 float:64.0 double:5.51221563E-315;
-        r2 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        r0 = r19;
-        r0.setMinWidth(r2);
-        r2 = -1;
-        r2 = java.lang.Integer.valueOf(r2);
-        r0 = r19;
-        r0.setTag(r2);
-        r2 = 1;
-        r3 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
-        r0 = r19;
-        r0.setTextSize(r2, r3);
-        r2 = "dialogButton";
-        r0 = r24;
-        r2 = r0.getThemeColor(r2);
-        r0 = r19;
-        r0.setTextColor(r2);
-        r2 = 17;
-        r0 = r19;
-        r0.setGravity(r2);
-        r2 = "fonts/rmedium.ttf";
-        r2 = org.telegram.messenger.AndroidUtilities.getTypeface(r2);
-        r0 = r19;
-        r0.setTypeface(r2);
-        r0 = r24;
-        r2 = r0.positiveButtonText;
-        r2 = r2.toString();
-        r2 = r2.toUpperCase();
-        r0 = r19;
-        r0.setText(r2);
-        r2 = org.telegram.ui.ActionBar.Theme.getRoundRectSelectorDrawable();
-        r0 = r19;
-        r0.setBackgroundDrawable(r2);
-        r2 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        r2 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        r3 = 0;
-        r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-        r5 = 0;
-        r0 = r19;
-        r0.setPadding(r2, r3, r4, r5);
-        r0 = r24;
-        r2 = r0.buttonsLayout;
-        r3 = -2;
-        r4 = 36;
-        r5 = 53;
-        r3 = org.telegram.ui.Components.LayoutHelper.createFrame(r3, r4, r5);
-        r0 = r19;
-        r2.addView(r0, r3);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$7;
-        r0 = r24;
-        r2.<init>();
-        r0 = r19;
-        r0.setOnClickListener(r2);
-    L_0x0673:
-        r0 = r24;
-        r2 = r0.negativeButtonText;
-        if (r2 == 0) goto L_0x070f;
-    L_0x0679:
-        r19 = new org.telegram.ui.ActionBar.AlertDialog$8;
-        r2 = r24.getContext();
-        r0 = r19;
-        r1 = r24;
-        r0.<init>(r2);
-        r2 = 1115684864; // 0x42800000 float:64.0 double:5.51221563E-315;
-        r2 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        r0 = r19;
-        r0.setMinWidth(r2);
-        r2 = -2;
-        r2 = java.lang.Integer.valueOf(r2);
-        r0 = r19;
-        r0.setTag(r2);
-        r2 = 1;
-        r3 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
-        r0 = r19;
-        r0.setTextSize(r2, r3);
-        r2 = "dialogButton";
-        r0 = r24;
-        r2 = r0.getThemeColor(r2);
-        r0 = r19;
-        r0.setTextColor(r2);
-        r2 = 17;
-        r0 = r19;
-        r0.setGravity(r2);
-        r2 = "fonts/rmedium.ttf";
-        r2 = org.telegram.messenger.AndroidUtilities.getTypeface(r2);
-        r0 = r19;
-        r0.setTypeface(r2);
-        r0 = r24;
-        r2 = r0.negativeButtonText;
-        r2 = r2.toString();
-        r2 = r2.toUpperCase();
-        r0 = r19;
-        r0.setText(r2);
-        r2 = org.telegram.ui.ActionBar.Theme.getRoundRectSelectorDrawable();
-        r0 = r19;
-        r0.setBackgroundDrawable(r2);
-        r2 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        r2 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        r3 = 0;
-        r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-        r5 = 0;
-        r0 = r19;
-        r0.setPadding(r2, r3, r4, r5);
-        r0 = r24;
-        r2 = r0.buttonsLayout;
-        r3 = -2;
-        r4 = 36;
-        r5 = 53;
-        r3 = org.telegram.ui.Components.LayoutHelper.createFrame(r3, r4, r5);
-        r0 = r19;
-        r2.addView(r0, r3);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$9;
-        r0 = r24;
-        r2.<init>();
-        r0 = r19;
-        r0.setOnClickListener(r2);
-    L_0x070f:
-        r0 = r24;
-        r2 = r0.neutralButtonText;
-        if (r2 == 0) goto L_0x07ab;
-    L_0x0715:
-        r19 = new org.telegram.ui.ActionBar.AlertDialog$10;
-        r2 = r24.getContext();
-        r0 = r19;
-        r1 = r24;
-        r0.<init>(r2);
-        r2 = 1115684864; // 0x42800000 float:64.0 double:5.51221563E-315;
-        r2 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        r0 = r19;
-        r0.setMinWidth(r2);
-        r2 = -3;
-        r2 = java.lang.Integer.valueOf(r2);
-        r0 = r19;
-        r0.setTag(r2);
-        r2 = 1;
-        r3 = 1096810496; // 0x41600000 float:14.0 double:5.41896386E-315;
-        r0 = r19;
-        r0.setTextSize(r2, r3);
-        r2 = "dialogButton";
-        r0 = r24;
-        r2 = r0.getThemeColor(r2);
-        r0 = r19;
-        r0.setTextColor(r2);
-        r2 = 17;
-        r0 = r19;
-        r0.setGravity(r2);
-        r2 = "fonts/rmedium.ttf";
-        r2 = org.telegram.messenger.AndroidUtilities.getTypeface(r2);
-        r0 = r19;
-        r0.setTypeface(r2);
-        r0 = r24;
-        r2 = r0.neutralButtonText;
-        r2 = r2.toString();
-        r2 = r2.toUpperCase();
-        r0 = r19;
-        r0.setText(r2);
-        r2 = org.telegram.ui.ActionBar.Theme.getRoundRectSelectorDrawable();
-        r0 = r19;
-        r0.setBackgroundDrawable(r2);
-        r2 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        r2 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        r3 = 0;
-        r4 = 1092616192; // 0x41200000 float:10.0 double:5.398241246E-315;
-        r4 = org.telegram.messenger.AndroidUtilities.dp(r4);
-        r5 = 0;
-        r0 = r19;
-        r0.setPadding(r2, r3, r4, r5);
-        r0 = r24;
-        r2 = r0.buttonsLayout;
-        r3 = -2;
-        r4 = 36;
-        r5 = 51;
-        r3 = org.telegram.ui.Components.LayoutHelper.createFrame(r3, r4, r5);
-        r0 = r19;
-        r2.addView(r0, r3);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$11;
-        r0 = r24;
-        r2.<init>();
-        r0 = r19;
-        r0.setOnClickListener(r2);
-    L_0x07ab:
-        r2 = org.telegram.messenger.AndroidUtilities.displaySize;
-        r2 = r2.x;
-        r0 = r24;
-        r0.lastScreenWidth = r2;
-        r2 = org.telegram.messenger.AndroidUtilities.displaySize;
-        r2 = r2.x;
-        r3 = 1111490560; // 0x42400000 float:48.0 double:5.491493014E-315;
-        r3 = org.telegram.messenger.AndroidUtilities.dp(r3);
-        r10 = r2 - r3;
-        r2 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r2 == 0) goto L_0x0836;
-    L_0x07c5:
-        r2 = org.telegram.messenger.AndroidUtilities.isSmallTablet();
-        if (r2 == 0) goto L_0x082f;
-    L_0x07cb:
-        r2 = 1138688000; // 0x43df0000 float:446.0 double:5.62586622E-315;
-        r15 = org.telegram.messenger.AndroidUtilities.dp(r2);
-    L_0x07d1:
-        r21 = r24.getWindow();
-        r16 = new android.view.WindowManager$LayoutParams;
-        r16.<init>();
-        r2 = r21.getAttributes();
-        r0 = r16;
-        r0.copyFrom(r2);
-        r2 = 1058642330; // 0x3f19999a float:0.6 double:5.230388065E-315;
-        r0 = r16;
-        r0.dimAmount = r2;
-        r2 = java.lang.Math.min(r15, r10);
-        r0 = r24;
-        r3 = r0.backgroundPaddings;
-        r3 = r3.left;
-        r2 = r2 + r3;
-        r0 = r24;
-        r3 = r0.backgroundPaddings;
-        r3 = r3.right;
-        r2 = r2 + r3;
-        r0 = r16;
-        r0.width = r2;
-        r0 = r16;
-        r2 = r0.flags;
-        r2 = r2 | 2;
-        r0 = r16;
-        r0.flags = r2;
-        r0 = r24;
-        r2 = r0.customView;
-        if (r2 == 0) goto L_0x081c;
-    L_0x0810:
-        r0 = r24;
-        r2 = r0.customView;
-        r0 = r24;
-        r2 = r0.canTextInput(r2);
-        if (r2 != 0) goto L_0x0827;
-    L_0x081c:
-        r0 = r16;
-        r2 = r0.flags;
-        r3 = 131072; // 0x20000 float:1.83671E-40 double:6.47582E-319;
-        r2 = r2 | r3;
-        r0 = r16;
-        r0.flags = r2;
-    L_0x0827:
-        r0 = r21;
-        r1 = r16;
-        r0.setAttributes(r1);
-        return;
-    L_0x082f:
-        r2 = 1140326400; // 0x43f80000 float:496.0 double:5.633960993E-315;
-        r15 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        goto L_0x07d1;
-    L_0x0836:
-        r2 = 1135738880; // 0x43b20000 float:356.0 double:5.611295633E-315;
-        r15 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        goto L_0x07d1;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.AlertDialog.onCreate(android.os.Bundle):void");
+    protected void onCreate(Bundle savedInstanceState) {
+        int maxWidth;
+        super.onCreate(savedInstanceState);
+        LinearLayout containerView = new LinearLayout(getContext()) {
+            private boolean inLayout;
+
+            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                this.inLayout = true;
+                int width = MeasureSpec.getSize(widthMeasureSpec);
+                int maxContentHeight = (MeasureSpec.getSize(heightMeasureSpec) - getPaddingTop()) - getPaddingBottom();
+                int availableHeight = maxContentHeight;
+                int availableWidth = (width - getPaddingLeft()) - getPaddingRight();
+                int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(availableWidth - AndroidUtilities.dp(48.0f), 1073741824);
+                int childFullWidthMeasureSpec = MeasureSpec.makeMeasureSpec(availableWidth, 1073741824);
+                if (AlertDialog.this.buttonsLayout != null) {
+                    int count = AlertDialog.this.buttonsLayout.getChildCount();
+                    for (int a = 0; a < count; a++) {
+                        ((TextView) AlertDialog.this.buttonsLayout.getChildAt(a)).setMaxWidth(AndroidUtilities.dp((float) ((availableWidth - AndroidUtilities.dp(24.0f)) / 2)));
+                    }
+                    AlertDialog.this.buttonsLayout.measure(childFullWidthMeasureSpec, heightMeasureSpec);
+                    LayoutParams layoutParams = (LayoutParams) AlertDialog.this.buttonsLayout.getLayoutParams();
+                    availableHeight -= (AlertDialog.this.buttonsLayout.getMeasuredHeight() + layoutParams.bottomMargin) + layoutParams.topMargin;
+                }
+                if (AlertDialog.this.titleTextView != null) {
+                    AlertDialog.this.titleTextView.measure(childWidthMeasureSpec, heightMeasureSpec);
+                    layoutParams = (LayoutParams) AlertDialog.this.titleTextView.getLayoutParams();
+                    availableHeight -= (AlertDialog.this.titleTextView.getMeasuredHeight() + layoutParams.bottomMargin) + layoutParams.topMargin;
+                }
+                if (AlertDialog.this.subtitleTextView != null) {
+                    AlertDialog.this.subtitleTextView.measure(childWidthMeasureSpec, heightMeasureSpec);
+                    layoutParams = (LayoutParams) AlertDialog.this.subtitleTextView.getLayoutParams();
+                    availableHeight -= (AlertDialog.this.subtitleTextView.getMeasuredHeight() + layoutParams.bottomMargin) + layoutParams.topMargin;
+                }
+                if (AlertDialog.this.topImageView != null) {
+                    AlertDialog.this.topImageView.measure(MeasureSpec.makeMeasureSpec(width, 1073741824), MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(132.0f), 1073741824));
+                    availableHeight -= AlertDialog.this.topImageView.getMeasuredHeight() - AndroidUtilities.dp(8.0f);
+                }
+                if (AlertDialog.this.progressViewStyle == 0) {
+                    layoutParams = (LayoutParams) AlertDialog.this.contentScrollView.getLayoutParams();
+                    int dp;
+                    if (AlertDialog.this.customView != null) {
+                        dp = (AlertDialog.this.titleTextView == null && AlertDialog.this.messageTextView.getVisibility() == 8 && AlertDialog.this.items == null) ? AndroidUtilities.dp(16.0f) : 0;
+                        layoutParams.topMargin = dp;
+                        layoutParams.bottomMargin = AlertDialog.this.buttonsLayout == null ? AndroidUtilities.dp(8.0f) : 0;
+                    } else if (AlertDialog.this.items != null) {
+                        dp = (AlertDialog.this.titleTextView == null && AlertDialog.this.messageTextView.getVisibility() == 8) ? AndroidUtilities.dp(8.0f) : 0;
+                        layoutParams.topMargin = dp;
+                        layoutParams.bottomMargin = AndroidUtilities.dp(8.0f);
+                    } else if (AlertDialog.this.messageTextView.getVisibility() == 0) {
+                        layoutParams.topMargin = AlertDialog.this.titleTextView == null ? AndroidUtilities.dp(19.0f) : 0;
+                        layoutParams.bottomMargin = AndroidUtilities.dp(20.0f);
+                    }
+                    availableHeight -= layoutParams.bottomMargin + layoutParams.topMargin;
+                    AlertDialog.this.contentScrollView.measure(childFullWidthMeasureSpec, MeasureSpec.makeMeasureSpec(availableHeight, Integer.MIN_VALUE));
+                    availableHeight -= AlertDialog.this.contentScrollView.getMeasuredHeight();
+                } else {
+                    if (AlertDialog.this.progressViewContainer != null) {
+                        AlertDialog.this.progressViewContainer.measure(childWidthMeasureSpec, MeasureSpec.makeMeasureSpec(availableHeight, Integer.MIN_VALUE));
+                        layoutParams = (LayoutParams) AlertDialog.this.progressViewContainer.getLayoutParams();
+                        availableHeight -= (AlertDialog.this.progressViewContainer.getMeasuredHeight() + layoutParams.bottomMargin) + layoutParams.topMargin;
+                    } else if (AlertDialog.this.messageTextView != null) {
+                        AlertDialog.this.messageTextView.measure(childWidthMeasureSpec, MeasureSpec.makeMeasureSpec(availableHeight, Integer.MIN_VALUE));
+                        if (AlertDialog.this.messageTextView.getVisibility() != 8) {
+                            layoutParams = (LayoutParams) AlertDialog.this.messageTextView.getLayoutParams();
+                            availableHeight -= (AlertDialog.this.messageTextView.getMeasuredHeight() + layoutParams.bottomMargin) + layoutParams.topMargin;
+                        }
+                    }
+                    if (AlertDialog.this.lineProgressView != null) {
+                        AlertDialog.this.lineProgressView.measure(childWidthMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(4.0f), 1073741824));
+                        layoutParams = (LayoutParams) AlertDialog.this.lineProgressView.getLayoutParams();
+                        availableHeight -= (AlertDialog.this.lineProgressView.getMeasuredHeight() + layoutParams.bottomMargin) + layoutParams.topMargin;
+                        AlertDialog.this.lineProgressViewPercent.measure(childWidthMeasureSpec, MeasureSpec.makeMeasureSpec(availableHeight, Integer.MIN_VALUE));
+                        layoutParams = (LayoutParams) AlertDialog.this.lineProgressViewPercent.getLayoutParams();
+                        availableHeight -= (AlertDialog.this.lineProgressViewPercent.getMeasuredHeight() + layoutParams.bottomMargin) + layoutParams.topMargin;
+                    }
+                }
+                setMeasuredDimension(width, ((maxContentHeight - availableHeight) + getPaddingTop()) + getPaddingBottom());
+                this.inLayout = false;
+                if (AlertDialog.this.lastScreenWidth != AndroidUtilities.displaySize.x) {
+                    AndroidUtilities.runOnUIThread(new Runnable() {
+                        public void run() {
+                            int maxWidth;
+                            AlertDialog.this.lastScreenWidth = AndroidUtilities.displaySize.x;
+                            int calculatedWidth = AndroidUtilities.displaySize.x - AndroidUtilities.dp(56.0f);
+                            if (!AndroidUtilities.isTablet()) {
+                                maxWidth = AndroidUtilities.dp(356.0f);
+                            } else if (AndroidUtilities.isSmallTablet()) {
+                                maxWidth = AndroidUtilities.dp(446.0f);
+                            } else {
+                                maxWidth = AndroidUtilities.dp(496.0f);
+                            }
+                            Window window = AlertDialog.this.getWindow();
+                            WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+                            params.copyFrom(window.getAttributes());
+                            params.width = (Math.min(maxWidth, calculatedWidth) + AlertDialog.this.backgroundPaddings.left) + AlertDialog.this.backgroundPaddings.right;
+                            window.setAttributes(params);
+                        }
+                    });
+                }
+            }
+
+            protected void onLayout(boolean changed, int l, int t, int r, int b) {
+                super.onLayout(changed, l, t, r, b);
+                if (AlertDialog.this.contentScrollView != null) {
+                    if (AlertDialog.this.onScrollChangedListener == null) {
+                        AlertDialog.this.onScrollChangedListener = new OnScrollChangedListener() {
+                            public void onScrollChanged() {
+                                boolean z;
+                                boolean z2 = false;
+                                AlertDialog alertDialog = AlertDialog.this;
+                                if (AlertDialog.this.titleTextView == null || AlertDialog.this.contentScrollView.getScrollY() <= AlertDialog.this.scrollContainer.getTop()) {
+                                    z = false;
+                                } else {
+                                    z = true;
+                                }
+                                alertDialog.runShadowAnimation(0, z);
+                                AlertDialog alertDialog2 = AlertDialog.this;
+                                if (AlertDialog.this.buttonsLayout != null && AlertDialog.this.contentScrollView.getScrollY() + AlertDialog.this.contentScrollView.getHeight() < AlertDialog.this.scrollContainer.getBottom()) {
+                                    z2 = true;
+                                }
+                                alertDialog2.runShadowAnimation(1, z2);
+                                AlertDialog.this.contentScrollView.invalidate();
+                            }
+                        };
+                        AlertDialog.this.contentScrollView.getViewTreeObserver().addOnScrollChangedListener(AlertDialog.this.onScrollChangedListener);
+                    }
+                    AlertDialog.this.onScrollChangedListener.onScrollChanged();
+                }
+            }
+
+            public void requestLayout() {
+                if (!this.inLayout) {
+                    super.requestLayout();
+                }
+            }
+
+            public boolean hasOverlappingRendering() {
+                return false;
+            }
+        };
+        containerView.setOrientation(1);
+        containerView.setBackgroundDrawable(this.shadowDrawable);
+        containerView.setFitsSystemWindows(VERSION.SDK_INT >= 21);
+        setContentView(containerView);
+        boolean hasButtons = (this.positiveButtonText == null && this.negativeButtonText == null && this.neutralButtonText == null) ? false : true;
+        if (!(this.topResId == 0 && this.topDrawable == null)) {
+            this.topImageView = new ImageView(getContext());
+            if (this.topDrawable != null) {
+                this.topImageView.setImageDrawable(this.topDrawable);
+            } else {
+                this.topImageView.setImageResource(this.topResId);
+            }
+            this.topImageView.setScaleType(ScaleType.CENTER);
+            this.topImageView.setBackgroundDrawable(getContext().getResources().getDrawable(R.drawable.popup_fixed_top));
+            this.topImageView.getBackground().setColorFilter(new PorterDuffColorFilter(this.topBackgroundColor, Mode.MULTIPLY));
+            this.topImageView.setPadding(0, 0, 0, 0);
+            containerView.addView(this.topImageView, LayoutHelper.createLinear(-1, 132, (LocaleController.isRTL ? 5 : 3) | 48, -8, -8, 0, 0));
+        }
+        if (this.title != null) {
+            this.titleTextView = new TextView(getContext());
+            this.titleTextView.setText(this.title);
+            this.titleTextView.setTextColor(getThemeColor(Theme.key_dialogTextBlack));
+            this.titleTextView.setTextSize(1, 20.0f);
+            this.titleTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+            this.titleTextView.setGravity((LocaleController.isRTL ? 5 : 3) | 48);
+            View view = this.titleTextView;
+            int i = (LocaleController.isRTL ? 5 : 3) | 48;
+            int i2 = this.subtitle != null ? 2 : this.items != null ? 14 : 10;
+            containerView.addView(view, LayoutHelper.createLinear(-2, -2, i, 24, 19, 24, i2));
+        }
+        if (this.subtitle != null) {
+            this.subtitleTextView = new TextView(getContext());
+            this.subtitleTextView.setText(this.subtitle);
+            this.subtitleTextView.setTextColor(getThemeColor(Theme.key_dialogIcon));
+            this.subtitleTextView.setTextSize(1, 14.0f);
+            this.subtitleTextView.setGravity((LocaleController.isRTL ? 5 : 3) | 48);
+            view = this.subtitleTextView;
+            i = (LocaleController.isRTL ? 5 : 3) | 48;
+            if (this.items != null) {
+                i2 = 14;
+            } else {
+                i2 = 10;
+            }
+            containerView.addView(view, LayoutHelper.createLinear(-2, -2, i, 24, 0, 24, i2));
+        }
+        if (this.progressViewStyle == 0) {
+            this.shadow[0] = (BitmapDrawable) getContext().getResources().getDrawable(R.drawable.header_shadow).mutate();
+            this.shadow[1] = (BitmapDrawable) getContext().getResources().getDrawable(R.drawable.header_shadow_reverse).mutate();
+            this.shadow[0].setAlpha(0);
+            this.shadow[1].setAlpha(0);
+            this.shadow[0].setCallback(this);
+            this.shadow[1].setCallback(this);
+            this.contentScrollView = new ScrollView(getContext()) {
+                protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+                    boolean result = super.drawChild(canvas, child, drawingTime);
+                    if (AlertDialog.this.shadow[0].getPaint().getAlpha() != 0) {
+                        AlertDialog.this.shadow[0].setBounds(0, getScrollY(), getMeasuredWidth(), getScrollY() + AndroidUtilities.dp(3.0f));
+                        AlertDialog.this.shadow[0].draw(canvas);
+                    }
+                    if (AlertDialog.this.shadow[1].getPaint().getAlpha() != 0) {
+                        AlertDialog.this.shadow[1].setBounds(0, (getScrollY() + getMeasuredHeight()) - AndroidUtilities.dp(3.0f), getMeasuredWidth(), getScrollY() + getMeasuredHeight());
+                        AlertDialog.this.shadow[1].draw(canvas);
+                    }
+                    return result;
+                }
+            };
+            this.contentScrollView.setVerticalScrollBarEnabled(false);
+            AndroidUtilities.setScrollViewEdgeEffectColor(this.contentScrollView, getThemeColor(Theme.key_dialogScrollGlow));
+            containerView.addView(this.contentScrollView, LayoutHelper.createLinear(-1, -2, 0.0f, 0.0f, 0.0f, 0.0f));
+            this.scrollContainer = new LinearLayout(getContext());
+            this.scrollContainer.setOrientation(1);
+            this.contentScrollView.addView(this.scrollContainer, new FrameLayout.LayoutParams(-1, -2));
+        }
+        this.messageTextView = new TextView(getContext());
+        this.messageTextView.setTextColor(getThemeColor(Theme.key_dialogTextBlack));
+        this.messageTextView.setTextSize(1, 16.0f);
+        this.messageTextView.setMovementMethod(new LinkMovementMethodMy());
+        this.messageTextView.setLinkTextColor(getThemeColor(Theme.key_dialogTextLink));
+        this.messageTextView.setGravity((LocaleController.isRTL ? 5 : 3) | 48);
+        View view2;
+        if (this.progressViewStyle == 1) {
+            int i3;
+            int i4;
+            this.progressViewContainer = new FrameLayout(getContext());
+            containerView.addView(this.progressViewContainer, LayoutHelper.createLinear(-1, 44, 51, 23, this.title == null ? 24 : 0, 23, 24));
+            View radialProgressView = new RadialProgressView(getContext());
+            radialProgressView.setProgressColor(getThemeColor(Theme.key_dialogProgressCircle));
+            this.progressViewContainer.addView(radialProgressView, LayoutHelper.createFrame(44, 44, (LocaleController.isRTL ? 5 : 3) | 48));
+            this.messageTextView.setLines(1);
+            this.messageTextView.setEllipsize(TruncateAt.END);
+            FrameLayout frameLayout = this.progressViewContainer;
+            view2 = this.messageTextView;
+            if (LocaleController.isRTL) {
+                i = 5;
+            } else {
+                i = 3;
+            }
+            i |= 16;
+            if (LocaleController.isRTL) {
+                i3 = 0;
+            } else {
+                i3 = 62;
+            }
+            float f = (float) i3;
+            if (LocaleController.isRTL) {
+                i4 = 62;
+            } else {
+                i4 = 0;
+            }
+            frameLayout.addView(view2, LayoutHelper.createFrame(-2, -2.0f, i, f, 0.0f, (float) i4, 0.0f));
+        } else if (this.progressViewStyle == 2) {
+            containerView.addView(this.messageTextView, LayoutHelper.createLinear(-2, -2, (LocaleController.isRTL ? 5 : 3) | 48, 24, this.title == null ? 19 : 0, 24, 20));
+            this.lineProgressView = new LineProgressView(getContext());
+            this.lineProgressView.setProgress(((float) this.currentProgress) / 100.0f, false);
+            this.lineProgressView.setProgressColor(getThemeColor(Theme.key_dialogLineProgress));
+            this.lineProgressView.setBackColor(getThemeColor(Theme.key_dialogLineProgressBackground));
+            containerView.addView(this.lineProgressView, LayoutHelper.createLinear(-1, 4, 19, 24, 0, 24, 0));
+            this.lineProgressViewPercent = new TextView(getContext());
+            this.lineProgressViewPercent.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+            this.lineProgressViewPercent.setGravity((LocaleController.isRTL ? 5 : 3) | 48);
+            this.lineProgressViewPercent.setTextColor(getThemeColor(Theme.key_dialogTextGray2));
+            this.lineProgressViewPercent.setTextSize(1, 14.0f);
+            containerView.addView(this.lineProgressViewPercent, LayoutHelper.createLinear(-2, -2, (LocaleController.isRTL ? 5 : 3) | 48, 23, 4, 23, 24));
+            updateLineProgressTextView();
+        } else {
+            LinearLayout linearLayout = this.scrollContainer;
+            view2 = this.messageTextView;
+            i = (LocaleController.isRTL ? 5 : 3) | 48;
+            i2 = (this.customView == null && this.items == null) ? 0 : this.customViewOffset;
+            linearLayout.addView(view2, LayoutHelper.createLinear(-2, -2, i, 24, 0, 24, i2));
+        }
+        if (TextUtils.isEmpty(this.message)) {
+            this.messageTextView.setVisibility(8);
+        } else {
+            this.messageTextView.setText(this.message);
+            this.messageTextView.setVisibility(0);
+        }
+        if (this.items != null) {
+            int a = 0;
+            while (a < this.items.length) {
+                if (this.items[a] != null) {
+                    AlertDialogCell cell = new AlertDialogCell(getContext());
+                    cell.setTextAndIcon(this.items[a], this.itemIcons != null ? this.itemIcons[a] : 0);
+                    this.scrollContainer.addView(cell, LayoutHelper.createLinear(-1, 48));
+                    cell.setTag(Integer.valueOf(a));
+                    cell.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            if (AlertDialog.this.onClickListener != null) {
+                                AlertDialog.this.onClickListener.onClick(AlertDialog.this, ((Integer) v.getTag()).intValue());
+                            }
+                            AlertDialog.this.dismiss();
+                        }
+                    });
+                }
+                a++;
+            }
+        }
+        if (this.customView != null) {
+            if (this.customView.getParent() != null) {
+                ((ViewGroup) this.customView.getParent()).removeView(this.customView);
+            }
+            this.scrollContainer.addView(this.customView, LayoutHelper.createLinear(-1, -2));
+        }
+        if (hasButtons) {
+            this.buttonsLayout = new FrameLayout(getContext()) {
+                protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+                    int count = getChildCount();
+                    View positiveButton = null;
+                    int width = right - left;
+                    for (int a = 0; a < count; a++) {
+                        View child = getChildAt(a);
+                        if (((Integer) child.getTag()).intValue() == -1) {
+                            positiveButton = child;
+                            if (LocaleController.isRTL) {
+                                child.layout(getPaddingLeft(), getPaddingTop(), getPaddingLeft() + child.getMeasuredWidth(), getPaddingTop() + child.getMeasuredHeight());
+                            } else {
+                                child.layout((width - getPaddingRight()) - child.getMeasuredWidth(), getPaddingTop(), (width - getPaddingRight()) + child.getMeasuredWidth(), getPaddingTop() + child.getMeasuredHeight());
+                            }
+                        } else if (((Integer) child.getTag()).intValue() == -2) {
+                            int x;
+                            if (LocaleController.isRTL) {
+                                x = getPaddingLeft();
+                                if (positiveButton != null) {
+                                    x += positiveButton.getMeasuredWidth() + AndroidUtilities.dp(8.0f);
+                                }
+                                child.layout(x, getPaddingTop(), child.getMeasuredWidth() + x, getPaddingTop() + child.getMeasuredHeight());
+                            } else {
+                                x = (width - getPaddingRight()) - child.getMeasuredWidth();
+                                if (positiveButton != null) {
+                                    x -= positiveButton.getMeasuredWidth() + AndroidUtilities.dp(8.0f);
+                                }
+                                child.layout(x, getPaddingTop(), child.getMeasuredWidth() + x, getPaddingTop() + child.getMeasuredHeight());
+                            }
+                        } else if (LocaleController.isRTL) {
+                            child.layout((width - getPaddingRight()) - child.getMeasuredWidth(), getPaddingTop(), (width - getPaddingRight()) + child.getMeasuredWidth(), getPaddingTop() + child.getMeasuredHeight());
+                        } else {
+                            child.layout(getPaddingLeft(), getPaddingTop(), getPaddingLeft() + child.getMeasuredWidth(), getPaddingTop() + child.getMeasuredHeight());
+                        }
+                    }
+                }
+            };
+            this.buttonsLayout.setPadding(AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f));
+            containerView.addView(this.buttonsLayout, LayoutHelper.createLinear(-1, 52));
+            if (this.positiveButtonText != null) {
+                radialProgressView = new TextView(getContext()) {
+                    public void setEnabled(boolean enabled) {
+                        super.setEnabled(enabled);
+                        setAlpha(enabled ? 1.0f : 0.5f);
+                    }
+                };
+                radialProgressView.setMinWidth(AndroidUtilities.dp(64.0f));
+                radialProgressView.setTag(Integer.valueOf(-1));
+                radialProgressView.setTextSize(1, 14.0f);
+                radialProgressView.setTextColor(getThemeColor(Theme.key_dialogButton));
+                radialProgressView.setGravity(17);
+                radialProgressView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+                radialProgressView.setText(this.positiveButtonText.toString().toUpperCase());
+                radialProgressView.setBackgroundDrawable(Theme.getRoundRectSelectorDrawable());
+                radialProgressView.setPadding(AndroidUtilities.dp(10.0f), 0, AndroidUtilities.dp(10.0f), 0);
+                this.buttonsLayout.addView(radialProgressView, LayoutHelper.createFrame(-2, 36, 53));
+                radialProgressView.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        if (AlertDialog.this.positiveButtonListener != null) {
+                            AlertDialog.this.positiveButtonListener.onClick(AlertDialog.this, -1);
+                        }
+                        AlertDialog.this.dismiss();
+                    }
+                });
+            }
+            if (this.negativeButtonText != null) {
+                radialProgressView = new TextView(getContext()) {
+                    public void setEnabled(boolean enabled) {
+                        super.setEnabled(enabled);
+                        setAlpha(enabled ? 1.0f : 0.5f);
+                    }
+                };
+                radialProgressView.setMinWidth(AndroidUtilities.dp(64.0f));
+                radialProgressView.setTag(Integer.valueOf(-2));
+                radialProgressView.setTextSize(1, 14.0f);
+                radialProgressView.setTextColor(getThemeColor(Theme.key_dialogButton));
+                radialProgressView.setGravity(17);
+                radialProgressView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+                radialProgressView.setText(this.negativeButtonText.toString().toUpperCase());
+                radialProgressView.setBackgroundDrawable(Theme.getRoundRectSelectorDrawable());
+                radialProgressView.setPadding(AndroidUtilities.dp(10.0f), 0, AndroidUtilities.dp(10.0f), 0);
+                this.buttonsLayout.addView(radialProgressView, LayoutHelper.createFrame(-2, 36, 53));
+                radialProgressView.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        if (AlertDialog.this.negativeButtonListener != null) {
+                            AlertDialog.this.negativeButtonListener.onClick(AlertDialog.this, -2);
+                        }
+                        AlertDialog.this.cancel();
+                    }
+                });
+            }
+            if (this.neutralButtonText != null) {
+                radialProgressView = new TextView(getContext()) {
+                    public void setEnabled(boolean enabled) {
+                        super.setEnabled(enabled);
+                        setAlpha(enabled ? 1.0f : 0.5f);
+                    }
+                };
+                radialProgressView.setMinWidth(AndroidUtilities.dp(64.0f));
+                radialProgressView.setTag(Integer.valueOf(-3));
+                radialProgressView.setTextSize(1, 14.0f);
+                radialProgressView.setTextColor(getThemeColor(Theme.key_dialogButton));
+                radialProgressView.setGravity(17);
+                radialProgressView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+                radialProgressView.setText(this.neutralButtonText.toString().toUpperCase());
+                radialProgressView.setBackgroundDrawable(Theme.getRoundRectSelectorDrawable());
+                radialProgressView.setPadding(AndroidUtilities.dp(10.0f), 0, AndroidUtilities.dp(10.0f), 0);
+                this.buttonsLayout.addView(radialProgressView, LayoutHelper.createFrame(-2, 36, 51));
+                radialProgressView.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        if (AlertDialog.this.neutralButtonListener != null) {
+                            AlertDialog.this.neutralButtonListener.onClick(AlertDialog.this, -2);
+                        }
+                        AlertDialog.this.dismiss();
+                    }
+                });
+            }
+        }
+        this.lastScreenWidth = AndroidUtilities.displaySize.x;
+        int calculatedWidth = AndroidUtilities.displaySize.x - AndroidUtilities.dp(48.0f);
+        if (!AndroidUtilities.isTablet()) {
+            maxWidth = AndroidUtilities.dp(356.0f);
+        } else if (AndroidUtilities.isSmallTablet()) {
+            maxWidth = AndroidUtilities.dp(446.0f);
+        } else {
+            maxWidth = AndroidUtilities.dp(496.0f);
+        }
+        Window window = getWindow();
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        params.copyFrom(window.getAttributes());
+        params.dimAmount = 0.6f;
+        params.width = (Math.min(maxWidth, calculatedWidth) + this.backgroundPaddings.left) + this.backgroundPaddings.right;
+        params.flags |= 2;
+        if (this.customView != null) {
+            if (canTextInput(this.customView)) {
+                params.softInputMode = 4;
+                window.setAttributes(params);
+            }
+        }
+        params.flags |= 131072;
+        window.setAttributes(params);
     }
 
     public void onBackPressed() {

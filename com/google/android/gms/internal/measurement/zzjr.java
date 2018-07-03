@@ -3255,11 +3255,11 @@ public class zzjr implements zzec {
     }
 
     public final void zzks() {
-        String zzhn;
         String str;
         zzab();
         zzkq();
         this.zzaqn = true;
+        String zzhn;
         try {
             Boolean zzkf = this.zzacw.zzfx().zzkf();
             if (zzkf == null) {

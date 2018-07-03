@@ -19,9 +19,9 @@ public final class zzki extends zzaby<zzki> {
     }
 
     private final zzki zze(zzabv com_google_android_gms_internal_measurement_zzabv) throws IOException {
-        int position;
         while (true) {
             int zzuw = com_google_android_gms_internal_measurement_zzabv.zzuw();
+            int position;
             switch (zzuw) {
                 case 0:
                     break;

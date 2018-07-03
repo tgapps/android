@@ -237,6 +237,7 @@ public class ConnectionsManager {
         protected NativeByteBuffer doInBackground(Void... voids) {
             Throwable e;
             ByteArrayOutputStream outbuf;
+            NativeByteBuffer buffer;
             InputStream httpConnectionStream = null;
             int i = 0;
             ByteArrayOutputStream outbuf2 = null;
@@ -275,7 +276,6 @@ public class ConnectionsManager {
                     int a;
                     StringBuilder builder;
                     byte[] bytes;
-                    NativeByteBuffer buffer;
                     byte[] data = new byte[32768];
                     while (!isCancelled()) {
                         int read = httpConnectionStream.read(data);
