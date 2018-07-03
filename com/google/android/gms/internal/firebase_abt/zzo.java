@@ -3,6 +3,7 @@ package com.google.android.gms.internal.firebase_abt;
 import java.io.IOException;
 import org.telegram.messenger.exoplayer2.RendererCapabilities;
 import org.telegram.messenger.voip.VoIPService;
+import org.telegram.tgnet.TLRPC;
 
 public final class zzo extends zzd<zzo> {
     public String zzaq;
@@ -70,7 +71,7 @@ public final class zzo extends zzd<zzo> {
                 case VoIPService.CALL_MAX_LAYER /*74*/:
                     this.zzay = com_google_android_gms_internal_firebase_abt_zza.readString();
                     continue;
-                case 82:
+                case TLRPC.LAYER /*82*/:
                     this.zzaz = com_google_android_gms_internal_firebase_abt_zza.readString();
                     continue;
                 case 90:

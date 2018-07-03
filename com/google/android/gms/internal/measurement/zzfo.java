@@ -29,6 +29,7 @@ final class zzfo implements Runnable {
     }
 
     public final void run() {
+        HttpURLConnection zzb;
         OutputStream outputStream;
         Throwable e;
         Map map;
@@ -39,7 +40,6 @@ final class zzfo implements Runnable {
         OutputStream outputStream2;
         this.zzajo.zzfs();
         int i2 = 0;
-        HttpURLConnection zzb;
         try {
             zzb = this.zzajo.zzb(this.url);
             try {

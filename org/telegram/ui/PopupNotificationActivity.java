@@ -34,7 +34,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import java.util.ArrayList;
-import java.util.Locale;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -53,11 +52,13 @@ import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
+import org.telegram.messenger.WebFile;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.exoplayer2.extractor.ts.PsExtractor;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.Chat;
+import org.telegram.tgnet.TLRPC.GeoPoint;
 import org.telegram.tgnet.TLRPC.KeyboardButton;
 import org.telegram.tgnet.TLRPC.PhotoSize;
 import org.telegram.tgnet.TLRPC.ReplyMarkup;
@@ -297,6 +298,12 @@ public class PopupNotificationActivity extends Activity implements NotificationC
             }
 
             public void onTextChanged(CharSequence text, boolean big) {
+            }
+
+            public void onTextSelectionChanged(int start, int end) {
+            }
+
+            public void onTextSpansChanged(CharSequence text) {
             }
 
             public void onStickersExpandedChange() {
@@ -772,7 +779,6 @@ public class PopupNotificationActivity extends Activity implements NotificationC
         }
         MessageObject messageObject = (MessageObject) this.popupMessages.get(num);
         View frameLayout;
-        FrameLayout frameLayout2;
         TextView messageText;
         if (messageObject.type == 1 || messageObject.type == 4) {
             if (this.imageViews.size() > 0) {
@@ -780,19 +786,19 @@ public class PopupNotificationActivity extends Activity implements NotificationC
                 this.imageViews.remove(0);
             } else {
                 frameLayout = new FrameLayout(this);
-                frameLayout2 = new FrameLayout(this);
-                frameLayout2.setPadding(AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f));
-                frameLayout2.setBackgroundDrawable(Theme.getSelectorDrawable(false));
-                frameLayout.addView(frameLayout2, LayoutHelper.createFrame(-1, -1.0f));
+                frameLayout = new FrameLayout(this);
+                frameLayout.setPadding(AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f));
+                frameLayout.setBackgroundDrawable(Theme.getSelectorDrawable(false));
+                frameLayout.addView(frameLayout, LayoutHelper.createFrame(-1, -1.0f));
                 BackupImageView backupImageView = new BackupImageView(this);
                 backupImageView.setTag(Integer.valueOf(311));
-                frameLayout2.addView(backupImageView, LayoutHelper.createFrame(-1, -1.0f));
+                frameLayout.addView(backupImageView, LayoutHelper.createFrame(-1, -1.0f));
                 frameLayout = new TextView(this);
                 frameLayout.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                 frameLayout.setTextSize(1, 16.0f);
                 frameLayout.setGravity(17);
                 frameLayout.setTag(Integer.valueOf(312));
-                frameLayout2.addView(frameLayout, LayoutHelper.createFrame(-1, -2, 17));
+                frameLayout.addView(frameLayout, LayoutHelper.createFrame(-1, -2, 17));
                 frameLayout.setTag(Integer.valueOf(2));
                 frameLayout.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -803,6 +809,7 @@ public class PopupNotificationActivity extends Activity implements NotificationC
             messageText = (TextView) view.findViewWithTag(Integer.valueOf(312));
             BackupImageView imageView = (BackupImageView) view.findViewWithTag(Integer.valueOf(311));
             imageView.setAspectFit(true);
+            BackupImageView backupImageView2;
             if (messageObject.type == 1) {
                 PhotoSize currentPhotoObject = FileLoader.getClosestPhotoSizeWithSize(messageObject.photoThumbs, AndroidUtilities.getPhotoSize());
                 PhotoSize thumb = FileLoader.getClosestPhotoSizeWithSize(messageObject.photoThumbs, 100);
@@ -813,7 +820,8 @@ public class PopupNotificationActivity extends Activity implements NotificationC
                         photoExist = false;
                     }
                     if (photoExist || DownloadController.getInstance(messageObject.currentAccount).canDownloadMedia(messageObject)) {
-                        imageView.setImage(currentPhotoObject.location, "100_100", thumb.location, currentPhotoObject.size);
+                        backupImageView2 = imageView;
+                        backupImageView2.setImage(currentPhotoObject.location, "100_100", thumb.location, currentPhotoObject.size);
                         photoSet = true;
                     } else if (thumb != null) {
                         imageView.setImage(thumb.location, null, (Drawable) null);
@@ -833,10 +841,15 @@ public class PopupNotificationActivity extends Activity implements NotificationC
                 messageText.setVisibility(8);
                 messageText.setText(messageObject.messageText);
                 imageView.setVisibility(0);
-                double lat = messageObject.messageOwner.media.geo.lat;
-                double lon = messageObject.messageOwner.media.geo._long;
-                BackupImageView backupImageView2 = imageView;
-                backupImageView2.setImage(String.format(Locale.US, "https://maps.googleapis.com/maps/api/staticmap?center=%f,%f&zoom=13&size=100x100&maptype=roadmap&scale=%d&markers=color:red|size:big|%f,%f&sensor=false", new Object[]{Double.valueOf(lat), Double.valueOf(lon), Integer.valueOf(Math.min(2, (int) Math.ceil((double) AndroidUtilities.density))), Double.valueOf(lat), Double.valueOf(lon)}), null, null);
+                GeoPoint geoPoint = messageObject.messageOwner.media.geo;
+                double lat = geoPoint.lat;
+                double lon = geoPoint._long;
+                if (MessagesController.getInstance(messageObject.currentAccount).mapProvider == 2) {
+                    backupImageView2 = imageView;
+                    backupImageView2.setImage(WebFile.createWithGeoPoint(geoPoint, 100, 100, 13, Math.min(2, (int) Math.ceil((double) AndroidUtilities.density))), null, (Drawable) null);
+                } else {
+                    imageView.setImage(AndroidUtilities.formapMapUrl(messageObject.currentAccount, lat, lon, 100, 100, true, 13), null, null);
+                }
             }
         } else if (messageObject.type == 2) {
             PopupAudioView cell;
@@ -846,15 +859,15 @@ public class PopupNotificationActivity extends Activity implements NotificationC
                 cell = (PopupAudioView) view.findViewWithTag(Integer.valueOf(300));
             } else {
                 frameLayout = new FrameLayout(this);
-                frameLayout2 = new FrameLayout(this);
-                frameLayout2.setPadding(AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f));
-                frameLayout2.setBackgroundDrawable(Theme.getSelectorDrawable(false));
-                frameLayout.addView(frameLayout2, LayoutHelper.createFrame(-1, -1.0f));
-                FrameLayout frameLayout1 = new FrameLayout(this);
-                frameLayout2.addView(frameLayout1, LayoutHelper.createFrame(-1, -2.0f, 17, 20.0f, 0.0f, 20.0f, 0.0f));
-                cell = new PopupAudioView(this);
-                cell.setTag(Integer.valueOf(300));
-                frameLayout1.addView(cell);
+                frameLayout = new FrameLayout(this);
+                frameLayout.setPadding(AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f));
+                frameLayout.setBackgroundDrawable(Theme.getSelectorDrawable(false));
+                frameLayout.addView(frameLayout, LayoutHelper.createFrame(-1, -1.0f));
+                frameLayout = new FrameLayout(this);
+                frameLayout.addView(frameLayout, LayoutHelper.createFrame(-1, -2.0f, 17, 20.0f, 0.0f, 20.0f, 0.0f));
+                PopupAudioView popupAudioView = new PopupAudioView(this);
+                popupAudioView.setTag(Integer.valueOf(300));
+                frameLayout.addView(popupAudioView);
                 frameLayout.setTag(Integer.valueOf(3));
                 frameLayout.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {

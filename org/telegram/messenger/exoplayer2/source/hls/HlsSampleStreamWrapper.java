@@ -3,8 +3,11 @@ package org.telegram.messenger.exoplayer2.source.hls;
 import android.os.Handler;
 import android.util.Log;
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.exoplayer2.Format;
 import org.telegram.messenger.exoplayer2.FormatHolder;
@@ -37,6 +40,9 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
     private static final int PRIMARY_TYPE_NONE = 0;
     private static final int PRIMARY_TYPE_TEXT = 1;
     private static final int PRIMARY_TYPE_VIDEO = 3;
+    public static final int SAMPLE_QUEUE_INDEX_NO_MAPPING_FATAL = -2;
+    public static final int SAMPLE_QUEUE_INDEX_NO_MAPPING_NON_FATAL = -3;
+    public static final int SAMPLE_QUEUE_INDEX_PENDING = -1;
     private static final String TAG = "HlsSampleStreamWrapper";
     private final Allocator allocator;
     private int audioSampleQueueIndex = -1;
@@ -48,6 +54,7 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
     private final EventDispatcher eventDispatcher;
     private final Handler handler = new Handler();
     private boolean haveAudioVideoSampleQueues;
+    private final ArrayList<HlsSampleStream> hlsSampleStreams = new ArrayList();
     private long lastSeekPositionUs;
     private final Loader loader = new Loader("Loader:HlsSampleStreamWrapper");
     private boolean loadingFinished;
@@ -65,6 +72,7 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
             HlsSampleStreamWrapper.this.onTracksEnded();
         }
     };
+    private TrackGroupArray optionalTrackGroups;
     private long pendingResetPositionUs;
     private boolean pendingResetUpstreamFormats;
     private boolean prepared;
@@ -83,6 +91,10 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
     private boolean tracksEnded;
     private int videoSampleQueueIndex = -1;
     private boolean videoSampleQueueMappingDone;
+
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface PrimaryTrackType {
+    }
 
     public interface Callback extends org.telegram.messenger.exoplayer2.source.SequenceableLoader.Callback<HlsSampleStreamWrapper> {
         void onPlaylistRefreshRequired(HlsUrl hlsUrl);
@@ -108,9 +120,10 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
         }
     }
 
-    public void prepareWithMasterPlaylistInfo(TrackGroupArray trackGroups, int primaryTrackGroupIndex) {
+    public void prepareWithMasterPlaylistInfo(TrackGroupArray trackGroups, int primaryTrackGroupIndex, TrackGroupArray optionalTrackGroups) {
         this.prepared = true;
         this.trackGroups = trackGroups;
+        this.optionalTrackGroups = optionalTrackGroups;
         this.primaryTrackGroupIndex = primaryTrackGroupIndex;
         this.callback.onPrepared();
     }
@@ -123,23 +136,19 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
         return this.trackGroups;
     }
 
-    public boolean isMappingFinished() {
-        return this.trackGroupToSampleQueueIndex != null;
-    }
-
     public int bindSampleQueueToSampleStream(int trackGroupIndex) {
-        if (!isMappingFinished()) {
-            return -1;
-        }
         int sampleQueueIndex = this.trackGroupToSampleQueueIndex[trackGroupIndex];
         if (sampleQueueIndex == -1) {
-            return -1;
+            if (this.optionalTrackGroups.indexOf(this.trackGroups.get(trackGroupIndex)) == -1) {
+                return -2;
+            }
+            return -3;
+        } else if (this.sampleQueuesEnabledStates[sampleQueueIndex]) {
+            return -2;
+        } else {
+            this.sampleQueuesEnabledStates[sampleQueueIndex] = true;
+            return sampleQueueIndex;
         }
-        if (this.sampleQueuesEnabledStates[sampleQueueIndex]) {
-            return -1;
-        }
-        this.sampleQueuesEnabledStates[sampleQueueIndex] = true;
-        return sampleQueueIndex;
     }
 
     public void unbindSampleQueue(int trackGroupIndex) {
@@ -181,6 +190,9 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
                 }
                 streams[i] = new HlsSampleStream(this, trackGroupIndex);
                 streamResetFlags[i] = true;
+                if (this.trackGroupToSampleQueueIndex != null) {
+                    ((HlsSampleStream) streams[i]).bindSampleQueue();
+                }
                 if (this.sampleQueuesBuilt && !seekRequired) {
                     sampleQueue = this.sampleQueues[this.trackGroupToSampleQueueIndex[trackGroupIndex]];
                     sampleQueue.rewind();
@@ -233,6 +245,7 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
                 }
             }
         }
+        updateSampleStreams(streams);
         this.seenFirstTrackSelection = true;
         return seekRequired;
     }
@@ -263,14 +276,15 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
     }
 
     public void release() {
-        boolean releasedSynchronously = this.loader.release(this);
-        if (this.prepared && !releasedSynchronously) {
+        if (this.prepared) {
             for (SampleQueue sampleQueue : this.sampleQueues) {
                 sampleQueue.discardToEnd();
             }
         }
+        this.loader.release(this);
         this.handler.removeCallbacksAndMessages(null);
         this.released = true;
+        this.hlsSampleStreams.clear();
     }
 
     public void onLoaderReleased() {
@@ -281,8 +295,8 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
         this.chunkSource.setIsTimestampMaster(isTimestampMaster);
     }
 
-    public void onPlaylistBlacklisted(HlsUrl url, long blacklistMs) {
-        this.chunkSource.onPlaylistBlacklisted(url, blacklistMs);
+    public boolean onPlaylistError(HlsUrl url, boolean shouldBlacklist) {
+        return this.chunkSource.onPlaylistError(url, shouldBlacklist);
     }
 
     public boolean isReady(int sampleQueueIndex) {
@@ -548,6 +562,15 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
         }
     }
 
+    private void updateSampleStreams(SampleStream[] streams) {
+        this.hlsSampleStreams.clear();
+        for (SampleStream stream : streams) {
+            if (stream != null) {
+                this.hlsSampleStreams.add((HlsSampleStream) stream);
+            }
+        }
+    }
+
     private boolean finishedReadingChunk(HlsMediaChunk chunk) {
         int chunkUid = chunk.uid;
         int sampleQueueCount = this.sampleQueues.length;
@@ -589,7 +612,7 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
                 mapSampleQueuesToMatchTrackGroups();
                 return;
             }
-            buildTracks();
+            buildTracksFromSampleStreams();
             this.prepared = true;
             this.callback.onPrepared();
         }
@@ -607,9 +630,13 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
                 }
             }
         }
+        Iterator it = this.hlsSampleStreams.iterator();
+        while (it.hasNext()) {
+            ((HlsSampleStream) it.next()).bindSampleQueue();
+        }
     }
 
-    private void buildTracks() {
+    private void buildTracksFromSampleStreams() {
         int i;
         int primaryExtractorTrackType = 0;
         int primaryExtractorTrackIndex = -1;
@@ -656,6 +683,8 @@ final class HlsSampleStreamWrapper implements ExtractorOutput, UpstreamFormatCha
             }
         }
         this.trackGroups = new TrackGroupArray(trackGroups);
+        Assertions.checkState(this.optionalTrackGroups == null);
+        this.optionalTrackGroups = TrackGroupArray.EMPTY;
     }
 
     private HlsMediaChunk getLastMediaChunk() {

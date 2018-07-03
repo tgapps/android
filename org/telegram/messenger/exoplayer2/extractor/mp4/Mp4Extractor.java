@@ -325,7 +325,7 @@ public final class Mp4Extractor implements Extractor, SeekMap {
                             }
                         }
                         mp4Track.trackOutput.format(format);
-                        durationUs = Math.max(durationUs, track.durationUs);
+                        durationUs = Math.max(durationUs, track.durationUs != C.TIME_UNSET ? track.durationUs : trackSampleTable.durationUs);
                         if (track.type == 2 && firstVideoTrackIndex == -1) {
                             firstVideoTrackIndex = tracks.size();
                         }

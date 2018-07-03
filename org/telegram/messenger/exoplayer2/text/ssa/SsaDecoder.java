@@ -203,7 +203,7 @@ public final class SsaDecoder extends SimpleSubtitleDecoder {
     public static long parseTimecodeUs(String timeString) {
         Matcher matcher = SSA_TIMECODE_PATTERN.matcher(timeString);
         if (matcher.matches()) {
-            return (((((Long.parseLong(matcher.group(1)) * 60) * 60) * C.MICROS_PER_SECOND) + ((Long.parseLong(matcher.group(2)) * 60) * C.MICROS_PER_SECOND)) + (Long.parseLong(matcher.group(3)) * C.MICROS_PER_SECOND)) + (Long.parseLong(matcher.group(4)) * 10000);
+            return (((((Long.parseLong(matcher.group(1)) * 60) * 60) * 1000000) + ((Long.parseLong(matcher.group(2)) * 60) * 1000000)) + (Long.parseLong(matcher.group(3)) * 1000000)) + (Long.parseLong(matcher.group(4)) * 10000);
         }
         return C.TIME_UNSET;
     }

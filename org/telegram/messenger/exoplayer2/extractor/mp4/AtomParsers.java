@@ -26,8 +26,8 @@ import org.telegram.messenger.exoplayer2.video.AvcConfig;
 import org.telegram.messenger.exoplayer2.video.HevcConfig;
 
 final class AtomParsers {
+    private static final int MAX_GAPLESS_TRIM_SIZE_SAMPLES = 3;
     private static final String TAG = "AtomParsers";
-    private static final int TYPE_cenc = Util.getIntegerCodeForString(C.CENC_TYPE_cenc);
     private static final int TYPE_clcp = Util.getIntegerCodeForString("clcp");
     private static final int TYPE_meta = Util.getIntegerCodeForString(MetaBox.TYPE);
     private static final int TYPE_sbtl = Util.getIntegerCodeForString("sbtl");
@@ -194,7 +194,7 @@ final class AtomParsers {
         if (duration == C.TIME_UNSET) {
             durationUs = C.TIME_UNSET;
         } else {
-            durationUs = Util.scaleLargeTimestamp(duration, C.MICROS_PER_SECOND, movieTimescale);
+            durationUs = Util.scaleLargeTimestamp(duration, 1000000, movieTimescale);
         }
         ContainerAtom stbl = mdia.getContainerAtomOfType(Atom.TYPE_minf).getContainerAtomOfType(Atom.TYPE_stbl);
         Pair<Long, String> mdhdData = parseMdhd(mdia.getLeafAtomOfType(Atom.TYPE_mdhd).data);
@@ -226,12 +226,13 @@ final class AtomParsers {
         }
         int sampleCount = sampleSizeBox.getSampleCount();
         if (sampleCount == 0) {
-            return new TrackSampleTable(new long[0], new int[0], 0, new long[0], new int[0]);
+            return new TrackSampleTable(new long[0], new int[0], 0, new long[0], new int[0], C.TIME_UNSET);
         }
         Object offsets;
         Object sizes;
         long[] timestamps;
         Object flags;
+        long duration;
         int i;
         boolean chunkOffsetsAreLongs = false;
         LeafAtom chunkOffsetsAtom = stblAtom.getLeafAtomOfType(Atom.TYPE_stco);
@@ -269,22 +270,23 @@ final class AtomParsers {
                 stss = null;
             }
         }
-        boolean isRechunkable = sampleSizeBox.isFixedSampleSize() && MimeTypes.AUDIO_RAW.equals(track.format.sampleMimeType) && remainingTimestampDeltaChanges == 0 && remainingTimestampOffsetChanges == 0 && remainingSynchronizationSamples == 0;
+        boolean isFixedSampleSizeRawAudio = sampleSizeBox.isFixedSampleSize() && MimeTypes.AUDIO_RAW.equals(track.format.sampleMimeType) && remainingTimestampDeltaChanges == 0 && remainingTimestampOffsetChanges == 0 && remainingSynchronizationSamples == 0;
         int maximumSize = 0;
         long timestampTimeUnits = 0;
-        if (isRechunkable) {
+        if (isFixedSampleSizeRawAudio) {
             long[] chunkOffsetsBytes = new long[chunkIterator.length];
             int[] chunkSampleCounts = new int[chunkIterator.length];
             while (chunkIterator.moveNext()) {
                 chunkOffsetsBytes[chunkIterator.index] = chunkIterator.offset;
                 chunkSampleCounts[chunkIterator.index] = chunkIterator.numSamples;
             }
-            Results rechunkedResults = FixedSampleSizeRechunker.rechunk(sampleSizeBox.readNextSampleSize(), chunkOffsetsBytes, chunkSampleCounts, (long) timestampDeltaInTimeUnits);
+            Results rechunkedResults = FixedSampleSizeRechunker.rechunk(Util.getPcmFrameSize(track.format.pcmEncoding, track.format.channelCount), chunkOffsetsBytes, chunkSampleCounts, (long) timestampDeltaInTimeUnits);
             offsets = rechunkedResults.offsets;
             sizes = rechunkedResults.sizes;
             maximumSize = rechunkedResults.maximumSize;
             timestamps = rechunkedResults.timestamps;
             flags = rechunkedResults.flags;
+            duration = rechunkedResults.duration;
         } else {
             offsets = new long[sampleCount];
             sizes = new int[sampleCount];
@@ -330,6 +332,7 @@ final class AtomParsers {
                 offset += (long) sizes[i];
                 remainingSamplesInChunk--;
             }
+            duration = timestampTimeUnits + ((long) timestampOffset);
             Assertions.checkArgument(remainingSamplesAtTimestampOffset == 0);
             while (remainingTimestampOffsetChanges > 0) {
                 Assertions.checkArgument(ctts.readUnsignedIntToInt() == 0);
@@ -340,31 +343,33 @@ final class AtomParsers {
                 Log.w(TAG, "Inconsistent stbl box for track " + track.id + ": remainingSynchronizationSamples " + remainingSynchronizationSamples + ", remainingSamplesAtTimestampDelta " + remainingSamplesAtTimestampDelta + ", remainingSamplesInChunk " + remainingSamplesInChunk + ", remainingTimestampDeltaChanges " + remainingTimestampDeltaChanges);
             }
         }
+        long durationUs = Util.scaleLargeTimestamp(duration, 1000000, track.timescale);
         if (track.editListDurations == null || gaplessInfoHolder.hasGaplessInfo()) {
-            Util.scaleLargeTimestampsInPlace(timestamps, C.MICROS_PER_SECOND, track.timescale);
-            return new TrackSampleTable(offsets, sizes, maximumSize, timestamps, flags);
+            Util.scaleLargeTimestampsInPlace(timestamps, 1000000, track.timescale);
+            return new TrackSampleTable(offsets, sizes, maximumSize, timestamps, flags, durationUs);
         }
+        long editStartTime;
         if (track.editListDurations.length == 1 && track.type == 1 && timestamps.length >= 2) {
-            long editStartTime = track.editListMediaTimes[0];
+            editStartTime = track.editListMediaTimes[0];
             long editEndTime = editStartTime + Util.scaleLargeTimestamp(track.editListDurations[0], track.timescale, track.movieTimescale);
-            long lastSampleEndTime = timestampTimeUnits;
-            if (timestamps[0] <= editStartTime && editStartTime < timestamps[1] && timestamps[timestamps.length - 1] < editEndTime && editEndTime <= lastSampleEndTime) {
-                long paddingTimeUnits = lastSampleEndTime - editEndTime;
+            if (canApplyEditWithGaplessInfo(timestamps, duration, editStartTime, editEndTime)) {
+                long paddingTimeUnits = duration - editEndTime;
                 long encoderDelay = Util.scaleLargeTimestamp(editStartTime - timestamps[0], (long) track.format.sampleRate, track.timescale);
                 long encoderPadding = Util.scaleLargeTimestamp(paddingTimeUnits, (long) track.format.sampleRate, track.timescale);
                 if (!(encoderDelay == 0 && encoderPadding == 0) && encoderDelay <= 2147483647L && encoderPadding <= 2147483647L) {
                     gaplessInfoHolder.encoderDelay = (int) encoderDelay;
                     gaplessInfoHolder.encoderPadding = (int) encoderPadding;
-                    Util.scaleLargeTimestampsInPlace(timestamps, C.MICROS_PER_SECOND, track.timescale);
-                    return new TrackSampleTable(offsets, sizes, maximumSize, timestamps, flags);
+                    Util.scaleLargeTimestampsInPlace(timestamps, 1000000, track.timescale);
+                    return new TrackSampleTable(offsets, sizes, maximumSize, timestamps, flags, durationUs);
                 }
             }
         }
         if (track.editListDurations.length == 1 && track.editListDurations[0] == 0) {
+            editStartTime = track.editListMediaTimes[0];
             for (i = 0; i < timestamps.length; i++) {
-                timestamps[i] = Util.scaleLargeTimestamp(timestamps[i] - track.editListMediaTimes[0], C.MICROS_PER_SECOND, track.timescale);
+                timestamps[i] = Util.scaleLargeTimestamp(timestamps[i] - editStartTime, 1000000, track.timescale);
             }
-            return new TrackSampleTable(offsets, sizes, maximumSize, timestamps, flags);
+            return new TrackSampleTable(offsets, sizes, maximumSize, timestamps, flags, Util.scaleLargeTimestamp(duration - editStartTime, 1000000, track.timescale));
         }
         Object editedOffsets;
         Object editedSizes;
@@ -375,11 +380,11 @@ final class AtomParsers {
         int nextSampleIndex = 0;
         boolean copyMetadata = false;
         for (i = 0; i < track.editListDurations.length; i++) {
-            long mediaTime = track.editListMediaTimes[i];
-            if (mediaTime != -1) {
-                long duration = Util.scaleLargeTimestamp(track.editListDurations[i], track.timescale, track.movieTimescale);
-                int startIndex = Util.binarySearchCeil(timestamps, mediaTime, true, true);
-                int endIndex = Util.binarySearchCeil(timestamps, mediaTime + duration, omitClippedSample, false);
+            long editMediaTime = track.editListMediaTimes[i];
+            if (editMediaTime != -1) {
+                long editDuration = Util.scaleLargeTimestamp(track.editListDurations[i], track.timescale, track.movieTimescale);
+                int startIndex = Util.binarySearchCeil(timestamps, editMediaTime, true, true);
+                int endIndex = Util.binarySearchCeil(timestamps, editMediaTime + editDuration, omitClippedSample, false);
                 editedSampleCount += endIndex - startIndex;
                 copyMetadata |= nextSampleIndex != startIndex ? 1 : 0;
                 nextSampleIndex = endIndex;
@@ -410,11 +415,11 @@ final class AtomParsers {
         long pts = 0;
         int sampleIndex = 0;
         for (i = 0; i < track.editListDurations.length; i++) {
-            mediaTime = track.editListMediaTimes[i];
-            duration = track.editListDurations[i];
-            if (mediaTime != -1) {
-                long endMediaTime = mediaTime + Util.scaleLargeTimestamp(duration, track.timescale, track.movieTimescale);
-                startIndex = Util.binarySearchCeil(timestamps, mediaTime, true, true);
+            editMediaTime = track.editListMediaTimes[i];
+            editDuration = track.editListDurations[i];
+            if (editMediaTime != -1) {
+                long endMediaTime = editMediaTime + Util.scaleLargeTimestamp(editDuration, track.timescale, track.movieTimescale);
+                startIndex = Util.binarySearchCeil(timestamps, editMediaTime, true, true);
                 endIndex = Util.binarySearchCeil(timestamps, endMediaTime, omitClippedSample, false);
                 if (copyMetadata) {
                     int count = endIndex - startIndex;
@@ -423,25 +428,26 @@ final class AtomParsers {
                     System.arraycopy(flags, startIndex, editedFlags, sampleIndex, count);
                 }
                 for (int j = startIndex; j < endIndex; j++) {
-                    editedTimestamps[sampleIndex] = Util.scaleLargeTimestamp(pts, C.MICROS_PER_SECOND, track.movieTimescale) + Util.scaleLargeTimestamp(timestamps[j] - mediaTime, C.MICROS_PER_SECOND, track.timescale);
+                    editedTimestamps[sampleIndex] = Util.scaleLargeTimestamp(pts, 1000000, track.movieTimescale) + Util.scaleLargeTimestamp(timestamps[j] - editMediaTime, 1000000, track.timescale);
                     if (copyMetadata && editedSizes[sampleIndex] > editedMaximumSize) {
                         editedMaximumSize = sizes[j];
                     }
                     sampleIndex++;
                 }
             }
-            pts += duration;
+            pts += editDuration;
         }
+        long editedDurationUs = Util.scaleLargeTimestamp(pts, 1000000, track.timescale);
         boolean hasSyncSample = false;
         for (i = 0; i < editedFlags.length && !hasSyncSample; i++) {
             hasSyncSample |= (editedFlags[i] & 1) != 0 ? 1 : 0;
         }
         if (hasSyncSample) {
-            return new TrackSampleTable(editedOffsets, editedSizes, editedMaximumSize, editedTimestamps, editedFlags);
+            return new TrackSampleTable(editedOffsets, editedSizes, editedMaximumSize, editedTimestamps, editedFlags, editedDurationUs);
         }
         Log.w(TAG, "Ignoring edit list: Edited sample sequence does not contain a sync sample.");
-        Util.scaleLargeTimestampsInPlace(timestamps, C.MICROS_PER_SECOND, track.timescale);
-        return new TrackSampleTable(offsets, sizes, maximumSize, timestamps, flags);
+        Util.scaleLargeTimestampsInPlace(timestamps, 1000000, track.timescale);
+        return new TrackSampleTable(offsets, sizes, maximumSize, timestamps, flags, durationUs);
     }
 
     public static Metadata parseUdta(LeafAtom udtaAtom, boolean isQuickTime) {
@@ -879,7 +885,6 @@ final class AtomParsers {
     }
 
     private static Pair<String, byte[]> parseEsdsFromParent(ParsableByteArray parent, int position) {
-        String mimeType;
         parent.setPosition((position + 8) + 4);
         parent.skipBytes(1);
         parseExpandableClassSize(parent);
@@ -896,43 +901,9 @@ final class AtomParsers {
         }
         parent.skipBytes(1);
         parseExpandableClassSize(parent);
-        switch (parent.readUnsignedByte()) {
-            case 32:
-                mimeType = MimeTypes.VIDEO_MP4V;
-                break;
-            case 33:
-                mimeType = "video/avc";
-                break;
-            case 35:
-                mimeType = MimeTypes.VIDEO_H265;
-                break;
-            case 64:
-            case 102:
-            case 103:
-            case 104:
-                mimeType = MimeTypes.AUDIO_AAC;
-                break;
-            case 96:
-            case 97:
-                mimeType = MimeTypes.VIDEO_MPEG2;
-                break;
-            case 107:
-                return Pair.create(MimeTypes.AUDIO_MPEG, null);
-            case 165:
-                mimeType = MimeTypes.AUDIO_AC3;
-                break;
-            case 166:
-                mimeType = MimeTypes.AUDIO_E_AC3;
-                break;
-            case 169:
-            case 172:
-                return Pair.create(MimeTypes.AUDIO_DTS, null);
-            case 170:
-            case 171:
-                return Pair.create(MimeTypes.AUDIO_DTS_HD, null);
-            default:
-                mimeType = null;
-                break;
+        String mimeType = MimeTypes.getMimeTypeFromMp4ObjectType(parent.readUnsignedByte());
+        if (MimeTypes.AUDIO_MPEG.equals(mimeType) || MimeTypes.AUDIO_DTS.equals(mimeType) || MimeTypes.AUDIO_DTS_HD.equals(mimeType)) {
+            return Pair.create(mimeType, null);
         }
         parent.skipBytes(12);
         parent.skipBytes(1);
@@ -1055,6 +1026,16 @@ final class AtomParsers {
             size = (size << 7) | (currentByte & 127);
         }
         return size;
+    }
+
+    private static boolean canApplyEditWithGaplessInfo(long[] timestamps, long duration, long editStartTime, long editEndTime) {
+        int lastIndex = timestamps.length - 1;
+        int latestDelayIndex = Util.constrainValue(3, 0, lastIndex);
+        int earliestPaddingIndex = Util.constrainValue(timestamps.length - 3, 0, lastIndex);
+        if (timestamps[0] > editStartTime || editStartTime >= timestamps[latestDelayIndex] || timestamps[earliestPaddingIndex] >= editEndTime || editEndTime > duration) {
+            return false;
+        }
+        return true;
     }
 
     private AtomParsers() {

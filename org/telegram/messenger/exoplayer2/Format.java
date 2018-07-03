@@ -1,12 +1,8 @@
 package org.telegram.messenger.exoplayer2;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.media.MediaFormat;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -142,7 +138,13 @@ public final class Format implements Parcelable {
         this.width = width;
         this.height = height;
         this.frameRate = frameRate;
+        if (rotationDegrees == -1) {
+            rotationDegrees = 0;
+        }
         this.rotationDegrees = rotationDegrees;
+        if (pixelWidthHeightRatio == -1.0f) {
+            pixelWidthHeightRatio = 1.0f;
+        }
         this.pixelWidthHeightRatio = pixelWidthHeightRatio;
         this.projectionData = projectionData;
         this.stereoMode = stereoMode;
@@ -150,7 +152,13 @@ public final class Format implements Parcelable {
         this.channelCount = channelCount;
         this.sampleRate = sampleRate;
         this.pcmEncoding = pcmEncoding;
+        if (encoderDelay == -1) {
+            encoderDelay = 0;
+        }
         this.encoderDelay = encoderDelay;
+        if (encoderPadding == -1) {
+            encoderPadding = 0;
+        }
         this.encoderPadding = encoderPadding;
         this.selectionFlags = selectionFlags;
         this.language = language;
@@ -176,7 +184,7 @@ public final class Format implements Parcelable {
         this.frameRate = in.readFloat();
         this.rotationDegrees = in.readInt();
         this.pixelWidthHeightRatio = in.readFloat();
-        this.projectionData = in.readInt() != 0 ? in.createByteArray() : null;
+        this.projectionData = Util.readBoolean(in) ? in.createByteArray() : null;
         this.stereoMode = in.readInt();
         this.colorInfo = (ColorInfo) in.readParcelable(ColorInfo.class.getClassLoader());
         this.channelCount = in.readInt();
@@ -236,26 +244,6 @@ public final class Format implements Parcelable {
         return (this.width == -1 || this.height == -1) ? -1 : this.width * this.height;
     }
 
-    @TargetApi(16)
-    @SuppressLint({"InlinedApi"})
-    public final MediaFormat getFrameworkMediaFormatV16() {
-        MediaFormat format = new MediaFormat();
-        format.setString("mime", this.sampleMimeType);
-        maybeSetStringV16(format, "language", this.language);
-        maybeSetIntegerV16(format, "max-input-size", this.maxInputSize);
-        maybeSetIntegerV16(format, "width", this.width);
-        maybeSetIntegerV16(format, "height", this.height);
-        maybeSetFloatV16(format, "frame-rate", this.frameRate);
-        maybeSetIntegerV16(format, "rotation-degrees", this.rotationDegrees);
-        maybeSetIntegerV16(format, "channel-count", this.channelCount);
-        maybeSetIntegerV16(format, "sample-rate", this.sampleRate);
-        for (int i = 0; i < this.initializationData.size(); i++) {
-            format.setByteBuffer("csd-" + i, ByteBuffer.wrap((byte[]) this.initializationData.get(i)));
-        }
-        maybeSetColorInfoV24(format, this.colorInfo);
-        return format;
-    }
-
     public String toString() {
         return "Format(" + this.id + ", " + this.containerMimeType + ", " + this.sampleMimeType + ", " + this.bitrate + ", " + this.language + ", [" + this.width + ", " + this.height + ", " + this.frameRate + "], [" + this.channelCount + ", " + this.sampleRate + "])";
     }
@@ -280,7 +268,14 @@ public final class Format implements Parcelable {
             return false;
         }
         Format other = (Format) obj;
-        if (this.bitrate != other.bitrate || this.maxInputSize != other.maxInputSize || this.width != other.width || this.height != other.height || this.frameRate != other.frameRate || this.rotationDegrees != other.rotationDegrees || this.pixelWidthHeightRatio != other.pixelWidthHeightRatio || this.stereoMode != other.stereoMode || this.channelCount != other.channelCount || this.sampleRate != other.sampleRate || this.pcmEncoding != other.pcmEncoding || this.encoderDelay != other.encoderDelay || this.encoderPadding != other.encoderPadding || this.subsampleOffsetUs != other.subsampleOffsetUs || this.selectionFlags != other.selectionFlags || !Util.areEqual(this.id, other.id) || !Util.areEqual(this.language, other.language) || this.accessibilityChannel != other.accessibilityChannel || !Util.areEqual(this.containerMimeType, other.containerMimeType) || !Util.areEqual(this.sampleMimeType, other.sampleMimeType) || !Util.areEqual(this.codecs, other.codecs) || !Util.areEqual(this.drmInitData, other.drmInitData) || !Util.areEqual(this.metadata, other.metadata) || !Util.areEqual(this.colorInfo, other.colorInfo) || !Arrays.equals(this.projectionData, other.projectionData) || this.initializationData.size() != other.initializationData.size()) {
+        if (this.bitrate == other.bitrate && this.maxInputSize == other.maxInputSize && this.width == other.width && this.height == other.height && this.frameRate == other.frameRate && this.rotationDegrees == other.rotationDegrees && this.pixelWidthHeightRatio == other.pixelWidthHeightRatio && this.stereoMode == other.stereoMode && this.channelCount == other.channelCount && this.sampleRate == other.sampleRate && this.pcmEncoding == other.pcmEncoding && this.encoderDelay == other.encoderDelay && this.encoderPadding == other.encoderPadding && this.subsampleOffsetUs == other.subsampleOffsetUs && this.selectionFlags == other.selectionFlags && Util.areEqual(this.id, other.id) && Util.areEqual(this.language, other.language) && this.accessibilityChannel == other.accessibilityChannel && Util.areEqual(this.containerMimeType, other.containerMimeType) && Util.areEqual(this.sampleMimeType, other.sampleMimeType) && Util.areEqual(this.codecs, other.codecs) && Util.areEqual(this.drmInitData, other.drmInitData) && Util.areEqual(this.metadata, other.metadata) && Util.areEqual(this.colorInfo, other.colorInfo) && Arrays.equals(this.projectionData, other.projectionData) && initializationDataEquals(other)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean initializationDataEquals(Format other) {
+        if (this.initializationData.size() != other.initializationData.size()) {
             return false;
         }
         for (int i = 0; i < this.initializationData.size(); i++) {
@@ -289,44 +284,6 @@ public final class Format implements Parcelable {
             }
         }
         return true;
-    }
-
-    @TargetApi(24)
-    private static void maybeSetColorInfoV24(MediaFormat format, ColorInfo colorInfo) {
-        if (colorInfo != null) {
-            maybeSetIntegerV16(format, "color-transfer", colorInfo.colorTransfer);
-            maybeSetIntegerV16(format, "color-standard", colorInfo.colorSpace);
-            maybeSetIntegerV16(format, "color-range", colorInfo.colorRange);
-            maybeSetByteBufferV16(format, "hdr-static-info", colorInfo.hdrStaticInfo);
-        }
-    }
-
-    @TargetApi(16)
-    private static void maybeSetStringV16(MediaFormat format, String key, String value) {
-        if (value != null) {
-            format.setString(key, value);
-        }
-    }
-
-    @TargetApi(16)
-    private static void maybeSetIntegerV16(MediaFormat format, String key, int value) {
-        if (value != -1) {
-            format.setInteger(key, value);
-        }
-    }
-
-    @TargetApi(16)
-    private static void maybeSetFloatV16(MediaFormat format, String key, float value) {
-        if (value != -1.0f) {
-            format.setFloat(key, value);
-        }
-    }
-
-    @TargetApi(16)
-    private static void maybeSetByteBufferV16(MediaFormat format, String key, byte[] value) {
-        if (value != null) {
-            format.setByteBuffer(key, ByteBuffer.wrap(value));
-        }
     }
 
     public static String toLogString(Format format) {
@@ -361,7 +318,7 @@ public final class Format implements Parcelable {
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        int i;
+        boolean z;
         dest.writeString(this.id);
         dest.writeString(this.containerMimeType);
         dest.writeString(this.sampleMimeType);
@@ -374,11 +331,11 @@ public final class Format implements Parcelable {
         dest.writeInt(this.rotationDegrees);
         dest.writeFloat(this.pixelWidthHeightRatio);
         if (this.projectionData != null) {
-            i = 1;
+            z = true;
         } else {
-            i = 0;
+            z = false;
         }
-        dest.writeInt(i);
+        Util.writeBoolean(dest, z);
         if (this.projectionData != null) {
             dest.writeByteArray(this.projectionData);
         }
@@ -395,8 +352,8 @@ public final class Format implements Parcelable {
         dest.writeLong(this.subsampleOffsetUs);
         int initializationDataSize = this.initializationData.size();
         dest.writeInt(initializationDataSize);
-        for (int i2 = 0; i2 < initializationDataSize; i2++) {
-            dest.writeByteArray((byte[]) this.initializationData.get(i2));
+        for (int i = 0; i < initializationDataSize; i++) {
+            dest.writeByteArray((byte[]) this.initializationData.get(i));
         }
         dest.writeParcelable(this.drmInitData, 0);
         dest.writeParcelable(this.metadata, 0);

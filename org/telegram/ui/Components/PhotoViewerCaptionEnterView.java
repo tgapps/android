@@ -34,6 +34,7 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.NotificationCenter.NotificationCenterDelegate;
+import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 import org.telegram.tgnet.TLRPC.Document;
@@ -46,7 +47,7 @@ import org.telegram.ui.Components.SizeNotifierFrameLayoutPhoto.SizeNotifierFrame
 
 public class PhotoViewerCaptionEnterView extends FrameLayout implements NotificationCenterDelegate, SizeNotifierFrameLayoutPhotoDelegate {
     private int audioInterfaceState;
-    private final int captionMaxLength = Callback.DEFAULT_DRAG_ANIMATION_DURATION;
+    private int captionMaxLength = Callback.DEFAULT_DRAG_ANIMATION_DURATION;
     private ActionMode currentActionMode;
     private PhotoViewerCaptionEnterViewDelegate delegate;
     private ImageView emojiButton;
@@ -172,7 +173,7 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
         this.messageEditText.setCursorSize(AndroidUtilities.dp(20.0f));
         this.messageEditText.setTextColor(-1);
         this.messageEditText.setHintTextColor(-1291845633);
-        this.messageEditText.setFilters(new InputFilter[]{new LengthFilter(Callback.DEFAULT_DRAG_ANIMATION_DURATION)});
+        this.messageEditText.setFilters(new InputFilter[]{new LengthFilter(this.captionMaxLength)});
         frameLayout.addView(this.messageEditText, LayoutHelper.createFrame(-1, -2.0f, 83, 52.0f, 0.0f, 6.0f, 0.0f));
         this.messageEditText.setOnKeyListener(new OnKeyListener() {
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
@@ -321,6 +322,11 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
             if (this.delegate != null) {
                 this.delegate.onTextChanged(this.messageEditText.getText());
             }
+            int old = this.captionMaxLength;
+            this.captionMaxLength = MessagesController.getInstance(UserConfig.selectedAccount).maxCaptionLength;
+            if (old != this.captionMaxLength) {
+                this.messageEditText.setFilters(new InputFilter[]{new LengthFilter(this.captionMaxLength)});
+            }
         }
     }
 
@@ -357,7 +363,7 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                 }
 
                 public void onEmojiSelected(String symbol) {
-                    if (PhotoViewerCaptionEnterView.this.messageEditText.length() + symbol.length() <= Callback.DEFAULT_DRAG_ANIMATION_DURATION) {
+                    if (PhotoViewerCaptionEnterView.this.messageEditText.length() + symbol.length() <= PhotoViewerCaptionEnterView.this.captionMaxLength) {
                         int i = PhotoViewerCaptionEnterView.this.messageEditText.getSelectionEnd();
                         if (i < 0) {
                             i = 0;

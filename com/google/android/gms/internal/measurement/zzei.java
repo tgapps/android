@@ -1281,12 +1281,12 @@ final class zzei extends zzjq {
     }
 
     public final zzdy zzbc(String str) {
+        Cursor query;
         Object e;
         Throwable th;
         Preconditions.checkNotEmpty(str);
         zzab();
         zzch();
-        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"app_instance_id", "gmp_app_id", "resettable_device_id_hash", "last_bundle_index", "last_bundle_start_timestamp", "last_bundle_end_timestamp", "app_version", "app_store", "gmp_version", "dev_cert_hash", "measurement_enabled", "day", "daily_public_events_count", "daily_events_count", "daily_conversions_count", "config_fetched_time", "failed_config_fetch_time", "app_version_int", "firebase_instance_id", "daily_error_events_count", "daily_realtime_events_count", "health_monitor_sample", "android_id", "adid_reporting_enabled", "ssaid_reporting_enabled"}, "app_id=?", new String[]{str}, null, null, null);
             try {
@@ -1442,12 +1442,12 @@ final class zzei extends zzjq {
     }
 
     final Map<Integer, zzkr> zzbf(String str) {
-        Cursor query;
         Object e;
         Throwable th;
         zzch();
         zzab();
         Preconditions.checkNotEmpty(str);
+        Cursor query;
         try {
             query = getWritableDatabase().query("audience_filter_values", new String[]{"audience_id", "current_results"}, "app_id=?", new String[]{str}, null, null, null);
             if (query.moveToFirst()) {
@@ -1547,7 +1547,6 @@ final class zzei extends zzjq {
     }
 
     public final zzeq zzf(String str, String str2) {
-        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
@@ -1555,6 +1554,7 @@ final class zzei extends zzjq {
         Preconditions.checkNotEmpty(str2);
         zzab();
         zzch();
+        Cursor query;
         try {
             query = getWritableDatabase().query("events", new String[]{"lifetime_count", "current_bundle_count", "last_fire_timestamp", "last_bundled_timestamp", "last_sampled_complex_event_id", "last_sampling_rate", "last_exempt_from_sampling"}, "app_id=? and name=?", new String[]{str, str2}, null, null, null);
             try {
@@ -1712,10 +1712,10 @@ final class zzei extends zzjq {
     }
 
     public final String zzhn() {
-        Cursor rawQuery;
         Object e;
         Throwable th;
         String str = null;
+        Cursor rawQuery;
         try {
             rawQuery = getWritableDatabase().rawQuery("select app_id from queue order by has_realtime desc, rowid asc limit 1;", null);
             try {
@@ -1991,7 +1991,6 @@ final class zzei extends zzjq {
     }
 
     final Map<Integer, List<zzkh>> zzl(String str, String str2) {
-        Cursor query;
         Object e;
         Throwable th;
         zzch();
@@ -1999,6 +1998,7 @@ final class zzei extends zzjq {
         Preconditions.checkNotEmpty(str);
         Preconditions.checkNotEmpty(str2);
         Map<Integer, List<zzkh>> arrayMap = new ArrayMap();
+        Cursor query;
         try {
             query = getWritableDatabase().query("property_filters", new String[]{"audience_id", DataSchemeDataSource.SCHEME_DATA}, "app_id=? AND property_name=?", new String[]{str, str2}, null, null, null);
             if (query.moveToFirst()) {

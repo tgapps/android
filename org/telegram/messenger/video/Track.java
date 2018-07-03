@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import org.telegram.messenger.exoplayer2.C;
 
 public class Track {
     private static Map<Integer, Integer> samplingFrequencyIndexMap = new HashMap();
@@ -239,7 +238,7 @@ public class Track {
         if (this.syncSamples != null && isSyncFrame) {
             this.syncSamples.add(Integer.valueOf(this.samples.size()));
         }
-        this.samplePresentationTimes.add(new SamplePresentationTime(this.samplePresentationTimes.size(), ((bufferInfo.presentationTimeUs * ((long) this.timeScale)) + 500000) / C.MICROS_PER_SECOND));
+        this.samplePresentationTimes.add(new SamplePresentationTime(this.samplePresentationTimes.size(), ((bufferInfo.presentationTimeUs * ((long) this.timeScale)) + 500000) / 1000000));
     }
 
     public void prepare() {

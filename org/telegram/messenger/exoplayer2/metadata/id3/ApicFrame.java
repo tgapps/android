@@ -67,6 +67,10 @@ public final class ApicFrame extends Id3Frame {
         return ((hashCode + i) * 31) + Arrays.hashCode(this.pictureData);
     }
 
+    public String toString() {
+        return this.id + ": mimeType=" + this.mimeType + ", description=" + this.description;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.mimeType);
         dest.writeString(this.description);

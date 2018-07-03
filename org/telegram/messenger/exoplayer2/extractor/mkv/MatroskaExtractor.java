@@ -1,6 +1,7 @@
 package org.telegram.messenger.exoplayer2.extractor.mkv;
 
 import android.util.Log;
+import android.util.Pair;
 import android.util.SparseArray;
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -82,6 +83,7 @@ public final class MatroskaExtractor implements Extractor {
         }
     };
     public static final int FLAG_DISABLE_SEEK_FOR_CUES = 1;
+    private static final int FOURCC_COMPRESSION_DIVX = 1482049860;
     private static final int FOURCC_COMPRESSION_VC1 = 826496599;
     private static final int ID_AUDIO = 225;
     private static final int ID_AUDIO_BIT_DEPTH = 25188;
@@ -542,13 +544,9 @@ public final class MatroskaExtractor implements Extractor {
                     this.nalUnitLengthFieldLength = hevcConfig.nalUnitLengthFieldLength;
                     break;
                 case 8:
-                    initializationData = parseFourCcVc1Private(new ParsableByteArray(this.codecPrivate));
-                    if (initializationData == null) {
-                        Log.w(MatroskaExtractor.TAG, "Unsupported FourCC. Setting mimeType to video/x-unknown");
-                        mimeType = MimeTypes.VIDEO_UNKNOWN;
-                        break;
-                    }
-                    mimeType = MimeTypes.VIDEO_VC1;
+                    Pair<String, List<byte[]>> pair = parseFourCcPrivate(new ParsableByteArray(this.codecPrivate));
+                    mimeType = (String) pair.first;
+                    initializationData = pair.second;
                     break;
                 case 9:
                     mimeType = MimeTypes.VIDEO_UNKNOWN;
@@ -722,24 +720,29 @@ public final class MatroskaExtractor implements Extractor {
             return hdrStaticInfoData;
         }
 
-        private static List<byte[]> parseFourCcVc1Private(ParsableByteArray buffer) throws ParserException {
+        private static Pair<String, List<byte[]>> parseFourCcPrivate(ParsableByteArray buffer) throws ParserException {
             try {
                 buffer.skipBytes(16);
-                if (buffer.readLittleEndianUnsignedInt() != 826496599) {
-                    return null;
+                long compression = buffer.readLittleEndianUnsignedInt();
+                if (compression == 1482049860) {
+                    return new Pair(MimeTypes.VIDEO_H263, null);
                 }
-                int startOffset = buffer.getPosition() + 20;
-                byte[] bufferData = buffer.data;
-                int offset = startOffset;
-                while (offset < bufferData.length - 4) {
-                    if (bufferData[offset] == (byte) 0 && bufferData[offset + 1] == (byte) 0 && bufferData[offset + 2] == (byte) 1 && bufferData[offset + 3] == (byte) 15) {
-                        return Collections.singletonList(Arrays.copyOfRange(bufferData, offset, bufferData.length));
+                if (compression == 826496599) {
+                    int startOffset = buffer.getPosition() + 20;
+                    byte[] bufferData = buffer.data;
+                    int offset = startOffset;
+                    while (offset < bufferData.length - 4) {
+                        if (bufferData[offset] == (byte) 0 && bufferData[offset + 1] == (byte) 0 && bufferData[offset + 2] == (byte) 1 && bufferData[offset + 3] == (byte) 15) {
+                            return new Pair(MimeTypes.VIDEO_VC1, Collections.singletonList(Arrays.copyOfRange(bufferData, offset, bufferData.length)));
+                        }
+                        offset++;
                     }
-                    offset++;
+                    throw new ParserException("Failed to find FourCC VC1 initialization data");
                 }
-                throw new ParserException("Failed to find FourCC VC1 initialization data");
+                Log.w(MatroskaExtractor.TAG, "Unknown FourCC. Setting mimeType to video/x-unknown");
+                return new Pair(MimeTypes.VIDEO_UNKNOWN, null);
             } catch (ArrayIndexOutOfBoundsException e) {
-                throw new ParserException("Error parsing FourCC VC1 codec private");
+                throw new ParserException("Error parsing FourCC private data");
             }
         }
 
@@ -812,7 +815,7 @@ public final class MatroskaExtractor implements Extractor {
         private int chunkSize;
         private boolean foundSyncframe;
         private int sampleCount;
-        private final byte[] syncframePrefix = new byte[12];
+        private final byte[] syncframePrefix = new byte[10];
         private long timeUs;
 
         public void reset() {
@@ -821,7 +824,7 @@ public final class MatroskaExtractor implements Extractor {
 
         public void startSample(ExtractorInput input, int blockFlags, int size) throws IOException, InterruptedException {
             if (!this.foundSyncframe) {
-                input.peekFully(this.syncframePrefix, 0, 12);
+                input.peekFully(this.syncframePrefix, 0, 10);
                 input.resetPeekPosition();
                 if (Ac3Util.parseTrueHdSyncframeAudioSampleCount(this.syncframePrefix) != -1) {
                     this.foundSyncframe = true;
@@ -844,7 +847,7 @@ public final class MatroskaExtractor implements Extractor {
                 if (i == 0) {
                     this.timeUs = timeUs;
                 }
-                if (this.sampleCount >= 8) {
+                if (this.sampleCount >= 16) {
                     track.output.sampleMetadata(this.timeUs, this.blockFlags, this.chunkSize, 0, track.cryptoData);
                     this.sampleCount = 0;
                 }
@@ -864,11 +867,97 @@ public final class MatroskaExtractor implements Extractor {
         }
 
         public int getElementType(int id) {
-            return MatroskaExtractor.this.getElementType(id);
+            switch (id) {
+                case MatroskaExtractor.ID_TRACK_TYPE /*131*/:
+                case MatroskaExtractor.ID_FLAG_DEFAULT /*136*/:
+                case MatroskaExtractor.ID_BLOCK_DURATION /*155*/:
+                case MatroskaExtractor.ID_CHANNELS /*159*/:
+                case MatroskaExtractor.ID_PIXEL_WIDTH /*176*/:
+                case MatroskaExtractor.ID_CUE_TIME /*179*/:
+                case MatroskaExtractor.ID_PIXEL_HEIGHT /*186*/:
+                case MatroskaExtractor.ID_TRACK_NUMBER /*215*/:
+                case MatroskaExtractor.ID_TIME_CODE /*231*/:
+                case MatroskaExtractor.ID_CUE_CLUSTER_POSITION /*241*/:
+                case MatroskaExtractor.ID_REFERENCE_BLOCK /*251*/:
+                case MatroskaExtractor.ID_CONTENT_COMPRESSION_ALGORITHM /*16980*/:
+                case MatroskaExtractor.ID_DOC_TYPE_READ_VERSION /*17029*/:
+                case MatroskaExtractor.ID_EBML_READ_VERSION /*17143*/:
+                case MatroskaExtractor.ID_CONTENT_ENCRYPTION_ALGORITHM /*18401*/:
+                case MatroskaExtractor.ID_CONTENT_ENCRYPTION_AES_SETTINGS_CIPHER_MODE /*18408*/:
+                case MatroskaExtractor.ID_CONTENT_ENCODING_ORDER /*20529*/:
+                case MatroskaExtractor.ID_CONTENT_ENCODING_SCOPE /*20530*/:
+                case MatroskaExtractor.ID_SEEK_POSITION /*21420*/:
+                case MatroskaExtractor.ID_STEREO_MODE /*21432*/:
+                case MatroskaExtractor.ID_DISPLAY_WIDTH /*21680*/:
+                case MatroskaExtractor.ID_DISPLAY_UNIT /*21682*/:
+                case MatroskaExtractor.ID_DISPLAY_HEIGHT /*21690*/:
+                case MatroskaExtractor.ID_FLAG_FORCED /*21930*/:
+                case MatroskaExtractor.ID_COLOUR_RANGE /*21945*/:
+                case MatroskaExtractor.ID_COLOUR_TRANSFER /*21946*/:
+                case MatroskaExtractor.ID_COLOUR_PRIMARIES /*21947*/:
+                case MatroskaExtractor.ID_MAX_CLL /*21948*/:
+                case MatroskaExtractor.ID_MAX_FALL /*21949*/:
+                case MatroskaExtractor.ID_CODEC_DELAY /*22186*/:
+                case MatroskaExtractor.ID_SEEK_PRE_ROLL /*22203*/:
+                case MatroskaExtractor.ID_AUDIO_BIT_DEPTH /*25188*/:
+                case MatroskaExtractor.ID_DEFAULT_DURATION /*2352003*/:
+                case MatroskaExtractor.ID_TIMECODE_SCALE /*2807729*/:
+                    return 2;
+                case 134:
+                case MatroskaExtractor.ID_DOC_TYPE /*17026*/:
+                case MatroskaExtractor.ID_LANGUAGE /*2274716*/:
+                    return 3;
+                case MatroskaExtractor.ID_BLOCK_GROUP /*160*/:
+                case MatroskaExtractor.ID_TRACK_ENTRY /*174*/:
+                case MatroskaExtractor.ID_CUE_TRACK_POSITIONS /*183*/:
+                case MatroskaExtractor.ID_CUE_POINT /*187*/:
+                case 224:
+                case MatroskaExtractor.ID_AUDIO /*225*/:
+                case MatroskaExtractor.ID_CONTENT_ENCRYPTION_AES_SETTINGS /*18407*/:
+                case MatroskaExtractor.ID_SEEK /*19899*/:
+                case MatroskaExtractor.ID_CONTENT_COMPRESSION /*20532*/:
+                case MatroskaExtractor.ID_CONTENT_ENCRYPTION /*20533*/:
+                case MatroskaExtractor.ID_COLOUR /*21936*/:
+                case MatroskaExtractor.ID_MASTERING_METADATA /*21968*/:
+                case MatroskaExtractor.ID_CONTENT_ENCODING /*25152*/:
+                case MatroskaExtractor.ID_CONTENT_ENCODINGS /*28032*/:
+                case MatroskaExtractor.ID_PROJECTION /*30320*/:
+                case MatroskaExtractor.ID_SEEK_HEAD /*290298740*/:
+                case 357149030:
+                case MatroskaExtractor.ID_TRACKS /*374648427*/:
+                case MatroskaExtractor.ID_SEGMENT /*408125543*/:
+                case MatroskaExtractor.ID_EBML /*440786851*/:
+                case MatroskaExtractor.ID_CUES /*475249515*/:
+                case MatroskaExtractor.ID_CLUSTER /*524531317*/:
+                    return 1;
+                case MatroskaExtractor.ID_BLOCK /*161*/:
+                case MatroskaExtractor.ID_SIMPLE_BLOCK /*163*/:
+                case MatroskaExtractor.ID_CONTENT_COMPRESSION_SETTINGS /*16981*/:
+                case MatroskaExtractor.ID_CONTENT_ENCRYPTION_KEY_ID /*18402*/:
+                case MatroskaExtractor.ID_SEEK_ID /*21419*/:
+                case MatroskaExtractor.ID_CODEC_PRIVATE /*25506*/:
+                case MatroskaExtractor.ID_PROJECTION_PRIVATE /*30322*/:
+                    return 4;
+                case MatroskaExtractor.ID_SAMPLING_FREQUENCY /*181*/:
+                case MatroskaExtractor.ID_DURATION /*17545*/:
+                case MatroskaExtractor.ID_PRIMARY_R_CHROMATICITY_X /*21969*/:
+                case MatroskaExtractor.ID_PRIMARY_R_CHROMATICITY_Y /*21970*/:
+                case MatroskaExtractor.ID_PRIMARY_G_CHROMATICITY_X /*21971*/:
+                case MatroskaExtractor.ID_PRIMARY_G_CHROMATICITY_Y /*21972*/:
+                case MatroskaExtractor.ID_PRIMARY_B_CHROMATICITY_X /*21973*/:
+                case MatroskaExtractor.ID_PRIMARY_B_CHROMATICITY_Y /*21974*/:
+                case MatroskaExtractor.ID_WHITE_POINT_CHROMATICITY_X /*21975*/:
+                case MatroskaExtractor.ID_WHITE_POINT_CHROMATICITY_Y /*21976*/:
+                case MatroskaExtractor.ID_LUMNINANCE_MAX /*21977*/:
+                case MatroskaExtractor.ID_LUMNINANCE_MIN /*21978*/:
+                    return 5;
+                default:
+                    return 0;
+            }
         }
 
         public boolean isLevel1Element(int id) {
-            return MatroskaExtractor.this.isLevel1Element(id);
+            return id == 357149030 || id == MatroskaExtractor.ID_CLUSTER || id == MatroskaExtractor.ID_CUES || id == MatroskaExtractor.ID_TRACKS;
         }
 
         public void startMasterElement(int id, long contentPosition, long contentSize) throws ParserException {
@@ -968,100 +1057,6 @@ public final class MatroskaExtractor implements Extractor {
         return -1;
     }
 
-    int getElementType(int id) {
-        switch (id) {
-            case ID_TRACK_TYPE /*131*/:
-            case ID_FLAG_DEFAULT /*136*/:
-            case ID_BLOCK_DURATION /*155*/:
-            case ID_CHANNELS /*159*/:
-            case ID_PIXEL_WIDTH /*176*/:
-            case ID_CUE_TIME /*179*/:
-            case ID_PIXEL_HEIGHT /*186*/:
-            case ID_TRACK_NUMBER /*215*/:
-            case ID_TIME_CODE /*231*/:
-            case ID_CUE_CLUSTER_POSITION /*241*/:
-            case ID_REFERENCE_BLOCK /*251*/:
-            case ID_CONTENT_COMPRESSION_ALGORITHM /*16980*/:
-            case ID_DOC_TYPE_READ_VERSION /*17029*/:
-            case ID_EBML_READ_VERSION /*17143*/:
-            case ID_CONTENT_ENCRYPTION_ALGORITHM /*18401*/:
-            case ID_CONTENT_ENCRYPTION_AES_SETTINGS_CIPHER_MODE /*18408*/:
-            case ID_CONTENT_ENCODING_ORDER /*20529*/:
-            case ID_CONTENT_ENCODING_SCOPE /*20530*/:
-            case ID_SEEK_POSITION /*21420*/:
-            case ID_STEREO_MODE /*21432*/:
-            case ID_DISPLAY_WIDTH /*21680*/:
-            case ID_DISPLAY_UNIT /*21682*/:
-            case ID_DISPLAY_HEIGHT /*21690*/:
-            case ID_FLAG_FORCED /*21930*/:
-            case ID_COLOUR_RANGE /*21945*/:
-            case ID_COLOUR_TRANSFER /*21946*/:
-            case ID_COLOUR_PRIMARIES /*21947*/:
-            case ID_MAX_CLL /*21948*/:
-            case ID_MAX_FALL /*21949*/:
-            case ID_CODEC_DELAY /*22186*/:
-            case ID_SEEK_PRE_ROLL /*22203*/:
-            case ID_AUDIO_BIT_DEPTH /*25188*/:
-            case ID_DEFAULT_DURATION /*2352003*/:
-            case ID_TIMECODE_SCALE /*2807729*/:
-                return 2;
-            case 134:
-            case ID_DOC_TYPE /*17026*/:
-            case ID_LANGUAGE /*2274716*/:
-                return 3;
-            case ID_BLOCK_GROUP /*160*/:
-            case ID_TRACK_ENTRY /*174*/:
-            case ID_CUE_TRACK_POSITIONS /*183*/:
-            case ID_CUE_POINT /*187*/:
-            case 224:
-            case ID_AUDIO /*225*/:
-            case ID_CONTENT_ENCRYPTION_AES_SETTINGS /*18407*/:
-            case ID_SEEK /*19899*/:
-            case ID_CONTENT_COMPRESSION /*20532*/:
-            case ID_CONTENT_ENCRYPTION /*20533*/:
-            case ID_COLOUR /*21936*/:
-            case ID_MASTERING_METADATA /*21968*/:
-            case ID_CONTENT_ENCODING /*25152*/:
-            case ID_CONTENT_ENCODINGS /*28032*/:
-            case ID_PROJECTION /*30320*/:
-            case ID_SEEK_HEAD /*290298740*/:
-            case 357149030:
-            case ID_TRACKS /*374648427*/:
-            case ID_SEGMENT /*408125543*/:
-            case ID_EBML /*440786851*/:
-            case ID_CUES /*475249515*/:
-            case ID_CLUSTER /*524531317*/:
-                return 1;
-            case ID_BLOCK /*161*/:
-            case ID_SIMPLE_BLOCK /*163*/:
-            case ID_CONTENT_COMPRESSION_SETTINGS /*16981*/:
-            case ID_CONTENT_ENCRYPTION_KEY_ID /*18402*/:
-            case ID_SEEK_ID /*21419*/:
-            case ID_CODEC_PRIVATE /*25506*/:
-            case ID_PROJECTION_PRIVATE /*30322*/:
-                return 4;
-            case ID_SAMPLING_FREQUENCY /*181*/:
-            case ID_DURATION /*17545*/:
-            case ID_PRIMARY_R_CHROMATICITY_X /*21969*/:
-            case ID_PRIMARY_R_CHROMATICITY_Y /*21970*/:
-            case ID_PRIMARY_G_CHROMATICITY_X /*21971*/:
-            case ID_PRIMARY_G_CHROMATICITY_Y /*21972*/:
-            case ID_PRIMARY_B_CHROMATICITY_X /*21973*/:
-            case ID_PRIMARY_B_CHROMATICITY_Y /*21974*/:
-            case ID_WHITE_POINT_CHROMATICITY_X /*21975*/:
-            case ID_WHITE_POINT_CHROMATICITY_Y /*21976*/:
-            case ID_LUMNINANCE_MAX /*21977*/:
-            case ID_LUMNINANCE_MIN /*21978*/:
-                return 5;
-            default:
-                return 0;
-        }
-    }
-
-    boolean isLevel1Element(int id) {
-        return id == 357149030 || id == ID_CLUSTER || id == ID_CUES || id == ID_TRACKS;
-    }
-
     void startMasterElement(int id, long contentPosition, long contentSize) throws ParserException {
         switch (id) {
             case ID_BLOCK_GROUP /*160*/:
@@ -1154,7 +1149,7 @@ public final class MatroskaExtractor implements Extractor {
                 return;
             case 357149030:
                 if (this.timecodeScale == C.TIME_UNSET) {
-                    this.timecodeScale = C.MICROS_PER_SECOND;
+                    this.timecodeScale = 1000000;
                 }
                 if (this.durationTimecode != C.TIME_UNSET) {
                     this.durationUs = scaleTimecodeToUs(this.durationTimecode);
@@ -1589,7 +1584,7 @@ public final class MatroskaExtractor implements Extractor {
             track.trueHdSampleRechunker.sampleMetadata(track, timeUs);
         } else {
             if (CODEC_ID_SUBRIP.equals(track.codecId)) {
-                commitSubtitleSample(track, SUBRIP_TIMECODE_FORMAT, 19, SUBRIP_TIMECODE_LAST_VALUE_SCALING_FACTOR, SUBRIP_TIMECODE_EMPTY);
+                commitSubtitleSample(track, SUBRIP_TIMECODE_FORMAT, 19, 1000, SUBRIP_TIMECODE_EMPTY);
             } else if (CODEC_ID_ASS.equals(track.codecId)) {
                 commitSubtitleSample(track, SSA_TIMECODE_FORMAT, 21, SSA_TIMECODE_LAST_VALUE_SCALING_FACTOR, SSA_TIMECODE_EMPTY);
             }
@@ -1761,9 +1756,9 @@ public final class MatroskaExtractor implements Extractor {
         if (durationUs == C.TIME_UNSET) {
             timeCodeData = emptyTimecode;
         } else {
-            durationUs -= ((long) (((int) (durationUs / 3600000000L)) * 3600)) * C.MICROS_PER_SECOND;
-            durationUs -= ((long) (((int) (durationUs / 60000000)) * 60)) * C.MICROS_PER_SECOND;
-            int lastValue = (int) ((durationUs - (((long) ((int) (durationUs / C.MICROS_PER_SECOND))) * C.MICROS_PER_SECOND)) / lastTimecodeValueScalingFactor);
+            durationUs -= ((long) (((int) (durationUs / 3600000000L)) * 3600)) * 1000000;
+            durationUs -= ((long) (((int) (durationUs / 60000000)) * 60)) * 1000000;
+            int lastValue = (int) ((durationUs - (((long) ((int) (durationUs / 1000000))) * 1000000)) / lastTimecodeValueScalingFactor);
             timeCodeData = Util.getUtf8Bytes(String.format(Locale.US, timecodeFormat, new Object[]{Integer.valueOf(hours), Integer.valueOf(minutes), Integer.valueOf(seconds), Integer.valueOf(lastValue)}));
         }
         System.arraycopy(timeCodeData, 0, subripSampleData, endTimecodeOffset, emptyTimecode.length);
@@ -1838,7 +1833,7 @@ public final class MatroskaExtractor implements Extractor {
         if (this.timecodeScale == C.TIME_UNSET) {
             throw new ParserException("Can't scale timecode prior to timecodeScale being set.");
         }
-        return Util.scaleLargeTimestamp(unscaledTimecode, this.timecodeScale, SUBRIP_TIMECODE_LAST_VALUE_SCALING_FACTOR);
+        return Util.scaleLargeTimestamp(unscaledTimecode, this.timecodeScale, 1000);
     }
 
     private static boolean isCodecSupported(String codecId) {

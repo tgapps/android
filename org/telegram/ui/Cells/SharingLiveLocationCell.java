@@ -283,9 +283,9 @@ public class SharingLiveLocationCell extends FrameLayout {
                     this.rect.set((float) (getMeasuredWidth() - AndroidUtilities.dp(43.0f)), (float) AndroidUtilities.dp(this.distanceTextView != null ? 18.0f : 12.0f), (float) (getMeasuredWidth() - AndroidUtilities.dp(13.0f)), (float) AndroidUtilities.dp(this.distanceTextView != null ? 48.0f : 42.0f));
                 }
                 if (this.distanceTextView == null) {
-                    color = Theme.getColor("location_liveLocationProgress");
+                    color = Theme.getColor(Theme.key_dialog_liveLocationProgress);
                 } else {
-                    color = Theme.getColor("location_liveLocationProgress");
+                    color = Theme.getColor(Theme.key_location_liveLocationProgress);
                 }
                 Theme.chat_radialProgress2Paint.setColor(color);
                 Theme.chat_livePaint.setColor(color);

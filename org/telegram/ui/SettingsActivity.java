@@ -86,6 +86,7 @@ import org.telegram.tgnet.TLRPC.TL_help_getSupport;
 import org.telegram.tgnet.TLRPC.TL_help_support;
 import org.telegram.tgnet.TLRPC.TL_photos_photo;
 import org.telegram.tgnet.TLRPC.TL_photos_uploadProfilePhoto;
+import org.telegram.tgnet.TLRPC.TL_secureFile;
 import org.telegram.tgnet.TLRPC.TL_userFull;
 import org.telegram.tgnet.TLRPC.TL_userProfilePhoto;
 import org.telegram.tgnet.TLRPC.TL_userProfilePhotoEmpty;
@@ -109,10 +110,10 @@ import org.telegram.ui.Cells.TextDetailSettingsCell;
 import org.telegram.ui.Cells.TextInfoCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.AvatarDrawable;
-import org.telegram.ui.Components.AvatarUpdater;
-import org.telegram.ui.Components.AvatarUpdater.AvatarUpdaterDelegate;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.CombinedDrawable;
+import org.telegram.ui.Components.ImageUpdater;
+import org.telegram.ui.Components.ImageUpdater.ImageUpdaterDelegate;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.NumberPicker;
 import org.telegram.ui.Components.RecyclerListView;
@@ -132,7 +133,6 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     private int autoplayGifsRow;
     private AvatarDrawable avatarDrawable;
     private BackupImageView avatarImage;
-    private AvatarUpdater avatarUpdater = new AvatarUpdater();
     private int backgroundRow;
     private int bioRow;
     private int clearLogsRow;
@@ -149,6 +149,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     private int extraHeight;
     private View extraHeightView;
     private int forceTcpInCallsRow;
+    private ImageUpdater imageUpdater = new ImageUpdater();
     private int languageRow;
     private LinearLayoutManager layoutManager;
     private ListAdapter listAdapter;
@@ -513,9 +514,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
 
     public boolean onFragmentCreate() {
         super.onFragmentCreate();
-        this.avatarUpdater.parentFragment = this;
-        this.avatarUpdater.delegate = new AvatarUpdaterDelegate() {
-            public void didUploadedPhoto(InputFile file, PhotoSize small, PhotoSize big) {
+        this.imageUpdater.parentFragment = this;
+        this.imageUpdater.delegate = new ImageUpdaterDelegate() {
+            public void didUploadedPhoto(InputFile file, PhotoSize small, PhotoSize big, TL_secureFile secureFile) {
                 TL_photos_uploadProfilePhoto req = new TL_photos_uploadProfilePhoto();
                 req.file = file;
                 ConnectionsManager.getInstance(SettingsActivity.this.currentAccount).sendRequest(req, new RequestDelegate() {
@@ -701,7 +702,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.featuredStickersDidLoaded);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.userInfoDidLoaded);
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiDidLoaded);
-        this.avatarUpdater.clear();
+        this.imageUpdater.clear();
     }
 
     public View createView(Context context) {
@@ -1197,9 +1198,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                         builder.setItems(items, new OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (i == 0) {
-                                    SettingsActivity.this.avatarUpdater.openCamera();
+                                    SettingsActivity.this.imageUpdater.openCamera();
                                 } else if (i == 1) {
-                                    SettingsActivity.this.avatarUpdater.openGallery();
+                                    SettingsActivity.this.imageUpdater.openGallery();
                                 } else if (i == 2) {
                                     MessagesController.getInstance(SettingsActivity.this.currentAccount).deleteUserPhoto(null);
                                 }
@@ -1317,18 +1318,18 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     }
 
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
-        this.avatarUpdater.onActivityResult(requestCode, resultCode, data);
+        this.imageUpdater.onActivityResult(requestCode, resultCode, data);
     }
 
     public void saveSelfArgs(Bundle args) {
-        if (this.avatarUpdater != null && this.avatarUpdater.currentPicturePath != null) {
-            args.putString("path", this.avatarUpdater.currentPicturePath);
+        if (this.imageUpdater != null && this.imageUpdater.currentPicturePath != null) {
+            args.putString("path", this.imageUpdater.currentPicturePath);
         }
     }
 
     public void restoreSelfArgs(Bundle args) {
-        if (this.avatarUpdater != null) {
-            this.avatarUpdater.currentPicturePath = args.getString("path");
+        if (this.imageUpdater != null) {
+            this.imageUpdater.currentPicturePath = args.getString("path");
         }
     }
 

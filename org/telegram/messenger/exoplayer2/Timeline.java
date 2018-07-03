@@ -11,7 +11,7 @@ public abstract class Timeline {
             return 0;
         }
 
-        public Window getWindow(int windowIndex, Window window, boolean setIds, long defaultPositionProjectionUs) {
+        public Window getWindow(int windowIndex, Window window, boolean setTag, long defaultPositionProjectionUs) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -74,43 +74,24 @@ public abstract class Timeline {
             return this.adPlaybackState.adGroupTimesUs[adGroupIndex];
         }
 
-        public int getNextAdIndexToPlay(int adGroupIndex) {
-            return this.adPlaybackState.adGroups[adGroupIndex].nextAdIndexToPlay;
+        public int getFirstAdIndexToPlay(int adGroupIndex) {
+            return this.adPlaybackState.adGroups[adGroupIndex].getFirstAdIndexToPlay();
+        }
+
+        public int getNextAdIndexToPlay(int adGroupIndex, int lastPlayedAdIndex) {
+            return this.adPlaybackState.adGroups[adGroupIndex].getNextAdIndexToPlay(lastPlayedAdIndex);
         }
 
         public boolean hasPlayedAdGroup(int adGroupIndex) {
-            AdGroup adGroup = this.adPlaybackState.adGroups[adGroupIndex];
-            return adGroup.nextAdIndexToPlay == adGroup.count;
+            return !this.adPlaybackState.adGroups[adGroupIndex].hasUnplayedAds();
         }
 
         public int getAdGroupIndexForPositionUs(long positionUs) {
-            long[] adGroupTimesUs = this.adPlaybackState.adGroupTimesUs;
-            if (adGroupTimesUs == null) {
-                return -1;
-            }
-            int index = adGroupTimesUs.length - 1;
-            while (index >= 0 && (adGroupTimesUs[index] == Long.MIN_VALUE || adGroupTimesUs[index] > positionUs)) {
-                index--;
-            }
-            if (index < 0 || hasPlayedAdGroup(index)) {
-                index = -1;
-            }
-            return index;
+            return this.adPlaybackState.getAdGroupIndexForPositionUs(positionUs);
         }
 
         public int getAdGroupIndexAfterPositionUs(long positionUs) {
-            long[] adGroupTimesUs = this.adPlaybackState.adGroupTimesUs;
-            if (adGroupTimesUs == null) {
-                return -1;
-            }
-            int index = 0;
-            while (index < adGroupTimesUs.length && adGroupTimesUs[index] != Long.MIN_VALUE && (positionUs >= adGroupTimesUs[index] || hasPlayedAdGroup(index))) {
-                index++;
-            }
-            if (index >= adGroupTimesUs.length) {
-                index = -1;
-            }
-            return index;
+            return this.adPlaybackState.getAdGroupIndexAfterPositionUs(positionUs);
         }
 
         public int getAdCountInAdGroup(int adGroupIndex) {
@@ -123,7 +104,8 @@ public abstract class Timeline {
         }
 
         public long getAdDurationUs(int adGroupIndex, int adIndexInAdGroup) {
-            return this.adPlaybackState.adGroups[adGroupIndex].durationsUs[adIndexInAdGroup];
+            AdGroup adGroup = this.adPlaybackState.adGroups[adGroupIndex];
+            return adGroup.count != -1 ? adGroup.durationsUs[adIndexInAdGroup] : C.TIME_UNSET;
         }
 
         public long getAdResumePositionUs() {
@@ -135,16 +117,16 @@ public abstract class Timeline {
         public long defaultPositionUs;
         public long durationUs;
         public int firstPeriodIndex;
-        public Object id;
         public boolean isDynamic;
         public boolean isSeekable;
         public int lastPeriodIndex;
         public long positionInFirstPeriodUs;
         public long presentationStartTimeMs;
+        public Object tag;
         public long windowStartTimeMs;
 
-        public Window set(Object id, long presentationStartTimeMs, long windowStartTimeMs, boolean isSeekable, boolean isDynamic, long defaultPositionUs, long durationUs, int firstPeriodIndex, int lastPeriodIndex, long positionInFirstPeriodUs) {
-            this.id = id;
+        public Window set(Object tag, long presentationStartTimeMs, long windowStartTimeMs, boolean isSeekable, boolean isDynamic, long defaultPositionUs, long durationUs, int firstPeriodIndex, int lastPeriodIndex, long positionInFirstPeriodUs) {
+            this.tag = tag;
             this.presentationStartTimeMs = presentationStartTimeMs;
             this.windowStartTimeMs = windowStartTimeMs;
             this.isSeekable = isSeekable;
@@ -240,8 +222,8 @@ public abstract class Timeline {
         return getWindow(windowIndex, window, false);
     }
 
-    public final Window getWindow(int windowIndex, Window window, boolean setIds) {
-        return getWindow(windowIndex, window, setIds, 0);
+    public final Window getWindow(int windowIndex, Window window, boolean setTag) {
+        return getWindow(windowIndex, window, setTag, 0);
     }
 
     public final int getNextPeriodIndex(int periodIndex, Period period, Window window, int repeatMode, boolean shuffleModeEnabled) {

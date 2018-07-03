@@ -117,7 +117,7 @@ public class DefaultSsChunkSource implements SsChunkSource {
             if (previous == null) {
                 chunkIndex = streamElement.getChunkIndex(loadPositionUs);
             } else {
-                chunkIndex = previous.getNextChunkIndex() - this.currentManifestChunkOffset;
+                chunkIndex = (int) (previous.getNextChunkIndex() - ((long) this.currentManifestChunkOffset));
                 if (chunkIndex < 0) {
                     this.fatalError = new BehindLiveWindowException();
                     return;
@@ -136,9 +136,10 @@ public class DefaultSsChunkSource implements SsChunkSource {
             this.trackSelection.updateSelectedTrack(playbackPositionUs, loadPositionUs - playbackPositionUs, resolveTimeToLiveEdgeUs(playbackPositionUs));
             long chunkStartTimeUs = streamElement.getStartTimeUs(chunkIndex);
             long chunkEndTimeUs = chunkStartTimeUs + streamElement.getChunkDurationUs(chunkIndex);
+            long chunkSeekTimeUs = previous == null ? loadPositionUs : C.TIME_UNSET;
             int currentAbsoluteChunkIndex = chunkIndex + this.currentManifestChunkOffset;
             int trackSelectionIndex = this.trackSelection.getSelectedIndex();
-            out.chunk = newMediaChunk(this.trackSelection.getSelectedFormat(), this.dataSource, streamElement.buildRequestUri(this.trackSelection.getIndexInTrackGroup(trackSelectionIndex), chunkIndex), null, currentAbsoluteChunkIndex, chunkStartTimeUs, chunkEndTimeUs, this.trackSelection.getSelectionReason(), this.trackSelection.getSelectionData(), this.extractorWrappers[trackSelectionIndex]);
+            out.chunk = newMediaChunk(this.trackSelection.getSelectedFormat(), this.dataSource, streamElement.buildRequestUri(this.trackSelection.getIndexInTrackGroup(trackSelectionIndex), chunkIndex), null, currentAbsoluteChunkIndex, chunkStartTimeUs, chunkEndTimeUs, chunkSeekTimeUs, this.trackSelection.getSelectionReason(), this.trackSelection.getSelectionData(), this.extractorWrappers[trackSelectionIndex]);
         }
     }
 
@@ -149,8 +150,9 @@ public class DefaultSsChunkSource implements SsChunkSource {
         return cancelable && ChunkedTrackBlacklistUtil.maybeBlacklistTrack(this.trackSelection, this.trackSelection.indexOf(chunk.trackFormat), e);
     }
 
-    private static MediaChunk newMediaChunk(Format format, DataSource dataSource, Uri uri, String cacheKey, int chunkIndex, long chunkStartTimeUs, long chunkEndTimeUs, int trackSelectionReason, Object trackSelectionData, ChunkExtractorWrapper extractorWrapper) {
-        return new ContainerMediaChunk(dataSource, new DataSpec(uri, 0, -1, cacheKey), format, trackSelectionReason, trackSelectionData, chunkStartTimeUs, chunkEndTimeUs, chunkIndex, 1, chunkStartTimeUs, extractorWrapper);
+    private static MediaChunk newMediaChunk(Format format, DataSource dataSource, Uri uri, String cacheKey, int chunkIndex, long chunkStartTimeUs, long chunkEndTimeUs, long chunkSeekTimeUs, int trackSelectionReason, Object trackSelectionData, ChunkExtractorWrapper extractorWrapper) {
+        long j = (long) chunkIndex;
+        return new ContainerMediaChunk(dataSource, new DataSpec(uri, 0, -1, cacheKey), format, trackSelectionReason, trackSelectionData, chunkStartTimeUs, chunkEndTimeUs, chunkSeekTimeUs, j, 1, chunkStartTimeUs, extractorWrapper);
     }
 
     private long resolveTimeToLiveEdgeUs(long playbackPositionUs) {

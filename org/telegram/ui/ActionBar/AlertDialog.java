@@ -40,6 +40,11 @@ public class AlertDialog extends Dialog implements Callback {
     private int currentProgress;
     private View customView;
     private int customViewOffset = 20;
+    private Runnable dismissRunnable = new Runnable() {
+        public void run() {
+            AlertDialog.this.dismiss();
+        }
+    };
     private int[] itemIcons;
     private CharSequence[] items;
     private int lastScreenWidth;
@@ -227,6 +232,10 @@ public class AlertDialog extends Dialog implements Callback {
             return this.alertDialog;
         }
 
+        public Runnable getDismissRunnable() {
+            return this.alertDialog.dismissRunnable;
+        }
+
         public Builder setOnDismissListener(OnDismissListener onDismissListener) {
             this.alertDialog.setOnDismissListener(onDismissListener);
             return this;
@@ -247,7 +256,7 @@ public class AlertDialog extends Dialog implements Callback {
         /*
         r24 = this;
         super.onCreate(r25);
-        r12 = new org.telegram.ui.ActionBar.AlertDialog$1;
+        r12 = new org.telegram.ui.ActionBar.AlertDialog$2;
         r2 = r24.getContext();
         r0 = r24;
         r12.<init>(r2);
@@ -258,7 +267,7 @@ public class AlertDialog extends Dialog implements Callback {
         r12.setBackgroundDrawable(r2);
         r2 = android.os.Build.VERSION.SDK_INT;
         r3 = 21;
-        if (r2 < r3) goto L_0x03ab;
+        if (r2 < r3) goto L_0x03a3;
     L_0x001f:
         r2 = 1;
     L_0x0020:
@@ -275,7 +284,7 @@ public class AlertDialog extends Dialog implements Callback {
     L_0x0034:
         r0 = r24;
         r2 = r0.neutralButtonText;
-        if (r2 == 0) goto L_0x03ae;
+        if (r2 == 0) goto L_0x03a6;
     L_0x003a:
         r13 = 1;
     L_0x003b:
@@ -294,7 +303,7 @@ public class AlertDialog extends Dialog implements Callback {
         r0.topImageView = r2;
         r0 = r24;
         r2 = r0.topDrawable;
-        if (r2 == 0) goto L_0x03b1;
+        if (r2 == 0) goto L_0x03a9;
     L_0x005a:
         r0 = r24;
         r2 = r0.topImageView;
@@ -310,7 +319,7 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = r0.topImageView;
         r3 = r24.getContext();
         r3 = r3.getResources();
-        r4 = 2131165611; // 0x7f0701ab float:1.7945444E38 double:1.052935714E-314;
+        r4 = 2131165617; // 0x7f0701b1 float:1.7945456E38 double:1.052935717E-314;
         r3 = r3.getDrawable(r4);
         r2.setBackgroundDrawable(r3);
         r0 = r24;
@@ -335,7 +344,7 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = -1;
         r3 = 132; // 0x84 float:1.85E-43 double:6.5E-322;
         r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x03be;
+        if (r4 == 0) goto L_0x03b6;
     L_0x00b2:
         r4 = 5;
     L_0x00b3:
@@ -381,7 +390,7 @@ public class AlertDialog extends Dialog implements Callback {
         r0 = r24;
         r3 = r0.titleTextView;
         r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x03c1;
+        if (r2 == 0) goto L_0x03b9;
     L_0x0110:
         r2 = 5;
     L_0x0111:
@@ -393,7 +402,7 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = -2;
         r3 = -2;
         r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x03c4;
+        if (r4 == 0) goto L_0x03bc;
     L_0x0122:
         r4 = 5;
     L_0x0123:
@@ -403,7 +412,7 @@ public class AlertDialog extends Dialog implements Callback {
         r7 = 24;
         r0 = r24;
         r8 = r0.subtitle;
-        if (r8 == 0) goto L_0x03c7;
+        if (r8 == 0) goto L_0x03bf;
     L_0x0131:
         r8 = 2;
     L_0x0132:
@@ -439,7 +448,7 @@ public class AlertDialog extends Dialog implements Callback {
         r0 = r24;
         r3 = r0.subtitleTextView;
         r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x03d5;
+        if (r2 == 0) goto L_0x03cd;
     L_0x017b:
         r2 = 5;
     L_0x017c:
@@ -451,7 +460,7 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = -2;
         r3 = -2;
         r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x03d8;
+        if (r4 == 0) goto L_0x03d0;
     L_0x018d:
         r4 = 5;
     L_0x018e:
@@ -461,7 +470,7 @@ public class AlertDialog extends Dialog implements Callback {
         r7 = 24;
         r0 = r24;
         r8 = r0.items;
-        if (r8 == 0) goto L_0x03db;
+        if (r8 == 0) goto L_0x03d3;
     L_0x019b:
         r8 = 14;
     L_0x019d:
@@ -478,7 +487,7 @@ public class AlertDialog extends Dialog implements Callback {
         r4 = 0;
         r2 = r24.getContext();
         r2 = r2.getResources();
-        r5 = 2131165342; // 0x7f07009e float:1.7944898E38 double:1.052935581E-314;
+        r5 = 2131165343; // 0x7f07009f float:1.79449E38 double:1.0529355816E-314;
         r2 = r2.getDrawable(r5);
         r2 = r2.mutate();
         r2 = (android.graphics.drawable.BitmapDrawable) r2;
@@ -488,7 +497,7 @@ public class AlertDialog extends Dialog implements Callback {
         r4 = 1;
         r2 = r24.getContext();
         r2 = r2.getResources();
-        r5 = 2131165343; // 0x7f07009f float:1.79449E38 double:1.0529355816E-314;
+        r5 = 2131165344; // 0x7f0700a0 float:1.7944902E38 double:1.052935582E-314;
         r2 = r2.getDrawable(r5);
         r2 = r2.mutate();
         r2 = (android.graphics.drawable.BitmapDrawable) r2;
@@ -517,7 +526,7 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = r2[r3];
         r0 = r24;
         r2.setCallback(r0);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$2;
+        r2 = new org.telegram.ui.ActionBar.AlertDialog$3;
         r3 = r24.getContext();
         r0 = r24;
         r2.<init>(r3);
@@ -592,7 +601,7 @@ public class AlertDialog extends Dialog implements Callback {
         r0 = r24;
         r3 = r0.messageTextView;
         r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x03df;
+        if (r2 == 0) goto L_0x03d7;
     L_0x02bc:
         r2 = 5;
     L_0x02bd:
@@ -601,7 +610,7 @@ public class AlertDialog extends Dialog implements Callback {
         r0 = r24;
         r2 = r0.progressViewStyle;
         r3 = 1;
-        if (r2 != r3) goto L_0x03f2;
+        if (r2 != r3) goto L_0x03ea;
     L_0x02c9:
         r2 = new android.widget.FrameLayout;
         r3 = r24.getContext();
@@ -617,7 +626,7 @@ public class AlertDialog extends Dialog implements Callback {
         r5 = 23;
         r0 = r24;
         r6 = r0.title;
-        if (r6 != 0) goto L_0x03e2;
+        if (r6 != 0) goto L_0x03da;
     L_0x02e9:
         r6 = 24;
     L_0x02eb:
@@ -640,7 +649,7 @@ public class AlertDialog extends Dialog implements Callback {
         r4 = 44;
         r5 = 44;
         r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x03e5;
+        if (r2 == 0) goto L_0x03dd;
     L_0x031d:
         r2 = 5;
     L_0x031e:
@@ -654,10 +663,6 @@ public class AlertDialog extends Dialog implements Callback {
         r2.setLines(r3);
         r0 = r24;
         r2 = r0.messageTextView;
-        r3 = 1;
-        r2.setSingleLine(r3);
-        r0 = r24;
-        r2 = r0.messageTextView;
         r3 = android.text.TextUtils.TruncateAt.END;
         r2.setEllipsize(r3);
         r0 = r24;
@@ -669,35 +674,35 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = -2;
         r3 = -1073741824; // 0xffffffffc0000000 float:-2.0 double:NaN;
         r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x03e8;
-    L_0x0355:
+        if (r4 == 0) goto L_0x03e0;
+    L_0x034d:
         r4 = 5;
-    L_0x0356:
+    L_0x034e:
         r4 = r4 | 16;
         r5 = org.telegram.messenger.LocaleController.isRTL;
-        if (r5 == 0) goto L_0x03eb;
-    L_0x035c:
+        if (r5 == 0) goto L_0x03e3;
+    L_0x0354:
         r5 = 0;
-    L_0x035d:
+    L_0x0355:
         r5 = (float) r5;
         r6 = 0;
         r7 = org.telegram.messenger.LocaleController.isRTL;
-        if (r7 == 0) goto L_0x03ef;
-    L_0x0363:
+        if (r7 == 0) goto L_0x03e7;
+    L_0x035b:
         r7 = 62;
-    L_0x0365:
+    L_0x035d:
         r7 = (float) r7;
         r8 = 0;
         r2 = org.telegram.ui.Components.LayoutHelper.createFrame(r2, r3, r4, r5, r6, r7, r8);
         r0 = r22;
         r1 = r23;
         r0.addView(r1, r2);
-    L_0x0372:
+    L_0x036a:
         r0 = r24;
         r2 = r0.message;
         r2 = android.text.TextUtils.isEmpty(r2);
-        if (r2 != 0) goto L_0x0521;
-    L_0x037c:
+        if (r2 != 0) goto L_0x0519;
+    L_0x0374:
         r0 = r24;
         r2 = r0.messageTextView;
         r0 = r24;
@@ -707,110 +712,110 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = r0.messageTextView;
         r3 = 0;
         r2.setVisibility(r3);
-    L_0x038f:
+    L_0x0387:
         r0 = r24;
         r2 = r0.items;
-        if (r2 == 0) goto L_0x056d;
-    L_0x0395:
+        if (r2 == 0) goto L_0x0565;
+    L_0x038d:
         r18 = 0;
         r14 = 0;
         r9 = 0;
-    L_0x0399:
+    L_0x0391:
         r0 = r24;
         r2 = r0.items;
         r2 = r2.length;
-        if (r9 >= r2) goto L_0x056d;
-    L_0x03a0:
+        if (r9 >= r2) goto L_0x0565;
+    L_0x0398:
         r0 = r24;
         r2 = r0.items;
         r2 = r2[r9];
-        if (r2 != 0) goto L_0x052c;
-    L_0x03a8:
+        if (r2 != 0) goto L_0x0524;
+    L_0x03a0:
         r9 = r9 + 1;
-        goto L_0x0399;
-    L_0x03ab:
+        goto L_0x0391;
+    L_0x03a3:
         r2 = 0;
         goto L_0x0020;
-    L_0x03ae:
+    L_0x03a6:
         r13 = 0;
         goto L_0x003b;
-    L_0x03b1:
+    L_0x03a9:
         r0 = r24;
         r2 = r0.topImageView;
         r0 = r24;
         r3 = r0.topResId;
         r2.setImageResource(r3);
         goto L_0x0065;
-    L_0x03be:
+    L_0x03b6:
         r4 = 3;
         goto L_0x00b3;
-    L_0x03c1:
+    L_0x03b9:
         r2 = 3;
         goto L_0x0111;
-    L_0x03c4:
+    L_0x03bc:
         r4 = 3;
         goto L_0x0123;
-    L_0x03c7:
+    L_0x03bf:
         r0 = r24;
         r8 = r0.items;
-        if (r8 == 0) goto L_0x03d1;
-    L_0x03cd:
+        if (r8 == 0) goto L_0x03c9;
+    L_0x03c5:
         r8 = 14;
         goto L_0x0132;
-    L_0x03d1:
+    L_0x03c9:
         r8 = 10;
         goto L_0x0132;
-    L_0x03d5:
+    L_0x03cd:
         r2 = 3;
         goto L_0x017c;
-    L_0x03d8:
+    L_0x03d0:
         r4 = 3;
         goto L_0x018e;
-    L_0x03db:
+    L_0x03d3:
         r8 = 10;
         goto L_0x019d;
-    L_0x03df:
+    L_0x03d7:
         r2 = 3;
         goto L_0x02bd;
-    L_0x03e2:
+    L_0x03da:
         r6 = 0;
         goto L_0x02eb;
-    L_0x03e5:
+    L_0x03dd:
         r2 = 3;
         goto L_0x031e;
-    L_0x03e8:
+    L_0x03e0:
         r4 = 3;
-        goto L_0x0356;
-    L_0x03eb:
+        goto L_0x034e;
+    L_0x03e3:
         r5 = 62;
-        goto L_0x035d;
-    L_0x03ef:
+        goto L_0x0355;
+    L_0x03e7:
         r7 = 0;
-        goto L_0x0365;
-    L_0x03f2:
+        goto L_0x035d;
+    L_0x03ea:
         r0 = r24;
         r2 = r0.progressViewStyle;
         r3 = 2;
-        if (r2 != r3) goto L_0x04e6;
-    L_0x03f9:
+        if (r2 != r3) goto L_0x04de;
+    L_0x03f1:
         r0 = r24;
         r0 = r0.messageTextView;
         r22 = r0;
         r2 = -2;
         r3 = -2;
         r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x04dc;
-    L_0x0405:
+        if (r4 == 0) goto L_0x04d4;
+    L_0x03fd:
         r4 = 5;
-    L_0x0406:
+    L_0x03fe:
         r4 = r4 | 48;
         r5 = 24;
         r0 = r24;
         r6 = r0.title;
-        if (r6 != 0) goto L_0x04df;
-    L_0x0410:
+        if (r6 != 0) goto L_0x04d7;
+    L_0x0408:
         r6 = 19;
-    L_0x0412:
+    L_0x040a:
         r7 = 24;
         r8 = 20;
         r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
@@ -868,10 +873,10 @@ public class AlertDialog extends Dialog implements Callback {
         r0 = r24;
         r3 = r0.lineProgressViewPercent;
         r2 = org.telegram.messenger.LocaleController.isRTL;
-        if (r2 == 0) goto L_0x04e2;
-    L_0x0498:
+        if (r2 == 0) goto L_0x04da;
+    L_0x0490:
         r2 = 5;
-    L_0x0499:
+    L_0x0491:
         r2 = r2 | 48;
         r3.setGravity(r2);
         r0 = r24;
@@ -891,10 +896,10 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = -2;
         r3 = -2;
         r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x04e4;
-    L_0x04c4:
+        if (r4 == 0) goto L_0x04dc;
+    L_0x04bc:
         r4 = 5;
-    L_0x04c5:
+    L_0x04bd:
         r4 = r4 | 48;
         r5 = 23;
         r6 = 4;
@@ -904,20 +909,20 @@ public class AlertDialog extends Dialog implements Callback {
         r0 = r22;
         r12.addView(r0, r2);
         r24.updateLineProgressTextView();
-        goto L_0x0372;
+        goto L_0x036a;
+    L_0x04d4:
+        r4 = 3;
+        goto L_0x03fe;
+    L_0x04d7:
+        r6 = 0;
+        goto L_0x040a;
+    L_0x04da:
+        r2 = 3;
+        goto L_0x0491;
     L_0x04dc:
         r4 = 3;
-        goto L_0x0406;
-    L_0x04df:
-        r6 = 0;
-        goto L_0x0412;
-    L_0x04e2:
-        r2 = 3;
-        goto L_0x0499;
-    L_0x04e4:
-        r4 = 3;
-        goto L_0x04c5;
-    L_0x04e6:
+        goto L_0x04bd;
+    L_0x04de:
         r0 = r24;
         r0 = r0.scrollContainer;
         r22 = r0;
@@ -927,43 +932,43 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = -2;
         r3 = -2;
         r4 = org.telegram.messenger.LocaleController.isRTL;
-        if (r4 == 0) goto L_0x051d;
-    L_0x04f8:
+        if (r4 == 0) goto L_0x0515;
+    L_0x04f0:
         r4 = 5;
-    L_0x04f9:
+    L_0x04f1:
         r4 = r4 | 48;
         r5 = 24;
         r6 = 0;
         r7 = 24;
         r0 = r24;
         r8 = r0.customView;
-        if (r8 != 0) goto L_0x050c;
-    L_0x0506:
+        if (r8 != 0) goto L_0x0504;
+    L_0x04fe:
         r0 = r24;
         r8 = r0.items;
-        if (r8 == 0) goto L_0x051f;
-    L_0x050c:
+        if (r8 == 0) goto L_0x0517;
+    L_0x0504:
         r0 = r24;
         r8 = r0.customViewOffset;
-    L_0x0510:
+    L_0x0508:
         r2 = org.telegram.ui.Components.LayoutHelper.createLinear(r2, r3, r4, r5, r6, r7, r8);
         r0 = r22;
         r1 = r23;
         r0.addView(r1, r2);
-        goto L_0x0372;
-    L_0x051d:
+        goto L_0x036a;
+    L_0x0515:
         r4 = 3;
-        goto L_0x04f9;
-    L_0x051f:
+        goto L_0x04f1;
+    L_0x0517:
         r8 = 0;
-        goto L_0x0510;
-    L_0x0521:
+        goto L_0x0508;
+    L_0x0519:
         r0 = r24;
         r2 = r0.messageTextView;
         r3 = 8;
         r2.setVisibility(r3);
-        goto L_0x038f;
-    L_0x052c:
+        goto L_0x0387;
+    L_0x0524:
         r11 = new org.telegram.ui.ActionBar.AlertDialog$AlertDialogCell;
         r2 = r24.getContext();
         r11.<init>(r2);
@@ -972,12 +977,12 @@ public class AlertDialog extends Dialog implements Callback {
         r3 = r2[r9];
         r0 = r24;
         r2 = r0.itemIcons;
-        if (r2 == 0) goto L_0x056b;
-    L_0x0541:
+        if (r2 == 0) goto L_0x0563;
+    L_0x0539:
         r0 = r24;
         r2 = r0.itemIcons;
         r2 = r2[r9];
-    L_0x0547:
+    L_0x053f:
         r11.setTextAndIcon(r3, r2);
         r0 = r24;
         r2 = r0.scrollContainer;
@@ -987,24 +992,24 @@ public class AlertDialog extends Dialog implements Callback {
         r2.addView(r11, r3);
         r2 = java.lang.Integer.valueOf(r9);
         r11.setTag(r2);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$3;
+        r2 = new org.telegram.ui.ActionBar.AlertDialog$4;
         r0 = r24;
         r2.<init>();
         r11.setOnClickListener(r2);
-        goto L_0x03a8;
-    L_0x056b:
+        goto L_0x03a0;
+    L_0x0563:
         r2 = 0;
-        goto L_0x0547;
-    L_0x056d:
+        goto L_0x053f;
+    L_0x0565:
         r0 = r24;
         r2 = r0.customView;
-        if (r2 == 0) goto L_0x05a1;
-    L_0x0573:
+        if (r2 == 0) goto L_0x0599;
+    L_0x056b:
         r0 = r24;
         r2 = r0.customView;
         r2 = r2.getParent();
-        if (r2 == 0) goto L_0x0590;
-    L_0x057d:
+        if (r2 == 0) goto L_0x0588;
+    L_0x0575:
         r0 = r24;
         r2 = r0.customView;
         r20 = r2.getParent();
@@ -1013,7 +1018,7 @@ public class AlertDialog extends Dialog implements Callback {
         r2 = r0.customView;
         r0 = r20;
         r0.removeView(r2);
-    L_0x0590:
+    L_0x0588:
         r0 = r24;
         r2 = r0.scrollContainer;
         r0 = r24;
@@ -1022,10 +1027,10 @@ public class AlertDialog extends Dialog implements Callback {
         r5 = -2;
         r4 = org.telegram.ui.Components.LayoutHelper.createLinear(r4, r5);
         r2.addView(r3, r4);
-    L_0x05a1:
-        if (r13 == 0) goto L_0x07b3;
-    L_0x05a3:
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$4;
+    L_0x0599:
+        if (r13 == 0) goto L_0x07ab;
+    L_0x059b:
+        r2 = new org.telegram.ui.ActionBar.AlertDialog$5;
         r3 = r24.getContext();
         r0 = r24;
         r2.<init>(r3);
@@ -1050,9 +1055,9 @@ public class AlertDialog extends Dialog implements Callback {
         r12.addView(r2, r3);
         r0 = r24;
         r2 = r0.positiveButtonText;
-        if (r2 == 0) goto L_0x067b;
-    L_0x05e5:
-        r19 = new org.telegram.ui.ActionBar.AlertDialog$5;
+        if (r2 == 0) goto L_0x0673;
+    L_0x05dd:
+        r19 = new org.telegram.ui.ActionBar.AlertDialog$6;
         r2 = r24.getContext();
         r0 = r19;
         r1 = r24;
@@ -1106,17 +1111,17 @@ public class AlertDialog extends Dialog implements Callback {
         r3 = org.telegram.ui.Components.LayoutHelper.createFrame(r3, r4, r5);
         r0 = r19;
         r2.addView(r0, r3);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$6;
+        r2 = new org.telegram.ui.ActionBar.AlertDialog$7;
         r0 = r24;
         r2.<init>();
         r0 = r19;
         r0.setOnClickListener(r2);
-    L_0x067b:
+    L_0x0673:
         r0 = r24;
         r2 = r0.negativeButtonText;
-        if (r2 == 0) goto L_0x0717;
-    L_0x0681:
-        r19 = new org.telegram.ui.ActionBar.AlertDialog$7;
+        if (r2 == 0) goto L_0x070f;
+    L_0x0679:
+        r19 = new org.telegram.ui.ActionBar.AlertDialog$8;
         r2 = r24.getContext();
         r0 = r19;
         r1 = r24;
@@ -1170,17 +1175,17 @@ public class AlertDialog extends Dialog implements Callback {
         r3 = org.telegram.ui.Components.LayoutHelper.createFrame(r3, r4, r5);
         r0 = r19;
         r2.addView(r0, r3);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$8;
+        r2 = new org.telegram.ui.ActionBar.AlertDialog$9;
         r0 = r24;
         r2.<init>();
         r0 = r19;
         r0.setOnClickListener(r2);
-    L_0x0717:
+    L_0x070f:
         r0 = r24;
         r2 = r0.neutralButtonText;
-        if (r2 == 0) goto L_0x07b3;
-    L_0x071d:
-        r19 = new org.telegram.ui.ActionBar.AlertDialog$9;
+        if (r2 == 0) goto L_0x07ab;
+    L_0x0715:
+        r19 = new org.telegram.ui.ActionBar.AlertDialog$10;
         r2 = r24.getContext();
         r0 = r19;
         r1 = r24;
@@ -1234,12 +1239,12 @@ public class AlertDialog extends Dialog implements Callback {
         r3 = org.telegram.ui.Components.LayoutHelper.createFrame(r3, r4, r5);
         r0 = r19;
         r2.addView(r0, r3);
-        r2 = new org.telegram.ui.ActionBar.AlertDialog$10;
+        r2 = new org.telegram.ui.ActionBar.AlertDialog$11;
         r0 = r24;
         r2.<init>();
         r0 = r19;
         r0.setOnClickListener(r2);
-    L_0x07b3:
+    L_0x07ab:
         r2 = org.telegram.messenger.AndroidUtilities.displaySize;
         r2 = r2.x;
         r0 = r24;
@@ -1250,14 +1255,14 @@ public class AlertDialog extends Dialog implements Callback {
         r3 = org.telegram.messenger.AndroidUtilities.dp(r3);
         r10 = r2 - r3;
         r2 = org.telegram.messenger.AndroidUtilities.isTablet();
-        if (r2 == 0) goto L_0x083e;
-    L_0x07cd:
+        if (r2 == 0) goto L_0x0836;
+    L_0x07c5:
         r2 = org.telegram.messenger.AndroidUtilities.isSmallTablet();
-        if (r2 == 0) goto L_0x0837;
-    L_0x07d3:
+        if (r2 == 0) goto L_0x082f;
+    L_0x07cb:
         r2 = 1138688000; // 0x43df0000 float:446.0 double:5.62586622E-315;
         r15 = org.telegram.messenger.AndroidUtilities.dp(r2);
-    L_0x07d9:
+    L_0x07d1:
         r21 = r24.getWindow();
         r16 = new android.view.WindowManager$LayoutParams;
         r16.<init>();
@@ -1285,33 +1290,33 @@ public class AlertDialog extends Dialog implements Callback {
         r0.flags = r2;
         r0 = r24;
         r2 = r0.customView;
-        if (r2 == 0) goto L_0x0824;
-    L_0x0818:
+        if (r2 == 0) goto L_0x081c;
+    L_0x0810:
         r0 = r24;
         r2 = r0.customView;
         r0 = r24;
         r2 = r0.canTextInput(r2);
-        if (r2 != 0) goto L_0x082f;
-    L_0x0824:
+        if (r2 != 0) goto L_0x0827;
+    L_0x081c:
         r0 = r16;
         r2 = r0.flags;
         r3 = 131072; // 0x20000 float:1.83671E-40 double:6.47582E-319;
         r2 = r2 | r3;
         r0 = r16;
         r0.flags = r2;
-    L_0x082f:
+    L_0x0827:
         r0 = r21;
         r1 = r16;
         r0.setAttributes(r1);
         return;
-    L_0x0837:
+    L_0x082f:
         r2 = 1140326400; // 0x43f80000 float:496.0 double:5.633960993E-315;
         r15 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        goto L_0x07d9;
-    L_0x083e:
+        goto L_0x07d1;
+    L_0x0836:
         r2 = 1135738880; // 0x43b20000 float:356.0 double:5.611295633E-315;
         r15 = org.telegram.messenger.AndroidUtilities.dp(r2);
-        goto L_0x07d9;
+        goto L_0x07d1;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.AlertDialog.onCreate(android.os.Bundle):void");
     }
@@ -1455,6 +1460,10 @@ public class AlertDialog extends Dialog implements Callback {
         if (this.contentScrollView != null) {
             this.contentScrollView.removeCallbacks(what);
         }
+    }
+
+    public void setPositiveButtonListener(OnClickListener listener) {
+        this.positiveButtonListener = listener;
     }
 
     protected int getThemeColor(String key) {

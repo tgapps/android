@@ -576,28 +576,31 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
 
     public void onRequestPermissionsResultFragment(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == 1) {
-            int a = 0;
-            while (a < permissions.length) {
-                if (grantResults.length > a && grantResults[a] == 0) {
+            for (int a = 0; a < permissions.length; a++) {
+                if (grantResults.length > a) {
                     String str = permissions[a];
-                    Object obj = -1;
+                    boolean z = true;
                     switch (str.hashCode()) {
                         case 1977429404:
                             if (str.equals("android.permission.READ_CONTACTS")) {
-                                obj = null;
+                                z = false;
                                 break;
                             }
                             break;
                     }
-                    switch (obj) {
-                        case null:
+                    switch (z) {
+                        case false:
+                            if (grantResults[a] != 0) {
+                                this.askAboutContacts = false;
+                                MessagesController.getGlobalNotificationsSettings().edit().putBoolean("askAboutContacts", false).commit();
+                                break;
+                            }
                             ContactsController.getInstance(this.currentAccount).forceImportContacts();
                             break;
                         default:
                             break;
                     }
                 }
-                a++;
             }
         }
     }

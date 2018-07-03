@@ -8,18 +8,22 @@ final class TtmlRegion {
     public final int lineAnchor;
     public final int lineType;
     public final float position;
+    public final float textSize;
+    public final int textSizeType;
     public final float width;
 
     public TtmlRegion(String id) {
-        this(id, Cue.DIMEN_UNSET, Cue.DIMEN_UNSET, Integer.MIN_VALUE, Integer.MIN_VALUE, Cue.DIMEN_UNSET);
+        this(id, Cue.DIMEN_UNSET, Cue.DIMEN_UNSET, Integer.MIN_VALUE, Integer.MIN_VALUE, Cue.DIMEN_UNSET, Integer.MIN_VALUE, Cue.DIMEN_UNSET);
     }
 
-    public TtmlRegion(String id, float position, float line, int lineType, int lineAnchor, float width) {
+    public TtmlRegion(String id, float position, float line, int lineType, int lineAnchor, float width, int textSizeType, float textSize) {
         this.id = id;
         this.position = position;
         this.line = line;
         this.lineType = lineType;
         this.lineAnchor = lineAnchor;
         this.width = width;
+        this.textSizeType = textSizeType;
+        this.textSize = textSize;
     }
 }

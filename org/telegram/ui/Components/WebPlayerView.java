@@ -540,9 +540,9 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
         }
 
         private void interpretExpression(String expr, HashMap<String, String> localVars, int allowRecursion) throws Exception {
+            Matcher matcher;
             expr = expr.trim();
             if (!TextUtils.isEmpty(expr)) {
-                Matcher matcher;
                 if (expr.charAt(0) == '(') {
                     int parens_count = 0;
                     matcher = WebPlayerView.exprParensPattern.matcher(expr);
@@ -2314,7 +2314,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
         }
         this.isLoading = true;
         this.controlsView.setProgress(0);
-        if (!(youtubeId == null || BuildVars.DEBUG_PRIVATE_VERSION)) {
+        if (youtubeId != null) {
             this.currentYoutubeId = youtubeId;
             youtubeId = null;
         }

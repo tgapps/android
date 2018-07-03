@@ -1,10 +1,22 @@
 package org.telegram.messenger.exoplayer2.source;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 import java.util.Arrays;
 import org.telegram.messenger.exoplayer2.Format;
 import org.telegram.messenger.exoplayer2.util.Assertions;
 
-public final class TrackGroup {
+public final class TrackGroup implements Parcelable {
+    public static final Creator<TrackGroup> CREATOR = new Creator<TrackGroup>() {
+        public TrackGroup createFromParcel(Parcel in) {
+            return new TrackGroup(in);
+        }
+
+        public TrackGroup[] newArray(int size) {
+            return new TrackGroup[size];
+        }
+    };
     private final Format[] formats;
     private int hashCode;
     public final int length;
@@ -13,6 +25,14 @@ public final class TrackGroup {
         Assertions.checkState(formats.length > 0);
         this.formats = formats;
         this.length = formats.length;
+    }
+
+    TrackGroup(Parcel in) {
+        this.length = in.readInt();
+        this.formats = new Format[this.length];
+        for (int i = 0; i < this.length; i++) {
+            this.formats[i] = (Format) in.readParcelable(Format.class.getClassLoader());
+        }
     }
 
     public Format getFormat(int index) {
@@ -47,5 +67,16 @@ public final class TrackGroup {
             return true;
         }
         return false;
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.length);
+        for (int i = 0; i < this.length; i++) {
+            dest.writeParcelable(this.formats[i], 0);
+        }
     }
 }

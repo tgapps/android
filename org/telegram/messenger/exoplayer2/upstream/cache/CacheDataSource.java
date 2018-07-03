@@ -1,6 +1,7 @@
 package org.telegram.messenger.exoplayer2.upstream.cache;
 
 import android.net.Uri;
+import android.util.Log;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.lang.annotation.Retention;
@@ -15,11 +16,16 @@ import org.telegram.messenger.exoplayer2.upstream.cache.Cache.CacheException;
 import org.telegram.messenger.exoplayer2.util.Assertions;
 
 public final class CacheDataSource implements DataSource {
+    public static final int CACHE_IGNORED_REASON_ERROR = 0;
+    public static final int CACHE_IGNORED_REASON_UNSET_LENGTH = 1;
+    private static final int CACHE_NOT_IGNORED = -1;
     public static final long DEFAULT_MAX_CACHE_FILE_SIZE = 2097152;
     public static final int FLAG_BLOCK_ON_CACHE = 1;
     public static final int FLAG_IGNORE_CACHE_FOR_UNSET_LENGTH_REQUESTS = 4;
     public static final int FLAG_IGNORE_CACHE_ON_ERROR = 2;
     private static final long MIN_READ_BEFORE_CHECKING_CACHE = 102400;
+    private static final String TAG = "CacheDataSource";
+    private Uri actualUri;
     private final boolean blockOnCache;
     private long bytesRemaining;
     private final Cache cache;
@@ -41,7 +47,13 @@ public final class CacheDataSource implements DataSource {
     private final DataSource upstreamDataSource;
     private Uri uri;
 
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface CacheIgnoredReason {
+    }
+
     public interface EventListener {
+        void onCacheIgnored(int i);
+
         void onCachedBytesRead(long j, long j2);
     }
 
@@ -146,14 +158,19 @@ Error: java.util.NoSuchElementException
     public long open(DataSpec dataSpec) throws IOException {
         boolean z = false;
         try {
-            this.uri = dataSpec.uri;
-            this.flags = dataSpec.flags;
             this.key = CacheUtil.getKey(dataSpec);
+            this.uri = dataSpec.uri;
+            this.actualUri = loadRedirectedUriOrReturnGivenUri(this.cache, this.key, this.uri);
+            this.flags = dataSpec.flags;
             this.readPosition = dataSpec.position;
-            if ((this.ignoreCacheOnError && this.seenCacheError) || (dataSpec.length == -1 && this.ignoreCacheForUnsetLengthRequests)) {
+            int reason = shouldIgnoreCacheForRequest(dataSpec);
+            if (reason != -1) {
                 z = true;
             }
             this.currentRequestIgnoresCache = z;
+            if (this.currentRequestIgnoresCache) {
+                notifyCacheIgnored(reason);
+            }
             if (dataSpec.length != -1 || this.currentRequestIgnoresCache) {
                 this.bytesRemaining = dataSpec.length;
             } else {
@@ -186,7 +203,7 @@ Error: java.util.NoSuchElementException
             }
             int bytesRead = this.currentDataSource.read(buffer, offset, readLength);
             if (bytesRead != -1) {
-                if (this.currentDataSource == this.cacheReadDataSource) {
+                if (isReadingFromCache()) {
                     this.totalCachedBytesRead += (long) bytesRead;
                 }
                 this.readPosition += (long) bytesRead;
@@ -196,7 +213,7 @@ Error: java.util.NoSuchElementException
                 this.bytesRemaining -= (long) bytesRead;
                 return bytesRead;
             } else if (this.currentDataSpecLengthUnset) {
-                setBytesRemaining(0);
+                setBytesRemainingAndMaybeStoreLength(0);
                 return bytesRead;
             } else if (this.bytesRemaining <= 0 && this.bytesRemaining != -1) {
                 return bytesRead;
@@ -207,7 +224,7 @@ Error: java.util.NoSuchElementException
             }
         } catch (IOException e) {
             if (this.currentDataSpecLengthUnset && isCausedByPositionOutOfRange(e)) {
-                setBytesRemaining(0);
+                setBytesRemainingAndMaybeStoreLength(0);
                 return -1;
             }
             handleBeforeThrow(e);
@@ -216,11 +233,12 @@ Error: java.util.NoSuchElementException
     }
 
     public Uri getUri() {
-        return this.currentDataSource == this.upstreamDataSource ? this.currentDataSource.getUri() : this.uri;
+        return this.actualUri;
     }
 
     public void close() throws IOException {
         this.uri = null;
+        this.actualUri = null;
         notifyBytesRead();
         try {
             closeCurrentSource();
@@ -240,6 +258,7 @@ Error: java.util.NoSuchElementException
             try {
                 nextSpan = this.cache.startReadWrite(this.key, this.readPosition);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new InterruptedIOException();
             }
         } else {
@@ -278,7 +297,7 @@ Error: java.util.NoSuchElementException
         long j = (this.currentRequestIgnoresCache || nextDataSource != this.upstreamDataSource) ? Long.MAX_VALUE : this.readPosition + MIN_READ_BEFORE_CHECKING_CACHE;
         this.checkCachePosition = j;
         if (checkCache) {
-            Assertions.checkState(this.currentDataSource == this.upstreamDataSource);
+            Assertions.checkState(isBypassingCache());
             if (nextDataSource != this.upstreamDataSource) {
                 try {
                     closeCurrentSource();
@@ -298,8 +317,37 @@ Error: java.util.NoSuchElementException
         this.currentDataSpecLengthUnset = nextDataSpec.length == -1;
         long resolvedLength = nextDataSource.open(nextDataSpec);
         if (this.currentDataSpecLengthUnset && resolvedLength != -1) {
-            setBytesRemaining(resolvedLength);
+            setBytesRemainingAndMaybeStoreLength(resolvedLength);
         }
+        maybeUpdateActualUriFieldAndRedirectedUriMetadata();
+    }
+
+    private void maybeUpdateActualUriFieldAndRedirectedUriMetadata() {
+        if (isReadingFromUpstream()) {
+            this.actualUri = this.currentDataSource.getUri();
+            maybeUpdateRedirectedUriMetadata();
+        }
+    }
+
+    private void maybeUpdateRedirectedUriMetadata() {
+        if (isWritingToCache()) {
+            ContentMetadataMutations mutations = new ContentMetadataMutations();
+            if (!this.uri.equals(this.actualUri)) {
+                ContentMetadataInternal.setRedirectedUri(mutations, this.actualUri);
+            } else {
+                ContentMetadataInternal.removeRedirectedUri(mutations);
+            }
+            try {
+                this.cache.applyContentMetadataMutations(this.key, mutations);
+            } catch (CacheException e) {
+                Log.w(TAG, "Couldn't update redirected URI. This might cause relative URIs get resolved incorrectly.", e);
+            }
+        }
+    }
+
+    private static Uri loadRedirectedUriOrReturnGivenUri(Cache cache, String key, Uri uri) {
+        Uri redirectedUri = ContentMetadataInternal.getRedirectedUri(cache.getContentMetadata(key));
+        return redirectedUri == null ? uri : redirectedUri;
     }
 
     private static boolean isCausedByPositionOutOfRange(IOException e) {
@@ -313,11 +361,23 @@ Error: java.util.NoSuchElementException
         return false;
     }
 
-    private void setBytesRemaining(long bytesRemaining) throws IOException {
+    private void setBytesRemainingAndMaybeStoreLength(long bytesRemaining) throws IOException {
         this.bytesRemaining = bytesRemaining;
         if (isWritingToCache()) {
             this.cache.setContentLength(this.key, this.readPosition + bytesRemaining);
         }
+    }
+
+    private boolean isReadingFromUpstream() {
+        return !isReadingFromCache();
+    }
+
+    private boolean isBypassingCache() {
+        return this.currentDataSource == this.upstreamDataSource;
+    }
+
+    private boolean isReadingFromCache() {
+        return this.currentDataSource == this.cacheReadDataSource;
     }
 
     private boolean isWritingToCache() {
@@ -325,8 +385,24 @@ Error: java.util.NoSuchElementException
     }
 
     private void handleBeforeThrow(IOException exception) {
-        if (this.currentDataSource == this.cacheReadDataSource || (exception instanceof CacheException)) {
+        if (isReadingFromCache() || (exception instanceof CacheException)) {
             this.seenCacheError = true;
+        }
+    }
+
+    private int shouldIgnoreCacheForRequest(DataSpec dataSpec) {
+        if (this.ignoreCacheOnError && this.seenCacheError) {
+            return 0;
+        }
+        if (this.ignoreCacheForUnsetLengthRequests && dataSpec.length == -1) {
+            return 1;
+        }
+        return -1;
+    }
+
+    private void notifyCacheIgnored(int reason) {
+        if (this.eventListener != null) {
+            this.eventListener.onCacheIgnored(reason);
         }
     }
 

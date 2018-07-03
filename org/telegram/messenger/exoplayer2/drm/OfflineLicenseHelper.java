@@ -7,7 +7,6 @@ import android.util.Pair;
 import java.util.HashMap;
 import java.util.UUID;
 import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.drm.DefaultDrmSessionManager.EventListener;
 import org.telegram.messenger.exoplayer2.drm.DrmSession.DrmSessionException;
 import org.telegram.messenger.exoplayer2.upstream.HttpDataSource.Factory;
 import org.telegram.messenger.exoplayer2.util.Assertions;
@@ -32,7 +31,7 @@ public final class OfflineLicenseHelper<T extends ExoMediaCrypto> {
     public OfflineLicenseHelper(UUID uuid, ExoMediaDrm<T> mediaDrm, MediaDrmCallback callback, HashMap<String, String> optionalKeyRequestParameters) {
         this.handlerThread.start();
         this.conditionVariable = new ConditionVariable();
-        EventListener eventListener = new EventListener() {
+        DefaultDrmSessionEventListener eventListener = new DefaultDrmSessionEventListener() {
             public void onDrmKeysLoaded() {
                 OfflineLicenseHelper.this.conditionVariable.open();
             }
@@ -49,7 +48,8 @@ public final class OfflineLicenseHelper<T extends ExoMediaCrypto> {
                 OfflineLicenseHelper.this.conditionVariable.open();
             }
         };
-        this.drmSessionManager = new DefaultDrmSessionManager(uuid, mediaDrm, callback, optionalKeyRequestParameters, new Handler(this.handlerThread.getLooper()), eventListener);
+        this.drmSessionManager = new DefaultDrmSessionManager(uuid, mediaDrm, callback, optionalKeyRequestParameters);
+        this.drmSessionManager.addListener(new Handler(this.handlerThread.getLooper()), eventListener);
     }
 
     public synchronized byte[] getPropertyByteArray(String key) {

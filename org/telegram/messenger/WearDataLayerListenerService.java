@@ -329,22 +329,25 @@ public class WearDataLayerListenerService extends WearableListenerService {
     }
 
     public static void updateWatchConnectionState() {
-        Wearable.getCapabilityClient(ApplicationLoader.applicationContext).getCapability("remote_notifications", 1).addOnCompleteListener(new OnCompleteListener<CapabilityInfo>() {
-            public void onComplete(Task<CapabilityInfo> task) {
-                WearDataLayerListenerService.watchConnected = false;
-                try {
-                    CapabilityInfo capabilityInfo = (CapabilityInfo) task.getResult();
-                    if (capabilityInfo != null) {
-                        for (Node node : capabilityInfo.getNodes()) {
-                            if (node.isNearby()) {
-                                WearDataLayerListenerService.watchConnected = true;
+        try {
+            Wearable.getCapabilityClient(ApplicationLoader.applicationContext).getCapability("remote_notifications", 1).addOnCompleteListener(new OnCompleteListener<CapabilityInfo>() {
+                public void onComplete(Task<CapabilityInfo> task) {
+                    WearDataLayerListenerService.watchConnected = false;
+                    try {
+                        CapabilityInfo capabilityInfo = (CapabilityInfo) task.getResult();
+                        if (capabilityInfo != null) {
+                            for (Node node : capabilityInfo.getNodes()) {
+                                if (node.isNearby()) {
+                                    WearDataLayerListenerService.watchConnected = true;
+                                }
                             }
                         }
+                    } catch (Exception e) {
                     }
-                } catch (Exception e) {
                 }
-            }
-        });
+            });
+        } catch (Throwable th) {
+        }
     }
 
     public static boolean isWatchConnected() {

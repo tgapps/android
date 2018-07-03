@@ -48,6 +48,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
     private ArrayList<AlbumEntry> albumsSorted = null;
     private boolean allowCaption;
     private boolean allowGifs;
+    private boolean allowSearchImages = true;
     private ChatActivity chatActivity;
     private int columnsCount = 2;
     private PhotoAlbumPickerActivityDelegate delegate;
@@ -55,6 +56,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
     private ListAdapter listAdapter;
     private RecyclerListView listView;
     private boolean loading = false;
+    private int maxSelectedPhotos = 100;
     private PickerBottomLayout pickerBottomLayout;
     private FrameLayout progressView;
     private ArrayList<SearchImage> recentGifImages = new ArrayList();
@@ -85,7 +87,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
 
         public int getItemCount() {
             int i = 0;
-            if (!PhotoAlbumPickerActivity.this.singlePhoto) {
+            if (!PhotoAlbumPickerActivity.this.singlePhoto && PhotoAlbumPickerActivity.this.allowSearchImages) {
                 if (PhotoAlbumPickerActivity.this.albumsSorted != null) {
                     i = (int) Math.ceil((double) (((float) PhotoAlbumPickerActivity.this.albumsSorted.size()) / ((float) PhotoAlbumPickerActivity.this.columnsCount)));
                 }
@@ -129,7 +131,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
                 photoPickerAlbumsCell.setAlbumsCount(PhotoAlbumPickerActivity.this.columnsCount);
                 for (int a = 0; a < PhotoAlbumPickerActivity.this.columnsCount; a++) {
                     int index;
-                    if (PhotoAlbumPickerActivity.this.singlePhoto) {
+                    if (PhotoAlbumPickerActivity.this.singlePhoto || !PhotoAlbumPickerActivity.this.allowSearchImages) {
                         index = (PhotoAlbumPickerActivity.this.columnsCount * position) + a;
                     } else {
                         index = ((position - 1) * PhotoAlbumPickerActivity.this.columnsCount) + a;
@@ -145,7 +147,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
         }
 
         public int getItemViewType(int i) {
-            if (!PhotoAlbumPickerActivity.this.singlePhoto && i == 0) {
+            if (!PhotoAlbumPickerActivity.this.singlePhoto && PhotoAlbumPickerActivity.this.allowSearchImages && i == 0) {
                 return 1;
             }
             return 0;
@@ -289,7 +291,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.albumsDidLoaded) {
             if (this.classGuid == ((Integer) args[0]).intValue()) {
-                if (this.singlePhoto) {
+                if (this.singlePhoto || !this.allowSearchImages) {
                     this.albumsSorted = (ArrayList) args[2];
                 } else {
                     this.albumsSorted = (ArrayList) args[1];
@@ -329,6 +331,14 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
                 }
             }
         }
+    }
+
+    public void setMaxSelectedPhotos(int value) {
+        this.maxSelectedPhotos = value;
+    }
+
+    public void setAllowSearchImages(boolean value) {
+        this.allowSearchImages = value;
     }
 
     public void setDelegate(PhotoAlbumPickerActivityDelegate delegate) {
@@ -471,6 +481,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
                 }
             });
         }
+        fragment.setMaxSelectedPhotos(this.maxSelectedPhotos);
         presentFragment(fragment);
     }
 }

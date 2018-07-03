@@ -161,7 +161,7 @@ public class SendLocationCell extends FrameLayout {
                 } else {
                     this.rect.set((float) (getMeasuredWidth() - AndroidUtilities.dp(43.0f)), (float) AndroidUtilities.dp(18.0f), (float) (getMeasuredWidth() - AndroidUtilities.dp(13.0f)), (float) AndroidUtilities.dp(48.0f));
                 }
-                int color = Theme.getColor("location_liveLocationProgress");
+                int color = Theme.getColor(Theme.key_location_liveLocationProgress);
                 Theme.chat_radialProgress2Paint.setColor(color);
                 Theme.chat_livePaint.setColor(color);
                 canvas.drawArc(this.rect, -90.0f, -360.0f * progress, false, Theme.chat_radialProgress2Paint);

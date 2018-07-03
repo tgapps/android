@@ -55,6 +55,7 @@ import org.telegram.tgnet.TLRPC.TL_chatPhoto;
 import org.telegram.tgnet.TLRPC.TL_error;
 import org.telegram.tgnet.TLRPC.TL_inputChannelEmpty;
 import org.telegram.tgnet.TLRPC.TL_messages_chats;
+import org.telegram.tgnet.TLRPC.TL_secureFile;
 import org.telegram.ui.ActionBar.ActionBar.ActionBarMenuOnItemClick;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.AlertDialog.Builder;
@@ -72,13 +73,13 @@ import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.AvatarDrawable;
-import org.telegram.ui.Components.AvatarUpdater;
-import org.telegram.ui.Components.AvatarUpdater.AvatarUpdaterDelegate;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.EditTextBoldCursor;
+import org.telegram.ui.Components.ImageUpdater;
+import org.telegram.ui.Components.ImageUpdater.ImageUpdaterDelegate;
 import org.telegram.ui.Components.LayoutHelper;
 
-public class ChannelEditInfoActivity extends BaseFragment implements NotificationCenterDelegate, AvatarUpdaterDelegate {
+public class ChannelEditInfoActivity extends BaseFragment implements NotificationCenterDelegate, ImageUpdaterDelegate {
     private static final int done_button = 1;
     private ArrayList<AdminedChannelCell> adminedChannelCells = new ArrayList();
     private ShadowSectionCell adminedInfoCell;
@@ -86,7 +87,6 @@ public class ChannelEditInfoActivity extends BaseFragment implements Notificatio
     private FileLocation avatar;
     private AvatarDrawable avatarDrawable = new AvatarDrawable();
     private BackupImageView avatarImage;
-    private AvatarUpdater avatarUpdater = new AvatarUpdater();
     private boolean canCreatePublic = true;
     private int chatId;
     private int checkReqId;
@@ -105,6 +105,7 @@ public class ChannelEditInfoActivity extends BaseFragment implements Notificatio
     private HeaderCell headerCell;
     private HeaderCell headerCell2;
     private boolean historyHidden;
+    private ImageUpdater imageUpdater = new ImageUpdater();
     private ChatFull info;
     private TextInfoPrivacyCell infoCell;
     private TextInfoPrivacyCell infoCell2;
@@ -204,8 +205,8 @@ public class ChannelEditInfoActivity extends BaseFragment implements Notificatio
                 }
             });
         }
-        this.avatarUpdater.parentFragment = this;
-        this.avatarUpdater.delegate = this;
+        this.imageUpdater.parentFragment = this;
+        this.imageUpdater.delegate = this;
         this.signMessages = this.currentChat.signatures;
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.chatInfoDidLoaded);
         return super.onFragmentCreate();
@@ -213,8 +214,8 @@ public class ChannelEditInfoActivity extends BaseFragment implements Notificatio
 
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
-        if (this.avatarUpdater != null) {
-            this.avatarUpdater.clear();
+        if (this.imageUpdater != null) {
+            this.imageUpdater.clear();
         }
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.chatInfoDidLoaded);
         AndroidUtilities.removeAdjustResize(getParentActivity(), this.classGuid);
@@ -251,7 +252,7 @@ public class ChannelEditInfoActivity extends BaseFragment implements Notificatio
                         AndroidUtilities.shakeView(ChannelEditInfoActivity.this.nameTextView, 2.0f, 0);
                     } else if (ChannelEditInfoActivity.this.usernameTextView == null || ChannelEditInfoActivity.this.isPrivate || (((ChannelEditInfoActivity.this.currentChat.username != null || ChannelEditInfoActivity.this.usernameTextView.length() == 0) && (ChannelEditInfoActivity.this.currentChat.username == null || ChannelEditInfoActivity.this.currentChat.username.equalsIgnoreCase(ChannelEditInfoActivity.this.usernameTextView.getText().toString()))) || ChannelEditInfoActivity.this.nameTextView.length() == 0 || ChannelEditInfoActivity.this.lastNameAvailable)) {
                         ChannelEditInfoActivity.this.donePressed = true;
-                        if (ChannelEditInfoActivity.this.avatarUpdater.uploadingAvatar != null) {
+                        if (ChannelEditInfoActivity.this.imageUpdater.uploadingImage != null) {
                             ChannelEditInfoActivity.this.createAfterUpload = true;
                             ChannelEditInfoActivity.this.progressDialog = new AlertDialog(ChannelEditInfoActivity.this.getParentActivity(), 1);
                             ChannelEditInfoActivity.this.progressDialog.setMessage(LocaleController.getString("Loading", R.string.Loading));
@@ -353,9 +354,9 @@ public class ChannelEditInfoActivity extends BaseFragment implements Notificatio
                     builder.setItems(ChannelEditInfoActivity.this.avatar != null ? new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley), LocaleController.getString("DeletePhoto", R.string.DeletePhoto)} : new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley)}, new OnClickListener() {
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (i == 0) {
-                                ChannelEditInfoActivity.this.avatarUpdater.openCamera();
+                                ChannelEditInfoActivity.this.imageUpdater.openCamera();
                             } else if (i == 1) {
-                                ChannelEditInfoActivity.this.avatarUpdater.openGallery();
+                                ChannelEditInfoActivity.this.imageUpdater.openGallery();
                             } else if (i == 2) {
                                 ChannelEditInfoActivity.this.avatar = null;
                                 ChannelEditInfoActivity.this.uploadedAvatar = null;
@@ -772,7 +773,7 @@ public class ChannelEditInfoActivity extends BaseFragment implements Notificatio
         }
     }
 
-    public void didUploadedPhoto(final InputFile file, final PhotoSize small, PhotoSize big) {
+    public void didUploadedPhoto(final InputFile file, final PhotoSize small, PhotoSize big, TL_secureFile secureFile) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             public void run() {
                 ChannelEditInfoActivity.this.uploadedAvatar = file;
@@ -795,12 +796,12 @@ public class ChannelEditInfoActivity extends BaseFragment implements Notificatio
     }
 
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
-        this.avatarUpdater.onActivityResult(requestCode, resultCode, data);
+        this.imageUpdater.onActivityResult(requestCode, resultCode, data);
     }
 
     public void saveSelfArgs(Bundle args) {
-        if (!(this.avatarUpdater == null || this.avatarUpdater.currentPicturePath == null)) {
-            args.putString("path", this.avatarUpdater.currentPicturePath);
+        if (!(this.imageUpdater == null || this.imageUpdater.currentPicturePath == null)) {
+            args.putString("path", this.imageUpdater.currentPicturePath);
         }
         if (this.nameTextView != null) {
             String text = this.nameTextView.getText().toString();
@@ -811,8 +812,8 @@ public class ChannelEditInfoActivity extends BaseFragment implements Notificatio
     }
 
     public void restoreSelfArgs(Bundle args) {
-        if (this.avatarUpdater != null) {
-            this.avatarUpdater.currentPicturePath = args.getString("path");
+        if (this.imageUpdater != null) {
+            this.imageUpdater.currentPicturePath = args.getString("path");
         }
     }
 

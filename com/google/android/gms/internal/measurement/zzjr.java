@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 
 public class zzjr implements zzec {
@@ -484,7 +483,7 @@ public class zzjr implements zzec {
                         }
                         zzix().endTransaction();
                         zzku();
-                        zzge().zzit().zzg("Background event processing time, ms", Long.valueOf(((System.nanoTime() - nanoTime) + 500000) / C.MICROS_PER_SECOND));
+                        zzge().zzit().zzg("Background event processing time, ms", Long.valueOf(((System.nanoTime() - nanoTime) + 500000) / 1000000));
                     }
                 }
                 z = false;
@@ -497,7 +496,7 @@ public class zzjr implements zzec {
                 }
                 zzix().endTransaction();
                 zzku();
-                zzge().zzit().zzg("Background event processing time, ms", Long.valueOf(((System.nanoTime() - nanoTime) + 500000) / C.MICROS_PER_SECOND));
+                zzge().zzit().zzg("Background event processing time, ms", Long.valueOf(((System.nanoTime() - nanoTime) + 500000) / 1000000));
             } catch (IOException e) {
                 zzge().zzim().zze("Data loss. Failed to insert raw event metadata. appId", zzfg.zzbm(com_google_android_gms_internal_measurement_zzkq.zzti), e);
             } catch (Throwable th) {
@@ -3257,10 +3256,10 @@ public class zzjr implements zzec {
 
     public final void zzks() {
         String zzhn;
+        String str;
         zzab();
         zzkq();
         this.zzaqn = true;
-        String str;
         try {
             Boolean zzkf = this.zzacw.zzfx().zzkf();
             if (zzkf == null) {

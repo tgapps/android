@@ -3,6 +3,7 @@ package com.google.android.gms.internal.measurement;
 import java.io.IOException;
 import org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor;
 import org.telegram.messenger.voip.VoIPService;
+import org.telegram.tgnet.TLRPC;
 
 public final class zzkq extends zzaby<zzkq> {
     private static volatile zzkq[] zzatg;
@@ -692,7 +693,7 @@ public final class zzkq extends zzaby<zzkq> {
                 case VoIPService.CALL_MAX_LAYER /*74*/:
                     this.zzatq = com_google_android_gms_internal_measurement_zzabv.readString();
                     continue;
-                case 82:
+                case TLRPC.LAYER /*82*/:
                     this.zzatr = com_google_android_gms_internal_measurement_zzabv.readString();
                     continue;
                 case 90:

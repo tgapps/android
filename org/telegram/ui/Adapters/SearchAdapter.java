@@ -112,8 +112,7 @@ public class SearchAdapter extends SelectionAdapter {
                     SearchAdapter.this.searchAdapterHelper.queryServerSearch(query, true, SearchAdapter.this.allowChats, SearchAdapter.this.allowBots, true, SearchAdapter.this.channelId, false);
                 }
                 final int currentAccount = UserConfig.selectedAccount;
-                final ArrayList<TL_contact> contactsCopy = new ArrayList();
-                contactsCopy.addAll(ContactsController.getInstance(currentAccount).contacts);
+                final ArrayList<TL_contact> contactsCopy = new ArrayList(ContactsController.getInstance(currentAccount).contacts);
                 Utilities.searchQueue.postRunnable(new Runnable() {
                     public void run() {
                         String search1 = query.trim().toLowerCase();

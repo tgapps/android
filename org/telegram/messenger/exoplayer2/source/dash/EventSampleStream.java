@@ -22,6 +22,8 @@ final class EventSampleStream implements SampleStream {
 
     EventSampleStream(EventStream eventStream, Format upstreamFormat, boolean eventStreamUpdatable) {
         this.upstreamFormat = upstreamFormat;
+        this.eventStream = eventStream;
+        this.eventTimesUs = eventStream.presentationTimesUs;
         updateEventStream(eventStream, eventStreamUpdatable);
     }
 

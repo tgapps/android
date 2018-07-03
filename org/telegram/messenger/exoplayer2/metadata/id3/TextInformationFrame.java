@@ -59,6 +59,10 @@ public final class TextInformationFrame extends Id3Frame {
         return hashCode + i;
     }
 
+    public String toString() {
+        return this.id + ": value=" + this.value;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.id);
         dest.writeString(this.description);

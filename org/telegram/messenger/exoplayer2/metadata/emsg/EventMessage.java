@@ -74,6 +74,10 @@ public final class EventMessage implements Entry {
         return false;
     }
 
+    public String toString() {
+        return "EMSG: scheme=" + this.schemeIdUri + ", id=" + this.id + ", value=" + this.value;
+    }
+
     public int describeContents() {
         return 0;
     }

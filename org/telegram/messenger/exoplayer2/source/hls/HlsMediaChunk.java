@@ -28,6 +28,7 @@ final class HlsMediaChunk extends MediaChunk {
     private int bytesLoaded;
     public final int discontinuitySequenceNumber;
     private final Extractor extractor;
+    private final boolean hasGapTag;
     public final HlsUrl hlsUrl;
     private final ParsableByteArray id3Data;
     private final Id3Decoder id3Decoder;
@@ -47,13 +48,14 @@ final class HlsMediaChunk extends MediaChunk {
     private final TimestampAdjuster timestampAdjuster;
     public final int uid;
 
-    public HlsMediaChunk(HlsExtractorFactory extractorFactory, DataSource dataSource, DataSpec dataSpec, DataSpec initDataSpec, HlsUrl hlsUrl, List<Format> muxedCaptionFormats, int trackSelectionReason, Object trackSelectionData, long startTimeUs, long endTimeUs, int chunkIndex, int discontinuitySequenceNumber, boolean isMasterTimestampSource, TimestampAdjuster timestampAdjuster, HlsMediaChunk previousChunk, DrmInitData drmInitData, byte[] fullSegmentEncryptionKey, byte[] encryptionIv) {
-        super(buildDataSource(dataSource, fullSegmentEncryptionKey, encryptionIv), dataSpec, hlsUrl.format, trackSelectionReason, trackSelectionData, startTimeUs, endTimeUs, chunkIndex);
+    public HlsMediaChunk(HlsExtractorFactory extractorFactory, DataSource dataSource, DataSpec dataSpec, DataSpec initDataSpec, HlsUrl hlsUrl, List<Format> muxedCaptionFormats, int trackSelectionReason, Object trackSelectionData, long startTimeUs, long endTimeUs, long chunkMediaSequence, int discontinuitySequenceNumber, boolean hasGapTag, boolean isMasterTimestampSource, TimestampAdjuster timestampAdjuster, HlsMediaChunk previousChunk, DrmInitData drmInitData, byte[] fullSegmentEncryptionKey, byte[] encryptionIv) {
+        super(buildDataSource(dataSource, fullSegmentEncryptionKey, encryptionIv), dataSpec, hlsUrl.format, trackSelectionReason, trackSelectionData, startTimeUs, endTimeUs, chunkMediaSequence);
         this.discontinuitySequenceNumber = discontinuitySequenceNumber;
         this.initDataSpec = initDataSpec;
         this.hlsUrl = hlsUrl;
         this.isMasterTimestampSource = isMasterTimestampSource;
         this.timestampAdjuster = timestampAdjuster;
+        this.hasGapTag = hasGapTag;
         Extractor previousExtractor = null;
         if (previousChunk != null) {
             this.shouldSpliceIn = previousChunk.hlsUrl != hlsUrl;
@@ -108,7 +110,10 @@ final class HlsMediaChunk extends MediaChunk {
     public void load() throws IOException, InterruptedException {
         maybeLoadInitData();
         if (!this.loadCanceled) {
-            loadMedia();
+            if (!this.hasGapTag) {
+                loadMedia();
+            }
+            this.loadCompleted = true;
         }
     }
 
@@ -135,10 +140,12 @@ final class HlsMediaChunk extends MediaChunk {
 
     private void loadMedia() throws IOException, InterruptedException {
         DataSpec loadDataSpec;
-        boolean skipLoadedBytes;
+        boolean skipLoadedBytes = true;
         if (this.isEncrypted) {
             loadDataSpec = this.dataSpec;
-            skipLoadedBytes = this.bytesLoaded != 0;
+            if (this.bytesLoaded == 0) {
+                skipLoadedBytes = false;
+            }
         } else {
             loadDataSpec = this.dataSpec.subrange((long) this.bytesLoaded);
             skipLoadedBytes = false;
@@ -168,7 +175,6 @@ final class HlsMediaChunk extends MediaChunk {
             }
             this.bytesLoaded = (int) (input.getPosition() - this.dataSpec.absoluteStreamPosition);
             Util.closeQuietly(this.dataSource);
-            this.loadCompleted = true;
         } catch (Throwable th) {
             Util.closeQuietly(this.dataSource);
         }

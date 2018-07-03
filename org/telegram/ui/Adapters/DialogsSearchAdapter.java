@@ -989,6 +989,29 @@ public class DialogsSearchAdapter extends SelectionAdapter {
         }
     }
 
+    public boolean isGlobalSearch(int i) {
+        if (isRecentSearchDisplayed() || !this.searchResultHashtags.isEmpty()) {
+            return false;
+        }
+        ArrayList<TLObject> globalSearch = this.searchAdapterHelper.getGlobalSearch();
+        ArrayList<TLObject> localServerSearch = this.searchAdapterHelper.getLocalServerSearch();
+        int localCount = this.searchResult.size();
+        int localServerCount = localServerSearch.size();
+        int globalCount = globalSearch.isEmpty() ? 0 : globalSearch.size() + 1;
+        int messagesCount = this.searchResultMessages.isEmpty() ? 0 : this.searchResultMessages.size() + 1;
+        if (i >= 0 && i < localCount) {
+            return false;
+        }
+        if (i >= localCount && i < localServerCount + localCount) {
+            return false;
+        }
+        if (i <= localCount + localServerCount || i >= (globalCount + localCount) + localServerCount) {
+            return (i <= (globalCount + localCount) + localServerCount || i >= ((globalCount + localCount) + messagesCount) + localServerCount) ? false : false;
+        } else {
+            return true;
+        }
+    }
+
     public long getItemId(int i) {
         return (long) i;
     }

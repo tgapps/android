@@ -33,8 +33,8 @@ final class SinglePeriodAdTimeline extends ForwardingTimeline {
         return period;
     }
 
-    public Window getWindow(int windowIndex, Window window, boolean setIds, long defaultPositionProjectionUs) {
-        window = super.getWindow(windowIndex, window, setIds, defaultPositionProjectionUs);
+    public Window getWindow(int windowIndex, Window window, boolean setTag, long defaultPositionProjectionUs) {
+        window = super.getWindow(windowIndex, window, setTag, defaultPositionProjectionUs);
         if (window.durationUs == C.TIME_UNSET) {
             window.durationUs = this.adPlaybackState.contentDurationUs;
         }

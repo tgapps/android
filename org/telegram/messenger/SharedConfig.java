@@ -23,6 +23,7 @@ public class SharedConfig {
     public static boolean directShare = true;
     public static int fontSize = AndroidUtilities.dp(16.0f);
     public static boolean groupPhotosEnabled = true;
+    public static boolean hasCameraCache;
     public static boolean inappCamera = true;
     public static boolean isWaitingForPasscodeEnter;
     public static long lastAppPauseTime;
@@ -35,6 +36,7 @@ public class SharedConfig {
     public static int passcodeType;
     public static boolean playOrderReversed;
     public static ArrayList<ProxyInfo> proxyList = new ArrayList();
+    private static boolean proxyListLoaded;
     public static byte[] pushAuthKey;
     public static byte[] pushAuthKeyId;
     public static String pushString = TtmlNode.ANONYMOUS_REGION_ID;
@@ -163,6 +165,7 @@ public class SharedConfig {
             shuffleMusic = preferences.getBoolean("shuffleMusic", false);
             playOrderReversed = preferences.getBoolean("playOrderReversed", false);
             inappCamera = preferences.getBoolean("inappCamera", true);
+            hasCameraCache = preferences.contains("cameraCache");
             roundCamera16to9 = true;
             groupPhotosEnabled = preferences.getBoolean("groupPhotosEnabled", true);
             repeatMode = preferences.getInt("repeatMode", 0);
@@ -325,7 +328,7 @@ public class SharedConfig {
     public static void toggleInappCamera() {
         inappCamera = !inappCamera;
         Editor editor = MessagesController.getGlobalMainSettings().edit();
-        editor.putBoolean("direct_share", inappCamera);
+        editor.putBoolean("inappCamera", inappCamera);
         editor.commit();
     }
 
@@ -344,7 +347,7 @@ public class SharedConfig {
     }
 
     public static void loadProxyList() {
-        if (proxyList.isEmpty()) {
+        if (!proxyListLoaded) {
             ProxyInfo info;
             SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0);
             String proxyAddress = preferences.getString("proxy_ip", TtmlNode.ANONYMOUS_REGION_ID);
@@ -352,6 +355,7 @@ public class SharedConfig {
             String proxyPassword = preferences.getString("proxy_pass", TtmlNode.ANONYMOUS_REGION_ID);
             String proxySecret = preferences.getString("proxy_secret", TtmlNode.ANONYMOUS_REGION_ID);
             int proxyPort = preferences.getInt("proxy_port", 1080);
+            proxyListLoaded = true;
             proxyList.clear();
             currentProxy = null;
             String list = preferences.getString("proxy_list", null);
@@ -367,6 +371,7 @@ public class SharedConfig {
                         }
                     }
                 }
+                data.cleanup();
             }
             if (currentProxy == null && !TextUtils.isEmpty(proxyAddress)) {
                 info = new ProxyInfo(proxyAddress, proxyPort, proxyUsername, proxyPassword, proxySecret);
@@ -376,7 +381,7 @@ public class SharedConfig {
         }
     }
 
-    private static void saveProxyList() {
+    public static void saveProxyList() {
         SerializedData serializedData = new SerializedData();
         int count = proxyList.size();
         serializedData.writeInt32(count);
@@ -395,6 +400,7 @@ public class SharedConfig {
             serializedData.writeString(str);
         }
         ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0).edit().putString("proxy_list", Base64.encodeToString(serializedData.toByteArray(), 2)).commit();
+        serializedData.cleanup();
     }
 
     public static ProxyInfo addProxy(ProxyInfo proxyInfo) {

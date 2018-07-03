@@ -49,6 +49,10 @@ public final class PrivFrame extends Id3Frame {
         return (((this.owner != null ? this.owner.hashCode() : 0) + 527) * 31) + Arrays.hashCode(this.privateData);
     }
 
+    public String toString() {
+        return this.id + ": owner=" + this.owner;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.owner);
         dest.writeByteArray(this.privateData);

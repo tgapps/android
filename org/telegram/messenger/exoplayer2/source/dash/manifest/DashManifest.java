@@ -6,8 +6,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.telegram.messenger.exoplayer2.C;
+import org.telegram.messenger.exoplayer2.offline.FilterableManifest;
 
-public class DashManifest {
+public class DashManifest implements FilterableManifest<DashManifest, RepresentationKey> {
     public final long availabilityStartTimeMs;
     public final long durationMs;
     public final boolean dynamic;
@@ -59,8 +60,8 @@ public class DashManifest {
         return C.msToUs(getPeriodDurationMs(index));
     }
 
-    public final DashManifest copy(List<RepresentationKey> representationKeys) {
-        LinkedList<RepresentationKey> linkedList = new LinkedList(representationKeys);
+    public final DashManifest copy(List<RepresentationKey> streamKeys) {
+        LinkedList<RepresentationKey> linkedList = new LinkedList(streamKeys);
         Collections.sort(linkedList);
         linkedList.add(new RepresentationKey(-1, -1, -1));
         ArrayList<Period> copyPeriods = new ArrayList();

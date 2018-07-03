@@ -400,7 +400,7 @@ public final class MediaCodecUtil {
         if (Util.SDK_INT == 16 && "OMX.qcom.audio.decoder.aac".equals(name) && ("C1504".equals(Util.DEVICE) || "C1505".equals(Util.DEVICE) || "C1604".equals(Util.DEVICE) || "C1605".equals(Util.DEVICE))) {
             return false;
         }
-        if (Util.SDK_INT < 24 && (("OMX.SEC.aac.dec".equals(name) || "OMX.Exynos.AAC.Decoder".equals(name)) && Util.MANUFACTURER.equals("samsung") && (Util.DEVICE.startsWith("zeroflte") || Util.DEVICE.startsWith("zerolte") || Util.DEVICE.startsWith("zenlte") || Util.DEVICE.equals("SC-05G") || Util.DEVICE.equals("marinelteatt") || Util.DEVICE.equals("404SC") || Util.DEVICE.equals("SC-04G") || Util.DEVICE.equals("SCV31")))) {
+        if (Util.SDK_INT < 24 && (("OMX.SEC.aac.dec".equals(name) || "OMX.Exynos.AAC.Decoder".equals(name)) && "samsung".equals(Util.MANUFACTURER) && (Util.DEVICE.startsWith("zeroflte") || Util.DEVICE.startsWith("zerolte") || Util.DEVICE.startsWith("zenlte") || "SC-05G".equals(Util.DEVICE) || "marinelteatt".equals(Util.DEVICE) || "404SC".equals(Util.DEVICE) || "SC-04G".equals(Util.DEVICE) || "SCV31".equals(Util.DEVICE)))) {
             return false;
         }
         if (Util.SDK_INT <= 19 && "OMX.SEC.vp8.dec".equals(name) && "samsung".equals(Util.MANUFACTURER) && (Util.DEVICE.startsWith("d2") || Util.DEVICE.startsWith("serrano") || Util.DEVICE.startsWith("jflte") || Util.DEVICE.startsWith("santos") || Util.DEVICE.startsWith("t0"))) {
@@ -429,7 +429,7 @@ public final class MediaCodecUtil {
     }
 
     private static boolean codecNeedsDisableAdaptationWorkaround(String name) {
-        return Util.SDK_INT <= 22 && ((Util.MODEL.equals("ODROID-XU3") || Util.MODEL.equals("Nexus 10")) && ("OMX.Exynos.AVC.Decoder".equals(name) || "OMX.Exynos.AVC.Decoder.secure".equals(name)));
+        return Util.SDK_INT <= 22 && (("ODROID-XU3".equals(Util.MODEL) || "Nexus 10".equals(Util.MODEL)) && ("OMX.Exynos.AVC.Decoder".equals(name) || "OMX.Exynos.AVC.Decoder.secure".equals(name)));
     }
 
     private static Pair<Integer, Integer> getHevcProfileAndLevel(String codec, String[] parts) {
@@ -478,14 +478,14 @@ public final class MediaCodecUtil {
                 Log.w(TAG, "Ignoring malformed AVC codec string: " + codec);
                 return null;
             }
-            Integer profile = Integer.valueOf(AVC_PROFILE_NUMBER_TO_CONST.get(profileInteger.intValue()));
-            if (profile == null) {
+            int profile = AVC_PROFILE_NUMBER_TO_CONST.get(profileInteger.intValue(), -1);
+            if (profile == -1) {
                 Log.w(TAG, "Unknown AVC profile: " + profileInteger);
                 return null;
             }
-            Integer level = Integer.valueOf(AVC_LEVEL_NUMBER_TO_CONST.get(levelInteger.intValue()));
-            if (level != null) {
-                return new Pair(profile, level);
+            int level = AVC_LEVEL_NUMBER_TO_CONST.get(levelInteger.intValue(), -1);
+            if (level != -1) {
+                return new Pair(Integer.valueOf(profile), Integer.valueOf(level));
             }
             Log.w(TAG, "Unknown AVC level: " + levelInteger);
             return null;

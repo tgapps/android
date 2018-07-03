@@ -48,6 +48,7 @@ import org.telegram.tgnet.TLRPC.TL_channels_updateUsername;
 import org.telegram.tgnet.TLRPC.TL_error;
 import org.telegram.tgnet.TLRPC.TL_inputChannelEmpty;
 import org.telegram.tgnet.TLRPC.TL_messages_chats;
+import org.telegram.tgnet.TLRPC.TL_secureFile;
 import org.telegram.ui.ActionBar.ActionBar.ActionBarMenuOnItemClick;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.AlertDialog.Builder;
@@ -63,13 +64,13 @@ import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextBlockCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Components.AvatarDrawable;
-import org.telegram.ui.Components.AvatarUpdater;
-import org.telegram.ui.Components.AvatarUpdater.AvatarUpdaterDelegate;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.EditTextBoldCursor;
+import org.telegram.ui.Components.ImageUpdater;
+import org.telegram.ui.Components.ImageUpdater.ImageUpdaterDelegate;
 import org.telegram.ui.Components.LayoutHelper;
 
-public class ChannelCreateActivity extends BaseFragment implements NotificationCenterDelegate, AvatarUpdaterDelegate {
+public class ChannelCreateActivity extends BaseFragment implements NotificationCenterDelegate, ImageUpdaterDelegate {
     private static final int done_button = 1;
     private ArrayList<AdminedChannelCell> adminedChannelCells = new ArrayList();
     private TextInfoPrivacyCell adminedInfoCell;
@@ -77,7 +78,6 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
     private FileLocation avatar;
     private AvatarDrawable avatarDrawable;
     private BackupImageView avatarImage;
-    private AvatarUpdater avatarUpdater;
     private boolean canCreatePublic = true;
     private int chatId;
     private int checkReqId;
@@ -91,6 +91,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
     private EditText editText;
     private HeaderCell headerCell;
     private TextView helpTextView;
+    private ImageUpdater imageUpdater;
     private ExportedChatInvite invite;
     private boolean isPrivate;
     private String lastCheckName;
@@ -118,7 +119,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
         this.currentStep = args.getInt("step", 0);
         if (this.currentStep == 0) {
             this.avatarDrawable = new AvatarDrawable();
-            this.avatarUpdater = new AvatarUpdater();
+            this.imageUpdater = new ImageUpdater();
             TL_channels_checkUsername req = new TL_channels_checkUsername();
             req.username = "1";
             req.channel = new TL_inputChannelEmpty();
@@ -154,9 +155,9 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
         if (this.currentStep == 1) {
             generateLink();
         }
-        if (this.avatarUpdater != null) {
-            this.avatarUpdater.parentFragment = this;
-            this.avatarUpdater.delegate = this;
+        if (this.imageUpdater != null) {
+            this.imageUpdater.parentFragment = this;
+            this.imageUpdater.delegate = this;
         }
         return super.onFragmentCreate();
     }
@@ -165,8 +166,8 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
         super.onFragmentDestroy();
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.chatDidCreated);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.chatDidFailCreate);
-        if (this.avatarUpdater != null) {
-            this.avatarUpdater.clear();
+        if (this.imageUpdater != null) {
+            this.imageUpdater.clear();
         }
         AndroidUtilities.removeAdjustResize(getParentActivity(), this.classGuid);
     }
@@ -197,7 +198,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
                                 return;
                             }
                             ChannelCreateActivity.this.donePressed = true;
-                            if (ChannelCreateActivity.this.avatarUpdater.uploadingAvatar != null) {
+                            if (ChannelCreateActivity.this.imageUpdater.uploadingImage != null) {
                                 ChannelCreateActivity.this.createAfterUpload = true;
                                 ChannelCreateActivity.this.progressDialog = new AlertDialog(ChannelCreateActivity.this.getParentActivity(), 1);
                                 ChannelCreateActivity.this.progressDialog.setMessage(LocaleController.getString("Loading", R.string.Loading));
@@ -305,9 +306,9 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
                         builder.setItems(ChannelCreateActivity.this.avatar != null ? new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley), LocaleController.getString("DeletePhoto", R.string.DeletePhoto)} : new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley)}, new OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (i == 0) {
-                                    ChannelCreateActivity.this.avatarUpdater.openCamera();
+                                    ChannelCreateActivity.this.imageUpdater.openCamera();
                                 } else if (i == 1) {
-                                    ChannelCreateActivity.this.avatarUpdater.openGallery();
+                                    ChannelCreateActivity.this.imageUpdater.openGallery();
                                 } else if (i == 2) {
                                     ChannelCreateActivity.this.avatar = null;
                                     ChannelCreateActivity.this.uploadedAvatar = null;
@@ -620,7 +621,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
         }
     }
 
-    public void didUploadedPhoto(final InputFile file, final PhotoSize small, PhotoSize big) {
+    public void didUploadedPhoto(final InputFile file, final PhotoSize small, PhotoSize big, TL_secureFile secureFile) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             public void run() {
                 ChannelCreateActivity.this.uploadedAvatar = file;
@@ -643,13 +644,13 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
     }
 
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
-        this.avatarUpdater.onActivityResult(requestCode, resultCode, data);
+        this.imageUpdater.onActivityResult(requestCode, resultCode, data);
     }
 
     public void saveSelfArgs(Bundle args) {
         if (this.currentStep == 0) {
-            if (!(this.avatarUpdater == null || this.avatarUpdater.currentPicturePath == null)) {
-                args.putString("path", this.avatarUpdater.currentPicturePath);
+            if (!(this.imageUpdater == null || this.imageUpdater.currentPicturePath == null)) {
+                args.putString("path", this.imageUpdater.currentPicturePath);
             }
             if (this.nameTextView != null) {
                 String text = this.nameTextView.getText().toString();
@@ -662,8 +663,8 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
 
     public void restoreSelfArgs(Bundle args) {
         if (this.currentStep == 0) {
-            if (this.avatarUpdater != null) {
-                this.avatarUpdater.currentPicturePath = args.getString("path");
+            if (this.imageUpdater != null) {
+                this.imageUpdater.currentPicturePath = args.getString("path");
             }
             String text = args.getString("nameTextView");
             if (text == null) {

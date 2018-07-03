@@ -56,6 +56,7 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
     private boolean loadingFinished;
     private final Runnable maybeFinishPrepareRunnable;
     private final int minLoadableRetryCount;
+    private boolean notifiedReadingStarted;
     private boolean notifyDiscontinuity;
     private final Runnable onContinueLoadingRequestedRunnable;
     private boolean pendingDeferredRetry;
@@ -160,10 +161,10 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
         }
 
         public void load() throws IOException, InterruptedException {
+            ExtractorInput input;
             Throwable th;
             int result = 0;
             while (result == 0 && !this.loadCanceled) {
-                ExtractorInput input;
                 try {
                     long position = this.positionHolder.position;
                     this.dataSpec = new DataSpec(this.uri, position, -1, ExtractorMediaPeriod.this.customCacheKey);
@@ -271,24 +272,26 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
             minLoadableRetryCount = 3;
         }
         this.actualMinLoadableRetryCount = minLoadableRetryCount;
+        eventDispatcher.mediaPeriodCreated();
     }
 
     public void release() {
-        boolean releasedSynchronously = this.loader.release(this);
-        if (this.prepared && !releasedSynchronously) {
+        if (this.prepared) {
             for (SampleQueue sampleQueue : this.sampleQueues) {
                 sampleQueue.discardToEnd();
             }
         }
+        this.loader.release(this);
         this.handler.removeCallbacksAndMessages(null);
         this.released = true;
+        this.eventDispatcher.mediaPeriodReleased();
     }
 
     public void onLoaderReleased() {
-        this.extractorHolder.release();
         for (SampleQueue sampleQueue : this.sampleQueues) {
             sampleQueue.reset();
         }
+        this.extractorHolder.release();
     }
 
     public void prepare(MediaPeriod.Callback callback, long positionUs) {
@@ -306,6 +309,7 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
     }
 
     public long selectTracks(TrackSelection[] selections, boolean[] mayRetainStreamFlags, SampleStream[] streams, boolean[] streamResetFlags, long positionUs) {
+        SampleQueue sampleQueue;
         Assertions.checkState(this.prepared);
         int oldEnabledTrackCount = this.enabledTrackCount;
         int i = 0;
@@ -333,7 +337,6 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
                 streams[i] = new SampleStreamImpl(track);
                 streamResetFlags[i] = true;
                 if (!seekRequired) {
-                    SampleQueue sampleQueue;
                     sampleQueue = this.sampleQueues[track];
                     sampleQueue.rewind();
                     if (sampleQueue.advanceTo(positionUs, true, true) != -1 || sampleQueue.getReadIndex() == 0) {
@@ -397,6 +400,10 @@ final class ExtractorMediaPeriod implements ExtractorOutput, MediaPeriod, Upstre
     }
 
     public long readDiscontinuity() {
+        if (!this.notifiedReadingStarted) {
+            this.eventDispatcher.readingStarted();
+            this.notifiedReadingStarted = true;
+        }
         if (!this.notifyDiscontinuity || (!this.loadingFinished && getExtractedSamplesCount() <= this.extractedSamplesCountAtStartOfLoad)) {
             return C.TIME_UNSET;
         }

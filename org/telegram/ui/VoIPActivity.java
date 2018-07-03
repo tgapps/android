@@ -1429,30 +1429,33 @@ public class VoIPActivity extends Activity implements NotificationCenterDelegate
     private void updateBlurredPhotos(final BitmapHolder src) {
         new Thread(new Runnable() {
             public void run() {
-                Bitmap blur1 = Bitmap.createBitmap(150, 150, Config.ARGB_8888);
-                Canvas canvas = new Canvas(blur1);
-                canvas.drawBitmap(src.bitmap, null, new Rect(0, 0, 150, 150), new Paint(2));
-                Utilities.blurBitmap(blur1, 3, 0, blur1.getWidth(), blur1.getHeight(), blur1.getRowBytes());
-                Palette palette = Palette.from(src.bitmap).generate();
-                Paint paint = new Paint();
-                paint.setColor((palette.getDarkMutedColor(-11242343) & 16777215) | 1140850688);
-                canvas.drawColor(637534208);
-                canvas.drawRect(0.0f, 0.0f, (float) canvas.getWidth(), (float) canvas.getHeight(), paint);
-                Bitmap blur2 = Bitmap.createBitmap(50, 50, Config.ARGB_8888);
-                Canvas canvas2 = new Canvas(blur2);
-                canvas2.drawBitmap(src.bitmap, null, new Rect(0, 0, 50, 50), new Paint(2));
-                Utilities.blurBitmap(blur2, 3, 0, blur2.getWidth(), blur2.getHeight(), blur2.getRowBytes());
-                paint.setAlpha(102);
-                canvas2.drawRect(0.0f, 0.0f, (float) canvas2.getWidth(), (float) canvas2.getHeight(), paint);
-                VoIPActivity.this.blurredPhoto1 = blur1;
-                VoIPActivity.this.blurredPhoto2 = blur2;
-                VoIPActivity.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        VoIPActivity.this.blurOverlayView1.setImageBitmap(VoIPActivity.this.blurredPhoto1);
-                        VoIPActivity.this.blurOverlayView2.setImageBitmap(VoIPActivity.this.blurredPhoto2);
-                        src.release();
-                    }
-                });
+                try {
+                    Bitmap blur1 = Bitmap.createBitmap(150, 150, Config.ARGB_8888);
+                    Canvas canvas = new Canvas(blur1);
+                    canvas.drawBitmap(src.bitmap, null, new Rect(0, 0, 150, 150), new Paint(2));
+                    Utilities.blurBitmap(blur1, 3, 0, blur1.getWidth(), blur1.getHeight(), blur1.getRowBytes());
+                    Palette palette = Palette.from(src.bitmap).generate();
+                    Paint paint = new Paint();
+                    paint.setColor((palette.getDarkMutedColor(-11242343) & 16777215) | 1140850688);
+                    canvas.drawColor(637534208);
+                    canvas.drawRect(0.0f, 0.0f, (float) canvas.getWidth(), (float) canvas.getHeight(), paint);
+                    Bitmap blur2 = Bitmap.createBitmap(50, 50, Config.ARGB_8888);
+                    Canvas canvas2 = new Canvas(blur2);
+                    canvas2.drawBitmap(src.bitmap, null, new Rect(0, 0, 50, 50), new Paint(2));
+                    Utilities.blurBitmap(blur2, 3, 0, blur2.getWidth(), blur2.getHeight(), blur2.getRowBytes());
+                    paint.setAlpha(102);
+                    canvas2.drawRect(0.0f, 0.0f, (float) canvas2.getWidth(), (float) canvas2.getHeight(), paint);
+                    VoIPActivity.this.blurredPhoto1 = blur1;
+                    VoIPActivity.this.blurredPhoto2 = blur2;
+                    VoIPActivity.this.runOnUiThread(new Runnable() {
+                        public void run() {
+                            VoIPActivity.this.blurOverlayView1.setImageBitmap(VoIPActivity.this.blurredPhoto1);
+                            VoIPActivity.this.blurOverlayView2.setImageBitmap(VoIPActivity.this.blurredPhoto2);
+                            src.release();
+                        }
+                    });
+                } catch (Throwable th) {
+                }
             }
         }).start();
     }

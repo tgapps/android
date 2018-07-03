@@ -735,7 +735,7 @@ public class SecretChatHelper {
                                             AndroidUtilities.runOnUIThread(new Runnable() {
                                                 public void run() {
                                                     message.send_state = 0;
-                                                    NotificationCenter.getInstance(SecretChatHelper.this.currentAccount).postNotificationName(NotificationCenter.messageReceivedByServer, Integer.valueOf(message.id), Integer.valueOf(message.id), message, Long.valueOf(message.dialog_id));
+                                                    NotificationCenter.getInstance(SecretChatHelper.this.currentAccount).postNotificationName(NotificationCenter.messageReceivedByServer, Integer.valueOf(message.id), Integer.valueOf(message.id), message, Long.valueOf(message.dialog_id), Long.valueOf(0));
                                                     SendMessagesHelper.getInstance(SecretChatHelper.this.currentAccount).processSentMessage(message.id);
                                                     if (MessageObject.isVideoMessage(message) || MessageObject.isNewGifMessage(message) || MessageObject.isRoundVideoMessage(message)) {
                                                         SendMessagesHelper.getInstance(SecretChatHelper.this.currentAccount).stopVideoService(attachPath);
@@ -871,6 +871,7 @@ public class SecretChatHelper {
                     newMessage.media.first_name = decryptedMessage.media.first_name;
                     newMessage.media.phone_number = decryptedMessage.media.phone_number;
                     newMessage.media.user_id = decryptedMessage.media.user_id;
+                    newMessage.media.vcard = TtmlNode.ANONYMOUS_REGION_ID;
                 } else if (decryptedMessage.media instanceof TL_decryptedMessageMediaGeoPoint) {
                     newMessage.media = new TL_messageMediaGeo();
                     newMessage.media.geo = new TL_geoPoint();

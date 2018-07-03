@@ -31,6 +31,7 @@ final class SingleSampleMediaPeriod implements MediaPeriod, Callback<SourceLoada
     boolean loadingFinished;
     boolean loadingSucceeded;
     private final int minLoadableRetryCount;
+    boolean notifiedReadingStarted;
     byte[] sampleData;
     int sampleSize;
     private final ArrayList<SampleStreamImpl> sampleStreams = new ArrayList();
@@ -154,10 +155,12 @@ final class SingleSampleMediaPeriod implements MediaPeriod, Callback<SourceLoada
         TrackGroup[] trackGroupArr = new TrackGroup[1];
         trackGroupArr[0] = new TrackGroup(format);
         this.tracks = new TrackGroupArray(trackGroupArr);
+        eventDispatcher.mediaPeriodCreated();
     }
 
     public void release() {
         this.loader.release();
+        this.eventDispatcher.mediaPeriodReleased();
     }
 
     public void prepare(MediaPeriod.Callback callback, long positionUs) {
@@ -204,6 +207,10 @@ final class SingleSampleMediaPeriod implements MediaPeriod, Callback<SourceLoada
     }
 
     public long readDiscontinuity() {
+        if (!this.notifiedReadingStarted) {
+            this.eventDispatcher.readingStarted();
+            this.notifiedReadingStarted = true;
+        }
         return C.TIME_UNSET;
     }
 

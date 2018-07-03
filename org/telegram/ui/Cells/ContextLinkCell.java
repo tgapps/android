@@ -26,8 +26,10 @@ import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
+import org.telegram.messenger.WebFile;
 import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.BotInlineResult;
@@ -118,7 +120,8 @@ public class ContextLinkCell extends View implements FileDownloadProgressListene
         int maxWidth = (viewWidth - AndroidUtilities.dp((float) AndroidUtilities.leftBaseline)) - AndroidUtilities.dp(8.0f);
         PhotoSize currentPhotoObjectThumb = null;
         ArrayList<PhotoSize> photoThumbs = null;
-        TLObject webDocument = null;
+        TLObject webFile = null;
+        TL_webDocument tL_webDocument = null;
         String urlLocation = null;
         if (this.documentAttach != null) {
             photoThumbs = new ArrayList();
@@ -174,20 +177,27 @@ public class ContextLinkCell extends View implements FileDownloadProgressListene
             if ((this.inlineResult.content instanceof TL_webDocument) && this.inlineResult.type != null) {
                 if (this.inlineResult.type.startsWith("gif")) {
                     if (this.documentAttachType != 2) {
-                        webDocument = (TL_webDocument) this.inlineResult.content;
+                        tL_webDocument = (TL_webDocument) this.inlineResult.content;
                         this.documentAttachType = 2;
                     }
                 } else if (this.inlineResult.type.equals("photo")) {
-                    TL_webDocument webDocument2 = this.inlineResult.thumb instanceof TL_webDocument ? (TL_webDocument) this.inlineResult.thumb : (TL_webDocument) this.inlineResult.content;
+                    tL_webDocument = this.inlineResult.thumb instanceof TL_webDocument ? (TL_webDocument) this.inlineResult.thumb : (TL_webDocument) this.inlineResult.content;
                 }
             }
-            if (webDocument == null && (this.inlineResult.thumb instanceof TL_webDocument)) {
-                webDocument = (TL_webDocument) this.inlineResult.thumb;
+            if (tL_webDocument == null && (this.inlineResult.thumb instanceof TL_webDocument)) {
+                tL_webDocument = (TL_webDocument) this.inlineResult.thumb;
             }
-            if (webDocument == null && this.currentPhotoObject == null && currentPhotoObjectThumb == null && ((this.inlineResult.send_message instanceof TL_botInlineMessageMediaVenue) || (this.inlineResult.send_message instanceof TL_botInlineMessageMediaGeo))) {
+            if (tL_webDocument == null && this.currentPhotoObject == null && currentPhotoObjectThumb == null && ((this.inlineResult.send_message instanceof TL_botInlineMessageMediaVenue) || (this.inlineResult.send_message instanceof TL_botInlineMessageMediaGeo))) {
                 double lat = this.inlineResult.send_message.geo.lat;
                 double lon = this.inlineResult.send_message.geo._long;
-                urlLocation = String.format(Locale.US, "https://maps.googleapis.com/maps/api/staticmap?center=%f,%f&zoom=15&size=72x72&maptype=roadmap&scale=%d&markers=color:red|size:small|%f,%f&sensor=false", new Object[]{Double.valueOf(lat), Double.valueOf(lon), Integer.valueOf(Math.min(2, (int) Math.ceil((double) AndroidUtilities.density))), Double.valueOf(lat), Double.valueOf(lon)});
+                if (MessagesController.getInstance(this.currentAccount).mapProvider == 2) {
+                    webFile = WebFile.createWithGeoPoint(this.inlineResult.send_message.geo, 72, 72, 15, Math.min(2, (int) Math.ceil((double) AndroidUtilities.density)));
+                } else {
+                    urlLocation = AndroidUtilities.formapMapUrl(this.currentAccount, lat, lon, 72, 72, true, 15);
+                }
+            }
+            if (tL_webDocument != null) {
+                webFile = WebFile.createWithWebDocument(tL_webDocument);
             }
         }
         int w = 0;
@@ -219,7 +229,7 @@ public class ContextLinkCell extends View implements FileDownloadProgressListene
             h = AndroidUtilities.dp(80.0f);
             w = h;
         }
-        if (!(this.documentAttach == null && this.currentPhotoObject == null && webDocument == null && urlLocation == null)) {
+        if (!(this.documentAttach == null && this.currentPhotoObject == null && webFile == null && urlLocation == null)) {
             String currentPhotoFilter;
             String currentPhotoFilterThumb = "52_52_b";
             if (this.mediaWebpage) {
@@ -247,12 +257,12 @@ public class ContextLinkCell extends View implements FileDownloadProgressListene
                     }
                     imageReceiver.setImage(tLObject, null, fileLocation, currentPhotoFilter, this.documentAttach.size, ext, 0);
                 } else {
-                    this.linkImageView.setImage(webDocument, urlLocation, null, null, this.currentPhotoObject != null ? this.currentPhotoObject.location : null, currentPhotoFilter, -1, ext, 1);
+                    this.linkImageView.setImage(webFile, urlLocation, null, null, this.currentPhotoObject != null ? this.currentPhotoObject.location : null, currentPhotoFilter, -1, ext, 1);
                 }
             } else if (this.currentPhotoObject != null) {
                 this.linkImageView.setImage(this.currentPhotoObject.location, currentPhotoFilter, currentPhotoObjectThumb != null ? currentPhotoObjectThumb.location : null, currentPhotoFilterThumb, this.currentPhotoObject.size, ext, 0);
             } else {
-                this.linkImageView.setImage(webDocument, urlLocation, currentPhotoFilter, null, currentPhotoObjectThumb != null ? currentPhotoObjectThumb.location : null, currentPhotoFilterThumb, -1, ext, 1);
+                this.linkImageView.setImage(webFile, urlLocation, currentPhotoFilter, null, currentPhotoObjectThumb != null ? currentPhotoObjectThumb.location : null, currentPhotoFilterThumb, -1, ext, 1);
             }
             this.drawLinkImageView = true;
         }
@@ -512,7 +522,7 @@ public class ContextLinkCell extends View implements FileDownloadProgressListene
             if (this.documentAttach != null) {
                 FileLoader.getInstance(this.currentAccount).loadFile(this.documentAttach, true, 0);
             } else if (this.inlineResult.content instanceof TL_webDocument) {
-                FileLoader.getInstance(this.currentAccount).loadFile((TL_webDocument) this.inlineResult.content, true, 1);
+                FileLoader.getInstance(this.currentAccount).loadFile(WebFile.createWithWebDocument(this.inlineResult.content), true, 1);
             }
             this.buttonState = 4;
             this.radialProgress.setBackground(getDrawableForCurrentState(), true, false);
@@ -521,7 +531,7 @@ public class ContextLinkCell extends View implements FileDownloadProgressListene
             if (this.documentAttach != null) {
                 FileLoader.getInstance(this.currentAccount).cancelLoadFile(this.documentAttach);
             } else if (this.inlineResult.content instanceof TL_webDocument) {
-                FileLoader.getInstance(this.currentAccount).cancelLoadFile((TL_webDocument) this.inlineResult.content);
+                FileLoader.getInstance(this.currentAccount).cancelLoadFile(WebFile.createWithWebDocument(this.inlineResult.content));
             }
             this.buttonState = 2;
             this.radialProgress.setBackground(getDrawableForCurrentState(), false, false);

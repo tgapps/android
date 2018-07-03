@@ -359,6 +359,17 @@ public class VideoPlayer implements NotificationCenterDelegate, EventListener, V
         }
     }
 
+    public void setPlaybackSpeed(float speed) {
+        float f = 1.0f;
+        if (this.player != null) {
+            SimpleExoPlayer simpleExoPlayer = this.player;
+            if (speed > 1.0f) {
+                f = 0.98f;
+            }
+            simpleExoPlayer.setPlaybackParameters(new PlaybackParameters(speed, f));
+        }
+    }
+
     public void setPlayWhenReady(boolean playWhenReady) {
         this.mixedPlayWhenReady = playWhenReady;
         if (playWhenReady && this.mixedAudio && (!this.audioPlayerReady || !this.videoPlayerReady)) {

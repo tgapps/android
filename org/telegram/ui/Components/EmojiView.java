@@ -1258,8 +1258,7 @@ public class EmojiView extends FrameLayout implements NotificationCenterDelegate
                     if (Emoji.isValidEmoji(StickersSearchGridAdapter.this.searchQuery)) {
                         final TL_messages_getStickers req2 = new TL_messages_getStickers();
                         req2.emoticon = StickersSearchGridAdapter.this.searchQuery;
-                        req2.hash = TtmlNode.ANONYMOUS_REGION_ID;
-                        req2.exclude_featured = true;
+                        req2.hash = 0;
                         StickersSearchGridAdapter.this.reqId2 = ConnectionsManager.getInstance(EmojiView.this.currentAccount).sendRequest(req2, new RequestDelegate() {
                             public void run(final TLObject response, TL_error error) {
                                 AndroidUtilities.runOnUIThread(new Runnable() {

@@ -68,6 +68,10 @@ public final class CommentFrame extends Id3Frame {
         return hashCode + i;
     }
 
+    public String toString() {
+        return this.id + ": language=" + this.language + ", description=" + this.description;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.id);
         dest.writeString(this.language);

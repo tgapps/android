@@ -197,7 +197,7 @@ public class ChunkSampleStream<T extends ChunkSource> implements SampleStream, S
             while (i < this.mediaChunks.size()) {
                 BaseMediaChunk mediaChunk = (BaseMediaChunk) this.mediaChunks.get(i);
                 long mediaChunkStartTimeUs = mediaChunk.startTimeUs;
-                if (mediaChunkStartTimeUs != positionUs) {
+                if (mediaChunkStartTimeUs != positionUs || mediaChunk.seekTimeUs != C.TIME_UNSET) {
                     if (mediaChunkStartTimeUs > positionUs) {
                         break;
                     }
@@ -241,12 +241,11 @@ public class ChunkSampleStream<T extends ChunkSource> implements SampleStream, S
 
     public void release(ReleaseCallback<T> callback) {
         this.releaseCallback = callback;
-        if (!this.loader.release(this)) {
-            this.primarySampleQueue.discardToEnd();
-            for (SampleQueue embeddedSampleQueue : this.embeddedSampleQueues) {
-                embeddedSampleQueue.discardToEnd();
-            }
+        this.primarySampleQueue.discardToEnd();
+        for (SampleQueue embeddedSampleQueue : this.embeddedSampleQueues) {
+            embeddedSampleQueue.discardToEnd();
         }
+        this.loader.release(this);
     }
 
     public void onLoaderReleased() {

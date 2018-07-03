@@ -39,7 +39,7 @@ public final class InitializationChunk extends Chunk {
         try {
             input = new DefaultExtractorInput(this.dataSource, loadDataSpec.absoluteStreamPosition, this.dataSource.open(loadDataSpec));
             if (this.bytesLoaded == 0) {
-                this.extractorWrapper.init(null);
+                this.extractorWrapper.init(null, C.TIME_UNSET);
             }
             Extractor extractor = this.extractorWrapper.extractor;
             int result = 0;

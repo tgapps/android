@@ -391,11 +391,11 @@ public final class zzka extends zzhh {
     }
 
     public static Object zzf(Object obj) {
-        ObjectOutputStream objectOutputStream;
         Throwable th;
         if (obj == null) {
             return null;
         }
+        ObjectOutputStream objectOutputStream;
         ObjectInputStream objectInputStream;
         try {
             OutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -653,11 +653,11 @@ public final class zzka extends zzhh {
     }
 
     final <T extends Parcelable> T zza(byte[] bArr, Creator<T> creator) {
+        T t;
         if (bArr == null) {
             return null;
         }
         Parcel obtain = Parcel.obtain();
-        T t;
         try {
             obtain.unmarshall(bArr, 0, bArr.length);
             obtain.setDataPosition(0);

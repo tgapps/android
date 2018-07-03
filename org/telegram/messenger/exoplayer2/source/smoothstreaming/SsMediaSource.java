@@ -11,11 +11,10 @@ import org.telegram.messenger.exoplayer2.ExoPlayer;
 import org.telegram.messenger.exoplayer2.ExoPlayerLibraryInfo;
 import org.telegram.messenger.exoplayer2.ParserException;
 import org.telegram.messenger.exoplayer2.Timeline;
+import org.telegram.messenger.exoplayer2.source.BaseMediaSource;
 import org.telegram.messenger.exoplayer2.source.CompositeSequenceableLoaderFactory;
 import org.telegram.messenger.exoplayer2.source.DefaultCompositeSequenceableLoaderFactory;
 import org.telegram.messenger.exoplayer2.source.MediaPeriod;
-import org.telegram.messenger.exoplayer2.source.MediaSource;
-import org.telegram.messenger.exoplayer2.source.MediaSource.Listener;
 import org.telegram.messenger.exoplayer2.source.MediaSource.MediaPeriodId;
 import org.telegram.messenger.exoplayer2.source.MediaSourceEventListener;
 import org.telegram.messenger.exoplayer2.source.MediaSourceEventListener.EventDispatcher;
@@ -24,6 +23,7 @@ import org.telegram.messenger.exoplayer2.source.ads.AdsMediaSource.MediaSourceFa
 import org.telegram.messenger.exoplayer2.source.smoothstreaming.manifest.SsManifest;
 import org.telegram.messenger.exoplayer2.source.smoothstreaming.manifest.SsManifest.StreamElement;
 import org.telegram.messenger.exoplayer2.source.smoothstreaming.manifest.SsManifestParser;
+import org.telegram.messenger.exoplayer2.source.smoothstreaming.manifest.SsUtil;
 import org.telegram.messenger.exoplayer2.upstream.Allocator;
 import org.telegram.messenger.exoplayer2.upstream.DataSource;
 import org.telegram.messenger.exoplayer2.upstream.Loader;
@@ -33,20 +33,19 @@ import org.telegram.messenger.exoplayer2.upstream.LoaderErrorThrower.Dummy;
 import org.telegram.messenger.exoplayer2.upstream.ParsingLoadable;
 import org.telegram.messenger.exoplayer2.upstream.ParsingLoadable.Parser;
 import org.telegram.messenger.exoplayer2.util.Assertions;
-import org.telegram.messenger.exoplayer2.util.Util;
 
-public final class SsMediaSource implements MediaSource, Callback<ParsingLoadable<SsManifest>> {
+public final class SsMediaSource extends BaseMediaSource implements Callback<ParsingLoadable<SsManifest>> {
     public static final long DEFAULT_LIVE_PRESENTATION_DELAY_MS = 30000;
     public static final int DEFAULT_MIN_LOADABLE_RETRY_COUNT = 3;
     private static final int MINIMUM_MANIFEST_REFRESH_PERIOD_MS = 5000;
     private static final long MIN_LIVE_DEFAULT_START_POSITION_US = 5000000;
     private final org.telegram.messenger.exoplayer2.source.smoothstreaming.SsChunkSource.Factory chunkSourceFactory;
     private final CompositeSequenceableLoaderFactory compositeSequenceableLoaderFactory;
-    private final EventDispatcher eventDispatcher;
     private final long livePresentationDelayMs;
     private SsManifest manifest;
     private DataSource manifestDataSource;
     private final org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory;
+    private final EventDispatcher manifestEventDispatcher;
     private long manifestLoadStartTimestamp;
     private Loader manifestLoader;
     private LoaderErrorThrower manifestLoaderErrorThrower;
@@ -55,7 +54,8 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
     private final Uri manifestUri;
     private final ArrayList<SsMediaPeriod> mediaPeriods;
     private final int minLoadableRetryCount;
-    private Listener sourceListener;
+    private final boolean sideloadedManifest;
+    private final Object tag;
 
     public static final class Factory implements MediaSourceFactory {
         private final org.telegram.messenger.exoplayer2.source.smoothstreaming.SsChunkSource.Factory chunkSourceFactory;
@@ -65,10 +65,17 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
         private final org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory;
         private Parser<? extends SsManifest> manifestParser;
         private int minLoadableRetryCount = 3;
+        private Object tag;
 
         public Factory(org.telegram.messenger.exoplayer2.source.smoothstreaming.SsChunkSource.Factory chunkSourceFactory, org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory) {
             this.chunkSourceFactory = (org.telegram.messenger.exoplayer2.source.smoothstreaming.SsChunkSource.Factory) Assertions.checkNotNull(chunkSourceFactory);
             this.manifestDataSourceFactory = manifestDataSourceFactory;
+        }
+
+        public Factory setTag(Object tag) {
+            Assertions.checkState(!this.isCreateCalled);
+            this.tag = tag;
+            return this;
         }
 
         public Factory setMinLoadableRetryCount(int minLoadableRetryCount) {
@@ -95,22 +102,36 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
             return this;
         }
 
-        public SsMediaSource createMediaSource(SsManifest manifest, Handler eventHandler, MediaSourceEventListener eventListener) {
+        public SsMediaSource createMediaSource(SsManifest manifest) {
             Assertions.checkArgument(!manifest.isLive);
             this.isCreateCalled = true;
-            return new SsMediaSource(manifest, null, null, null, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, eventHandler, eventListener);
+            return new SsMediaSource(manifest, null, null, null, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, this.tag);
+        }
+
+        @Deprecated
+        public SsMediaSource createMediaSource(SsManifest manifest, Handler eventHandler, MediaSourceEventListener eventListener) {
+            SsMediaSource mediaSource = createMediaSource(manifest);
+            if (!(eventHandler == null || eventListener == null)) {
+                mediaSource.addEventListener(eventHandler, eventListener);
+            }
+            return mediaSource;
         }
 
         public SsMediaSource createMediaSource(Uri manifestUri) {
-            return createMediaSource(manifestUri, null, null);
-        }
-
-        public SsMediaSource createMediaSource(Uri manifestUri, Handler eventHandler, MediaSourceEventListener eventListener) {
             this.isCreateCalled = true;
             if (this.manifestParser == null) {
                 this.manifestParser = new SsManifestParser();
             }
-            return new SsMediaSource(null, (Uri) Assertions.checkNotNull(manifestUri), this.manifestDataSourceFactory, this.manifestParser, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, eventHandler, eventListener);
+            return new SsMediaSource(null, (Uri) Assertions.checkNotNull(manifestUri), this.manifestDataSourceFactory, this.manifestParser, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, this.tag);
+        }
+
+        @Deprecated
+        public SsMediaSource createMediaSource(Uri manifestUri, Handler eventHandler, MediaSourceEventListener eventListener) {
+            SsMediaSource mediaSource = createMediaSource(manifestUri);
+            if (!(eventHandler == null || eventListener == null)) {
+                mediaSource.addEventListener(eventHandler, eventListener);
+            }
+            return mediaSource;
         }
 
         public int[] getSupportedTypes() {
@@ -129,7 +150,10 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
 
     @Deprecated
     public SsMediaSource(SsManifest manifest, org.telegram.messenger.exoplayer2.source.smoothstreaming.SsChunkSource.Factory chunkSourceFactory, int minLoadableRetryCount, Handler eventHandler, MediaSourceEventListener eventListener) {
-        this(manifest, null, null, null, chunkSourceFactory, new DefaultCompositeSequenceableLoaderFactory(), minLoadableRetryCount, 30000, eventHandler, eventListener);
+        this(manifest, null, null, null, chunkSourceFactory, new DefaultCompositeSequenceableLoaderFactory(), minLoadableRetryCount, 30000, null);
+        if (eventHandler != null && eventListener != null) {
+            addEventListener(eventHandler, eventListener);
+        }
     }
 
     @Deprecated
@@ -144,33 +168,35 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
 
     @Deprecated
     public SsMediaSource(Uri manifestUri, org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory, Parser<? extends SsManifest> manifestParser, org.telegram.messenger.exoplayer2.source.smoothstreaming.SsChunkSource.Factory chunkSourceFactory, int minLoadableRetryCount, long livePresentationDelayMs, Handler eventHandler, MediaSourceEventListener eventListener) {
-        this(null, manifestUri, manifestDataSourceFactory, manifestParser, chunkSourceFactory, new DefaultCompositeSequenceableLoaderFactory(), minLoadableRetryCount, livePresentationDelayMs, eventHandler, eventListener);
+        this(null, manifestUri, manifestDataSourceFactory, manifestParser, chunkSourceFactory, new DefaultCompositeSequenceableLoaderFactory(), minLoadableRetryCount, livePresentationDelayMs, null);
+        if (eventHandler != null && eventListener != null) {
+            addEventListener(eventHandler, eventListener);
+        }
     }
 
-    private SsMediaSource(SsManifest manifest, Uri manifestUri, org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory, Parser<? extends SsManifest> manifestParser, org.telegram.messenger.exoplayer2.source.smoothstreaming.SsChunkSource.Factory chunkSourceFactory, CompositeSequenceableLoaderFactory compositeSequenceableLoaderFactory, int minLoadableRetryCount, long livePresentationDelayMs, Handler eventHandler, MediaSourceEventListener eventListener) {
-        boolean z = manifest == null || !manifest.isLive;
-        Assertions.checkState(z);
+    private SsMediaSource(SsManifest manifest, Uri manifestUri, org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory, Parser<? extends SsManifest> manifestParser, org.telegram.messenger.exoplayer2.source.smoothstreaming.SsChunkSource.Factory chunkSourceFactory, CompositeSequenceableLoaderFactory compositeSequenceableLoaderFactory, int minLoadableRetryCount, long livePresentationDelayMs, Object tag) {
+        boolean z = true;
+        boolean z2 = manifest == null || !manifest.isLive;
+        Assertions.checkState(z2);
         this.manifest = manifest;
-        if (manifestUri == null) {
-            manifestUri = null;
-        } else if (!Util.toLowerInvariant(manifestUri.getLastPathSegment()).matches("manifest(\\(.+\\))?")) {
-            manifestUri = Uri.withAppendedPath(manifestUri, "Manifest");
-        }
-        this.manifestUri = manifestUri;
+        this.manifestUri = manifestUri == null ? null : SsUtil.fixManifestUri(manifestUri);
         this.manifestDataSourceFactory = manifestDataSourceFactory;
         this.manifestParser = manifestParser;
         this.chunkSourceFactory = chunkSourceFactory;
         this.compositeSequenceableLoaderFactory = compositeSequenceableLoaderFactory;
         this.minLoadableRetryCount = minLoadableRetryCount;
         this.livePresentationDelayMs = livePresentationDelayMs;
-        this.eventDispatcher = new EventDispatcher(eventHandler, eventListener);
+        this.manifestEventDispatcher = createEventDispatcher(null);
+        this.tag = tag;
+        if (manifest == null) {
+            z = false;
+        }
+        this.sideloadedManifest = z;
         this.mediaPeriods = new ArrayList();
     }
 
-    public void prepareSource(ExoPlayer player, boolean isTopLevelSource, Listener listener) {
-        Assertions.checkState(this.sourceListener == null, MediaSource.MEDIA_SOURCE_REUSED_ERROR_MESSAGE);
-        this.sourceListener = listener;
-        if (this.manifest != null) {
+    public void prepareSourceInternal(ExoPlayer player, boolean isTopLevelSource) {
+        if (this.sideloadedManifest) {
             this.manifestLoaderErrorThrower = new Dummy();
             processManifest();
             return;
@@ -188,7 +214,7 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
 
     public MediaPeriod createPeriod(MediaPeriodId id, Allocator allocator) {
         Assertions.checkArgument(id.periodIndex == 0);
-        SsMediaPeriod period = new SsMediaPeriod(this.manifest, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.eventDispatcher, this.manifestLoaderErrorThrower, allocator);
+        SsMediaPeriod period = new SsMediaPeriod(this.manifest, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, createEventDispatcher(id), this.manifestLoaderErrorThrower, allocator);
         this.mediaPeriods.add(period);
         return period;
     }
@@ -198,8 +224,8 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
         this.mediaPeriods.remove(period);
     }
 
-    public void releaseSource() {
-        this.manifest = null;
+    public void releaseSourceInternal() {
+        this.manifest = this.sideloadedManifest ? this.manifest : null;
         this.manifestDataSource = null;
         this.manifestLoadStartTimestamp = 0;
         if (this.manifestLoader != null) {
@@ -213,7 +239,7 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
     }
 
     public void onLoadCompleted(ParsingLoadable<SsManifest> loadable, long elapsedRealtimeMs, long loadDurationMs) {
-        this.eventDispatcher.loadCompleted(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
+        this.manifestEventDispatcher.loadCompleted(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
         this.manifest = (SsManifest) loadable.getResult();
         this.manifestLoadStartTimestamp = elapsedRealtimeMs - loadDurationMs;
         processManifest();
@@ -221,17 +247,16 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
     }
 
     public void onLoadCanceled(ParsingLoadable<SsManifest> loadable, long elapsedRealtimeMs, long loadDurationMs, boolean released) {
-        this.eventDispatcher.loadCompleted(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
+        this.manifestEventDispatcher.loadCanceled(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
     }
 
     public int onLoadError(ParsingLoadable<SsManifest> loadable, long elapsedRealtimeMs, long loadDurationMs, IOException error) {
         boolean isFatal = error instanceof ParserException;
-        this.eventDispatcher.loadError(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded(), error, isFatal);
+        this.manifestEventDispatcher.loadError(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded(), error, isFatal);
         return isFatal ? 3 : 0;
     }
 
     private void processManifest() {
-        long startTimeUs;
         Timeline timeline;
         for (int i = 0; i < this.mediaPeriods.size(); i++) {
             ((SsMediaPeriod) this.mediaPeriods.get(i)).updateManifest(this.manifest);
@@ -240,39 +265,40 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
         StreamElement[] streamElementArr = this.manifest.streamElements;
         int length = streamElementArr.length;
         int i2 = 0;
-        long startTimeUs2 = Long.MAX_VALUE;
+        long startTimeUs = Long.MAX_VALUE;
         while (i2 < length) {
+            long startTimeUs2;
             StreamElement element = streamElementArr[i2];
             if (element.chunkCount > 0) {
-                startTimeUs = Math.min(startTimeUs2, element.getStartTimeUs(0));
+                startTimeUs2 = Math.min(startTimeUs, element.getStartTimeUs(0));
                 endTimeUs = Math.max(endTimeUs, element.getStartTimeUs(element.chunkCount - 1) + element.getChunkDurationUs(element.chunkCount - 1));
             } else {
-                startTimeUs = startTimeUs2;
+                startTimeUs2 = startTimeUs;
             }
             i2++;
-            startTimeUs2 = startTimeUs;
-        }
-        if (startTimeUs2 == Long.MAX_VALUE) {
-            timeline = new SinglePeriodTimeline(this.manifest.isLive ? C.TIME_UNSET : 0, 0, 0, 0, true, this.manifest.isLive);
             startTimeUs = startTimeUs2;
+        }
+        if (startTimeUs == Long.MAX_VALUE) {
+            timeline = new SinglePeriodTimeline(this.manifest.isLive ? C.TIME_UNSET : 0, 0, 0, 0, true, this.manifest.isLive, this.tag);
+            startTimeUs2 = startTimeUs;
         } else if (this.manifest.isLive) {
             if (this.manifest.dvrWindowLengthUs == C.TIME_UNSET || this.manifest.dvrWindowLengthUs <= 0) {
-                startTimeUs = startTimeUs2;
+                startTimeUs2 = startTimeUs;
             } else {
-                startTimeUs = Math.max(startTimeUs2, endTimeUs - this.manifest.dvrWindowLengthUs);
+                startTimeUs2 = Math.max(startTimeUs, endTimeUs - this.manifest.dvrWindowLengthUs);
             }
-            durationUs = endTimeUs - startTimeUs;
+            durationUs = endTimeUs - startTimeUs2;
             long defaultStartPositionUs = durationUs - C.msToUs(this.livePresentationDelayMs);
             if (defaultStartPositionUs < MIN_LIVE_DEFAULT_START_POSITION_US) {
                 defaultStartPositionUs = Math.min(MIN_LIVE_DEFAULT_START_POSITION_US, durationUs / 2);
             }
-            Timeline singlePeriodTimeline = new SinglePeriodTimeline(C.TIME_UNSET, durationUs, startTimeUs, defaultStartPositionUs, true, true);
+            Timeline singlePeriodTimeline = new SinglePeriodTimeline(C.TIME_UNSET, durationUs, startTimeUs2, defaultStartPositionUs, true, true, this.tag);
         } else {
-            durationUs = this.manifest.durationUs != C.TIME_UNSET ? this.manifest.durationUs : endTimeUs - startTimeUs2;
-            Timeline singlePeriodTimeline2 = new SinglePeriodTimeline(startTimeUs2 + durationUs, durationUs, startTimeUs2, 0, true, false);
-            startTimeUs = startTimeUs2;
+            durationUs = this.manifest.durationUs != C.TIME_UNSET ? this.manifest.durationUs : endTimeUs - startTimeUs;
+            Timeline singlePeriodTimeline2 = new SinglePeriodTimeline(startTimeUs + durationUs, durationUs, startTimeUs, 0, true, false, this.tag);
+            startTimeUs2 = startTimeUs;
         }
-        this.sourceListener.onSourceInfoRefreshed(this, timeline, this.manifest);
+        refreshSourceInfo(timeline, this.manifest);
     }
 
     private void scheduleManifestRefresh() {
@@ -287,6 +313,6 @@ public final class SsMediaSource implements MediaSource, Callback<ParsingLoadabl
 
     private void startLoadingManifest() {
         ParsingLoadable<SsManifest> loadable = new ParsingLoadable(this.manifestDataSource, this.manifestUri, 4, this.manifestParser);
-        this.eventDispatcher.loadStarted(loadable.dataSpec, loadable.type, this.manifestLoader.startLoading(loadable, this, this.minLoadableRetryCount));
+        this.manifestEventDispatcher.loadStarted(loadable.dataSpec, loadable.type, this.manifestLoader.startLoading(loadable, this, this.minLoadableRetryCount));
     }
 }

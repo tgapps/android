@@ -37,6 +37,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
+import org.telegram.messenger.exoplayer2.DefaultLoadControl;
 import org.telegram.messenger.support.widget.LinearLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
 import org.telegram.messenger.support.widget.RecyclerView.Adapter;
@@ -1529,10 +1530,10 @@ public class ChannelUsersActivity extends BaseFragment implements NotificationCe
                                                 int status1 = 0;
                                                 int status2 = 0;
                                                 if (!(user1 == null || user1.status == null)) {
-                                                    status1 = user1.id == UserConfig.getInstance(ChannelUsersActivity.this.currentAccount).getClientUserId() ? ConnectionsManager.getInstance(ChannelUsersActivity.this.currentAccount).getCurrentTime() + 50000 : user1.status.expires;
+                                                    status1 = user1.id == UserConfig.getInstance(ChannelUsersActivity.this.currentAccount).getClientUserId() ? ConnectionsManager.getInstance(ChannelUsersActivity.this.currentAccount).getCurrentTime() + DefaultLoadControl.DEFAULT_MAX_BUFFER_MS : user1.status.expires;
                                                 }
                                                 if (!(user2 == null || user2.status == null)) {
-                                                    status2 = user2.id == UserConfig.getInstance(ChannelUsersActivity.this.currentAccount).getClientUserId() ? ConnectionsManager.getInstance(ChannelUsersActivity.this.currentAccount).getCurrentTime() + 50000 : user2.status.expires;
+                                                    status2 = user2.id == UserConfig.getInstance(ChannelUsersActivity.this.currentAccount).getClientUserId() ? ConnectionsManager.getInstance(ChannelUsersActivity.this.currentAccount).getCurrentTime() + DefaultLoadControl.DEFAULT_MAX_BUFFER_MS : user2.status.expires;
                                                 }
                                                 if (status1 <= 0 || status2 <= 0) {
                                                     if (status1 >= 0 || status2 >= 0) {

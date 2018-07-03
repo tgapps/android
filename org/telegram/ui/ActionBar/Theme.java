@@ -707,7 +707,7 @@ public class Theme {
     public static final String key_dialogTextLink = "dialogTextLink";
     public static final String key_dialogTextRed = "dialogTextRed";
     public static final String key_dialogTopBackground = "dialogTopBackground";
-    public static final String key_dialog_liveLocationProgress = "location_liveLocationProgress";
+    public static final String key_dialog_liveLocationProgress = "dialog_liveLocationProgress";
     public static final String key_divider = "divider";
     public static final String key_emptyListPlaceholder = "emptyListPlaceholder";
     public static final String key_fastScrollActive = "fastScrollActive";
@@ -753,6 +753,9 @@ public class Theme {
     public static final String key_musicPicker_buttonIcon = "musicPicker_buttonIcon";
     public static final String key_musicPicker_checkbox = "musicPicker_checkbox";
     public static final String key_musicPicker_checkboxCheck = "musicPicker_checkboxCheck";
+    public static final String key_passport_authorizeBackground = "passport_authorizeBackground";
+    public static final String key_passport_authorizeBackgroundSelected = "passport_authorizeBackgroundSelected";
+    public static final String key_passport_authorizeText = "passport_authorizeText";
     public static final String key_picker_badge = "picker_badge";
     public static final String key_picker_badgeText = "picker_badgeText";
     public static final String key_picker_disabledButton = "picker_disabledButton";
@@ -846,6 +849,7 @@ public class Theme {
     public static Paint linkSelectionPaint;
     public static Drawable listSelector;
     private static Paint maskPaint = new Paint(1);
+    public static Drawable moveUpDrawable;
     private static ArrayList<ThemeInfo> otherThemes = new ArrayList();
     private static ThemeInfo previousTheme;
     public static TextPaint profile_aboutTextPaint;
@@ -1410,13 +1414,16 @@ public class Theme {
         defaultColors.put(key_files_folderIconBackground, Integer.valueOf(-986896));
         defaultColors.put(key_files_iconText, Integer.valueOf(-1));
         defaultColors.put(key_sessions_devicesImage, Integer.valueOf(-6908266));
+        defaultColors.put(key_passport_authorizeBackground, Integer.valueOf(-12211217));
+        defaultColors.put(key_passport_authorizeBackgroundSelected, Integer.valueOf(-12542501));
+        defaultColors.put(key_passport_authorizeText, Integer.valueOf(-1));
         defaultColors.put(key_location_markerX, Integer.valueOf(-8355712));
         defaultColors.put(key_location_sendLocationBackground, Integer.valueOf(-9592620));
         defaultColors.put(key_location_sendLiveLocationBackground, Integer.valueOf(-39836));
         defaultColors.put(key_location_sendLocationIcon, Integer.valueOf(-1));
-        defaultColors.put("location_liveLocationProgress", Integer.valueOf(-13262875));
+        defaultColors.put(key_location_liveLocationProgress, Integer.valueOf(-13262875));
         defaultColors.put(key_location_placeLocationBackground, Integer.valueOf(-11753238));
-        defaultColors.put("location_liveLocationProgress", Integer.valueOf(-13262875));
+        defaultColors.put(key_dialog_liveLocationProgress, Integer.valueOf(-13262875));
         defaultColors.put(key_calls_callReceivedGreenIcon, Integer.valueOf(-16725933));
         defaultColors.put(key_calls_callReceivedRedIcon, Integer.valueOf(-47032));
         defaultColors.put(key_featuredStickers_addedIcon, Integer.valueOf(-11491093));
@@ -1748,7 +1755,7 @@ public class Theme {
     L_0x0059:
         r5 = org.telegram.messenger.ApplicationLoader.applicationContext;
         r5 = r5.getResources();
-        r6 = 2131165537; // 0x7f070161 float:1.7945294E38 double:1.0529356774E-314;
+        r6 = 2131165541; // 0x7f070165 float:1.7945302E38 double:1.0529356794E-314;
         r5 = r5.getDrawable(r6);
         dialogs_holidayDrawable = r5;
         r5 = 1077936128; // 0x40400000 float:3.0 double:5.325712093E-315;
@@ -1914,6 +1921,17 @@ public class Theme {
         stateListDrawable.addState(new int[]{16842919}, createRoundRectDrawable(AndroidUtilities.dp(3.0f), getColor(key_dialogButtonSelector)));
         stateListDrawable.addState(new int[]{16842913}, createRoundRectDrawable(AndroidUtilities.dp(3.0f), getColor(key_dialogButtonSelector)));
         stateListDrawable.addState(StateSet.WILD_CARD, new ColorDrawable(0));
+        return stateListDrawable;
+    }
+
+    public static Drawable createSelectorWithBackgroundDrawable(int backgroundColor, int color) {
+        if (VERSION.SDK_INT >= 21) {
+            return new RippleDrawable(new ColorStateList(new int[][]{StateSet.WILD_CARD}, new int[]{color}), new ColorDrawable(backgroundColor), new ColorDrawable(backgroundColor));
+        }
+        Drawable stateListDrawable = new StateListDrawable();
+        stateListDrawable.addState(new int[]{16842919}, new ColorDrawable(color));
+        stateListDrawable.addState(new int[]{16842913}, new ColorDrawable(color));
+        stateListDrawable.addState(StateSet.WILD_CARD, new ColorDrawable(backgroundColor));
         return stateListDrawable;
     }
 
@@ -2369,8 +2387,8 @@ public class Theme {
     }
 
     public static File getAssetFile(String assetName) {
-        File file = new File(ApplicationLoader.getFilesDirFixed(), assetName);
         long size;
+        File file = new File(ApplicationLoader.getFilesDirFixed(), assetName);
         try {
             InputStream stream = ApplicationLoader.applicationContext.getAssets().open(assetName);
             size = (long) stream.available();
@@ -2570,6 +2588,7 @@ public class Theme {
             dialogs_mentionDrawable = resources.getDrawable(R.drawable.mentionchatslist);
             dialogs_botDrawable = resources.getDrawable(R.drawable.list_bot);
             dialogs_pinnedDrawable = resources.getDrawable(R.drawable.list_pin);
+            moveUpDrawable = resources.getDrawable(R.drawable.preview_open);
             applyDialogsTheme();
         }
         dialogs_namePaint.setTextSize((float) AndroidUtilities.dp(17.0f));
@@ -3315,12 +3334,12 @@ public class Theme {
             Utilities.searchQueue.postRunnable(new Runnable() {
                 public void run() {
                     Throwable e;
-                    int selectedBackground;
+                    int i;
+                    SharedPreferences preferences;
                     File toFile;
                     Throwable th;
                     synchronized (Theme.wallpaperSync) {
-                        int i;
-                        SharedPreferences preferences;
+                        int selectedBackground;
                         if (!MessagesController.getGlobalMainSettings().getBoolean("overrideThemeWallpaper", false)) {
                             Integer backgroundColor = (Integer) Theme.currentColors.get(Theme.key_chat_wallpaper);
                             if (backgroundColor != null) {

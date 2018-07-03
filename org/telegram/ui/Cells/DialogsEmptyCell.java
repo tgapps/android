@@ -21,6 +21,7 @@ import org.telegram.ui.Components.LayoutHelper;
 
 public class DialogsEmptyCell extends LinearLayout {
     private int currentAccount = UserConfig.selectedAccount;
+    private int currentType;
     private TextView emptyTextView1;
     private TextView emptyTextView2;
 
@@ -38,7 +39,7 @@ public class DialogsEmptyCell extends LinearLayout {
         this.emptyTextView1.setTextColor(Theme.getColor(Theme.key_emptyListPlaceholder));
         this.emptyTextView1.setGravity(17);
         this.emptyTextView1.setTextSize(1, 20.0f);
-        addView(this.emptyTextView1, LayoutHelper.createLinear(-2, -2));
+        addView(this.emptyTextView1, LayoutHelper.createLinear(-2, -2, 0.0f, 20.0f, 0.0f, 0.0f));
         this.emptyTextView2 = new TextView(context);
         String help = LocaleController.getString("NoChatsHelp", R.string.NoChatsHelp);
         if (AndroidUtilities.isTablet() && !AndroidUtilities.isSmallTablet()) {
@@ -50,7 +51,24 @@ public class DialogsEmptyCell extends LinearLayout {
         this.emptyTextView2.setGravity(17);
         this.emptyTextView2.setPadding(AndroidUtilities.dp(8.0f), AndroidUtilities.dp(6.0f), AndroidUtilities.dp(8.0f), 0);
         this.emptyTextView2.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
-        addView(this.emptyTextView2, LayoutHelper.createLinear(-2, -2));
+        addView(this.emptyTextView2, LayoutHelper.createLinear(-2, -2, 0.0f, 0.0f, 0.0f, 20.0f));
+    }
+
+    public void setType(int value) {
+        String help;
+        this.currentType = value;
+        if (this.currentType == 0) {
+            help = LocaleController.getString("NoChatsHelp", R.string.NoChatsHelp);
+            if (AndroidUtilities.isTablet() && !AndroidUtilities.isSmallTablet()) {
+                help = help.replace('\n', ' ');
+            }
+        } else {
+            help = LocaleController.getString("NoChatsContactsHelp", R.string.NoChatsContactsHelp);
+            if (AndroidUtilities.isTablet() && !AndroidUtilities.isSmallTablet()) {
+                help = help.replace('\n', ' ');
+            }
+        }
+        this.emptyTextView2.setText(help);
     }
 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -58,10 +76,14 @@ public class DialogsEmptyCell extends LinearLayout {
         if (totalHeight == 0) {
             totalHeight = (AndroidUtilities.displaySize.y - ActionBar.getCurrentActionBarHeight()) - (VERSION.SDK_INT >= 21 ? AndroidUtilities.statusBarHeight : 0);
         }
-        ArrayList<RecentMeUrl> arrayList = MessagesController.getInstance(this.currentAccount).hintDialogs;
-        if (!arrayList.isEmpty()) {
-            totalHeight -= (((AndroidUtilities.dp(72.0f) * arrayList.size()) + arrayList.size()) - 1) + AndroidUtilities.dp(50.0f);
+        if (this.currentType == 0) {
+            ArrayList<RecentMeUrl> arrayList = MessagesController.getInstance(this.currentAccount).hintDialogs;
+            if (!arrayList.isEmpty()) {
+                totalHeight -= (((AndroidUtilities.dp(72.0f) * arrayList.size()) + arrayList.size()) - 1) + AndroidUtilities.dp(50.0f);
+            }
+            super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), 1073741824), MeasureSpec.makeMeasureSpec(totalHeight, 1073741824));
+            return;
         }
-        super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), 1073741824), MeasureSpec.makeMeasureSpec(totalHeight, 1073741824));
+        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(totalHeight, Integer.MIN_VALUE));
     }
 }

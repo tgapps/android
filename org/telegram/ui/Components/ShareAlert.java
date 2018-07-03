@@ -52,7 +52,6 @@ import org.telegram.messenger.NotificationCenter.NotificationCenterDelegate;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.support.widget.GridLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
 import org.telegram.messenger.support.widget.RecyclerView.Adapter;
@@ -435,7 +434,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenterDelegat
                         ShareSearchAdapter.this.notifyDataSetChanged();
                         if (!isEmpty && !becomeEmpty && ShareAlert.this.topBeforeSwitch > 0) {
                             ShareAlert.this.layoutManager.scrollToPositionWithOffset(0, -ShareAlert.this.topBeforeSwitch);
-                            ShareAlert.this.topBeforeSwitch = C.PRIORITY_DOWNLOAD;
+                            ShareAlert.this.topBeforeSwitch = -1000;
                         }
                     }
                 }
@@ -843,7 +842,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenterDelegat
                 return paddingTop - i;
             }
         }
-        return C.PRIORITY_DOWNLOAD;
+        return -1000;
     }
 
     public void didReceivedNotification(int id, int account, Object... args) {

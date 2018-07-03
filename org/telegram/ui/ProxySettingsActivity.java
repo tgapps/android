@@ -187,6 +187,7 @@ public class ProxySettingsActivity extends BaseFragment {
                         enabled = true;
                     } else {
                         enabled = preferences.getBoolean("proxy_enabled", false);
+                        SharedConfig.saveProxyList();
                     }
                     if (ProxySettingsActivity.this.addingNewProxy || SharedConfig.currentProxy == ProxySettingsActivity.this.currentProxyInfo) {
                         editor.putString("proxy_ip", ProxySettingsActivity.this.currentProxyInfo.address);

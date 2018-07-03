@@ -2,6 +2,7 @@ package com.google.android.gms.internal.measurement;
 
 import android.net.Uri;
 import org.telegram.messenger.exoplayer2.C;
+import org.telegram.messenger.exoplayer2.DefaultLoadControl;
 import org.telegram.messenger.exoplayer2.DefaultRenderersFactory;
 import org.telegram.messenger.exoplayer2.source.chunk.ChunkedTrackBlacklistUtil;
 import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
@@ -25,7 +26,7 @@ public final class zzew {
     public static zzex<Integer> zzagr = zzex.zzc("measurement.upload.max_events_per_bundle", 1000, 1000);
     public static zzex<Integer> zzags = zzex.zzc("measurement.upload.max_events_per_day", DefaultOggSeeker.MATCH_BYTE_RANGE, DefaultOggSeeker.MATCH_BYTE_RANGE);
     public static zzex<Integer> zzagt = zzex.zzc("measurement.upload.max_error_events_per_day", 1000, 1000);
-    public static zzex<Integer> zzagu = zzex.zzc("measurement.upload.max_public_events_per_day", 50000, 50000);
+    public static zzex<Integer> zzagu = zzex.zzc("measurement.upload.max_public_events_per_day", DefaultLoadControl.DEFAULT_MAX_BUFFER_MS, DefaultLoadControl.DEFAULT_MAX_BUFFER_MS);
     public static zzex<Integer> zzagv = zzex.zzc("measurement.upload.max_conversions_per_day", 500, 500);
     public static zzex<Integer> zzagw = zzex.zzc("measurement.upload.max_realtime_events_per_day", 10, 10);
     public static zzex<Integer> zzagx = zzex.zzc("measurement.store.max_stored_events_per_app", DefaultOggSeeker.MATCH_BYTE_RANGE, DefaultOggSeeker.MATCH_BYTE_RANGE);

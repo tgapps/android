@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import org.telegram.messenger.exoplayer2.C;
 
 public final class zzgn extends zzez {
     private final zzjr zzajp;
@@ -206,14 +205,14 @@ public final class zzgn extends zzez {
         Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzeu);
         zzc(str, true);
         this.zzajp.zzge().zzis().zzg("Log and bundle. event", this.zzajp.zzga().zzbj(com_google_android_gms_internal_measurement_zzeu.name));
-        long nanoTime = this.zzajp.zzbt().nanoTime() / C.MICROS_PER_SECOND;
+        long nanoTime = this.zzajp.zzbt().nanoTime() / 1000000;
         try {
             byte[] bArr = (byte[]) this.zzajp.zzgd().zzc(new zzha(this, com_google_android_gms_internal_measurement_zzeu, str)).get();
             if (bArr == null) {
                 this.zzajp.zzge().zzim().zzg("Log and bundle returned null. appId", zzfg.zzbm(str));
                 bArr = new byte[0];
             }
-            this.zzajp.zzge().zzis().zzd("Log and bundle processed. event, size, time_ms", this.zzajp.zzga().zzbj(com_google_android_gms_internal_measurement_zzeu.name), Integer.valueOf(bArr.length), Long.valueOf((this.zzajp.zzbt().nanoTime() / C.MICROS_PER_SECOND) - nanoTime));
+            this.zzajp.zzge().zzis().zzd("Log and bundle processed. event, size, time_ms", this.zzajp.zzga().zzbj(com_google_android_gms_internal_measurement_zzeu.name), Integer.valueOf(bArr.length), Long.valueOf((this.zzajp.zzbt().nanoTime() / 1000000) - nanoTime));
             return bArr;
         } catch (InterruptedException e2) {
             e = e2;

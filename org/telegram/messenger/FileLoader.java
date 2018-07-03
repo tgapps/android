@@ -21,6 +21,7 @@ import org.telegram.tgnet.TLRPC.FileLocation;
 import org.telegram.tgnet.TLRPC.InputEncryptedFile;
 import org.telegram.tgnet.TLRPC.InputFile;
 import org.telegram.tgnet.TLRPC.Message;
+import org.telegram.tgnet.TLRPC.Photo;
 import org.telegram.tgnet.TLRPC.PhotoSize;
 import org.telegram.tgnet.TLRPC.TL_documentAttributeFilename;
 import org.telegram.tgnet.TLRPC.TL_fileLocationUnavailable;
@@ -30,7 +31,7 @@ import org.telegram.tgnet.TLRPC.TL_messageMediaPhoto;
 import org.telegram.tgnet.TLRPC.TL_messageMediaWebPage;
 import org.telegram.tgnet.TLRPC.TL_messageService;
 import org.telegram.tgnet.TLRPC.TL_photoCachedSize;
-import org.telegram.tgnet.TLRPC.TL_webDocument;
+import org.telegram.tgnet.TLRPC.TL_secureFile;
 import org.telegram.tgnet.TLRPC.WebDocument;
 
 public class FileLoader {
@@ -334,28 +335,34 @@ public class FileLoader {
     }
 
     public void cancelLoadFile(Document document) {
-        cancelLoadFile(document, null, null, null);
+        cancelLoadFile(document, null, null, null, null);
     }
 
-    public void cancelLoadFile(TL_webDocument document) {
-        cancelLoadFile(null, document, null, null);
+    public void cancelLoadFile(SecureDocument document) {
+        cancelLoadFile(null, document, null, null, null);
+    }
+
+    public void cancelLoadFile(WebFile document) {
+        cancelLoadFile(null, null, document, null, null);
     }
 
     public void cancelLoadFile(PhotoSize photo) {
-        cancelLoadFile(null, null, photo.location, null);
+        cancelLoadFile(null, null, null, photo.location, null);
     }
 
     public void cancelLoadFile(FileLocation location, String ext) {
-        cancelLoadFile(null, null, location, ext);
+        cancelLoadFile(null, null, null, location, ext);
     }
 
-    private void cancelLoadFile(Document document, TL_webDocument webDocument, FileLocation location, String locationExt) {
-        if (location != null || document != null || webDocument != null) {
+    private void cancelLoadFile(Document document, SecureDocument secureDocument, WebFile webDocument, FileLocation location, String locationExt) {
+        if (location != null || document != null || webDocument != null || secureDocument != null) {
             String fileName;
             if (location != null) {
                 fileName = getAttachFileName(location, locationExt);
             } else if (document != null) {
                 fileName = getAttachFileName(document);
+            } else if (secureDocument != null) {
+                fileName = getAttachFileName(secureDocument);
             } else if (webDocument != null) {
                 fileName = getAttachFileName(webDocument);
             } else {
@@ -364,18 +371,19 @@ public class FileLoader {
             if (fileName != null) {
                 this.loadOperationPathsUI.remove(fileName);
                 final Document document2 = document;
-                final TL_webDocument tL_webDocument = webDocument;
+                final WebFile webFile = webDocument;
+                final SecureDocument secureDocument2 = secureDocument;
                 final FileLocation fileLocation = location;
                 fileLoaderQueue.postRunnable(new Runnable() {
                     public void run() {
                         FileLoadOperation operation = (FileLoadOperation) FileLoader.this.loadOperationPaths.remove(fileName);
                         if (operation != null) {
                             int datacenterId = operation.getDatacenterId();
-                            if (MessageObject.isVoiceDocument(document2) || MessageObject.isVoiceWebDocument(tL_webDocument)) {
+                            if (MessageObject.isVoiceDocument(document2) || MessageObject.isVoiceWebDocument(webFile)) {
                                 if (!FileLoader.this.getAudioLoadOperationQueue(datacenterId).remove(operation)) {
                                     FileLoader.this.currentAudioLoadOperationsCount.put(datacenterId, FileLoader.this.currentAudioLoadOperationsCount.get(datacenterId) - 1);
                                 }
-                            } else if (fileLocation == null && !MessageObject.isImageWebDocument(tL_webDocument)) {
+                            } else if (secureDocument2 == null && fileLocation == null && !MessageObject.isImageWebDocument(webFile)) {
                                 if (!FileLoader.this.getLoadOperationQueue(datacenterId).remove(operation)) {
                                     FileLoader.this.currentLoadOperationsCount.put(datacenterId, FileLoader.this.currentLoadOperationsCount.get(datacenterId) - 1);
                                 }
@@ -411,7 +419,13 @@ public class FileLoader {
             if (cacheType == 0 && photo != null && (photo.size == 0 || photo.location.key != null)) {
                 cacheType = 1;
             }
-            loadFile(null, null, photo.location, ext, photo.size, false, cacheType);
+            loadFile(null, null, null, photo.location, ext, photo.size, false, cacheType);
+        }
+    }
+
+    public void loadFile(SecureDocument secureDocument, boolean force) {
+        if (secureDocument != null) {
+            loadFile(null, secureDocument, null, null, null, 0, force, 1);
         }
     }
 
@@ -420,12 +434,12 @@ public class FileLoader {
             if (!(cacheType != 0 || document == null || document.key == null)) {
                 cacheType = 1;
             }
-            loadFile(document, null, null, null, 0, force, cacheType);
+            loadFile(document, null, null, null, null, 0, force, cacheType);
         }
     }
 
-    public void loadFile(TL_webDocument document, boolean force, int cacheType) {
-        loadFile(null, document, null, null, 0, force, cacheType);
+    public void loadFile(WebFile document, boolean force, int cacheType) {
+        loadFile(null, null, document, null, null, 0, force, cacheType);
     }
 
     public void loadFile(FileLocation location, String ext, int size, int cacheType) {
@@ -433,7 +447,7 @@ public class FileLoader {
             if (cacheType == 0 && (size == 0 || !(location == null || location.key == null))) {
                 cacheType = 1;
             }
-            loadFile(null, null, location, ext, size, true, cacheType);
+            loadFile(null, null, null, location, ext, size, true, cacheType);
         }
     }
 
@@ -455,10 +469,12 @@ public class FileLoader {
         }
     }
 
-    private FileLoadOperation loadFileInternal(Document document, TL_webDocument webDocument, FileLocation location, String locationExt, int locationSize, boolean force, FileStreamLoadOperation stream, int streamOffset, int cacheType) {
+    private FileLoadOperation loadFileInternal(Document document, SecureDocument secureDocument, WebFile webDocument, FileLocation location, String locationExt, int locationSize, boolean force, FileStreamLoadOperation stream, int streamOffset, int cacheType) {
         String fileName = null;
         if (location != null) {
             fileName = getAttachFileName(location, locationExt);
+        } else if (secureDocument != null) {
+            fileName = getAttachFileName(secureDocument);
         } else if (document != null) {
             fileName = getAttachFileName(document);
         } else if (webDocument != null) {
@@ -480,7 +496,10 @@ public class FileLoader {
             File storeDir = tempDir;
             int type = 4;
             FileLoadOperation fileLoadOperation;
-            if (location != null) {
+            if (secureDocument != null) {
+                fileLoadOperation = new FileLoadOperation(secureDocument);
+                type = 3;
+            } else if (location != null) {
                 fileLoadOperation = new FileLoadOperation(location, locationExt, locationSize);
                 type = 0;
             } else if (document != null) {
@@ -493,7 +512,7 @@ public class FileLoader {
                     type = 3;
                 }
             } else if (webDocument != null) {
-                fileLoadOperation = new FileLoadOperation(webDocument);
+                fileLoadOperation = new FileLoadOperation(this.currentAccount, webDocument);
                 if (MessageObject.isVoiceWebDocument(webDocument)) {
                     type = 1;
                 } else if (MessageObject.isVideoWebDocument(webDocument)) {
@@ -513,7 +532,7 @@ public class FileLoader {
             final String finalFileName = fileName;
             final int finalType = type;
             final Document document2 = document;
-            final TL_webDocument tL_webDocument = webDocument;
+            final WebFile webFile = webDocument;
             final FileLocation fileLocation = location;
             operation.setDelegate(new FileLoadOperationDelegate() {
                 public void didFinishLoadingFile(FileLoadOperation operation, File finalFile) {
@@ -521,12 +540,12 @@ public class FileLoader {
                     if (FileLoader.this.delegate != null) {
                         FileLoader.this.delegate.fileDidLoaded(finalFileName, finalFile, finalType);
                     }
-                    FileLoader.this.checkDownloadQueue(operation.getDatacenterId(), document2, tL_webDocument, fileLocation, finalFileName);
+                    FileLoader.this.checkDownloadQueue(operation.getDatacenterId(), document2, webFile, fileLocation, finalFileName);
                 }
 
                 public void didFailedLoadingFile(FileLoadOperation operation, int reason) {
                     FileLoader.this.loadOperationPathsUI.remove(finalFileName);
-                    FileLoader.this.checkDownloadQueue(operation.getDatacenterId(), document2, tL_webDocument, fileLocation, finalFileName);
+                    FileLoader.this.checkDownloadQueue(operation.getDatacenterId(), document2, webFile, fileLocation, finalFileName);
                     if (FileLoader.this.delegate != null) {
                         FileLoader.this.delegate.fileDidFailedLoad(finalFileName, reason);
                     }
@@ -606,10 +625,10 @@ public class FileLoader {
             operation.setForceRequest(true);
             if (MessageObject.isVoiceDocument(document) || MessageObject.isVoiceWebDocument(webDocument)) {
                 downloadQueue = audioLoadOperationQueue;
-            } else if (location != null || MessageObject.isImageWebDocument(webDocument)) {
-                downloadQueue = photoLoadOperationQueue;
-            } else {
+            } else if (secureDocument == null && location == null && !MessageObject.isImageWebDocument(webDocument)) {
                 downloadQueue = loadOperationQueue;
+            } else {
+                downloadQueue = photoLoadOperationQueue;
             }
             if (downloadQueue == null) {
                 return operation;
@@ -657,7 +676,7 @@ public class FileLoader {
         }
     }
 
-    private void loadFile(Document document, TL_webDocument webDocument, FileLocation location, String locationExt, int locationSize, boolean force, int cacheType) {
+    private void loadFile(Document document, SecureDocument secureDocument, WebFile webDocument, FileLocation location, String locationExt, int locationSize, boolean force, int cacheType) {
         String fileName;
         if (location != null) {
             fileName = getAttachFileName(location, locationExt);
@@ -672,7 +691,8 @@ public class FileLoader {
             this.loadOperationPathsUI.put(fileName, Boolean.valueOf(true));
         }
         final Document document2 = document;
-        final TL_webDocument tL_webDocument = webDocument;
+        final SecureDocument secureDocument2 = secureDocument;
+        final WebFile webFile = webDocument;
         final FileLocation fileLocation = location;
         final String str = locationExt;
         final int i = locationSize;
@@ -680,7 +700,7 @@ public class FileLoader {
         final int i2 = cacheType;
         fileLoaderQueue.postRunnable(new Runnable() {
             public void run() {
-                FileLoader.this.loadFileInternal(document2, tL_webDocument, fileLocation, str, i, z, null, 0, i2);
+                FileLoader.this.loadFileInternal(document2, secureDocument2, webFile, fileLocation, str, i, z, null, 0, i2);
             }
         });
     }
@@ -693,7 +713,7 @@ public class FileLoader {
         final int i = offset;
         fileLoaderQueue.postRunnable(new Runnable() {
             public void run() {
-                result[0] = FileLoader.this.loadFileInternal(document2, null, null, null, 0, true, fileStreamLoadOperation, i, 0);
+                result[0] = FileLoader.this.loadFileInternal(document2, null, null, null, null, 0, true, fileStreamLoadOperation, i, 0);
                 semaphore.countDown();
             }
         });
@@ -705,11 +725,11 @@ public class FileLoader {
         return result[0];
     }
 
-    private void checkDownloadQueue(int datacenterId, Document document, TL_webDocument webDocument, FileLocation location, String arg1) {
+    private void checkDownloadQueue(int datacenterId, Document document, WebFile webDocument, FileLocation location, String arg1) {
         final int i = datacenterId;
         final String str = arg1;
         final Document document2 = document;
-        final TL_webDocument tL_webDocument = webDocument;
+        final WebFile webFile = webDocument;
         final FileLocation fileLocation = location;
         fileLoaderQueue.postRunnable(new Runnable() {
             public void run() {
@@ -719,7 +739,7 @@ public class FileLoader {
                 FileLoadOperation operation = (FileLoadOperation) FileLoader.this.loadOperationPaths.remove(str);
                 int count;
                 int maxCount;
-                if (MessageObject.isVoiceDocument(document2) || MessageObject.isVoiceWebDocument(tL_webDocument)) {
+                if (MessageObject.isVoiceDocument(document2) || MessageObject.isVoiceWebDocument(webFile)) {
                     count = FileLoader.this.currentAudioLoadOperationsCount.get(i);
                     if (operation != null) {
                         if (operation.wasStarted()) {
@@ -745,7 +765,7 @@ public class FileLoader {
                             return;
                         }
                     }
-                } else if (fileLocation != null || MessageObject.isImageWebDocument(tL_webDocument)) {
+                } else if (fileLocation != null || MessageObject.isImageWebDocument(webFile)) {
                     count = FileLoader.this.currentPhotoLoadOperationsCount.get(i);
                     if (operation != null) {
                         if (operation.wasStarted()) {
@@ -953,8 +973,8 @@ public class FileLoader {
             } else {
                 dir = getDirectory(0);
             }
-        } else if (attach instanceof TL_webDocument) {
-            TL_webDocument document2 = (TL_webDocument) attach;
+        } else if (attach instanceof WebFile) {
+            WebFile document2 = (WebFile) attach;
             if (document2.mime_type.startsWith("image/")) {
                 dir = getDirectory(0);
             } else if (document2.mime_type.startsWith("audio/")) {
@@ -964,6 +984,8 @@ public class FileLoader {
             } else {
                 dir = getDirectory(3);
             }
+        } else if ((attach instanceof TL_secureFile) || (attach instanceof SecureDocument)) {
+            dir = getDirectory(4);
         }
         if (dir == null) {
             return new File(TtmlNode.ANONYMOUS_REGION_ID);
@@ -1129,31 +1151,44 @@ public class FileLoader {
             } else {
                 return document.dc_id + "_" + document.id + "_" + document.version;
             }
-        } else if (attach instanceof TL_webDocument) {
-            TL_webDocument document2 = (TL_webDocument) attach;
+        } else if (attach instanceof SecureDocument) {
+            SecureDocument secureDocument = (SecureDocument) attach;
+            return secureDocument.secureFile.dc_id + "_" + secureDocument.secureFile.id + ".jpg";
+        } else if (attach instanceof TL_secureFile) {
+            TL_secureFile secureFile = (TL_secureFile) attach;
+            return secureFile.dc_id + "_" + secureFile.id + ".jpg";
+        } else if (attach instanceof WebFile) {
+            WebFile document2 = (WebFile) attach;
             return Utilities.MD5(document2.url) + "." + ImageLoader.getHttpUrlExtension(document2.url, getExtensionByMime(document2.mime_type));
         } else if (attach instanceof PhotoSize) {
             PhotoSize photo = (PhotoSize) attach;
             if (photo.location == null || (photo.location instanceof TL_fileLocationUnavailable)) {
                 return TtmlNode.ANONYMOUS_REGION_ID;
             }
-            r5 = new StringBuilder().append(photo.location.volume_id).append("_").append(photo.location.local_id).append(".");
+            r7 = new StringBuilder().append(photo.location.volume_id).append("_").append(photo.location.local_id).append(".");
             if (ext == null) {
                 ext = "jpg";
             }
-            return r5.append(ext).toString();
-        } else if (!(attach instanceof FileLocation)) {
-            return TtmlNode.ANONYMOUS_REGION_ID;
-        } else {
+            return r7.append(ext).toString();
+        } else if (attach instanceof FileLocation) {
             if (attach instanceof TL_fileLocationUnavailable) {
                 return TtmlNode.ANONYMOUS_REGION_ID;
             }
-            FileLocation location = (FileLocation) attach;
-            r5 = new StringBuilder().append(location.volume_id).append("_").append(location.local_id).append(".");
+            location = (FileLocation) attach;
+            r7 = new StringBuilder().append(location.volume_id).append("_").append(location.local_id).append(".");
             if (ext == null) {
                 ext = "jpg";
             }
-            return r5.append(ext).toString();
+            return r7.append(ext).toString();
+        } else if (!(attach instanceof Photo)) {
+            return TtmlNode.ANONYMOUS_REGION_ID;
+        } else {
+            location = (FileLocation) attach;
+            r7 = new StringBuilder().append(location.volume_id).append("_").append(location.local_id).append(".");
+            if (ext == null) {
+                ext = "jpg";
+            }
+            return r7.append(ext).toString();
         }
     }
 

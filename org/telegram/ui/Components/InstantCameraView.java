@@ -82,7 +82,6 @@ import org.telegram.messenger.camera.CameraController;
 import org.telegram.messenger.camera.CameraInfo;
 import org.telegram.messenger.camera.CameraSession;
 import org.telegram.messenger.camera.Size;
-import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.exoplayer2.extractor.ts.PsExtractor;
 import org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink;
 import org.telegram.messenger.video.MP4Builder;
@@ -719,7 +718,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             if (this.lastTimestamp == -1) {
                 this.lastTimestamp = timestampNanos;
                 if (this.currentTimestamp != 0) {
-                    dt = (System.currentTimeMillis() - this.lastCommitedFrameTime) * C.MICROS_PER_SECOND;
+                    dt = (System.currentTimeMillis() - this.lastCommitedFrameTime) * 1000000;
                     alphaDt = 0;
                 } else {
                     dt = 0;
@@ -1086,7 +1085,6 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         }
 
         public void drainEncoder(boolean endOfStream) throws Exception {
-            MediaFormat newFormat;
             if (endOfStream) {
                 this.videoEncoder.signalEndOfInputStream();
             }
@@ -1095,6 +1093,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                 encoderOutputBuffers = this.videoEncoder.getOutputBuffers();
             }
             while (true) {
+                MediaFormat newFormat;
                 ByteBuffer encodedData;
                 int encoderStatus = this.videoEncoder.dequeueOutputBuffer(this.videoBufferInfo, 10000);
                 if (encoderStatus == -1) {

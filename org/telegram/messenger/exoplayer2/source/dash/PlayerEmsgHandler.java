@@ -238,9 +238,10 @@ public final class PlayerEmsgHandler implements Callback {
     }
 
     private void handleManifestExpiredMessage(long eventTimeUs, long manifestPublishTimeMsInEmsg) {
-        if (!this.manifestPublishTimeToExpiryTimeUs.containsKey(Long.valueOf(manifestPublishTimeMsInEmsg))) {
+        Long previousExpiryTimeUs = (Long) this.manifestPublishTimeToExpiryTimeUs.get(Long.valueOf(manifestPublishTimeMsInEmsg));
+        if (previousExpiryTimeUs == null) {
             this.manifestPublishTimeToExpiryTimeUs.put(Long.valueOf(manifestPublishTimeMsInEmsg), Long.valueOf(eventTimeUs));
-        } else if (((Long) this.manifestPublishTimeToExpiryTimeUs.get(Long.valueOf(manifestPublishTimeMsInEmsg))).longValue() > eventTimeUs) {
+        } else if (previousExpiryTimeUs.longValue() > eventTimeUs) {
             this.manifestPublishTimeToExpiryTimeUs.put(Long.valueOf(manifestPublishTimeMsInEmsg), Long.valueOf(eventTimeUs));
         }
     }
@@ -251,9 +252,6 @@ public final class PlayerEmsgHandler implements Callback {
     }
 
     private Entry<Long, Long> ceilingExpiryEntryForPublishTime(long publishTimeMs) {
-        if (this.manifestPublishTimeToExpiryTimeUs.isEmpty()) {
-            return null;
-        }
         return this.manifestPublishTimeToExpiryTimeUs.ceilingEntry(Long.valueOf(publishTimeMs));
     }
 

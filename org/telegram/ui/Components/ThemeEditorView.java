@@ -53,7 +53,6 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.support.widget.LinearLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
 import org.telegram.messenger.support.widget.RecyclerView.Adapter;
@@ -743,7 +742,7 @@ public class ThemeEditorView {
                     return paddingTop - i;
                 }
             }
-            return C.PRIORITY_DOWNLOAD;
+            return -1000;
         }
 
         protected boolean canDismissWithSwipe() {

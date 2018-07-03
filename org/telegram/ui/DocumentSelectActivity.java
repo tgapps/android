@@ -60,6 +60,7 @@ import org.telegram.ui.Components.RecyclerListView.SelectionAdapter;
 public class DocumentSelectActivity extends BaseFragment {
     private static final int done = 3;
     private ArrayList<View> actionModeViews = new ArrayList();
+    private boolean canSelectOnlyImageFiles;
     private File currentDir;
     private DocumentSelectActivityDelegate delegate;
     private EmptyTextProgressView emptyView;
@@ -68,6 +69,7 @@ public class DocumentSelectActivity extends BaseFragment {
     private LinearLayoutManager layoutManager;
     private ListAdapter listAdapter;
     private RecyclerListView listView;
+    private int maxSelectedFiles = -1;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context arg0, Intent intent) {
             Runnable r = new Runnable() {
@@ -259,9 +261,7 @@ public class DocumentSelectActivity extends BaseFragment {
                     }
                     DocumentSelectActivity.this.finishFragment();
                 } else if (id == 3 && DocumentSelectActivity.this.delegate != null) {
-                    ArrayList<String> files = new ArrayList();
-                    files.addAll(DocumentSelectActivity.this.selectedFiles.keySet());
-                    DocumentSelectActivity.this.delegate.didSelectFiles(DocumentSelectActivity.this, files);
+                    DocumentSelectActivity.this.delegate.didSelectFiles(DocumentSelectActivity.this, new ArrayList(DocumentSelectActivity.this.selectedFiles.keySet()));
                     for (ListItem item : DocumentSelectActivity.this.selectedFiles.values()) {
                         item.date = System.currentTimeMillis();
                     }
@@ -318,8 +318,14 @@ public class DocumentSelectActivity extends BaseFragment {
                     if (!file.canRead()) {
                         DocumentSelectActivity.this.showErrorBox(LocaleController.getString("AccessError", R.string.AccessError));
                         return false;
+                    } else if (DocumentSelectActivity.this.canSelectOnlyImageFiles && item.thumb == null) {
+                        DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("PassportUploadNotImage", R.string.PassportUploadNotImage, new Object[0]));
+                        return false;
                     } else if (DocumentSelectActivity.this.sizeLimit != 0 && file.length() > DocumentSelectActivity.this.sizeLimit) {
                         DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("FileUploadLimit", R.string.FileUploadLimit, AndroidUtilities.formatFileSize(DocumentSelectActivity.this.sizeLimit)));
+                        return false;
+                    } else if (DocumentSelectActivity.this.maxSelectedFiles >= 0 && DocumentSelectActivity.this.selectedFiles.size() >= DocumentSelectActivity.this.maxSelectedFiles) {
+                        DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("PassportUploadMaxReached", R.string.PassportUploadMaxReached, LocaleController.formatPluralString("Files", DocumentSelectActivity.this.maxSelectedFiles)));
                         return false;
                     } else if (file.length() == 0) {
                         return false;
@@ -388,15 +394,20 @@ public class DocumentSelectActivity extends BaseFragment {
                             DocumentSelectActivity.this.showErrorBox(LocaleController.getString("AccessError", R.string.AccessError));
                             file = new File("/mnt/sdcard");
                         }
-                        if (DocumentSelectActivity.this.sizeLimit != 0 && file.length() > DocumentSelectActivity.this.sizeLimit) {
+                        if (DocumentSelectActivity.this.canSelectOnlyImageFiles && item.thumb == null) {
+                            DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("PassportUploadNotImage", R.string.PassportUploadNotImage, new Object[0]));
+                        } else if (DocumentSelectActivity.this.sizeLimit != 0 && file.length() > DocumentSelectActivity.this.sizeLimit) {
                             DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("FileUploadLimit", R.string.FileUploadLimit, AndroidUtilities.formatFileSize(DocumentSelectActivity.this.sizeLimit)));
                         } else if (file.length() == 0) {
                         } else {
                             if (DocumentSelectActivity.this.actionBar.isActionModeShowed()) {
                                 if (DocumentSelectActivity.this.selectedFiles.containsKey(file.toString())) {
                                     DocumentSelectActivity.this.selectedFiles.remove(file.toString());
-                                } else {
+                                } else if (DocumentSelectActivity.this.maxSelectedFiles < 0 || DocumentSelectActivity.this.selectedFiles.size() < DocumentSelectActivity.this.maxSelectedFiles) {
                                     DocumentSelectActivity.this.selectedFiles.put(file.toString(), item);
+                                } else {
+                                    DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("PassportUploadMaxReached", R.string.PassportUploadMaxReached, LocaleController.formatPluralString("Files", DocumentSelectActivity.this.maxSelectedFiles)));
+                                    return;
                                 }
                                 if (DocumentSelectActivity.this.selectedFiles.isEmpty()) {
                                     DocumentSelectActivity.this.actionBar.hideActionMode();
@@ -419,6 +430,14 @@ public class DocumentSelectActivity extends BaseFragment {
         });
         listRoots();
         return this.fragmentView;
+    }
+
+    public void setMaxSelectedFiles(int value) {
+        this.maxSelectedFiles = value;
+    }
+
+    public void setCanSelectOnlyImageFiles(boolean value) {
+        this.canSelectOnlyImageFiles = true;
     }
 
     public void loadRecentFiles() {

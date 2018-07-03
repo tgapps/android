@@ -166,11 +166,11 @@ abstract class StreamReader {
     }
 
     protected long convertGranuleToTime(long granule) {
-        return (C.MICROS_PER_SECOND * granule) / ((long) this.sampleRate);
+        return (1000000 * granule) / ((long) this.sampleRate);
     }
 
     protected long convertTimeToGranule(long timeUs) {
-        return (((long) this.sampleRate) * timeUs) / C.MICROS_PER_SECOND;
+        return (((long) this.sampleRate) * timeUs) / 1000000;
     }
 
     protected void onSeekEnd(long currentGranule) {

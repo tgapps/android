@@ -13,7 +13,6 @@ public class AdaptiveTrackSelection extends BaseTrackSelection {
     public static final float DEFAULT_BANDWIDTH_FRACTION = 0.75f;
     public static final float DEFAULT_BUFFERED_FRACTION_TO_LIVE_EDGE_FOR_QUALITY_INCREASE = 0.75f;
     public static final int DEFAULT_MAX_DURATION_FOR_QUALITY_DECREASE_MS = 25000;
-    public static final int DEFAULT_MAX_INITIAL_BITRATE = 800000;
     public static final int DEFAULT_MIN_DURATION_FOR_QUALITY_INCREASE_MS = 10000;
     public static final int DEFAULT_MIN_DURATION_TO_RETAIN_AFTER_DISCARD_MS = 25000;
     public static final long DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS = 2000;
@@ -23,7 +22,6 @@ public class AdaptiveTrackSelection extends BaseTrackSelection {
     private final Clock clock;
     private long lastBufferEvaluationMs;
     private final long maxDurationForQualityDecreaseUs;
-    private final int maxInitialBitrate;
     private final long minDurationForQualityIncreaseUs;
     private final long minDurationToRetainAfterDiscardUs;
     private final long minTimeBetweenBufferReevaluationMs;
@@ -37,22 +35,20 @@ public class AdaptiveTrackSelection extends BaseTrackSelection {
         private final float bufferedFractionToLiveEdgeForQualityIncrease;
         private final Clock clock;
         private final int maxDurationForQualityDecreaseMs;
-        private final int maxInitialBitrate;
         private final int minDurationForQualityIncreaseMs;
         private final int minDurationToRetainAfterDiscardMs;
         private final long minTimeBetweenBufferReevaluationMs;
 
         public Factory(BandwidthMeter bandwidthMeter) {
-            this(bandwidthMeter, AdaptiveTrackSelection.DEFAULT_MAX_INITIAL_BITRATE, 10000, 25000, 25000, 0.75f, 0.75f, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS, Clock.DEFAULT);
+            this(bandwidthMeter, 10000, 25000, 25000, 0.75f, 0.75f, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS, Clock.DEFAULT);
         }
 
-        public Factory(BandwidthMeter bandwidthMeter, int maxInitialBitrate, int minDurationForQualityIncreaseMs, int maxDurationForQualityDecreaseMs, int minDurationToRetainAfterDiscardMs, float bandwidthFraction) {
-            this(bandwidthMeter, maxInitialBitrate, minDurationForQualityIncreaseMs, maxDurationForQualityDecreaseMs, minDurationToRetainAfterDiscardMs, bandwidthFraction, 0.75f, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS, Clock.DEFAULT);
+        public Factory(BandwidthMeter bandwidthMeter, int minDurationForQualityIncreaseMs, int maxDurationForQualityDecreaseMs, int minDurationToRetainAfterDiscardMs, float bandwidthFraction) {
+            this(bandwidthMeter, minDurationForQualityIncreaseMs, maxDurationForQualityDecreaseMs, minDurationToRetainAfterDiscardMs, bandwidthFraction, 0.75f, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS, Clock.DEFAULT);
         }
 
-        public Factory(BandwidthMeter bandwidthMeter, int maxInitialBitrate, int minDurationForQualityIncreaseMs, int maxDurationForQualityDecreaseMs, int minDurationToRetainAfterDiscardMs, float bandwidthFraction, float bufferedFractionToLiveEdgeForQualityIncrease, long minTimeBetweenBufferReevaluationMs, Clock clock) {
+        public Factory(BandwidthMeter bandwidthMeter, int minDurationForQualityIncreaseMs, int maxDurationForQualityDecreaseMs, int minDurationToRetainAfterDiscardMs, float bandwidthFraction, float bufferedFractionToLiveEdgeForQualityIncrease, long minTimeBetweenBufferReevaluationMs, Clock clock) {
             this.bandwidthMeter = bandwidthMeter;
-            this.maxInitialBitrate = maxInitialBitrate;
             this.minDurationForQualityIncreaseMs = minDurationForQualityIncreaseMs;
             this.maxDurationForQualityDecreaseMs = maxDurationForQualityDecreaseMs;
             this.minDurationToRetainAfterDiscardMs = minDurationToRetainAfterDiscardMs;
@@ -63,18 +59,17 @@ public class AdaptiveTrackSelection extends BaseTrackSelection {
         }
 
         public AdaptiveTrackSelection createTrackSelection(TrackGroup group, int... tracks) {
-            return new AdaptiveTrackSelection(group, tracks, this.bandwidthMeter, this.maxInitialBitrate, (long) this.minDurationForQualityIncreaseMs, (long) this.maxDurationForQualityDecreaseMs, (long) this.minDurationToRetainAfterDiscardMs, this.bandwidthFraction, this.bufferedFractionToLiveEdgeForQualityIncrease, this.minTimeBetweenBufferReevaluationMs, this.clock);
+            return new AdaptiveTrackSelection(group, tracks, this.bandwidthMeter, (long) this.minDurationForQualityIncreaseMs, (long) this.maxDurationForQualityDecreaseMs, (long) this.minDurationToRetainAfterDiscardMs, this.bandwidthFraction, this.bufferedFractionToLiveEdgeForQualityIncrease, this.minTimeBetweenBufferReevaluationMs, this.clock);
         }
     }
 
     public AdaptiveTrackSelection(TrackGroup group, int[] tracks, BandwidthMeter bandwidthMeter) {
-        this(group, tracks, bandwidthMeter, DEFAULT_MAX_INITIAL_BITRATE, 10000, 25000, 25000, 0.75f, 0.75f, DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS, Clock.DEFAULT);
+        this(group, tracks, bandwidthMeter, 10000, 25000, 25000, 0.75f, 0.75f, DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS, Clock.DEFAULT);
     }
 
-    public AdaptiveTrackSelection(TrackGroup group, int[] tracks, BandwidthMeter bandwidthMeter, int maxInitialBitrate, long minDurationForQualityIncreaseMs, long maxDurationForQualityDecreaseMs, long minDurationToRetainAfterDiscardMs, float bandwidthFraction, float bufferedFractionToLiveEdgeForQualityIncrease, long minTimeBetweenBufferReevaluationMs, Clock clock) {
+    public AdaptiveTrackSelection(TrackGroup group, int[] tracks, BandwidthMeter bandwidthMeter, long minDurationForQualityIncreaseMs, long maxDurationForQualityDecreaseMs, long minDurationToRetainAfterDiscardMs, float bandwidthFraction, float bufferedFractionToLiveEdgeForQualityIncrease, long minTimeBetweenBufferReevaluationMs, Clock clock) {
         super(group, tracks);
         this.bandwidthMeter = bandwidthMeter;
-        this.maxInitialBitrate = maxInitialBitrate;
         this.minDurationForQualityIncreaseUs = 1000 * minDurationForQualityIncreaseMs;
         this.maxDurationForQualityDecreaseUs = 1000 * maxDurationForQualityDecreaseMs;
         this.minDurationToRetainAfterDiscardUs = 1000 * minDurationToRetainAfterDiscardMs;
@@ -153,8 +148,7 @@ public class AdaptiveTrackSelection extends BaseTrackSelection {
     }
 
     private int determineIdealSelectedIndex(long nowMs) {
-        long bitrateEstimate = this.bandwidthMeter.getBitrateEstimate();
-        long effectiveBitrate = bitrateEstimate == -1 ? (long) this.maxInitialBitrate : (long) (((float) bitrateEstimate) * this.bandwidthFraction);
+        long effectiveBitrate = (long) (((float) this.bandwidthMeter.getBitrateEstimate()) * this.bandwidthFraction);
         int lowestBitrateNonBlacklistedIndex = 0;
         int i = 0;
         while (i < this.length) {

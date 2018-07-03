@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -22,11 +23,10 @@ import org.telegram.messenger.exoplayer2.ExoPlayerLibraryInfo;
 import org.telegram.messenger.exoplayer2.ParserException;
 import org.telegram.messenger.exoplayer2.Timeline;
 import org.telegram.messenger.exoplayer2.Timeline.Window;
+import org.telegram.messenger.exoplayer2.source.BaseMediaSource;
 import org.telegram.messenger.exoplayer2.source.CompositeSequenceableLoaderFactory;
 import org.telegram.messenger.exoplayer2.source.DefaultCompositeSequenceableLoaderFactory;
 import org.telegram.messenger.exoplayer2.source.MediaPeriod;
-import org.telegram.messenger.exoplayer2.source.MediaSource;
-import org.telegram.messenger.exoplayer2.source.MediaSource.Listener;
 import org.telegram.messenger.exoplayer2.source.MediaSource.MediaPeriodId;
 import org.telegram.messenger.exoplayer2.source.MediaSourceEventListener;
 import org.telegram.messenger.exoplayer2.source.MediaSourceEventListener.EventDispatcher;
@@ -49,7 +49,7 @@ import org.telegram.messenger.exoplayer2.upstream.ParsingLoadable.Parser;
 import org.telegram.messenger.exoplayer2.util.Assertions;
 import org.telegram.messenger.exoplayer2.util.Util;
 
-public final class DashMediaSource implements MediaSource {
+public final class DashMediaSource extends BaseMediaSource {
     public static final long DEFAULT_LIVE_PRESENTATION_DELAY_FIXED_MS = 30000;
     public static final long DEFAULT_LIVE_PRESENTATION_DELAY_PREFER_MANIFEST_MS = -1;
     public static final int DEFAULT_MIN_LOADABLE_RETRY_COUNT = 3;
@@ -61,18 +61,19 @@ public final class DashMediaSource implements MediaSource {
     private DataSource dataSource;
     private boolean dynamicMediaPresentationEnded;
     private long elapsedRealtimeOffsetMs;
-    private final EventDispatcher eventDispatcher;
     private long expiredManifestPublishTimeUs;
     private int firstPeriodId;
     private Handler handler;
+    private Uri initialManifestUri;
     private final long livePresentationDelayMs;
     private Loader loader;
     private DashManifest manifest;
     private final ManifestCallback manifestCallback;
     private final org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory;
+    private final EventDispatcher manifestEventDispatcher;
     private IOException manifestFatalError;
     private long manifestLoadEndTimestampMs;
-    private LoaderErrorThrower manifestLoadErrorThrower;
+    private final LoaderErrorThrower manifestLoadErrorThrower;
     private boolean manifestLoadPending;
     private long manifestLoadStartTimestampMs;
     private final Parser<? extends DashManifest> manifestParser;
@@ -84,8 +85,8 @@ public final class DashMediaSource implements MediaSource {
     private final Runnable refreshManifestRunnable;
     private final boolean sideloadedManifest;
     private final Runnable simulateManifestRefreshRunnable;
-    private Listener sourceListener;
     private int staleManifestReloadAttempt;
+    private final Object tag;
 
     private static final class PeriodSeekInfo {
         public final long availableEndTimeUs;
@@ -110,10 +111,10 @@ public final class DashMediaSource implements MediaSource {
                     availableStartTimeUs = 0;
                     availableEndTimeUs = 0;
                 } else if (!seenEmptyIndex) {
-                    int firstSegmentNum = index.getFirstSegmentNum();
+                    long firstSegmentNum = index.getFirstSegmentNum();
                     availableStartTimeUs = Math.max(availableStartTimeUs, index.getTimeUs(firstSegmentNum));
                     if (segmentCount != -1) {
-                        int lastSegmentNum = (firstSegmentNum + segmentCount) - 1;
+                        long lastSegmentNum = (((long) segmentCount) + firstSegmentNum) - 1;
                         availableEndTimeUs = Math.min(availableEndTimeUs, index.getTimeUs(lastSegmentNum) + index.getDurationUs(lastSegmentNum, durationUs));
                     }
                 }
@@ -136,8 +137,9 @@ public final class DashMediaSource implements MediaSource {
         private final long windowDefaultStartPositionUs;
         private final long windowDurationUs;
         private final long windowStartTimeMs;
+        private final Object windowTag;
 
-        public DashTimeline(long presentationStartTimeMs, long windowStartTimeMs, int firstPeriodId, long offsetInFirstPeriodUs, long windowDurationUs, long windowDefaultStartPositionUs, DashManifest manifest) {
+        public DashTimeline(long presentationStartTimeMs, long windowStartTimeMs, int firstPeriodId, long offsetInFirstPeriodUs, long windowDurationUs, long windowDefaultStartPositionUs, DashManifest manifest, Object windowTag) {
             this.presentationStartTimeMs = presentationStartTimeMs;
             this.windowStartTimeMs = windowStartTimeMs;
             this.firstPeriodId = firstPeriodId;
@@ -145,6 +147,7 @@ public final class DashMediaSource implements MediaSource {
             this.windowDurationUs = windowDurationUs;
             this.windowDefaultStartPositionUs = windowDefaultStartPositionUs;
             this.manifest = manifest;
+            this.windowTag = windowTag;
         }
 
         public int getPeriodCount() {
@@ -170,9 +173,9 @@ public final class DashMediaSource implements MediaSource {
             return 1;
         }
 
-        public Window getWindow(int windowIndex, Window window, boolean setIdentifier, long defaultPositionProjectionUs) {
+        public Window getWindow(int windowIndex, Window window, boolean setTag, long defaultPositionProjectionUs) {
             Assertions.checkIndex(windowIndex, 0, 1);
-            return window.set(null, this.presentationStartTimeMs, this.windowStartTimeMs, true, this.manifest.dynamic, getAdjustedWindowDefaultStartPositionUs(defaultPositionProjectionUs), this.windowDurationUs, 0, this.manifest.getPeriodCount() - 1, this.offsetInFirstPeriodUs);
+            return window.set(setTag ? this.windowTag : null, this.presentationStartTimeMs, this.windowStartTimeMs, true, this.manifest.dynamic, getAdjustedWindowDefaultStartPositionUs(defaultPositionProjectionUs), this.windowDurationUs, 0, this.manifest.getPeriodCount() - 1, this.offsetInFirstPeriodUs);
         }
 
         public int getIndexOfPeriod(Object uid) {
@@ -248,10 +251,17 @@ public final class DashMediaSource implements MediaSource {
         private final org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory;
         private Parser<? extends DashManifest> manifestParser;
         private int minLoadableRetryCount = 3;
+        private Object tag;
 
         public Factory(org.telegram.messenger.exoplayer2.source.dash.DashChunkSource.Factory chunkSourceFactory, org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory) {
             this.chunkSourceFactory = (org.telegram.messenger.exoplayer2.source.dash.DashChunkSource.Factory) Assertions.checkNotNull(chunkSourceFactory);
             this.manifestDataSourceFactory = manifestDataSourceFactory;
+        }
+
+        public Factory setTag(Object tag) {
+            Assertions.checkState(!this.isCreateCalled);
+            this.tag = tag;
+            return this;
         }
 
         public Factory setMinLoadableRetryCount(int minLoadableRetryCount) {
@@ -278,22 +288,36 @@ public final class DashMediaSource implements MediaSource {
             return this;
         }
 
-        public DashMediaSource createMediaSource(DashManifest manifest, Handler eventHandler, MediaSourceEventListener eventListener) {
+        public DashMediaSource createMediaSource(DashManifest manifest) {
             Assertions.checkArgument(!manifest.dynamic);
             this.isCreateCalled = true;
-            return new DashMediaSource(manifest, null, null, null, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, eventHandler, eventListener);
+            return new DashMediaSource(manifest, null, null, null, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, this.tag);
+        }
+
+        @Deprecated
+        public DashMediaSource createMediaSource(DashManifest manifest, Handler eventHandler, MediaSourceEventListener eventListener) {
+            DashMediaSource mediaSource = createMediaSource(manifest);
+            if (!(eventHandler == null || eventListener == null)) {
+                mediaSource.addEventListener(eventHandler, eventListener);
+            }
+            return mediaSource;
         }
 
         public DashMediaSource createMediaSource(Uri manifestUri) {
-            return createMediaSource(manifestUri, null, null);
-        }
-
-        public DashMediaSource createMediaSource(Uri manifestUri, Handler eventHandler, MediaSourceEventListener eventListener) {
             this.isCreateCalled = true;
             if (this.manifestParser == null) {
                 this.manifestParser = new DashManifestParser();
             }
-            return new DashMediaSource(null, (Uri) Assertions.checkNotNull(manifestUri), this.manifestDataSourceFactory, this.manifestParser, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, eventHandler, eventListener);
+            return new DashMediaSource(null, (Uri) Assertions.checkNotNull(manifestUri), this.manifestDataSourceFactory, this.manifestParser, this.chunkSourceFactory, this.compositeSequenceableLoaderFactory, this.minLoadableRetryCount, this.livePresentationDelayMs, this.tag);
+        }
+
+        @Deprecated
+        public DashMediaSource createMediaSource(Uri manifestUri, Handler eventHandler, MediaSourceEventListener eventListener) {
+            DashMediaSource mediaSource = createMediaSource(manifestUri);
+            if (!(eventHandler == null || eventListener == null)) {
+                mediaSource.addEventListener(eventHandler, eventListener);
+            }
+            return mediaSource;
         }
 
         public int[] getSupportedTypes() {
@@ -308,7 +332,7 @@ public final class DashMediaSource implements MediaSource {
         }
 
         public Long parse(Uri uri, InputStream inputStream) throws IOException {
-            String firstLine = new BufferedReader(new InputStreamReader(inputStream)).readLine();
+            String firstLine = new BufferedReader(new InputStreamReader(inputStream, Charset.forName(C.UTF8_NAME))).readLine();
             try {
                 Matcher matcher = TIMESTAMP_WITH_TIMEZONE_PATTERN.matcher(firstLine);
                 if (matcher.matches()) {
@@ -406,7 +430,10 @@ public final class DashMediaSource implements MediaSource {
 
     @Deprecated
     public DashMediaSource(DashManifest manifest, org.telegram.messenger.exoplayer2.source.dash.DashChunkSource.Factory chunkSourceFactory, int minLoadableRetryCount, Handler eventHandler, MediaSourceEventListener eventListener) {
-        this(manifest, null, null, null, chunkSourceFactory, new DefaultCompositeSequenceableLoaderFactory(), minLoadableRetryCount, -1, eventHandler, eventListener);
+        this(manifest, null, null, null, chunkSourceFactory, new DefaultCompositeSequenceableLoaderFactory(), minLoadableRetryCount, -1, null);
+        if (eventHandler != null && eventListener != null) {
+            addEventListener(eventHandler, eventListener);
+        }
     }
 
     @Deprecated
@@ -421,10 +448,14 @@ public final class DashMediaSource implements MediaSource {
 
     @Deprecated
     public DashMediaSource(Uri manifestUri, org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory, Parser<? extends DashManifest> manifestParser, org.telegram.messenger.exoplayer2.source.dash.DashChunkSource.Factory chunkSourceFactory, int minLoadableRetryCount, long livePresentationDelayMs, Handler eventHandler, MediaSourceEventListener eventListener) {
-        this(null, manifestUri, manifestDataSourceFactory, manifestParser, chunkSourceFactory, new DefaultCompositeSequenceableLoaderFactory(), minLoadableRetryCount, livePresentationDelayMs, eventHandler, eventListener);
+        this(null, manifestUri, manifestDataSourceFactory, manifestParser, chunkSourceFactory, new DefaultCompositeSequenceableLoaderFactory(), minLoadableRetryCount, livePresentationDelayMs, null);
+        if (eventHandler != null && eventListener != null) {
+            addEventListener(eventHandler, eventListener);
+        }
     }
 
-    private DashMediaSource(DashManifest manifest, Uri manifestUri, org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory, Parser<? extends DashManifest> manifestParser, org.telegram.messenger.exoplayer2.source.dash.DashChunkSource.Factory chunkSourceFactory, CompositeSequenceableLoaderFactory compositeSequenceableLoaderFactory, int minLoadableRetryCount, long livePresentationDelayMs, Handler eventHandler, MediaSourceEventListener eventListener) {
+    private DashMediaSource(DashManifest manifest, Uri manifestUri, org.telegram.messenger.exoplayer2.upstream.DataSource.Factory manifestDataSourceFactory, Parser<? extends DashManifest> manifestParser, org.telegram.messenger.exoplayer2.source.dash.DashChunkSource.Factory chunkSourceFactory, CompositeSequenceableLoaderFactory compositeSequenceableLoaderFactory, int minLoadableRetryCount, long livePresentationDelayMs, Object tag) {
+        this.initialManifestUri = manifestUri;
         this.manifest = manifest;
         this.manifestUri = manifestUri;
         this.manifestDataSourceFactory = manifestDataSourceFactory;
@@ -433,8 +464,9 @@ public final class DashMediaSource implements MediaSource {
         this.minLoadableRetryCount = minLoadableRetryCount;
         this.livePresentationDelayMs = livePresentationDelayMs;
         this.compositeSequenceableLoaderFactory = compositeSequenceableLoaderFactory;
+        this.tag = tag;
         this.sideloadedManifest = manifest != null;
-        this.eventDispatcher = new EventDispatcher(eventHandler, eventListener);
+        this.manifestEventDispatcher = createEventDispatcher(null);
         this.manifestUriLock = new Object();
         this.periodsById = new SparseArray();
         this.playerEmsgCallback = new DefaultPlayerEmsgCallback();
@@ -444,9 +476,11 @@ public final class DashMediaSource implements MediaSource {
             this.manifestCallback = null;
             this.refreshManifestRunnable = null;
             this.simulateManifestRefreshRunnable = null;
+            this.manifestLoadErrorThrower = new Dummy();
             return;
         }
         this.manifestCallback = new ManifestCallback();
+        this.manifestLoadErrorThrower = new ManifestLoadErrorThrower();
         this.refreshManifestRunnable = new Runnable() {
             public void run() {
                 DashMediaSource.this.startLoadingManifest();
@@ -462,20 +496,17 @@ public final class DashMediaSource implements MediaSource {
     public void replaceManifestUri(Uri manifestUri) {
         synchronized (this.manifestUriLock) {
             this.manifestUri = manifestUri;
+            this.initialManifestUri = manifestUri;
         }
     }
 
-    public void prepareSource(ExoPlayer player, boolean isTopLevelSource, Listener listener) {
-        Assertions.checkState(this.sourceListener == null, MediaSource.MEDIA_SOURCE_REUSED_ERROR_MESSAGE);
-        this.sourceListener = listener;
+    public void prepareSourceInternal(ExoPlayer player, boolean isTopLevelSource) {
         if (this.sideloadedManifest) {
-            this.manifestLoadErrorThrower = new Dummy();
             processManifest(false);
             return;
         }
         this.dataSource = this.manifestDataSourceFactory.createDataSource();
         this.loader = new Loader("Loader:DashMediaSource");
-        this.manifestLoadErrorThrower = new ManifestLoadErrorThrower();
         this.handler = new Handler();
         startLoadingManifest();
     }
@@ -486,7 +517,7 @@ public final class DashMediaSource implements MediaSource {
 
     public MediaPeriod createPeriod(MediaPeriodId periodId, Allocator allocator) {
         int periodIndex = periodId.periodIndex;
-        DashMediaPeriod mediaPeriod = new DashMediaPeriod(this.firstPeriodId + periodIndex, this.manifest, periodIndex, this.chunkSourceFactory, this.minLoadableRetryCount, this.eventDispatcher.copyWithMediaTimeOffsetMs(this.manifest.getPeriod(periodIndex).startMs), this.elapsedRealtimeOffsetMs, this.manifestLoadErrorThrower, allocator, this.compositeSequenceableLoaderFactory, this.playerEmsgCallback);
+        DashMediaPeriod mediaPeriod = new DashMediaPeriod(this.firstPeriodId + periodIndex, this.manifest, periodIndex, this.chunkSourceFactory, this.minLoadableRetryCount, createEventDispatcher(periodId, this.manifest.getPeriod(periodIndex).startMs), this.elapsedRealtimeOffsetMs, this.manifestLoadErrorThrower, allocator, this.compositeSequenceableLoaderFactory, this.playerEmsgCallback);
         this.periodsById.put(mediaPeriod.id, mediaPeriod);
         return mediaPeriod;
     }
@@ -497,22 +528,27 @@ public final class DashMediaSource implements MediaSource {
         this.periodsById.remove(dashMediaPeriod.id);
     }
 
-    public void releaseSource() {
+    public void releaseSourceInternal() {
         this.manifestLoadPending = false;
         this.dataSource = null;
-        this.manifestLoadErrorThrower = null;
         if (this.loader != null) {
             this.loader.release();
             this.loader = null;
         }
         this.manifestLoadStartTimestampMs = 0;
         this.manifestLoadEndTimestampMs = 0;
-        this.manifest = null;
+        this.manifest = this.sideloadedManifest ? this.manifest : null;
+        this.manifestUri = this.initialManifestUri;
+        this.manifestFatalError = null;
         if (this.handler != null) {
             this.handler.removeCallbacksAndMessages(null);
             this.handler = null;
         }
         this.elapsedRealtimeOffsetMs = 0;
+        this.staleManifestReloadAttempt = 0;
+        this.expiredManifestPublishTimeUs = C.TIME_UNSET;
+        this.dynamicMediaPresentationEnded = false;
+        this.firstPeriodId = 0;
         this.periodsById.clear();
     }
 
@@ -532,7 +568,7 @@ public final class DashMediaSource implements MediaSource {
     }
 
     void onManifestLoadCompleted(ParsingLoadable<DashManifest> loadable, long elapsedRealtimeMs, long loadDurationMs) {
-        this.eventDispatcher.loadCompleted(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
+        this.manifestEventDispatcher.loadCompleted(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
         DashManifest newManifest = (DashManifest) loadable.getResult();
         int periodCount = this.manifest == null ? 0 : this.manifest.getPeriodCount();
         int removedPeriodCount = 0;
@@ -545,7 +581,7 @@ public final class DashMediaSource implements MediaSource {
             if (periodCount - removedPeriodCount > newManifest.getPeriodCount()) {
                 Log.w(TAG, "Loaded out of sync manifest");
                 isManifestStale = true;
-            } else if (this.dynamicMediaPresentationEnded || newManifest.publishTimeMs <= this.expiredManifestPublishTimeUs) {
+            } else if (this.dynamicMediaPresentationEnded || (this.expiredManifestPublishTimeUs != C.TIME_UNSET && newManifest.publishTimeMs * 1000 <= this.expiredManifestPublishTimeUs)) {
                 Log.w(TAG, "Loaded stale dynamic manifest: " + newManifest.publishTimeMs + ", " + this.dynamicMediaPresentationEnded + ", " + this.expiredManifestPublishTimeUs);
                 isManifestStale = true;
             }
@@ -585,23 +621,23 @@ public final class DashMediaSource implements MediaSource {
 
     int onManifestLoadError(ParsingLoadable<DashManifest> loadable, long elapsedRealtimeMs, long loadDurationMs, IOException error) {
         boolean isFatal = error instanceof ParserException;
-        this.eventDispatcher.loadError(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded(), error, isFatal);
+        this.manifestEventDispatcher.loadError(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded(), error, isFatal);
         return isFatal ? 3 : 0;
     }
 
     void onUtcTimestampLoadCompleted(ParsingLoadable<Long> loadable, long elapsedRealtimeMs, long loadDurationMs) {
-        this.eventDispatcher.loadCompleted(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
+        this.manifestEventDispatcher.loadCompleted(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
         onUtcTimestampResolved(((Long) loadable.getResult()).longValue() - elapsedRealtimeMs);
     }
 
     int onUtcTimestampLoadError(ParsingLoadable<Long> loadable, long elapsedRealtimeMs, long loadDurationMs, IOException error) {
-        this.eventDispatcher.loadError(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded(), error, true);
+        this.manifestEventDispatcher.loadError(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded(), error, true);
         onUtcTimestampResolutionError(error);
         return 2;
     }
 
     void onLoadCanceled(ParsingLoadable<?> loadable, long elapsedRealtimeMs, long loadDurationMs) {
-        this.eventDispatcher.loadCanceled(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
+        this.manifestEventDispatcher.loadCanceled(loadable.dataSpec, loadable.type, elapsedRealtimeMs, loadDurationMs, loadable.bytesLoaded());
     }
 
     private void resolveUtcTimingElement(UtcTimingElement timingElement) {
@@ -685,7 +721,7 @@ public final class DashMediaSource implements MediaSource {
                 windowDefaultStartPositionUs = Math.min(MIN_LIVE_DEFAULT_START_POSITION_US, windowDurationUs / 2);
             }
         }
-        this.sourceListener.onSourceInfoRefreshed(this, new DashTimeline(this.manifest.availabilityStartTimeMs, (this.manifest.availabilityStartTimeMs + this.manifest.getPeriod(0).startMs) + C.usToMs(currentStartTimeUs), this.firstPeriodId, currentStartTimeUs, windowDurationUs, windowDefaultStartPositionUs, this.manifest), this.manifest);
+        refreshSourceInfo(new DashTimeline(this.manifest.availabilityStartTimeMs, (this.manifest.availabilityStartTimeMs + this.manifest.getPeriod(0).startMs) + C.usToMs(currentStartTimeUs), this.firstPeriodId, currentStartTimeUs, windowDurationUs, windowDefaultStartPositionUs, this.manifest, this.tag), this.manifest);
         if (!this.sideloadedManifest) {
             this.handler.removeCallbacks(this.simulateManifestRefreshRunnable);
             if (windowChangingImplicitly) {
@@ -693,7 +729,7 @@ public final class DashMediaSource implements MediaSource {
             }
             if (this.manifestLoadPending) {
                 startLoadingManifest();
-            } else if (scheduleRefresh && this.manifest.dynamic) {
+            } else if (scheduleRefresh && this.manifest.dynamic && this.manifest.minUpdatePeriodMs != C.TIME_UNSET) {
                 long minUpdatePeriodMs = this.manifest.minUpdatePeriodMs;
                 if (minUpdatePeriodMs == 0) {
                     minUpdatePeriodMs = DefaultRenderersFactory.DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS;
@@ -726,7 +762,7 @@ public final class DashMediaSource implements MediaSource {
     }
 
     private <T> void startLoading(ParsingLoadable<T> loadable, Callback<ParsingLoadable<T>> callback, int minRetryCount) {
-        this.eventDispatcher.loadStarted(loadable.dataSpec, loadable.type, this.loader.startLoading(loadable, callback, minRetryCount));
+        this.manifestEventDispatcher.loadStarted(loadable.dataSpec, loadable.type, this.loader.startLoading(loadable, callback, minRetryCount));
     }
 
     private long getNowUnixTimeUs() {

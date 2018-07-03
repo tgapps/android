@@ -259,7 +259,7 @@ public class ActionBarMenuItem extends FrameLayout {
         view.setBackgroundDrawable(Theme.getSelectorDrawable(false));
     }
 
-    public TextView addSubItem(int id, String text) {
+    public TextView addSubItem(int id, CharSequence text) {
         createPopupLayout();
         TextView textView = new TextView(getContext());
         textView.setTextColor(Theme.getColor(Theme.key_actionBarDefaultSubmenuItem));

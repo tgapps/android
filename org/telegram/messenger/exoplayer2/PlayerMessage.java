@@ -6,6 +6,7 @@ import org.telegram.messenger.exoplayer2.util.Assertions;
 public final class PlayerMessage {
     private boolean deleteAfterDelivery = true;
     private Handler handler;
+    private boolean isCanceled;
     private boolean isDelivered;
     private boolean isProcessed;
     private boolean isSent;
@@ -124,6 +125,17 @@ public final class PlayerMessage {
         this.isSent = true;
         this.sender.sendMessage(this);
         return this;
+    }
+
+    public synchronized PlayerMessage cancel() {
+        Assertions.checkState(this.isSent);
+        this.isCanceled = true;
+        markAsProcessed(false);
+        return this;
+    }
+
+    public synchronized boolean isCanceled() {
+        return this.isCanceled;
     }
 
     public synchronized boolean blockUntilDelivered() throws InterruptedException {

@@ -43,6 +43,7 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,6 +68,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
+import org.telegram.messenger.exoplayer2.DefaultLoadControl;
 import org.telegram.messenger.support.widget.LinearLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
 import org.telegram.messenger.support.widget.RecyclerView.LayoutParams;
@@ -111,6 +113,7 @@ import org.telegram.tgnet.TLRPC.TL_encryptedChat;
 import org.telegram.tgnet.TLRPC.TL_error;
 import org.telegram.tgnet.TLRPC.TL_messageEncryptedAction;
 import org.telegram.tgnet.TLRPC.TL_peerNotifySettings;
+import org.telegram.tgnet.TLRPC.TL_secureFile;
 import org.telegram.tgnet.TLRPC.TL_userEmpty;
 import org.telegram.tgnet.TLRPC.TL_userFull;
 import org.telegram.tgnet.TLRPC.User;
@@ -138,11 +141,11 @@ import org.telegram.ui.Cells.UserCell;
 import org.telegram.ui.ChannelRightsEditActivity.ChannelRightsEditActivityDelegate;
 import org.telegram.ui.Components.AlertsCreator;
 import org.telegram.ui.Components.AvatarDrawable;
-import org.telegram.ui.Components.AvatarUpdater;
-import org.telegram.ui.Components.AvatarUpdater.AvatarUpdaterDelegate;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.CombinedDrawable;
 import org.telegram.ui.Components.IdenticonDrawable;
+import org.telegram.ui.Components.ImageUpdater;
+import org.telegram.ui.Components.ImageUpdater.ImageUpdaterDelegate;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.RecyclerListView.Holder;
@@ -178,7 +181,6 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
     private float animationProgress;
     private AvatarDrawable avatarDrawable;
     private BackupImageView avatarImage;
-    private AvatarUpdater avatarUpdater;
     private int banFromGroup;
     private BotInfo botInfo;
     private ActionBarMenuItem callItem;
@@ -198,6 +200,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
     private int emptyRowChat2;
     private int extraHeight;
     private int groupsInCommonRow;
+    private ImageUpdater imageUpdater;
     private ChatFull info;
     private int initialAnimationExtraHeight;
     private boolean isBot;
@@ -762,15 +765,15 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
             NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.chatInfoDidLoaded);
             this.sortedUsers = new ArrayList();
             updateOnlineCount();
-            this.avatarUpdater = new AvatarUpdater();
-            this.avatarUpdater.delegate = new AvatarUpdaterDelegate() {
-                public void didUploadedPhoto(InputFile file, PhotoSize small, PhotoSize big) {
+            this.imageUpdater = new ImageUpdater();
+            this.imageUpdater.delegate = new ImageUpdaterDelegate() {
+                public void didUploadedPhoto(InputFile file, PhotoSize small, PhotoSize big, TL_secureFile secureFile) {
                     if (ProfileActivity.this.chat_id != 0) {
                         MessagesController.getInstance(ProfileActivity.this.currentAccount).changeChatAvatar(ProfileActivity.this.chat_id, file);
                     }
                 }
             };
-            this.avatarUpdater.parentFragment = this;
+            this.imageUpdater.parentFragment = this;
             if (ChatObject.isChannel(this.currentChat)) {
                 MessagesController.getInstance(this.currentAccount).loadFullChat(this.chat_id, this.classGuid, true);
             }
@@ -810,7 +813,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
             }
         } else if (this.chat_id != 0) {
             NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.chatInfoDidLoaded);
-            this.avatarUpdater.clear();
+            this.imageUpdater.clear();
         }
     }
 
@@ -1561,9 +1564,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
                                 builder.setItems(items, new OnClickListener() {
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         if (i == 0) {
-                                            ProfileActivity.this.avatarUpdater.openCamera();
+                                            ProfileActivity.this.imageUpdater.openCamera();
                                         } else if (i == 1) {
-                                            ProfileActivity.this.avatarUpdater.openGallery();
+                                            ProfileActivity.this.imageUpdater.openGallery();
                                         } else if (i == 2) {
                                             MessagesController.getInstance(ProfileActivity.this.currentAccount).changeChatAvatar(ProfileActivity.this.chat_id, null);
                                         }
@@ -1622,6 +1625,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
                     if (i == 0) {
                         try {
                             ((ClipboardManager) ApplicationLoader.applicationContext.getSystemService("clipboard")).setPrimaryClip(ClipData.newPlainText("label", "@" + username));
+                            Toast.makeText(ProfileActivity.this.getParentActivity(), LocaleController.getString("TextCopied", R.string.TextCopied), 0).show();
                         } catch (Throwable e) {
                             FileLog.e(e);
                         }
@@ -1661,6 +1665,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
                     } else if (i == 1) {
                         try {
                             ((ClipboardManager) ApplicationLoader.applicationContext.getSystemService("clipboard")).setPrimaryClip(ClipData.newPlainText("label", "+" + user.phone));
+                            Toast.makeText(ProfileActivity.this.getParentActivity(), LocaleController.getString("PhoneCopied", R.string.PhoneCopied), 0).show();
                         } catch (Throwable e2) {
                             FileLog.e(e2);
                         }
@@ -1687,6 +1692,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
                         }
                         if (!TextUtils.isEmpty(about)) {
                             AndroidUtilities.addToClipboard(about);
+                            Toast.makeText(ProfileActivity.this.getParentActivity(), LocaleController.getString("TextCopied", R.string.TextCopied), 0).show();
                         }
                     } catch (Throwable e) {
                         FileLog.e(e);
@@ -1716,23 +1722,23 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
     }
 
     public void saveSelfArgs(Bundle args) {
-        if (this.chat_id != 0 && this.avatarUpdater != null && this.avatarUpdater.currentPicturePath != null) {
-            args.putString("path", this.avatarUpdater.currentPicturePath);
+        if (this.chat_id != 0 && this.imageUpdater != null && this.imageUpdater.currentPicturePath != null) {
+            args.putString("path", this.imageUpdater.currentPicturePath);
         }
     }
 
     public void restoreSelfArgs(Bundle args) {
         if (this.chat_id != 0) {
             MessagesController.getInstance(this.currentAccount).loadChatInfo(this.chat_id, null, false);
-            if (this.avatarUpdater != null) {
-                this.avatarUpdater.currentPicturePath = args.getString("path");
+            if (this.imageUpdater != null) {
+                this.imageUpdater.currentPicturePath = args.getString("path");
             }
         }
     }
 
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
         if (this.chat_id != 0) {
-            this.avatarUpdater.onActivityResult(requestCode, resultCode, data);
+            this.imageUpdater.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -2403,10 +2409,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
                         int status1 = 0;
                         int status2 = 0;
                         if (!(user1 == null || user1.status == null)) {
-                            status1 = user1.id == UserConfig.getInstance(ProfileActivity.this.currentAccount).getClientUserId() ? ConnectionsManager.getInstance(ProfileActivity.this.currentAccount).getCurrentTime() + 50000 : user1.status.expires;
+                            status1 = user1.id == UserConfig.getInstance(ProfileActivity.this.currentAccount).getClientUserId() ? ConnectionsManager.getInstance(ProfileActivity.this.currentAccount).getCurrentTime() + DefaultLoadControl.DEFAULT_MAX_BUFFER_MS : user1.status.expires;
                         }
                         if (!(user2 == null || user2.status == null)) {
-                            status2 = user2.id == UserConfig.getInstance(ProfileActivity.this.currentAccount).getClientUserId() ? ConnectionsManager.getInstance(ProfileActivity.this.currentAccount).getCurrentTime() + 50000 : user2.status.expires;
+                            status2 = user2.id == UserConfig.getInstance(ProfileActivity.this.currentAccount).getClientUserId() ? ConnectionsManager.getInstance(ProfileActivity.this.currentAccount).getCurrentTime() + DefaultLoadControl.DEFAULT_MAX_BUFFER_MS : user2.status.expires;
                         }
                         if (status1 <= 0 || status2 <= 0) {
                             if (status1 >= 0 || status2 >= 0) {
@@ -2862,7 +2868,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
                             item.addSubItem(10, LocaleController.getString("BotShare", R.string.BotShare));
                         }
                         if (user.phone != null && user.phone.length() != 0) {
-                            String string;
+                            CharSequence string;
                             item.addSubItem(1, LocaleController.getString("AddContact", R.string.AddContact));
                             item.addSubItem(3, LocaleController.getString("ShareContact", R.string.ShareContact));
                             if (this.userBlocked) {
@@ -2992,7 +2998,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
     }
 
     public ThemeDescription[] getThemeDescriptions() {
-        ThemeDescriptionDelegate сellDelegate = new ThemeDescriptionDelegate() {
+        ThemeDescriptionDelegate cellDelegate = new ThemeDescriptionDelegate() {
             public void didSetColor() {
                 if (ProfileActivity.this.listView != null) {
                     int count = ProfileActivity.this.listView.getChildCount();
@@ -3030,16 +3036,16 @@ public class ProfileActivity extends BaseFragment implements NotificationCenterD
         r10[67] = new ThemeDescription(this.listView, ThemeDescription.FLAG_CHECKTAG, new Class[]{UserCell.class}, new String[]{"adminImage"}, null, null, null, Theme.key_profile_creatorIcon);
         r10[68] = new ThemeDescription(this.listView, ThemeDescription.FLAG_CHECKTAG, new Class[]{UserCell.class}, new String[]{"adminImage"}, null, null, null, Theme.key_profile_adminIcon);
         r10[69] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"nameTextView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText);
-        r10[70] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"statusColor"}, null, null, сellDelegate, Theme.key_windowBackgroundWhiteGrayText);
-        r10[71] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"statusOnlineColor"}, null, null, сellDelegate, Theme.key_windowBackgroundWhiteBlueText);
+        r10[70] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"statusColor"}, null, null, cellDelegate, Theme.key_windowBackgroundWhiteGrayText);
+        r10[71] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"statusOnlineColor"}, null, null, cellDelegate, Theme.key_windowBackgroundWhiteBlueText);
         r10[72] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, null, new Drawable[]{Theme.avatar_photoDrawable, Theme.avatar_broadcastDrawable, Theme.avatar_savedDrawable}, null, Theme.key_avatar_text);
-        r10[73] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundRed);
-        r10[74] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundOrange);
-        r10[75] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundViolet);
-        r10[76] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundGreen);
-        r10[77] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundCyan);
-        r10[78] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundBlue);
-        r10[79] = new ThemeDescription(null, 0, null, null, null, сellDelegate, Theme.key_avatar_backgroundPink);
+        r10[73] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundRed);
+        r10[74] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundOrange);
+        r10[75] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundViolet);
+        r10[76] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundGreen);
+        r10[77] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundCyan);
+        r10[78] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundBlue);
+        r10[79] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundPink);
         r10[80] = new ThemeDescription(this.listView, 0, new Class[]{LoadingCell.class}, new String[]{"progressBar"}, null, null, null, Theme.key_progressCircle);
         r10[81] = new ThemeDescription(this.listView, 0, new Class[]{AboutLinkCell.class}, new String[]{"imageView"}, null, null, null, Theme.key_windowBackgroundWhiteGrayIcon);
         r10[82] = new ThemeDescription(this.listView, ThemeDescription.FLAG_TEXTCOLOR, new Class[]{AboutLinkCell.class}, Theme.profile_aboutTextPaint, null, null, Theme.key_windowBackgroundWhiteBlackText);

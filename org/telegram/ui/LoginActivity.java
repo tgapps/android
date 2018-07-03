@@ -28,6 +28,7 @@ import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.text.style.ClickableSpan;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -61,6 +62,7 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
@@ -73,6 +75,7 @@ import org.telegram.messenger.exoplayer2.DefaultLoadControl;
 import org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
+import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.TL_account_deleteAccount;
 import org.telegram.tgnet.TLRPC.TL_account_getPassword;
@@ -96,7 +99,7 @@ import org.telegram.tgnet.TLRPC.TL_auth_sentCodeTypeSms;
 import org.telegram.tgnet.TLRPC.TL_auth_signIn;
 import org.telegram.tgnet.TLRPC.TL_auth_signUp;
 import org.telegram.tgnet.TLRPC.TL_error;
-import org.telegram.tgnet.TLRPC.TL_help_getTermsOfService;
+import org.telegram.tgnet.TLRPC.TL_help_termsOfService;
 import org.telegram.tgnet.TLRPC.User;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBar.ActionBarMenuOnItemClick;
@@ -111,7 +114,6 @@ import org.telegram.ui.Components.EditTextBoldCursor;
 import org.telegram.ui.Components.HintEditText;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.SlideView;
-import org.telegram.ui.Components.URLSpanNoUnderline;
 import org.telegram.ui.CountrySelectActivity.CountrySelectActivityDelegate;
 
 @SuppressLint({"HardwareIds"})
@@ -119,6 +121,7 @@ public class LoginActivity extends BaseFragment {
     private static final int done_button = 1;
     private boolean checkPermissions;
     private boolean checkShowPermissions;
+    private TL_help_termsOfService currentTermsOfService;
     private int currentViewNum;
     private View doneButton;
     private boolean newAccount;
@@ -260,7 +263,7 @@ public class LoginActivity extends BaseFragment {
                     LoginActivityPasswordView.this.resetAccountText.setVisibility(0);
                     LoginActivityPasswordView.this.resetAccountButton.setVisibility(0);
                     AndroidUtilities.hideKeyboard(LoginActivityPasswordView.this.codeField);
-                    LoginActivity.this.needShowAlert(LocaleController.getString("RestorePasswordNoEmailTitle", R.string.RestorePasswordNoEmailTitle), LocaleController.getString("RestorePasswordNoEmailText", R.string.RestorePasswordNoEmailText));
+                    LoginActivity.this.needShowAlert(LocaleController.getString("RestorePasswordNoEitle", R.string.RestorePasswordNoEmailTitle), LocaleController.getString("RestorePasswordNoEmailText", R.string.RestorePasswordNoEmailText));
                 }
             });
             this.resetAccountButton = new TextView(context);
@@ -682,9 +685,61 @@ public class LoginActivity extends BaseFragment {
         private boolean nextPressed = false;
         private String phoneCode;
         private String phoneHash;
+        private TextView privacyView;
         private String requestPhone;
         private TextView textView;
         private TextView wrongNumber;
+
+        public class LinkSpan extends ClickableSpan {
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+            }
+
+            public void onClick(View widget) {
+                LoginActivityRegisterView.this.showTermsOfService(false);
+            }
+        }
+
+        private void showTermsOfService(boolean needAccept) {
+            if (LoginActivity.this.currentTermsOfService != null) {
+                Builder builder = new Builder(LoginActivity.this.getParentActivity());
+                builder.setTitle(LocaleController.getString("TermsOfService", R.string.TermsOfService));
+                if (needAccept) {
+                    builder.setPositiveButton(LocaleController.getString("Accept", R.string.Accept), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            LoginActivity.this.currentTermsOfService.popup = false;
+                            LoginActivityRegisterView.this.onNextPressed();
+                        }
+                    });
+                    builder.setNegativeButton(LocaleController.getString("Decline", R.string.Decline), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Builder builder = new Builder(LoginActivity.this.getParentActivity());
+                            builder.setTitle(LocaleController.getString("TermsOfService", R.string.TermsOfService));
+                            builder.setMessage(LocaleController.getString("TosDecline", R.string.TosDecline));
+                            builder.setPositiveButton(LocaleController.getString("SignUp", R.string.SignUp), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    LoginActivity.this.currentTermsOfService.popup = false;
+                                    LoginActivityRegisterView.this.onNextPressed();
+                                }
+                            });
+                            builder.setNegativeButton(LocaleController.getString("Decline", R.string.Decline), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    LoginActivityRegisterView.this.wrongNumber.callOnClick();
+                                }
+                            });
+                            LoginActivity.this.showDialog(builder.create());
+                        }
+                    });
+                } else {
+                    builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
+                }
+                SpannableStringBuilder text = new SpannableStringBuilder(LoginActivity.this.currentTermsOfService.text);
+                MessageObject.addEntitiesToText(text, LoginActivity.this.currentTermsOfService.entities, false, 0, false, false, false);
+                builder.setMessage(text);
+                LoginActivity.this.showDialog(builder.create());
+            }
+        }
 
         public LoginActivityRegisterView(Context context) {
             super(context);
@@ -739,9 +794,6 @@ public class LoginActivity extends BaseFragment {
                     return true;
                 }
             });
-            LinearLayout linearLayout = new LinearLayout(context);
-            linearLayout.setGravity(80);
-            addView(linearLayout, LayoutHelper.createLinear(-1, -1));
             this.wrongNumber = new TextView(context);
             this.wrongNumber.setText(LocaleController.getString("CancelRegistration", R.string.CancelRegistration));
             this.wrongNumber.setGravity((LocaleController.isRTL ? 5 : 3) | 1);
@@ -749,7 +801,8 @@ public class LoginActivity extends BaseFragment {
             this.wrongNumber.setTextSize(1, 14.0f);
             this.wrongNumber.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
             this.wrongNumber.setPadding(0, AndroidUtilities.dp(24.0f), 0, 0);
-            linearLayout.addView(this.wrongNumber, LayoutHelper.createLinear(-2, -2, (LocaleController.isRTL ? 5 : 3) | 80, 0, 0, 0, 10));
+            this.wrongNumber.setVisibility(8);
+            addView(this.wrongNumber, LayoutHelper.createLinear(-2, -2, (LocaleController.isRTL ? 5 : 3) | 48, 0, 20, 0, 0));
             this.wrongNumber.setOnClickListener(new OnClickListener(LoginActivity.this) {
                 public void onClick(View view) {
                     Builder builder = new Builder(LoginActivity.this.getParentActivity());
@@ -765,6 +818,24 @@ public class LoginActivity extends BaseFragment {
                     LoginActivity.this.showDialog(builder.create());
                 }
             });
+            this.privacyView = new TextView(context);
+            this.privacyView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+            this.privacyView.setMovementMethod(new LinkMovementMethodMy());
+            this.privacyView.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
+            this.privacyView.setTextSize(1, 14.0f);
+            this.privacyView.setGravity(81);
+            this.privacyView.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
+            addView(this.privacyView, LayoutHelper.createLinear(-2, -1, 81, 0, 28, 0, 16));
+            String str = LocaleController.getString("TermsOfServiceLogin", R.string.TermsOfServiceLogin);
+            SpannableStringBuilder text = new SpannableStringBuilder(str);
+            int index1 = str.indexOf(42);
+            int index2 = str.lastIndexOf(42);
+            if (!(index1 == -1 || index2 == -1 || index1 == index2)) {
+                text.replace(index2, index2 + 1, TtmlNode.ANONYMOUS_REGION_ID);
+                text.replace(index1, index1 + 1, TtmlNode.ANONYMOUS_REGION_ID);
+                text.setSpan(new LinkSpan(), index1, index2 - 1, 33);
+            }
+            this.privacyView.setText(text);
         }
 
         public void onBackPressed() {
@@ -804,39 +875,43 @@ public class LoginActivity extends BaseFragment {
 
         public void onNextPressed() {
             if (!this.nextPressed) {
-                this.nextPressed = true;
-                TL_auth_signUp req = new TL_auth_signUp();
-                req.phone_code = this.phoneCode;
-                req.phone_code_hash = this.phoneHash;
-                req.phone_number = this.requestPhone;
-                req.first_name = this.firstNameField.getText().toString();
-                req.last_name = this.lastNameField.getText().toString();
-                LoginActivity.this.needShowProgress(0);
-                ConnectionsManager.getInstance(LoginActivity.this.currentAccount).sendRequest(req, new RequestDelegate() {
-                    public void run(final TLObject response, final TL_error error) {
-                        AndroidUtilities.runOnUIThread(new Runnable() {
-                            public void run() {
-                                LoginActivityRegisterView.this.nextPressed = false;
-                                LoginActivity.this.needHideProgress();
-                                if (error == null) {
-                                    LoginActivity.this.onAuthSuccess((TL_auth_authorization) response);
-                                } else if (error.text.contains("PHONE_NUMBER_INVALID")) {
-                                    LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
-                                } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
-                                    LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidCode", R.string.InvalidCode));
-                                } else if (error.text.contains("PHONE_CODE_EXPIRED")) {
-                                    LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("CodeExpired", R.string.CodeExpired));
-                                } else if (error.text.contains("FIRSTNAME_INVALID")) {
-                                    LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidFirstName", R.string.InvalidFirstName));
-                                } else if (error.text.contains("LASTNAME_INVALID")) {
-                                    LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidLastName", R.string.InvalidLastName));
-                                } else {
-                                    LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), error.text);
+                if (LoginActivity.this.currentTermsOfService == null || !LoginActivity.this.currentTermsOfService.popup) {
+                    this.nextPressed = true;
+                    TL_auth_signUp req = new TL_auth_signUp();
+                    req.phone_code = this.phoneCode;
+                    req.phone_code_hash = this.phoneHash;
+                    req.phone_number = this.requestPhone;
+                    req.first_name = this.firstNameField.getText().toString();
+                    req.last_name = this.lastNameField.getText().toString();
+                    LoginActivity.this.needShowProgress(0);
+                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).sendRequest(req, new RequestDelegate() {
+                        public void run(final TLObject response, final TL_error error) {
+                            AndroidUtilities.runOnUIThread(new Runnable() {
+                                public void run() {
+                                    LoginActivityRegisterView.this.nextPressed = false;
+                                    LoginActivity.this.needHideProgress();
+                                    if (error == null) {
+                                        LoginActivity.this.onAuthSuccess((TL_auth_authorization) response);
+                                    } else if (error.text.contains("PHONE_NUMBER_INVALID")) {
+                                        LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
+                                    } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
+                                        LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidCode", R.string.InvalidCode));
+                                    } else if (error.text.contains("PHONE_CODE_EXPIRED")) {
+                                        LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("CodeExpired", R.string.CodeExpired));
+                                    } else if (error.text.contains("FIRSTNAME_INVALID")) {
+                                        LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidFirstName", R.string.InvalidFirstName));
+                                    } else if (error.text.contains("LASTNAME_INVALID")) {
+                                        LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidLastName", R.string.InvalidLastName));
+                                    } else {
+                                        LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), error.text);
+                                    }
                                 }
-                            }
-                        });
-                    }
-                }, 10);
+                            });
+                        }
+                    }, 10);
+                    return;
+                }
+                showTermsOfService(true);
             }
         }
 
@@ -849,6 +924,12 @@ public class LoginActivity extends BaseFragment {
             if (last.length() != 0) {
                 bundle.putString("registerview_last", last);
             }
+            if (LoginActivity.this.currentTermsOfService != null) {
+                SerializedData data = new SerializedData(LoginActivity.this.currentTermsOfService.getObjectSize());
+                LoginActivity.this.currentTermsOfService.serializeToStream(data);
+                bundle.putString("terms", Base64.encodeToString(data.toByteArray(), 0));
+                data.cleanup();
+            }
             if (this.currentParams != null) {
                 bundle.putBundle("registerview_params", this.currentParams);
             }
@@ -858,6 +939,19 @@ public class LoginActivity extends BaseFragment {
             this.currentParams = bundle.getBundle("registerview_params");
             if (this.currentParams != null) {
                 setParams(this.currentParams, true);
+            }
+            try {
+                String terms = bundle.getString("terms");
+                if (terms != null) {
+                    byte[] arr = Base64.decode(terms, 0);
+                    if (arr != null) {
+                        SerializedData data = new SerializedData(arr);
+                        LoginActivity.this.currentTermsOfService = TL_help_termsOfService.TLdeserialize(data, data.readInt32(false), false);
+                        data.cleanup();
+                    }
+                }
+            } catch (Throwable e) {
+                FileLog.e(e);
             }
             String first = bundle.getString("registerview_first");
             if (first != null) {
@@ -1262,7 +1356,7 @@ public class LoginActivity extends BaseFragment {
                                     LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("CodeExpired", R.string.CodeExpired));
                                 } else if (error.text.startsWith("FLOOD_WAIT")) {
                                     LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("FloodWait", R.string.FloodWait));
-                                } else if (error.code != C.PRIORITY_DOWNLOAD) {
+                                } else if (error.code != -1000) {
                                     LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("ErrorOccurred", R.string.ErrorOccurred) + "\n" + error.text);
                                 }
                             }
@@ -1723,37 +1817,15 @@ public class LoginActivity extends BaseFragment {
         private HashMap<String, String> countriesMap = new HashMap();
         private TextView countryButton;
         private int countryState = 0;
-        private String currentCountryIso = TtmlNode.ANONYMOUS_REGION_ID;
-        private String currentTermsOfService;
-        private int currentTermsReqId;
         private boolean ignoreOnPhoneChange = false;
         private boolean ignoreOnTextChange = false;
         private boolean ignoreSelection = false;
-        private HashMap<String, String> isoMap = new HashMap();
-        private String lastLoadedTerms;
         private boolean nextPressed = false;
         private HintEditText phoneField;
         private HashMap<String, String> phoneFormatMap = new HashMap();
-        private TextView privacyView;
-        private boolean showTermsAfterLoading;
         private TextView textView;
         private TextView textView2;
         private View view;
-
-        public class LinkSpan extends ClickableSpan {
-            public void updateDrawState(TextPaint ds) {
-                super.updateDrawState(ds);
-                ds.setUnderlineText(false);
-            }
-
-            public void onClick(View widget) {
-                if (PhoneView.this.currentTermsOfService == null) {
-                    PhoneView.this.showTermsAfterLoading = true;
-                } else {
-                    PhoneView.this.showTermsOfService();
-                }
-            }
-        }
 
         public PhoneView(Context context) {
             super(context);
@@ -1846,30 +1918,26 @@ public class LoginActivity extends BaseFragment {
                                 }
                                 if (!ok) {
                                     textToSet = text.substring(1, text.length()) + PhoneView.this.phoneField.getText().toString();
-                                    EditTextBoldCursor access$1300 = PhoneView.this.codeField;
+                                    EditTextBoldCursor access$1000 = PhoneView.this.codeField;
                                     text = text.substring(0, 1);
-                                    access$1300.setText(text);
+                                    access$1000.setText(text);
                                 }
                             }
                             String country = (String) PhoneView.this.codesMap.get(text);
                             if (country != null) {
                                 int index = PhoneView.this.countriesArray.indexOf(country);
                                 if (index != -1) {
-                                    PhoneView.this.currentCountryIso = (String) PhoneView.this.isoMap.get(text);
                                     PhoneView.this.ignoreSelection = true;
                                     PhoneView.this.countryButton.setText((CharSequence) PhoneView.this.countriesArray.get(index));
                                     String hint = (String) PhoneView.this.phoneFormatMap.get(text);
                                     PhoneView.this.phoneField.setHintText(hint != null ? hint.replace('X', '–') : null);
                                     PhoneView.this.countryState = 0;
-                                    PhoneView.this.loadTermsOfService();
                                 } else {
-                                    PhoneView.this.currentCountryIso = TtmlNode.ANONYMOUS_REGION_ID;
                                     PhoneView.this.countryButton.setText(LocaleController.getString("WrongCountry", R.string.WrongCountry));
                                     PhoneView.this.phoneField.setHintText(null);
                                     PhoneView.this.countryState = 2;
                                 }
                             } else {
-                                PhoneView.this.currentCountryIso = TtmlNode.ANONYMOUS_REGION_ID;
                                 PhoneView.this.countryButton.setText(LocaleController.getString("WrongCountry", R.string.WrongCountry));
                                 PhoneView.this.phoneField.setHintText(null);
                                 PhoneView.this.countryState = 2;
@@ -1974,11 +2042,11 @@ public class LoginActivity extends BaseFragment {
                         }
                         s.replace(0, s.length(), builder);
                         if (start >= 0) {
-                            HintEditText access$1100 = PhoneView.this.phoneField;
+                            HintEditText access$800 = PhoneView.this.phoneField;
                             if (start > PhoneView.this.phoneField.length()) {
                                 start = PhoneView.this.phoneField.length();
                             }
-                            access$1100.setSelection(start);
+                            access$800.setSelection(start);
                         }
                         PhoneView.this.phoneField.onTextChange();
                         PhoneView.this.ignoreOnPhoneChange = false;
@@ -2033,24 +2101,6 @@ public class LoginActivity extends BaseFragment {
                     }
                 });
             }
-            this.privacyView = new TextView(context);
-            this.privacyView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
-            this.privacyView.setMovementMethod(new LinkMovementMethodMy());
-            this.privacyView.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
-            this.privacyView.setTextSize(1, 14.0f);
-            this.privacyView.setGravity(81);
-            this.privacyView.setLineSpacing((float) AndroidUtilities.dp(2.0f), 1.0f);
-            addView(this.privacyView, LayoutHelper.createLinear(-2, -1, 81, 0, 28, 0, 10));
-            String str = LocaleController.getString("TermsOfServiceLogin", R.string.TermsOfServiceLogin);
-            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(str);
-            int index1 = str.indexOf(42);
-            int index2 = str.lastIndexOf(42);
-            if (!(index1 == -1 || index2 == -1 || index1 == index2)) {
-                spannableStringBuilder.replace(index2, index2 + 1, TtmlNode.ANONYMOUS_REGION_ID);
-                spannableStringBuilder.replace(index1, index1 + 1, TtmlNode.ANONYMOUS_REGION_ID);
-                spannableStringBuilder.setSpan(new LinkSpan(), index1, index2 - 1, 33);
-            }
-            this.privacyView.setText(spannableStringBuilder);
             HashMap<String, String> languageMap = new HashMap();
             try {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getResources().getAssets().open("countries.txt")));
@@ -2062,7 +2112,6 @@ public class LoginActivity extends BaseFragment {
                     String[] args = line.split(";");
                     this.countriesArray.add(0, args[2]);
                     this.countriesMap.put(args[2], args[0]);
-                    this.isoMap.put(args[0], args[1]);
                     this.codesMap.put(args[0], args[2]);
                     if (args.length > 3) {
                         this.phoneFormatMap.put(args[0], args[3]);
@@ -2091,12 +2140,10 @@ public class LoginActivity extends BaseFragment {
             if (country != null) {
                 String countryName = (String) languageMap.get(country);
                 if (!(countryName == null || this.countriesArray.indexOf(countryName) == -1)) {
-                    this.currentCountryIso = country;
                     this.codeField.setText((CharSequence) this.countriesMap.get(countryName));
                     this.countryState = 0;
                 }
             }
-            loadTermsOfService();
             if (this.codeField.length() == 0) {
                 this.countryButton.setText(LocaleController.getString("ChooseCountry", R.string.ChooseCountry));
                 this.phoneField.setHintText(null);
@@ -2118,60 +2165,8 @@ public class LoginActivity extends BaseFragment {
                 this.countryButton.setText(name);
                 String hint = (String) this.phoneFormatMap.get(code);
                 this.phoneField.setHintText(hint != null ? hint.replace('X', '–') : null);
-                this.currentCountryIso = iso;
-                loadTermsOfService();
                 this.countryState = 0;
                 this.ignoreOnTextChange = false;
-            }
-        }
-
-        public void loadTermsOfService() {
-            if (this.lastLoadedTerms == null || !this.lastLoadedTerms.equals(this.currentCountryIso)) {
-                if (this.currentTermsReqId != 0) {
-                    ConnectionsManager.getInstance(LoginActivity.this.currentAccount).cancelRequest(this.currentTermsReqId, true);
-                    this.currentTermsReqId = 0;
-                }
-                this.currentTermsOfService = null;
-                TL_help_getTermsOfService req = new TL_help_getTermsOfService();
-                String str = this.currentCountryIso;
-                this.lastLoadedTerms = str;
-                req.country_iso2 = str;
-                this.currentTermsReqId = ConnectionsManager.getInstance(LoginActivity.this.currentAccount).sendRequest(req, new RequestDelegate() {
-                    public void run(final TLObject response, TL_error error) {
-                        AndroidUtilities.runOnUIThread(new Runnable() {
-                            public void run() {
-                                if (PhoneView.this.currentTermsReqId != 0) {
-                                    PhoneView.this.currentTermsReqId = 0;
-                                    if (response != null) {
-                                        PhoneView.this.currentTermsOfService = response.text;
-                                        if (PhoneView.this.showTermsAfterLoading) {
-                                            PhoneView.this.showTermsOfService();
-                                            PhoneView.this.showTermsAfterLoading = false;
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }, 9);
-            }
-        }
-
-        private void showTermsOfService() {
-            if (this.currentTermsOfService != null) {
-                Builder builder = new Builder(LoginActivity.this.getParentActivity());
-                builder.setTitle(LocaleController.getString("TermsOfService", R.string.TermsOfService));
-                builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
-                SpannableStringBuilder text = new SpannableStringBuilder(this.currentTermsOfService);
-                int index1 = this.currentTermsOfService.indexOf(91);
-                int index2 = this.currentTermsOfService.lastIndexOf(93);
-                if (!(index1 == -1 || index2 == -1)) {
-                    text.replace(index2, index2 + 1, TtmlNode.ANONYMOUS_REGION_ID);
-                    text.replace(index1, index1 + 1, TtmlNode.ANONYMOUS_REGION_ID);
-                    text.setSpan(new URLSpanNoUnderline(LocaleController.getString("PrivacyPolicyUrl", R.string.PrivacyPolicyUrl)), index1, index2 - 1, 33);
-                }
-                builder.setMessage(text);
-                LoginActivity.this.showDialog(builder.create());
             }
         }
 
@@ -2255,26 +2250,28 @@ public class LoginActivity extends BaseFragment {
                     LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
                 } else {
                     String phone = PhoneFormat.stripExceptNumbers(TtmlNode.ANONYMOUS_REGION_ID + this.codeField.getText() + this.phoneField.getText());
-                    for (int a = 0; a < 3; a++) {
-                        UserConfig userConfig = UserConfig.getInstance(a);
-                        if (userConfig.isClientActivated()) {
-                            String userPhone = userConfig.getCurrentUser().phone;
-                            if (userPhone.contains(phone) || phone.contains(userPhone)) {
-                                final int num = a;
-                                builder = new Builder(LoginActivity.this.getParentActivity());
-                                builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
-                                builder.setMessage(LocaleController.getString("AccountAlreadyLoggedIn", R.string.AccountAlreadyLoggedIn));
-                                builder.setPositiveButton(LocaleController.getString("AccountSwitch", R.string.AccountSwitch), new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (UserConfig.selectedAccount != num) {
-                                            ((LaunchActivity) LoginActivity.this.getParentActivity()).switchToAccount(num, false);
+                    if (LoginActivity.this.getParentActivity() instanceof LaunchActivity) {
+                        for (int a = 0; a < 3; a++) {
+                            UserConfig userConfig = UserConfig.getInstance(a);
+                            if (userConfig.isClientActivated()) {
+                                String userPhone = userConfig.getCurrentUser().phone;
+                                if (userPhone.contains(phone) || phone.contains(userPhone)) {
+                                    final int num = a;
+                                    builder = new Builder(LoginActivity.this.getParentActivity());
+                                    builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+                                    builder.setMessage(LocaleController.getString("AccountAlreadyLoggedIn", R.string.AccountAlreadyLoggedIn));
+                                    builder.setPositiveButton(LocaleController.getString("AccountSwitch", R.string.AccountSwitch), new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (UserConfig.selectedAccount != num) {
+                                                ((LaunchActivity) LoginActivity.this.getParentActivity()).switchToAccount(num, false);
+                                            }
+                                            LoginActivity.this.finishFragment();
                                         }
-                                        LoginActivity.this.finishFragment();
-                                    }
-                                });
-                                builder.setNegativeButton(LocaleController.getString("OK", R.string.OK), null);
-                                LoginActivity.this.showDialog(builder.create());
-                                return;
+                                    });
+                                    builder.setNegativeButton(LocaleController.getString("OK", R.string.OK), null);
+                                    LoginActivity.this.showDialog(builder.create());
+                                    return;
+                                }
                             }
                         }
                     }
@@ -2337,7 +2334,7 @@ public class LoginActivity extends BaseFragment {
                                             LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("CodeExpired", R.string.CodeExpired));
                                         } else if (error.text.startsWith("FLOOD_WAIT")) {
                                             LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), LocaleController.getString("FloodWait", R.string.FloodWait));
-                                        } else if (error.code != C.PRIORITY_DOWNLOAD) {
+                                        } else if (error.code != -1000) {
                                             LoginActivity.this.needShowAlert(LocaleController.getString("AppName", R.string.AppName), error.text);
                                         }
                                     }
@@ -2914,13 +2911,17 @@ public class LoginActivity extends BaseFragment {
 
     private void needFinishActivity() {
         clearCurrentState();
-        if (!this.newAccount) {
+        if (getParentActivity() instanceof LaunchActivity) {
+            if (this.newAccount) {
+                this.newAccount = false;
+                ((LaunchActivity) getParentActivity()).switchToAccount(this.currentAccount, false);
+                finishFragment();
+                return;
+            }
             presentFragment(new DialogsActivity(null), true);
             NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged, new Object[0]);
-        } else if (getParentActivity() != null) {
-            this.newAccount = false;
-            ((LaunchActivity) getParentActivity()).switchToAccount(this.currentAccount, false);
-            finishFragment();
+        } else if (getParentActivity() instanceof ExternalActionActivity) {
+            ((ExternalActionActivity) getParentActivity()).onFinishLogin();
         }
     }
 
@@ -2944,6 +2945,9 @@ public class LoginActivity extends BaseFragment {
     }
 
     private void fillNextCodeParams(Bundle params, TL_auth_sentCode res) {
+        if (res.terms_of_service != null) {
+            this.currentTermsOfService = res.terms_of_service;
+        }
         params.putString("phoneHash", res.phone_code_hash);
         if (res.next_type instanceof TL_auth_codeTypeCall) {
             params.putInt("nextType", 4);

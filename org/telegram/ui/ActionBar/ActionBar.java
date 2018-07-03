@@ -50,6 +50,7 @@ public class ActionBar extends FrameLayout {
     protected int itemsActionModeColor;
     protected int itemsBackgroundColor;
     protected int itemsColor;
+    private Runnable lastRunnable;
     private CharSequence lastSubtitle;
     private CharSequence lastTitle;
     private boolean manualStart;
@@ -681,6 +682,11 @@ public class ActionBar extends FrameLayout {
         this.allowOverlayTitle = value;
     }
 
+    public void setTitleActionRunnable(Runnable action) {
+        this.titleActionRunnable = action;
+        this.lastRunnable = action;
+    }
+
     public void setTitleOverlayText(String title, String subtitle, Runnable action) {
         int i = 0;
         if (this.allowOverlayTitle && this.parentFragment.parentLayout != null) {
@@ -716,6 +722,9 @@ public class ActionBar extends FrameLayout {
                 }
                 simpleTextView2.setVisibility(i);
                 this.subtitleTextView.setText(textToSet);
+            }
+            if (action == null) {
+                action = this.lastRunnable;
             }
             this.titleActionRunnable = action;
         }

@@ -670,6 +670,12 @@ public class GroupCreateActivity extends BaseFragment implements OnClickListener
         frameLayout.addView(this.scrollView);
         this.spansContainer = new SpansContainer(context);
         this.scrollView.addView(this.spansContainer, LayoutHelper.createFrame(-1, -2.0f));
+        this.spansContainer.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                GroupCreateActivity.this.editText.requestFocus();
+                AndroidUtilities.showKeyboard(GroupCreateActivity.this.editText);
+            }
+        });
         this.editText = new EditTextBoldCursor(context) {
             public boolean onTouchEvent(MotionEvent event) {
                 if (GroupCreateActivity.this.currentDeletingSpan != null) {

@@ -40,6 +40,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC.FileLocation;
 import org.telegram.tgnet.TLRPC.InputFile;
 import org.telegram.tgnet.TLRPC.PhotoSize;
+import org.telegram.tgnet.TLRPC.TL_secureFile;
 import org.telegram.tgnet.TLRPC.User;
 import org.telegram.ui.ActionBar.ActionBar.ActionBarMenuOnItemClick;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
@@ -51,24 +52,23 @@ import org.telegram.ui.ActionBar.ThemeDescription.ThemeDescriptionDelegate;
 import org.telegram.ui.Cells.GroupCreateSectionCell;
 import org.telegram.ui.Cells.GroupCreateUserCell;
 import org.telegram.ui.Components.AvatarDrawable;
-import org.telegram.ui.Components.AvatarUpdater;
-import org.telegram.ui.Components.AvatarUpdater.AvatarUpdaterDelegate;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.ContextProgressView;
 import org.telegram.ui.Components.EditTextBoldCursor;
 import org.telegram.ui.Components.GroupCreateDividerItemDecoration;
+import org.telegram.ui.Components.ImageUpdater;
+import org.telegram.ui.Components.ImageUpdater.ImageUpdaterDelegate;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.RecyclerListView.Holder;
 import org.telegram.ui.Components.RecyclerListView.SelectionAdapter;
 
-public class GroupCreateFinalActivity extends BaseFragment implements NotificationCenterDelegate, AvatarUpdaterDelegate {
+public class GroupCreateFinalActivity extends BaseFragment implements NotificationCenterDelegate, ImageUpdaterDelegate {
     private static final int done_button = 1;
     private GroupCreateAdapter adapter;
     private FileLocation avatar;
     private AvatarDrawable avatarDrawable;
     private BackupImageView avatarImage;
-    private AvatarUpdater avatarUpdater = new AvatarUpdater();
     private int chatType = 0;
     private boolean createAfterUpload;
     private ActionBarMenuItem doneItem;
@@ -76,6 +76,7 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
     private boolean donePressed;
     private EditTextBoldCursor editText;
     private FrameLayout editTextContainer;
+    private ImageUpdater imageUpdater = new ImageUpdater();
     private RecyclerView listView;
     private String nameToSet;
     private ContextProgressView progressView;
@@ -148,8 +149,8 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.updateInterfaces);
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.chatDidCreated);
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.chatDidFailCreate);
-        this.avatarUpdater.parentFragment = this;
-        this.avatarUpdater.delegate = this;
+        this.imageUpdater.parentFragment = this;
+        this.imageUpdater.delegate = this;
         this.selectedContacts = getArguments().getIntegerArrayList("result");
         final ArrayList<Integer> usersToLoad = new ArrayList();
         for (int a = 0; a < this.selectedContacts.size(); a++) {
@@ -188,7 +189,7 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.updateInterfaces);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.chatDidCreated);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.chatDidFailCreate);
-        this.avatarUpdater.clear();
+        this.imageUpdater.clear();
         if (this.reqId != 0) {
             ConnectionsManager.getInstance(this.currentAccount).cancelRequest(this.reqId, true);
         }
@@ -223,7 +224,7 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
                     GroupCreateFinalActivity.this.donePressed = true;
                     AndroidUtilities.hideKeyboard(GroupCreateFinalActivity.this.editText);
                     GroupCreateFinalActivity.this.editText.setEnabled(false);
-                    if (GroupCreateFinalActivity.this.avatarUpdater.uploadingAvatar != null) {
+                    if (GroupCreateFinalActivity.this.imageUpdater.uploadingImage != null) {
                         GroupCreateFinalActivity.this.createAfterUpload = true;
                         return;
                     }
@@ -275,9 +276,9 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
                     builder.setItems(GroupCreateFinalActivity.this.avatar != null ? new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley), LocaleController.getString("DeletePhoto", R.string.DeletePhoto)} : new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley)}, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (i == 0) {
-                                GroupCreateFinalActivity.this.avatarUpdater.openCamera();
+                                GroupCreateFinalActivity.this.imageUpdater.openCamera();
                             } else if (i == 1) {
-                                GroupCreateFinalActivity.this.avatarUpdater.openGallery();
+                                GroupCreateFinalActivity.this.imageUpdater.openGallery();
                             } else if (i == 2) {
                                 GroupCreateFinalActivity.this.avatar = null;
                                 GroupCreateFinalActivity.this.uploadedAvatar = null;
@@ -357,7 +358,7 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
         return this.fragmentView;
     }
 
-    public void didUploadedPhoto(final InputFile file, final PhotoSize small, PhotoSize big) {
+    public void didUploadedPhoto(final InputFile file, final PhotoSize small, PhotoSize big, TL_secureFile secureFile) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             public void run() {
                 GroupCreateFinalActivity.this.uploadedAvatar = file;
@@ -371,12 +372,12 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
     }
 
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
-        this.avatarUpdater.onActivityResult(requestCode, resultCode, data);
+        this.imageUpdater.onActivityResult(requestCode, resultCode, data);
     }
 
     public void saveSelfArgs(Bundle args) {
-        if (!(this.avatarUpdater == null || this.avatarUpdater.currentPicturePath == null)) {
-            args.putString("path", this.avatarUpdater.currentPicturePath);
+        if (!(this.imageUpdater == null || this.imageUpdater.currentPicturePath == null)) {
+            args.putString("path", this.imageUpdater.currentPicturePath);
         }
         if (this.editText != null) {
             String text = this.editText.getText().toString();
@@ -387,8 +388,8 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
     }
 
     public void restoreSelfArgs(Bundle args) {
-        if (this.avatarUpdater != null) {
-            this.avatarUpdater.currentPicturePath = args.getString("path");
+        if (this.imageUpdater != null) {
+            this.imageUpdater.currentPicturePath = args.getString("path");
         }
         String text = args.getString("nameTextView");
         if (text == null) {

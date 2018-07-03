@@ -90,7 +90,7 @@ public abstract class BaseLocationAdapter extends SelectionAdapter {
         if (!this.searchingUser) {
             this.searchingUser = true;
             TL_contacts_resolveUsername req = new TL_contacts_resolveUsername();
-            req.username = "foursquare";
+            req.username = MessagesController.getInstance(this.currentAccount).venueSearchBot;
             ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
                 public void run(final TLObject response, TL_error error) {
                     if (response != null) {
@@ -126,7 +126,7 @@ public abstract class BaseLocationAdapter extends SelectionAdapter {
                 }
             }
             this.searching = true;
-            TLObject object = MessagesController.getInstance(this.currentAccount).getUserOrChat("foursquare");
+            TLObject object = MessagesController.getInstance(this.currentAccount).getUserOrChat(MessagesController.getInstance(this.currentAccount).venueSearchBot);
             if (object instanceof User) {
                 User user = (User) object;
                 TL_messages_getInlineBotResults req = new TL_messages_getInlineBotResults();

@@ -29,6 +29,11 @@ public final class Id3Decoder implements MetadataDecoder {
     private static final int ID3_TEXT_ENCODING_UTF_16 = 1;
     private static final int ID3_TEXT_ENCODING_UTF_16BE = 2;
     private static final int ID3_TEXT_ENCODING_UTF_8 = 3;
+    public static final FramePredicate NO_FRAMES_PREDICATE = new FramePredicate() {
+        public boolean evaluate(int majorVersion, int id0, int id1, int id2, int id3) {
+            return false;
+        }
+    };
     private static final String TAG = "Id3Decoder";
     private final FramePredicate framePredicate;
 
@@ -685,20 +690,13 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         if (frameSize < 1) {
             return null;
         }
-        String value;
         int encoding = id3Data.readUnsignedByte();
         String charset = getCharsetName(encoding);
         byte[] data = new byte[(frameSize - 1)];
         id3Data.readBytes(data, 0, frameSize - 1);
         int descriptionEndIndex = indexOfEos(data, 0, encoding);
-        String description = new String(data, 0, descriptionEndIndex, charset);
         int valueStartIndex = descriptionEndIndex + delimiterLength(encoding);
-        if (valueStartIndex < data.length) {
-            value = new String(data, valueStartIndex, indexOfEos(data, valueStartIndex, encoding) - valueStartIndex, charset);
-        } else {
-            value = TtmlNode.ANONYMOUS_REGION_ID;
-        }
-        return new TextInformationFrame("TXXX", description, value);
+        return new TextInformationFrame("TXXX", new String(data, 0, descriptionEndIndex, charset), decodeStringIfValid(data, valueStartIndex, indexOfEos(data, valueStartIndex, encoding), charset));
     }
 
     private static TextInformationFrame decodeTextInformationFrame(ParsableByteArray id3Data, int frameSize, String id) throws UnsupportedEncodingException {
@@ -716,20 +714,13 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         if (frameSize < 1) {
             return null;
         }
-        String url;
         int encoding = id3Data.readUnsignedByte();
         String charset = getCharsetName(encoding);
         byte[] data = new byte[(frameSize - 1)];
         id3Data.readBytes(data, 0, frameSize - 1);
         int descriptionEndIndex = indexOfEos(data, 0, encoding);
-        String description = new String(data, 0, descriptionEndIndex, charset);
         int urlStartIndex = descriptionEndIndex + delimiterLength(encoding);
-        if (urlStartIndex < data.length) {
-            url = new String(data, urlStartIndex, indexOfZeroByte(data, urlStartIndex) - urlStartIndex, "ISO-8859-1");
-        } else {
-            url = TtmlNode.ANONYMOUS_REGION_ID;
-        }
-        return new UrlLinkFrame("WXXX", description, url);
+        return new UrlLinkFrame("WXXX", new String(data, 0, descriptionEndIndex, charset), decodeStringIfValid(data, urlStartIndex, indexOfZeroByte(data, urlStartIndex), "ISO-8859-1"));
     }
 
     private static UrlLinkFrame decodeUrlLinkFrame(ParsableByteArray id3Data, int frameSize, String id) throws UnsupportedEncodingException {
@@ -754,10 +745,10 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         String mimeType = new String(data, 0, mimeTypeEndIndex, "ISO-8859-1");
         int filenameStartIndex = mimeTypeEndIndex + 1;
         int filenameEndIndex = indexOfEos(data, filenameStartIndex, encoding);
-        String filename = new String(data, filenameStartIndex, filenameEndIndex - filenameStartIndex, charset);
+        String filename = decodeStringIfValid(data, filenameStartIndex, filenameEndIndex, charset);
         int descriptionStartIndex = filenameEndIndex + delimiterLength(encoding);
         int descriptionEndIndex = indexOfEos(data, descriptionStartIndex, encoding);
-        return new GeobFrame(mimeType, filename, new String(data, descriptionStartIndex, descriptionEndIndex - descriptionStartIndex, charset), copyOfRangeIfValid(data, descriptionEndIndex + delimiterLength(encoding), data.length));
+        return new GeobFrame(mimeType, filename, decodeStringIfValid(data, descriptionStartIndex, descriptionEndIndex, charset), copyOfRangeIfValid(data, descriptionEndIndex + delimiterLength(encoding), data.length));
     }
 
     private static ApicFrame decodeApicFrame(ParsableByteArray id3Data, int frameSize, int majorVersion) throws UnsupportedEncodingException {
@@ -770,7 +761,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         if (majorVersion == 2) {
             mimeTypeEndIndex = 2;
             mimeType = "image/" + Util.toLowerInvariant(new String(data, 0, 3, "ISO-8859-1"));
-            if (mimeType.equals("image/jpg")) {
+            if ("image/jpg".equals(mimeType)) {
                 mimeType = "image/jpeg";
             }
         } else {
@@ -790,7 +781,6 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         if (frameSize < 4) {
             return null;
         }
-        String text;
         int encoding = id3Data.readUnsignedByte();
         String charset = getCharsetName(encoding);
         byte[] data = new byte[3];
@@ -799,14 +789,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
         data = new byte[(frameSize - 4)];
         id3Data.readBytes(data, 0, frameSize - 4);
         int descriptionEndIndex = indexOfEos(data, 0, encoding);
-        String description = new String(data, 0, descriptionEndIndex, charset);
         int textStartIndex = descriptionEndIndex + delimiterLength(encoding);
-        if (textStartIndex < data.length) {
-            text = new String(data, textStartIndex, indexOfEos(data, textStartIndex, encoding) - textStartIndex, charset);
-        } else {
-            text = TtmlNode.ANONYMOUS_REGION_ID;
-        }
-        return new CommentFrame(language, description, text);
+        return new CommentFrame(language, new String(data, 0, descriptionEndIndex, charset), decodeStringIfValid(data, textStartIndex, indexOfEos(data, textStartIndex, encoding), charset));
     }
 
     private static ChapterFrame decodeChapterFrame(ParsableByteArray id3Data, int frameSize, int majorVersion, boolean unsignedIntFrameSizeHack, int frameHeaderSize, FramePredicate framePredicate) throws UnsupportedEncodingException {
@@ -942,5 +926,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: Can't find immediate dom
             return new byte[0];
         }
         return Arrays.copyOfRange(data, from, to);
+    }
+
+    private static String decodeStringIfValid(byte[] data, int from, int to, String charsetName) throws UnsupportedEncodingException {
+        if (to <= from || to > data.length) {
+            return TtmlNode.ANONYMOUS_REGION_ID;
+        }
+        return new String(data, from, to - from, charsetName);
     }
 }

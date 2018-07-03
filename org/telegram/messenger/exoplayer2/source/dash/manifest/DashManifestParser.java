@@ -92,125 +92,50 @@ public class DashManifestParser extends DefaultHandler implements Parser<DashMan
     }
 
     protected DashManifest parseMediaPresentationDescription(XmlPullParser xpp, String baseUrl) throws XmlPullParserException, IOException {
-        boolean dynamic;
-        long minUpdateTimeMs;
-        long timeShiftBufferDepthMs;
-        long suggestedPresentationDelayMs;
-        long publishTimeMs;
-        UtcTimingElement utcTiming;
-        Uri location;
-        List<Period> periods;
-        long nextPeriodStartMs;
-        boolean seenEarlyAccessPeriod;
-        boolean seenFirstBaseUrl;
-        Pair<Period, Long> periodWithDurationMs;
-        Period period;
-        long periodDurationMs;
         long availabilityStartTime = parseDateTime(xpp, "availabilityStartTime", C.TIME_UNSET);
         long durationMs = parseDuration(xpp, "mediaPresentationDuration", C.TIME_UNSET);
         long minBufferTimeMs = parseDuration(xpp, "minBufferTime", C.TIME_UNSET);
         String typeString = xpp.getAttributeValue(null, "type");
-        if (typeString != null) {
-            if (typeString.equals("dynamic")) {
-                dynamic = true;
-                minUpdateTimeMs = dynamic ? parseDuration(xpp, "minimumUpdatePeriod", C.TIME_UNSET) : C.TIME_UNSET;
-                timeShiftBufferDepthMs = dynamic ? parseDuration(xpp, "timeShiftBufferDepth", C.TIME_UNSET) : C.TIME_UNSET;
-                suggestedPresentationDelayMs = dynamic ? parseDuration(xpp, "suggestedPresentationDelay", C.TIME_UNSET) : C.TIME_UNSET;
-                publishTimeMs = parseDateTime(xpp, "publishTime", C.TIME_UNSET);
-                utcTiming = null;
-                location = null;
-                periods = new ArrayList();
-                nextPeriodStartMs = dynamic ? C.TIME_UNSET : 0;
-                seenEarlyAccessPeriod = false;
-                seenFirstBaseUrl = false;
-                do {
-                    xpp.next();
-                    if (XmlPullParserUtil.isStartTag(xpp, "BaseURL")) {
-                        if (XmlPullParserUtil.isStartTag(xpp, "UTCTiming")) {
-                            if (XmlPullParserUtil.isStartTag(xpp, "Location")) {
-                                if (XmlPullParserUtil.isStartTag(xpp, "Period") && !seenEarlyAccessPeriod) {
-                                    periodWithDurationMs = parsePeriod(xpp, baseUrl, nextPeriodStartMs);
-                                    period = periodWithDurationMs.first;
-                                    if (period.startMs == C.TIME_UNSET) {
-                                        periodDurationMs = ((Long) periodWithDurationMs.second).longValue();
-                                        if (periodDurationMs != C.TIME_UNSET) {
-                                            nextPeriodStartMs = C.TIME_UNSET;
-                                        } else {
-                                            nextPeriodStartMs = period.startMs + periodDurationMs;
-                                        }
-                                        periods.add(period);
-                                    } else if (dynamic) {
-                                        throw new ParserException("Unable to determine start of period " + periods.size());
-                                    } else {
-                                        seenEarlyAccessPeriod = true;
-                                    }
-                                }
-                            } else {
-                                location = Uri.parse(xpp.nextText());
-                            }
-                        } else {
-                            utcTiming = parseUtcTiming(xpp);
-                        }
-                    } else if (!seenFirstBaseUrl) {
-                        baseUrl = parseBaseUrl(xpp, baseUrl);
-                        seenFirstBaseUrl = true;
-                    }
-                } while (!XmlPullParserUtil.isEndTag(xpp, "MPD"));
-                if (durationMs == C.TIME_UNSET) {
-                    if (nextPeriodStartMs != C.TIME_UNSET) {
-                        durationMs = nextPeriodStartMs;
-                    } else if (!dynamic) {
-                        throw new ParserException("Unable to determine duration of static manifest.");
-                    }
-                }
-                if (periods.isEmpty()) {
-                    return buildMediaPresentationDescription(availabilityStartTime, durationMs, minBufferTimeMs, dynamic, minUpdateTimeMs, timeShiftBufferDepthMs, suggestedPresentationDelayMs, publishTimeMs, utcTiming, location, periods);
-                }
-                throw new ParserException("No periods found.");
-            }
-        }
-        dynamic = false;
-        if (dynamic) {
-        }
-        if (dynamic) {
-        }
-        if (dynamic) {
-        }
-        publishTimeMs = parseDateTime(xpp, "publishTime", C.TIME_UNSET);
-        utcTiming = null;
-        location = null;
-        periods = new ArrayList();
-        if (dynamic) {
-        }
-        seenEarlyAccessPeriod = false;
-        seenFirstBaseUrl = false;
+        boolean dynamic = typeString != null && "dynamic".equals(typeString);
+        long minUpdateTimeMs = dynamic ? parseDuration(xpp, "minimumUpdatePeriod", C.TIME_UNSET) : C.TIME_UNSET;
+        long timeShiftBufferDepthMs = dynamic ? parseDuration(xpp, "timeShiftBufferDepth", C.TIME_UNSET) : C.TIME_UNSET;
+        long suggestedPresentationDelayMs = dynamic ? parseDuration(xpp, "suggestedPresentationDelay", C.TIME_UNSET) : C.TIME_UNSET;
+        long publishTimeMs = parseDateTime(xpp, "publishTime", C.TIME_UNSET);
+        UtcTimingElement utcTiming = null;
+        Uri location = null;
+        List<Period> periods = new ArrayList();
+        long nextPeriodStartMs = dynamic ? C.TIME_UNSET : 0;
+        boolean seenEarlyAccessPeriod = false;
+        boolean seenFirstBaseUrl = false;
         do {
             xpp.next();
-            if (XmlPullParserUtil.isStartTag(xpp, "BaseURL")) {
+            if (!XmlPullParserUtil.isStartTag(xpp, "BaseURL")) {
                 if (XmlPullParserUtil.isStartTag(xpp, "UTCTiming")) {
-                    if (XmlPullParserUtil.isStartTag(xpp, "Location")) {
-                        periodWithDurationMs = parsePeriod(xpp, baseUrl, nextPeriodStartMs);
-                        period = periodWithDurationMs.first;
-                        if (period.startMs == C.TIME_UNSET) {
-                            periodDurationMs = ((Long) periodWithDurationMs.second).longValue();
-                            if (periodDurationMs != C.TIME_UNSET) {
-                                nextPeriodStartMs = period.startMs + periodDurationMs;
-                            } else {
-                                nextPeriodStartMs = C.TIME_UNSET;
-                            }
-                            periods.add(period);
-                        } else if (dynamic) {
-                            throw new ParserException("Unable to determine start of period " + periods.size());
-                        } else {
-                            seenEarlyAccessPeriod = true;
-                        }
-                    } else {
-                        location = Uri.parse(xpp.nextText());
-                    }
-                } else {
                     utcTiming = parseUtcTiming(xpp);
+                } else {
+                    if (XmlPullParserUtil.isStartTag(xpp, "Location")) {
+                        location = Uri.parse(xpp.nextText());
+                    } else {
+                        if (XmlPullParserUtil.isStartTag(xpp, "Period") && !seenEarlyAccessPeriod) {
+                            Pair<Period, Long> periodWithDurationMs = parsePeriod(xpp, baseUrl, nextPeriodStartMs);
+                            Period period = periodWithDurationMs.first;
+                            if (period.startMs != C.TIME_UNSET) {
+                                long periodDurationMs = ((Long) periodWithDurationMs.second).longValue();
+                                if (periodDurationMs == C.TIME_UNSET) {
+                                    nextPeriodStartMs = C.TIME_UNSET;
+                                } else {
+                                    nextPeriodStartMs = period.startMs + periodDurationMs;
+                                }
+                                periods.add(period);
+                            } else if (dynamic) {
+                                seenEarlyAccessPeriod = true;
+                            } else {
+                                throw new ParserException("Unable to determine start of period " + periods.size());
+                            }
+                        }
+                    }
                 }
-            } else if (seenFirstBaseUrl) {
+            } else if (!seenFirstBaseUrl) {
                 baseUrl = parseBaseUrl(xpp, baseUrl);
                 seenFirstBaseUrl = true;
             }
@@ -218,11 +143,11 @@ public class DashManifestParser extends DefaultHandler implements Parser<DashMan
         if (durationMs == C.TIME_UNSET) {
             if (nextPeriodStartMs != C.TIME_UNSET) {
                 durationMs = nextPeriodStartMs;
-            } else if (dynamic) {
+            } else if (!dynamic) {
                 throw new ParserException("Unable to determine duration of static manifest.");
             }
         }
-        if (periods.isEmpty()) {
+        if (!periods.isEmpty()) {
             return buildMediaPresentationDescription(availabilityStartTime, durationMs, minBufferTimeMs, dynamic, minUpdateTimeMs, timeShiftBufferDepthMs, suggestedPresentationDelayMs, publishTimeMs, utcTiming, location, periods);
         }
         throw new ParserException("No periods found.");
@@ -634,7 +559,7 @@ public class DashManifestParser extends DefaultHandler implements Parser<DashMan
         long timescale = parseLong(xpp, "timescale", parent != null ? parent.timescale : 1);
         long presentationTimeOffset = parseLong(xpp, "presentationTimeOffset", parent != null ? parent.presentationTimeOffset : 0);
         long duration = parseLong(xpp, "duration", parent != null ? parent.duration : C.TIME_UNSET);
-        int startNumber = parseInt(xpp, "startNumber", parent != null ? parent.startNumber : 1);
+        long startNumber = parseLong(xpp, "startNumber", parent != null ? parent.startNumber : 1);
         RangedUri initialization = null;
         List<SegmentTimelineElement> timeline = null;
         List<RangedUri> segments = null;
@@ -669,7 +594,7 @@ public class DashManifestParser extends DefaultHandler implements Parser<DashMan
         return buildSegmentList(initialization, timescale, presentationTimeOffset, startNumber, duration, timeline, segments);
     }
 
-    protected SegmentList buildSegmentList(RangedUri initialization, long timescale, long presentationTimeOffset, int startNumber, long duration, List<SegmentTimelineElement> timeline, List<RangedUri> segments) {
+    protected SegmentList buildSegmentList(RangedUri initialization, long timescale, long presentationTimeOffset, long startNumber, long duration, List<SegmentTimelineElement> timeline, List<RangedUri> segments) {
         return new SegmentList(initialization, timescale, presentationTimeOffset, startNumber, duration, timeline, segments);
     }
 
@@ -677,7 +602,7 @@ public class DashManifestParser extends DefaultHandler implements Parser<DashMan
         long timescale = parseLong(xpp, "timescale", parent != null ? parent.timescale : 1);
         long presentationTimeOffset = parseLong(xpp, "presentationTimeOffset", parent != null ? parent.presentationTimeOffset : 0);
         long duration = parseLong(xpp, "duration", parent != null ? parent.duration : C.TIME_UNSET);
-        int startNumber = parseInt(xpp, "startNumber", parent != null ? parent.startNumber : 1);
+        long startNumber = parseLong(xpp, "startNumber", parent != null ? parent.startNumber : 1);
         UrlTemplate mediaTemplate = parseUrlTemplate(xpp, "media", parent != null ? parent.mediaTemplate : null);
         UrlTemplate initializationTemplate = parseUrlTemplate(xpp, "initialization", parent != null ? parent.initializationTemplate : null);
         RangedUri initialization = null;
@@ -703,7 +628,7 @@ public class DashManifestParser extends DefaultHandler implements Parser<DashMan
         return buildSegmentTemplate(initialization, timescale, presentationTimeOffset, startNumber, duration, timeline, initializationTemplate, mediaTemplate);
     }
 
-    protected SegmentTemplate buildSegmentTemplate(RangedUri initialization, long timescale, long presentationTimeOffset, int startNumber, long duration, List<SegmentTimelineElement> timeline, UrlTemplate initializationTemplate, UrlTemplate mediaTemplate) {
+    protected SegmentTemplate buildSegmentTemplate(RangedUri initialization, long timescale, long presentationTimeOffset, long startNumber, long duration, List<SegmentTimelineElement> timeline, UrlTemplate initializationTemplate, UrlTemplate mediaTemplate) {
         return new SegmentTemplate(initialization, timescale, presentationTimeOffset, startNumber, duration, timeline, initializationTemplate, mediaTemplate);
     }
 
@@ -737,7 +662,7 @@ public class DashManifestParser extends DefaultHandler implements Parser<DashMan
         long id = parseLong(xpp, TtmlNode.ATTR_ID, 0);
         long duration = parseLong(xpp, "duration", C.TIME_UNSET);
         long presentationTime = parseLong(xpp, "presentationTime", 0);
-        return buildEvent(schemeIdUri, value, id, Util.scaleLargeTimestamp(duration, 1000, timescale), parseEventObject(xpp, scratchOutputStream), Util.scaleLargeTimestamp(presentationTime, C.MICROS_PER_SECOND, timescale));
+        return buildEvent(schemeIdUri, value, id, Util.scaleLargeTimestamp(duration, 1000, timescale), parseEventObject(xpp, scratchOutputStream), Util.scaleLargeTimestamp(presentationTime, 1000000, timescale));
     }
 
     protected byte[] parseEventObject(XmlPullParser xpp, ByteArrayOutputStream scratchOutputStream) throws XmlPullParserException, IOException {

@@ -57,7 +57,6 @@ import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.audioinfo.AudioInfo;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.support.widget.LinearLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
 import org.telegram.messenger.support.widget.RecyclerView.Adapter;
@@ -990,7 +989,7 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
                         NotificationCenter.getInstance(AudioPlayerAlert.this.currentAccount).postNotificationName(NotificationCenter.closeChats, new Object[0]);
                         ChatActivity chatActivity = new ChatActivity(args);
                         if (AudioPlayerAlert.this.parentActivity.presentFragment(chatActivity, true, false)) {
-                            chatActivity.showReplyPanel(true, null, arrayList, null, false);
+                            chatActivity.showFieldPanelForForward(true, arrayList);
                         } else {
                             fragment.finishFragment();
                         }
@@ -1169,7 +1168,7 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
                 return paddingTop - i;
             }
         }
-        return C.PRIORITY_DOWNLOAD;
+        return -1000;
     }
 
     public void didReceivedNotification(int id, int account, Object... args) {
@@ -1409,7 +1408,7 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
         if ((messageObject == null && shutdown) || (messageObject != null && !messageObject.isMusic())) {
             dismiss();
         } else if (messageObject != null) {
-            if (messageObject.eventId != 0) {
+            if (messageObject.eventId != 0 || messageObject.getId() <= -2000000000) {
                 this.hasOptions = false;
                 this.menuItem.setVisibility(4);
                 this.optionsButton.setVisibility(4);

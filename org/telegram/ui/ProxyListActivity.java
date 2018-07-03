@@ -407,20 +407,18 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
         this.listView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(View view, int position) {
                 boolean z = true;
-                ProxyListActivity proxyListActivity;
                 Holder holder;
                 Editor editor;
                 int a;
                 if (position == ProxyListActivity.this.useProxyRow) {
                     if (SharedConfig.currentProxy == null) {
-                        ProxyListActivity.this.presentFragment(new ProxySettingsActivity());
-                        return;
+                        if (SharedConfig.proxyList.isEmpty()) {
+                            ProxyListActivity.this.presentFragment(new ProxySettingsActivity());
+                            return;
+                        }
+                        SharedConfig.currentProxy = (ProxyInfo) SharedConfig.proxyList.get(0);
                     }
-                    proxyListActivity = ProxyListActivity.this;
-                    if (ProxyListActivity.this.useProxySettings) {
-                        z = false;
-                    }
-                    proxyListActivity.useProxySettings = z;
+                    ProxyListActivity.this.useProxySettings = !ProxyListActivity.this.useProxySettings;
                     SharedPreferences preferences = MessagesController.getGlobalMainSettings();
                     ((TextCheckCell) view).setChecked(ProxyListActivity.this.useProxySettings);
                     if (!ProxyListActivity.this.useProxySettings) {
@@ -433,7 +431,9 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                     editor = MessagesController.getGlobalMainSettings().edit();
                     editor.putBoolean("proxy_enabled", ProxyListActivity.this.useProxySettings);
                     editor.commit();
-                    NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.proxySettingsChanged);
+                    NotificationCenter.getGlobalInstance().removeObserver(ProxyListActivity.this, NotificationCenter.proxySettingsChanged);
+                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.proxySettingsChanged, new Object[0]);
+                    NotificationCenter.getGlobalInstance().addObserver(ProxyListActivity.this, NotificationCenter.proxySettingsChanged);
                     ConnectionsManager.setProxySettings(ProxyListActivity.this.useProxySettings, SharedConfig.currentProxy.address, SharedConfig.currentProxy.port, SharedConfig.currentProxy.username, SharedConfig.currentProxy.password, SharedConfig.currentProxy.secret);
                     for (a = ProxyListActivity.this.proxyStartRow; a < ProxyListActivity.this.proxyEndRow; a++) {
                         holder = (Holder) ProxyListActivity.this.listView.findViewHolderForAdapterPosition(a);
@@ -442,7 +442,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                         }
                     }
                 } else if (position == ProxyListActivity.this.callsRow) {
-                    proxyListActivity = ProxyListActivity.this;
+                    ProxyListActivity proxyListActivity = ProxyListActivity.this;
                     if (ProxyListActivity.this.useProxyForCalls) {
                         z = false;
                     }
@@ -509,6 +509,9 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                             ProxyListActivity.this.useProxyForCalls = false;
                             ProxyListActivity.this.useProxySettings = false;
                         }
+                        NotificationCenter.getGlobalInstance().removeObserver(ProxyListActivity.this, NotificationCenter.proxySettingsChanged);
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.proxySettingsChanged, new Object[0]);
+                        NotificationCenter.getGlobalInstance().addObserver(ProxyListActivity.this, NotificationCenter.proxySettingsChanged);
                         ProxyListActivity.this.updateRows(true);
                     }
                 });

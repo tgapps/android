@@ -59,6 +59,10 @@ public final class UrlLinkFrame extends Id3Frame {
         return hashCode + i;
     }
 
+    public String toString() {
+        return this.id + ": url=" + this.url;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.id);
         dest.writeString(this.description);

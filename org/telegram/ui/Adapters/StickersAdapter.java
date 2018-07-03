@@ -132,333 +132,355 @@ public class StickersAdapter extends SelectionAdapter implements NotificationCen
 
     /* JADX WARNING: inconsistent code. */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public void loadStikersForEmoji(java.lang.CharSequence r17) {
+    public void loadStikersForEmoji(java.lang.CharSequence r20) {
         /*
-        r16 = this;
-        r12 = org.telegram.messenger.SharedConfig.suggestStickers;
-        r13 = 2;
-        if (r12 != r13) goto L_0x0006;
-    L_0x0005:
-        return;
-    L_0x0006:
-        if (r17 == 0) goto L_0x0092;
+        r19 = this;
+        r15 = org.telegram.messenger.SharedConfig.suggestStickers;
+        r16 = 2;
+        r0 = r16;
+        if (r15 != r0) goto L_0x0009;
     L_0x0008:
-        r12 = r17.length();
-        if (r12 <= 0) goto L_0x0092;
-    L_0x000e:
-        r12 = r17.length();
-        r13 = 14;
-        if (r12 > r13) goto L_0x0092;
-    L_0x0016:
-        r10 = 1;
-    L_0x0017:
-        if (r10 == 0) goto L_0x0225;
-    L_0x0019:
-        r6 = r17.length();
-        r1 = 0;
+        return;
+    L_0x0009:
+        if (r20 == 0) goto L_0x00b1;
+    L_0x000b:
+        r15 = r20.length();
+        if (r15 <= 0) goto L_0x00b1;
+    L_0x0011:
+        r15 = r20.length();
+        r16 = 14;
+        r0 = r16;
+        if (r15 > r0) goto L_0x00b1;
+    L_0x001b:
+        r13 = 1;
+    L_0x001c:
+        if (r13 == 0) goto L_0x0262;
     L_0x001e:
-        if (r1 >= r6) goto L_0x00c4;
-    L_0x0020:
-        r12 = r6 + -1;
-        if (r1 >= r12) goto L_0x0094;
-    L_0x0024:
-        r0 = r17;
-        r12 = r0.charAt(r1);
-        r13 = 55356; // 0xd83c float:7.757E-41 double:2.73495E-319;
-        if (r12 != r13) goto L_0x0049;
-    L_0x002f:
-        r12 = r1 + 1;
-        r0 = r17;
-        r12 = r0.charAt(r12);
-        r13 = 57339; // 0xdffb float:8.0349E-41 double:2.8329E-319;
-        if (r12 < r13) goto L_0x0049;
-    L_0x003c:
-        r12 = r1 + 1;
-        r0 = r17;
-        r12 = r0.charAt(r12);
-        r13 = 57343; // 0xdfff float:8.0355E-41 double:2.8331E-319;
-        if (r12 <= r13) goto L_0x006b;
+        r10 = r20.toString();
+        r8 = r20.length();
+        r3 = 0;
+    L_0x0027:
+        if (r3 >= r8) goto L_0x00ef;
+    L_0x0029:
+        r15 = r8 + -1;
+        if (r3 >= r15) goto L_0x00b4;
+    L_0x002d:
+        r0 = r20;
+        r15 = r0.charAt(r3);
+        r16 = 55356; // 0xd83c float:7.757E-41 double:2.73495E-319;
+        r0 = r16;
+        if (r15 != r0) goto L_0x0058;
+    L_0x003a:
+        r15 = r3 + 1;
+        r0 = r20;
+        r15 = r0.charAt(r15);
+        r16 = 57339; // 0xdffb float:8.0349E-41 double:2.8329E-319;
+        r0 = r16;
+        if (r15 < r0) goto L_0x0058;
     L_0x0049:
-        r0 = r17;
-        r12 = r0.charAt(r1);
-        r13 = 8205; // 0x200d float:1.1498E-41 double:4.054E-320;
-        if (r12 != r13) goto L_0x0094;
-    L_0x0053:
-        r12 = r1 + 1;
-        r0 = r17;
-        r12 = r0.charAt(r12);
-        r13 = 9792; // 0x2640 float:1.3722E-41 double:4.838E-320;
-        if (r12 == r13) goto L_0x006b;
-    L_0x005f:
-        r12 = r1 + 1;
-        r0 = r17;
-        r12 = r0.charAt(r12);
-        r13 = 9794; // 0x2642 float:1.3724E-41 double:4.839E-320;
-        if (r12 != r13) goto L_0x0094;
-    L_0x006b:
-        r12 = 2;
-        r12 = new java.lang.CharSequence[r12];
+        r15 = r3 + 1;
+        r0 = r20;
+        r15 = r0.charAt(r15);
+        r16 = 57343; // 0xdfff float:8.0355E-41 double:2.8331E-319;
+        r0 = r16;
+        if (r15 <= r0) goto L_0x0080;
+    L_0x0058:
+        r0 = r20;
+        r15 = r0.charAt(r3);
+        r16 = 8205; // 0x200d float:1.1498E-41 double:4.054E-320;
+        r0 = r16;
+        if (r15 != r0) goto L_0x00b4;
+    L_0x0064:
+        r15 = r3 + 1;
+        r0 = r20;
+        r15 = r0.charAt(r15);
+        r16 = 9792; // 0x2640 float:1.3722E-41 double:4.838E-320;
+        r0 = r16;
+        if (r15 == r0) goto L_0x0080;
+    L_0x0072:
+        r15 = r3 + 1;
+        r0 = r20;
+        r15 = r0.charAt(r15);
+        r16 = 9794; // 0x2642 float:1.3724E-41 double:4.839E-320;
+        r0 = r16;
+        if (r15 != r0) goto L_0x00b4;
+    L_0x0080:
+        r15 = 2;
+        r15 = new java.lang.CharSequence[r15];
+        r16 = 0;
+        r17 = 0;
+        r0 = r20;
+        r1 = r17;
+        r17 = r0.subSequence(r1, r3);
+        r15[r16] = r17;
+        r16 = 1;
+        r17 = r3 + 2;
+        r18 = r20.length();
+        r0 = r20;
+        r1 = r17;
+        r2 = r18;
+        r17 = r0.subSequence(r1, r2);
+        r15[r16] = r17;
+        r20 = android.text.TextUtils.concat(r15);
+        r8 = r8 + -2;
+        r3 = r3 + -1;
+    L_0x00ad:
+        r3 = r3 + 1;
+        goto L_0x0027;
+    L_0x00b1:
         r13 = 0;
-        r14 = 0;
-        r0 = r17;
-        r14 = r0.subSequence(r14, r1);
-        r12[r13] = r14;
-        r13 = 1;
-        r14 = r1 + 2;
-        r15 = r17.length();
-        r0 = r17;
-        r14 = r0.subSequence(r14, r15);
-        r12[r13] = r14;
-        r17 = android.text.TextUtils.concat(r12);
-        r6 = r6 + -2;
-        r1 = r1 + -1;
-    L_0x008f:
-        r1 = r1 + 1;
-        goto L_0x001e;
-    L_0x0092:
-        r10 = 0;
-        goto L_0x0017;
-    L_0x0094:
-        r0 = r17;
-        r12 = r0.charAt(r1);
-        r13 = 65039; // 0xfe0f float:9.1139E-41 double:3.21335E-319;
-        if (r12 != r13) goto L_0x008f;
-    L_0x009f:
-        r12 = 2;
-        r12 = new java.lang.CharSequence[r12];
-        r13 = 0;
-        r14 = 0;
-        r0 = r17;
-        r14 = r0.subSequence(r14, r1);
-        r12[r13] = r14;
-        r13 = 1;
-        r14 = r1 + 1;
-        r15 = r17.length();
-        r0 = r17;
-        r14 = r0.subSequence(r14, r15);
-        r12[r13] = r14;
-        r17 = android.text.TextUtils.concat(r12);
-        r6 = r6 + -1;
-        r1 = r1 + -1;
-        goto L_0x008f;
-    L_0x00c4:
-        r12 = r17.toString();
-        r12 = r12.trim();
+        goto L_0x001c;
+    L_0x00b4:
+        r0 = r20;
+        r15 = r0.charAt(r3);
+        r16 = 65039; // 0xfe0f float:9.1139E-41 double:3.21335E-319;
         r0 = r16;
-        r0.lastSticker = r12;
-        r0 = r16;
-        r12 = r0.lastSticker;
-        r12 = org.telegram.messenger.Emoji.isValidEmoji(r12);
-        if (r12 != 0) goto L_0x00f2;
-    L_0x00da:
-        r0 = r16;
-        r12 = r0.visible;
-        if (r12 == 0) goto L_0x0005;
-    L_0x00e0:
+        if (r15 != r0) goto L_0x00ad;
+    L_0x00c1:
+        r15 = 2;
+        r15 = new java.lang.CharSequence[r15];
+        r16 = 0;
+        r17 = 0;
+        r0 = r20;
+        r1 = r17;
+        r17 = r0.subSequence(r1, r3);
+        r15[r16] = r17;
+        r16 = 1;
+        r17 = r3 + 1;
+        r18 = r20.length();
+        r0 = r20;
+        r1 = r17;
+        r2 = r18;
+        r17 = r0.subSequence(r1, r2);
+        r15[r16] = r17;
+        r20 = android.text.TextUtils.concat(r15);
+        r8 = r8 + -1;
+        r3 = r3 + -1;
+        goto L_0x00ad;
+    L_0x00ef:
+        r15 = r20.toString();
+        r15 = r15.trim();
+        r0 = r19;
+        r0.lastSticker = r15;
+        r15 = org.telegram.messenger.Emoji.isValidEmoji(r10);
+        if (r15 != 0) goto L_0x0124;
+    L_0x0101:
+        r0 = r19;
+        r15 = r0.lastSticker;
+        r15 = org.telegram.messenger.Emoji.isValidEmoji(r15);
+        if (r15 != 0) goto L_0x0124;
+    L_0x010b:
+        r0 = r19;
+        r15 = r0.visible;
+        if (r15 == 0) goto L_0x0008;
+    L_0x0111:
+        r15 = 0;
+        r0 = r19;
+        r0.visible = r15;
+        r0 = r19;
+        r15 = r0.delegate;
+        r16 = 0;
+        r15.needChangePanelVisibility(r16);
+        r19.notifyDataSetChanged();
+        goto L_0x0008;
+    L_0x0124:
+        r15 = 0;
+        r0 = r19;
+        r0.stickers = r15;
+        r15 = 0;
+        r0 = r19;
+        r0.stickersMap = r15;
+        r15 = 0;
+        r0 = r19;
+        r0.delayLocalResults = r15;
+        r0 = r19;
+        r15 = r0.currentAccount;
+        r15 = org.telegram.messenger.DataQuery.getInstance(r15);
+        r16 = 0;
+        r11 = r15.getRecentStickersNoCopy(r16);
+        r0 = r19;
+        r15 = r0.currentAccount;
+        r15 = org.telegram.messenger.DataQuery.getInstance(r15);
+        r16 = 2;
+        r7 = r15.getRecentStickersNoCopy(r16);
         r12 = 0;
+        r3 = 0;
+        r14 = r11.size();
+    L_0x0155:
+        if (r3 >= r14) goto L_0x0173;
+    L_0x0157:
+        r6 = r11.get(r3);
+        r6 = (org.telegram.tgnet.TLRPC.Document) r6;
+        r0 = r19;
+        r15 = r0.lastSticker;
+        r0 = r19;
+        r15 = r0.isValidSticker(r6, r15);
+        if (r15 == 0) goto L_0x0194;
+    L_0x0169:
+        r0 = r19;
+        r0.addStickerToResult(r6);
+        r12 = r12 + 1;
+        r15 = 5;
+        if (r12 < r15) goto L_0x0194;
+    L_0x0173:
+        r3 = 0;
+        r14 = r7.size();
+    L_0x0178:
+        if (r3 >= r14) goto L_0x0197;
+    L_0x017a:
+        r6 = r7.get(r3);
+        r6 = (org.telegram.tgnet.TLRPC.Document) r6;
+        r0 = r19;
+        r15 = r0.lastSticker;
+        r0 = r19;
+        r15 = r0.isValidSticker(r6, r15);
+        if (r15 == 0) goto L_0x0191;
+    L_0x018c:
+        r0 = r19;
+        r0.addStickerToResult(r6);
+    L_0x0191:
+        r3 = r3 + 1;
+        goto L_0x0178;
+    L_0x0194:
+        r3 = r3 + 1;
+        goto L_0x0155;
+    L_0x0197:
+        r0 = r19;
+        r15 = r0.currentAccount;
+        r15 = org.telegram.messenger.DataQuery.getInstance(r15);
+        r4 = r15.getAllStickers();
+        if (r4 == 0) goto L_0x0219;
+    L_0x01a5:
+        r0 = r19;
+        r15 = r0.lastSticker;
+        r15 = r4.get(r15);
+        r15 = (java.util.ArrayList) r15;
+        r9 = r15;
+    L_0x01b0:
+        if (r9 == 0) goto L_0x01d2;
+    L_0x01b2:
+        r15 = r9.isEmpty();
+        if (r15 != 0) goto L_0x01d2;
+    L_0x01b8:
+        r5 = new java.util.ArrayList;
+        r5.<init>(r9);
+        r15 = r11.isEmpty();
+        if (r15 != 0) goto L_0x01cd;
+    L_0x01c3:
+        r15 = new org.telegram.ui.Adapters.StickersAdapter$1;
+        r0 = r19;
+        r15.<init>(r7, r11);
+        java.util.Collections.sort(r5, r15);
+    L_0x01cd:
+        r0 = r19;
+        r0.addStickersToResult(r5);
+    L_0x01d2:
+        r15 = org.telegram.messenger.SharedConfig.suggestStickers;
+        if (r15 != 0) goto L_0x01df;
+    L_0x01d6:
+        r0 = r19;
+        r15 = r0.lastSticker;
+        r0 = r19;
+        r0.searchServerStickers(r15);
+    L_0x01df:
+        r0 = r19;
+        r15 = r0.stickers;
+        if (r15 == 0) goto L_0x024c;
+    L_0x01e5:
+        r0 = r19;
+        r15 = r0.stickers;
+        r15 = r15.isEmpty();
+        if (r15 != 0) goto L_0x024c;
+    L_0x01ef:
+        r15 = org.telegram.messenger.SharedConfig.suggestStickers;
+        if (r15 != 0) goto L_0x021b;
+    L_0x01f3:
+        r0 = r19;
+        r15 = r0.stickers;
+        r15 = r15.size();
+        r16 = 5;
         r0 = r16;
-        r0.visible = r12;
-        r0 = r16;
-        r12 = r0.delegate;
-        r13 = 0;
-        r12.needChangePanelVisibility(r13);
-        r16.notifyDataSetChanged();
-        goto L_0x0005;
-    L_0x00f2:
-        r12 = 0;
-        r0 = r16;
-        r0.stickers = r12;
-        r12 = 0;
-        r0 = r16;
-        r0.stickersMap = r12;
-        r12 = 0;
-        r0 = r16;
-        r0.delayLocalResults = r12;
-        r0 = r16;
-        r12 = r0.currentAccount;
-        r12 = org.telegram.messenger.DataQuery.getInstance(r12);
-        r13 = 0;
-        r8 = r12.getRecentStickersNoCopy(r13);
-        r0 = r16;
-        r12 = r0.currentAccount;
-        r12 = org.telegram.messenger.DataQuery.getInstance(r12);
-        r13 = 2;
-        r5 = r12.getRecentStickersNoCopy(r13);
+        if (r15 >= r0) goto L_0x021b;
+    L_0x0201:
+        r15 = 1;
+        r0 = r19;
+        r0.delayLocalResults = r15;
+        r0 = r19;
+        r15 = r0.delegate;
+        r16 = 0;
+        r15.needChangePanelVisibility(r16);
+        r15 = 0;
+        r0 = r19;
+        r0.visible = r15;
+    L_0x0214:
+        r19.notifyDataSetChanged();
+        goto L_0x0008;
+    L_0x0219:
         r9 = 0;
-        r1 = 0;
-        r11 = r8.size();
-    L_0x0121:
-        if (r1 >= r11) goto L_0x013f;
-    L_0x0123:
-        r4 = r8.get(r1);
-        r4 = (org.telegram.tgnet.TLRPC.Document) r4;
+        goto L_0x01b0;
+    L_0x021b:
+        r19.checkStickerFilesExistAndDownload();
+        r0 = r19;
+        r0 = r0.delegate;
+        r16 = r0;
+        r0 = r19;
+        r15 = r0.stickers;
+        if (r15 == 0) goto L_0x024a;
+    L_0x022a:
+        r0 = r19;
+        r15 = r0.stickers;
+        r15 = r15.isEmpty();
+        if (r15 != 0) goto L_0x024a;
+    L_0x0234:
+        r0 = r19;
+        r15 = r0.stickersToLoad;
+        r15 = r15.isEmpty();
+        if (r15 == 0) goto L_0x024a;
+    L_0x023e:
+        r15 = 1;
+    L_0x023f:
         r0 = r16;
-        r12 = r0.lastSticker;
-        r0 = r16;
-        r12 = r0.isValidSticker(r4, r12);
-        if (r12 == 0) goto L_0x0160;
-    L_0x0135:
-        r0 = r16;
-        r0.addStickerToResult(r4);
-        r9 = r9 + 1;
-        r12 = 5;
-        if (r9 < r12) goto L_0x0160;
-    L_0x013f:
-        r1 = 0;
-        r11 = r5.size();
-    L_0x0144:
-        if (r1 >= r11) goto L_0x0163;
-    L_0x0146:
-        r4 = r5.get(r1);
-        r4 = (org.telegram.tgnet.TLRPC.Document) r4;
-        r0 = r16;
-        r12 = r0.lastSticker;
-        r0 = r16;
-        r12 = r0.isValidSticker(r4, r12);
-        if (r12 == 0) goto L_0x015d;
-    L_0x0158:
-        r0 = r16;
-        r0.addStickerToResult(r4);
-    L_0x015d:
-        r1 = r1 + 1;
-        goto L_0x0144;
-    L_0x0160:
-        r1 = r1 + 1;
-        goto L_0x0121;
-    L_0x0163:
-        r0 = r16;
-        r12 = r0.currentAccount;
-        r12 = org.telegram.messenger.DataQuery.getInstance(r12);
-        r2 = r12.getAllStickers();
-        if (r2 == 0) goto L_0x01e1;
-    L_0x0171:
-        r0 = r16;
-        r12 = r0.lastSticker;
-        r12 = r2.get(r12);
-        r12 = (java.util.ArrayList) r12;
-        r7 = r12;
-    L_0x017c:
-        if (r7 == 0) goto L_0x019e;
-    L_0x017e:
-        r12 = r7.isEmpty();
-        if (r12 != 0) goto L_0x019e;
-    L_0x0184:
-        r3 = new java.util.ArrayList;
-        r3.<init>(r7);
-        r12 = r8.isEmpty();
-        if (r12 != 0) goto L_0x0199;
-    L_0x018f:
-        r12 = new org.telegram.ui.Adapters.StickersAdapter$1;
-        r0 = r16;
-        r12.<init>(r5, r8);
-        java.util.Collections.sort(r3, r12);
-    L_0x0199:
-        r0 = r16;
-        r0.addStickersToResult(r3);
-    L_0x019e:
-        r12 = org.telegram.messenger.SharedConfig.suggestStickers;
-        if (r12 != 0) goto L_0x01ab;
-    L_0x01a2:
-        r0 = r16;
-        r12 = r0.lastSticker;
-        r0 = r16;
-        r0.searchServerStickers(r12);
-    L_0x01ab:
-        r0 = r16;
-        r12 = r0.stickers;
-        if (r12 == 0) goto L_0x0210;
-    L_0x01b1:
-        r0 = r16;
-        r12 = r0.stickers;
-        r12 = r12.isEmpty();
-        if (r12 != 0) goto L_0x0210;
-    L_0x01bb:
-        r12 = org.telegram.messenger.SharedConfig.suggestStickers;
-        if (r12 != 0) goto L_0x01e3;
-    L_0x01bf:
-        r0 = r16;
-        r12 = r0.stickers;
-        r12 = r12.size();
-        r13 = 5;
-        if (r12 >= r13) goto L_0x01e3;
-    L_0x01ca:
-        r12 = 1;
-        r0 = r16;
-        r0.delayLocalResults = r12;
-        r0 = r16;
-        r12 = r0.delegate;
-        r13 = 0;
-        r12.needChangePanelVisibility(r13);
-        r12 = 0;
-        r0 = r16;
-        r0.visible = r12;
-    L_0x01dc:
-        r16.notifyDataSetChanged();
-        goto L_0x0005;
-    L_0x01e1:
-        r7 = 0;
-        goto L_0x017c;
-    L_0x01e3:
-        r16.checkStickerFilesExistAndDownload();
-        r0 = r16;
-        r13 = r0.delegate;
-        r0 = r16;
-        r12 = r0.stickers;
-        if (r12 == 0) goto L_0x020e;
-    L_0x01f0:
-        r0 = r16;
-        r12 = r0.stickers;
-        r12 = r12.isEmpty();
-        if (r12 != 0) goto L_0x020e;
-    L_0x01fa:
-        r0 = r16;
-        r12 = r0.stickersToLoad;
-        r12 = r12.isEmpty();
-        if (r12 == 0) goto L_0x020e;
-    L_0x0204:
-        r12 = 1;
-    L_0x0205:
-        r13.needChangePanelVisibility(r12);
-        r12 = 1;
-        r0 = r16;
-        r0.visible = r12;
-        goto L_0x01dc;
-    L_0x020e:
-        r12 = 0;
-        goto L_0x0205;
-    L_0x0210:
-        r0 = r16;
-        r12 = r0.visible;
-        if (r12 == 0) goto L_0x0005;
-    L_0x0216:
-        r0 = r16;
-        r12 = r0.delegate;
-        r13 = 0;
-        r12.needChangePanelVisibility(r13);
-        r12 = 0;
-        r0 = r16;
-        r0.visible = r12;
-        goto L_0x0005;
-    L_0x0225:
-        r12 = "";
-        r0 = r16;
-        r0.lastSticker = r12;
-        r0 = r16;
-        r12 = r0.visible;
-        if (r12 == 0) goto L_0x0005;
-    L_0x0232:
-        r0 = r16;
-        r12 = r0.stickers;
-        if (r12 == 0) goto L_0x0005;
-    L_0x0238:
-        r12 = 0;
-        r0 = r16;
-        r0.visible = r12;
-        r0 = r16;
-        r12 = r0.delegate;
-        r13 = 0;
-        r12.needChangePanelVisibility(r13);
-        goto L_0x0005;
+        r0.needChangePanelVisibility(r15);
+        r15 = 1;
+        r0 = r19;
+        r0.visible = r15;
+        goto L_0x0214;
+    L_0x024a:
+        r15 = 0;
+        goto L_0x023f;
+    L_0x024c:
+        r0 = r19;
+        r15 = r0.visible;
+        if (r15 == 0) goto L_0x0008;
+    L_0x0252:
+        r0 = r19;
+        r15 = r0.delegate;
+        r16 = 0;
+        r15.needChangePanelVisibility(r16);
+        r15 = 0;
+        r0 = r19;
+        r0.visible = r15;
+        goto L_0x0008;
+    L_0x0262:
+        r15 = "";
+        r0 = r19;
+        r0.lastSticker = r15;
+        r0 = r19;
+        r15 = r0.visible;
+        if (r15 == 0) goto L_0x0008;
+    L_0x026f:
+        r0 = r19;
+        r15 = r0.stickers;
+        if (r15 == 0) goto L_0x0008;
+    L_0x0275:
+        r15 = 0;
+        r0 = r19;
+        r0.visible = r15;
+        r0 = r19;
+        r15 = r0.delegate;
+        r16 = 0;
+        r15.needChangePanelVisibility(r16);
+        goto L_0x0008;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.StickersAdapter.loadStikersForEmoji(java.lang.CharSequence):void");
     }
@@ -469,8 +491,7 @@ public class StickersAdapter extends SelectionAdapter implements NotificationCen
         }
         TL_messages_getStickers req = new TL_messages_getStickers();
         req.emoticon = emoji;
-        req.hash = TtmlNode.ANONYMOUS_REGION_ID;
-        req.exclude_featured = false;
+        req.hash = 0;
         this.lastReqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
             public void run(final TLObject response, TL_error error) {
                 AndroidUtilities.runOnUIThread(new Runnable() {

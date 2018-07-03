@@ -39,6 +39,7 @@ public final class C {
     public static final int CRYPTO_MODE_AES_CBC = 2;
     public static final int CRYPTO_MODE_AES_CTR = 1;
     public static final int CRYPTO_MODE_UNENCRYPTED = 0;
+    public static final int DATA_TYPE_AD = 6;
     public static final int DATA_TYPE_CUSTOM_BASE = 10000;
     public static final int DATA_TYPE_DRM = 3;
     public static final int DATA_TYPE_MANIFEST = 4;
@@ -74,6 +75,7 @@ public final class C {
     public static final int MSG_SET_SURFACE = 1;
     public static final int MSG_SET_VOLUME = 2;
     public static final long NANOS_PER_SECOND = 1000000000;
+    public static final int PERCENTAGE_UNSET = -1;
     public static final UUID PLAYREADY_UUID = new UUID(-7348484286925749626L, -6083546864340672619L);
     public static final int POSITION_UNSET = -1;
     public static final int PRIORITY_DOWNLOAD = -1000;

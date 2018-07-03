@@ -187,22 +187,32 @@ public class ThemeDescription {
                 this.viewToInvalidate.setBackgroundColor(color);
             }
             if ((this.changeFlags & FLAG_BACKGROUNDFILTER) != 0) {
-                drawable = this.viewToInvalidate.getBackground();
-                if (drawable instanceof CombinedDrawable) {
-                    if ((this.changeFlags & FLAG_DRAWABLESELECTEDSTATE) != 0) {
-                        drawable = ((CombinedDrawable) drawable).getBackground();
-                    } else {
-                        drawable = ((CombinedDrawable) drawable).getIcon();
+                if ((this.changeFlags & FLAG_PROGRESSBAR) == 0) {
+                    drawable = this.viewToInvalidate.getBackground();
+                    if (drawable instanceof CombinedDrawable) {
+                        if ((this.changeFlags & FLAG_DRAWABLESELECTEDSTATE) != 0) {
+                            drawable = ((CombinedDrawable) drawable).getBackground();
+                        } else {
+                            drawable = ((CombinedDrawable) drawable).getIcon();
+                        }
                     }
-                }
-                if (drawable != null) {
-                    if ((drawable instanceof StateListDrawable) || (VERSION.SDK_INT >= 21 && (drawable instanceof RippleDrawable))) {
-                        Theme.setSelectorDrawableColor(drawable, color, (this.changeFlags & FLAG_DRAWABLESELECTEDSTATE) != 0);
-                    } else if (drawable instanceof ShapeDrawable) {
-                        ((ShapeDrawable) drawable).getPaint().setColor(color);
-                    } else {
-                        drawable.setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                    if (drawable != null) {
+                        if ((drawable instanceof StateListDrawable) || (VERSION.SDK_INT >= 21 && (drawable instanceof RippleDrawable))) {
+                            boolean z;
+                            if ((this.changeFlags & FLAG_DRAWABLESELECTEDSTATE) != 0) {
+                                z = true;
+                            } else {
+                                z = false;
+                            }
+                            Theme.setSelectorDrawableColor(drawable, color, z);
+                        } else if (drawable instanceof ShapeDrawable) {
+                            ((ShapeDrawable) drawable).getPaint().setColor(color);
+                        } else {
+                            drawable.setColorFilter(new PorterDuffColorFilter(color, Mode.MULTIPLY));
+                        }
                     }
+                } else if (this.viewToInvalidate instanceof EditTextBoldCursor) {
+                    ((EditTextBoldCursor) this.viewToInvalidate).setErrorLineColor(color);
                 }
             }
         }
@@ -278,7 +288,11 @@ public class ThemeDescription {
         }
         if ((this.changeFlags & FLAG_HINTTEXTCOLOR) != 0) {
             if (this.viewToInvalidate instanceof EditTextBoldCursor) {
-                ((EditTextBoldCursor) this.viewToInvalidate).setHintColor(color);
+                if ((this.changeFlags & FLAG_PROGRESSBAR) != 0) {
+                    ((EditTextBoldCursor) this.viewToInvalidate).setHeaderHintColor(color);
+                } else {
+                    ((EditTextBoldCursor) this.viewToInvalidate).setHintColor(color);
+                }
             } else if (this.viewToInvalidate instanceof EditText) {
                 ((EditText) this.viewToInvalidate).setHintTextColor(color);
             }
@@ -334,7 +348,7 @@ public class ThemeDescription {
                     processViewColor(header, color);
                 }
             }
-        } else if (this.viewToInvalidate != null) {
+        } else if (this.viewToInvalidate != null && (this.listClasses == null || this.listClasses.length == 0)) {
             if ((this.changeFlags & FLAG_SELECTOR) != 0) {
                 this.viewToInvalidate.setBackgroundDrawable(Theme.getSelectorDrawable(false));
             } else if ((this.changeFlags & FLAG_SELECTORWHITE) != 0) {
@@ -412,6 +426,10 @@ public class ThemeDescription {
                         if (background != null) {
                             background.setColorFilter(Theme.colorFilter);
                         }
+                    } else if ((this.changeFlags & FLAG_SELECTOR) != 0) {
+                        child.setBackgroundDrawable(Theme.getSelectorDrawable(false));
+                    } else if ((this.changeFlags & FLAG_SELECTORWHITE) != 0) {
+                        child.setBackgroundDrawable(Theme.getSelectorDrawable(true));
                     }
                 } else {
                     passedCheck = false;

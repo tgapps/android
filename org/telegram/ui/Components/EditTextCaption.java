@@ -2,8 +2,12 @@ package org.telegram.ui.Components;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.DialogInterface.OnShowListener;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.Build.VERSION;
 import android.text.Editable;
 import android.text.Layout.Alignment;
@@ -17,19 +21,31 @@ import android.view.ActionMode.Callback;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View.MeasureSpec;
+import android.view.ViewGroup.MarginLayoutParams;
+import android.widget.FrameLayout.LayoutParams;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.beta.R;
+import org.telegram.ui.ActionBar.AlertDialog.Builder;
+import org.telegram.ui.ActionBar.Theme;
 
 public class EditTextCaption extends EditTextBoldCursor {
     private String caption;
     private StaticLayout captionLayout;
     private boolean copyPasteShowed;
+    private EditTextCaptionDelegate delegate;
     private int hintColor;
+    private int selectionEnd = -1;
+    private int selectionStart = -1;
     private int triesCount = 0;
     private int userNameLength;
     private int xOffset;
     private int yOffset;
+
+    public interface EditTextCaptionDelegate {
+        void onSpansChanged();
+    }
 
     public EditTextCaption(Context context) {
         super(context);
@@ -47,21 +63,121 @@ public class EditTextCaption extends EditTextBoldCursor {
         }
     }
 
-    private void makeSelectedBold() {
+    public void setDelegate(EditTextCaptionDelegate editTextCaptionDelegate) {
+        this.delegate = editTextCaptionDelegate;
+    }
+
+    public void makeSelectedBold() {
         applyTextStyleToSelection(new TypefaceSpan(AndroidUtilities.getTypeface("fonts/rmedium.ttf")));
     }
 
-    private void makeSelectedItalic() {
+    public void makeSelectedItalic() {
         applyTextStyleToSelection(new TypefaceSpan(AndroidUtilities.getTypeface("fonts/ritalic.ttf")));
     }
 
-    private void makeSelectedRegular() {
+    public void makeSelectedMono() {
+        applyTextStyleToSelection(new TypefaceSpan(Typeface.MONOSPACE));
+    }
+
+    public void makeSelectedUrl() {
+        int start;
+        int end;
+        Builder builder = new Builder(getContext());
+        builder.setTitle(LocaleController.getString("CreateLink", R.string.CreateLink));
+        final EditTextBoldCursor editText = new EditTextBoldCursor(getContext()) {
+            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(64.0f), 1073741824));
+            }
+        };
+        editText.setTextSize(1, 18.0f);
+        editText.setText("http://");
+        editText.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        editText.setHintText(LocaleController.getString("URL", R.string.URL));
+        editText.setHeaderHintColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueHeader));
+        editText.setSingleLine(true);
+        editText.setTransformHintToHeader(true);
+        editText.setLineColors(Theme.getColor(Theme.key_windowBackgroundWhiteInputField), Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), Theme.getColor(Theme.key_windowBackgroundWhiteRedText3));
+        editText.setImeOptions(6);
+        editText.setBackgroundDrawable(null);
+        editText.requestFocus();
+        editText.setPadding(0, 0, 0, 0);
+        builder.setView(editText);
+        if (this.selectionStart < 0 || this.selectionEnd < 0) {
+            start = getSelectionStart();
+            end = getSelectionEnd();
+        } else {
+            start = this.selectionStart;
+            end = this.selectionEnd;
+            this.selectionEnd = -1;
+            this.selectionStart = -1;
+        }
+        builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Editable editable = EditTextCaption.this.getText();
+                CharacterStyle[] spans = (CharacterStyle[]) editable.getSpans(start, end, CharacterStyle.class);
+                if (spans != null && spans.length > 0) {
+                    for (CharacterStyle oldSpan : spans) {
+                        int spanStart = editable.getSpanStart(oldSpan);
+                        int spanEnd = editable.getSpanEnd(oldSpan);
+                        editable.removeSpan(oldSpan);
+                        if (spanStart < start) {
+                            editable.setSpan(oldSpan, spanStart, start, 33);
+                        }
+                        if (spanEnd > end) {
+                            editable.setSpan(oldSpan, end, spanEnd, 33);
+                        }
+                    }
+                }
+                editable.setSpan(new URLSpanReplacement(editText.getText().toString()), start, end, 33);
+                if (EditTextCaption.this.delegate != null) {
+                    EditTextCaption.this.delegate.onSpansChanged();
+                }
+            }
+        });
+        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+        builder.show().setOnShowListener(new OnShowListener() {
+            public void onShow(DialogInterface dialog) {
+                editText.requestFocus();
+                AndroidUtilities.showKeyboard(editText);
+            }
+        });
+        if (editText != null) {
+            MarginLayoutParams layoutParams = (MarginLayoutParams) editText.getLayoutParams();
+            if (layoutParams != null) {
+                if (layoutParams instanceof LayoutParams) {
+                    ((LayoutParams) layoutParams).gravity = 1;
+                }
+                int dp = AndroidUtilities.dp(24.0f);
+                layoutParams.leftMargin = dp;
+                layoutParams.rightMargin = dp;
+                layoutParams.height = AndroidUtilities.dp(36.0f);
+                editText.setLayoutParams(layoutParams);
+            }
+            editText.setSelection(editText.getText().length());
+        }
+    }
+
+    public void makeSelectedRegular() {
         applyTextStyleToSelection(null);
     }
 
+    public void setSelectionOverride(int start, int end) {
+        this.selectionStart = start;
+        this.selectionEnd = end;
+    }
+
     private void applyTextStyleToSelection(TypefaceSpan span) {
-        int start = getSelectionStart();
-        int end = getSelectionEnd();
+        int start;
+        int end;
+        if (this.selectionStart < 0 || this.selectionEnd < 0) {
+            start = getSelectionStart();
+            end = getSelectionEnd();
+        } else {
+            start = this.selectionStart;
+            end = this.selectionEnd;
+            this.selectionEnd = -1;
+            this.selectionStart = -1;
+        }
         Editable editable = getText();
         CharacterStyle[] spans = (CharacterStyle[]) editable.getSpans(start, end, CharacterStyle.class);
         if (spans != null && spans.length > 0) {
@@ -79,6 +195,9 @@ public class EditTextCaption extends EditTextBoldCursor {
         }
         if (span != null) {
             editable.setSpan(span, start, end, 33);
+        }
+        if (this.delegate != null) {
+            this.delegate.onSpansChanged();
         }
     }
 
@@ -109,6 +228,12 @@ public class EditTextCaption extends EditTextBoldCursor {
                     mode.finish();
                 } else if (item.getItemId() == R.id.menu_italic) {
                     EditTextCaption.this.makeSelectedItalic();
+                    mode.finish();
+                } else if (item.getItemId() == R.id.menu_mono) {
+                    EditTextCaption.this.makeSelectedMono();
+                    mode.finish();
+                } else if (item.getItemId() == R.id.menu_link) {
+                    EditTextCaption.this.makeSelectedUrl();
                     mode.finish();
                 } else {
                     try {

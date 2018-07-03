@@ -242,6 +242,7 @@ public class ConnectionsManager {
             ByteArrayOutputStream outbuf2 = null;
             while (i < 3) {
                 String googleDomain;
+                String domain;
                 if (i == 0) {
                     try {
                         googleDomain = "www.google.com";
@@ -254,7 +255,12 @@ public class ConnectionsManager {
                 } else {
                     googleDomain = "google.com";
                 }
-                URLConnection httpConnection = new URL("https://" + googleDomain + "/resolve?name=" + (ConnectionsManager.native_isTestBackend(this.currentAccount) != 0 ? "tapv2.stel.com" : "apv2.stel.com") + "&type=16").openConnection();
+                if (ConnectionsManager.native_isTestBackend(this.currentAccount) != 0) {
+                    domain = "tapv2.stel.com";
+                } else {
+                    domain = MessagesController.getInstance(this.currentAccount).dcDomainName;
+                }
+                URLConnection httpConnection = new URL("https://" + googleDomain + "/resolve?name=" + domain + "&type=16").openConnection();
                 httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
                 httpConnection.addRequestProperty("Host", "dns.google.com");
                 httpConnection.setConnectTimeout(DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS);
@@ -350,13 +356,6 @@ public class ConnectionsManager {
             }
             outbuf = outbuf2;
             return null;
-            if (outbuf != null) {
-                try {
-                    outbuf.close();
-                } catch (Exception e4) {
-                }
-            }
-            throw th;
             throw th;
             if (httpConnectionStream != null) {
                 try {
@@ -365,6 +364,13 @@ public class ConnectionsManager {
                     FileLog.e(e22);
                 }
             }
+            if (outbuf != null) {
+                try {
+                    outbuf.close();
+                } catch (Exception e4) {
+                }
+            }
+            throw th;
             if (outbuf != null) {
                 outbuf.close();
             }
@@ -594,7 +600,7 @@ public class ConnectionsManager {
             systemVersion = "SDK Unknown";
         }
         UserConfig.getInstance(this.currentAccount).loadConfig();
-        init(BuildVars.BUILD_VERSION, 78, BuildVars.APP_ID, deviceModel, systemVersion, appVersion, langCode, systemLangCode, configPath, FileLog.getNetworkLogPath(), UserConfig.getInstance(this.currentAccount).getClientUserId(), enablePushConnection);
+        init(BuildVars.BUILD_VERSION, 82, BuildVars.APP_ID, deviceModel, systemVersion, appVersion, langCode, systemLangCode, configPath, FileLog.getNetworkLogPath(), UserConfig.getInstance(this.currentAccount).getClientUserId(), enablePushConnection);
     }
 
     public long getCurrentTimeMillis() {

@@ -25,7 +25,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import org.json.JSONObject;
 import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.DefaultLoadControl;
 
 public class StripeApiHandler {
     private static final SSLSocketFactory SSL_SOCKET_FACTORY = new StripeSSLSocketFactory();
@@ -254,7 +253,7 @@ Error: java.util.NoSuchElementException
 
     private static HttpURLConnection createStripeConnection(String url, RequestOptions options) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setConnectTimeout(DefaultLoadControl.DEFAULT_MAX_BUFFER_MS);
+        conn.setConnectTimeout(30000);
         conn.setReadTimeout(80000);
         conn.setUseCaches(false);
         for (Entry<String, String> header : getHeaders(options).entrySet()) {

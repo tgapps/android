@@ -5,12 +5,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.View.MeasureSpec;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.MediaController.SearchImage;
 import org.telegram.messenger.beta.R;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.CheckBox;
@@ -94,6 +96,23 @@ public class PhotoPickerPhotoCell extends FrameLayout {
 
     public void setNum(int num) {
         this.checkBox.setNum(num);
+    }
+
+    public void setImage(SearchImage searchImage) {
+        Drawable thumb = getResources().getDrawable(R.drawable.nophotos);
+        if (searchImage.thumbPhotoSize != null) {
+            this.photoImage.setImage(searchImage.thumbPhotoSize.location, null, thumb);
+        } else if (searchImage.photoSize != null) {
+            this.photoImage.setImage(searchImage.photoSize.location, "80_80", thumb);
+        } else if (searchImage.thumbPath != null) {
+            this.photoImage.setImage(searchImage.thumbPath, null, thumb);
+        } else if (searchImage.thumbUrl != null && searchImage.thumbUrl.length() > 0) {
+            this.photoImage.setImage(searchImage.thumbUrl, null, thumb);
+        } else if (searchImage.document == null || searchImage.document.thumb == null) {
+            this.photoImage.setImageDrawable(thumb);
+        } else {
+            this.photoImage.setImage(searchImage.document.thumb.location, null, thumb);
+        }
     }
 
     public void setChecked(int num, final boolean checked, boolean animated) {

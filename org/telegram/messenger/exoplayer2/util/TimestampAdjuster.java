@@ -83,10 +83,10 @@ public final class TimestampAdjuster {
     }
 
     public static long ptsToUs(long pts) {
-        return (C.MICROS_PER_SECOND * pts) / 90000;
+        return (1000000 * pts) / 90000;
     }
 
     public static long usToPts(long us) {
-        return (90000 * us) / C.MICROS_PER_SECOND;
+        return (90000 * us) / 1000000;
     }
 }

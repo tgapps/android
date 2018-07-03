@@ -47,7 +47,7 @@ final class ConstantBitrateSeeker implements Seeker {
     }
 
     public long getTimeUs(long position) {
-        return ((Math.max(0, position - this.firstFramePosition) * C.MICROS_PER_SECOND) * 8) / ((long) this.bitrate);
+        return ((Math.max(0, position - this.firstFramePosition) * 1000000) * 8) / ((long) this.bitrate);
     }
 
     public long getDurationUs() {

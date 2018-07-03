@@ -245,11 +245,11 @@ public class LocationActivityAdapter extends BaseLocationAdapter {
             }
             return null;
         } else if (this.liveLocationType == 1) {
-            if (i <= 3 || i >= this.places.size() + 3) {
+            if (i <= 3 || i >= this.places.size() + 4) {
                 return null;
             }
             return this.places.get(i - 4);
-        } else if (i <= 2 || i >= this.places.size() + 2) {
+        } else if (i <= 2 || i >= this.places.size() + 3) {
             return null;
         } else {
             return this.places.get(i - 3);

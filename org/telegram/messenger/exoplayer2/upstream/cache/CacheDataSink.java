@@ -21,6 +21,7 @@ public final class CacheDataSink implements DataSink {
     private final long maxCacheFileSize;
     private OutputStream outputStream;
     private long outputStreamBytesWritten;
+    private final boolean syncFileDescriptor;
     private FileOutputStream underlyingFileOutputStream;
 
     public static class CacheDataSinkException extends CacheException {
@@ -29,81 +30,23 @@ public final class CacheDataSink implements DataSink {
         }
     }
 
-    private void closeCurrentOutputStream() throws java.io.IOException {
-        /* JADX: method processing error */
-/*
-Error: java.util.NoSuchElementException
-	at java.util.HashMap$HashIterator.nextEntry(HashMap.java:925)
-	at java.util.HashMap$KeyIterator.next(HashMap.java:956)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.applyRemove(BlockFinallyExtract.java:535)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.extractFinally(BlockFinallyExtract.java:175)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.processExceptionHandler(BlockFinallyExtract.java:79)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.visit(BlockFinallyExtract.java:51)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.ProcessClass.process(ProcessClass.java:37)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-*/
-        /*
-        r5 = this;
-        r4 = 0;
-        r2 = r5.outputStream;
-        if (r2 != 0) goto L_0x0006;
-    L_0x0005:
-        return;
-    L_0x0006:
-        r1 = 0;
-        r2 = r5.outputStream;	 Catch:{ all -> 0x002d }
-        r2.flush();	 Catch:{ all -> 0x002d }
-        r2 = r5.underlyingFileOutputStream;	 Catch:{ all -> 0x002d }
-        r2 = r2.getFD();	 Catch:{ all -> 0x002d }
-        r2.sync();	 Catch:{ all -> 0x002d }
-        r1 = 1;
-        r2 = r5.outputStream;
-        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r2);
-        r5.outputStream = r4;
-        r0 = r5.file;
-        r5.file = r4;
-        if (r1 == 0) goto L_0x0029;
-    L_0x0023:
-        r2 = r5.cache;
-        r2.commitFile(r0);
-        goto L_0x0005;
-    L_0x0029:
-        r0.delete();
-        goto L_0x0005;
-    L_0x002d:
-        r2 = move-exception;
-        r3 = r5.outputStream;
-        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r3);
-        r5.outputStream = r4;
-        r0 = r5.file;
-        r5.file = r4;
-        if (r1 == 0) goto L_0x0041;
-    L_0x003b:
-        r3 = r5.cache;
-        r3.commitFile(r0);
-    L_0x0040:
-        throw r2;
-    L_0x0041:
-        r0.delete();
-        goto L_0x0040;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink.closeCurrentOutputStream():void");
+    public CacheDataSink(Cache cache, long maxCacheFileSize) {
+        this(cache, maxCacheFileSize, DEFAULT_BUFFER_SIZE, true);
     }
 
-    public CacheDataSink(Cache cache, long maxCacheFileSize) {
-        this(cache, maxCacheFileSize, DEFAULT_BUFFER_SIZE);
+    public CacheDataSink(Cache cache, long maxCacheFileSize, boolean syncFileDescriptor) {
+        this(cache, maxCacheFileSize, DEFAULT_BUFFER_SIZE, syncFileDescriptor);
     }
 
     public CacheDataSink(Cache cache, long maxCacheFileSize, int bufferSize) {
+        this(cache, maxCacheFileSize, bufferSize, true);
+    }
+
+    public CacheDataSink(Cache cache, long maxCacheFileSize, int bufferSize, boolean syncFileDescriptor) {
         this.cache = (Cache) Assertions.checkNotNull(cache);
         this.maxCacheFileSize = maxCacheFileSize;
         this.bufferSize = bufferSize;
+        this.syncFileDescriptor = syncFileDescriptor;
     }
 
     public void open(DataSpec dataSpec) throws CacheDataSinkException {
@@ -171,5 +114,60 @@ Error: java.util.NoSuchElementException
             this.outputStream = this.underlyingFileOutputStream;
         }
         this.outputStreamBytesWritten = 0;
+    }
+
+    /* JADX WARNING: inconsistent code. */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void closeCurrentOutputStream() throws java.io.IOException {
+        /*
+        r5 = this;
+        r4 = 0;
+        r2 = r5.outputStream;
+        if (r2 != 0) goto L_0x0006;
+    L_0x0005:
+        return;
+    L_0x0006:
+        r1 = 0;
+        r2 = r5.outputStream;	 Catch:{ all -> 0x0031 }
+        r2.flush();	 Catch:{ all -> 0x0031 }
+        r2 = r5.syncFileDescriptor;	 Catch:{ all -> 0x0031 }
+        if (r2 == 0) goto L_0x0019;
+    L_0x0010:
+        r2 = r5.underlyingFileOutputStream;	 Catch:{ all -> 0x0031 }
+        r2 = r2.getFD();	 Catch:{ all -> 0x0031 }
+        r2.sync();	 Catch:{ all -> 0x0031 }
+    L_0x0019:
+        r1 = 1;
+        r2 = r5.outputStream;
+        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r2);
+        r5.outputStream = r4;
+        r0 = r5.file;
+        r5.file = r4;
+        if (r1 == 0) goto L_0x002d;
+    L_0x0027:
+        r2 = r5.cache;
+        r2.commitFile(r0);
+        goto L_0x0005;
+    L_0x002d:
+        r0.delete();
+        goto L_0x0005;
+    L_0x0031:
+        r2 = move-exception;
+        r3 = r5.outputStream;
+        org.telegram.messenger.exoplayer2.util.Util.closeQuietly(r3);
+        r5.outputStream = r4;
+        r0 = r5.file;
+        r5.file = r4;
+        if (r1 == 0) goto L_0x0045;
+    L_0x003f:
+        r3 = r5.cache;
+        r3.commitFile(r0);
+    L_0x0044:
+        throw r2;
+    L_0x0045:
+        r0.delete();
+        goto L_0x0044;
+        */
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink.closeCurrentOutputStream():void");
     }
 }

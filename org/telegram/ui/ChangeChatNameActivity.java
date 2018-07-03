@@ -28,6 +28,7 @@ import org.telegram.tgnet.TLRPC.FileLocation;
 import org.telegram.tgnet.TLRPC.InputFile;
 import org.telegram.tgnet.TLRPC.PhotoSize;
 import org.telegram.tgnet.TLRPC.TL_chatPhoto;
+import org.telegram.tgnet.TLRPC.TL_secureFile;
 import org.telegram.ui.ActionBar.ActionBar.ActionBarMenuOnItemClick;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.AlertDialog.Builder;
@@ -37,24 +38,24 @@ import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.AvatarDrawable;
-import org.telegram.ui.Components.AvatarUpdater;
-import org.telegram.ui.Components.AvatarUpdater.AvatarUpdaterDelegate;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.EditTextBoldCursor;
+import org.telegram.ui.Components.ImageUpdater;
+import org.telegram.ui.Components.ImageUpdater.ImageUpdaterDelegate;
 import org.telegram.ui.Components.LayoutHelper;
 
-public class ChangeChatNameActivity extends BaseFragment implements AvatarUpdaterDelegate {
+public class ChangeChatNameActivity extends BaseFragment implements ImageUpdaterDelegate {
     private static final int done_button = 1;
     private FileLocation avatar;
     private AvatarDrawable avatarDrawable;
     private BackupImageView avatarImage;
-    private AvatarUpdater avatarUpdater;
     private int chatId;
     private boolean createAfterUpload;
     private Chat currentChat;
     private View doneButton;
     private boolean donePressed;
     private View headerLabelView;
+    private ImageUpdater imageUpdater;
     private EditTextBoldCursor nameTextView;
     private AlertDialog progressDialog;
     private InputFile uploadedAvatar;
@@ -67,9 +68,9 @@ public class ChangeChatNameActivity extends BaseFragment implements AvatarUpdate
         super.onFragmentCreate();
         this.avatarDrawable = new AvatarDrawable();
         this.chatId = getArguments().getInt("chat_id", 0);
-        this.avatarUpdater = new AvatarUpdater();
-        this.avatarUpdater.parentFragment = this;
-        this.avatarUpdater.delegate = this;
+        this.imageUpdater = new ImageUpdater();
+        this.imageUpdater.parentFragment = this;
+        this.imageUpdater.delegate = this;
         return true;
     }
 
@@ -93,7 +94,7 @@ public class ChangeChatNameActivity extends BaseFragment implements AvatarUpdate
                         return;
                     }
                     ChangeChatNameActivity.this.donePressed = true;
-                    if (ChangeChatNameActivity.this.avatarUpdater.uploadingAvatar != null) {
+                    if (ChangeChatNameActivity.this.imageUpdater.uploadingImage != null) {
                         ChangeChatNameActivity.this.createAfterUpload = true;
                         ChangeChatNameActivity.this.progressDialog = new AlertDialog(ChangeChatNameActivity.this.getParentActivity(), 1);
                         ChangeChatNameActivity.this.progressDialog.setMessage(LocaleController.getString("Loading", R.string.Loading));
@@ -169,9 +170,9 @@ public class ChangeChatNameActivity extends BaseFragment implements AvatarUpdate
                     builder.setItems(ChangeChatNameActivity.this.avatar != null ? new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley), LocaleController.getString("DeletePhoto", R.string.DeletePhoto)} : new CharSequence[]{LocaleController.getString("FromCamera", R.string.FromCamera), LocaleController.getString("FromGalley", R.string.FromGalley)}, new OnClickListener() {
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (i == 0) {
-                                ChangeChatNameActivity.this.avatarUpdater.openCamera();
+                                ChangeChatNameActivity.this.imageUpdater.openCamera();
                             } else if (i == 1) {
-                                ChangeChatNameActivity.this.avatarUpdater.openGallery();
+                                ChangeChatNameActivity.this.imageUpdater.openGallery();
                             } else if (i == 2) {
                                 ChangeChatNameActivity.this.avatar = null;
                                 ChangeChatNameActivity.this.uploadedAvatar = null;
@@ -290,7 +291,7 @@ public class ChangeChatNameActivity extends BaseFragment implements AvatarUpdate
         }
     }
 
-    public void didUploadedPhoto(final InputFile file, final PhotoSize small, PhotoSize big) {
+    public void didUploadedPhoto(final InputFile file, final PhotoSize small, PhotoSize big, TL_secureFile secureFile) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             public void run() {
                 ChangeChatNameActivity.this.uploadedAvatar = file;
@@ -313,12 +314,12 @@ public class ChangeChatNameActivity extends BaseFragment implements AvatarUpdate
     }
 
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
-        this.avatarUpdater.onActivityResult(requestCode, resultCode, data);
+        this.imageUpdater.onActivityResult(requestCode, resultCode, data);
     }
 
     public void saveSelfArgs(Bundle args) {
-        if (!(this.avatarUpdater == null || this.avatarUpdater.currentPicturePath == null)) {
-            args.putString("path", this.avatarUpdater.currentPicturePath);
+        if (!(this.imageUpdater == null || this.imageUpdater.currentPicturePath == null)) {
+            args.putString("path", this.imageUpdater.currentPicturePath);
         }
         if (this.nameTextView != null) {
             String text = this.nameTextView.getText().toString();
@@ -329,8 +330,8 @@ public class ChangeChatNameActivity extends BaseFragment implements AvatarUpdate
     }
 
     public void restoreSelfArgs(Bundle args) {
-        if (this.avatarUpdater != null) {
-            this.avatarUpdater.currentPicturePath = args.getString("path");
+        if (this.imageUpdater != null) {
+            this.imageUpdater.currentPicturePath = args.getString("path");
         }
     }
 
