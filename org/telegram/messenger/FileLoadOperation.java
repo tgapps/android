@@ -25,6 +25,7 @@ import org.telegram.tgnet.TLRPC.TL_fileLocation;
 import org.telegram.tgnet.TLRPC.TL_inputDocumentFileLocation;
 import org.telegram.tgnet.TLRPC.TL_inputEncryptedFileLocation;
 import org.telegram.tgnet.TLRPC.TL_inputFileLocation;
+import org.telegram.tgnet.TLRPC.TL_inputWebFileGeoPointLocation;
 import org.telegram.tgnet.TLRPC.TL_upload_cdnFile;
 import org.telegram.tgnet.TLRPC.TL_upload_cdnFileReuploadNeeded;
 import org.telegram.tgnet.TLRPC.TL_upload_file;
@@ -1295,7 +1296,10 @@ public class FileLoadOperation {
                     int i;
                     boolean isLast = this.totalBytesCount <= 0 || a == count - 1 || (this.totalBytesCount > 0 && this.currentDownloadChunkSize + downloadOffset >= this.totalBytesCount);
                     int connectionType = this.requestsCount % 2 == 0 ? 2 : ConnectionsManager.ConnectionTypeDownload2;
-                    int flags = (this.isForceRequest ? 32 : 0) | 2;
+                    int flags = this.isForceRequest ? 32 : 0;
+                    if (!(this.webLocation instanceof TL_inputWebFileGeoPointLocation)) {
+                        flags |= 2;
+                    }
                     TLObject req;
                     if (this.isCdn) {
                         req = new TL_upload_getCdnFile();

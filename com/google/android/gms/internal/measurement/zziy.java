@@ -1,17 +1,21 @@
 package com.google.android.gms.internal.measurement;
 
-import android.content.ComponentName;
-
 final class zziy implements Runnable {
-    private final /* synthetic */ ComponentName val$name;
-    private final /* synthetic */ zziw zzapn;
+    private final /* synthetic */ zzez zzapv;
+    private final /* synthetic */ zzix zzapw;
 
-    zziy(zziw com_google_android_gms_internal_measurement_zziw, ComponentName componentName) {
-        this.zzapn = com_google_android_gms_internal_measurement_zziw;
-        this.val$name = componentName;
+    zziy(zzix com_google_android_gms_internal_measurement_zzix, zzez com_google_android_gms_internal_measurement_zzez) {
+        this.zzapw = com_google_android_gms_internal_measurement_zzix;
+        this.zzapv = com_google_android_gms_internal_measurement_zzez;
     }
 
     public final void run() {
-        this.zzapn.zzape.onServiceDisconnected(this.val$name);
+        synchronized (this.zzapw) {
+            this.zzapw.zzapt = false;
+            if (!this.zzapw.zzapn.isConnected()) {
+                this.zzapw.zzapn.zzgf().zziz().log("Connected to service");
+                this.zzapw.zzapn.zza(this.zzapv);
+            }
+        }
     }
 }

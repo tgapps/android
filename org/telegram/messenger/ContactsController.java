@@ -9,10 +9,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
@@ -133,6 +135,38 @@ public class ContactsController {
         }
     }
 
+    private class MyContentObserver extends ContentObserver {
+        private Runnable checkRunnable = new Runnable() {
+            public void run() {
+                for (int a = 0; a < 3; a++) {
+                    if (UserConfig.getInstance(a).isClientActivated()) {
+                        ConnectionsManager.getInstance(a).resumeNetworkMaybe();
+                        ContactsController.getInstance(a).checkContacts();
+                    }
+                }
+            }
+        };
+
+        public MyContentObserver() {
+            super(null);
+        }
+
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            synchronized (ContactsController.this.observerLock) {
+                if (ContactsController.this.ignoreChanges) {
+                    return;
+                }
+                Utilities.globalQueue.cancelRunnable(this.checkRunnable);
+                Utilities.globalQueue.postRunnable(this.checkRunnable, 500);
+            }
+        }
+
+        public boolean deliverSelfNotifications() {
+            return false;
+        }
+    }
+
     public static ContactsController getInstance(int num) {
         ContactsController localInstance = Instance[num];
         if (localInstance == null) {
@@ -186,6 +220,18 @@ public class ContactsController {
         this.sectionsToReplace.put("Ÿ", "Y");
         this.sectionsToReplace.put("Ý", "Y");
         this.sectionsToReplace.put("Ţ", "Y");
+        if (instance == 0) {
+            Utilities.globalQueue.postRunnable(new Runnable() {
+                public void run() {
+                    try {
+                        if (ContactsController.this.hasContactsPermission()) {
+                            ApplicationLoader.applicationContext.getContentResolver().registerContentObserver(Contacts.CONTENT_URI, true, new MyContentObserver());
+                        }
+                    } catch (Throwable th) {
+                    }
+                }
+            });
+        }
     }
 
     public void cleanup() {
@@ -799,7 +845,7 @@ public class ContactsController {
         goto L_0x0174;
     L_0x01fa:
         r4 = "PhoneMobile";
-        r5 = 2131494306; // 0x7f0c05a2 float:1.8612117E38 double:1.053098111E-314;
+        r5 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
         r13 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01ae;
     L_0x0205:
@@ -809,7 +855,7 @@ public class ContactsController {
     L_0x020a:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneHome";
-        r5 = 2131494304; // 0x7f0c05a0 float:1.8612113E38 double:1.05309811E-314;
+        r5 = 2131494315; // 0x7f0c05ab float:1.8612135E38 double:1.0530981153E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;
@@ -820,7 +866,7 @@ public class ContactsController {
     L_0x021f:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneMobile";
-        r5 = 2131494306; // 0x7f0c05a2 float:1.8612117E38 double:1.053098111E-314;
+        r5 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;
@@ -831,7 +877,7 @@ public class ContactsController {
     L_0x0234:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneWork";
-        r5 = 2131494312; // 0x7f0c05a8 float:1.8612129E38 double:1.053098114E-314;
+        r5 = 2131494323; // 0x7f0c05b3 float:1.8612151E38 double:1.0530981193E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;
@@ -842,14 +888,14 @@ public class ContactsController {
     L_0x024b:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneMain";
-        r5 = 2131494305; // 0x7f0c05a1 float:1.8612115E38 double:1.0530981104E-314;
+        r5 = 2131494316; // 0x7f0c05ac float:1.8612137E38 double:1.053098116E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;
     L_0x025c:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneOther";
-        r5 = 2131494311; // 0x7f0c05a7 float:1.8612127E38 double:1.0530981134E-314;
+        r5 = 2131494322; // 0x7f0c05b2 float:1.861215E38 double:1.053098119E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;
@@ -2146,6 +2192,7 @@ public class ContactsController {
     private void applyContactsUpdates(ArrayList<Integer> ids, ConcurrentHashMap<Integer, User> userDict, ArrayList<TL_contact> newC, ArrayList<Integer> contactsTD) {
         int a;
         Integer uid;
+        Contact contact;
         int index;
         if (newC == null || contactsTD == null) {
             newC = new ArrayList();
@@ -2153,9 +2200,9 @@ public class ContactsController {
             for (a = 0; a < ids.size(); a++) {
                 uid = (Integer) ids.get(a);
                 if (uid.intValue() > 0) {
-                    TL_contact contact = new TL_contact();
-                    contact.user_id = uid.intValue();
-                    newC.add(contact);
+                    TL_contact contact2 = new TL_contact();
+                    contact2.user_id = uid.intValue();
+                    newC.add(contact2);
                 } else if (uid.intValue() < 0) {
                     contactsTD.add(Integer.valueOf(-uid.intValue()));
                 }
@@ -2168,7 +2215,6 @@ public class ContactsController {
         StringBuilder toDelete = new StringBuilder();
         boolean reloadContacts = false;
         for (a = 0; a < newC.size(); a++) {
-            Contact contact2;
             TL_contact newContact = (TL_contact) newC.get(a);
             User user = null;
             if (userDict != null) {
@@ -2182,11 +2228,11 @@ public class ContactsController {
             if (user == null || TextUtils.isEmpty(user.phone)) {
                 reloadContacts = true;
             } else {
-                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact2 != null) {
-                    index = contact2.shortPhones.indexOf(user.phone);
+                contact = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact != null) {
+                    index = contact.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact2.phoneDeleted.set(index, Integer.valueOf(0));
+                        contact.phoneDeleted.set(index, Integer.valueOf(0));
                     }
                 }
                 if (toAdd.length() != 0) {
@@ -2214,11 +2260,11 @@ public class ContactsController {
             if (user == null) {
                 reloadContacts = true;
             } else if (!TextUtils.isEmpty(user.phone)) {
-                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact2 != null) {
-                    index = contact2.shortPhones.indexOf(user.phone);
+                contact = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact != null) {
+                    index = contact.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact2.phoneDeleted.set(index, Integer.valueOf(1));
+                        contact.phoneDeleted.set(index, Integer.valueOf(1));
                     }
                 }
                 if (toDelete.length() != 0) {

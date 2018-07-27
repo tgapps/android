@@ -53,6 +53,7 @@ public class WearDataLayerListenerService extends WearableListenerService {
     }
 
     public void onChannelOpened(Channel ch) {
+        DataOutputStream dataOutputStream;
         DataInputStream dataInputStream;
         GoogleApiClient apiClient = new Builder(this).addApi(Wearable.API).build();
         if (apiClient.blockingConnect().isSuccess()) {
@@ -60,7 +61,6 @@ public class WearDataLayerListenerService extends WearableListenerService {
             if (BuildVars.LOGS_ENABLED) {
                 FileLog.d("wear channel path: " + path);
             }
-            DataOutputStream dataOutputStream;
             try {
                 User user;
                 final CyclicBarrier barrier;

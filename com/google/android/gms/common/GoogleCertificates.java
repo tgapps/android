@@ -4,19 +4,15 @@ import android.content.Context;
 import android.util.Log;
 import com.google.android.gms.common.internal.ICertData;
 import com.google.android.gms.common.internal.ICertData.Stub;
-import com.google.android.gms.common.internal.IGoogleCertificatesApi;
 import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.dynamic.IObjectWrapper;
 import com.google.android.gms.dynamic.ObjectWrapper;
-import com.google.android.gms.dynamite.DynamiteModule;
-import com.google.android.gms.dynamite.DynamiteModule.LoadingException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import javax.annotation.CheckReturnValue;
 
 @CheckReturnValue
 final class GoogleCertificates {
-    private static volatile IGoogleCertificatesApi zzax;
     private static final Object zzay = new Object();
     private static Context zzaz;
 
@@ -77,39 +73,6 @@ final class GoogleCertificates {
                 Log.w("GoogleCertificates", "GoogleCertificates has been initialized already");
             } else if (context != null) {
                 zzaz = context.getApplicationContext();
-            }
-        }
-    }
-
-    static zzg zza(String str, CertData certData, boolean z) {
-        boolean z2 = true;
-        try {
-            zzc();
-            Preconditions.checkNotNull(zzaz);
-            try {
-                if (zzax.isGoogleOrPlatformSigned(new GoogleCertificatesQuery(str, certData, z), ObjectWrapper.wrap(zzaz.getPackageManager()))) {
-                    return zzg.zzg();
-                }
-                if (z || !zza(str, certData, true).zzbl) {
-                    z2 = false;
-                }
-                return zzg.zza(str, certData, z, z2);
-            } catch (Throwable e) {
-                Log.e("GoogleCertificates", "Failed to get Google certificates from remote", e);
-                return zzg.zza("module call", e);
-            }
-        } catch (Throwable e2) {
-            return zzg.zza("module init", e2);
-        }
-    }
-
-    private static void zzc() throws LoadingException {
-        if (zzax == null) {
-            Preconditions.checkNotNull(zzaz);
-            synchronized (zzay) {
-                if (zzax == null) {
-                    zzax = IGoogleCertificatesApi.Stub.asInterface(DynamiteModule.load(zzaz, DynamiteModule.PREFER_HIGHEST_OR_LOCAL_VERSION_NO_FORCE_STAGING, "com.google.android.gms.googlecertificates").instantiate("com.google.android.gms.common.GoogleCertificatesImpl"));
-                }
             }
         }
     }

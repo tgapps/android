@@ -2,68 +2,66 @@ package com.google.android.gms.internal.measurement;
 
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
-import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
-public final class zzee implements Creator<zzed> {
-    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
-        String str = null;
-        String str2 = null;
-        zzjx com_google_android_gms_internal_measurement_zzjx = null;
-        long j = 0;
-        boolean z = false;
-        String str3 = null;
-        zzeu com_google_android_gms_internal_measurement_zzeu = null;
-        long j2 = 0;
-        zzeu com_google_android_gms_internal_measurement_zzeu2 = null;
-        long j3 = 0;
-        zzeu com_google_android_gms_internal_measurement_zzeu3 = null;
-        while (parcel.dataPosition() < validateObjectHeader) {
-            int readHeader = SafeParcelReader.readHeader(parcel);
-            switch (SafeParcelReader.getFieldId(readHeader)) {
-                case 2:
-                    str = SafeParcelReader.createString(parcel, readHeader);
-                    break;
-                case 3:
-                    str2 = SafeParcelReader.createString(parcel, readHeader);
-                    break;
-                case 4:
-                    com_google_android_gms_internal_measurement_zzjx = (zzjx) SafeParcelReader.createParcelable(parcel, readHeader, zzjx.CREATOR);
-                    break;
-                case 5:
-                    j = SafeParcelReader.readLong(parcel, readHeader);
-                    break;
-                case 6:
-                    z = SafeParcelReader.readBoolean(parcel, readHeader);
-                    break;
-                case 7:
-                    str3 = SafeParcelReader.createString(parcel, readHeader);
-                    break;
-                case 8:
-                    com_google_android_gms_internal_measurement_zzeu = (zzeu) SafeParcelReader.createParcelable(parcel, readHeader, zzeu.CREATOR);
-                    break;
-                case 9:
-                    j2 = SafeParcelReader.readLong(parcel, readHeader);
-                    break;
-                case 10:
-                    com_google_android_gms_internal_measurement_zzeu2 = (zzeu) SafeParcelReader.createParcelable(parcel, readHeader, zzeu.CREATOR);
-                    break;
-                case 11:
-                    j3 = SafeParcelReader.readLong(parcel, readHeader);
-                    break;
-                case 12:
-                    com_google_android_gms_internal_measurement_zzeu3 = (zzeu) SafeParcelReader.createParcelable(parcel, readHeader, zzeu.CREATOR);
-                    break;
-                default:
-                    SafeParcelReader.skipUnknownField(parcel, readHeader);
-                    break;
-            }
-        }
-        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
-        return new zzed(str, str2, com_google_android_gms_internal_measurement_zzjx, j, z, str3, com_google_android_gms_internal_measurement_zzeu, j2, com_google_android_gms_internal_measurement_zzeu2, j3, com_google_android_gms_internal_measurement_zzeu3);
+public final class zzee extends AbstractSafeParcelable {
+    public static final Creator<zzee> CREATOR = new zzef();
+    public boolean active;
+    public long creationTimestamp;
+    public String origin;
+    public String packageName;
+    public long timeToLive;
+    public String triggerEventName;
+    public long triggerTimeout;
+    public zzjz zzaeq;
+    public zzew zzaer;
+    public zzew zzaes;
+    public zzew zzaet;
+
+    zzee(zzee com_google_android_gms_internal_measurement_zzee) {
+        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzee);
+        this.packageName = com_google_android_gms_internal_measurement_zzee.packageName;
+        this.origin = com_google_android_gms_internal_measurement_zzee.origin;
+        this.zzaeq = com_google_android_gms_internal_measurement_zzee.zzaeq;
+        this.creationTimestamp = com_google_android_gms_internal_measurement_zzee.creationTimestamp;
+        this.active = com_google_android_gms_internal_measurement_zzee.active;
+        this.triggerEventName = com_google_android_gms_internal_measurement_zzee.triggerEventName;
+        this.zzaer = com_google_android_gms_internal_measurement_zzee.zzaer;
+        this.triggerTimeout = com_google_android_gms_internal_measurement_zzee.triggerTimeout;
+        this.zzaes = com_google_android_gms_internal_measurement_zzee.zzaes;
+        this.timeToLive = com_google_android_gms_internal_measurement_zzee.timeToLive;
+        this.zzaet = com_google_android_gms_internal_measurement_zzee.zzaet;
     }
 
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new zzed[i];
+    zzee(String str, String str2, zzjz com_google_android_gms_internal_measurement_zzjz, long j, boolean z, String str3, zzew com_google_android_gms_internal_measurement_zzew, long j2, zzew com_google_android_gms_internal_measurement_zzew2, long j3, zzew com_google_android_gms_internal_measurement_zzew3) {
+        this.packageName = str;
+        this.origin = str2;
+        this.zzaeq = com_google_android_gms_internal_measurement_zzjz;
+        this.creationTimestamp = j;
+        this.active = z;
+        this.triggerEventName = str3;
+        this.zzaer = com_google_android_gms_internal_measurement_zzew;
+        this.triggerTimeout = j2;
+        this.zzaes = com_google_android_gms_internal_measurement_zzew2;
+        this.timeToLive = j3;
+        this.zzaet = com_google_android_gms_internal_measurement_zzew3;
+    }
+
+    public final void writeToParcel(Parcel parcel, int i) {
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, this.packageName, false);
+        SafeParcelWriter.writeString(parcel, 3, this.origin, false);
+        SafeParcelWriter.writeParcelable(parcel, 4, this.zzaeq, i, false);
+        SafeParcelWriter.writeLong(parcel, 5, this.creationTimestamp);
+        SafeParcelWriter.writeBoolean(parcel, 6, this.active);
+        SafeParcelWriter.writeString(parcel, 7, this.triggerEventName, false);
+        SafeParcelWriter.writeParcelable(parcel, 8, this.zzaer, i, false);
+        SafeParcelWriter.writeLong(parcel, 9, this.triggerTimeout);
+        SafeParcelWriter.writeParcelable(parcel, 10, this.zzaes, i, false);
+        SafeParcelWriter.writeLong(parcel, 11, this.timeToLive);
+        SafeParcelWriter.writeParcelable(parcel, 12, this.zzaet, i, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 }

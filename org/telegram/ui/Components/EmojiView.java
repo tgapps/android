@@ -192,6 +192,7 @@ public class EmojiView extends FrameLayout implements NotificationCenterDelegate
         }
     };
     private ArrayList<TL_messages_stickerSet> stickerSets = new ArrayList();
+    private TextView stickersCounter;
     private Drawable stickersDrawable;
     private TextView stickersEmptyView;
     private StickersGridAdapter stickersGridAdapter;
@@ -1796,11 +1797,11 @@ public class EmojiView extends FrameLayout implements NotificationCenterDelegate
 
     private static String addColorToCode(String code, String color) {
         String end = null;
-        int lenght = code.length();
-        if (lenght > 2 && code.charAt(code.length() - 2) == '‍') {
+        int length = code.length();
+        if (length > 2 && code.charAt(code.length() - 2) == '‍') {
             end = code.substring(code.length() - 2);
             code = code.substring(0, code.length() - 2);
-        } else if (lenght > 3 && code.charAt(code.length() - 3) == '‍') {
+        } else if (length > 3 && code.charAt(code.length() - 3) == '‍') {
             end = code.substring(code.length() - 3);
             code = code.substring(0, code.length() - 3);
         }
@@ -2836,10 +2837,10 @@ public class EmojiView extends FrameLayout implements NotificationCenterDelegate
             if (!(this.trendingGridAdapter == null || this.trendingGridAdapter.getItemCount() == 0 || unread.isEmpty())) {
                 drawable = getContext().getResources().getDrawable(R.drawable.ic_smiles_trend);
                 Theme.setDrawableColorByKey(drawable, Theme.key_chat_emojiPanelIcon);
-                TextView stickersCounter = this.stickersTab.addIconTabWithCounter(drawable);
+                this.stickersCounter = this.stickersTab.addIconTabWithCounter(drawable);
                 this.trendingTabNum = this.stickersTabOffset;
                 this.stickersTabOffset++;
-                stickersCounter.setText(String.format("%d", new Object[]{Integer.valueOf(unread.size())}));
+                this.stickersCounter.setText(String.format("%d", new Object[]{Integer.valueOf(unread.size())}));
             }
             if (!this.favouriteStickers.isEmpty()) {
                 this.favTabBum = this.stickersTabOffset;
@@ -3064,6 +3065,11 @@ public class EmojiView extends FrameLayout implements NotificationCenterDelegate
         if (this.mediaBanTooltip != null) {
             ((ShapeDrawable) this.mediaBanTooltip.getBackground()).getPaint().setColor(Theme.getColor(Theme.key_chat_gifSaveHintBackground));
             this.mediaBanTooltip.setTextColor(Theme.getColor(Theme.key_chat_gifSaveHintText));
+        }
+        if (this.stickersCounter != null) {
+            this.stickersCounter.setTextColor(Theme.getColor(Theme.key_chat_emojiPanelBadgeText));
+            Theme.setDrawableColor(this.stickersCounter.getBackground(), Theme.getColor(Theme.key_chat_emojiPanelBadgeBackground));
+            this.stickersCounter.invalidate();
         }
         Theme.setDrawableColorByKey(this.stickersDrawable, Theme.key_chat_emojiPanelIcon);
         for (int a = 0; a < this.icons.length - 1; a++) {

@@ -168,9 +168,11 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
             if (cell == null) {
                 return null;
             }
-            coords = new int[2];
+            int[] coords = new int[2];
             cell.getImageView().getLocationInWindow(coords);
-            coords[0] = coords[0] - ChatAttachAlert.this.getLeftInset();
+            if (VERSION.SDK_INT < 26) {
+                coords[0] = coords[0] - ChatAttachAlert.this.getLeftInset();
+            }
             PlaceProviderObject object = new PlaceProviderObject();
             object.viewX = coords[0];
             object.viewY = coords[1];
@@ -319,7 +321,6 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
             this.imageView.setRoundRadius(AndroidUtilities.dp(27.0f));
             addView(this.imageView, LayoutHelper.createFrame(54, 54.0f, 49, 0.0f, 7.0f, 0.0f, 0.0f));
             this.nameTextView = new TextView(context);
-            this.nameTextView.setTextColor(Theme.getColor(Theme.key_dialogTextGray2));
             this.nameTextView.setTextSize(1, 12.0f);
             this.nameTextView.setMaxLines(2);
             this.nameTextView.setGravity(49);
@@ -349,6 +350,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
 
         public void setUser(User user) {
             if (user != null) {
+                this.nameTextView.setTextColor(Theme.getColor(Theme.key_dialogTextGray2));
                 this.currentUser = user;
                 TLObject photo = null;
                 this.nameTextView.setText(ContactsController.formatName(user.first_name, user.last_name));
@@ -422,7 +424,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
             super(context);
             this.imageView = new ImageView(context);
             this.imageView.setScaleType(ScaleType.CENTER);
-            addView(this.imageView, LayoutHelper.createFrame(64, 64, 49));
+            addView(this.imageView, LayoutHelper.createFrame(54, 54.0f, 49, 0.0f, 5.0f, 0.0f, 0.0f));
             this.textView = new TextView(context);
             this.textView.setLines(1);
             this.textView.setSingleLine(true);
@@ -572,7 +574,6 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                     break;
                 case 1:
                     frameLayout = new FrameLayout(this.mContext);
-                    frameLayout.setBackgroundColor(-986896);
                     frameLayout.addView(new ShadowSectionCell(this.mContext), LayoutHelper.createFrame(-1, -1.0f));
                     view = frameLayout;
                     break;
@@ -598,7 +599,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
         }
 
         public void onBindViewHolder(ViewHolder holder, int position) {
-            if (position > 1) {
+            if (position == 1) {
+                holder.itemView.setBackgroundColor(Theme.getColor(Theme.key_dialogBackgroundGray));
+            } else if (position > 1) {
                 position = (position - 2) * 4;
                 FrameLayout frameLayout = holder.itemView;
                 for (int a = 0; a < 4; a++) {
@@ -860,6 +863,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.reloadInlineHints);
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.cameraInitied);
         this.shadowDrawable = context.getResources().getDrawable(R.drawable.sheet_shadow).mutate();
+        Theme.setDrawableColor(this.shadowDrawable, Theme.getColor(Theme.key_dialogBackground));
         ViewGroup anonymousClass2 = new RecyclerListView(context) {
             private int lastHeight;
             private int lastWidth;
@@ -1700,6 +1704,29 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
         return this.cameraOpened && processTouchEvent(event);
     }
 
+    public void checkColors() {
+        int count = this.attachButtons.size();
+        for (int a = 0; a < count; a++) {
+            ((AttachButton) this.attachButtons.get(a)).textView.setTextColor(Theme.getColor(Theme.key_dialogTextGray2));
+        }
+        this.lineView.setBackgroundColor(Theme.getColor(Theme.key_dialogGrayLine));
+        Theme.setDrawableColor(this.hintTextView.getBackground(), Theme.getColor(Theme.key_chat_gifSaveHintBackground));
+        if (this.hintTextView != null) {
+            this.hintTextView.setTextColor(Theme.getColor(Theme.key_chat_gifSaveHintText));
+        }
+        if (this.listView != null) {
+            this.listView.setGlowColor(Theme.getColor(Theme.key_dialogScrollGlow));
+            ViewHolder holder = this.listView.findViewHolderForAdapterPosition(1);
+            if (holder != null) {
+                holder.itemView.setBackgroundColor(Theme.getColor(Theme.key_dialogBackgroundGray));
+            }
+        }
+        if (this.ciclePaint != null) {
+            this.ciclePaint.setColor(Theme.getColor(Theme.key_dialogBackground));
+        }
+        Theme.setDrawableColor(this.shadowDrawable, Theme.getColor(Theme.key_dialogBackground));
+    }
+
     private void resetRecordState() {
         if (this.baseFragment != null) {
             for (int a = 0; a < 2; a++) {
@@ -2531,32 +2558,28 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
     public void updatePhotosButton() {
         int count = selectedPhotos.size();
         if (count == 0) {
-            this.sendPhotosButton.imageView.setPadding(0, AndroidUtilities.dp(4.0f), 0, 0);
-            this.sendPhotosButton.imageView.setBackgroundResource(R.drawable.attach_hide_states);
-            this.sendPhotosButton.imageView.setImageResource(R.drawable.attach_hide2);
+            this.sendPhotosButton.imageView.setBackgroundDrawable(Theme.chat_attachButtonDrawables[7]);
             this.sendPhotosButton.textView.setText(TtmlNode.ANONYMOUS_REGION_ID);
             if (this.baseFragment instanceof ChatActivity) {
                 this.sendDocumentsButton.textView.setText(LocaleController.getString("ChatDocument", R.string.ChatDocument));
             }
         } else {
-            this.sendPhotosButton.imageView.setPadding(AndroidUtilities.dp(2.0f), 0, 0, 0);
-            this.sendPhotosButton.imageView.setBackgroundResource(R.drawable.attach_send_states);
-            this.sendPhotosButton.imageView.setImageResource(R.drawable.attach_send2);
-            TextView access$8700;
+            this.sendPhotosButton.imageView.setBackgroundDrawable(Theme.chat_attachButtonDrawables[8]);
+            TextView access$8300;
             Object[] objArr;
             if (this.baseFragment instanceof ChatActivity) {
-                access$8700 = this.sendPhotosButton.textView;
+                access$8300 = this.sendPhotosButton.textView;
                 objArr = new Object[1];
                 objArr[0] = String.format("(%d)", new Object[]{Integer.valueOf(count)});
-                access$8700.setText(LocaleController.formatString("SendItems", R.string.SendItems, objArr));
+                access$8300.setText(LocaleController.formatString("SendItems", R.string.SendItems, objArr));
                 if (this.editingMessageObject == null || !this.editingMessageObject.hasValidGroupId()) {
                     this.sendDocumentsButton.textView.setText(count == 1 ? LocaleController.getString("SendAsFile", R.string.SendAsFile) : LocaleController.getString("SendAsFiles", R.string.SendAsFiles));
                 }
             } else {
-                access$8700 = this.sendPhotosButton.textView;
+                access$8300 = this.sendPhotosButton.textView;
                 objArr = new Object[1];
                 objArr[0] = String.format("(%d)", new Object[]{Integer.valueOf(count)});
-                access$8700.setText(LocaleController.formatString("UploadItems", R.string.UploadItems, objArr));
+                access$8300.setText(LocaleController.formatString("UploadItems", R.string.UploadItems, objArr));
             }
         }
         if (VERSION.SDK_INT < 23 || getContext().checkSelfPermission("android.permission.READ_EXTERNAL_STORAGE") == 0) {

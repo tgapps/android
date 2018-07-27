@@ -2,14 +2,14 @@ package com.google.android.gms.internal.measurement;
 
 final class zzjl implements Runnable {
     private final /* synthetic */ long zzadj;
-    private final /* synthetic */ zzjh zzapx;
+    private final /* synthetic */ zzji zzaqg;
 
-    zzjl(zzjh com_google_android_gms_internal_measurement_zzjh, long j) {
-        this.zzapx = com_google_android_gms_internal_measurement_zzjh;
+    zzjl(zzji com_google_android_gms_internal_measurement_zzji, long j) {
+        this.zzaqg = com_google_android_gms_internal_measurement_zzji;
         this.zzadj = j;
     }
 
     public final void run() {
-        this.zzapx.zzag(this.zzadj);
+        this.zzaqg.zzaf(this.zzadj);
     }
 }

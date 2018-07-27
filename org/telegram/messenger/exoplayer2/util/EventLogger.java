@@ -106,11 +106,11 @@ public class EventLogger implements AnalyticsListener {
             return;
         }
         TrackGroup trackGroup;
+        int trackIndex;
         logd("tracksChanged [" + getEventTimeString(eventTime) + ", ");
         int rendererCount = mappedTrackInfo.getRendererCount();
         for (int rendererIndex = 0; rendererIndex < rendererCount; rendererIndex++) {
             int groupIndex;
-            int trackIndex;
             TrackGroupArray rendererTrackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
             TrackSelection trackSelection = trackSelections.get(rendererIndex);
             if (rendererTrackGroups.length > 0) {

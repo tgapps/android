@@ -1,26 +1,15 @@
 package com.google.android.gms.internal.measurement;
 
-import com.google.android.gms.common.internal.Preconditions;
-import com.google.android.gms.common.util.Clock;
+final class zzjm implements Runnable {
+    private final /* synthetic */ long zzadj;
+    private final /* synthetic */ zzji zzaqg;
 
-final class zzjm {
-    private long startTime;
-    private final Clock zzro;
-
-    public zzjm(Clock clock) {
-        Preconditions.checkNotNull(clock);
-        this.zzro = clock;
+    zzjm(zzji com_google_android_gms_internal_measurement_zzji, long j) {
+        this.zzaqg = com_google_android_gms_internal_measurement_zzji;
+        this.zzadj = j;
     }
 
-    public final void clear() {
-        this.startTime = 0;
-    }
-
-    public final void start() {
-        this.startTime = this.zzro.elapsedRealtime();
-    }
-
-    public final boolean zzj(long j) {
-        return this.startTime == 0 || this.zzro.elapsedRealtime() - this.startTime >= 3600000;
+    public final void run() {
+        this.zzaqg.zzag(this.zzadj);
     }
 }

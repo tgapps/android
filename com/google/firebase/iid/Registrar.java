@@ -13,17 +13,17 @@ import java.util.List;
 public final class Registrar implements ComponentRegistrar {
 
     private static class zza implements FirebaseInstanceIdInternal {
-        private final FirebaseInstanceId zzbz;
+        private final FirebaseInstanceId zzce;
 
         public zza(FirebaseInstanceId firebaseInstanceId) {
-            this.zzbz = firebaseInstanceId;
+            this.zzce = firebaseInstanceId;
         }
     }
 
     @Keep
     public final List<Component<?>> getComponents() {
-        Component build = Component.builder(FirebaseInstanceId.class).add(Dependency.required(FirebaseApp.class)).factory(zzaf.zzby).alwaysEager().build();
-        Component build2 = Component.builder(FirebaseInstanceIdInternal.class).add(Dependency.required(FirebaseInstanceId.class)).factory(zzag.zzby).build();
+        Component build = Component.builder(FirebaseInstanceId.class).add(Dependency.required(FirebaseApp.class)).factory(zzam.zzcd).alwaysEager().build();
+        Component build2 = Component.builder(FirebaseInstanceIdInternal.class).add(Dependency.required(FirebaseInstanceId.class)).factory(zzan.zzcd).build();
         return Arrays.asList(new Component[]{build, build2});
     }
 }

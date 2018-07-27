@@ -76,6 +76,7 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
     private EditText mTextInput;
     private String mToken;
     private String mUrl;
+    private String mUserId;
 
     private static class FeedbackHandler extends Handler {
         private final WeakReference<FeedbackActivity> mWeakFeedbackActivity;
@@ -174,6 +175,7 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
             this.mInitialUserName = extras.getString("initialUserName");
             this.mInitialUserEmail = extras.getString("initialUserEmail");
             this.mInitialUserSubject = extras.getString("initialUserSubject");
+            this.mUserId = extras.getString("userId");
             Parcelable[] initialAttachmentsArray = extras.getParcelableArray("initialAttachments");
             if (initialAttachmentsArray != null) {
                 this.mInitialAttachments.clear();
@@ -278,7 +280,7 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
             this.mInSendFeedback = true;
             configureFeedbackView(false);
         } else if (viewId == R.id.button_refresh) {
-            sendFetchFeedback(this.mUrl, null, null, null, null, null, this.mToken, this.mFeedbackHandler, true);
+            sendFetchFeedback(this.mUrl, null, null, null, null, null, null, this.mToken, this.mFeedbackHandler, true);
         }
     }
 
@@ -467,7 +469,7 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
             return;
         }
         configureFeedbackView(true);
-        sendFetchFeedback(this.mUrl, null, null, null, null, null, this.mToken, this.mFeedbackHandler, true);
+        sendFetchFeedback(this.mUrl, null, null, null, null, null, null, this.mToken, this.mFeedbackHandler, true);
     }
 
     private void createParseFeedbackTask(String feedbackResponseString, String requestType) {
@@ -569,7 +571,7 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
                         return null;
                     }
                 });
-                sendFetchFeedback(this.mUrl, name, email, subject, text, this.mAttachmentListView.getAttachments(), token, this.mFeedbackHandler, false);
+                sendFetchFeedback(this.mUrl, name, email, subject, text, this.mUserId, this.mAttachmentListView.getAttachments(), token, this.mFeedbackHandler, false);
                 hideKeyboard();
                 return;
             } else {
@@ -590,8 +592,8 @@ public class FeedbackActivity extends Activity implements OnClickListener, OnFoc
         enableDisableSendFeedbackButton(true);
     }
 
-    private void sendFetchFeedback(String url, String name, String email, String subject, String text, List<Uri> attachmentUris, String token, Handler feedbackHandler, boolean isFetchMessages) {
-        this.mSendFeedbackTask = new SendFeedbackTask(this.mContext, url, name, email, subject, text, attachmentUris, token, feedbackHandler, isFetchMessages);
+    private void sendFetchFeedback(String url, String name, String email, String subject, String text, String userId, List<Uri> attachmentUris, String token, Handler feedbackHandler, boolean isFetchMessages) {
+        this.mSendFeedbackTask = new SendFeedbackTask(this.mContext, url, name, email, subject, text, userId, attachmentUris, token, feedbackHandler, isFetchMessages);
         AsyncTaskUtils.execute(this.mSendFeedbackTask);
     }
 

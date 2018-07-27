@@ -1052,25 +1052,26 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 }
                 this.pressCount++;
                 if (this.pressCount >= 2 || BuildVars.DEBUG_PRIVATE_VERSION) {
-                    String string;
+                    String str;
                     Builder builder = new Builder(SettingsActivity.this.getParentActivity());
                     builder.setTitle(LocaleController.getString("DebugMenu", R.string.DebugMenu));
-                    CharSequence[] items = new CharSequence[7];
+                    CharSequence[] items = new CharSequence[9];
                     items[0] = LocaleController.getString("DebugMenuImportContacts", R.string.DebugMenuImportContacts);
                     items[1] = LocaleController.getString("DebugMenuReloadContacts", R.string.DebugMenuReloadContacts);
                     items[2] = LocaleController.getString("DebugMenuResetContacts", R.string.DebugMenuResetContacts);
                     items[3] = LocaleController.getString("DebugMenuResetDialogs", R.string.DebugMenuResetDialogs);
                     items[4] = BuildVars.LOGS_ENABLED ? LocaleController.getString("DebugMenuDisableLogs", R.string.DebugMenuDisableLogs) : LocaleController.getString("DebugMenuEnableLogs", R.string.DebugMenuEnableLogs);
-                    if (SharedConfig.inappCamera) {
-                        string = LocaleController.getString("DebugMenuDisableCamera", R.string.DebugMenuDisableCamera);
-                    } else {
-                        string = LocaleController.getString("DebugMenuEnableCamera", R.string.DebugMenuEnableCamera);
-                    }
-                    items[5] = string;
+                    items[5] = SharedConfig.inappCamera ? LocaleController.getString("DebugMenuDisableCamera", R.string.DebugMenuDisableCamera) : LocaleController.getString("DebugMenuEnableCamera", R.string.DebugMenuEnableCamera);
                     items[6] = LocaleController.getString("DebugMenuClearMediaCache", R.string.DebugMenuClearMediaCache);
+                    items[7] = null;
+                    if (BuildVars.DEBUG_PRIVATE_VERSION) {
+                        str = "Check for app updates";
+                    } else {
+                        str = null;
+                    }
+                    items[8] = str;
                     builder.setItems(items, new OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            boolean z = true;
                             if (which == 0) {
                                 UserConfig.getInstance(SettingsActivity.this.currentAccount).syncContacts = true;
                                 UserConfig.getInstance(SettingsActivity.this.currentAccount).saveConfig(false);
@@ -1082,8 +1083,11 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                             } else if (which == 3) {
                                 MessagesController.getInstance(SettingsActivity.this.currentAccount).forceResetDialogs();
                             } else if (which == 4) {
+                                boolean z;
                                 if (BuildVars.LOGS_ENABLED) {
                                     z = false;
+                                } else {
+                                    z = true;
                                 }
                                 BuildVars.LOGS_ENABLED = z;
                                 ApplicationLoader.applicationContext.getSharedPreferences("systemConfig", 0).edit().putBoolean("logsEnabled", BuildVars.LOGS_ENABLED).commit();
@@ -1093,6 +1097,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                                 MessagesStorage.getInstance(SettingsActivity.this.currentAccount).clearSentMedia();
                             } else if (which == 7) {
                                 SharedConfig.toggleRoundCamera16to9();
+                            } else if (which == 8) {
+                                ((LaunchActivity) SettingsActivity.this.getParentActivity()).checkAppUpdate(true);
                             }
                         }
                     });

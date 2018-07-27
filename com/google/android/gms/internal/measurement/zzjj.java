@@ -1,14 +1,21 @@
 package com.google.android.gms.internal.measurement;
 
-final class zzjj extends zzem {
-    private final /* synthetic */ zzjh zzapx;
+import android.os.Bundle;
 
-    zzjj(zzjh com_google_android_gms_internal_measurement_zzjh, zzhi com_google_android_gms_internal_measurement_zzhi) {
-        this.zzapx = com_google_android_gms_internal_measurement_zzjh;
-        super(com_google_android_gms_internal_measurement_zzhi);
+final class zzjj extends zzeo {
+    private final /* synthetic */ zzji zzaqg;
+
+    zzjj(zzji com_google_android_gms_internal_measurement_zzji, zzhj com_google_android_gms_internal_measurement_zzhj) {
+        this.zzaqg = com_google_android_gms_internal_measurement_zzji;
+        super(com_google_android_gms_internal_measurement_zzhj);
     }
 
     public final void run() {
-        this.zzapx.zzkk();
+        zzhh com_google_android_gms_internal_measurement_zzhh = this.zzaqg;
+        com_google_android_gms_internal_measurement_zzhh.zzab();
+        com_google_android_gms_internal_measurement_zzhh.zzgf().zziz().zzg("Session started, time", Long.valueOf(com_google_android_gms_internal_measurement_zzhh.zzbt().elapsedRealtime()));
+        com_google_android_gms_internal_measurement_zzhh.zzgg().zzakt.set(false);
+        com_google_android_gms_internal_measurement_zzhh.zzfv().zza("auto", "_s", new Bundle());
+        com_google_android_gms_internal_measurement_zzhh.zzgg().zzaku.set(com_google_android_gms_internal_measurement_zzhh.zzbt().currentTimeMillis());
     }
 }

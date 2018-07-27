@@ -1,19 +1,10 @@
 package com.google.android.gms.internal.firebase_messaging;
 
-import android.os.Binder;
-import android.os.IBinder;
-import android.os.IInterface;
-import android.os.Parcel;
-import android.os.RemoteException;
+abstract class zzb {
+    private static final Throwable[] zzc = new Throwable[0];
 
-public class zzb extends Binder implements IInterface {
-    private static zzd zzc = null;
-
-    public IBinder asBinder() {
-        throw new NoSuchMethodError();
+    zzb() {
     }
 
-    public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        throw new NoSuchMethodError();
-    }
+    public abstract void zza(Throwable th, Throwable th2);
 }

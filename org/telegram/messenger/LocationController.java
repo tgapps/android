@@ -241,8 +241,8 @@ public class LocationController implements NotificationCenterDelegate {
                 req.stop_geo_live = false;
                 req.flags |= MessagesController.UPDATE_MASK_CHANNEL;
                 req.geo_point = new TL_inputGeoPoint();
-                req.geo_point.lat = this.lastKnownLocation.getLatitude();
-                req.geo_point._long = this.lastKnownLocation.getLongitude();
+                req.geo_point.lat = AndroidUtilities.fixLocationCoord(this.lastKnownLocation.getLatitude());
+                req.geo_point._long = AndroidUtilities.fixLocationCoord(this.lastKnownLocation.getLongitude());
                 final int[] reqId = new int[]{ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
                     public void run(TLObject response, TL_error error) {
                         if (error == null) {

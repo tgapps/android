@@ -12,17 +12,17 @@ import java.util.concurrent.Executors;
 
 public abstract class zzb extends Service {
     private final Object lock;
-    final ExecutorService zzl;
-    private Binder zzm;
-    private int zzn;
-    private int zzo;
+    final ExecutorService zzh;
+    private Binder zzi;
+    private int zzj;
+    private int zzk;
 
     public zzb() {
         String str = "Firebase-";
         String valueOf = String.valueOf(getClass().getSimpleName());
-        this.zzl = Executors.newSingleThreadExecutor(new NamedThreadFactory(valueOf.length() != 0 ? str.concat(valueOf) : new String(str)));
+        this.zzh = Executors.newSingleThreadExecutor(new NamedThreadFactory(valueOf.length() != 0 ? str.concat(valueOf) : new String(str)));
         this.lock = new Object();
-        this.zzo = 0;
+        this.zzk = 0;
     }
 
     private final void zza(Intent intent) {
@@ -30,9 +30,9 @@ public abstract class zzb extends Service {
             WakefulBroadcastReceiver.completeWakefulIntent(intent);
         }
         synchronized (this.lock) {
-            this.zzo--;
-            if (this.zzo == 0) {
-                stopSelfResult(this.zzn);
+            this.zzk--;
+            if (this.zzk == 0) {
+                stopSelfResult(this.zzj);
             }
         }
     }
@@ -41,16 +41,16 @@ public abstract class zzb extends Service {
         if (Log.isLoggable("EnhancedIntentService", 3)) {
             Log.d("EnhancedIntentService", "Service received bind request");
         }
-        if (this.zzm == null) {
-            this.zzm = new zzf(this);
+        if (this.zzi == null) {
+            this.zzi = new zzf(this);
         }
-        return this.zzm;
+        return this.zzi;
     }
 
     public final int onStartCommand(Intent intent, int i, int i2) {
         synchronized (this.lock) {
-            this.zzn = i2;
-            this.zzo++;
+            this.zzj = i2;
+            this.zzk++;
         }
         Intent zzb = zzb(intent);
         if (zzb == null) {
@@ -60,7 +60,7 @@ public abstract class zzb extends Service {
             zza(intent);
             return 2;
         } else {
-            this.zzl.execute(new zzc(this, zzb, intent));
+            this.zzh.execute(new zzc(this, zzb, intent));
             return 3;
         }
     }

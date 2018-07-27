@@ -137,8 +137,8 @@ public abstract class BaseLocationAdapter extends SelectionAdapter {
                 req.bot = MessagesController.getInstance(this.currentAccount).getInputUser(user);
                 req.offset = TtmlNode.ANONYMOUS_REGION_ID;
                 req.geo_point = new TL_inputGeoPoint();
-                req.geo_point.lat = coordinate.getLatitude();
-                req.geo_point._long = coordinate.getLongitude();
+                req.geo_point.lat = AndroidUtilities.fixLocationCoord(coordinate.getLatitude());
+                req.geo_point._long = AndroidUtilities.fixLocationCoord(coordinate.getLongitude());
                 req.flags |= 1;
                 int lower_id = (int) this.dialogId;
                 int high_id = (int) (this.dialogId >> 32);

@@ -1,9 +1,18 @@
 package com.google.android.gms.internal.firebase_messaging;
 
-import android.os.IInterface;
-import android.os.Message;
-import android.os.RemoteException;
+final class zze extends zzb {
+    private final zzc zzg = new zzc();
 
-public interface zze extends IInterface {
-    void send(Message message) throws RemoteException;
+    zze() {
+    }
+
+    public final void zza(Throwable th, Throwable th2) {
+        if (th2 == th) {
+            throw new IllegalArgumentException("Self suppression is not allowed.", th2);
+        } else if (th2 == null) {
+            throw new NullPointerException("The suppressed exception cannot be null.");
+        } else {
+            this.zzg.zza(th, true).add(th2);
+        }
+    }
 }

@@ -32,7 +32,11 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.TL_account_resetNotifySettings;
+import org.telegram.tgnet.TLRPC.TL_account_updateNotifySettings;
 import org.telegram.tgnet.TLRPC.TL_error;
+import org.telegram.tgnet.TLRPC.TL_inputNotifyChats;
+import org.telegram.tgnet.TLRPC.TL_inputNotifyUsers;
+import org.telegram.tgnet.TLRPC.TL_inputPeerNotifySettings;
 import org.telegram.ui.ActionBar.ActionBar.ActionBarMenuOnItemClick;
 import org.telegram.ui.ActionBar.AlertDialog.Builder;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -839,6 +843,33 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
     }
 
     public void updateServerNotificationsSettings(boolean group) {
+        int i = 0;
+        SharedPreferences preferences = MessagesController.getNotificationsSettings(this.currentAccount);
+        TL_account_updateNotifySettings req = new TL_account_updateNotifySettings();
+        req.settings = new TL_inputPeerNotifySettings();
+        req.settings.flags = 5;
+        TL_inputPeerNotifySettings tL_inputPeerNotifySettings;
+        if (group) {
+            req.peer = new TL_inputNotifyChats();
+            tL_inputPeerNotifySettings = req.settings;
+            if (!preferences.getBoolean("EnableGroup", true)) {
+                i = ConnectionsManager.DEFAULT_DATACENTER_ID;
+            }
+            tL_inputPeerNotifySettings.mute_until = i;
+            req.settings.show_previews = preferences.getBoolean("EnablePreviewGroup", true);
+        } else {
+            req.peer = new TL_inputNotifyUsers();
+            tL_inputPeerNotifySettings = req.settings;
+            if (!preferences.getBoolean("EnableAll", true)) {
+                i = ConnectionsManager.DEFAULT_DATACENTER_ID;
+            }
+            tL_inputPeerNotifySettings.mute_until = i;
+            req.settings.show_previews = preferences.getBoolean("EnablePreviewAll", true);
+        }
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
+            public void run(TLObject response, TL_error error) {
+            }
+        });
     }
 
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
@@ -889,6 +920,9 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                 }
             }
             editor.commit();
+            if (requestCode == this.messageSoundRow || requestCode == this.groupSoundRow) {
+                updateServerNotificationsSettings(requestCode == this.groupSoundRow);
+            }
             this.adapter.notifyItemChanged(requestCode);
         }
     }

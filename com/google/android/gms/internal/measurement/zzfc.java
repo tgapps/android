@@ -1,187 +1,101 @@
 package com.google.android.gms.internal.measurement;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabaseLockedException;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteFullException;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.SystemClock;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build.VERSION;
+import android.text.TextUtils;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.api.internal.GoogleServices;
 import com.google.android.gms.common.util.Clock;
+import com.google.android.gms.common.wrappers.InstantApps;
+import com.google.firebase.iid.FirebaseInstanceId;
 
-public final class zzfc extends zzhh {
-    private final zzfd zzaig = new zzfd(this, getContext(), "google_app_measurement_local.db");
-    private boolean zzaih;
+public final class zzfc extends zzhi {
+    private String zzadm;
+    private String zzadt;
+    private long zzadx;
+    private int zzaen;
+    private int zzain;
+    private long zzaio;
+    private String zztg;
+    private String zzth;
+    private String zzti;
 
-    zzfc(zzgl com_google_android_gms_internal_measurement_zzgl) {
-        super(com_google_android_gms_internal_measurement_zzgl);
+    zzfc(zzgm com_google_android_gms_internal_measurement_zzgm) {
+        super(com_google_android_gms_internal_measurement_zzgm);
     }
 
-    private final SQLiteDatabase getWritableDatabase() throws SQLiteException {
-        if (this.zzaih) {
-            return null;
-        }
-        SQLiteDatabase writableDatabase = this.zzaig.getWritableDatabase();
-        if (writableDatabase != null) {
-            return writableDatabase;
-        }
-        this.zzaih = true;
-        return null;
-    }
-
-    private final boolean zza(int i, byte[] bArr) {
+    private final String zzgl() {
+        String str = null;
         zzab();
-        if (this.zzaih) {
-            return false;
-        }
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("type", Integer.valueOf(i));
-        contentValues.put("entry", bArr);
-        int i2 = 5;
-        int i3 = 0;
-        while (i3 < 5) {
-            SQLiteDatabase sQLiteDatabase = null;
-            Cursor cursor = null;
+        zzfs();
+        if (!zzgh().zzax(this.zzti) || this.zzacw.isEnabled()) {
             try {
-                sQLiteDatabase = getWritableDatabase();
-                if (sQLiteDatabase == null) {
-                    this.zzaih = true;
-                    if (sQLiteDatabase != null) {
-                        sQLiteDatabase.close();
-                    }
-                    return false;
-                }
-                sQLiteDatabase.beginTransaction();
-                long j = 0;
-                cursor = sQLiteDatabase.rawQuery("select count(1) from messages", null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    j = cursor.getLong(0);
-                }
-                if (j >= 100000) {
-                    zzge().zzim().log("Data loss, local db full");
-                    j = (100000 - j) + 1;
-                    long delete = (long) sQLiteDatabase.delete("messages", "rowid in (select rowid from messages order by rowid asc limit ?)", new String[]{Long.toString(j)});
-                    if (delete != j) {
-                        zzge().zzim().zzd("Different delete count than expected in local db. expected, received, difference", Long.valueOf(j), Long.valueOf(delete), Long.valueOf(j - delete));
-                    }
-                }
-                sQLiteDatabase.insertOrThrow("messages", null, contentValues);
-                sQLiteDatabase.setTransactionSuccessful();
-                sQLiteDatabase.endTransaction();
-                if (cursor != null) {
-                    cursor.close();
-                }
-                if (sQLiteDatabase != null) {
-                    sQLiteDatabase.close();
-                }
-                return true;
-            } catch (SQLiteFullException e) {
-                zzge().zzim().zzg("Error writing entry to local database", e);
-                this.zzaih = true;
-                if (cursor != null) {
-                    cursor.close();
-                }
-                if (sQLiteDatabase != null) {
-                    sQLiteDatabase.close();
-                }
-                i3++;
-            } catch (SQLiteDatabaseLockedException e2) {
-                SystemClock.sleep((long) i2);
-                i2 += 20;
-                if (cursor != null) {
-                    cursor.close();
-                }
-                if (sQLiteDatabase != null) {
-                    sQLiteDatabase.close();
-                }
-                i3++;
-            } catch (SQLiteException e3) {
-                if (sQLiteDatabase != null) {
-                    if (sQLiteDatabase.inTransaction()) {
-                        sQLiteDatabase.endTransaction();
-                    }
-                }
-                zzge().zzim().zzg("Error writing entry to local database", e3);
-                this.zzaih = true;
-                if (cursor != null) {
-                    cursor.close();
-                }
-                if (sQLiteDatabase != null) {
-                    sQLiteDatabase.close();
-                }
-                i3++;
-            } catch (Throwable th) {
-                if (cursor != null) {
-                    cursor.close();
-                }
-                if (sQLiteDatabase != null) {
-                    sQLiteDatabase.close();
-                }
+                str = FirebaseInstanceId.getInstance().getId();
+            } catch (IllegalStateException e) {
+                zzgf().zziv().log("Failed to retrieve Firebase Instance Id");
             }
         }
-        zzge().zzip().log("Failed to write entry to local database");
-        return false;
+        return str;
     }
 
     public final /* bridge */ /* synthetic */ Context getContext() {
         return super.getContext();
     }
 
-    public final void resetAnalyticsData() {
-        zzab();
-        try {
-            int delete = getWritableDatabase().delete("messages", null, null) + 0;
-            if (delete > 0) {
-                zzge().zzit().zzg("Reset local analytics data. records", Integer.valueOf(delete));
-            }
-        } catch (SQLiteException e) {
-            zzge().zzim().zzg("Error resetting local analytics data. error", e);
-        }
-    }
-
-    public final boolean zza(zzeu com_google_android_gms_internal_measurement_zzeu) {
-        Parcel obtain = Parcel.obtain();
-        com_google_android_gms_internal_measurement_zzeu.writeToParcel(obtain, 0);
-        byte[] marshall = obtain.marshall();
-        obtain.recycle();
-        if (marshall.length <= 131072) {
-            return zza(0, marshall);
-        }
-        zzge().zzip().log("Event is too long for local database. Sending event directly to service");
-        return false;
-    }
-
-    public final boolean zza(zzjx com_google_android_gms_internal_measurement_zzjx) {
-        Parcel obtain = Parcel.obtain();
-        com_google_android_gms_internal_measurement_zzjx.writeToParcel(obtain, 0);
-        byte[] marshall = obtain.marshall();
-        obtain.recycle();
-        if (marshall.length <= 131072) {
-            return zza(1, marshall);
-        }
-        zzge().zzip().log("User property too long for local database. Sending directly to service");
-        return false;
+    final String getGmpAppId() {
+        zzch();
+        return this.zzadm;
     }
 
     public final /* bridge */ /* synthetic */ void zzab() {
         super.zzab();
     }
 
-    public final /* bridge */ /* synthetic */ Clock zzbt() {
-        return super.zzbt();
+    final String zzah() {
+        zzch();
+        return this.zzti;
     }
 
-    public final boolean zzc(zzed com_google_android_gms_internal_measurement_zzed) {
-        zzgb();
-        byte[] zza = zzka.zza((Parcelable) com_google_android_gms_internal_measurement_zzed);
-        if (zza.length <= 131072) {
-            return zza(2, zza);
+    final zzdz zzbh(String str) {
+        zzab();
+        zzfs();
+        String zzah = zzah();
+        String gmpAppId = getGmpAppId();
+        zzch();
+        String str2 = this.zzth;
+        long zzip = (long) zzip();
+        zzch();
+        String str3 = this.zzadt;
+        zzch();
+        zzab();
+        if (this.zzaio == 0) {
+            this.zzaio = this.zzacw.zzgc().zzd(getContext(), getContext().getPackageName());
         }
-        zzge().zzip().log("Conditional user property too long for local database. Sending directly to service");
-        return false;
+        long j = this.zzaio;
+        boolean isEnabled = this.zzacw.isEnabled();
+        boolean z = !zzgg().zzakw;
+        String zzgl = zzgl();
+        zzch();
+        long j2 = this.zzadx;
+        long zzkb = this.zzacw.zzkb();
+        int zziq = zziq();
+        zzhh zzgh = zzgh();
+        zzgh.zzfs();
+        Boolean zzar = zzgh.zzar("google_analytics_adid_collection_enabled");
+        boolean z2 = zzar == null || zzar.booleanValue();
+        boolean booleanValue = Boolean.valueOf(z2).booleanValue();
+        zzgh = zzgh();
+        zzgh.zzfs();
+        zzar = zzgh.zzar("google_analytics_ssaid_collection_enabled");
+        z2 = zzar == null || zzar.booleanValue();
+        return new zzdz(zzah, gmpAppId, str2, zzip, str3, 12451, j, str, isEnabled, z, zzgl, j2, zzkb, zziq, booleanValue, Boolean.valueOf(z2).booleanValue(), zzgg().zzjl());
+    }
+
+    public final /* bridge */ /* synthetic */ Clock zzbt() {
+        return super.zzbt();
     }
 
     public final /* bridge */ /* synthetic */ void zzfr() {
@@ -192,417 +106,175 @@ public final class zzfc extends zzhh {
         super.zzfs();
     }
 
-    public final /* bridge */ /* synthetic */ zzdu zzft() {
-        return super.zzft();
-    }
-
-    public final /* bridge */ /* synthetic */ zzhk zzfu() {
+    public final /* bridge */ /* synthetic */ zzdu zzfu() {
         return super.zzfu();
     }
 
-    public final /* bridge */ /* synthetic */ zzfb zzfv() {
+    public final /* bridge */ /* synthetic */ zzhl zzfv() {
         return super.zzfv();
     }
 
-    public final /* bridge */ /* synthetic */ zzeo zzfw() {
+    public final /* bridge */ /* synthetic */ zzfc zzfw() {
         return super.zzfw();
     }
 
-    public final /* bridge */ /* synthetic */ zzii zzfx() {
+    public final /* bridge */ /* synthetic */ zzeq zzfx() {
         return super.zzfx();
     }
 
-    public final /* bridge */ /* synthetic */ zzif zzfy() {
+    public final /* bridge */ /* synthetic */ zzij zzfy() {
         return super.zzfy();
     }
 
-    public final /* bridge */ /* synthetic */ zzfc zzfz() {
+    public final /* bridge */ /* synthetic */ zzig zzfz() {
         return super.zzfz();
     }
 
-    public final /* bridge */ /* synthetic */ zzfe zzga() {
+    public final /* bridge */ /* synthetic */ zzfd zzga() {
         return super.zzga();
     }
 
-    public final /* bridge */ /* synthetic */ zzka zzgb() {
+    public final /* bridge */ /* synthetic */ zzff zzgb() {
         return super.zzgb();
     }
 
-    public final /* bridge */ /* synthetic */ zzjh zzgc() {
+    public final /* bridge */ /* synthetic */ zzkc zzgc() {
         return super.zzgc();
     }
 
-    public final /* bridge */ /* synthetic */ zzgg zzgd() {
+    public final /* bridge */ /* synthetic */ zzji zzgd() {
         return super.zzgd();
     }
 
-    public final /* bridge */ /* synthetic */ zzfg zzge() {
+    public final /* bridge */ /* synthetic */ zzgh zzge() {
         return super.zzge();
     }
 
-    public final /* bridge */ /* synthetic */ zzfr zzgf() {
+    public final /* bridge */ /* synthetic */ zzfh zzgf() {
         return super.zzgf();
     }
 
-    public final /* bridge */ /* synthetic */ zzef zzgg() {
+    public final /* bridge */ /* synthetic */ zzfs zzgg() {
         return super.zzgg();
     }
 
-    protected final boolean zzhf() {
-        return false;
+    public final /* bridge */ /* synthetic */ zzeg zzgh() {
+        return super.zzgh();
     }
 
-    public final java.util.List<com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable> zzp(int r14) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: Unreachable block: B:150:0x0138
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.modifyBlocksTree(BlockProcessor.java:248)
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.processBlocksTree(BlockProcessor.java:52)
-	at jadx.core.dex.visitors.blocksmaker.BlockProcessor.rerun(BlockProcessor.java:44)
-	at jadx.core.dex.visitors.blocksmaker.BlockFinallyExtract.visit(BlockFinallyExtract.java:57)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.ProcessClass.process(ProcessClass.java:37)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-	at jadx.api.JadxDecompiler$1.run(JadxDecompiler.java:199)
-*/
-        /*
-        r13 = this;
-        r13.zzab();
-        r0 = r13.zzaih;
-        if (r0 == 0) goto L_0x0009;
-    L_0x0007:
-        r0 = 0;
-    L_0x0008:
-        return r0;
-    L_0x0009:
-        r10 = new java.util.ArrayList;
-        r10.<init>();
-        r0 = r13.getContext();
-        r1 = "google_app_measurement_local.db";
-        r0 = r0.getDatabasePath(r1);
-        r0 = r0.exists();
-        if (r0 != 0) goto L_0x0021;
-    L_0x001f:
-        r0 = r10;
-        goto L_0x0008;
-    L_0x0021:
-        r9 = 5;
-        r0 = 0;
-        r12 = r0;
-    L_0x0024:
-        r0 = 5;
-        if (r12 >= r0) goto L_0x01e5;
-    L_0x0027:
-        r3 = 0;
-        r11 = 0;
-        r0 = r13.getWritableDatabase();	 Catch:{ SQLiteFullException -> 0x0217, SQLiteDatabaseLockedException -> 0x020e, SQLiteException -> 0x0204, all -> 0x01f6 }
-        if (r0 != 0) goto L_0x0039;
-    L_0x002f:
-        r1 = 1;
-        r13.zzaih = r1;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        if (r0 == 0) goto L_0x0037;
-    L_0x0034:
-        r0.close();
-    L_0x0037:
-        r0 = 0;
-        goto L_0x0008;
-    L_0x0039:
-        r0.beginTransaction();	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r1 = "messages";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r2 = 3;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r2 = new java.lang.String[r2];	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r3 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r4 = "rowid";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r2[r3] = r4;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r3 = 1;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r4 = "type";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r2[r3] = r4;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r3 = 2;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r4 = "entry";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r2[r3] = r4;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r3 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r4 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r5 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r6 = 0;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r7 = "rowid asc";	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r8 = 100;	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r8 = java.lang.Integer.toString(r8);	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r2 = r0.query(r1, r2, r3, r4, r5, r6, r7, r8);	 Catch:{ SQLiteFullException -> 0x021c, SQLiteDatabaseLockedException -> 0x0212, SQLiteException -> 0x0209, all -> 0x01fb }
-        r4 = -1;
-    L_0x0067:
-        r1 = r2.moveToNext();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        if (r1 == 0) goto L_0x01aa;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x006d:
-        r1 = 0;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r4 = r2.getLong(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1 = 1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1 = r2.getInt(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r3 = 2;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r6 = r2.getBlob(r3);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        if (r1 != 0) goto L_0x0115;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x007e:
-        r3 = android.os.Parcel.obtain();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1 = 0;
-        r7 = r6.length;	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r3.unmarshall(r6, r1, r7);	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r1 = 0;	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r3.setDataPosition(r1);	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r1 = com.google.android.gms.internal.measurement.zzeu.CREATOR;	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r1 = r1.createFromParcel(r3);	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r1 = (com.google.android.gms.internal.measurement.zzeu) r1;	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r3.recycle();
-        if (r1 == 0) goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x0098:
-        r10.add(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        goto L_0x0067;
-    L_0x009c:
-        r1 = move-exception;
-        r3 = r0;
-    L_0x009e:
-        r0 = r13.zzge();	 Catch:{ all -> 0x0200 }
-        r0 = r0.zzim();	 Catch:{ all -> 0x0200 }
-        r4 = "Error reading entries from local database";	 Catch:{ all -> 0x0200 }
-        r0.zzg(r4, r1);	 Catch:{ all -> 0x0200 }
-        r0 = 1;	 Catch:{ all -> 0x0200 }
-        r13.zzaih = r0;	 Catch:{ all -> 0x0200 }
-        if (r2 == 0) goto L_0x00b4;
-    L_0x00b1:
-        r2.close();
-    L_0x00b4:
-        if (r3 == 0) goto L_0x0221;
-    L_0x00b6:
-        r3.close();
-        r0 = r9;
-    L_0x00ba:
-        r1 = r12 + 1;
-        r12 = r1;
-        r9 = r0;
-        goto L_0x0024;
-    L_0x00c0:
-        r1 = move-exception;
-        r1 = r13.zzge();	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r1 = r1.zzim();	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r6 = "Failed to load event from local database";	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r1.log(r6);	 Catch:{ ParseException -> 0x00c0, all -> 0x00e6 }
-        r3.recycle();
-        goto L_0x0067;
-    L_0x00d3:
-        r1 = move-exception;
-        r3 = r0;
-    L_0x00d5:
-        r0 = (long) r9;
-        android.os.SystemClock.sleep(r0);	 Catch:{ all -> 0x0200 }
-        r0 = r9 + 20;
-        if (r2 == 0) goto L_0x00e0;
-    L_0x00dd:
-        r2.close();
-    L_0x00e0:
-        if (r3 == 0) goto L_0x00ba;
-    L_0x00e2:
-        r3.close();
-        goto L_0x00ba;
-    L_0x00e6:
-        r1 = move-exception;
-        r3.recycle();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        throw r1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x00eb:
-        r1 = move-exception;
-        r3 = r0;
-    L_0x00ed:
-        if (r3 == 0) goto L_0x00f8;
-    L_0x00ef:
-        r0 = r3.inTransaction();	 Catch:{ all -> 0x0200 }
-        if (r0 == 0) goto L_0x00f8;	 Catch:{ all -> 0x0200 }
-    L_0x00f5:
-        r3.endTransaction();	 Catch:{ all -> 0x0200 }
-    L_0x00f8:
-        r0 = r13.zzge();	 Catch:{ all -> 0x0200 }
-        r0 = r0.zzim();	 Catch:{ all -> 0x0200 }
-        r4 = "Error reading entries from local database";	 Catch:{ all -> 0x0200 }
-        r0.zzg(r4, r1);	 Catch:{ all -> 0x0200 }
-        r0 = 1;	 Catch:{ all -> 0x0200 }
-        r13.zzaih = r0;	 Catch:{ all -> 0x0200 }
-        if (r2 == 0) goto L_0x010e;
-    L_0x010b:
-        r2.close();
-    L_0x010e:
-        if (r3 == 0) goto L_0x0221;
-    L_0x0110:
-        r3.close();
-        r0 = r9;
-        goto L_0x00ba;
-    L_0x0115:
-        r3 = 1;
-        if (r1 != r3) goto L_0x015e;
-    L_0x0118:
-        r7 = android.os.Parcel.obtain();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r3 = 0;
-        r1 = 0;
-        r8 = r6.length;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r7.unmarshall(r6, r1, r8);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r1 = 0;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r7.setDataPosition(r1);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r1 = com.google.android.gms.internal.measurement.zzjx.CREATOR;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r1 = r1.createFromParcel(r7);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r1 = (com.google.android.gms.internal.measurement.zzjx) r1;	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r7.recycle();
-    L_0x0131:
-        if (r1 == 0) goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x0133:
-        r10.add(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        goto L_0x0067;
-    L_0x0138:
-        r1 = move-exception;
-        r3 = r0;
-    L_0x013a:
-        if (r2 == 0) goto L_0x013f;
-    L_0x013c:
-        r2.close();
-    L_0x013f:
-        if (r3 == 0) goto L_0x0144;
-    L_0x0141:
-        r3.close();
-    L_0x0144:
-        throw r1;
-    L_0x0145:
-        r1 = move-exception;
-        r1 = r13.zzge();	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r1 = r1.zzim();	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r6 = "Failed to load user property from local database";	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r1.log(r6);	 Catch:{ ParseException -> 0x0145, all -> 0x0159 }
-        r7.recycle();
-        r1 = r3;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        goto L_0x0131;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x0159:
-        r1 = move-exception;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r7.recycle();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        throw r1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x015e:
-        r3 = 2;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        if (r1 != r3) goto L_0x019a;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x0161:
-        r7 = android.os.Parcel.obtain();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r3 = 0;
-        r1 = 0;
-        r8 = r6.length;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r7.unmarshall(r6, r1, r8);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r1 = 0;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r7.setDataPosition(r1);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r1 = com.google.android.gms.internal.measurement.zzed.CREATOR;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r1 = r1.createFromParcel(r7);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r1 = (com.google.android.gms.internal.measurement.zzed) r1;	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r7.recycle();
-    L_0x017a:
-        if (r1 == 0) goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x017c:
-        r10.add(r1);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        goto L_0x0067;
-    L_0x0181:
-        r1 = move-exception;
-        r1 = r13.zzge();	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r1 = r1.zzim();	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r6 = "Failed to load user property from local database";	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r1.log(r6);	 Catch:{ ParseException -> 0x0181, all -> 0x0195 }
-        r7.recycle();
-        r1 = r3;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        goto L_0x017a;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x0195:
-        r1 = move-exception;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r7.recycle();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        throw r1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x019a:
-        r1 = r13.zzge();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1 = r1.zzim();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r3 = "Unknown record type in local database";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1.log(r3);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        goto L_0x0067;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x01aa:
-        r1 = "messages";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r3 = "rowid <= ?";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r6 = 1;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r6 = new java.lang.String[r6];	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r7 = 0;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r4 = java.lang.Long.toString(r4);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r6[r7] = r4;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1 = r0.delete(r1, r3, r6);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r3 = r10.size();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        if (r1 >= r3) goto L_0x01d2;	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x01c4:
-        r1 = r13.zzge();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1 = r1.zzim();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r3 = "Fewer entries removed from local database than expected";	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r1.log(r3);	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-    L_0x01d2:
-        r0.setTransactionSuccessful();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        r0.endTransaction();	 Catch:{ SQLiteFullException -> 0x009c, SQLiteDatabaseLockedException -> 0x00d3, SQLiteException -> 0x00eb, all -> 0x0138 }
-        if (r2 == 0) goto L_0x01dd;
-    L_0x01da:
-        r2.close();
-    L_0x01dd:
-        if (r0 == 0) goto L_0x01e2;
-    L_0x01df:
-        r0.close();
-    L_0x01e2:
-        r0 = r10;
-        goto L_0x0008;
-    L_0x01e5:
-        r0 = r13.zzge();
-        r0 = r0.zzip();
-        r1 = "Failed to read events from database in reasonable time";
-        r0.log(r1);
-        r0 = 0;
-        goto L_0x0008;
-    L_0x01f6:
-        r0 = move-exception;
-        r1 = r0;
-        r2 = r11;
-        goto L_0x013a;
-    L_0x01fb:
-        r1 = move-exception;
-        r2 = r11;
-        r3 = r0;
-        goto L_0x013a;
-    L_0x0200:
-        r0 = move-exception;
-        r1 = r0;
-        goto L_0x013a;
-    L_0x0204:
-        r0 = move-exception;
-        r1 = r0;
-        r2 = r11;
-        goto L_0x00ed;
-    L_0x0209:
-        r1 = move-exception;
-        r2 = r11;
-        r3 = r0;
-        goto L_0x00ed;
-    L_0x020e:
-        r0 = move-exception;
-        r2 = r11;
-        goto L_0x00d5;
-    L_0x0212:
-        r1 = move-exception;
-        r2 = r11;
-        r3 = r0;
-        goto L_0x00d5;
-    L_0x0217:
-        r0 = move-exception;
-        r1 = r0;
-        r2 = r11;
-        goto L_0x009e;
-    L_0x021c:
-        r1 = move-exception;
-        r2 = r11;
-        r3 = r0;
-        goto L_0x009e;
-    L_0x0221:
-        r0 = r9;
-        goto L_0x00ba;
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.internal.measurement.zzfc.zzp(int):java.util.List<com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable>");
+    public final /* bridge */ /* synthetic */ zzec zzgi() {
+        return super.zzgi();
+    }
+
+    protected final boolean zzhh() {
+        return true;
+    }
+
+    protected final void zzin() {
+        int i = 1;
+        String str = "unknown";
+        String str2 = "Unknown";
+        int i2 = Integer.MIN_VALUE;
+        String str3 = "Unknown";
+        String packageName = getContext().getPackageName();
+        PackageManager packageManager = getContext().getPackageManager();
+        if (packageManager == null) {
+            zzgf().zzis().zzg("PackageManager is null, app identity information might be inaccurate. appId", zzfh.zzbl(packageName));
+        } else {
+            try {
+                str = packageManager.getInstallerPackageName(packageName);
+            } catch (IllegalArgumentException e) {
+                zzgf().zzis().zzg("Error retrieving app installer package name. appId", zzfh.zzbl(packageName));
+            }
+            if (str == null) {
+                str = "manual_install";
+            } else if ("com.android.vending".equals(str)) {
+                str = TtmlNode.ANONYMOUS_REGION_ID;
+            }
+            try {
+                PackageInfo packageInfo = packageManager.getPackageInfo(getContext().getPackageName(), 0);
+                if (packageInfo != null) {
+                    CharSequence applicationLabel = packageManager.getApplicationLabel(packageInfo.applicationInfo);
+                    if (!TextUtils.isEmpty(applicationLabel)) {
+                        str3 = applicationLabel.toString();
+                    }
+                    str2 = packageInfo.versionName;
+                    i2 = packageInfo.versionCode;
+                }
+            } catch (NameNotFoundException e2) {
+                zzgf().zzis().zze("Error retrieving package info. appId, appName", zzfh.zzbl(packageName), str3);
+            }
+        }
+        this.zzti = packageName;
+        this.zzadt = str;
+        this.zzth = str2;
+        this.zzain = i2;
+        this.zztg = str3;
+        this.zzaio = 0;
+        zzgi();
+        Status initialize = GoogleServices.initialize(getContext());
+        int i3 = (initialize == null || !initialize.isSuccess()) ? 0 : 1;
+        if (i3 == 0) {
+            if (initialize == null) {
+                zzgf().zzis().log("GoogleService failed to initialize (no status)");
+            } else {
+                zzgf().zzis().zze("GoogleService failed to initialize, status", Integer.valueOf(initialize.getStatusCode()), initialize.getStatusMessage());
+            }
+        }
+        if (i3 != 0) {
+            Boolean zzhk = zzgh().zzhk();
+            if (zzgh().zzhj()) {
+                zzgf().zzix().log("Collection disabled with firebase_analytics_collection_deactivated=1");
+                i3 = 0;
+            } else if (zzhk != null && !zzhk.booleanValue()) {
+                zzgf().zzix().log("Collection disabled with firebase_analytics_collection_enabled=0");
+                i3 = 0;
+            } else if (zzhk == null && GoogleServices.isMeasurementExplicitlyDisabled()) {
+                zzgf().zzix().log("Collection disabled with google_app_measurement_enable=0");
+                i3 = 0;
+            } else {
+                zzgf().zziz().log("Collection enabled");
+                i3 = 1;
+            }
+        } else {
+            i3 = 0;
+        }
+        this.zzadm = TtmlNode.ANONYMOUS_REGION_ID;
+        this.zzadx = 0;
+        zzgi();
+        if (this.zzacw.zzka() != null) {
+            this.zzadm = this.zzacw.zzka();
+        } else {
+            try {
+                String googleAppId = GoogleServices.getGoogleAppId();
+                if (TextUtils.isEmpty(googleAppId)) {
+                    googleAppId = TtmlNode.ANONYMOUS_REGION_ID;
+                }
+                this.zzadm = googleAppId;
+                if (i3 != 0) {
+                    zzgf().zziz().zze("App package, google app id", this.zzti, this.zzadm);
+                }
+            } catch (IllegalStateException e3) {
+                zzgf().zzis().zze("getGoogleAppId or isMeasurementEnabled failed with exception. appId", zzfh.zzbl(packageName), e3);
+            }
+        }
+        if (VERSION.SDK_INT >= 16) {
+            if (!InstantApps.isInstantApp(getContext())) {
+                i = 0;
+            }
+            this.zzaen = i;
+            return;
+        }
+        this.zzaen = 0;
+    }
+
+    final int zzip() {
+        zzch();
+        return this.zzain;
+    }
+
+    final int zziq() {
+        zzch();
+        return this.zzaen;
     }
 }

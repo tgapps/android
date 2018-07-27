@@ -10,6 +10,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build.VERSION;
@@ -71,7 +72,9 @@ import org.telegram.tgnet.TLRPC.TL_account_getPassword;
 import org.telegram.tgnet.TLRPC.TL_contacts_resolveUsername;
 import org.telegram.tgnet.TLRPC.TL_contacts_resolvedPeer;
 import org.telegram.tgnet.TLRPC.TL_error;
+import org.telegram.tgnet.TLRPC.TL_help_appUpdate;
 import org.telegram.tgnet.TLRPC.TL_help_deepLinkInfo;
+import org.telegram.tgnet.TLRPC.TL_help_getAppUpdate;
 import org.telegram.tgnet.TLRPC.TL_help_getDeepLinkInfo;
 import org.telegram.tgnet.TLRPC.TL_help_termsOfService;
 import org.telegram.tgnet.TLRPC.TL_inputGameShortName;
@@ -98,6 +101,7 @@ import org.telegram.ui.Cells.DrawerUserCell;
 import org.telegram.ui.Cells.LanguageCell;
 import org.telegram.ui.Components.AlertsCreator;
 import org.telegram.ui.Components.AlertsCreator.AccountSelectDelegate;
+import org.telegram.ui.Components.BlockingUpdateView;
 import org.telegram.ui.Components.EmbedBottomSheet;
 import org.telegram.ui.Components.JoinGroupAlert;
 import org.telegram.ui.Components.LayoutHelper;
@@ -109,6 +113,7 @@ import org.telegram.ui.Components.StickersAlert;
 import org.telegram.ui.Components.TermsOfServiceView;
 import org.telegram.ui.Components.TermsOfServiceView.TermsOfServiceViewDelegate;
 import org.telegram.ui.Components.ThemeEditorView;
+import org.telegram.ui.Components.UpdateAppAlertDialog;
 import org.telegram.ui.DialogsActivity.DialogsActivityDelegate;
 import org.telegram.ui.LocationActivity.LocationActivityDelegate;
 import org.telegram.ui.PhonebookSelectActivity.PhonebookSelectActivityDelegate;
@@ -119,6 +124,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     private static ArrayList<BaseFragment> rightFragmentsStack = new ArrayList();
     private ActionBarLayout actionBarLayout;
     private View backgroundTablet;
+    private BlockingUpdateView blockingUpdateView;
     private ArrayList<User> contactsToSend;
     private Uri contactsToSendUri;
     private int currentAccount;
@@ -325,7 +331,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0.setTaskDescription(r1);	 Catch:{ Exception -> 0x094c }
     L_0x0173:
         r35 = r40.getWindow();
-        r36 = 2131165690; // 0x7f0701fa float:1.7945604E38 double:1.052935753E-314;
+        r36 = 2131165669; // 0x7f0701e5 float:1.7945562E38 double:1.0529357426E-314;
         r35.setBackgroundDrawableResource(r36);
         r35 = org.telegram.messenger.SharedConfig.passcodeHash;
         r35 = r35.length();
@@ -434,7 +440,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r1 = r40;
         r1.backgroundTablet = r0;
         r35 = r40.getResources();
-        r36 = 2131165267; // 0x7f070053 float:1.7944746E38 double:1.052935544E-314;
+        r36 = 2131165246; // 0x7f07003e float:1.7944704E38 double:1.0529355337E-314;
         r13 = r35.getDrawable(r36);
         r13 = (android.graphics.drawable.BitmapDrawable) r13;
         r35 = android.graphics.Shader.TileMode.REPEAT;
@@ -578,7 +584,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r40;
         r0 = r0.layersActionBarLayout;
         r35 = r0;
-        r36 = 2131165252; // 0x7f070044 float:1.7944716E38 double:1.0529355366E-314;
+        r36 = 2131165231; // 0x7f07002f float:1.7944673E38 double:1.0529355262E-314;
         r35.setBackgroundResource(r36);
         r0 = r40;
         r0 = r0.layersActionBarLayout;
@@ -1482,6 +1488,22 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         }
     }
 
+    private void showUpdateActivity(int account, TL_help_appUpdate update) {
+        if (this.blockingUpdateView == null) {
+            this.blockingUpdateView = new BlockingUpdateView(this) {
+                public void setVisibility(int visibility) {
+                    super.setVisibility(visibility);
+                    if (visibility == 8) {
+                        LaunchActivity.this.drawerLayoutContainer.setAllowOpenDrawer(true, false);
+                    }
+                }
+            };
+            this.drawerLayoutContainer.addView(this.blockingUpdateView, LayoutHelper.createFrame(-1, -1.0f));
+        }
+        this.blockingUpdateView.show(account, update);
+        this.drawerLayoutContainer.setAllowOpenDrawer(false, false);
+    }
+
     private void showTosActivity(int account, TL_help_termsOfService tos) {
         if (this.termsOfServiceView == null) {
             this.termsOfServiceView = new TermsOfServiceView(this);
@@ -2348,7 +2370,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r0 = r29;
         r1 = r53;
         r0.putString(r4, r1);
-        r4 = new org.telegram.ui.LaunchActivity$8;
+        r4 = new org.telegram.ui.LaunchActivity$9;
         r0 = r73;
         r1 = r29;
         r4.<init>(r1);
@@ -3229,7 +3251,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r19 = r4.get(r5);
         r19 = (org.telegram.ui.ActionBar.BaseFragment) r19;
         r4 = new org.telegram.ui.Components.SharingLocationsAlert;
-        r5 = new org.telegram.ui.LaunchActivity$9;
+        r5 = new org.telegram.ui.LaunchActivity$10;
         r0 = r73;
         r1 = r45;
         r5.<init>(r1);
@@ -3309,14 +3331,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0e84:
         r4 = "selectAlertString";
         r5 = "SendContactTo";
-        r18 = 2131494512; // 0x7f0c0670 float:1.8612534E38 double:1.0530982127E-314;
+        r18 = 2131494525; // 0x7f0c067d float:1.861256E38 double:1.053098219E-314;
         r0 = r18;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r29;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendContactToGroup";
-        r18 = 2131494499; // 0x7f0c0663 float:1.8612508E38 double:1.0530982063E-314;
+        r18 = 2131494512; // 0x7f0c0670 float:1.8612534E38 double:1.0530982127E-314;
         r0 = r18;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r29;
@@ -3392,14 +3414,14 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
     L_0x0f39:
         r4 = "selectAlertString";
         r5 = "SendMessagesTo";
-        r18 = 2131494512; // 0x7f0c0670 float:1.8612534E38 double:1.0530982127E-314;
+        r18 = 2131494525; // 0x7f0c067d float:1.861256E38 double:1.053098219E-314;
         r0 = r18;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r29;
         r0.putString(r4, r5);
         r4 = "selectAlertStringGroup";
         r5 = "SendMessagesToGroup";
-        r18 = 2131494513; // 0x7f0c0671 float:1.8612537E38 double:1.053098213E-314;
+        r18 = 2131494526; // 0x7f0c067e float:1.8612563E38 double:1.0530982196E-314;
         r0 = r18;
         r5 = org.telegram.messenger.LocaleController.getString(r5, r0);
         r0 = r29;
@@ -4110,6 +4132,57 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         }).show();
     }
 
+    public void checkAppUpdate(boolean force) {
+        if (!force && BuildVars.DEBUG_VERSION) {
+            return;
+        }
+        if (!force && !BuildVars.CHECK_UPDATES) {
+            return;
+        }
+        if (force || Math.abs(System.currentTimeMillis() - UserConfig.getInstance(0).lastUpdateCheckTime) >= 86400000) {
+            TL_help_getAppUpdate req = new TL_help_getAppUpdate();
+            try {
+                req.source = ApplicationLoader.applicationContext.getPackageManager().getInstallerPackageName(ApplicationLoader.applicationContext.getPackageName());
+            } catch (Exception e) {
+            }
+            if (req.source == null) {
+                req.source = TtmlNode.ANONYMOUS_REGION_ID;
+            }
+            final int accountNum = this.currentAccount;
+            ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
+                public void run(TLObject response, TL_error error) {
+                    UserConfig.getInstance(0).lastUpdateCheckTime = System.currentTimeMillis();
+                    UserConfig.getInstance(0).saveConfig(false);
+                    if (response instanceof TL_help_appUpdate) {
+                        final TL_help_appUpdate res = (TL_help_appUpdate) response;
+                        AndroidUtilities.runOnUIThread(new Runnable() {
+                            public void run() {
+                                if (BuildVars.DEBUG_PRIVATE_VERSION) {
+                                    res.popup = Utilities.random.nextBoolean();
+                                }
+                                if (res.popup) {
+                                    UserConfig.getInstance(0).pendingAppUpdate = res;
+                                    UserConfig.getInstance(0).pendingAppUpdateBuildVersion = BuildVars.BUILD_VERSION;
+                                    try {
+                                        PackageInfo packageInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
+                                        UserConfig.getInstance(0).pendingAppUpdateInstallTime = Math.max(packageInfo.lastUpdateTime, packageInfo.firstInstallTime);
+                                    } catch (Throwable e) {
+                                        FileLog.e(e);
+                                        UserConfig.getInstance(0).pendingAppUpdateInstallTime = 0;
+                                    }
+                                    UserConfig.getInstance(0).saveConfig(false);
+                                    LaunchActivity.this.showUpdateActivity(accountNum, res);
+                                    return;
+                                }
+                                new UpdateAppAlertDialog(LaunchActivity.this, res, accountNum).show();
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
+
     public AlertDialog showAlertDialog(Builder builder) {
         AlertDialog alertDialog = null;
         try {
@@ -4504,7 +4577,10 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         }
         if (UserConfig.getInstance(UserConfig.selectedAccount).unacceptedTermsOfService != null) {
             showTosActivity(UserConfig.selectedAccount, UserConfig.getInstance(UserConfig.selectedAccount).unacceptedTermsOfService);
+        } else if (UserConfig.getInstance(0).pendingAppUpdate != null) {
+            showUpdateActivity(UserConfig.selectedAccount, UserConfig.getInstance(0).pendingAppUpdate);
         }
+        checkAppUpdate(false);
     }
 
     public void onConfigurationChanged(Configuration newConfig) {

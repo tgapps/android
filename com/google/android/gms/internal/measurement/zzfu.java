@@ -4,31 +4,30 @@ import android.content.SharedPreferences.Editor;
 import com.google.android.gms.common.internal.Preconditions;
 
 public final class zzfu {
-    private long value;
-    private boolean zzakp;
-    private final /* synthetic */ zzfr zzakq;
-    private final long zzakr;
+    private boolean value;
+    private final boolean zzakx = true;
+    private boolean zzaky;
+    private final /* synthetic */ zzfs zzakz;
     private final String zzny;
 
-    public zzfu(zzfr com_google_android_gms_internal_measurement_zzfr, String str, long j) {
-        this.zzakq = com_google_android_gms_internal_measurement_zzfr;
+    public zzfu(zzfs com_google_android_gms_internal_measurement_zzfs, String str, boolean z) {
+        this.zzakz = com_google_android_gms_internal_measurement_zzfs;
         Preconditions.checkNotEmpty(str);
         this.zzny = str;
-        this.zzakr = j;
     }
 
-    public final long get() {
-        if (!this.zzakp) {
-            this.zzakp = true;
-            this.value = this.zzakq.zziy().getLong(this.zzny, this.zzakr);
+    public final boolean get() {
+        if (!this.zzaky) {
+            this.zzaky = true;
+            this.value = this.zzakz.zzjf().getBoolean(this.zzny, this.zzakx);
         }
         return this.value;
     }
 
-    public final void set(long j) {
-        Editor edit = this.zzakq.zziy().edit();
-        edit.putLong(this.zzny, j);
+    public final void set(boolean z) {
+        Editor edit = this.zzakz.zzjf().edit();
+        edit.putBoolean(this.zzny, z);
         edit.apply();
-        this.value = j;
+        this.value = z;
     }
 }

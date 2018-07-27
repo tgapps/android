@@ -1,41 +1,19 @@
 package com.google.android.gms.internal.measurement;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
-final class zzho implements Callable<String> {
-    private final /* synthetic */ zzhk zzanw;
+final class zzho implements Runnable {
+    private final /* synthetic */ AtomicReference zzaof;
+    private final /* synthetic */ zzhl zzaog;
+    private final /* synthetic */ boolean zzaoj;
 
-    zzho(zzhk com_google_android_gms_internal_measurement_zzhk) {
-        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
+    zzho(zzhl com_google_android_gms_internal_measurement_zzhl, AtomicReference atomicReference, boolean z) {
+        this.zzaog = com_google_android_gms_internal_measurement_zzhl;
+        this.zzaof = atomicReference;
+        this.zzaoj = z;
     }
 
-    public final /* synthetic */ Object call() throws Exception {
-        Object zzja = this.zzanw.zzgf().zzja();
-        if (zzja == null) {
-            zzhg zzfu = this.zzanw.zzfu();
-            if (zzfu.zzgd().zzjk()) {
-                zzfu.zzge().zzim().log("Cannot retrieve app instance id from analytics worker thread");
-                zzja = null;
-            } else {
-                zzfu.zzgd();
-                if (zzgg.isMainThread()) {
-                    zzfu.zzge().zzim().log("Cannot retrieve app instance id from main thread");
-                    zzja = null;
-                } else {
-                    long elapsedRealtime = zzfu.zzbt().elapsedRealtime();
-                    zzja = zzfu.zzae(120000);
-                    elapsedRealtime = zzfu.zzbt().elapsedRealtime() - elapsedRealtime;
-                    if (zzja == null && elapsedRealtime < 120000) {
-                        zzja = zzfu.zzae(120000 - elapsedRealtime);
-                    }
-                }
-            }
-            if (zzja == null) {
-                throw new TimeoutException();
-            }
-            this.zzanw.zzgf().zzbr(zzja);
-        }
-        return zzja;
+    public final void run() {
+        this.zzaog.zzfy().zza(this.zzaof, this.zzaoj);
     }
 }

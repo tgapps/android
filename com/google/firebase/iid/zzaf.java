@@ -1,16 +1,15 @@
 package com.google.firebase.iid;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.components.ComponentContainer;
-import com.google.firebase.components.ComponentFactory;
+final /* synthetic */ class zzaf implements Runnable {
+    private final zzab zzbt;
+    private final zzai zzbu;
 
-final /* synthetic */ class zzaf implements ComponentFactory {
-    static final ComponentFactory zzby = new zzaf();
-
-    private zzaf() {
+    zzaf(zzab com_google_firebase_iid_zzab, zzai com_google_firebase_iid_zzai) {
+        this.zzbt = com_google_firebase_iid_zzab;
+        this.zzbu = com_google_firebase_iid_zzai;
     }
 
-    public final Object create(ComponentContainer componentContainer) {
-        return new FirebaseInstanceId((FirebaseApp) componentContainer.get(FirebaseApp.class));
+    public final void run() {
+        this.zzbt.zza(this.zzbu.zzbw);
     }
 }

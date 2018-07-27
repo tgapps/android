@@ -154,12 +154,12 @@ public class AttachmentDownloader {
         }
 
         private boolean downloadAttachment(String url, File file) {
-            boolean z;
             Throwable e;
             Throwable th;
             InputStream input = null;
             OutputStream output = null;
             HttpURLConnection connection = null;
+            boolean z;
             try {
                 connection = (HttpURLConnection) createConnection(new URL(url));
                 connection.connect();
@@ -320,7 +320,7 @@ public class AttachmentDownloader {
 
         private URLConnection createConnection(URL url) throws IOException {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.addRequestProperty("User-Agent", "HockeySDK/Android 5.0.4");
+            connection.addRequestProperty("User-Agent", "HockeySDK/Android 5.1.0");
             connection.setInstanceFollowRedirects(true);
             return connection;
         }

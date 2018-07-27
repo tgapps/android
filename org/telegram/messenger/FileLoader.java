@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import org.telegram.messenger.FileLoadOperation.FileLoadOperationDelegate;
@@ -166,6 +167,19 @@ public class FileLoader {
                     operation.checkNewDataAvailable(j, j2);
                 } else if (j2 != 0) {
                     FileLoader.this.uploadSizes.put(str, Long.valueOf(j2));
+                }
+            }
+        });
+    }
+
+    public void onNetworkChanged(final boolean slow) {
+        fileLoaderQueue.postRunnable(new Runnable() {
+            public void run() {
+                for (Entry<String, FileUploadOperation> entry : FileLoader.this.uploadOperationPaths.entrySet()) {
+                    ((FileUploadOperation) entry.getValue()).onNetworkChanged(slow);
+                }
+                for (Entry<String, FileUploadOperation> entry2 : FileLoader.this.uploadOperationPathsEnc.entrySet()) {
+                    ((FileUploadOperation) entry2.getValue()).onNetworkChanged(slow);
                 }
             }
         });

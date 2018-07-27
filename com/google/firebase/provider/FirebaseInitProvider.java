@@ -11,26 +11,6 @@ import com.google.android.gms.common.internal.Preconditions;
 import com.google.firebase.FirebaseApp;
 
 public class FirebaseInitProvider extends ContentProvider {
-    public void attachInfo(Context context, ProviderInfo providerInfo) {
-        Preconditions.checkNotNull(providerInfo, "FirebaseInitProvider ProviderInfo cannot be null.");
-        if ("com.google.firebase.firebaseinitprovider".equals(providerInfo.authority)) {
-            throw new IllegalStateException("Incorrect provider authority in manifest. Most likely due to a missing applicationId variable in application's build.gradle.");
-        }
-        super.attachInfo(context, providerInfo);
-    }
-
-    public int delete(Uri uri, String str, String[] strArr) {
-        return 0;
-    }
-
-    public String getType(Uri uri) {
-        return null;
-    }
-
-    public Uri insert(Uri uri, ContentValues contentValues) {
-        return null;
-    }
-
     public boolean onCreate() {
         if (FirebaseApp.initializeApp(getContext()) == null) {
             Log.i("FirebaseInitProvider", "FirebaseApp initialization unsuccessful");
@@ -44,7 +24,27 @@ public class FirebaseInitProvider extends ContentProvider {
         return null;
     }
 
+    public String getType(Uri uri) {
+        return null;
+    }
+
+    public Uri insert(Uri uri, ContentValues contentValues) {
+        return null;
+    }
+
+    public int delete(Uri uri, String str, String[] strArr) {
+        return 0;
+    }
+
     public int update(Uri uri, ContentValues contentValues, String str, String[] strArr) {
         return 0;
+    }
+
+    public void attachInfo(Context context, ProviderInfo info) {
+        Preconditions.checkNotNull(info, "FirebaseInitProvider ProviderInfo cannot be null.");
+        if ("com.google.firebase.firebaseinitprovider".equals(info.authority)) {
+            throw new IllegalStateException("Incorrect provider authority in manifest. Most likely due to a missing applicationId variable in application's build.gradle.");
+        }
+        super.attachInfo(context, info);
     }
 }

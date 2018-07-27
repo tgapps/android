@@ -217,11 +217,11 @@ public class FirebaseRemoteConfig {
     }
 
     private static zzaw zze(Context context) {
+        FileInputStream openFileInput;
         Throwable e;
         if (context == null) {
             return null;
         }
-        FileInputStream openFileInput;
         try {
             openFileInput = context.openFileInput("persisted_config");
             try {

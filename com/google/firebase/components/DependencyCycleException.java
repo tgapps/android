@@ -4,12 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DependencyCycleException extends DependencyException {
-    private final List<Component<?>> zzap;
+    private final List<Component<?>> zza;
 
-    public DependencyCycleException(List<Component<?>> list) {
-        String str = "Dependency cycle detected: ";
-        String valueOf = String.valueOf(Arrays.toString(list.toArray()));
-        super(valueOf.length() != 0 ? str.concat(valueOf) : new String(str));
-        this.zzap = list;
+    public DependencyCycleException(List<Component<?>> componentsInCycle) {
+        super("Dependency cycle detected: " + Arrays.toString(componentsInCycle.toArray()));
+        this.zza = componentsInCycle;
     }
 }

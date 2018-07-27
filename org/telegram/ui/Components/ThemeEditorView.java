@@ -833,23 +833,47 @@ public class ThemeEditorView {
                     this.startY = y;
                 } else if (event.getAction() != 2 || this.dragging) {
                     if (event.getAction() == 1 && !this.dragging && ThemeEditorView.this.editorAlert == null) {
-                        ActionBarLayout actionBarLayout = ((LaunchActivity) ThemeEditorView.this.parentActivity).getActionBarLayout();
-                        if (!actionBarLayout.fragmentsStack.isEmpty()) {
-                            ThemeDescription[] items = ((BaseFragment) actionBarLayout.fragmentsStack.get(actionBarLayout.fragmentsStack.size() - 1)).getThemeDescriptions();
-                            if (items != null) {
-                                ThemeEditorView.this.editorAlert = new EditorAlert(ThemeEditorView.this.parentActivity, items);
-                                ThemeEditorView.this.editorAlert.setOnDismissListener(new OnDismissListener() {
-                                    public void onDismiss(DialogInterface dialog) {
-                                    }
-                                });
-                                ThemeEditorView.this.editorAlert.setOnDismissListener(new OnDismissListener() {
-                                    public void onDismiss(DialogInterface dialog) {
-                                        ThemeEditorView.this.editorAlert = null;
-                                        ThemeEditorView.this.show();
-                                    }
-                                });
-                                ThemeEditorView.this.editorAlert.show();
-                                ThemeEditorView.this.hide();
+                        LaunchActivity launchActivity = (LaunchActivity) ThemeEditorView.this.parentActivity;
+                        ActionBarLayout actionBarLayout = null;
+                        if (AndroidUtilities.isTablet()) {
+                            actionBarLayout = launchActivity.getLayersActionBarLayout();
+                            if (actionBarLayout != null && actionBarLayout.fragmentsStack.isEmpty()) {
+                                actionBarLayout = null;
+                            }
+                            if (actionBarLayout == null) {
+                                actionBarLayout = launchActivity.getRightActionBarLayout();
+                                if (actionBarLayout != null && actionBarLayout.fragmentsStack.isEmpty()) {
+                                    actionBarLayout = null;
+                                }
+                            }
+                        }
+                        if (actionBarLayout == null) {
+                            actionBarLayout = launchActivity.getActionBarLayout();
+                        }
+                        if (actionBarLayout != null) {
+                            BaseFragment fragment;
+                            if (actionBarLayout.fragmentsStack.isEmpty()) {
+                                fragment = null;
+                            } else {
+                                fragment = (BaseFragment) actionBarLayout.fragmentsStack.get(actionBarLayout.fragmentsStack.size() - 1);
+                            }
+                            if (fragment != null) {
+                                ThemeDescription[] items = fragment.getThemeDescriptions();
+                                if (items != null) {
+                                    ThemeEditorView.this.editorAlert = new EditorAlert(ThemeEditorView.this.parentActivity, items);
+                                    ThemeEditorView.this.editorAlert.setOnDismissListener(new OnDismissListener() {
+                                        public void onDismiss(DialogInterface dialog) {
+                                        }
+                                    });
+                                    ThemeEditorView.this.editorAlert.setOnDismissListener(new OnDismissListener() {
+                                        public void onDismiss(DialogInterface dialog) {
+                                            ThemeEditorView.this.editorAlert = null;
+                                            ThemeEditorView.this.show();
+                                        }
+                                    });
+                                    ThemeEditorView.this.editorAlert.show();
+                                    ThemeEditorView.this.hide();
+                                }
                             }
                         }
                     }

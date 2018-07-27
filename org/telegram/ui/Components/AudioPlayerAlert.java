@@ -124,7 +124,7 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
     private ImageView playButton;
     private Drawable[] playOrderButtons = new Drawable[2];
     private FrameLayout playerLayout;
-    private ArrayList<MessageObject> playlist = new ArrayList();
+    private ArrayList<MessageObject> playlist;
     private LineProgressView progressView;
     private ImageView repeatButton;
     private int scrollOffsetY = ConnectionsManager.DEFAULT_DATACENTER_ID;

@@ -28,7 +28,7 @@ public class HttpURLConnectionBuilder {
     public HttpURLConnectionBuilder(String urlString) {
         this.mUrlString = urlString;
         this.mHeaders = new HashMap();
-        this.mHeaders.put("User-Agent", "HockeySDK/Android 5.0.4");
+        this.mHeaders.put("User-Agent", "HockeySDK/Android 5.1.0");
     }
 
     public HttpURLConnectionBuilder setRequestMethod(String requestMethod) {

@@ -281,7 +281,7 @@ public class TwoStepVerificationActivity extends BaseFragment implements Notific
         });
         this.fragmentView = new FrameLayout(context);
         FrameLayout frameLayout = this.fragmentView;
-        frameLayout.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
+        frameLayout.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
         this.doneItem = this.actionBar.createMenu().addItemWithWidth(1, R.drawable.ic_done, AndroidUtilities.dp(56.0f));
         this.scrollView = new ScrollView(context);
         this.scrollView.setFillViewport(true);
@@ -584,7 +584,7 @@ public class TwoStepVerificationActivity extends BaseFragment implements Notific
                                 String pendingHint = TwoStepVerificationActivity.this.currentPassword.hint;
                                 if (!(TwoStepVerificationActivity.this.waitingForEmail || pendingCurrentSalt == null)) {
                                     NotificationCenter.getInstance(TwoStepVerificationActivity.this.currentAccount).removeObserver(TwoStepVerificationActivity.this, NotificationCenter.didSetTwoStepPassword);
-                                    NotificationCenter.getInstance(TwoStepVerificationActivity.this.currentAccount).postNotificationName(NotificationCenter.didSetTwoStepPassword, null, pendingCurrentSalt, pendingNewSecureSalt, pendingSecureRandom, pendingEmail, pendingHint, null);
+                                    NotificationCenter.getInstance(TwoStepVerificationActivity.this.currentAccount).postNotificationName(NotificationCenter.didSetTwoStepPassword, null, pendingCurrentSalt, pendingNewSecureSalt, pendingSecureRandom, pendingEmail, pendingHint, null, null);
                                     TwoStepVerificationActivity.this.finishFragment();
                                 }
                             }
@@ -817,10 +817,23 @@ public class TwoStepVerificationActivity extends BaseFragment implements Notific
         final TL_account_updatePasswordSettings req = new TL_account_updatePasswordSettings();
         req.current_password_hash = this.currentPasswordHash;
         req.new_settings = new TL_account_passwordInputSettings();
-        if (!clear) {
+        if (clear) {
+            UserConfig.getInstance(this.currentAccount).resetSavedPassword();
+            if (this.waitingForEmail && (this.currentPassword instanceof TL_account_noPassword)) {
+                req.new_settings.flags = 2;
+                req.new_settings.email = TtmlNode.ANONYMOUS_REGION_ID;
+                req.current_password_hash = new byte[0];
+            } else {
+                req.new_settings.flags = 3;
+                req.new_settings.hint = TtmlNode.ANONYMOUS_REGION_ID;
+                req.new_settings.new_password_hash = new byte[0];
+                req.new_settings.new_salt = new byte[0];
+                req.new_settings.email = TtmlNode.ANONYMOUS_REGION_ID;
+            }
+        } else {
             TL_account_passwordInputSettings tL_account_passwordInputSettings;
             if (this.firstPassword != null && this.firstPassword.length() > 0) {
-                byte[] newPasswordBytes = this.firstPassword.getBytes();
+                byte[] newPasswordBytes = AndroidUtilities.getStringBytes(this.firstPassword);
                 byte[] new_salt = this.currentPassword.new_salt;
                 byte[] hash = new byte[((new_salt.length * 2) + newPasswordBytes.length)];
                 System.arraycopy(new_salt, 0, hash, 0, new_salt.length);
@@ -852,16 +865,6 @@ public class TwoStepVerificationActivity extends BaseFragment implements Notific
                 tL_account_passwordInputSettings.flags |= 2;
                 req.new_settings.email = this.email.trim();
             }
-        } else if (this.waitingForEmail && (this.currentPassword instanceof TL_account_noPassword)) {
-            req.new_settings.flags = 2;
-            req.new_settings.email = TtmlNode.ANONYMOUS_REGION_ID;
-            req.current_password_hash = new byte[0];
-        } else {
-            req.new_settings.flags = 3;
-            req.new_settings.hint = TtmlNode.ANONYMOUS_REGION_ID;
-            req.new_settings.new_password_hash = new byte[0];
-            req.new_settings.new_salt = new byte[0];
-            req.new_settings.email = TtmlNode.ANONYMOUS_REGION_ID;
         }
         needShowProgress();
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new RequestDelegate() {
@@ -882,7 +885,7 @@ public class TwoStepVerificationActivity extends BaseFragment implements Notific
                                 builder = new Builder(TwoStepVerificationActivity.this.getParentActivity());
                                 builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialogInterface, int i) {
-                                        NotificationCenter.getInstance(TwoStepVerificationActivity.this.currentAccount).postNotificationName(NotificationCenter.didSetTwoStepPassword, req.new_settings.new_password_hash, req.new_settings.new_salt, TwoStepVerificationActivity.this.currentPassword.new_secure_salt, TwoStepVerificationActivity.this.currentPassword.secure_random, TwoStepVerificationActivity.this.email, TwoStepVerificationActivity.this.hint, null);
+                                        NotificationCenter.getInstance(TwoStepVerificationActivity.this.currentAccount).postNotificationName(NotificationCenter.didSetTwoStepPassword, req.new_settings.new_password_hash, req.new_settings.new_salt, TwoStepVerificationActivity.this.currentPassword.new_secure_salt, TwoStepVerificationActivity.this.currentPassword.secure_random, TwoStepVerificationActivity.this.email, TwoStepVerificationActivity.this.hint, null, TwoStepVerificationActivity.this.firstPassword);
                                         TwoStepVerificationActivity.this.finishFragment();
                                     }
                                 });
@@ -905,7 +908,7 @@ public class TwoStepVerificationActivity extends BaseFragment implements Notific
                                             activity.setCloseAfterSet(true);
                                             TwoStepVerificationActivity.this.parentLayout.addFragmentToStack(activity, TwoStepVerificationActivity.this.parentLayout.fragmentsStack.size() - 1);
                                         }
-                                        NotificationCenter.getInstance(TwoStepVerificationActivity.this.currentAccount).postNotificationName(NotificationCenter.didSetTwoStepPassword, req.new_settings.new_password_hash, req.new_settings.new_salt, TwoStepVerificationActivity.this.currentPassword.new_secure_salt, TwoStepVerificationActivity.this.currentPassword.secure_random, TwoStepVerificationActivity.this.email, TwoStepVerificationActivity.this.hint, TwoStepVerificationActivity.this.email);
+                                        NotificationCenter.getInstance(TwoStepVerificationActivity.this.currentAccount).postNotificationName(NotificationCenter.didSetTwoStepPassword, req.new_settings.new_password_hash, req.new_settings.new_salt, TwoStepVerificationActivity.this.currentPassword.new_secure_salt, TwoStepVerificationActivity.this.currentPassword.secure_random, TwoStepVerificationActivity.this.email, TwoStepVerificationActivity.this.hint, TwoStepVerificationActivity.this.email, TwoStepVerificationActivity.this.firstPassword);
                                         TwoStepVerificationActivity.this.finishFragment();
                                     }
                                 });
@@ -963,7 +966,7 @@ public class TwoStepVerificationActivity extends BaseFragment implements Notific
                     onPasscodeError(false);
                     return;
                 }
-                final byte[] oldPasswordBytes = oldPassword.getBytes();
+                final byte[] oldPasswordBytes = AndroidUtilities.getStringBytes(oldPassword);
                 needShowProgress();
                 byte[] hash = new byte[((this.currentPassword.current_salt.length * 2) + oldPasswordBytes.length)];
                 System.arraycopy(this.currentPassword.current_salt, 0, hash, 0, this.currentPassword.current_salt.length);
@@ -1109,7 +1112,7 @@ public class TwoStepVerificationActivity extends BaseFragment implements Notific
     public ThemeDescription[] getThemeDescriptions() {
         r9 = new ThemeDescription[21];
         r9[0] = new ThemeDescription(this.listView, ThemeDescription.FLAG_CELLBACKGROUNDCOLOR, new Class[]{TextSettingsCell.class}, null, null, null, Theme.key_windowBackgroundWhite);
-        r9[1] = new ThemeDescription(this.fragmentView, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundGray);
+        r9[1] = new ThemeDescription(this.fragmentView, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundWhite);
         r9[2] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_actionBarDefault);
         r9[3] = new ThemeDescription(this.listView, ThemeDescription.FLAG_LISTGLOWCOLOR, null, null, null, null, Theme.key_actionBarDefault);
         r9[4] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_AB_ITEMSCOLOR, null, null, null, null, Theme.key_actionBarDefaultIcon);

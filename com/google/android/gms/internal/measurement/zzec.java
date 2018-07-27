@@ -1,14 +1,15 @@
 package com.google.android.gms.internal.measurement;
 
 import android.content.Context;
-import com.google.android.gms.common.util.Clock;
+import android.os.Looper;
 
-interface zzec {
-    Context getContext();
+public final class zzec {
+    private final boolean zzaep = false;
 
-    Clock zzbt();
+    zzec(Context context) {
+    }
 
-    zzgg zzgd();
-
-    zzfg zzge();
+    public static boolean isMainThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
+    }
 }

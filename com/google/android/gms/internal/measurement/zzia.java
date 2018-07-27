@@ -1,16 +1,15 @@
 package com.google.android.gms.internal.measurement;
 
 final class zzia implements Runnable {
-    private final /* synthetic */ zzhk zzanw;
-    private final /* synthetic */ long zzaod;
+    private final /* synthetic */ zzhl zzaog;
+    private final /* synthetic */ boolean zzaom;
 
-    zzia(zzhk com_google_android_gms_internal_measurement_zzhk, long j) {
-        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
-        this.zzaod = j;
+    zzia(zzhl com_google_android_gms_internal_measurement_zzhl, boolean z) {
+        this.zzaog = com_google_android_gms_internal_measurement_zzhl;
+        this.zzaom = z;
     }
 
     public final void run() {
-        this.zzanw.zzgf().zzaki.set(this.zzaod);
-        this.zzanw.zzge().zzis().zzg("Minimum session duration set", Long.valueOf(this.zzaod));
+        this.zzaog.zzi(this.zzaom);
     }
 }

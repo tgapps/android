@@ -202,4 +202,12 @@ public class ActionBarMenu extends LinearLayout {
         }
         return null;
     }
+
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        int count = getChildCount();
+        for (int a = 0; a < count; a++) {
+            getChildAt(a).setEnabled(enabled);
+        }
+    }
 }

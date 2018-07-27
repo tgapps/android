@@ -1,91 +1,37 @@
 package com.google.android.gms.internal.measurement;
 
-import android.os.Parcel;
+import android.os.IInterface;
 import android.os.RemoteException;
 import java.util.List;
 
-public abstract class zzez extends zzo implements zzey {
-    public zzez() {
-        super("com.google.android.gms.measurement.internal.IMeasurementService");
-    }
+public interface zzez extends IInterface {
+    List<zzjz> zza(zzdz com_google_android_gms_internal_measurement_zzdz, boolean z) throws RemoteException;
 
-    protected final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        List zza;
-        switch (i) {
-            case 1:
-                zza((zzeu) zzp.zza(parcel, zzeu.CREATOR), (zzdz) zzp.zza(parcel, zzdz.CREATOR));
-                parcel2.writeNoException();
-                break;
-            case 2:
-                zza((zzjx) zzp.zza(parcel, zzjx.CREATOR), (zzdz) zzp.zza(parcel, zzdz.CREATOR));
-                parcel2.writeNoException();
-                break;
-            case 4:
-                zza((zzdz) zzp.zza(parcel, zzdz.CREATOR));
-                parcel2.writeNoException();
-                break;
-            case 5:
-                zza((zzeu) zzp.zza(parcel, zzeu.CREATOR), parcel.readString(), parcel.readString());
-                parcel2.writeNoException();
-                break;
-            case 6:
-                zzb((zzdz) zzp.zza(parcel, zzdz.CREATOR));
-                parcel2.writeNoException();
-                break;
-            case 7:
-                zza = zza((zzdz) zzp.zza(parcel, zzdz.CREATOR), zzp.zza(parcel));
-                parcel2.writeNoException();
-                parcel2.writeTypedList(zza);
-                break;
-            case 9:
-                byte[] zza2 = zza((zzeu) zzp.zza(parcel, zzeu.CREATOR), parcel.readString());
-                parcel2.writeNoException();
-                parcel2.writeByteArray(zza2);
-                break;
-            case 10:
-                zza(parcel.readLong(), parcel.readString(), parcel.readString(), parcel.readString());
-                parcel2.writeNoException();
-                break;
-            case 11:
-                String zzc = zzc((zzdz) zzp.zza(parcel, zzdz.CREATOR));
-                parcel2.writeNoException();
-                parcel2.writeString(zzc);
-                break;
-            case 12:
-                zza((zzed) zzp.zza(parcel, zzed.CREATOR), (zzdz) zzp.zza(parcel, zzdz.CREATOR));
-                parcel2.writeNoException();
-                break;
-            case 13:
-                zzb((zzed) zzp.zza(parcel, zzed.CREATOR));
-                parcel2.writeNoException();
-                break;
-            case 14:
-                zza = zza(parcel.readString(), parcel.readString(), zzp.zza(parcel), (zzdz) zzp.zza(parcel, zzdz.CREATOR));
-                parcel2.writeNoException();
-                parcel2.writeTypedList(zza);
-                break;
-            case 15:
-                zza = zza(parcel.readString(), parcel.readString(), parcel.readString(), zzp.zza(parcel));
-                parcel2.writeNoException();
-                parcel2.writeTypedList(zza);
-                break;
-            case 16:
-                zza = zza(parcel.readString(), parcel.readString(), (zzdz) zzp.zza(parcel, zzdz.CREATOR));
-                parcel2.writeNoException();
-                parcel2.writeTypedList(zza);
-                break;
-            case 17:
-                zza = zze(parcel.readString(), parcel.readString(), parcel.readString());
-                parcel2.writeNoException();
-                parcel2.writeTypedList(zza);
-                break;
-            case 18:
-                zzd((zzdz) zzp.zza(parcel, zzdz.CREATOR));
-                parcel2.writeNoException();
-                break;
-            default:
-                return false;
-        }
-        return true;
-    }
+    List<zzee> zza(String str, String str2, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    List<zzjz> zza(String str, String str2, String str3, boolean z) throws RemoteException;
+
+    List<zzjz> zza(String str, String str2, boolean z, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    void zza(long j, String str, String str2, String str3) throws RemoteException;
+
+    void zza(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    void zza(zzee com_google_android_gms_internal_measurement_zzee, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    void zza(zzew com_google_android_gms_internal_measurement_zzew, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    void zza(zzew com_google_android_gms_internal_measurement_zzew, String str, String str2) throws RemoteException;
+
+    void zza(zzjz com_google_android_gms_internal_measurement_zzjz, zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    void zzb(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    void zzb(zzee com_google_android_gms_internal_measurement_zzee) throws RemoteException;
+
+    String zzc(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    void zzd(zzdz com_google_android_gms_internal_measurement_zzdz) throws RemoteException;
+
+    List<zzee> zze(String str, String str2, String str3) throws RemoteException;
 }

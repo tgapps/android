@@ -561,7 +561,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                     if (PhotoViewer.this.currentVideoFinishedLoading) {
                         bufferedProgress = 1.0f;
                     } else {
-                        long newTime = SystemClock.uptimeMillis();
+                        long newTime = SystemClock.elapsedRealtime();
                         if (Math.abs(newTime - PhotoViewer.this.lastBufferedPositionCheck) >= 500) {
                             if (PhotoViewer.this.isStreaming) {
                                 float access$1100;
@@ -2140,7 +2140,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                         if (this.currentVideoFinishedLoading) {
                             bufferedProgress = 1.0f;
                         } else {
-                            long newTime = SystemClock.uptimeMillis();
+                            long newTime = SystemClock.elapsedRealtime();
                             if (Math.abs(newTime - this.lastBufferedPositionCheck) >= 500) {
                                 float progress;
                                 if (this.seekToProgressPending == 0.0f) {
@@ -2717,7 +2717,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                             PhotoViewer.this.disableShowCheck = true;
                             Bundle args2 = new Bundle();
                             args2.putLong("dialog_id", PhotoViewer.this.currentDialogId);
-                            r0 = new MediaActivity(args2);
+                            r0 = new MediaActivity(args2, new int[]{-1, -1, -1, -1, -1});
                             if (PhotoViewer.this.parentChatActivity != null) {
                                 r0.setChatInfo(PhotoViewer.this.parentChatActivity.getCurrentChatInfo());
                             }
@@ -3165,7 +3165,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
             this.pickerViewSendButton = new ImageView(this.parentActivity);
             this.pickerViewSendButton.setScaleType(ScaleType.CENTER);
             this.pickerViewSendButton.setBackgroundDrawable(Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(56.0f), -10043398, -10043398));
-            this.pickerViewSendButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chats_actionIcon), Mode.MULTIPLY));
+            this.pickerViewSendButton.setColorFilter(new PorterDuffColorFilter(-1, Mode.MULTIPLY));
             this.pickerViewSendButton.setPadding(AndroidUtilities.dp(4.0f), 0, 0, 0);
             this.pickerViewSendButton.setImageResource(R.drawable.ic_send);
             this.containerView.addView(this.pickerViewSendButton, LayoutHelper.createFrame(56, 56.0f, 85, 0.0f, 0.0f, 14.0f, 14.0f));
@@ -6065,7 +6065,7 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         r0.muteVideo = r3;
         r0 = r23;
         r3 = r0.muteItem;
-        r4 = 2131165710; // 0x7f07020e float:1.7945645E38 double:1.052935763E-314;
+        r4 = 2131165690; // 0x7f0701fa float:1.7945604E38 double:1.052935753E-314;
         r3.setImageResource(r4);
         r0 = r23;
         r3 = r0.editorDoneLayout;
@@ -8975,8 +8975,8 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         if (!hide || this.hintTextView != null) {
             if (this.hintTextView == null) {
                 this.hintTextView = new TextView(this.containerView.getContext());
-                this.hintTextView.setBackgroundDrawable(Theme.createRoundRectDrawable(AndroidUtilities.dp(3.0f), Theme.getColor(Theme.key_chat_gifSaveHintBackground)));
-                this.hintTextView.setTextColor(Theme.getColor(Theme.key_chat_gifSaveHintText));
+                this.hintTextView.setBackgroundDrawable(Theme.createRoundRectDrawable(AndroidUtilities.dp(3.0f), -871296751));
+                this.hintTextView.setTextColor(-1);
                 this.hintTextView.setTextSize(1, 14.0f);
                 this.hintTextView.setPadding(AndroidUtilities.dp(8.0f), AndroidUtilities.dp(7.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(7.0f));
                 this.hintTextView.setGravity(16);

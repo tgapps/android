@@ -1903,7 +1903,7 @@ public class MessagesStorage {
                             dialog.pinnedNum = (totalPinnedCount - a) + maxPinnedNum;
                         }
                     }
-                    MessagesStorage.this.putDialogsInternal(org_telegram_tgnet_TLRPC_messages_Dialogs, false);
+                    MessagesStorage.this.putDialogsInternal(org_telegram_tgnet_TLRPC_messages_Dialogs, 0);
                     MessagesStorage.this.saveDiffParamsInternal(i2, i3, i4, i5);
                     if (message == null || message.id == UserConfig.getInstance(MessagesStorage.this.currentAccount).dialogsLoadOffsetId) {
                         UserConfig.getInstance(MessagesStorage.this.currentAccount).dialogsLoadOffsetId = ConnectionsManager.DEFAULT_DATACENTER_ID;
@@ -1961,6 +1961,7 @@ public class MessagesStorage {
             this.storageQueue.postRunnable(new Runnable() {
                 public void run() {
                     try {
+                        MessagesStorage.this.database.executeFast("DELETE FROM user_photos WHERE uid = " + did).stepThis().dispose();
                         SQLitePreparedStatement state = MessagesStorage.this.database.executeFast("REPLACE INTO user_photos VALUES(?, ?, ?)");
                         Iterator it = photos.photos.iterator();
                         while (it.hasNext()) {
@@ -3552,6 +3553,42 @@ Error: java.util.NoSuchElementException
         });
     }
 
+    public boolean checkMessageByRandomId(long random_id) {
+        final boolean[] result = new boolean[1];
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final long j = random_id;
+        this.storageQueue.postRunnable(new Runnable() {
+            public void run() {
+                SQLiteCursor cursor = null;
+                try {
+                    cursor = MessagesStorage.this.database.queryFinalized(String.format(Locale.US, "SELECT random_id FROM randoms WHERE random_id = %d", new Object[]{Long.valueOf(j)}), new Object[0]);
+                    if (cursor.next()) {
+                        result[0] = true;
+                    }
+                    if (cursor != null) {
+                        cursor.dispose();
+                    }
+                } catch (Throwable e) {
+                    FileLog.e(e);
+                    if (cursor != null) {
+                        cursor.dispose();
+                    }
+                } catch (Throwable th) {
+                    if (cursor != null) {
+                        cursor.dispose();
+                    }
+                }
+                countDownLatch.countDown();
+            }
+        });
+        try {
+            countDownLatch.await();
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+        return result[0];
+    }
+
     public boolean checkMessageId(long dialog_id, int mid) {
         final boolean[] result = new boolean[1];
         final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -3857,7 +3894,7 @@ Error: java.util.NoSuchElementException
                                             holeMessageMaxId = C.NANOS_PER_SECOND | (((long) channelId) << 32);
                                         }
                                     }
-                                    cursor = MessagesStorage.this.database.queryFinalized(String.format(Locale.US, "SELECT * FROM (SELECT m.read_state, m.data, m.send_state, m.mid, m.date, r.random_id, m.replydata, m.media, m.ttl, m.mention FROM messages as m LEFT JOIN randoms as r ON r.mid = m.mid WHERE m.uid = %d AND m.mid <= %d AND m.mid >= %d ORDER BY m.date DESC, m.mid DESC LIMIT %d) UNION SELECT * FROM (SELECT m.read_state, m.data, m.send_state, m.mid, m.date, r.random_id, m.replydata, m.media, m.ttl, m.mention FROM messages as m LEFT JOIN randoms as r ON r.mid = m.mid WHERE m.uid = %d AND m.mid > %d AND m.mid <= %d ORDER BY m.date ASC, m.mid ASC LIMIT %d)", new Object[]{Long.valueOf(j), Long.valueOf(messageMaxId), Long.valueOf(holeMessageMinId), Integer.valueOf(count_query / 2), Long.valueOf(j), Long.valueOf(messageMaxId), Long.valueOf(holeMessageMaxId), Integer.valueOf(count_query / 2)}), new Object[0]);
+                                    cursor = MessagesStorage.this.database.queryFinalized(String.format(Locale.US, "SELECT * FROM (SELECT m.read_state, m.data, m.send_state, m.mid, m.date, r.random_id, m.replydata, m.media, m.ttl, m.mention FROM messages as m LEFT JOIN randoms as r ON r.mid = m.mid WHERE m.uid = %d AND m.mid <= %d AND (m.mid >= %d OR m.mid < 0) ORDER BY m.date DESC, m.mid DESC LIMIT %d) UNION SELECT * FROM (SELECT m.read_state, m.data, m.send_state, m.mid, m.date, r.random_id, m.replydata, m.media, m.ttl, m.mention FROM messages as m LEFT JOIN randoms as r ON r.mid = m.mid WHERE m.uid = %d AND m.mid > %d AND (m.mid <= %d OR m.mid < 0) ORDER BY m.date ASC, m.mid ASC LIMIT %d)", new Object[]{Long.valueOf(j), Long.valueOf(messageMaxId), Long.valueOf(holeMessageMinId), Integer.valueOf(count_query / 2), Long.valueOf(j), Long.valueOf(messageMaxId), Long.valueOf(holeMessageMaxId), Integer.valueOf(count_query / 2)}), new Object[0]);
                                 }
                             } else if (i3 == 2) {
                                 existingUnreadCount = 0;
@@ -4000,6 +4037,8 @@ Error: java.util.NoSuchElementException
                             cursor = MessagesStorage.this.database.queryFinalized(String.format(Locale.US, "SELECT m.read_state, m.data, m.send_state, m.mid, m.date, r.random_id, m.replydata, m.media, m.ttl, m.mention FROM messages as m LEFT JOIN randoms as r ON r.mid = m.mid WHERE m.uid = %d AND m.date <= %d ORDER BY m.mid ASC LIMIT %d,%d", new Object[]{Long.valueOf(j), Integer.valueOf(i4), Integer.valueOf(0), Integer.valueOf(count_query)}), new Object[0]);
                         }
                     }
+                    int minId = ConnectionsManager.DEFAULT_DATACENTER_ID;
+                    int maxId = Integer.MIN_VALUE;
                     if (cursor != null) {
                         while (cursor.next()) {
                             data = cursor.byteBufferValue(1);
@@ -4013,6 +4052,10 @@ Error: java.util.NoSuchElementException
                                 data.reuse();
                                 MessageObject.setUnreadFlags(message, cursor.intValue(0));
                                 message.id = cursor.intValue(3);
+                                if (message.id > 0) {
+                                    minId = Math.min(message.id, minId);
+                                    maxId = Math.max(message.id, maxId);
+                                }
                                 message.date = cursor.intValue(4);
                                 message.dialog_id = j;
                                 if ((message.flags & 1024) != 0) {
@@ -4119,15 +4162,11 @@ Error: java.util.NoSuchElementException
                         }
                     });
                     if (lower_id != 0) {
-                        if ((i3 == 3 || i3 == 4 || (i3 == 2 && queryFromServer && !unreadCountIsLocal)) && !res.messages.isEmpty()) {
-                            int minId = ((Message) res.messages.get(res.messages.size() - 1)).id;
-                            int maxId = ((Message) res.messages.get(0)).id;
-                            if (minId > max_id_query || maxId < max_id_query) {
-                                replyMessages.clear();
-                                usersToLoad.clear();
-                                chatsToLoad.clear();
-                                res.messages.clear();
-                            }
+                        if ((i3 == 3 || i3 == 4 || (i3 == 2 && queryFromServer && !unreadCountIsLocal)) && !res.messages.isEmpty() && (minId > max_id_query || maxId < max_id_query)) {
+                            replyMessages.clear();
+                            usersToLoad.clear();
+                            chatsToLoad.clear();
+                            res.messages.clear();
                         }
                         if ((i3 == 4 || i3 == 3) && res.messages.size() == 1) {
                             res.messages.clear();
@@ -4315,7 +4354,7 @@ Error: java.util.NoSuchElementException
                 r6.countDown();
                 throw r5;
                 */
-                throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.60.run():void");
+                throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.61.run():void");
             }
         });
         try {
@@ -4433,7 +4472,7 @@ Error: java.util.NoSuchElementException
                 L_0x0087:
                     throw r5;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.61.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.62.run():void");
                 }
             });
         }
@@ -4545,7 +4584,7 @@ Error: java.util.NoSuchElementException
                 L_0x009a:
                     throw r4;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.62.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.63.run():void");
                 }
             });
         }
@@ -4610,7 +4649,7 @@ Error: java.util.NoSuchElementException
                 L_0x0037:
                     throw r2;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.63.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.64.run():void");
                 }
             });
         }
@@ -4675,7 +4714,7 @@ Error: java.util.NoSuchElementException
                 L_0x0037:
                     throw r2;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.64.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.65.run():void");
                 }
             });
         }
@@ -4907,7 +4946,7 @@ Error: java.util.NoSuchElementException
                 L_0x016a:
                     throw r7;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.65.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.66.run():void");
                 }
             });
         }
@@ -5023,7 +5062,7 @@ Error: java.util.NoSuchElementException
                     r5.countDown();
                     throw r4;
                     */
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.68.run():void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.69.run():void");
                 }
             });
         }
@@ -5608,7 +5647,7 @@ Error: java.util.NoSuchElementException
                     dialog.pinnedNum = pinned;
                     dialog.pts = difference.pts;
                     dialogs.dialogs.add(dialog);
-                    MessagesStorage.this.putDialogsInternal(dialogs, false);
+                    MessagesStorage.this.putDialogsInternal(dialogs, 0);
                     MessagesStorage.this.updateDialogsWithDeletedMessages(new ArrayList(), null, false, channel_id);
                     AndroidUtilities.runOnUIThread(new Runnable() {
                         public void run() {
@@ -6133,6 +6172,7 @@ Error: java.util.NoSuchElementException
     }
 
     private long[] updateMessageStateAndIdInternal(long random_id, Integer _oldId, int newId, int date, int channelId) {
+        SQLitePreparedStatement state;
         SQLiteCursor cursor = null;
         long newMessageId = (long) newId;
         if (_oldId == null) {
@@ -6185,7 +6225,6 @@ Error: java.util.NoSuchElementException
         if (did == 0) {
             return null;
         }
-        SQLitePreparedStatement state;
         if (oldMessageId != newMessageId || date == 0) {
             state = null;
             try {
@@ -6492,7 +6531,9 @@ Error: java.util.NoSuchElementException
             int a;
             String ids;
             long did;
-            ArrayList<Long> dialogsIds = new ArrayList();
+            SQLitePreparedStatement state;
+            ArrayList<Integer> arrayList = new ArrayList(messages);
+            ArrayList<Long> arrayList2 = new ArrayList();
             LongSparseArray<Integer[]> dialogsToUpdate = new LongSparseArray();
             if (channelId != 0) {
                 StringBuilder builder = new StringBuilder(messages.size());
@@ -6509,10 +6550,11 @@ Error: java.util.NoSuchElementException
             }
             ArrayList<File> filesToDelete = new ArrayList();
             int currentUser = UserConfig.getInstance(this.currentAccount).getClientUserId();
-            SQLiteCursor cursor = this.database.queryFinalized(String.format(Locale.US, "SELECT uid, data, read_state, out, mention FROM messages WHERE mid IN(%s)", new Object[]{ids}), new Object[0]);
+            SQLiteCursor cursor = this.database.queryFinalized(String.format(Locale.US, "SELECT uid, data, read_state, out, mention, mid FROM messages WHERE mid IN(%s)", new Object[]{ids}), new Object[0]);
             while (cursor.next()) {
                 try {
                     did = cursor.longValue(0);
+                    arrayList.remove(Integer.valueOf(cursor.intValue(5)));
                     if (did != ((long) currentUser)) {
                         int read_state = cursor.intValue(2);
                         if (cursor.intValue(3) == 0) {
@@ -6581,8 +6623,8 @@ Error: java.util.NoSuchElementException
                     old_mentions_count = cursor.intValue(1);
                 }
                 cursor.dispose();
-                dialogsIds.add(Long.valueOf(did));
-                SQLitePreparedStatement state = this.database.executeFast("UPDATE dialogs SET unread_count = ?, unread_count_i = ? WHERE did = ?");
+                arrayList2.add(Long.valueOf(did));
+                state = this.database.executeFast("UPDATE dialogs SET unread_count = ?, unread_count_i = ? WHERE did = ?");
                 state.requery();
                 state.bindInteger(1, Math.max(0, old_unread_count - counts[0].intValue()));
                 state.bindInteger(2, Math.max(0, old_mentions_count - counts[1].intValue()));
@@ -6593,10 +6635,64 @@ Error: java.util.NoSuchElementException
             this.database.executeFast(String.format(Locale.US, "DELETE FROM messages WHERE mid IN(%s)", new Object[]{ids})).stepThis().dispose();
             this.database.executeFast(String.format(Locale.US, "DELETE FROM bot_keyboard WHERE mid IN(%s)", new Object[]{ids})).stepThis().dispose();
             this.database.executeFast(String.format(Locale.US, "DELETE FROM messages_seq WHERE mid IN(%s)", new Object[]{ids})).stepThis().dispose();
+            if (arrayList.isEmpty()) {
+                long uid;
+                int type;
+                cursor = this.database.queryFinalized(String.format(Locale.US, "SELECT uid, type FROM media_v2 WHERE mid IN(%s)", new Object[]{ids}), new Object[0]);
+                SparseArray<LongSparseArray<Integer>> mediaCounts = null;
+                while (cursor.next()) {
+                    Integer count;
+                    uid = cursor.longValue(0);
+                    type = cursor.intValue(1);
+                    if (mediaCounts == null) {
+                        mediaCounts = new SparseArray();
+                    }
+                    LongSparseArray<Integer> counts2 = (LongSparseArray) mediaCounts.get(type);
+                    if (counts2 == null) {
+                        counts2 = new LongSparseArray();
+                        count = Integer.valueOf(0);
+                        mediaCounts.put(type, counts2);
+                    } else {
+                        count = (Integer) counts2.get(uid);
+                    }
+                    if (count == null) {
+                        count = Integer.valueOf(0);
+                    }
+                    counts2.put(uid, Integer.valueOf(count.intValue() + 1));
+                }
+                cursor.dispose();
+                if (mediaCounts != null) {
+                    state = this.database.executeFast("REPLACE INTO media_counts_v2 VALUES(?, ?, ?)");
+                    for (a = 0; a < mediaCounts.size(); a++) {
+                        type = mediaCounts.keyAt(a);
+                        LongSparseArray<Integer> value = (LongSparseArray) mediaCounts.valueAt(a);
+                        for (int b = 0; b < value.size(); b++) {
+                            uid = value.keyAt(b);
+                            int lower_part = (int) uid;
+                            int count2 = -1;
+                            cursor = this.database.queryFinalized(String.format(Locale.US, "SELECT count FROM media_counts_v2 WHERE uid = %d AND type = %d LIMIT 1", new Object[]{Long.valueOf(uid), Integer.valueOf(type)}), new Object[0]);
+                            if (cursor.next()) {
+                                count2 = cursor.intValue(0);
+                            }
+                            cursor.dispose();
+                            if (count2 != -1) {
+                                state.requery();
+                                count2 = Math.max(0, count2 - ((Integer) value.valueAt(b)).intValue());
+                                state.bindLong(1, uid);
+                                state.bindInteger(2, type);
+                                state.bindInteger(3, count2);
+                                state.step();
+                            }
+                        }
+                    }
+                    state.dispose();
+                }
+            } else {
+                this.database.executeFast("DELETE FROM media_counts_v2 WHERE 1").stepThis().dispose();
+            }
             this.database.executeFast(String.format(Locale.US, "DELETE FROM media_v2 WHERE mid IN(%s)", new Object[]{ids})).stepThis().dispose();
-            this.database.executeFast("DELETE FROM media_counts_v2 WHERE 1").stepThis().dispose();
             DataQuery.getInstance(this.currentAccount).clearBotKeyboard(0, messages);
-            return dialogsIds;
+            return arrayList2;
         } catch (Throwable e2) {
             FileLog.e(e2);
             return null;
@@ -6842,7 +6938,7 @@ Error: java.util.NoSuchElementException
             }
             this.database.executeFast(String.format(Locale.US, "DELETE FROM messages WHERE uid = %d AND mid <= %d", new Object[]{Integer.valueOf(-channelId), Long.valueOf(maxMessageId)})).stepThis().dispose();
             this.database.executeFast(String.format(Locale.US, "DELETE FROM media_v2 WHERE uid = %d AND mid <= %d", new Object[]{Integer.valueOf(-channelId), Long.valueOf(maxMessageId)})).stepThis().dispose();
-            this.database.executeFast("DELETE FROM media_counts_v2 WHERE 1").stepThis().dispose();
+            this.database.executeFast(String.format(Locale.US, "DELETE FROM media_counts_v2 WHERE uid = %d", new Object[]{Integer.valueOf(-channelId)})).stepThis().dispose();
             return dialogsIds;
         } catch (Throwable e2) {
             FileLog.e(e2);
@@ -7497,7 +7593,7 @@ Error: java.util.NoSuchElementException
         }
     }
 
-    private void putDialogsInternal(messages_Dialogs dialogs, boolean check) {
+    private void putDialogsInternal(messages_Dialogs dialogs, int check) {
         try {
             int a;
             Message message;
@@ -7525,79 +7621,168 @@ Error: java.util.NoSuchElementException
                             dialog.id = (long) (-dialog.peer.channel_id);
                         }
                     }
-                    if (check) {
-                        SQLiteCursor cursor = this.database.queryFinalized("SELECT did FROM dialogs WHERE did = " + dialog.id, new Object[0]);
+                    SQLiteCursor cursor;
+                    int messageDate;
+                    NativeByteBuffer data;
+                    long messageId;
+                    long topMessage;
+                    int flags;
+                    if (check == 1) {
+                        cursor = this.database.queryFinalized("SELECT did FROM dialogs WHERE did = " + dialog.id, new Object[0]);
                         boolean exists = cursor.next();
                         cursor.dispose();
                         if (exists) {
                         }
-                    }
-                    int messageDate = 0;
-                    message = (Message) new_dialogMessage.get(dialog.id);
-                    if (message != null) {
-                        messageDate = Math.max(message.date, 0);
-                        if (isValidKeyboardToSave(message)) {
-                            DataQuery.getInstance(this.currentAccount).putBotKeyboard(dialog.id, message);
+                        messageDate = 0;
+                        message = (Message) new_dialogMessage.get(dialog.id);
+                        if (message != null) {
+                            messageDate = Math.max(message.date, 0);
+                            if (isValidKeyboardToSave(message)) {
+                                DataQuery.getInstance(this.currentAccount).putBotKeyboard(dialog.id, message);
+                            }
+                            fixUnsupportedMedia(message);
+                            data = new NativeByteBuffer(message.getObjectSize());
+                            message.serializeToStream(data);
+                            messageId = (long) message.id;
+                            if (message.to_id.channel_id != 0) {
+                                messageId |= ((long) message.to_id.channel_id) << 32;
+                            }
+                            state.requery();
+                            state.bindLong(1, messageId);
+                            state.bindLong(2, dialog.id);
+                            state.bindInteger(3, MessageObject.getUnreadFlags(message));
+                            state.bindInteger(4, message.send_state);
+                            state.bindInteger(5, message.date);
+                            state.bindByteBuffer(6, data);
+                            state.bindInteger(7, MessageObject.isOut(message) ? 1 : 0);
+                            state.bindInteger(8, 0);
+                            state.bindInteger(9, (message.flags & 1024) == 0 ? message.views : 0);
+                            state.bindInteger(10, 0);
+                            state.bindInteger(11, message.mentioned ? 1 : 0);
+                            state.step();
+                            if (DataQuery.canAddMessageToMedia(message)) {
+                                state3.requery();
+                                state3.bindLong(1, messageId);
+                                state3.bindLong(2, dialog.id);
+                                state3.bindInteger(3, message.date);
+                                state3.bindInteger(4, DataQuery.getMediaType(message));
+                                state3.bindByteBuffer(5, data);
+                                state3.step();
+                            }
+                            data.reuse();
+                            createFirstHoles(dialog.id, state5, state6, message.id);
                         }
-                        fixUnsupportedMedia(message);
-                        NativeByteBuffer data = new NativeByteBuffer(message.getObjectSize());
-                        message.serializeToStream(data);
-                        long messageId = (long) message.id;
-                        if (message.to_id.channel_id != 0) {
-                            messageId |= ((long) message.to_id.channel_id) << 32;
+                        topMessage = (long) dialog.top_message;
+                        if (dialog.peer.channel_id != 0) {
+                            topMessage |= ((long) dialog.peer.channel_id) << 32;
                         }
-                        state.requery();
-                        state.bindLong(1, messageId);
-                        state.bindLong(2, dialog.id);
-                        state.bindInteger(3, MessageObject.getUnreadFlags(message));
-                        state.bindInteger(4, message.send_state);
-                        state.bindInteger(5, message.date);
-                        state.bindByteBuffer(6, data);
-                        state.bindInteger(7, MessageObject.isOut(message) ? 1 : 0);
-                        state.bindInteger(8, 0);
-                        state.bindInteger(9, (message.flags & 1024) != 0 ? message.views : 0);
-                        state.bindInteger(10, 0);
-                        state.bindInteger(11, message.mentioned ? 1 : 0);
-                        state.step();
-                        if (DataQuery.canAddMessageToMedia(message)) {
-                            state3.requery();
-                            state3.bindLong(1, messageId);
-                            state3.bindLong(2, dialog.id);
-                            state3.bindInteger(3, message.date);
-                            state3.bindInteger(4, DataQuery.getMediaType(message));
-                            state3.bindByteBuffer(5, data);
-                            state3.step();
+                        state2.requery();
+                        state2.bindLong(1, dialog.id);
+                        state2.bindInteger(2, messageDate);
+                        state2.bindInteger(3, dialog.unread_count);
+                        state2.bindLong(4, topMessage);
+                        state2.bindInteger(5, dialog.read_inbox_max_id);
+                        state2.bindInteger(6, dialog.read_outbox_max_id);
+                        state2.bindLong(7, 0);
+                        state2.bindInteger(8, dialog.unread_mentions_count);
+                        state2.bindInteger(9, dialog.pts);
+                        state2.bindInteger(10, 0);
+                        state2.bindInteger(11, dialog.pinnedNum);
+                        flags = 0;
+                        if (dialog.unread_mark) {
+                            flags = 0 | 1;
                         }
-                        data.reuse();
-                        createFirstHoles(dialog.id, state5, state6, message.id);
-                    }
-                    long topMessage = (long) dialog.top_message;
-                    if (dialog.peer.channel_id != 0) {
-                        topMessage |= ((long) dialog.peer.channel_id) << 32;
-                    }
-                    state2.requery();
-                    state2.bindLong(1, dialog.id);
-                    state2.bindInteger(2, messageDate);
-                    state2.bindInteger(3, dialog.unread_count);
-                    state2.bindLong(4, topMessage);
-                    state2.bindInteger(5, dialog.read_inbox_max_id);
-                    state2.bindInteger(6, dialog.read_outbox_max_id);
-                    state2.bindLong(7, 0);
-                    state2.bindInteger(8, dialog.unread_mentions_count);
-                    state2.bindInteger(9, dialog.pts);
-                    state2.bindInteger(10, 0);
-                    state2.bindInteger(11, dialog.pinnedNum);
-                    int flags = 0;
-                    if (dialog.unread_mark) {
-                        flags = 0 | 1;
-                    }
-                    state2.bindInteger(12, flags);
-                    state2.step();
-                    if (dialog.notify_settings != null) {
-                        state4.requery();
-                        state4.bindLong(1, dialog.id);
-                        state4.bindInteger(2, dialog.notify_settings.mute_until != 0 ? 1 : 0);
-                        state4.step();
+                        state2.bindInteger(12, flags);
+                        state2.step();
+                        if (dialog.notify_settings != null) {
+                            state4.requery();
+                            state4.bindLong(1, dialog.id);
+                            state4.bindInteger(2, dialog.notify_settings.mute_until == 0 ? 1 : 0);
+                            state4.step();
+                        }
+                    } else {
+                        if (dialog.pinned && check == 2) {
+                            cursor = this.database.queryFinalized("SELECT pinned FROM dialogs WHERE did = " + dialog.id, new Object[0]);
+                            if (cursor.next()) {
+                                dialog.pinnedNum = cursor.intValue(0);
+                            }
+                            cursor.dispose();
+                        }
+                        messageDate = 0;
+                        message = (Message) new_dialogMessage.get(dialog.id);
+                        if (message != null) {
+                            messageDate = Math.max(message.date, 0);
+                            if (isValidKeyboardToSave(message)) {
+                                DataQuery.getInstance(this.currentAccount).putBotKeyboard(dialog.id, message);
+                            }
+                            fixUnsupportedMedia(message);
+                            data = new NativeByteBuffer(message.getObjectSize());
+                            message.serializeToStream(data);
+                            messageId = (long) message.id;
+                            if (message.to_id.channel_id != 0) {
+                                messageId |= ((long) message.to_id.channel_id) << 32;
+                            }
+                            state.requery();
+                            state.bindLong(1, messageId);
+                            state.bindLong(2, dialog.id);
+                            state.bindInteger(3, MessageObject.getUnreadFlags(message));
+                            state.bindInteger(4, message.send_state);
+                            state.bindInteger(5, message.date);
+                            state.bindByteBuffer(6, data);
+                            if (MessageObject.isOut(message)) {
+                            }
+                            state.bindInteger(7, MessageObject.isOut(message) ? 1 : 0);
+                            state.bindInteger(8, 0);
+                            if ((message.flags & 1024) == 0) {
+                            }
+                            state.bindInteger(9, (message.flags & 1024) == 0 ? message.views : 0);
+                            state.bindInteger(10, 0);
+                            if (message.mentioned) {
+                            }
+                            state.bindInteger(11, message.mentioned ? 1 : 0);
+                            state.step();
+                            if (DataQuery.canAddMessageToMedia(message)) {
+                                state3.requery();
+                                state3.bindLong(1, messageId);
+                                state3.bindLong(2, dialog.id);
+                                state3.bindInteger(3, message.date);
+                                state3.bindInteger(4, DataQuery.getMediaType(message));
+                                state3.bindByteBuffer(5, data);
+                                state3.step();
+                            }
+                            data.reuse();
+                            createFirstHoles(dialog.id, state5, state6, message.id);
+                        }
+                        topMessage = (long) dialog.top_message;
+                        if (dialog.peer.channel_id != 0) {
+                            topMessage |= ((long) dialog.peer.channel_id) << 32;
+                        }
+                        state2.requery();
+                        state2.bindLong(1, dialog.id);
+                        state2.bindInteger(2, messageDate);
+                        state2.bindInteger(3, dialog.unread_count);
+                        state2.bindLong(4, topMessage);
+                        state2.bindInteger(5, dialog.read_inbox_max_id);
+                        state2.bindInteger(6, dialog.read_outbox_max_id);
+                        state2.bindLong(7, 0);
+                        state2.bindInteger(8, dialog.unread_mentions_count);
+                        state2.bindInteger(9, dialog.pts);
+                        state2.bindInteger(10, 0);
+                        state2.bindInteger(11, dialog.pinnedNum);
+                        flags = 0;
+                        if (dialog.unread_mark) {
+                            flags = 0 | 1;
+                        }
+                        state2.bindInteger(12, flags);
+                        state2.step();
+                        if (dialog.notify_settings != null) {
+                            state4.requery();
+                            state4.bindLong(1, dialog.id);
+                            if (dialog.notify_settings.mute_until == 0) {
+                            }
+                            state4.bindInteger(2, dialog.notify_settings.mute_until == 0 ? 1 : 0);
+                            state4.step();
+                        }
                     }
                 }
                 state.dispose();
@@ -7703,7 +7888,7 @@ Error: java.util.NoSuchElementException
         });
     }
 
-    public void putDialogs(final messages_Dialogs dialogs, final boolean check) {
+    public void putDialogs(final messages_Dialogs dialogs, final int check) {
         if (!dialogs.dialogs.isEmpty()) {
             this.storageQueue.postRunnable(new Runnable() {
                 public void run() {

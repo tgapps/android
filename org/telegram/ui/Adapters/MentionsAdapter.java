@@ -120,7 +120,6 @@ public class MentionsAdapter extends SelectionAdapter {
     private SearchAdapterHelper searchAdapterHelper;
     private Runnable searchGlobalRunnable;
     private ArrayList<BotInlineResult> searchResultBotContext;
-    private HashMap<String, BotInlineResult> searchResultBotContextById;
     private TL_inlineBotSwitchPM searchResultBotContextSwitch;
     private ArrayList<String> searchResultCommands;
     private ArrayList<String> searchResultCommandsHelp;
@@ -140,7 +139,7 @@ public class MentionsAdapter extends SelectionAdapter {
         void onContextSearch(boolean z);
     }
 
-    static /* synthetic */ int access$3104(MentionsAdapter x0) {
+    static /* synthetic */ int access$3004(MentionsAdapter x0) {
         int i = x0.channelLastReqId + 1;
         x0.channelLastReqId = i;
         return i;
@@ -319,7 +318,6 @@ public class MentionsAdapter extends SelectionAdapter {
     private void searchForContextBot(String username, String query) {
         if (this.foundContextBot == null || this.foundContextBot.username == null || !this.foundContextBot.username.equals(username) || this.searchingContextQuery == null || !this.searchingContextQuery.equals(query)) {
             this.searchResultBotContext = null;
-            this.searchResultBotContextById = null;
             this.searchResultBotContextSwitch = null;
             notifyDataSetChanged();
             if (this.foundContextBot != null) {
@@ -497,19 +495,17 @@ public class MentionsAdapter extends SelectionAdapter {
                                             messagesStorage.saveBotCache(key, res);
                                         }
                                         MentionsAdapter.this.nextQueryOffset = res.next_offset;
-                                        if (MentionsAdapter.this.searchResultBotContextById == null) {
-                                            MentionsAdapter.this.searchResultBotContextById = new HashMap();
+                                        if (MentionsAdapter.this.searchResultBotContextSwitch == null) {
                                             MentionsAdapter.this.searchResultBotContextSwitch = res.switch_pm;
                                         }
                                         int a = 0;
                                         while (a < res.results.size()) {
                                             BotInlineResult result = (BotInlineResult) res.results.get(a);
-                                            if (MentionsAdapter.this.searchResultBotContextById.containsKey(result.id) || (!(result.document instanceof TL_document) && !(result.photo instanceof TL_photo) && result.content == null && (result.send_message instanceof TL_botInlineMessageMediaAuto))) {
+                                            if (!(result.document instanceof TL_document) && !(result.photo instanceof TL_photo) && result.content == null && (result.send_message instanceof TL_botInlineMessageMediaAuto)) {
                                                 res.results.remove(a);
                                                 a--;
                                             }
                                             result.query_id = res.query_id;
-                                            MentionsAdapter.this.searchResultBotContextById.put(result.id, result);
                                             a++;
                                         }
                                         boolean added = false;
@@ -574,8 +570,8 @@ public class MentionsAdapter extends SelectionAdapter {
                 if (!(!user.bot_inline_geo || this.lastKnownLocation == null || this.lastKnownLocation.getLatitude() == -1000.0d)) {
                     req.flags |= 1;
                     req.geo_point = new TL_inputGeoPoint();
-                    req.geo_point.lat = this.lastKnownLocation.getLatitude();
-                    req.geo_point._long = this.lastKnownLocation.getLongitude();
+                    req.geo_point.lat = AndroidUtilities.fixLocationCoord(this.lastKnownLocation.getLatitude());
+                    req.geo_point._long = AndroidUtilities.fixLocationCoord(this.lastKnownLocation.getLongitude());
                 }
                 int lower_id = (int) this.dialog_id;
                 int high_id = (int) (this.dialog_id >> 32);
@@ -795,7 +791,7 @@ public class MentionsAdapter extends SelectionAdapter {
                                 req.offset = 0;
                                 req.filter = new TL_channelParticipantsSearch();
                                 req.filter.q = str;
-                                final int currentReqId = MentionsAdapter.access$3104(MentionsAdapter.this);
+                                final int currentReqId = MentionsAdapter.access$3004(MentionsAdapter.this);
                                 MentionsAdapter.this.channelReqId = ConnectionsManager.getInstance(MentionsAdapter.this.currentAccount).sendRequest(req, new RequestDelegate() {
                                     public void run(final TLObject response, final TL_error error) {
                                         AndroidUtilities.runOnUIThread(new Runnable() {

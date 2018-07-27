@@ -11,34 +11,32 @@ import com.google.android.gms.common.util.PlatformVersion;
 import javax.annotation.concurrent.GuardedBy;
 
 public final class FirebaseInstanceIdReceiver extends WakefulBroadcastReceiver {
-    private static boolean zzat = false;
+    private static boolean zzaw = false;
     @GuardedBy("FirebaseInstanceIdReceiver.class")
-    private static zzh zzau;
+    private static zzh zzax;
     @GuardedBy("FirebaseInstanceIdReceiver.class")
-    private static zzh zzav;
+    private static zzh zzay;
 
     private static synchronized zzh zza(Context context, String str) {
         zzh com_google_firebase_iid_zzh;
         synchronized (FirebaseInstanceIdReceiver.class) {
             if ("com.google.firebase.MESSAGING_EVENT".equals(str)) {
-                if (zzav == null) {
-                    zzav = new zzh(context, str);
+                if (zzay == null) {
+                    zzay = new zzh(context, str);
                 }
-                com_google_firebase_iid_zzh = zzav;
+                com_google_firebase_iid_zzh = zzay;
             } else {
-                if (zzau == null) {
-                    zzau = new zzh(context, str);
+                if (zzax == null) {
+                    zzax = new zzh(context, str);
                 }
-                com_google_firebase_iid_zzh = zzau;
+                com_google_firebase_iid_zzh = zzax;
             }
         }
         return com_google_firebase_iid_zzh;
     }
 
     private final void zza(Context context, Intent intent, String str) {
-        String str2 = null;
-        int i = 0;
-        int i2 = -1;
+        int i;
         intent.setComponent(null);
         intent.setPackage(context.getPackageName());
         if (VERSION.SDK_INT <= 18) {
@@ -50,35 +48,44 @@ public final class FirebaseInstanceIdReceiver extends WakefulBroadcastReceiver {
             intent.removeExtra("gcm.rawData64");
         }
         if ("google.com/iid".equals(intent.getStringExtra("from")) || "com.google.firebase.INSTANCE_ID_EVENT".equals(str)) {
-            str2 = "com.google.firebase.INSTANCE_ID_EVENT";
+            stringExtra = "com.google.firebase.INSTANCE_ID_EVENT";
         } else if ("com.google.android.c2dm.intent.RECEIVE".equals(str) || "com.google.firebase.MESSAGING_EVENT".equals(str)) {
-            str2 = "com.google.firebase.MESSAGING_EVENT";
+            stringExtra = "com.google.firebase.MESSAGING_EVENT";
         } else {
             Log.d("FirebaseInstanceId", "Unexpected intent");
+            stringExtra = null;
         }
-        if (str2 != null) {
-            if (PlatformVersion.isAtLeastO() && context.getApplicationInfo().targetSdkVersion >= 26) {
-                i = 1;
+        if (stringExtra != null) {
+            if (Log.isLoggable("FirebaseInstanceId", 3)) {
+                String str2 = "FirebaseInstanceId";
+                String str3 = "Starting service: ";
+                String valueOf = String.valueOf(stringExtra);
+                Log.d(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
             }
+            i = (!PlatformVersion.isAtLeastO() || context.getApplicationInfo().targetSdkVersion < 26) ? 0 : 1;
             if (i != 0) {
                 if (isOrderedBroadcast()) {
                     setResultCode(-1);
                 }
-                zza(context, str2).zza(intent, goAsync());
+                zza(context, stringExtra).zza(intent, goAsync());
+                i = -1;
             } else {
-                i2 = zzan.zzad().zza(context, str2, intent);
+                i = zzat.zzah().zzb(context, stringExtra, intent);
             }
+        } else {
+            i = -1;
         }
         if (isOrderedBroadcast()) {
-            setResultCode(i2);
+            setResultCode(i);
         }
     }
 
     public final void onReceive(Context context, Intent intent) {
         if (intent != null) {
             Parcelable parcelableExtra = intent.getParcelableExtra("wrapped_intent");
-            if (parcelableExtra instanceof Intent) {
-                zza(context, (Intent) parcelableExtra, intent.getAction());
+            Intent intent2 = parcelableExtra instanceof Intent ? (Intent) parcelableExtra : null;
+            if (intent2 != null) {
+                zza(context, intent2, intent.getAction());
             } else {
                 zza(context, intent, intent.getAction());
             }

@@ -1,19 +1,24 @@
 package com.google.android.gms.internal.measurement;
 
-final class zzgc implements Runnable {
-    private final /* synthetic */ zzgl zzalb;
-    private final /* synthetic */ zzfg zzalc;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import com.google.android.gms.common.internal.Preconditions;
 
-    zzgc(zzgb com_google_android_gms_internal_measurement_zzgb, zzgl com_google_android_gms_internal_measurement_zzgl, zzfg com_google_android_gms_internal_measurement_zzfg) {
-        this.zzalb = com_google_android_gms_internal_measurement_zzgl;
-        this.zzalc = com_google_android_gms_internal_measurement_zzfg;
-    }
-
-    public final void run() {
-        if (this.zzalb.zzjp() == null) {
-            this.zzalc.zzim().log("Install Referrer Reporter is null");
-        } else {
-            this.zzalb.zzjp().zzjh();
+public final class zzgc {
+    public static boolean zza(Context context) {
+        Preconditions.checkNotNull(context);
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            if (packageManager == null) {
+                return false;
+            }
+            ActivityInfo receiverInfo = packageManager.getReceiverInfo(new ComponentName(context, "com.google.android.gms.measurement.AppMeasurementReceiver"), 0);
+            return receiverInfo != null && receiverInfo.enabled;
+        } catch (NameNotFoundException e) {
+            return false;
         }
     }
 }

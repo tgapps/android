@@ -1,19 +1,14 @@
 package com.google.firebase.iid;
 
-import android.os.IBinder;
-import android.os.Parcel;
-import android.os.Parcelable.Creator;
+import java.util.concurrent.Executor;
 
-final class zzj implements Creator<zzi> {
-    zzj() {
+final /* synthetic */ class zzj implements Executor {
+    static final Executor zzac = new zzj();
+
+    private zzj() {
     }
 
-    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
-        IBinder readStrongBinder = parcel.readStrongBinder();
-        return readStrongBinder != null ? new zzi(readStrongBinder) : null;
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new zzi[i];
+    public final void execute(Runnable runnable) {
+        runnable.run();
     }
 }

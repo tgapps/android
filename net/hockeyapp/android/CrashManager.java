@@ -165,7 +165,7 @@ public class CrashManager {
                 parameters.put("contact", contact);
                 parameters.put("description", description);
                 parameters.put("sdk", "HockeySDK");
-                parameters.put("sdk_version", "5.0.4");
+                parameters.put("sdk_version", "5.1.0");
                 urlConnection = new HttpURLConnectionBuilder(getURLString()).setRequestMethod("POST").writeFormFields(parameters).build();
                 int responseCode = urlConnection.getResponseCode();
                 boolean z = responseCode == 202 || responseCode == 201;

@@ -2,10 +2,8 @@ package com.google.android.gms.common;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 import com.google.android.gms.common.internal.Preconditions;
-import com.google.android.gms.common.wrappers.Wrappers;
 import javax.annotation.CheckReturnValue;
 
 @CheckReturnValue
@@ -47,45 +45,6 @@ public class GoogleSignatureVerifier {
         return null;
     }
 
-    private final zzg zza(PackageInfo packageInfo) {
-        boolean honorsDebugCertificates = GooglePlayServicesUtilLight.honorsDebugCertificates(this.mContext);
-        if (packageInfo == null) {
-            return zzg.zze("null pkg");
-        }
-        if (packageInfo.signatures.length != 1) {
-            return zzg.zze("single cert required");
-        }
-        CertData com_google_android_gms_common_zzb = new zzb(packageInfo.signatures[0].toByteArray());
-        String str = packageInfo.packageName;
-        zzg zza = GoogleCertificates.zza(str, com_google_android_gms_common_zzb, honorsDebugCertificates);
-        return (!zza.zzbl || packageInfo.applicationInfo == null || (packageInfo.applicationInfo.flags & 2) == 0) ? zza : (!honorsDebugCertificates || GoogleCertificates.zza(str, com_google_android_gms_common_zzb, false).zzbl) ? zzg.zze("debuggable release cert app rejected") : zza;
-    }
-
-    private final zzg zzb(int i) {
-        String[] packagesForUid = Wrappers.packageManager(this.mContext).getPackagesForUid(i);
-        if (packagesForUid == null || packagesForUid.length == 0) {
-            return zzg.zze("no pkgs");
-        }
-        zzg com_google_android_gms_common_zzg = null;
-        for (String zzf : packagesForUid) {
-            com_google_android_gms_common_zzg = zzf(zzf);
-            if (com_google_android_gms_common_zzg.zzbl) {
-                return com_google_android_gms_common_zzg;
-            }
-        }
-        return com_google_android_gms_common_zzg;
-    }
-
-    private final zzg zzf(String str) {
-        try {
-            return zza(Wrappers.packageManager(this.mContext).getPackageInfo(str, 64));
-        } catch (NameNotFoundException e) {
-            String str2 = "no pkg ";
-            String valueOf = String.valueOf(str);
-            return zzg.zze(valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2));
-        }
-    }
-
     public boolean isGooglePublicSignedPackage(PackageInfo packageInfo) {
         if (packageInfo == null) {
             return false;
@@ -116,11 +75,5 @@ public class GoogleSignatureVerifier {
             }
         }
         return false;
-    }
-
-    public boolean isUidGoogleSigned(int i) {
-        zzg zzb = zzb(i);
-        zzb.zzi();
-        return zzb.zzbl;
     }
 }

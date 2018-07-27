@@ -1896,8 +1896,8 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
     private void sendLocation(Location location) {
         MessageMedia mediaGeo = new TL_messageMediaGeo();
         mediaGeo.geo = new TL_geoPoint();
-        mediaGeo.geo.lat = location.getLatitude();
-        mediaGeo.geo._long = location.getLongitude();
+        mediaGeo.geo.lat = AndroidUtilities.fixLocationCoord(location.getLatitude());
+        mediaGeo.geo._long = AndroidUtilities.fixLocationCoord(location.getLongitude());
         for (Entry<String, MessageObject> entry : this.waitingForLocation.entrySet()) {
             MessageObject messageObject = (MessageObject) entry.getValue();
             sendMessage(mediaGeo, messageObject.getDialogId(), messageObject, null, null);
@@ -4438,6 +4438,9 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
                 newMsg.media = sentMessage.media;
             } else if (sentMessage.media instanceof TL_messageMediaWebPage) {
                 newMsg.media = sentMessage.media;
+            } else if (sentMessage.media instanceof TL_messageMediaGeo) {
+                sentMessage.media.geo.lat = newMsg.media.geo.lat;
+                sentMessage.media.geo._long = newMsg.media.geo._long;
             } else if (sentMessage.media instanceof TL_messageMediaGame) {
                 newMsg.media = sentMessage.media;
                 if ((newMsg.media instanceof TL_messageMediaGame) && !TextUtils.isEmpty(sentMessage.message)) {

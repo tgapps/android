@@ -24,7 +24,6 @@ import org.telegram.tgnet.ConnectionsManager;
 @SuppressLint({"NewApi"})
 public class CameraView extends FrameLayout implements SurfaceTextureListener {
     private CameraSession cameraSession;
-    private boolean circleShape = false;
     private int clipLeft;
     private int clipTop;
     private int cx;
@@ -101,10 +100,10 @@ public class CameraView extends FrameLayout implements SurfaceTextureListener {
             z = true;
         }
         this.isFrontface = z;
-        initCamera(this.isFrontface);
+        initCamera();
     }
 
-    private void initCamera(boolean front) {
+    private void initCamera() {
         CameraInfo info = null;
         ArrayList<CameraInfo> cameraInfos = CameraController.getInstance().getCameras();
         if (cameraInfos != null) {
@@ -177,7 +176,7 @@ public class CameraView extends FrameLayout implements SurfaceTextureListener {
     }
 
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        initCamera(this.isFrontface);
+        initCamera();
     }
 
     public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height) {

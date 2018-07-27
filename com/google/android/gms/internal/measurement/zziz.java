@@ -1,21 +1,17 @@
 package com.google.android.gms.internal.measurement;
 
-final class zziz implements Runnable {
-    private final /* synthetic */ zziw zzapn;
-    private final /* synthetic */ zzey zzapo;
+import android.content.ComponentName;
 
-    zziz(zziw com_google_android_gms_internal_measurement_zziw, zzey com_google_android_gms_internal_measurement_zzey) {
-        this.zzapn = com_google_android_gms_internal_measurement_zziw;
-        this.zzapo = com_google_android_gms_internal_measurement_zzey;
+final class zziz implements Runnable {
+    private final /* synthetic */ ComponentName val$name;
+    private final /* synthetic */ zzix zzapw;
+
+    zziz(zzix com_google_android_gms_internal_measurement_zzix, ComponentName componentName) {
+        this.zzapw = com_google_android_gms_internal_measurement_zzix;
+        this.val$name = componentName;
     }
 
     public final void run() {
-        synchronized (this.zzapn) {
-            this.zzapn.zzapk = false;
-            if (!this.zzapn.zzape.isConnected()) {
-                this.zzapn.zzape.zzge().zzis().log("Connected to remote service");
-                this.zzapn.zzape.zza(this.zzapo);
-            }
-        }
+        this.zzapw.zzapn.onServiceDisconnected(this.val$name);
     }
 }

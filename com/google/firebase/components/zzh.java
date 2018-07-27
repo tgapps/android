@@ -1,42 +1,28 @@
 package com.google.firebase.components;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.google.firebase.inject.Provider;
 
-final class zzh {
-    private final Component<?> zzaj;
-    private final Set<zzh> zzak = new HashSet();
-    private final Set<zzh> zzal = new HashSet();
+final class zzh<T> implements Provider<T> {
+    private static final Object zza = new Object();
+    private volatile Object zzb = zza;
+    private volatile Provider<T> zzc;
 
-    zzh(Component<?> component) {
-        this.zzaj = component;
+    zzh(ComponentFactory<T> componentFactory, ComponentContainer componentContainer) {
+        this.zzc = new zzi(componentFactory, componentContainer);
     }
 
-    final void zza(zzh com_google_firebase_components_zzh) {
-        this.zzak.add(com_google_firebase_components_zzh);
-    }
-
-    final void zzb(zzh com_google_firebase_components_zzh) {
-        this.zzal.add(com_google_firebase_components_zzh);
-    }
-
-    final void zzc(zzh com_google_firebase_components_zzh) {
-        this.zzal.remove(com_google_firebase_components_zzh);
-    }
-
-    final Set<zzh> zzf() {
-        return this.zzak;
-    }
-
-    final Component<?> zzk() {
-        return this.zzaj;
-    }
-
-    final boolean zzl() {
-        return this.zzal.isEmpty();
-    }
-
-    final boolean zzm() {
-        return this.zzak.isEmpty();
+    public final T get() {
+        T t = this.zzb;
+        if (t == zza) {
+            synchronized (this) {
+                t = this.zzb;
+                if (t == zza) {
+                    t = this.zzc.get();
+                    this.zzb = t;
+                    this.zzc = null;
+                }
+            }
+        }
+        return t;
     }
 }

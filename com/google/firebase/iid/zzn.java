@@ -1,18 +1,21 @@
 package com.google.firebase.iid;
 
-import android.os.Bundle;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
-import java.io.IOException;
 
-final class zzn implements Continuation<Bundle, String> {
-    private final /* synthetic */ zzl zzbc;
+final /* synthetic */ class zzn implements zzaq {
+    private final FirebaseInstanceId zzaq;
+    private final String zzar;
+    private final String zzas;
+    private final String zzav;
 
-    zzn(zzl com_google_firebase_iid_zzl) {
-        this.zzbc = com_google_firebase_iid_zzl;
+    zzn(FirebaseInstanceId firebaseInstanceId, String str, String str2, String str3) {
+        this.zzaq = firebaseInstanceId;
+        this.zzar = str;
+        this.zzas = str2;
+        this.zzav = str3;
     }
 
-    public final /* synthetic */ Object then(Task task) throws Exception {
-        return this.zzbc.zza((Bundle) task.getResult(IOException.class));
+    public final Task zzt() {
+        return this.zzaq.zza(this.zzar, this.zzas, this.zzav);
     }
 }

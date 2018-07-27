@@ -49,6 +49,7 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
     protected Long doInBackground(Void... args) {
         OutputStream output;
         Throwable e;
+        Long valueOf;
         Throwable th;
         InputStream input = null;
         OutputStream output2 = null;
@@ -56,7 +57,6 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
         connection.connect();
         int lengthOfFile = connection.getContentLength();
         String contentType = connection.getContentType();
-        Long valueOf;
         if (contentType == null || !contentType.contains(MimeTypes.BASE_TYPE_TEXT)) {
             try {
                 if (this.mDirectory.mkdirs() || this.mDirectory.exists()) {
@@ -186,7 +186,7 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
     }
 
     protected void setConnectionProperties(HttpURLConnection connection) {
-        connection.addRequestProperty("User-Agent", "HockeySDK/Android 5.0.4");
+        connection.addRequestProperty("User-Agent", "HockeySDK/Android 5.1.0");
         connection.setInstanceFollowRedirects(true);
     }
 

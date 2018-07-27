@@ -45,6 +45,7 @@ import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.EmuDetector;
+import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.KeepAliveJob;
 import org.telegram.messenger.LocaleController;
@@ -237,7 +238,6 @@ public class ConnectionsManager {
         protected NativeByteBuffer doInBackground(Void... voids) {
             Throwable e;
             ByteArrayOutputStream outbuf;
-            NativeByteBuffer buffer;
             InputStream httpConnectionStream = null;
             int i = 0;
             ByteArrayOutputStream outbuf2 = null;
@@ -276,6 +276,7 @@ public class ConnectionsManager {
                     int a;
                     StringBuilder builder;
                     byte[] bytes;
+                    NativeByteBuffer buffer;
                     byte[] data = new byte[32768];
                     while (!isCancelled()) {
                         int read = httpConnectionStream.read(data);
@@ -516,7 +517,7 @@ public class ConnectionsManager {
 
     public static native void native_setLangCode(int i, String str);
 
-    public static native void native_setNetworkAvailable(int i, boolean z, int i2);
+    public static native void native_setNetworkAvailable(int i, boolean z, int i2, boolean z2);
 
     public static native void native_setProxySettings(int i, String str, int i2, String str2, String str3, String str4);
 
@@ -652,6 +653,7 @@ public class ConnectionsManager {
                     tLObject.freeResources();
                     ConnectionsManager.native_sendRequest(ConnectionsManager.this.currentAccount, buffer.address, new RequestDelegateInternal() {
                         public void run(long response, int errorCode, String errorText, int networkType) {
+                            Throwable e;
                             TLObject resp = null;
                             TL_error error = null;
                             if (response != 0) {
@@ -659,8 +661,8 @@ public class ConnectionsManager {
                                     NativeByteBuffer buff = NativeByteBuffer.wrap(response);
                                     buff.reused = true;
                                     resp = tLObject.deserializeResponse(buff, buff.readInt32(true), true);
-                                } catch (Exception e) {
-                                    e = e;
+                                } catch (Exception e2) {
+                                    e = e2;
                                     FileLog.e(e);
                                     return;
                                 }
@@ -673,11 +675,10 @@ public class ConnectionsManager {
                                         FileLog.e(tLObject + " got error " + error2.code + " " + error2.text);
                                     }
                                     error = error2;
-                                } catch (Exception e2) {
-                                    Throwable e3;
-                                    e3 = e2;
+                                } catch (Exception e3) {
+                                    e = e3;
                                     error = error2;
-                                    FileLog.e(e3);
+                                    FileLog.e(e);
                                     return;
                                 }
                             }
@@ -740,7 +741,7 @@ public class ConnectionsManager {
 
     private void checkConnection() {
         native_setUseIpv6(this.currentAccount, useIpv6Address());
-        native_setNetworkAvailable(this.currentAccount, isNetworkOnline(), getCurrentNetworkType());
+        native_setNetworkAvailable(this.currentAccount, isNetworkOnline(), getCurrentNetworkType(), isConnectionSlow());
     }
 
     public void setPushConnectionEnabled(boolean value) {
@@ -762,6 +763,7 @@ public class ConnectionsManager {
         ApplicationLoader.applicationContext.registerReceiver(new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
                 ConnectionsManager.this.checkConnection();
+                FileLoader.getInstance(ConnectionsManager.this.currentAccount).onNetworkChanged(ConnectionsManager.isConnectionSlow());
             }
         }, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
     }
@@ -973,7 +975,7 @@ public class ConnectionsManager {
         Throwable th;
         HashMap<String, ResolvedDomain> cache = (HashMap) dnsCache.get();
         ResolvedDomain resolvedDomain = (ResolvedDomain) cache.get(domain);
-        if (resolvedDomain != null && SystemClock.uptimeMillis() - resolvedDomain.ttl < 300000) {
+        if (resolvedDomain != null && SystemClock.elapsedRealtime() - resolvedDomain.ttl < 300000) {
             return resolvedDomain.address;
         }
         ByteArrayOutputStream byteArrayOutputStream = null;
@@ -1002,7 +1004,7 @@ public class ConnectionsManager {
                 JSONArray array = new JSONObject(new String(outbuf.toByteArray())).getJSONArray("Answer");
                 if (array.length() > 0) {
                     String ip = array.getJSONObject(Utilities.random.nextInt(array.length())).getString(DataSchemeDataSource.SCHEME_DATA);
-                    cache.put(domain, new ResolvedDomain(ip, SystemClock.uptimeMillis()));
+                    cache.put(domain, new ResolvedDomain(ip, SystemClock.elapsedRealtime()));
                     if (httpConnectionStream != null) {
                         try {
                             httpConnectionStream.close();
@@ -1233,6 +1235,24 @@ public class ConnectionsManager {
             FileLog.e(e2);
             return false;
         }
+    }
+
+    public static boolean isConnectionSlow() {
+        try {
+            NetworkInfo netInfo = ((ConnectivityManager) ApplicationLoader.applicationContext.getSystemService("connectivity")).getActiveNetworkInfo();
+            if (netInfo.getType() == 0) {
+                switch (netInfo.getSubtype()) {
+                    case 1:
+                    case 2:
+                    case 4:
+                    case 7:
+                    case 11:
+                        return true;
+                }
+            }
+        } catch (Throwable th) {
+        }
+        return false;
     }
 
     public static boolean isNetworkOnline() {

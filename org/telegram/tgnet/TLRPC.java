@@ -7732,7 +7732,8 @@ public class TLRPC {
     }
 
     public static class TL_help_getAppUpdate extends TLObject {
-        public static int constructor = -1372724842;
+        public static int constructor = 1378703997;
+        public String source;
 
         public TLObject deserializeResponse(AbstractSerializedData stream, int constructor, boolean exception) {
             return help_AppUpdate.TLdeserialize(stream, constructor, exception);
@@ -7740,6 +7741,7 @@ public class TLRPC {
 
         public void serializeToStream(AbstractSerializedData stream) {
             stream.writeInt32(constructor);
+            stream.writeString(this.source);
         }
     }
 
@@ -9341,6 +9343,18 @@ public class TLRPC {
         public void serializeToStream(AbstractSerializedData stream) {
             stream.writeInt32(constructor);
             stream.writeString(this.hash);
+        }
+    }
+
+    public static class TL_messages_clearAllDrafts extends TLObject {
+        public static int constructor = 2119757468;
+
+        public TLObject deserializeResponse(AbstractSerializedData stream, int constructor, boolean exception) {
+            return Bool.TLdeserialize(stream, constructor, exception);
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
         }
     }
 
@@ -14630,19 +14644,14 @@ public class TLRPC {
     }
 
     public static abstract class help_AppUpdate extends TLObject {
-        public boolean critical;
-        public int id;
-        public String text;
-        public String url;
-
         public static help_AppUpdate TLdeserialize(AbstractSerializedData stream, int constructor, boolean exception) {
             help_AppUpdate result = null;
             switch (constructor) {
-                case -1987579119:
-                    result = new TL_help_appUpdate();
-                    break;
                 case -1000708810:
                     result = new TL_help_noAppUpdate();
+                    break;
+                case 497489295:
+                    result = new TL_help_appUpdate();
                     break;
             }
             if (result == null && exception) {
@@ -18637,21 +18646,76 @@ public class TLRPC {
     }
 
     public static class TL_help_appUpdate extends help_AppUpdate {
-        public static int constructor = -1987579119;
+        public static int constructor = 497489295;
+        public Document document;
+        public ArrayList<MessageEntity> entities = new ArrayList();
+        public int flags;
+        public int id;
+        public boolean popup;
+        public String text;
+        public String url;
+        public String version;
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
+            boolean z;
+            this.flags = stream.readInt32(exception);
+            if ((this.flags & 1) != 0) {
+                z = true;
+            } else {
+                z = false;
+            }
+            this.popup = z;
             this.id = stream.readInt32(exception);
-            this.critical = stream.readBool(exception);
-            this.url = stream.readString(exception);
+            this.version = stream.readString(exception);
             this.text = stream.readString(exception);
+            if (stream.readInt32(exception) == 481674261) {
+                int count = stream.readInt32(exception);
+                int a = 0;
+                while (a < count) {
+                    MessageEntity object = MessageEntity.TLdeserialize(stream, stream.readInt32(exception), exception);
+                    if (object != null) {
+                        this.entities.add(object);
+                        a++;
+                    } else {
+                        return;
+                    }
+                }
+                if ((this.flags & 2) != 0) {
+                    this.document = Document.TLdeserialize(stream, stream.readInt32(exception), exception);
+                }
+                if ((this.flags & 4) != 0) {
+                    this.url = stream.readString(exception);
+                }
+            } else if (exception) {
+                throw new RuntimeException(String.format("wrong Vector magic, got %x", new Object[]{Integer.valueOf(magic)}));
+            }
         }
 
         public void serializeToStream(AbstractSerializedData stream) {
+            int i;
             stream.writeInt32(constructor);
+            if (this.popup) {
+                i = this.flags | 1;
+            } else {
+                i = this.flags & -2;
+            }
+            this.flags = i;
+            stream.writeInt32(this.flags);
             stream.writeInt32(this.id);
-            stream.writeBool(this.critical);
-            stream.writeString(this.url);
+            stream.writeString(this.version);
             stream.writeString(this.text);
+            stream.writeInt32(481674261);
+            int count = this.entities.size();
+            stream.writeInt32(count);
+            for (int a = 0; a < count; a++) {
+                ((MessageEntity) this.entities.get(a)).serializeToStream(stream);
+            }
+            if ((this.flags & 2) != 0) {
+                this.document.serializeToStream(stream);
+            }
+            if ((this.flags & 4) != 0) {
+                stream.writeString(this.url);
+            }
         }
     }
 

@@ -321,6 +321,10 @@ public class ActionBar extends FrameLayout {
     }
 
     public ActionBarMenu createActionMode() {
+        return createActionMode(true);
+    }
+
+    public ActionBarMenu createActionMode(boolean needTop) {
         if (this.actionMode != null) {
             return this.actionMode;
         }
@@ -339,10 +343,11 @@ public class ActionBar extends FrameLayout {
         LayoutParams layoutParams = (LayoutParams) this.actionMode.getLayoutParams();
         layoutParams.height = -1;
         layoutParams.width = -1;
+        layoutParams.bottomMargin = this.extraHeight;
         layoutParams.gravity = 5;
         this.actionMode.setLayoutParams(layoutParams);
         this.actionMode.setVisibility(4);
-        if (this.occupyStatusBar && this.actionModeTop == null) {
+        if (this.occupyStatusBar && needTop && this.actionModeTop == null) {
             this.actionModeTop = new View(getContext());
             this.actionModeTop.setBackgroundColor(Theme.getColor(Theme.key_actionBarActionModeDefaultTop));
             addView(this.actionModeTop);
@@ -521,6 +526,11 @@ public class ActionBar extends FrameLayout {
 
     public void setExtraHeight(int value) {
         this.extraHeight = value;
+        if (this.actionMode != null) {
+            LayoutParams layoutParams = (LayoutParams) this.actionMode.getLayoutParams();
+            layoutParams.bottomMargin = this.extraHeight;
+            this.actionMode.setLayoutParams(layoutParams);
+        }
     }
 
     public void closeSearchField() {
@@ -536,6 +546,19 @@ public class ActionBar extends FrameLayout {
     public void openSearchField(String text) {
         if (this.menu != null && text != null) {
             this.menu.openSearchField(!this.isSearchFieldVisible, text);
+        }
+    }
+
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (this.backButtonImageView != null) {
+            this.backButtonImageView.setEnabled(enabled);
+        }
+        if (this.menu != null) {
+            this.menu.setEnabled(enabled);
+        }
+        if (this.actionMode != null) {
+            this.actionMode.setEnabled(enabled);
         }
     }
 

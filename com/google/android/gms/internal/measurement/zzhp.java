@@ -1,17 +1,38 @@
 package com.google.android.gms.internal.measurement;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeoutException;
 
-final class zzhp implements Runnable {
-    private final /* synthetic */ AtomicReference zzanv;
-    private final /* synthetic */ zzhk zzanw;
+final class zzhp implements Callable<String> {
+    private final /* synthetic */ zzhl zzaog;
 
-    zzhp(zzhk com_google_android_gms_internal_measurement_zzhk, AtomicReference atomicReference) {
-        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
-        this.zzanv = atomicReference;
+    zzhp(zzhl com_google_android_gms_internal_measurement_zzhl) {
+        this.zzaog = com_google_android_gms_internal_measurement_zzhl;
     }
 
-    public final void run() {
-        this.zzanw.zzfx().zza(this.zzanv);
+    public final /* synthetic */ Object call() throws Exception {
+        Object zzjh = this.zzaog.zzgg().zzjh();
+        if (zzjh == null) {
+            zzhh zzfv = this.zzaog.zzfv();
+            if (zzfv.zzge().zzjr()) {
+                zzfv.zzgf().zzis().log("Cannot retrieve app instance id from analytics worker thread");
+                zzjh = null;
+            } else if (zzec.isMainThread()) {
+                zzfv.zzgf().zzis().log("Cannot retrieve app instance id from main thread");
+                zzjh = null;
+            } else {
+                long elapsedRealtime = zzfv.zzbt().elapsedRealtime();
+                zzjh = zzfv.zzae(120000);
+                elapsedRealtime = zzfv.zzbt().elapsedRealtime() - elapsedRealtime;
+                if (zzjh == null && elapsedRealtime < 120000) {
+                    zzjh = zzfv.zzae(120000 - elapsedRealtime);
+                }
+            }
+            if (zzjh == null) {
+                throw new TimeoutException();
+            }
+            this.zzaog.zzgg().zzbq(zzjh);
+        }
+        return zzjh;
     }
 }

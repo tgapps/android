@@ -155,6 +155,10 @@ public class Browser {
         openUrl(context, uri, allowCustom, true);
     }
 
+    public static void openUrl(Context context, String url, boolean allowCustom, boolean tryTelegraph) {
+        openUrl(context, Uri.parse(url), allowCustom, tryTelegraph);
+    }
+
     public static void openUrl(Context context, Uri uri, boolean allowCustom, boolean tryTelegraph) {
         if (context != null && uri != null) {
             Intent intent;

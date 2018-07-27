@@ -23,6 +23,10 @@ public abstract class Task<TResult> {
         throw new UnsupportedOperationException("continueWith is not implemented");
     }
 
+    public <TContinuationResult> Task<TContinuationResult> continueWithTask(Executor executor, Continuation<TResult, Task<TContinuationResult>> continuation) {
+        throw new UnsupportedOperationException("continueWithTask is not implemented");
+    }
+
     public abstract Exception getException();
 
     public abstract TResult getResult();

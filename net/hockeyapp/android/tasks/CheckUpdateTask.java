@@ -110,7 +110,7 @@ public class CheckUpdateTask extends AsyncTask<Void, String, JSONArray> {
 
     protected URLConnection createConnection(URL url) throws IOException {
         URLConnection connection = url.openConnection();
-        connection.addRequestProperty("User-Agent", "HockeySDK/Android 5.0.4");
+        connection.addRequestProperty("User-Agent", "HockeySDK/Android 5.1.0");
         return connection;
     }
 
@@ -217,7 +217,7 @@ public class CheckUpdateTask extends AsyncTask<Void, String, JSONArray> {
             builder.append("&oem=").append(encodeParam(Constants.PHONE_MANUFACTURER));
             builder.append("&app_version=").append(encodeParam(Constants.APP_VERSION));
             builder.append("&sdk=").append(encodeParam("HockeySDK"));
-            builder.append("&sdk_version=").append(encodeParam("5.0.4"));
+            builder.append("&sdk_version=").append(encodeParam("5.1.0"));
             builder.append("&lang=").append(encodeParam(Locale.getDefault().getLanguage()));
             builder.append("&usage_time=").append(this.usageTime);
             return builder.toString();
@@ -242,7 +242,7 @@ public class CheckUpdateTask extends AsyncTask<Void, String, JSONArray> {
             builder.append("&oem=").append(encodeParam(Constants.PHONE_MANUFACTURER));
             builder.append("&app_version=").append(encodeParam(Constants.APP_VERSION));
             builder.append("&sdk=").append(encodeParam("HockeySDK"));
-            builder.append("&sdk_version=").append(encodeParam("5.0.4"));
+            builder.append("&sdk_version=").append(encodeParam("5.1.0"));
             builder.append("&lang=").append(encodeParam(Locale.getDefault().getLanguage()));
             builder.append("&usage_time=").append(this.usageTime);
             return builder.toString();
@@ -265,7 +265,7 @@ public class CheckUpdateTask extends AsyncTask<Void, String, JSONArray> {
         builder.append("&oem=").append(encodeParam(Constants.PHONE_MANUFACTURER));
         builder.append("&app_version=").append(encodeParam(Constants.APP_VERSION));
         builder.append("&sdk=").append(encodeParam("HockeySDK"));
-        builder.append("&sdk_version=").append(encodeParam("5.0.4"));
+        builder.append("&sdk_version=").append(encodeParam("5.1.0"));
         builder.append("&lang=").append(encodeParam(Locale.getDefault().getLanguage()));
         builder.append("&usage_time=").append(this.usageTime);
         return builder.toString();

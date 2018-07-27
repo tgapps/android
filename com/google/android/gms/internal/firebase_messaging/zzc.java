@@ -1,20 +1,29 @@
 package com.google.android.gms.internal.firebase_messaging;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.lang.ref.ReferenceQueue;
+import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class zzc {
-    private static final ClassLoader zzd = zzc.class.getClassLoader();
+final class zzc {
+    private final ConcurrentHashMap<zzd, List<Throwable>> zzd = new ConcurrentHashMap(16, 0.75f, 10);
+    private final ReferenceQueue<Throwable> zze = new ReferenceQueue();
 
-    private zzc() {
+    zzc() {
     }
 
-    public static void zza(Parcel parcel, Parcelable parcelable) {
-        if (parcelable == null) {
-            parcel.writeInt(0);
-            return;
+    public final List<Throwable> zza(Throwable th, boolean z) {
+        Object poll = this.zze.poll();
+        while (poll != null) {
+            this.zzd.remove(poll);
+            poll = this.zze.poll();
         }
-        parcel.writeInt(1);
-        parcelable.writeToParcel(parcel, 0);
+        List<Throwable> list = (List) this.zzd.get(new zzd(th, null));
+        if (list != null) {
+            return list;
+        }
+        Vector vector = new Vector(2);
+        list = (List) this.zzd.putIfAbsent(new zzd(th, this.zze), vector);
+        return list == null ? vector : list;
     }
 }

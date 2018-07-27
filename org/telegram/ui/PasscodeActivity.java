@@ -71,6 +71,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
     private static final int pin_item = 2;
     private int autoLockDetailRow;
     private int autoLockRow;
+    private int badPasscodeTries;
     private int captureDetailRow;
     private int captureRow;
     private int changePasscodeRow;
@@ -80,6 +81,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
     private Drawable dropDownDrawable;
     private int fingerprintRow;
     private String firstPassword;
+    private long lastPasscodeTry;
     private ListAdapter listAdapter;
     private RecyclerListView listView;
     private int passcodeDetailRow;
@@ -666,14 +668,22 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
             this.passwordEditText.setText(TtmlNode.ANONYMOUS_REGION_ID);
         } else if (this.type != 2) {
         } else {
-            if (SharedConfig.checkPasscode(this.passwordEditText.getText().toString())) {
+            if (SharedConfig.passcodeRetryInMs > 0) {
+                int value = Math.max(1, (int) Math.ceil(((double) SharedConfig.passcodeRetryInMs) / 1000.0d));
+                Toast.makeText(getParentActivity(), LocaleController.formatString("TooManyTries", R.string.TooManyTries, LocaleController.formatPluralString("Seconds", value)), 0).show();
+                this.passwordEditText.setText(TtmlNode.ANONYMOUS_REGION_ID);
+                onPasscodeError();
+            } else if (SharedConfig.checkPasscode(this.passwordEditText.getText().toString())) {
+                SharedConfig.badPasscodeTries = 0;
+                SharedConfig.saveConfig();
                 this.passwordEditText.clearFocus();
                 AndroidUtilities.hideKeyboard(this.passwordEditText);
                 presentFragment(new PasscodeActivity(0), true);
-                return;
+            } else {
+                SharedConfig.increaseBadPasscodeTries();
+                this.passwordEditText.setText(TtmlNode.ANONYMOUS_REGION_ID);
+                onPasscodeError();
             }
-            this.passwordEditText.setText(TtmlNode.ANONYMOUS_REGION_ID);
-            onPasscodeError();
         }
     }
 

@@ -1232,7 +1232,7 @@ public class LocaleController {
             discount = false;
         }
         amount = Math.abs(amount);
-        Currency сurrency = Currency.getInstance(type);
+        Currency currency = Currency.getInstance(type);
         int i = -1;
         switch (type.hashCode()) {
             case 65726:
@@ -1471,9 +1471,9 @@ public class LocaleController {
                 doubleAmount = ((double) amount) / 100.0d;
                 break;
         }
-        if (сurrency != null) {
+        if (currency != null) {
             NumberFormat format = NumberFormat.getCurrencyInstance(this.currentLocale != null ? this.currentLocale : this.systemDefaultLocale);
-            format.setCurrency(сurrency);
+            format.setCurrency(currency);
             if (type.equals("IRR")) {
                 format.setMaximumFractionDigits(0);
             }
@@ -1993,7 +1993,7 @@ public class LocaleController {
             lang = "en";
         }
         lang = lang.toLowerCase();
-        boolean z = lang.startsWith("ar") || lang.startsWith("fa") || (BuildVars.DEBUG_VERSION && (lang.startsWith("he") || lang.startsWith("iw")));
+        boolean z = lang.startsWith("ar") || lang.startsWith("fa") || lang.startsWith("he") || lang.startsWith("iw");
         isRTL = z;
         if (lang.equals("ko")) {
             i = 2;

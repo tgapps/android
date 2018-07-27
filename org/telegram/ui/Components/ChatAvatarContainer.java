@@ -96,7 +96,7 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
                         args = new Bundle();
                         if (UserObject.isUserSelf(user)) {
                             args.putLong("dialog_id", ChatAvatarContainer.this.parentFragment.getDialogId());
-                            MediaActivity fragment2 = new MediaActivity(args);
+                            MediaActivity fragment2 = new MediaActivity(args, new int[]{-1, -1, -1, -1, -1});
                             fragment2.setChatInfo(ChatAvatarContainer.this.parentFragment.getCurrentChatInfo());
                             ChatAvatarContainer.this.parentFragment.presentFragment(fragment2);
                             return;

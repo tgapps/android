@@ -1,46 +1,41 @@
 package com.google.android.gms.internal.measurement;
 
-import com.google.android.gms.common.internal.Preconditions;
+import android.os.Parcel;
+import android.os.Parcelable.Creator;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
-public final class zzex<V> {
-    private final zzws<V> zzaid;
-    private final String zzny;
-
-    private zzex(String str, zzws<V> com_google_android_gms_internal_measurement_zzws_V) {
-        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzws_V);
-        this.zzaid = com_google_android_gms_internal_measurement_zzws_V;
-        this.zzny = str;
+public final class zzex implements Creator<zzew> {
+    public final /* synthetic */ Object createFromParcel(Parcel parcel) {
+        int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
+        long j = 0;
+        String str = null;
+        zzet com_google_android_gms_internal_measurement_zzet = null;
+        String str2 = null;
+        while (parcel.dataPosition() < validateObjectHeader) {
+            int readHeader = SafeParcelReader.readHeader(parcel);
+            switch (SafeParcelReader.getFieldId(readHeader)) {
+                case 2:
+                    str2 = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 3:
+                    com_google_android_gms_internal_measurement_zzet = (zzet) SafeParcelReader.createParcelable(parcel, readHeader, zzet.CREATOR);
+                    break;
+                case 4:
+                    str = SafeParcelReader.createString(parcel, readHeader);
+                    break;
+                case 5:
+                    j = SafeParcelReader.readLong(parcel, readHeader);
+                    break;
+                default:
+                    SafeParcelReader.skipUnknownField(parcel, readHeader);
+                    break;
+            }
+        }
+        SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
+        return new zzew(str2, com_google_android_gms_internal_measurement_zzet, str, j);
     }
 
-    static zzex<Double> zza(String str, double d, double d2) {
-        return new zzex(str, zzew.zzagc.zzb(str, -3.0d));
-    }
-
-    static zzex<Long> zzb(String str, long j, long j2) {
-        return new zzex(str, zzew.zzagc.zze(str, j));
-    }
-
-    static zzex<Boolean> zzb(String str, boolean z, boolean z2) {
-        return new zzex(str, zzew.zzagc.zzf(str, z));
-    }
-
-    static zzex<Integer> zzc(String str, int i, int i2) {
-        return new zzex(str, zzew.zzagc.zzd(str, i));
-    }
-
-    static zzex<String> zzd(String str, String str2, String str3) {
-        return new zzex(str, zzew.zzagc.zzv(str, str2));
-    }
-
-    public final V get() {
-        return this.zzaid.get();
-    }
-
-    public final V get(V v) {
-        return v != null ? v : this.zzaid.get();
-    }
-
-    public final String getKey() {
-        return this.zzny;
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new zzew[i];
     }
 }

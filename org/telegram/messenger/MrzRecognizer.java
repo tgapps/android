@@ -95,145 +95,182 @@ public class MrzRecognizer {
             scale = 1500.0f / ((float) Math.max(bitmap.getWidth(), bitmap.getHeight()));
             bitmap = Bitmap.createScaledBitmap(bitmap, Math.round(((float) bitmap.getWidth()) * scale), Math.round(((float) bitmap.getHeight()) * scale), true);
         }
-        Bitmap binaryBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ALPHA_8);
-        Rect[][] charRects = binarizeAndFindCharacters(bitmap, binaryBitmap);
-        if (charRects == null || charRects.length == 0 || charRects[0].length == 0) {
-            return null;
-        }
-        Bitmap chrBitmap = Bitmap.createBitmap(charRects[0].length * 10, charRects.length * 15, Config.ALPHA_8);
-        canvas = new Canvas(chrBitmap);
-        Paint aaPaint = new Paint(2);
-        Rect dst2 = new Rect(0, 0, 10, 15);
-        int y = 0;
-        for (Rect[] line : charRects) {
-            int x = 0;
-            for (Rect rect : charRects[r8]) {
-                dst2.set(x * 10, y * 15, (x * 10) + 10, (y * 15) + 15);
-                canvas.drawBitmap(binaryBitmap, rect, dst2, aaPaint);
-                x++;
+        Bitmap binaryBitmap = null;
+        Rect[][] charRects = null;
+        int maxLength = 0;
+        int lineCount = 0;
+        int i = 0;
+        while (i < 3) {
+            Matrix m = null;
+            Bitmap toProcess = bitmap;
+            switch (i) {
+                case 1:
+                    m = new Matrix();
+                    m.setRotate(1.0f, (float) (bitmap.getWidth() / 2), (float) (bitmap.getHeight() / 2));
+                    break;
+                case 2:
+                    m = new Matrix();
+                    m.setRotate(-1.0f, (float) (bitmap.getWidth() / 2), (float) (bitmap.getHeight() / 2));
+                    break;
             }
-            y++;
-        }
-        String mrz = performRecognition(chrBitmap, charRects.length, charRects[0].length, ApplicationLoader.applicationContext.getAssets());
-        if (mrz == null) {
-            return null;
-        }
-        String[] mrzLines = TextUtils.split(mrz, "\n");
-        Result result = new Result();
-        if (mrzLines.length < 2 || mrzLines[0].length() < 30 || mrzLines[1].length() != mrzLines[0].length()) {
-            return null;
-        }
-        result.rawMRZ = TextUtils.join("\n", mrzLines);
-        HashMap<String, String> countries = getCountriesMap();
-        char type = mrzLines[0].charAt(0);
-        int lastNameEnd;
-        String number;
-        String birthDate;
-        String expiryDate;
-        if (type == 'P') {
-            result.type = 1;
-            if (mrzLines[0].length() == 44) {
-                result.issuingCountry = mrzLines[0].substring(2, 5);
-                lastNameEnd = mrzLines[0].indexOf("<<");
-                if (lastNameEnd != -1) {
-                    result.lastName = mrzLines[0].substring(5, lastNameEnd).replace('<', ' ').replace('0', 'O').trim();
-                    result.firstName = mrzLines[0].substring(lastNameEnd + 2).replace('<', ' ').replace('0', 'O').trim();
-                }
-                number = mrzLines[1].substring(0, 9).replace('<', ' ').replace('O', '0').trim();
-                if (checksum(number) == getNumber(mrzLines[1].charAt(9))) {
-                    result.number = number;
-                }
-                result.nationality = mrzLines[1].substring(10, 13);
-                birthDate = mrzLines[1].substring(13, 19).replace('O', '0').replace('I', '1');
-                if (checksum(birthDate) == getNumber(mrzLines[1].charAt(19))) {
-                    parseBirthDate(birthDate, result);
-                }
-                result.gender = parseGender(mrzLines[1].charAt(20));
-                expiryDate = mrzLines[1].substring(21, 27).replace('O', '0').replace('I', '1');
-                if (checksum(expiryDate) == getNumber(mrzLines[1].charAt(27)) || mrzLines[1].charAt(27) == '<') {
-                    parseExpiryDate(expiryDate, result);
-                }
-                if ("RUS".equals(result.issuingCountry) && mrzLines[0].charAt(1) == 'N') {
-                    result.type = 3;
-                    result.firstName = russianTranslit(result.firstName);
-                    result.lastName = russianTranslit(result.lastName);
-                    if (result.number != null) {
-                        result.number = result.number.substring(0, 3) + mrzLines[1].charAt(28) + result.number.substring(3);
-                    }
-                } else {
-                    result.firstName = result.firstName.replace('8', 'B');
-                    result.lastName = result.lastName.replace('8', 'B');
-                }
-                result.lastName = capitalize(result.lastName);
-                result.firstName = capitalize(result.firstName);
+            if (m != null) {
+                toProcess = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
             }
-        } else if (type == 'I' || type == 'A' || type == 'C') {
-            result.type = 2;
-            if (mrzLines.length == 3 && mrzLines[0].length() == 30 && mrzLines[2].length() == 30) {
-                result.issuingCountry = mrzLines[0].substring(2, 5);
-                number = mrzLines[0].substring(5, 14).replace('<', ' ').replace('O', '0').trim();
-                if (checksum(number) == mrzLines[0].charAt(14) - 48) {
-                    result.number = number;
-                }
-                birthDate = mrzLines[1].substring(0, 6).replace('O', '0').replace('I', '1');
-                if (checksum(birthDate) == getNumber(mrzLines[1].charAt(6))) {
-                    parseBirthDate(birthDate, result);
-                }
-                result.gender = parseGender(mrzLines[1].charAt(7));
-                expiryDate = mrzLines[1].substring(8, 14).replace('O', '0').replace('I', '1');
-                if (checksum(expiryDate) == getNumber(mrzLines[1].charAt(14)) || mrzLines[1].charAt(14) == '<') {
-                    parseExpiryDate(expiryDate, result);
-                }
-                result.nationality = mrzLines[1].substring(15, 18);
-                lastNameEnd = mrzLines[2].indexOf("<<");
-                if (lastNameEnd != -1) {
-                    result.lastName = mrzLines[2].substring(0, lastNameEnd).replace('<', ' ').trim();
-                    result.firstName = mrzLines[2].substring(lastNameEnd + 2).replace('<', ' ').trim();
-                }
-            } else if (mrzLines.length == 2 && mrzLines[0].length() == 36) {
-                result.issuingCountry = mrzLines[0].substring(2, 5);
-                if ("FRA".equals(result.issuingCountry) && type == 'I' && mrzLines[0].charAt(1) == 'D') {
-                    result.nationality = "FRA";
-                    result.lastName = mrzLines[0].substring(5, 30).replace('<', ' ').trim();
-                    result.firstName = mrzLines[1].substring(13, 27).replace("<<", ", ").replace('<', ' ').trim();
-                    number = mrzLines[1].substring(0, 12).replace('O', '0');
-                    if (checksum(number) == getNumber(mrzLines[1].charAt(12))) {
-                        result.number = number;
-                    }
-                    birthDate = mrzLines[1].substring(27, 33).replace('O', '0').replace('I', '1');
-                    if (checksum(birthDate) == getNumber(mrzLines[1].charAt(33))) {
-                        parseBirthDate(birthDate, result);
-                    }
-                    result.gender = parseGender(mrzLines[1].charAt(34));
-                    result.doesNotExpire = true;
-                } else {
-                    lastNameEnd = mrzLines[0].indexOf("<<");
-                    if (lastNameEnd != -1) {
-                        result.lastName = mrzLines[0].substring(5, lastNameEnd).replace('<', ' ').trim();
-                        result.firstName = mrzLines[0].substring(lastNameEnd + 2).replace('<', ' ').trim();
-                    }
-                    number = mrzLines[1].substring(0, 9).replace('<', ' ').replace('O', '0').trim();
-                    if (checksum(number) == getNumber(mrzLines[1].charAt(9))) {
-                        result.number = number;
-                    }
-                    result.nationality = mrzLines[1].substring(10, 13);
-                    birthDate = mrzLines[1].substring(13, 19).replace('O', '0').replace('I', '1');
-                    if (checksum(birthDate) == getNumber(mrzLines[1].charAt(19))) {
-                        parseBirthDate(birthDate, result);
-                    }
-                    result.gender = parseGender(mrzLines[1].charAt(20));
-                    expiryDate = mrzLines[1].substring(21, 27).replace('O', '0').replace('I', '1');
-                    if (checksum(expiryDate) == getNumber(mrzLines[1].charAt(27)) || mrzLines[1].charAt(27) == '<') {
-                        parseExpiryDate(expiryDate, result);
-                    }
+            binaryBitmap = Bitmap.createBitmap(toProcess.getWidth(), toProcess.getHeight(), Config.ALPHA_8);
+            charRects = binarizeAndFindCharacters(toProcess, binaryBitmap);
+            for (Rect[] rects : charRects) {
+                maxLength = Math.max(rects.length, maxLength);
+                if (rects.length > 0) {
+                    lineCount++;
                 }
             }
-            result.firstName = capitalize(result.firstName.replace('0', 'O').replace('8', 'B'));
-            result.lastName = capitalize(result.lastName.replace('0', 'O').replace('8', 'B'));
+            if (lineCount < 2 || maxLength < 30) {
+                i++;
+            } else if (maxLength >= 30 || lineCount < 2) {
+                return null;
+            } else {
+                Bitmap chrBitmap = Bitmap.createBitmap(charRects[0].length * 10, charRects.length * 15, Config.ALPHA_8);
+                canvas = new Canvas(chrBitmap);
+                Paint aaPaint = new Paint(2);
+                Rect dst2 = new Rect(0, 0, 10, 15);
+                int y = 0;
+                for (Rect[] line : charRects) {
+                    int x = 0;
+                    for (Rect rect : charRects[r8]) {
+                        dst2.set(x * 10, y * 15, (x * 10) + 10, (y * 15) + 15);
+                        canvas.drawBitmap(binaryBitmap, rect, dst2, aaPaint);
+                        x++;
+                    }
+                    y++;
+                }
+                String mrz = performRecognition(chrBitmap, charRects.length, charRects[0].length, ApplicationLoader.applicationContext.getAssets());
+                if (mrz == null) {
+                    return null;
+                }
+                String[] mrzLines = TextUtils.split(mrz, "\n");
+                Result result = new Result();
+                if (mrzLines.length < 2 || mrzLines[0].length() < 30 || mrzLines[1].length() != mrzLines[0].length()) {
+                    return null;
+                }
+                result.rawMRZ = TextUtils.join("\n", mrzLines);
+                HashMap<String, String> countries = getCountriesMap();
+                char type = mrzLines[0].charAt(0);
+                int lastNameEnd;
+                String number;
+                String birthDate;
+                String expiryDate;
+                if (type == 'P') {
+                    result.type = 1;
+                    if (mrzLines[0].length() == 44) {
+                        result.issuingCountry = mrzLines[0].substring(2, 5);
+                        lastNameEnd = mrzLines[0].indexOf("<<", 6);
+                        if (lastNameEnd != -1) {
+                            result.lastName = mrzLines[0].substring(5, lastNameEnd).replace('<', ' ').replace('0', 'O').trim();
+                            result.firstName = mrzLines[0].substring(lastNameEnd + 2).replace('<', ' ').replace('0', 'O').trim();
+                            if (result.firstName.contains("   ")) {
+                                result.firstName = result.firstName.substring(0, result.firstName.indexOf("   "));
+                            }
+                        }
+                        number = mrzLines[1].substring(0, 9).replace('<', ' ').replace('O', '0').trim();
+                        if (checksum(number) == getNumber(mrzLines[1].charAt(9))) {
+                            result.number = number;
+                        }
+                        result.nationality = mrzLines[1].substring(10, 13);
+                        birthDate = mrzLines[1].substring(13, 19).replace('O', '0').replace('I', '1');
+                        if (checksum(birthDate) == getNumber(mrzLines[1].charAt(19))) {
+                            parseBirthDate(birthDate, result);
+                        }
+                        result.gender = parseGender(mrzLines[1].charAt(20));
+                        expiryDate = mrzLines[1].substring(21, 27).replace('O', '0').replace('I', '1');
+                        if (checksum(expiryDate) == getNumber(mrzLines[1].charAt(27)) || mrzLines[1].charAt(27) == '<') {
+                            parseExpiryDate(expiryDate, result);
+                        }
+                        if ("RUS".equals(result.issuingCountry) && mrzLines[0].charAt(1) == 'N') {
+                            result.type = 3;
+                            result.firstName = russianTranslit(result.firstName);
+                            result.lastName = russianTranslit(result.lastName);
+                            if (result.number != null) {
+                                result.number = result.number.substring(0, 3) + mrzLines[1].charAt(28) + result.number.substring(3);
+                            }
+                        } else {
+                            result.firstName = result.firstName.replace('8', 'B');
+                            result.lastName = result.lastName.replace('8', 'B');
+                        }
+                        result.lastName = capitalize(result.lastName);
+                        result.firstName = capitalize(result.firstName);
+                    }
+                } else if (type == 'I' || type == 'A' || type == 'C') {
+                    result.type = 2;
+                    if (mrzLines.length == 3 && mrzLines[0].length() == 30 && mrzLines[2].length() == 30) {
+                        result.issuingCountry = mrzLines[0].substring(2, 5);
+                        number = mrzLines[0].substring(5, 14).replace('<', ' ').replace('O', '0').trim();
+                        if (checksum(number) == mrzLines[0].charAt(14) - 48) {
+                            result.number = number;
+                        }
+                        birthDate = mrzLines[1].substring(0, 6).replace('O', '0').replace('I', '1');
+                        if (checksum(birthDate) == getNumber(mrzLines[1].charAt(6))) {
+                            parseBirthDate(birthDate, result);
+                        }
+                        result.gender = parseGender(mrzLines[1].charAt(7));
+                        expiryDate = mrzLines[1].substring(8, 14).replace('O', '0').replace('I', '1');
+                        if (checksum(expiryDate) == getNumber(mrzLines[1].charAt(14)) || mrzLines[1].charAt(14) == '<') {
+                            parseExpiryDate(expiryDate, result);
+                        }
+                        result.nationality = mrzLines[1].substring(15, 18);
+                        lastNameEnd = mrzLines[2].indexOf("<<");
+                        if (lastNameEnd != -1) {
+                            result.lastName = mrzLines[2].substring(0, lastNameEnd).replace('<', ' ').trim();
+                            result.firstName = mrzLines[2].substring(lastNameEnd + 2).replace('<', ' ').trim();
+                        }
+                    } else if (mrzLines.length == 2 && mrzLines[0].length() == 36) {
+                        result.issuingCountry = mrzLines[0].substring(2, 5);
+                        if ("FRA".equals(result.issuingCountry) && type == 'I' && mrzLines[0].charAt(1) == 'D') {
+                            result.nationality = "FRA";
+                            result.lastName = mrzLines[0].substring(5, 30).replace('<', ' ').trim();
+                            result.firstName = mrzLines[1].substring(13, 27).replace("<<", ", ").replace('<', ' ').trim();
+                            number = mrzLines[1].substring(0, 12).replace('O', '0');
+                            if (checksum(number) == getNumber(mrzLines[1].charAt(12))) {
+                                result.number = number;
+                            }
+                            birthDate = mrzLines[1].substring(27, 33).replace('O', '0').replace('I', '1');
+                            if (checksum(birthDate) == getNumber(mrzLines[1].charAt(33))) {
+                                parseBirthDate(birthDate, result);
+                            }
+                            result.gender = parseGender(mrzLines[1].charAt(34));
+                            result.doesNotExpire = true;
+                        } else {
+                            lastNameEnd = mrzLines[0].indexOf("<<");
+                            if (lastNameEnd != -1) {
+                                result.lastName = mrzLines[0].substring(5, lastNameEnd).replace('<', ' ').trim();
+                                result.firstName = mrzLines[0].substring(lastNameEnd + 2).replace('<', ' ').trim();
+                            }
+                            number = mrzLines[1].substring(0, 9).replace('<', ' ').replace('O', '0').trim();
+                            if (checksum(number) == getNumber(mrzLines[1].charAt(9))) {
+                                result.number = number;
+                            }
+                            result.nationality = mrzLines[1].substring(10, 13);
+                            birthDate = mrzLines[1].substring(13, 19).replace('O', '0').replace('I', '1');
+                            if (checksum(birthDate) == getNumber(mrzLines[1].charAt(19))) {
+                                parseBirthDate(birthDate, result);
+                            }
+                            result.gender = parseGender(mrzLines[1].charAt(20));
+                            expiryDate = mrzLines[1].substring(21, 27).replace('O', '0').replace('I', '1');
+                            if (checksum(expiryDate) == getNumber(mrzLines[1].charAt(27)) || mrzLines[1].charAt(27) == '<') {
+                                parseExpiryDate(expiryDate, result);
+                            }
+                        }
+                    }
+                    result.firstName = capitalize(result.firstName.replace('0', 'O').replace('8', 'B'));
+                    result.lastName = capitalize(result.lastName.replace('0', 'O').replace('8', 'B'));
+                }
+                result.issuingCountry = (String) countries.get(result.issuingCountry);
+                result.nationality = (String) countries.get(result.nationality);
+                return result;
+            }
         }
-        result.issuingCountry = (String) countries.get(result.issuingCountry);
-        result.nationality = (String) countries.get(result.nationality);
-        return result;
+        if (maxLength >= 30) {
+        }
+        return null;
     }
 
     public static Result recognize(byte[] yuvData, int width, int height, int rotation) {
@@ -433,7 +470,7 @@ public class MrzRecognizer {
         countries.put("GAB", "GA");
         countries.put("GMB", "GM");
         countries.put("GEO", "GE");
-        countries.put("DEU", "DE");
+        countries.put("D<<", "DE");
         countries.put("GHA", "GH");
         countries.put("GIB", "GI");
         countries.put("GRC", "GR");

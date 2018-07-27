@@ -1,14 +1,16 @@
 package com.google.firebase.iid;
 
-public final class zzac extends Exception {
-    private final int errorCode;
+import android.os.Handler.Callback;
+import android.os.Message;
 
-    public zzac(int i, String str) {
-        super(str);
-        this.errorCode = i;
+final /* synthetic */ class zzac implements Callback {
+    private final zzab zzbt;
+
+    zzac(zzab com_google_firebase_iid_zzab) {
+        this.zzbt = com_google_firebase_iid_zzab;
     }
 
-    public final int getErrorCode() {
-        return this.errorCode;
+    public final boolean handleMessage(Message message) {
+        return this.zzbt.zza(message);
     }
 }

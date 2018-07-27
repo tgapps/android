@@ -3,29 +3,26 @@ package com.google.android.gms.internal.measurement;
 import android.os.RemoteException;
 
 final class zzin implements Runnable {
-    private final /* synthetic */ zzie zzaow;
-    private final /* synthetic */ zzii zzape;
+    private final /* synthetic */ zzdz zzano;
+    private final /* synthetic */ zzij zzapn;
 
-    zzin(zzii com_google_android_gms_internal_measurement_zzii, zzie com_google_android_gms_internal_measurement_zzie) {
-        this.zzape = com_google_android_gms_internal_measurement_zzii;
-        this.zzaow = com_google_android_gms_internal_measurement_zzie;
+    zzin(zzij com_google_android_gms_internal_measurement_zzij, zzdz com_google_android_gms_internal_measurement_zzdz) {
+        this.zzapn = com_google_android_gms_internal_measurement_zzij;
+        this.zzano = com_google_android_gms_internal_measurement_zzdz;
     }
 
     public final void run() {
-        zzey zzd = this.zzape.zzaoy;
+        zzez zzd = this.zzapn.zzaph;
         if (zzd == null) {
-            this.zzape.zzge().zzim().log("Failed to send current screen to service");
+            this.zzapn.zzgf().zzis().log("Discarding data. Failed to send app launch");
             return;
         }
         try {
-            if (this.zzaow == null) {
-                zzd.zza(0, null, null, this.zzape.getContext().getPackageName());
-            } else {
-                zzd.zza(this.zzaow.zzaoj, this.zzaow.zzul, this.zzaow.zzaoi, this.zzape.getContext().getPackageName());
-            }
-            this.zzape.zzcu();
+            zzd.zza(this.zzano);
+            this.zzapn.zza(zzd, null, this.zzano);
+            this.zzapn.zzcu();
         } catch (RemoteException e) {
-            this.zzape.zzge().zzim().zzg("Failed to send current screen to the service", e);
+            this.zzapn.zzgf().zzis().zzg("Failed to send app launch to the service", e);
         }
     }
 }

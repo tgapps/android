@@ -1,16 +1,395 @@
 package com.google.android.gms.internal.measurement;
 
-final class zzgm implements Runnable {
-    private final /* synthetic */ zzhj zzana;
-    private final /* synthetic */ zzgl zzanb;
+import android.app.Application;
+import android.content.Context;
+import android.text.TextUtils;
+import com.google.android.gms.common.api.internal.GoogleServices;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.util.Clock;
+import com.google.android.gms.common.util.DefaultClock;
+import com.google.android.gms.common.wrappers.Wrappers;
+import com.google.android.gms.measurement.AppMeasurement;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import java.util.concurrent.atomic.AtomicReference;
 
-    zzgm(zzgl com_google_android_gms_internal_measurement_zzgl, zzhj com_google_android_gms_internal_measurement_zzhj) {
-        this.zzanb = com_google_android_gms_internal_measurement_zzgl;
-        this.zzana = com_google_android_gms_internal_measurement_zzhj;
+public class zzgm implements zzhj {
+    private static volatile zzgm zzamn;
+    private final long zzaem;
+    private final zzec zzagd;
+    private final String zzamo;
+    private final zzeg zzamp;
+    private final zzfs zzamq;
+    private final zzfh zzamr;
+    private final zzgh zzams;
+    private final zzji zzamt;
+    private final AppMeasurement zzamu;
+    private final FirebaseAnalytics zzamv;
+    private final zzkc zzamw;
+    private final zzff zzamx;
+    private final zzig zzamy;
+    private final zzhl zzamz;
+    private final zzdu zzana;
+    private zzfd zzanb;
+    private zzij zzanc;
+    private zzeq zzand;
+    private zzfc zzane;
+    private zzfy zzanf;
+    private Boolean zzang;
+    private long zzanh;
+    private int zzani;
+    private int zzanj;
+    private final Context zzqx;
+    private final Clock zzro;
+    private boolean zzvo = false;
+
+    private zzgm(zzhk com_google_android_gms_internal_measurement_zzhk) {
+        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzhk);
+        this.zzagd = new zzec(com_google_android_gms_internal_measurement_zzhk.zzqx);
+        zzey.zza(this.zzagd);
+        this.zzqx = com_google_android_gms_internal_measurement_zzhk.zzqx;
+        this.zzamo = com_google_android_gms_internal_measurement_zzhk.zzamo;
+        zzwu.init(this.zzqx);
+        this.zzro = DefaultClock.getInstance();
+        this.zzaem = this.zzro.currentTimeMillis();
+        this.zzamp = new zzeg(this);
+        zzhi com_google_android_gms_internal_measurement_zzfs = new zzfs(this);
+        com_google_android_gms_internal_measurement_zzfs.zzm();
+        this.zzamq = com_google_android_gms_internal_measurement_zzfs;
+        com_google_android_gms_internal_measurement_zzfs = new zzfh(this);
+        com_google_android_gms_internal_measurement_zzfs.zzm();
+        this.zzamr = com_google_android_gms_internal_measurement_zzfs;
+        com_google_android_gms_internal_measurement_zzfs = new zzkc(this);
+        com_google_android_gms_internal_measurement_zzfs.zzm();
+        this.zzamw = com_google_android_gms_internal_measurement_zzfs;
+        com_google_android_gms_internal_measurement_zzfs = new zzff(this);
+        com_google_android_gms_internal_measurement_zzfs.zzm();
+        this.zzamx = com_google_android_gms_internal_measurement_zzfs;
+        this.zzana = new zzdu(this);
+        com_google_android_gms_internal_measurement_zzfs = new zzig(this);
+        com_google_android_gms_internal_measurement_zzfs.zzm();
+        this.zzamy = com_google_android_gms_internal_measurement_zzfs;
+        com_google_android_gms_internal_measurement_zzfs = new zzhl(this);
+        com_google_android_gms_internal_measurement_zzfs.zzm();
+        this.zzamz = com_google_android_gms_internal_measurement_zzfs;
+        this.zzamu = new AppMeasurement(this);
+        this.zzamv = new FirebaseAnalytics(this);
+        com_google_android_gms_internal_measurement_zzfs = new zzji(this);
+        com_google_android_gms_internal_measurement_zzfs.zzm();
+        this.zzamt = com_google_android_gms_internal_measurement_zzfs;
+        com_google_android_gms_internal_measurement_zzfs = new zzgh(this);
+        com_google_android_gms_internal_measurement_zzfs.zzm();
+        this.zzams = com_google_android_gms_internal_measurement_zzfs;
+        zzec com_google_android_gms_internal_measurement_zzec = this.zzagd;
+        if (this.zzqx.getApplicationContext() instanceof Application) {
+            zzhh zzfv = zzfv();
+            if (zzfv.getContext().getApplicationContext() instanceof Application) {
+                Application application = (Application) zzfv.getContext().getApplicationContext();
+                if (zzfv.zzanz == null) {
+                    zzfv.zzanz = new zzie(zzfv);
+                }
+                application.unregisterActivityLifecycleCallbacks(zzfv.zzanz);
+                application.registerActivityLifecycleCallbacks(zzfv.zzanz);
+                zzfv.zzgf().zziz().log("Registered activity lifecycle callback");
+            }
+        } else {
+            zzgf().zziv().log("Application context is not an Application");
+        }
+        this.zzams.zzc(new zzgn(this, com_google_android_gms_internal_measurement_zzhk));
     }
 
-    public final void run() {
-        this.zzanb.zza(this.zzana);
-        this.zzanb.start();
+    public static zzgm zza(Context context, String str, String str2) {
+        Preconditions.checkNotNull(context);
+        Preconditions.checkNotNull(context.getApplicationContext());
+        if (zzamn == null) {
+            synchronized (zzgm.class) {
+                if (zzamn == null) {
+                    zzamn = new zzgm(new zzhk(context, null));
+                }
+            }
+        }
+        return zzamn;
+    }
+
+    private static void zza(zzhh com_google_android_gms_internal_measurement_zzhh) {
+        if (com_google_android_gms_internal_measurement_zzhh == null) {
+            throw new IllegalStateException("Component not created");
+        }
+    }
+
+    private static void zza(zzhi com_google_android_gms_internal_measurement_zzhi) {
+        if (com_google_android_gms_internal_measurement_zzhi == null) {
+            throw new IllegalStateException("Component not created");
+        } else if (!com_google_android_gms_internal_measurement_zzhi.isInitialized()) {
+            String valueOf = String.valueOf(com_google_android_gms_internal_measurement_zzhi.getClass());
+            throw new IllegalStateException(new StringBuilder(String.valueOf(valueOf).length() + 27).append("Component not initialized: ").append(valueOf).toString());
+        }
+    }
+
+    private final void zza(zzhk com_google_android_gms_internal_measurement_zzhk) {
+        zzfj zzix;
+        zzge().zzab();
+        zzeg.zzhi();
+        zzhi com_google_android_gms_internal_measurement_zzeq = new zzeq(this);
+        com_google_android_gms_internal_measurement_zzeq.zzm();
+        this.zzand = com_google_android_gms_internal_measurement_zzeq;
+        com_google_android_gms_internal_measurement_zzeq = new zzfc(this);
+        com_google_android_gms_internal_measurement_zzeq.zzm();
+        this.zzane = com_google_android_gms_internal_measurement_zzeq;
+        zzhi com_google_android_gms_internal_measurement_zzfd = new zzfd(this);
+        com_google_android_gms_internal_measurement_zzfd.zzm();
+        this.zzanb = com_google_android_gms_internal_measurement_zzfd;
+        com_google_android_gms_internal_measurement_zzfd = new zzij(this);
+        com_google_android_gms_internal_measurement_zzfd.zzm();
+        this.zzanc = com_google_android_gms_internal_measurement_zzfd;
+        this.zzamw.zzke();
+        this.zzamq.zzke();
+        this.zzanf = new zzfy(this);
+        this.zzane.zzke();
+        zzgf().zzix().zzg("App measurement is starting up, version", Long.valueOf(12451));
+        zzec com_google_android_gms_internal_measurement_zzec = this.zzagd;
+        zzgf().zzix().log("To enable debug logging run: adb shell setprop log.tag.FA VERBOSE");
+        com_google_android_gms_internal_measurement_zzec = this.zzagd;
+        String zzah = com_google_android_gms_internal_measurement_zzeq.zzah();
+        if (zzgc().zzci(zzah)) {
+            zzix = zzgf().zzix();
+            zzah = "Faster debug mode event logging enabled. To disable, run:\n  adb shell setprop debug.firebase.analytics.app .none.";
+        } else {
+            zzix = zzgf().zzix();
+            String str = "To enable faster debug mode event logging run:\n  adb shell setprop debug.firebase.analytics.app ";
+            zzah = String.valueOf(zzah);
+            zzah = zzah.length() != 0 ? str.concat(zzah) : new String(str);
+        }
+        zzix.log(zzah);
+        zzgf().zziy().log("Debug-level message logging enabled");
+        if (this.zzani != this.zzanj) {
+            zzgf().zzis().zze("Not all components initialized", Integer.valueOf(this.zzani), Integer.valueOf(this.zzanj));
+        }
+        this.zzvo = true;
+    }
+
+    private final void zzch() {
+        if (!this.zzvo) {
+            throw new IllegalStateException("AppMeasurement is not initialized");
+        }
+    }
+
+    public final Context getContext() {
+        return this.zzqx;
+    }
+
+    public final boolean isEnabled() {
+        boolean z = false;
+        zzge().zzab();
+        zzch();
+        if (this.zzamp.zzhj()) {
+            return false;
+        }
+        Boolean zzhk = this.zzamp.zzhk();
+        if (zzhk != null) {
+            z = zzhk.booleanValue();
+        } else if (!GoogleServices.isMeasurementExplicitlyDisabled()) {
+            z = true;
+        }
+        return zzgg().zzg(z);
+    }
+
+    protected final void start() {
+        boolean z = false;
+        zzge().zzab();
+        if (zzgg().zzakd.get() == 0) {
+            zzgg().zzakd.set(this.zzro.currentTimeMillis());
+        }
+        if (Long.valueOf(zzgg().zzaki.get()).longValue() == 0) {
+            zzgf().zziz().zzg("Persisting first open", Long.valueOf(this.zzaem));
+            zzgg().zzaki.set(this.zzaem);
+        }
+        zzec com_google_android_gms_internal_measurement_zzec;
+        if (zzkd()) {
+            com_google_android_gms_internal_measurement_zzec = this.zzagd;
+            if (!TextUtils.isEmpty(zzfw().getGmpAppId())) {
+                String zzjg = zzgg().zzjg();
+                if (zzjg == null) {
+                    zzgg().zzbp(zzfw().getGmpAppId());
+                } else if (!zzjg.equals(zzfw().getGmpAppId())) {
+                    zzgf().zzix().log("Rechecking which service to use due to a GMP App Id change");
+                    zzgg().zzjj();
+                    this.zzanc.disconnect();
+                    this.zzanc.zzdf();
+                    zzgg().zzbp(zzfw().getGmpAppId());
+                    zzgg().zzaki.set(this.zzaem);
+                    zzgg().zzakk.zzbr(null);
+                }
+            }
+            zzfv().zzbq(zzgg().zzakk.zzjn());
+            com_google_android_gms_internal_measurement_zzec = this.zzagd;
+            if (!TextUtils.isEmpty(zzfw().getGmpAppId())) {
+                boolean isEnabled = isEnabled();
+                if (!(zzgg().zzjm() || this.zzamp.zzhj())) {
+                    zzfs zzgg = zzgg();
+                    if (!isEnabled) {
+                        z = true;
+                    }
+                    zzgg.zzh(z);
+                }
+                if (!this.zzamp.zzay(zzfw().zzah()) || isEnabled) {
+                    zzfv().zzkj();
+                }
+                zzfy().zza(new AtomicReference());
+            }
+        } else if (isEnabled()) {
+            if (!zzgc().zzw("android.permission.INTERNET")) {
+                zzgf().zzis().log("App is missing INTERNET permission");
+            }
+            if (!zzgc().zzw("android.permission.ACCESS_NETWORK_STATE")) {
+                zzgf().zzis().log("App is missing ACCESS_NETWORK_STATE permission");
+            }
+            com_google_android_gms_internal_measurement_zzec = this.zzagd;
+            if (!Wrappers.packageManager(this.zzqx).isCallerInstantApp()) {
+                if (!zzgc.zza(this.zzqx)) {
+                    zzgf().zzis().log("AppMeasurementReceiver not registered/enabled");
+                }
+                if (!zzkc.zza(this.zzqx, false)) {
+                    zzgf().zzis().log("AppMeasurementService not registered/enabled");
+                }
+            }
+            zzgf().zzis().log("Uploading is not possible. App measurement disabled");
+        }
+    }
+
+    final void zzb(zzhi com_google_android_gms_internal_measurement_zzhi) {
+        this.zzani++;
+    }
+
+    public final Clock zzbt() {
+        return this.zzro;
+    }
+
+    final void zzfr() {
+        zzec com_google_android_gms_internal_measurement_zzec = this.zzagd;
+        throw new IllegalStateException("Unexpected call on client side");
+    }
+
+    final void zzfs() {
+        zzec com_google_android_gms_internal_measurement_zzec = this.zzagd;
+    }
+
+    public final zzdu zzfu() {
+        zza(this.zzana);
+        return this.zzana;
+    }
+
+    public final zzhl zzfv() {
+        zza(this.zzamz);
+        return this.zzamz;
+    }
+
+    public final zzfc zzfw() {
+        zza(this.zzane);
+        return this.zzane;
+    }
+
+    public final zzeq zzfx() {
+        zza(this.zzand);
+        return this.zzand;
+    }
+
+    public final zzij zzfy() {
+        zza(this.zzanc);
+        return this.zzanc;
+    }
+
+    public final zzig zzfz() {
+        zza(this.zzamy);
+        return this.zzamy;
+    }
+
+    public final zzfd zzga() {
+        zza(this.zzanb);
+        return this.zzanb;
+    }
+
+    public final zzff zzgb() {
+        zza(this.zzamx);
+        return this.zzamx;
+    }
+
+    public final zzkc zzgc() {
+        zza(this.zzamw);
+        return this.zzamw;
+    }
+
+    public final zzji zzgd() {
+        zza(this.zzamt);
+        return this.zzamt;
+    }
+
+    public final zzgh zzge() {
+        zza(this.zzams);
+        return this.zzams;
+    }
+
+    public final zzfh zzgf() {
+        zza(this.zzamr);
+        return this.zzamr;
+    }
+
+    public final zzfs zzgg() {
+        zza(this.zzamq);
+        return this.zzamq;
+    }
+
+    public final zzeg zzgh() {
+        return this.zzamp;
+    }
+
+    public final zzec zzgi() {
+        return this.zzagd;
+    }
+
+    public final zzfh zzjv() {
+        return (this.zzamr == null || !this.zzamr.isInitialized()) ? null : this.zzamr;
+    }
+
+    final zzgh zzjx() {
+        return this.zzams;
+    }
+
+    public final AppMeasurement zzjy() {
+        return this.zzamu;
+    }
+
+    public final FirebaseAnalytics zzjz() {
+        return this.zzamv;
+    }
+
+    public final String zzka() {
+        return this.zzamo;
+    }
+
+    final long zzkb() {
+        Long valueOf = Long.valueOf(zzgg().zzaki.get());
+        return valueOf.longValue() == 0 ? this.zzaem : Math.min(this.zzaem, valueOf.longValue());
+    }
+
+    final void zzkc() {
+        this.zzanj++;
+    }
+
+    protected final boolean zzkd() {
+        boolean z = false;
+        zzch();
+        zzge().zzab();
+        if (this.zzang == null || this.zzanh == 0 || !(this.zzang == null || this.zzang.booleanValue() || Math.abs(this.zzro.elapsedRealtime() - this.zzanh) <= 1000)) {
+            this.zzanh = this.zzro.elapsedRealtime();
+            zzec com_google_android_gms_internal_measurement_zzec = this.zzagd;
+            if (zzgc().zzw("android.permission.INTERNET") && zzgc().zzw("android.permission.ACCESS_NETWORK_STATE") && (Wrappers.packageManager(this.zzqx).isCallerInstantApp() || (zzgc.zza(this.zzqx) && zzkc.zza(this.zzqx, false)))) {
+                z = true;
+            }
+            this.zzang = Boolean.valueOf(z);
+            if (this.zzang.booleanValue()) {
+                this.zzang = Boolean.valueOf(zzgc().zzcf(zzfw().getGmpAppId()));
+            }
+        }
+        return this.zzang.booleanValue();
     }
 }

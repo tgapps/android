@@ -391,6 +391,11 @@ public class NotificationCompat {
             return this;
         }
 
+        public Builder addAction(Action action) {
+            this.mActions.add(action);
+            return this;
+        }
+
         public Builder setStyle(Style style) {
             if (this.mStyle != style) {
                 this.mStyle = style;
@@ -683,6 +688,12 @@ public class NotificationCompat {
                 this.mSender = sender;
             }
 
+            public Message setData(String dataMimeType, Uri dataUri) {
+                this.mDataMimeType = dataMimeType;
+                this.mDataUri = dataUri;
+                return this;
+            }
+
             public CharSequence getText() {
                 return this.mText;
             }
@@ -752,6 +763,10 @@ public class NotificationCompat {
                 this.mMessages.remove(0);
             }
             return this;
+        }
+
+        public List<Message> getMessages() {
+            return this.mMessages;
         }
 
         public void apply(NotificationBuilderWithBuilderAccessor builder) {

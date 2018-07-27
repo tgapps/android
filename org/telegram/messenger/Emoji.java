@@ -266,25 +266,25 @@ public class Emoji {
     }
 
     public static String fixEmoji(String emoji) {
-        int lenght = emoji.length();
+        int length = emoji.length();
         int a = 0;
-        while (a < lenght) {
+        while (a < length) {
             char ch = emoji.charAt(a);
             if (ch < '?' || ch > '?') {
                 if (ch == '⃣') {
                     break;
                 } else if (ch >= '‼' && ch <= '㊙' && EmojiData.emojiToFE0FMap.containsKey(Character.valueOf(ch))) {
                     emoji = emoji.substring(0, a + 1) + "️" + emoji.substring(a + 1);
-                    lenght++;
+                    length++;
                     a++;
                 }
-            } else if (ch != '?' || a >= lenght - 1) {
+            } else if (ch != '?' || a >= length - 1) {
                 a++;
             } else {
                 ch = emoji.charAt(a + 1);
                 if (ch == '?' || ch == '?' || ch == '?' || ch == '?') {
                     emoji = emoji.substring(0, a + 2) + "️" + emoji.substring(a + 2);
-                    lenght++;
+                    length++;
                     a += 2;
                 } else {
                     a++;
@@ -445,6 +445,7 @@ public class Emoji {
                     }
                 }
                 previousGoodIndex = i;
+                char prevCh = c;
                 for (int a = 0; a < 3; a++) {
                     if (i + 1 < length) {
                         c = cs.charAt(i + 1);
@@ -455,7 +456,7 @@ public class Emoji {
                                 startLength++;
                                 doneEmoji = false;
                             }
-                        } else if (c >= '︀' && c <= '️') {
+                        } else if ((startIndex != -1 || prevCh == '*' || (prevCh >= '1' && prevCh <= '9')) && c >= '︀' && c <= '️') {
                             i++;
                             startLength++;
                         }

@@ -1,43 +1,94 @@
 package com.google.android.gms.internal.measurement;
 
-abstract class zzhh extends zzhg {
-    private boolean zzvo;
+import android.content.Context;
+import com.google.android.gms.common.internal.Preconditions;
+import com.google.android.gms.common.util.Clock;
 
-    zzhh(zzgl com_google_android_gms_internal_measurement_zzgl) {
-        super(com_google_android_gms_internal_measurement_zzgl);
-        this.zzacw.zzb(this);
+class zzhh implements zzhj {
+    protected final zzgm zzacw;
+
+    zzhh(zzgm com_google_android_gms_internal_measurement_zzgm) {
+        Preconditions.checkNotNull(com_google_android_gms_internal_measurement_zzgm);
+        this.zzacw = com_google_android_gms_internal_measurement_zzgm;
     }
 
-    final boolean isInitialized() {
-        return this.zzvo;
+    public Context getContext() {
+        return this.zzacw.getContext();
     }
 
-    protected final void zzch() {
-        if (!isInitialized()) {
-            throw new IllegalStateException("Not initialized");
-        }
+    public void zzab() {
+        this.zzacw.zzge().zzab();
     }
 
-    protected abstract boolean zzhf();
-
-    protected void zzih() {
+    public Clock zzbt() {
+        return this.zzacw.zzbt();
     }
 
-    public final void zzjw() {
-        if (this.zzvo) {
-            throw new IllegalStateException("Can't initialize twice");
-        }
-        zzih();
-        this.zzacw.zzju();
-        this.zzvo = true;
+    public void zzfr() {
+        this.zzacw.zzfr();
     }
 
-    public final void zzm() {
-        if (this.zzvo) {
-            throw new IllegalStateException("Can't initialize twice");
-        } else if (!zzhf()) {
-            this.zzacw.zzju();
-            this.zzvo = true;
-        }
+    public void zzfs() {
+        this.zzacw.zzfs();
+    }
+
+    public zzdu zzfu() {
+        return this.zzacw.zzfu();
+    }
+
+    public zzhl zzfv() {
+        return this.zzacw.zzfv();
+    }
+
+    public zzfc zzfw() {
+        return this.zzacw.zzfw();
+    }
+
+    public zzeq zzfx() {
+        return this.zzacw.zzfx();
+    }
+
+    public zzij zzfy() {
+        return this.zzacw.zzfy();
+    }
+
+    public zzig zzfz() {
+        return this.zzacw.zzfz();
+    }
+
+    public zzfd zzga() {
+        return this.zzacw.zzga();
+    }
+
+    public zzff zzgb() {
+        return this.zzacw.zzgb();
+    }
+
+    public zzkc zzgc() {
+        return this.zzacw.zzgc();
+    }
+
+    public zzji zzgd() {
+        return this.zzacw.zzgd();
+    }
+
+    public zzgh zzge() {
+        return this.zzacw.zzge();
+    }
+
+    public zzfh zzgf() {
+        return this.zzacw.zzgf();
+    }
+
+    public zzfs zzgg() {
+        return this.zzacw.zzgg();
+    }
+
+    public zzeg zzgh() {
+        return this.zzacw.zzgh();
+    }
+
+    public zzec zzgi() {
+        return this.zzacw.zzgi();
     }
 }

@@ -80,6 +80,13 @@ final class zzu<TResult> extends Task<TResult> {
         return com_google_android_gms_tasks_zzu;
     }
 
+    public final <TContinuationResult> Task<TContinuationResult> continueWithTask(Executor executor, Continuation<TResult, Task<TContinuationResult>> continuation) {
+        Task com_google_android_gms_tasks_zzu = new zzu();
+        this.zzage.zza(new zze(executor, continuation, com_google_android_gms_tasks_zzu));
+        zzdt();
+        return com_google_android_gms_tasks_zzu;
+    }
+
     public final Exception getException() {
         Exception exception;
         synchronized (this.mLock) {

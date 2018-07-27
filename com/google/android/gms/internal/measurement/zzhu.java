@@ -3,23 +3,21 @@ package com.google.android.gms.internal.measurement;
 import java.util.concurrent.atomic.AtomicReference;
 
 final class zzhu implements Runnable {
-    private final /* synthetic */ String zzanh;
-    private final /* synthetic */ String zzani;
-    private final /* synthetic */ String zzanj;
-    private final /* synthetic */ AtomicReference zzanv;
-    private final /* synthetic */ zzhk zzanw;
-    private final /* synthetic */ boolean zzanz;
+    private final /* synthetic */ String zzanr;
+    private final /* synthetic */ String zzans;
+    private final /* synthetic */ String zzant;
+    private final /* synthetic */ AtomicReference zzaof;
+    private final /* synthetic */ zzhl zzaog;
 
-    zzhu(zzhk com_google_android_gms_internal_measurement_zzhk, AtomicReference atomicReference, String str, String str2, String str3, boolean z) {
-        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
-        this.zzanv = atomicReference;
-        this.zzanj = str;
-        this.zzanh = str2;
-        this.zzani = str3;
-        this.zzanz = z;
+    zzhu(zzhl com_google_android_gms_internal_measurement_zzhl, AtomicReference atomicReference, String str, String str2, String str3) {
+        this.zzaog = com_google_android_gms_internal_measurement_zzhl;
+        this.zzaof = atomicReference;
+        this.zzant = str;
+        this.zzanr = str2;
+        this.zzans = str3;
     }
 
     public final void run() {
-        this.zzanw.zzacw.zzfx().zza(this.zzanv, this.zzanj, this.zzanh, this.zzani, this.zzanz);
+        this.zzaog.zzacw.zzfy().zza(this.zzaof, this.zzant, this.zzanr, this.zzans);
     }
 }

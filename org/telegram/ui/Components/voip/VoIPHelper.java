@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -43,6 +44,7 @@ import org.telegram.tgnet.TLRPC.TL_phone_setCallRating;
 import org.telegram.tgnet.TLRPC.TL_updates;
 import org.telegram.tgnet.TLRPC.TL_userFull;
 import org.telegram.tgnet.TLRPC.User;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.AlertDialog.Builder;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.CheckBoxCell;
@@ -249,7 +251,7 @@ public class VoIPHelper {
         final int i = account;
         final Context context2 = context;
         final Runnable runnable = onDismiss;
-        final View btn = new Builder(context).setTitle(LocaleController.getString("CallMessageReportProblem", R.string.CallMessageReportProblem)).setView(linearLayout).setPositiveButton(LocaleController.getString("Send", R.string.Send), new OnClickListener() {
+        AlertDialog alert = new Builder(context).setTitle(LocaleController.getString("CallMessageReportProblem", R.string.CallMessageReportProblem)).setView(linearLayout).setPositiveButton(LocaleController.getString("Send", R.string.Send), new OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 final int currentAccount = UserConfig.selectedAccount;
                 final TL_phone_setCallRating req = new TL_phone_setCallRating();
@@ -280,7 +282,15 @@ public class VoIPHelper {
                     runnable.run();
                 }
             }
-        }).show().getButton(-1);
+        }).create();
+        final AlertDialog alertDialog = alert;
+        alert.setOnShowListener(new OnShowListener() {
+            public void onShow(DialogInterface dialog) {
+                AndroidUtilities.hideKeyboard(alertDialog.getWindow().getDecorView());
+            }
+        });
+        alert.show();
+        final View btn = alert.getButton(-1);
         btn.setEnabled(false);
         view2 = linearLayout;
         final Context context3 = context;

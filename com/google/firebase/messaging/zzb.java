@@ -10,7 +10,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.connector.AnalyticsConnector;
 
 final class zzb {
-    private static void zzb(Context context, String str, Intent intent) {
+    private static void zzc(Context context, String str, Intent intent) {
         Bundle bundle = new Bundle();
         String stringExtra = intent.getStringExtra("google.c.a.c_id");
         if (stringExtra != null) {
@@ -55,11 +55,11 @@ final class zzb {
         }
     }
 
-    public static void zzc(Context context, Intent intent) {
-        zzb(context, "_nr", intent);
+    public static void zze(Context context, Intent intent) {
+        zzc(context, "_nr", intent);
     }
 
-    public static void zzd(Context context, Intent intent) {
+    public static void zzf(Context context, Intent intent) {
         if (intent != null) {
             if ("1".equals(intent.getStringExtra("google.c.a.tc"))) {
                 AnalyticsConnector analyticsConnector = (AnalyticsConnector) FirebaseApp.getInstance().get(AnalyticsConnector.class);
@@ -81,14 +81,14 @@ final class zzb {
                 Log.d("FirebaseMessaging", "Received event with track-conversion=false. Do not set user property");
             }
         }
-        zzb(context, "_no", intent);
+        zzc(context, "_no", intent);
     }
 
-    public static void zze(Context context, Intent intent) {
-        zzb(context, "_nd", intent);
+    public static void zzg(Context context, Intent intent) {
+        zzc(context, "_nd", intent);
     }
 
-    public static void zzf(Context context, Intent intent) {
-        zzb(context, "_nf", intent);
+    public static void zzh(Context context, Intent intent) {
+        zzc(context, "_nf", intent);
     }
 }

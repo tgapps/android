@@ -74,13 +74,6 @@ public final class Preconditions {
         throw new NullPointerException(String.valueOf(obj));
     }
 
-    public static int checkNotZero(int i) {
-        if (i != 0) {
-            return i;
-        }
-        throw new IllegalArgumentException("Given Integer is zero");
-    }
-
     public static void checkState(boolean z) {
         if (!z) {
             throw new IllegalStateException();

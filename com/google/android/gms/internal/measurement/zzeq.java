@@ -1,49 +1,106 @@
 package com.google.android.gms.internal.measurement;
 
-import com.google.android.gms.common.internal.Preconditions;
+import android.content.Context;
+import com.google.android.gms.common.util.Clock;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-final class zzeq {
-    final String name;
-    final long zzafr;
-    final long zzafs;
-    final long zzaft;
-    final long zzafu;
-    final Long zzafv;
-    final Long zzafw;
-    final Boolean zzafx;
-    final String zzti;
+public final class zzeq extends zzhi {
+    private long zzafn;
+    private String zzafo;
 
-    zzeq(String str, String str2, long j, long j2, long j3, long j4, Long l, Long l2, Boolean bool) {
-        Preconditions.checkNotEmpty(str);
-        Preconditions.checkNotEmpty(str2);
-        Preconditions.checkArgument(j >= 0);
-        Preconditions.checkArgument(j2 >= 0);
-        Preconditions.checkArgument(j4 >= 0);
-        this.zzti = str;
-        this.name = str2;
-        this.zzafr = j;
-        this.zzafs = j2;
-        this.zzaft = j3;
-        this.zzafu = j4;
-        this.zzafv = l;
-        this.zzafw = l2;
-        this.zzafx = bool;
+    zzeq(zzgm com_google_android_gms_internal_measurement_zzgm) {
+        super(com_google_android_gms_internal_measurement_zzgm);
     }
 
-    final zzeq zza(Long l, Long l2, Boolean bool) {
-        Boolean bool2 = (bool == null || bool.booleanValue()) ? bool : null;
-        return new zzeq(this.zzti, this.name, this.zzafr, this.zzafs, this.zzaft, this.zzafu, l, l2, bool2);
+    public final /* bridge */ /* synthetic */ Context getContext() {
+        return super.getContext();
     }
 
-    final zzeq zzac(long j) {
-        return new zzeq(this.zzti, this.name, this.zzafr, this.zzafs, j, this.zzafu, this.zzafv, this.zzafw, this.zzafx);
+    public final /* bridge */ /* synthetic */ void zzab() {
+        super.zzab();
     }
 
-    final zzeq zzad(long j) {
-        return new zzeq(this.zzti, this.name, this.zzafr, this.zzafs, this.zzaft, j, this.zzafv, this.zzafw, this.zzafx);
+    public final /* bridge */ /* synthetic */ Clock zzbt() {
+        return super.zzbt();
     }
 
-    final zzeq zzie() {
-        return new zzeq(this.zzti, this.name, this.zzafr + 1, this.zzafs + 1, this.zzaft, this.zzafu, this.zzafv, this.zzafw, this.zzafx);
+    public final /* bridge */ /* synthetic */ void zzfr() {
+        super.zzfr();
+    }
+
+    public final /* bridge */ /* synthetic */ void zzfs() {
+        super.zzfs();
+    }
+
+    public final /* bridge */ /* synthetic */ zzdu zzfu() {
+        return super.zzfu();
+    }
+
+    public final /* bridge */ /* synthetic */ zzhl zzfv() {
+        return super.zzfv();
+    }
+
+    public final /* bridge */ /* synthetic */ zzfc zzfw() {
+        return super.zzfw();
+    }
+
+    public final /* bridge */ /* synthetic */ zzeq zzfx() {
+        return super.zzfx();
+    }
+
+    public final /* bridge */ /* synthetic */ zzij zzfy() {
+        return super.zzfy();
+    }
+
+    public final /* bridge */ /* synthetic */ zzig zzfz() {
+        return super.zzfz();
+    }
+
+    public final /* bridge */ /* synthetic */ zzfd zzga() {
+        return super.zzga();
+    }
+
+    public final /* bridge */ /* synthetic */ zzff zzgb() {
+        return super.zzgb();
+    }
+
+    public final /* bridge */ /* synthetic */ zzkc zzgc() {
+        return super.zzgc();
+    }
+
+    public final /* bridge */ /* synthetic */ zzji zzgd() {
+        return super.zzgd();
+    }
+
+    public final /* bridge */ /* synthetic */ zzgh zzge() {
+        return super.zzge();
+    }
+
+    public final /* bridge */ /* synthetic */ zzfh zzgf() {
+        return super.zzgf();
+    }
+
+    public final /* bridge */ /* synthetic */ zzfs zzgg() {
+        return super.zzgg();
+    }
+
+    public final /* bridge */ /* synthetic */ zzeg zzgh() {
+        return super.zzgh();
+    }
+
+    public final /* bridge */ /* synthetic */ zzec zzgi() {
+        return super.zzgi();
+    }
+
+    protected final boolean zzhh() {
+        Calendar instance = Calendar.getInstance();
+        this.zzafn = TimeUnit.MINUTES.convert((long) (instance.get(16) + instance.get(15)), TimeUnit.MILLISECONDS);
+        Locale locale = Locale.getDefault();
+        String toLowerCase = locale.getLanguage().toLowerCase(Locale.ENGLISH);
+        String toLowerCase2 = locale.getCountry().toLowerCase(Locale.ENGLISH);
+        this.zzafo = new StringBuilder((String.valueOf(toLowerCase).length() + 1) + String.valueOf(toLowerCase2).length()).append(toLowerCase).append("-").append(toLowerCase2).toString();
+        return false;
     }
 }

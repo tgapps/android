@@ -839,7 +839,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                         InstantCameraView.this.videoEditedInfo.encryptedFile = InstantCameraView.this.encryptedFile;
                         InstantCameraView.this.videoEditedInfo.key = InstantCameraView.this.key;
                         InstantCameraView.this.videoEditedInfo.iv = InstantCameraView.this.iv;
-                        InstantCameraView.this.videoEditedInfo.estimatedSize = InstantCameraView.this.size;
+                        InstantCameraView.this.videoEditedInfo.estimatedSize = Math.max(1, InstantCameraView.this.size);
                         InstantCameraView.this.videoEditedInfo.framerate = 25;
                         VideoEditedInfo access$2000 = InstantCameraView.this.videoEditedInfo;
                         InstantCameraView.this.videoEditedInfo.originalWidth = PsExtractor.VIDEO_STREAM_MASK;
@@ -2007,7 +2007,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                         endTime = this.videoEditedInfo.estimatedDuration;
                     }
                     this.videoEditedInfo.estimatedDuration = endTime - startTime;
-                    this.videoEditedInfo.estimatedSize = (long) (((double) this.size) * (((double) this.videoEditedInfo.estimatedDuration) / totalDuration));
+                    this.videoEditedInfo.estimatedSize = Math.max(1, (long) (((double) this.size) * (((double) this.videoEditedInfo.estimatedDuration) / totalDuration)));
                     this.videoEditedInfo.bitrate = 400000;
                     if (this.videoEditedInfo.startTime > 0) {
                         videoEditedInfo = this.videoEditedInfo;
@@ -2019,7 +2019,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                     }
                     FileLoader.getInstance(this.currentAccount).cancelUploadFile(this.cameraFile.getAbsolutePath(), false);
                 } else {
-                    this.videoEditedInfo.estimatedSize = this.size;
+                    this.videoEditedInfo.estimatedSize = Math.max(1, this.size);
                 }
                 this.videoEditedInfo.file = this.file;
                 this.videoEditedInfo.encryptedFile = this.encryptedFile;

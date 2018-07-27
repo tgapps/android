@@ -1,18 +1,16 @@
 package com.google.firebase.iid;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.components.ComponentContainer;
+import com.google.firebase.components.ComponentFactory;
 
-final class zzam extends Handler {
-    private final /* synthetic */ zzal zzck;
+final /* synthetic */ class zzam implements ComponentFactory {
+    static final ComponentFactory zzcd = new zzam();
 
-    zzam(zzal com_google_firebase_iid_zzal, Looper looper) {
-        this.zzck = com_google_firebase_iid_zzal;
-        super(looper);
+    private zzam() {
     }
 
-    public final void handleMessage(Message message) {
-        this.zzck.zzb(message);
+    public final Object create(ComponentContainer componentContainer) {
+        return new FirebaseInstanceId((FirebaseApp) componentContainer.get(FirebaseApp.class));
     }
 }

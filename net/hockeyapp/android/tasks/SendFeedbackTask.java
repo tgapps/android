@@ -36,14 +36,16 @@ public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String,
     private String mText;
     private String mToken;
     private String mUrlString;
+    private String mUserId;
 
-    public SendFeedbackTask(Context context, String urlString, String name, String email, String subject, String text, List<Uri> attachmentUris, String token, Handler handler, boolean isFetchMessages) {
+    public SendFeedbackTask(Context context, String urlString, String name, String email, String subject, String text, String userId, List<Uri> attachmentUris, String token, Handler handler, boolean isFetchMessages) {
         this.mContext = context;
         this.mUrlString = urlString;
         this.mName = name;
         this.mEmail = email;
         this.mSubject = subject;
         this.mText = text;
+        this.mUserId = userId;
         this.mAttachmentUris = attachmentUris;
         this.mToken = token;
         this.mHandler = handler;
@@ -169,7 +171,10 @@ public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String,
             parameters.put("os_version", Constants.ANDROID_VERSION);
             parameters.put("oem", Constants.PHONE_MANUFACTURER);
             parameters.put("model", Constants.PHONE_MODEL);
-            parameters.put("sdk_version", "5.0.4");
+            parameters.put("sdk_version", "5.1.0");
+            if (this.mUserId != null) {
+                parameters.put("user_string", this.mUserId);
+            }
             if (this.mToken != null) {
                 this.mUrlString += this.mToken + "/";
             }
@@ -209,7 +214,10 @@ public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String,
             parameters.put("os_version", Constants.ANDROID_VERSION);
             parameters.put("oem", Constants.PHONE_MANUFACTURER);
             parameters.put("model", Constants.PHONE_MODEL);
-            parameters.put("sdk_version", "5.0.4");
+            parameters.put("sdk_version", "5.1.0");
+            if (this.mUserId != null) {
+                parameters.put("user_string", this.mUserId);
+            }
             if (this.mToken != null) {
                 this.mUrlString += this.mToken + "/";
             }

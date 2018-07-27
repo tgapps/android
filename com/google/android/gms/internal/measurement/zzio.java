@@ -1,14 +1,31 @@
 package com.google.android.gms.internal.measurement;
 
-final class zzio extends zzem {
-    private final /* synthetic */ zzii zzape;
+import android.os.RemoteException;
 
-    zzio(zzii com_google_android_gms_internal_measurement_zzii, zzhi com_google_android_gms_internal_measurement_zzhi) {
-        this.zzape = com_google_android_gms_internal_measurement_zzii;
-        super(com_google_android_gms_internal_measurement_zzhi);
+final class zzio implements Runnable {
+    private final /* synthetic */ zzif zzapf;
+    private final /* synthetic */ zzij zzapn;
+
+    zzio(zzij com_google_android_gms_internal_measurement_zzij, zzif com_google_android_gms_internal_measurement_zzif) {
+        this.zzapn = com_google_android_gms_internal_measurement_zzij;
+        this.zzapf = com_google_android_gms_internal_measurement_zzif;
     }
 
     public final void run() {
-        this.zzape.zzge().zzip().log("Tasks have been queued for a long time");
+        zzez zzd = this.zzapn.zzaph;
+        if (zzd == null) {
+            this.zzapn.zzgf().zzis().log("Failed to send current screen to service");
+            return;
+        }
+        try {
+            if (this.zzapf == null) {
+                zzd.zza(0, null, null, this.zzapn.getContext().getPackageName());
+            } else {
+                zzd.zza(this.zzapf.zzaot, this.zzapf.zzul, this.zzapf.zzaos, this.zzapn.getContext().getPackageName());
+            }
+            this.zzapn.zzcu();
+        } catch (RemoteException e) {
+            this.zzapn.zzgf().zzis().zzg("Failed to send current screen to the service", e);
+        }
     }
 }

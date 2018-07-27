@@ -2948,6 +2948,11 @@ public class ArticleViewer implements OnDoubleTapListener, OnGestureListener, No
                 } else if (insets.getSystemWindowInsetLeft() != 0) {
                     ArticleViewer.this.barBackground.measure(MeasureSpec.makeMeasureSpec(insets.getSystemWindowInsetLeft(), 1073741824), MeasureSpec.makeMeasureSpec(heightSize, 1073741824));
                 } else {
+                    if (insets.getSystemWindowInsetBottom() == 0) {
+                        ArticleViewer.this.barBackground.setVisibility(4);
+                    } else {
+                        ArticleViewer.this.barBackground.setVisibility(0);
+                    }
                     ArticleViewer.this.barBackground.measure(MeasureSpec.makeMeasureSpec(widthSize, 1073741824), MeasureSpec.makeMeasureSpec(insets.getSystemWindowInsetBottom(), 1073741824));
                 }
             }
@@ -3189,7 +3194,7 @@ public class ArticleViewer implements OnDoubleTapListener, OnGestureListener, No
             super(context);
             this.radialProgress.setAlphaForPrevious(true);
             this.radialProgress.setDiff(AndroidUtilities.dp(0.0f));
-            this.radialProgress.setStrikeWidth(AndroidUtilities.dp(2.0f));
+            this.radialProgress.setStrokeWidth(AndroidUtilities.dp(2.0f));
             this.TAG = DownloadController.getInstance(ArticleViewer.this.currentAccount).generateObserverTag();
             this.seekBar = new SeekBar(context);
             this.seekBar.setDelegate(new SeekBarDelegate(ArticleViewer.this) {

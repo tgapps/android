@@ -1,19 +1,21 @@
 package com.google.android.gms.internal.measurement;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 final class zzhn implements Runnable {
-    private final /* synthetic */ AtomicReference zzanv;
-    private final /* synthetic */ zzhk zzanw;
-    private final /* synthetic */ boolean zzanz;
+    private final /* synthetic */ String val$name;
+    private final /* synthetic */ String zzanr;
+    private final /* synthetic */ zzhl zzaog;
+    private final /* synthetic */ Object zzaoh;
+    private final /* synthetic */ long zzaoi;
 
-    zzhn(zzhk com_google_android_gms_internal_measurement_zzhk, AtomicReference atomicReference, boolean z) {
-        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
-        this.zzanv = atomicReference;
-        this.zzanz = z;
+    zzhn(zzhl com_google_android_gms_internal_measurement_zzhl, String str, String str2, Object obj, long j) {
+        this.zzaog = com_google_android_gms_internal_measurement_zzhl;
+        this.zzanr = str;
+        this.val$name = str2;
+        this.zzaoh = obj;
+        this.zzaoi = j;
     }
 
     public final void run() {
-        this.zzanw.zzfx().zza(this.zzanv, this.zzanz);
+        this.zzaog.zza(this.zzanr, this.val$name, this.zzaoh, this.zzaoi);
     }
 }

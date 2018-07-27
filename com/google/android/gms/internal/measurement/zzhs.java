@@ -3,15 +3,15 @@ package com.google.android.gms.internal.measurement;
 import com.google.android.gms.measurement.AppMeasurement.ConditionalUserProperty;
 
 final class zzhs implements Runnable {
-    private final /* synthetic */ zzhk zzanw;
-    private final /* synthetic */ ConditionalUserProperty zzaob;
+    private final /* synthetic */ zzhl zzaog;
+    private final /* synthetic */ ConditionalUserProperty zzaol;
 
-    zzhs(zzhk com_google_android_gms_internal_measurement_zzhk, ConditionalUserProperty conditionalUserProperty) {
-        this.zzanw = com_google_android_gms_internal_measurement_zzhk;
-        this.zzaob = conditionalUserProperty;
+    zzhs(zzhl com_google_android_gms_internal_measurement_zzhl, ConditionalUserProperty conditionalUserProperty) {
+        this.zzaog = com_google_android_gms_internal_measurement_zzhl;
+        this.zzaol = conditionalUserProperty;
     }
 
     public final void run() {
-        this.zzanw.zzc(this.zzaob);
+        this.zzaog.zzb(this.zzaol);
     }
 }

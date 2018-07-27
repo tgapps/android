@@ -1,17 +1,38 @@
 package com.google.android.gms.internal.measurement;
 
-final class zzih implements Runnable {
-    private final /* synthetic */ zzif zzaov;
-    private final /* synthetic */ zzie zzaow;
+import android.os.Bundle;
 
-    zzih(zzif com_google_android_gms_internal_measurement_zzif, zzie com_google_android_gms_internal_measurement_zzie) {
-        this.zzaov = com_google_android_gms_internal_measurement_zzif;
-        this.zzaow = com_google_android_gms_internal_measurement_zzie;
+final class zzih implements Runnable {
+    private final /* synthetic */ boolean zzapb;
+    private final /* synthetic */ zzif zzapc;
+    private final /* synthetic */ zzif zzapd;
+    private final /* synthetic */ zzig zzape;
+
+    zzih(zzig com_google_android_gms_internal_measurement_zzig, boolean z, zzif com_google_android_gms_internal_measurement_zzif, zzif com_google_android_gms_internal_measurement_zzif2) {
+        this.zzape = com_google_android_gms_internal_measurement_zzig;
+        this.zzapb = z;
+        this.zzapc = com_google_android_gms_internal_measurement_zzif;
+        this.zzapd = com_google_android_gms_internal_measurement_zzif2;
     }
 
     public final void run() {
-        this.zzaov.zza(this.zzaow);
-        this.zzaov.zzaol = null;
-        this.zzaov.zzfx().zzb(null);
+        if (this.zzapb && this.zzape.zzaov != null) {
+            this.zzape.zza(this.zzape.zzaov);
+        }
+        boolean z = (this.zzapc != null && this.zzapc.zzaot == this.zzapd.zzaot && zzkc.zzs(this.zzapc.zzaos, this.zzapd.zzaos) && zzkc.zzs(this.zzapc.zzul, this.zzapd.zzul)) ? false : true;
+        if (z) {
+            Bundle bundle = new Bundle();
+            zzig.zza(this.zzapd, bundle, true);
+            if (this.zzapc != null) {
+                if (this.zzapc.zzul != null) {
+                    bundle.putString("_pn", this.zzapc.zzul);
+                }
+                bundle.putString("_pc", this.zzapc.zzaos);
+                bundle.putLong("_pi", this.zzapc.zzaot);
+            }
+            this.zzape.zzfv().zza("auto", "_vs", bundle);
+        }
+        this.zzape.zzaov = this.zzapd;
+        this.zzape.zzfy().zzb(this.zzapd);
     }
 }
