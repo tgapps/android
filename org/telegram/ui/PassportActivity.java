@@ -1377,26 +1377,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
                 this.savedSaltedPassword = UserConfig.getInstance(this.currentAccount).savedSaltedPassword;
             }
             if (this.currentPassword == null) {
-                ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account_getPassword(), new RequestDelegate() {
-                    public void run(final TLObject response, TL_error error) {
-                        AndroidUtilities.runOnUIThread(new Runnable() {
-                            public void run() {
-                                if (response != null) {
-                                    PassportActivity.this.currentPassword = (account_Password) response;
-                                    byte[] salt = new byte[(PassportActivity.this.currentPassword.new_salt.length + 8)];
-                                    Utilities.random.nextBytes(salt);
-                                    System.arraycopy(PassportActivity.this.currentPassword.new_salt, 0, salt, 0, PassportActivity.this.currentPassword.new_salt.length);
-                                    PassportActivity.this.currentPassword.new_salt = salt;
-                                    PassportActivity.this.updatePasswordInterface();
-                                    if (PassportActivity.this.inputFieldContainers[0].getVisibility() == 0) {
-                                        PassportActivity.this.inputFields[0].requestFocus();
-                                        AndroidUtilities.showKeyboard(PassportActivity.this.inputFields[0]);
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }), this.classGuid);
+                loadPasswordInfo();
             } else {
                 byte[] salt = new byte[(this.currentPassword.new_salt.length + 8)];
                 Utilities.random.nextBytes(salt);
@@ -1477,6 +1458,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         this.actionBar.setAllowOverlayTitle(true);
         this.actionBar.setActionBarMenuOnItemClick(new ActionBarMenuOnItemClick() {
             public void onItemClick(int id) {
+                JSONObject json;
                 if (id == -1) {
                     if (!PassportActivity.this.checkDiscard()) {
                         if (PassportActivity.this.currentActivityType == 0 || PassportActivity.this.currentActivityType == 5) {
@@ -1630,10 +1612,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
                             if (PassportActivity.this.documentsErrors != null) {
                                 PassportActivity.this.documentsErrors.clear();
                             }
-                            PassportActivityDelegate access$2600 = PassportActivity.this.delegate;
-                            SecureValueType access$3200 = PassportActivity.this.currentType;
+                            PassportActivityDelegate access$2400 = PassportActivity.this.delegate;
+                            SecureValueType access$3000 = PassportActivity.this.currentType;
                             String jSONObject2 = json.toString();
-                            SecureValueType access$3800 = PassportActivity.this.currentDocumentsType;
+                            SecureValueType access$3600 = PassportActivity.this.currentDocumentsType;
                             if (documentsJson != null) {
                                 jSONObject = documentsJson.toString();
                             } else {
@@ -1646,7 +1628,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
                             } else {
                                 secureDocument = PassportActivity.this.reverseDocument;
                             }
-                            access$2600.saveValue(access$3200, null, jSONObject2, access$3800, jSONObject, null, access$300, access$400, secureDocument, finishRunnable, errorRunnable);
+                            access$2400.saveValue(access$3000, null, jSONObject2, access$3600, jSONObject, null, access$300, access$400, secureDocument, finishRunnable, errorRunnable);
                         } else {
                             return;
                         }
@@ -1677,13 +1659,13 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             }
         });
         if (this.currentActivityType == 7) {
-            View anonymousClass5 = new ScrollView(context) {
+            View anonymousClass4 = new ScrollView(context) {
                 protected boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect) {
                     return false;
                 }
             };
-            this.scrollView = anonymousClass5;
-            this.fragmentView = anonymousClass5;
+            this.scrollView = anonymousClass4;
+            this.fragmentView = anonymousClass4;
             this.scrollView.setFillViewport(true);
             AndroidUtilities.setScrollViewEdgeEffectColor(this.scrollView, Theme.getColor(Theme.key_actionBarDefault));
         } else {
@@ -1789,6 +1771,29 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         Bundle params = new Bundle();
         params.putString("phone", (String) this.currentValues.get("phone"));
         fillNextCodeParams(params, this.currentPhoneVerification, false);
+    }
+
+    private void loadPasswordInfo() {
+        ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account_getPassword(), new RequestDelegate() {
+            public void run(final TLObject response, TL_error error) {
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    public void run() {
+                        if (response != null) {
+                            PassportActivity.this.currentPassword = (account_Password) response;
+                            byte[] salt = new byte[(PassportActivity.this.currentPassword.new_salt.length + 8)];
+                            Utilities.random.nextBytes(salt);
+                            System.arraycopy(PassportActivity.this.currentPassword.new_salt, 0, salt, 0, PassportActivity.this.currentPassword.new_salt.length);
+                            PassportActivity.this.currentPassword.new_salt = salt;
+                            PassportActivity.this.updatePasswordInterface();
+                            if (PassportActivity.this.inputFieldContainers[0].getVisibility() == 0) {
+                                PassportActivity.this.inputFields[0].requestFocus();
+                                AndroidUtilities.showKeyboard(PassportActivity.this.inputFields[0]);
+                            }
+                        }
+                    }
+                });
+            }
+        }), this.classGuid);
     }
 
     private void createEmailVerificationInterface(Context context) {
@@ -2050,28 +2055,30 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         }
         RequestDelegate requestDelegate = new RequestDelegate() {
             private void openRequestInterface() {
-                int type;
-                if (!saved) {
-                    UserConfig.getInstance(PassportActivity.this.currentAccount).savePassword(currentPasswordHash, PassportActivity.this.saltedPassword);
-                }
-                AndroidUtilities.hideKeyboard(PassportActivity.this.inputFields[0]);
-                PassportActivity.this.ignoreOnFailure = true;
-                if (PassportActivity.this.currentBotId == 0) {
-                    type = 8;
-                } else {
-                    type = 0;
-                }
-                PassportActivity activity = new PassportActivity(type, PassportActivity.this.currentBotId, PassportActivity.this.currentScope, PassportActivity.this.currentPublicKey, PassportActivity.this.currentPayload, PassportActivity.this.currentCallbackUrl, PassportActivity.this.currentForm, PassportActivity.this.currentPassword);
-                activity.currentEmail = PassportActivity.this.currentEmail;
-                activity.currentAccount = PassportActivity.this.currentAccount;
-                activity.saltedPassword = PassportActivity.this.saltedPassword;
-                activity.secureSecret = PassportActivity.this.secureSecret;
-                activity.secureSecretId = PassportActivity.this.secureSecretId;
-                activity.needActivityResult = PassportActivity.this.needActivityResult;
-                if (PassportActivity.this.parentLayout.checkTransitionAnimation()) {
-                    PassportActivity.this.presentAfterAnimation = activity;
-                } else {
-                    PassportActivity.this.presentFragment(activity, true);
+                if (PassportActivity.this.inputFields != null) {
+                    int type;
+                    if (!saved) {
+                        UserConfig.getInstance(PassportActivity.this.currentAccount).savePassword(currentPasswordHash, PassportActivity.this.saltedPassword);
+                    }
+                    AndroidUtilities.hideKeyboard(PassportActivity.this.inputFields[0]);
+                    PassportActivity.this.ignoreOnFailure = true;
+                    if (PassportActivity.this.currentBotId == 0) {
+                        type = 8;
+                    } else {
+                        type = 0;
+                    }
+                    PassportActivity activity = new PassportActivity(type, PassportActivity.this.currentBotId, PassportActivity.this.currentScope, PassportActivity.this.currentPublicKey, PassportActivity.this.currentPayload, PassportActivity.this.currentCallbackUrl, PassportActivity.this.currentForm, PassportActivity.this.currentPassword);
+                    activity.currentEmail = PassportActivity.this.currentEmail;
+                    activity.currentAccount = PassportActivity.this.currentAccount;
+                    activity.saltedPassword = PassportActivity.this.saltedPassword;
+                    activity.secureSecret = PassportActivity.this.secureSecret;
+                    activity.secureSecretId = PassportActivity.this.secureSecretId;
+                    activity.needActivityResult = PassportActivity.this.needActivityResult;
+                    if (PassportActivity.this.parentLayout == null || !PassportActivity.this.parentLayout.checkTransitionAnimation()) {
+                        PassportActivity.this.presentFragment(activity, true);
+                    } else {
+                        PassportActivity.this.presentAfterAnimation = activity;
+                    }
                 }
             }
 
@@ -4031,11 +4038,11 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
                                 if (num == 7) {
                                     builder.setNegativeButton(LocaleController.getString("PassportSelectNotExpire", R.string.PassportSelectNotExpire), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
-                                            int[] access$4100 = PassportActivity.this.currentExpireDate;
-                                            int[] access$41002 = PassportActivity.this.currentExpireDate;
+                                            int[] access$3900 = PassportActivity.this.currentExpireDate;
+                                            int[] access$39002 = PassportActivity.this.currentExpireDate;
                                             PassportActivity.this.currentExpireDate[2] = 0;
-                                            access$41002[1] = 0;
-                                            access$4100[0] = 0;
+                                            access$39002[1] = 0;
+                                            access$3900[0] = 0;
                                             field.setText(LocaleController.getString("PassportNoExpireDate", R.string.PassportNoExpireDate));
                                         }
                                     });
@@ -5922,7 +5929,8 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         } else {
             if (id == NotificationCenter.didSetTwoStepPassword) {
                 if (args == null || args.length <= 0) {
-                    this.currentPassword = new TL_account_noPassword();
+                    this.currentPassword = null;
+                    loadPasswordInfo();
                 } else {
                     if (!(args[7] == null || this.inputFields[0] == null)) {
                         this.inputFields[0].setText((String) args[7]);
@@ -6508,11 +6516,11 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
                                                         PassportActivity.this.inputFields[2].setText(String.format(Locale.US, "%02d.%02d.%d", new Object[]{Integer.valueOf(result.birthDay), Integer.valueOf(result.birthMonth), Integer.valueOf(result.birthYear)}));
                                                     }
                                                     if (result.expiryDay <= 0 || result.expiryMonth <= 0 || result.expiryYear <= 0) {
-                                                        int[] access$4100 = PassportActivity.this.currentExpireDate;
-                                                        int[] access$41002 = PassportActivity.this.currentExpireDate;
+                                                        int[] access$3900 = PassportActivity.this.currentExpireDate;
+                                                        int[] access$39002 = PassportActivity.this.currentExpireDate;
                                                         PassportActivity.this.currentExpireDate[2] = 0;
-                                                        access$41002[1] = 0;
-                                                        access$4100[0] = 0;
+                                                        access$39002[1] = 0;
+                                                        access$3900[0] = 0;
                                                         PassportActivity.this.inputFields[7].setText(LocaleController.getString("PassportNoExpireDate", R.string.PassportNoExpireDate));
                                                         return;
                                                     }

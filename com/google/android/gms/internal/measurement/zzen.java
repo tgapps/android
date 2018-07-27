@@ -71,13 +71,13 @@ public final class zzen {
     }
 
     private static boolean zza(zzfh com_google_android_gms_internal_measurement_zzfh, SQLiteDatabase sQLiteDatabase, String str) {
+        Cursor query;
         Object e;
         Throwable th;
         Cursor cursor = null;
         if (com_google_android_gms_internal_measurement_zzfh == null) {
             throw new IllegalArgumentException("Monitor must not be null");
         }
-        Cursor query;
         try {
             SQLiteDatabase sQLiteDatabase2 = sQLiteDatabase;
             query = sQLiteDatabase2.query("SQLITE_MASTER", new String[]{"name"}, "name=?", new String[]{str}, null, null, null);

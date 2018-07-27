@@ -43,6 +43,7 @@ public class ScrollSlidingTextTabStrip extends HorizontalScrollView {
                     return;
                 }
                 ScrollSlidingTextTabStrip.this.animatingIndicator = false;
+                ScrollSlidingTextTabStrip.this.setEnabled(true);
                 if (ScrollSlidingTextTabStrip.this.delegate != null) {
                     ScrollSlidingTextTabStrip.this.delegate.onPageScrolled(1.0f);
                 }
@@ -90,6 +91,10 @@ public class ScrollSlidingTextTabStrip extends HorizontalScrollView {
 
     public void setDelegate(ScrollSlidingTabStripDelegate scrollSlidingTabStripDelegate) {
         this.delegate = scrollSlidingTabStripDelegate;
+    }
+
+    public boolean isAnimatingIndicator() {
+        return this.animatingIndicator;
     }
 
     private void setAnimationProgressInernal(TextView newTab, TextView prevTab, float value) {
@@ -197,6 +202,7 @@ public class ScrollSlidingTextTabStrip extends HorizontalScrollView {
                     ScrollSlidingTextTabStrip.this.animateIndicatorStartWidth = ScrollSlidingTextTabStrip.this.indicatorWidth;
                     ScrollSlidingTextTabStrip.this.animateIndicatorToX = v.getLeft();
                     ScrollSlidingTextTabStrip.this.animateIndicatorToWidth = v.getMeasuredWidth();
+                    ScrollSlidingTextTabStrip.this.setEnabled(false);
                     AndroidUtilities.runOnUIThread(ScrollSlidingTextTabStrip.this.animationRunnable, 16);
                     if (ScrollSlidingTextTabStrip.this.delegate != null) {
                         ScrollSlidingTextTabStrip.this.delegate.onPageSelected(id, scrollingForward);
@@ -213,6 +219,10 @@ public class ScrollSlidingTextTabStrip extends HorizontalScrollView {
 
     public int getCurrentTabId() {
         return this.selectedTabId;
+    }
+
+    public int getFirstTabId() {
+        return this.positionToId.get(0, 0);
     }
 
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
@@ -268,6 +278,7 @@ public class ScrollSlidingTextTabStrip extends HorizontalScrollView {
             if (this.animatingIndicator) {
                 AndroidUtilities.cancelRunOnUIThread(this.animationRunnable);
                 this.animatingIndicator = false;
+                setEnabled(true);
                 if (this.delegate != null) {
                     this.delegate.onPageScrolled(1.0f);
                 }

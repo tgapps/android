@@ -120,6 +120,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
     private boolean cameraAnimationInProgress;
     private PhotoAttachAdapter cameraAttachAdapter;
     private FrameLayout cameraIcon;
+    private ImageView cameraImageView;
     private boolean cameraInitied;
     private float cameraOpenProgress;
     private boolean cameraOpened;
@@ -1705,6 +1706,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
     }
 
     public void checkColors() {
+        ViewHolder holder;
         int count = this.attachButtons.size();
         for (int a = 0; a < count; a++) {
             ((AttachButton) this.attachButtons.get(a)).textView.setTextColor(Theme.getColor(Theme.key_dialogTextGray2));
@@ -1716,7 +1718,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
         }
         if (this.listView != null) {
             this.listView.setGlowColor(Theme.getColor(Theme.key_dialogScrollGlow));
-            ViewHolder holder = this.listView.findViewHolderForAdapterPosition(1);
+            holder = this.listView.findViewHolderForAdapterPosition(1);
             if (holder != null) {
                 holder.itemView.setBackgroundColor(Theme.getColor(Theme.key_dialogBackgroundGray));
             }
@@ -1725,6 +1727,15 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
             this.ciclePaint.setColor(Theme.getColor(Theme.key_dialogBackground));
         }
         Theme.setDrawableColor(this.shadowDrawable, Theme.getColor(Theme.key_dialogBackground));
+        if (this.cameraImageView != null) {
+            this.cameraImageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_dialogCameraIcon), Mode.MULTIPLY));
+        }
+        if (this.attachPhotoRecyclerView != null) {
+            holder = this.attachPhotoRecyclerView.findViewHolderForAdapterPosition(0);
+            if (holder != null && (holder.itemView instanceof PhotoAttachCameraCell)) {
+                ((PhotoAttachCameraCell) holder.itemView).getImageView().setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_dialogCameraIcon), Mode.MULTIPLY));
+            }
+        }
     }
 
     private void resetRecordState() {
@@ -1992,11 +2003,6 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
 
     public void onActivityResultFragment(int requestCode, Intent data, String currentPicturePath) {
         Throwable e;
-        Bitmap bitmap;
-        File file;
-        OutputStream fileOutputStream;
-        int i;
-        PhotoEntry entry;
         Throwable th;
         if (this.baseFragment != null && this.baseFragment.getParentActivity() != null) {
             mediaFromExternalCamera = true;
@@ -2020,10 +2026,15 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                 } catch (Throwable e2) {
                     FileLog.e(e2);
                 }
-                int i2 = lastImageId;
-                lastImageId = i2 - 1;
-                openPhotoViewer(new PhotoEntry(0, i2, 0, currentPicturePath, orientation, false), false, true);
+                int i = lastImageId;
+                lastImageId = i - 1;
+                openPhotoViewer(new PhotoEntry(0, i, 0, currentPicturePath, orientation, false), false, true);
             } else if (requestCode == 2) {
+                Bitmap bitmap;
+                File file;
+                OutputStream fileOutputStream;
+                int i2;
+                PhotoEntry entry;
                 String videoPath = null;
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.d("pic path " + currentPicturePath);
@@ -2089,9 +2100,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                             fileOutputStream = new FileOutputStream(file);
                             bitmap.compress(CompressFormat.JPEG, 55, fileOutputStream);
                             SharedConfig.saveConfig();
-                            i = lastImageId;
-                            lastImageId = i - 1;
-                            entry = new PhotoEntry(0, i, 0, videoPath, 0, true);
+                            i2 = lastImageId;
+                            lastImageId = i2 - 1;
+                            entry = new PhotoEntry(0, i2, 0, videoPath, 0, true);
                             entry.duration = (int) duration;
                             entry.thumbPath = file.getAbsolutePath();
                             openPhotoViewer(entry, false, true);
@@ -2125,9 +2136,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                     fileOutputStream = new FileOutputStream(file);
                     bitmap.compress(CompressFormat.JPEG, 55, fileOutputStream);
                     SharedConfig.saveConfig();
-                    i = lastImageId;
-                    lastImageId = i - 1;
-                    entry = new PhotoEntry(0, i, 0, videoPath, 0, true);
+                    i2 = lastImageId;
+                    lastImageId = i2 - 1;
+                    entry = new PhotoEntry(0, i2, 0, videoPath, 0, true);
                     entry.duration = (int) duration;
                     entry.thumbPath = file.getAbsolutePath();
                     openPhotoViewer(entry, false, true);
@@ -2141,9 +2152,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                     FileLog.e(e22222);
                 }
                 SharedConfig.saveConfig();
-                i = lastImageId;
-                lastImageId = i - 1;
-                entry = new PhotoEntry(0, i, 0, videoPath, 0, true);
+                i2 = lastImageId;
+                lastImageId = i2 - 1;
+                entry = new PhotoEntry(0, i2, 0, videoPath, 0, true);
                 entry.duration = (int) duration;
                 entry.thumbPath = file.getAbsolutePath();
                 openPhotoViewer(entry, false, true);
@@ -2436,10 +2447,11 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                 });
                 if (this.cameraIcon == null) {
                     this.cameraIcon = new FrameLayout(this.baseFragment.getParentActivity());
-                    ImageView cameraImageView = new ImageView(this.baseFragment.getParentActivity());
-                    cameraImageView.setScaleType(ScaleType.CENTER);
-                    cameraImageView.setImageResource(R.drawable.instant_camera);
-                    this.cameraIcon.addView(cameraImageView, LayoutHelper.createFrame(80, 80, 85));
+                    this.cameraImageView = new ImageView(this.baseFragment.getParentActivity());
+                    this.cameraImageView.setScaleType(ScaleType.CENTER);
+                    this.cameraImageView.setImageResource(R.drawable.instant_camera);
+                    this.cameraImageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_dialogCameraIcon), Mode.MULTIPLY));
+                    this.cameraIcon.addView(this.cameraImageView, LayoutHelper.createFrame(80, 80, 85));
                 }
                 this.container.addView(this.cameraIcon, 2, LayoutHelper.createFrame(80, 80.0f));
                 this.cameraView.setAlpha(this.mediaEnabled ? 1.0f : 0.2f);

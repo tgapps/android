@@ -40,7 +40,6 @@ final class zzaw implements Runnable {
     }
 
     private final boolean zzam() {
-        String zzj;
         Exception e;
         String str;
         String valueOf;
@@ -48,6 +47,7 @@ final class zzaw implements Runnable {
         if (zzi != null && !zzi.zzj(this.zzak.zzac())) {
             return true;
         }
+        String zzj;
         try {
             zzj = this.zzda.zzj();
             if (zzj == null) {

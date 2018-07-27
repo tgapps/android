@@ -861,7 +861,6 @@ public class MessageObject {
 
     public MessageObject(int accountNum, Message message, AbstractMap<Integer, User> users, AbstractMap<Integer, Chat> chats, SparseArray<User> sUsers, SparseArray<Chat> sChats, boolean generateLayout, long eid) {
         int size;
-        int a;
         this.type = 1000;
         Theme.createChatResources(null, true);
         this.currentAccount = accountNum;
@@ -1142,6 +1141,7 @@ public class MessageObject {
                     TL_messageActionSecureValuesSent valuesSent = (TL_messageActionSecureValuesSent) message.action;
                     StringBuilder str = new StringBuilder();
                     size = valuesSent.types.size();
+                    int a;
                     for (a = 0; a < size; a++) {
                         SecureValueType type = (SecureValueType) valuesSent.types.get(a);
                         if (str.length() > 0) {

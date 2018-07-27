@@ -236,7 +236,6 @@ public class SearchAdapter extends SelectionAdapter {
     }
 
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Object username;
         if (holder.getItemViewType() == 0) {
             TLObject object = getItem(position);
             if (object != null) {
@@ -249,12 +248,12 @@ public class SearchAdapter extends SelectionAdapter {
                     un = ((Chat) object).username;
                     id = ((Chat) object).id;
                 }
-                CharSequence username2 = null;
+                CharSequence username = null;
                 CharSequence name = null;
                 if (position < this.searchResult.size()) {
                     name = (CharSequence) this.searchResultNames.get(position);
                     if (name != null && un != null && un.length() > 0 && name.toString().startsWith("@" + un)) {
-                        username2 = name;
+                        username = name;
                         name = null;
                     }
                 } else if (position > this.searchResult.size() && un != null) {
@@ -262,6 +261,7 @@ public class SearchAdapter extends SelectionAdapter {
                     if (foundUserName.startsWith("@")) {
                         foundUserName = foundUserName.substring(1);
                     }
+                    Object username2;
                     try {
                         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
                         spannableStringBuilder.append("@");
@@ -276,16 +276,16 @@ public class SearchAdapter extends SelectionAdapter {
                             }
                             spannableStringBuilder.setSpan(new ForegroundColorSpan(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4)), index, index + len, 33);
                         }
-                        username = spannableStringBuilder;
+                        username2 = spannableStringBuilder;
                     } catch (Throwable e) {
-                        username = un;
+                        username2 = un;
                         FileLog.e(e);
                     }
                 }
                 boolean z;
                 if (this.useUserCell) {
                     UserCell userCell = (UserCell) holder.itemView;
-                    userCell.setData(object, name, username2, 0);
+                    userCell.setData(object, name, username, 0);
                     if (this.checkedMap != null) {
                         if (this.checkedMap.indexOfKey(id) >= 0) {
                             z = true;
@@ -298,7 +298,7 @@ public class SearchAdapter extends SelectionAdapter {
                     return;
                 }
                 ProfileSearchCell profileSearchCell = holder.itemView;
-                profileSearchCell.setData(object, null, name, username2, false, false);
+                profileSearchCell.setData(object, null, name, username, false, false);
                 z = (position == getItemCount() + -1 || position == this.searchResult.size() - 1) ? false : true;
                 profileSearchCell.useSeparator = z;
             }

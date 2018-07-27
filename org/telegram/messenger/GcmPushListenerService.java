@@ -45,11 +45,11 @@ public class GcmPushListenerService extends FirebaseMessagingService {
                 ApplicationLoader.postInitApplication();
                 Utilities.stageQueue.postRunnable(new Runnable() {
                     public void run() {
-                        int currentAccount;
                         Throwable e;
                         if (BuildVars.LOGS_ENABLED) {
                             FileLog.d("GCM START PROCESSING");
                         }
+                        int currentAccount;
                         try {
                             Object value = data.get(TtmlNode.TAG_P);
                             if (value instanceof String) {

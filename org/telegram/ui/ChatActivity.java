@@ -18020,13 +18020,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
     }
 
     private void processSelectedOption(int option) {
+        File file;
+        Intent intent;
         if (this.selectedObject != null && getParentActivity() != null) {
             int a;
             Bundle args;
-            File file;
             AlertDialog.Builder builder;
             String path;
-            Intent intent;
             switch (option) {
                 case 0:
                     if (this.selectedObjectGroup == null) {
@@ -18824,7 +18824,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
                 }
             }
         };
-        ThemeDescription[] themeDescriptionArr = new ThemeDescription[366];
+        ThemeDescription[] themeDescriptionArr = new ThemeDescription[367];
         themeDescriptionArr[0] = new ThemeDescription(this.fragmentView, 0, null, null, null, null, Theme.key_chat_wallpaper);
         themeDescriptionArr[1] = new ThemeDescription(this.actionBar, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_actionBarDefault);
         themeDescriptionArr[2] = new ThemeDescription(this.chatListView, ThemeDescription.FLAG_LISTGLOWCOLOR, null, null, null, null, Theme.key_actionBarDefault);
@@ -19191,6 +19191,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenterDele
         themeDescriptionArr[363] = new ThemeDescription(null, 0, null, null, null, attachAlertDelegate, Theme.key_dialogTextGray2);
         themeDescriptionArr[364] = new ThemeDescription(null, 0, null, null, null, attachAlertDelegate, Theme.key_dialogScrollGlow);
         themeDescriptionArr[365] = new ThemeDescription(null, 0, null, null, null, attachAlertDelegate, Theme.key_dialogGrayLine);
+        themeDescriptionArr[366] = new ThemeDescription(null, 0, null, null, null, attachAlertDelegate, Theme.key_dialogCameraIcon);
         return themeDescriptionArr;
     }
 }

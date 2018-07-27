@@ -125,9 +125,9 @@ public abstract class zzwu<T> {
 
     @Nullable
     private final T zzsi() {
-        String str;
         zzxe com_google_android_gms_internal_measurement_zzxe = this.zzbnr;
         if (zzsj()) {
+            String str;
             try {
                 str = (String) zza(new zzww(this));
                 if (str != null) {

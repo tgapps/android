@@ -254,23 +254,23 @@ final class zzw {
                 zzb(context, str, zze);
                 return zze;
             }
-            com_google_firebase_iid_zzy2 = null;
+            com_google_firebase_iid_zzy = null;
             try {
                 zze = zza(context.getSharedPreferences("com.google.android.gms.appid", 0), str);
                 if (zze != null) {
                     zza(context, str, zze);
                     return zze;
                 }
-                com_google_firebase_iid_zzy = com_google_firebase_iid_zzy2;
-                if (com_google_firebase_iid_zzy == null) {
+                com_google_firebase_iid_zzy2 = com_google_firebase_iid_zzy;
+                if (com_google_firebase_iid_zzy2 == null) {
                     return null;
                 }
-                throw com_google_firebase_iid_zzy;
+                throw com_google_firebase_iid_zzy2;
             } catch (zzy e) {
-                com_google_firebase_iid_zzy = e;
+                com_google_firebase_iid_zzy2 = e;
             }
-        } catch (zzy com_google_firebase_iid_zzy3) {
-            com_google_firebase_iid_zzy2 = com_google_firebase_iid_zzy3;
+        } catch (zzy com_google_firebase_iid_zzy22) {
+            com_google_firebase_iid_zzy = com_google_firebase_iid_zzy22;
         }
     }
 
