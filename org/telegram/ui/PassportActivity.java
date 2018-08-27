@@ -5771,8 +5771,6 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
     }
 
     private void createIdentityInterface(Context context) {
-        String key;
-        HashMap<String, String> values;
         final EditTextBoldCursor editTextBoldCursor;
         final String str;
         this.languageMap = new HashMap();
@@ -5899,6 +5897,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
         this.inputFields = new EditTextBoldCursor[count];
         int a = 0;
         while (a < count) {
+            String key;
+            HashMap<String, String> values;
             EditTextBoldCursor editTextBoldCursor2 = new EditTextBoldCursor(context);
             this.inputFields[a] = editTextBoldCursor2;
             final EditTextBoldCursor editTextBoldCursor3 = editTextBoldCursor2;

@@ -642,13 +642,13 @@ public class NotificationsController {
     }
 
     final /* synthetic */ void lambda$processNewMessages$16$NotificationsController(ArrayList messageObjects, boolean isFcm, ArrayList popupArrayAdd, boolean isLast) {
+        long dialog_id;
         boolean added = false;
         LongSparseArray<Boolean> settingsCache = new LongSparseArray();
         SharedPreferences preferences = MessagesController.getNotificationsSettings(this.currentAccount);
         boolean allowPinned = preferences.getBoolean("PinnedMessages", true);
         int popup = 0;
         for (int a = 0; a < messageObjects.size(); a++) {
-            long dialog_id;
             MessageObject messageObject = (MessageObject) messageObjects.get(a);
             long mid = (long) messageObject.getId();
             long random_id = messageObject.isFcmMessage() ? messageObject.messageOwner.random_id : 0;

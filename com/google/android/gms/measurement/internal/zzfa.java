@@ -3344,6 +3344,8 @@ public class zzfa implements zzcq {
     }
 
     final void zzf(zzh com_google_android_gms_measurement_internal_zzh) {
+        zzco zzjq;
+        String zzal;
         zzaf();
         zzlr();
         Preconditions.checkNotNull(com_google_android_gms_measurement_internal_zzh);
@@ -3370,8 +3372,6 @@ public class zzfa implements zzcq {
                     i = 0;
                 }
                 zzjq().beginTransaction();
-                zzco zzjq;
-                String zzal;
                 try {
                     zzbl = zzjq().zzbl(com_google_android_gms_measurement_internal_zzh.packageName);
                     if (zzbl != null) {

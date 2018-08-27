@@ -242,6 +242,11 @@ public class NotificationsExceptionsActivity extends BaseFragment {
                 int lower_id = (int) exception.did;
                 int high_id = (int) (exception.did >> 32);
                 User user;
+                String originalName;
+                String tName;
+                int found;
+                int b;
+                String q;
                 if (lower_id == 0) {
                     EncryptedChat encryptedChat = MessagesController.getInstance(NotificationsExceptionsActivity.this.currentAccount).getEncryptedChat(Integer.valueOf(high_id));
                     if (encryptedChat != null) {
@@ -251,11 +256,61 @@ public class NotificationsExceptionsActivity extends BaseFragment {
                             names[1] = user.username;
                         }
                     }
+                    originalName = names[0];
+                    names[0] = names[0].toLowerCase();
+                    tName = LocaleController.getInstance().getTranslitString(names[0]);
+                    tName = null;
+                    found = 0;
+                    b = 0;
+                    while (b < search.length) {
+                        q = search[b];
+                        if (names[0] == null) {
+                        }
+                        found = 2;
+                        if (found != 0) {
+                            if (found == 1) {
+                                resultArrayNames.add(AndroidUtilities.generateSearchName(originalName, null, q));
+                            } else {
+                                resultArrayNames.add(AndroidUtilities.generateSearchName("@" + names[1], null, "@" + q));
+                            }
+                            resultArray.add(exception);
+                        } else {
+                            b++;
+                        }
+                    }
                 } else if (lower_id > 0) {
                     user = MessagesController.getInstance(NotificationsExceptionsActivity.this.currentAccount).getUser(Integer.valueOf(lower_id));
-                    if (user != null) {
-                        names[0] = ContactsController.formatName(user.first_name, user.last_name);
-                        names[1] = user.username;
+                    if (!user.deleted) {
+                        if (user != null) {
+                            names[0] = ContactsController.formatName(user.first_name, user.last_name);
+                            names[1] = user.username;
+                        }
+                        originalName = names[0];
+                        names[0] = names[0].toLowerCase();
+                        tName = LocaleController.getInstance().getTranslitString(names[0]);
+                        if (names[0] != null && names[0].equals(tName)) {
+                            tName = null;
+                        }
+                        found = 0;
+                        b = 0;
+                        while (b < search.length) {
+                            q = search[b];
+                            if ((names[0] == null && (names[0].startsWith(q) || names[0].contains(" " + q))) || (tName != null && (tName.startsWith(q) || tName.contains(" " + q)))) {
+                                found = 1;
+                            } else if (names[1] != null && names[1].startsWith(q)) {
+                                found = 2;
+                            }
+                            if (found != 0) {
+                                if (found == 1) {
+                                    resultArrayNames.add(AndroidUtilities.generateSearchName(originalName, null, q));
+                                } else {
+                                    resultArrayNames.add(AndroidUtilities.generateSearchName("@" + names[1], null, "@" + q));
+                                }
+                                resultArray.add(exception);
+                            } else {
+                                b++;
+                            }
+                        }
                     }
                 } else {
                     Chat chat = MessagesController.getInstance(NotificationsExceptionsActivity.this.currentAccount).getChat(Integer.valueOf(-lower_id));
@@ -265,31 +320,27 @@ public class NotificationsExceptionsActivity extends BaseFragment {
                             names[1] = chat.username;
                         }
                     }
-                }
-                String originalName = names[0];
-                names[0] = names[0].toLowerCase();
-                String tName = LocaleController.getInstance().getTranslitString(names[0]);
-                if (names[0] != null && names[0].equals(tName)) {
+                    originalName = names[0];
+                    names[0] = names[0].toLowerCase();
+                    tName = LocaleController.getInstance().getTranslitString(names[0]);
                     tName = null;
-                }
-                int found = 0;
-                int b = 0;
-                while (b < search.length) {
-                    String q = search[b];
-                    if ((names[0] != null && (names[0].startsWith(q) || names[0].contains(" " + q))) || (tName != null && (tName.startsWith(q) || tName.contains(" " + q)))) {
-                        found = 1;
-                    } else if (names[1] != null && names[1].startsWith(q)) {
-                        found = 2;
-                    }
-                    if (found != 0) {
-                        if (found == 1) {
-                            resultArrayNames.add(AndroidUtilities.generateSearchName(originalName, null, q));
-                        } else {
-                            resultArrayNames.add(AndroidUtilities.generateSearchName("@" + names[1], null, "@" + q));
+                    found = 0;
+                    b = 0;
+                    while (b < search.length) {
+                        q = search[b];
+                        if (names[0] == null) {
                         }
-                        resultArray.add(exception);
-                    } else {
-                        b++;
+                        found = 2;
+                        if (found != 0) {
+                            b++;
+                        } else {
+                            if (found == 1) {
+                                resultArrayNames.add(AndroidUtilities.generateSearchName("@" + names[1], null, "@" + q));
+                            } else {
+                                resultArrayNames.add(AndroidUtilities.generateSearchName(originalName, null, q));
+                            }
+                            resultArray.add(exception);
+                        }
                     }
                 }
             }

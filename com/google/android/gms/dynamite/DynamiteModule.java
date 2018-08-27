@@ -193,11 +193,11 @@ public final class DynamiteModule {
     }
 
     public static DynamiteModule load(Context context, VersionPolicy versionPolicy, String str) throws LoadingException {
+        SelectionResult selectModule;
+        DynamiteModule zzd;
         zza com_google_android_gms_dynamite_DynamiteModule_zza = (zza) zzabv.get();
         zza com_google_android_gms_dynamite_DynamiteModule_zza2 = new zza();
         zzabv.set(com_google_android_gms_dynamite_DynamiteModule_zza2);
-        SelectionResult selectModule;
-        DynamiteModule zzd;
         try {
             selectModule = versionPolicy.selectModule(context, str, zzabw);
             Log.i("DynamiteModule", new StringBuilder((String.valueOf(str).length() + 68) + String.valueOf(str).length()).append("Considering local module ").append(str).append(":").append(selectModule.localVersion).append(" and remote module ").append(str).append(":").append(selectModule.remoteVersion).toString());
@@ -309,8 +309,8 @@ public final class DynamiteModule {
     }
 
     private static int zzb(Context context, String str, boolean z) throws LoadingException {
-        Throwable e;
         Cursor queryForDynamiteModule;
+        Throwable e;
         try {
             queryForDynamiteModule = queryForDynamiteModule(context, str, z);
             if (queryForDynamiteModule != null) {

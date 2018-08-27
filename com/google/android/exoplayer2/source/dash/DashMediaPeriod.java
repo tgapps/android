@@ -309,9 +309,9 @@ final class DashMediaPeriod implements MediaPeriod, Callback<ChunkSampleStream<D
     }
 
     private void selectNewStreams(TrackSelection[] selections, SampleStream[] streams, boolean[] streamResetFlags, long positionUs, int[] streamIndexToTrackGroupIndex) {
+        TrackGroupInfo trackGroupInfo;
         int i = 0;
         while (i < selections.length) {
-            TrackGroupInfo trackGroupInfo;
             if (streams[i] == null && selections[i] != null) {
                 streamResetFlags[i] = true;
                 trackGroupInfo = this.trackGroupInfos[streamIndexToTrackGroupIndex[i]];

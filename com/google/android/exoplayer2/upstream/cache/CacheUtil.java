@@ -99,22 +99,22 @@ public final class CacheUtil {
     }
 
     private static long readAndDiscard(DataSpec dataSpec, long absoluteStreamPosition, long length, DataSource dataSource, byte[] buffer, PriorityTaskManager priorityTaskManager, int priority, CachingCounters counters, AtomicBoolean isCanceled) throws IOException, InterruptedException {
+        DataSpec dataSpec2;
         long totalRead;
         Throwable th;
-        DataSpec dataSpec2 = dataSpec;
+        DataSpec dataSpec3 = dataSpec;
         loop0:
         while (true) {
-            DataSpec dataSpec3;
             if (priorityTaskManager != null) {
                 priorityTaskManager.proceed(priority);
             }
             try {
                 throwExceptionIfInterruptedOrCancelled(isCanceled);
-                dataSpec3 = new DataSpec(dataSpec2.uri, dataSpec2.postBody, absoluteStreamPosition, (dataSpec2.position + absoluteStreamPosition) - dataSpec2.absoluteStreamPosition, -1, dataSpec2.key, dataSpec2.flags | 2);
+                dataSpec2 = new DataSpec(dataSpec3.uri, dataSpec3.postBody, absoluteStreamPosition, (dataSpec3.position + absoluteStreamPosition) - dataSpec3.absoluteStreamPosition, -1, dataSpec3.key, dataSpec3.flags | 2);
                 try {
-                    long resolvedLength = dataSource.open(dataSpec3);
+                    long resolvedLength = dataSource.open(dataSpec2);
                     if (counters.contentLength == -1 && resolvedLength != -1) {
-                        counters.contentLength = dataSpec3.absoluteStreamPosition + resolvedLength;
+                        counters.contentLength = dataSpec2.absoluteStreamPosition + resolvedLength;
                     }
                     totalRead = 0;
                     while (totalRead != length) {
@@ -132,16 +132,16 @@ public final class CacheUtil {
                     th = th2;
                 }
             } catch (PriorityTooLowException e2) {
-                dataSpec = dataSpec2;
+                dataSpec = dataSpec3;
             } catch (Throwable th3) {
                 th = th3;
-                dataSpec = dataSpec2;
+                dataSpec = dataSpec3;
             }
             Util.closeQuietly(dataSource);
-            dataSpec2 = dataSpec;
+            dataSpec3 = dataSpec;
         }
         if (counters.contentLength == -1) {
-            counters.contentLength = dataSpec3.absoluteStreamPosition + totalRead;
+            counters.contentLength = dataSpec2.absoluteStreamPosition + totalRead;
         }
         Util.closeQuietly(dataSource);
         return totalRead;

@@ -2163,10 +2163,10 @@ public class SendMessagesHelper implements NotificationCenterDelegate {
 
     private void sendMessage(String message, String caption, MessageMedia location, TL_photo photo, VideoEditedInfo videoEditedInfo, User user, TL_document document, TL_game game, long peer, String path, MessageObject reply_to_msg, WebPage webPage, boolean searchLinks, MessageObject retryMessageObject, ArrayList<MessageEntity> entities, ReplyMarkup replyMarkup, HashMap<String, String> params, int ttl) {
         Throwable e;
-        MessageObject newMsgObj;
         if ((user == null || user.phone != null) && peer != 0) {
             Chat chat;
             Document document2;
+            MessageObject newMsgObj;
             MessageMedia messageMedia;
             int a;
             DocumentAttribute attribute;

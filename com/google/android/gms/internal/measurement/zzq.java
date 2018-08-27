@@ -25,8 +25,8 @@ public class zzq implements IInterface {
     }
 
     protected final Parcel transactAndReadException(int i, Parcel parcel) throws RemoteException {
-        IBinder iBinder;
         Parcel obtain = Parcel.obtain();
+        IBinder iBinder;
         try {
             iBinder = this.zzqt;
             iBinder.transact(i, parcel, obtain, 0);

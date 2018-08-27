@@ -67,23 +67,23 @@ final class zzx {
                 zza(context, str, zze);
                 return zze;
             }
-            com_google_firebase_iid_zzz = null;
+            com_google_firebase_iid_zzz2 = null;
             try {
                 zze = zza(context.getSharedPreferences("com.google.android.gms.appid", 0), str);
                 if (zze != null) {
                     zza(context, str, zze, false);
                     return zze;
                 }
-                com_google_firebase_iid_zzz2 = com_google_firebase_iid_zzz;
-                if (com_google_firebase_iid_zzz2 == null) {
+                com_google_firebase_iid_zzz = com_google_firebase_iid_zzz2;
+                if (com_google_firebase_iid_zzz == null) {
                     return null;
                 }
-                throw com_google_firebase_iid_zzz2;
+                throw com_google_firebase_iid_zzz;
             } catch (zzz e) {
-                com_google_firebase_iid_zzz2 = e;
+                com_google_firebase_iid_zzz = e;
             }
-        } catch (zzz com_google_firebase_iid_zzz22) {
-            com_google_firebase_iid_zzz = com_google_firebase_iid_zzz22;
+        } catch (zzz com_google_firebase_iid_zzz3) {
+            com_google_firebase_iid_zzz2 = com_google_firebase_iid_zzz3;
         }
     }
 

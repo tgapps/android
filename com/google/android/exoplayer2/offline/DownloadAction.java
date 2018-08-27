@@ -38,11 +38,11 @@ public abstract class DownloadAction {
 
     public static synchronized Deserializer[] getDefaultDeserializers() {
         Deserializer[] deserializerArr;
-        int count;
         synchronized (DownloadAction.class) {
             if (defaultDeserializers != null) {
                 deserializerArr = defaultDeserializers;
             } else {
+                int count;
                 Deserializer[] deserializers = new Deserializer[4];
                 int count2 = 0 + 1;
                 deserializers[0] = ProgressiveDownloadAction.DESERIALIZER;

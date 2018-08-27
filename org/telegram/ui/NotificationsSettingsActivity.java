@@ -646,6 +646,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         SharedPreferences preferences = MessagesController.getNotificationsSettings(this.currentAccount);
         Map<String, ?> values = preferences.getAll();
         for (Entry<String, ?> entry : values.entrySet()) {
+            User user;
             Chat chat;
             String key = (String) entry.getKey();
             if (key.startsWith("notify2_")) {
@@ -666,9 +667,11 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     int high_id = (int) (did << 32);
                     if (lower_id != 0) {
                         if (lower_id > 0) {
-                            if (MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(lower_id)) == null) {
+                            user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(lower_id));
+                            if (user == null) {
                                 usersToLoad.add(Integer.valueOf(lower_id));
                                 waitingForLoadExceptions.put(did, exception);
+                            } else if (user.deleted) {
                             }
                             usersResult.add(exception);
                         } else {
@@ -687,9 +690,13 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                         if (encryptedChat == null) {
                             encryptedChatsToLoad.add(Integer.valueOf(high_id));
                             waitingForLoadExceptions.put(did, exception);
-                        } else if (MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(encryptedChat.user_id)) == null) {
-                            usersToLoad.add(Integer.valueOf(encryptedChat.user_id));
-                            waitingForLoadExceptions.put((long) encryptedChat.user_id, exception);
+                        } else {
+                            user = MessagesController.getInstance(this.currentAccount).getUser(Integer.valueOf(encryptedChat.user_id));
+                            if (user == null) {
+                                usersToLoad.add(Integer.valueOf(encryptedChat.user_id));
+                                waitingForLoadExceptions.put((long) encryptedChat.user_id, exception);
+                            } else if (user.deleted) {
+                            }
                         }
                         usersResult.add(exception);
                     }
@@ -720,7 +727,10 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
             }
             size = users.size();
             for (a = 0; a < size; a++) {
-                waitingForLoadExceptions.remove((long) ((User) users.get(a)).id);
+                user = (User) users.get(a);
+                if (!user.deleted) {
+                    waitingForLoadExceptions.remove((long) user.id);
+                }
             }
             size = encryptedChats.size();
             for (a = 0; a < size; a++) {

@@ -296,7 +296,7 @@ public class MusicPlayerService extends Service implements NotificationCenterDel
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     public void run() {
                         int i = 2;
-                        if (MusicPlayerService.this.remoteControlClient != null) {
+                        if (MusicPlayerService.this.remoteControlClient != null && MediaController.getInstance().getPlayingMessageObject() != null) {
                             if (((long) MediaController.getInstance().getPlayingMessageObject().audioPlayerDuration) == C.TIME_UNSET) {
                                 AndroidUtilities.runOnUIThread(this, 500);
                                 return;

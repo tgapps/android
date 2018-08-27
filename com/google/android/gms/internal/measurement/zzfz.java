@@ -121,9 +121,9 @@ public final class zzfz extends zzza<zzfz> {
     }
 
     private final zzfz zzd(zzyx com_google_android_gms_internal_measurement_zzyx) throws IOException {
-        int position;
         while (true) {
             int zzug = com_google_android_gms_internal_measurement_zzyx.zzug();
+            int position;
             switch (zzug) {
                 case 0:
                     break;

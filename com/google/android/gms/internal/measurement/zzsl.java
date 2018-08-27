@@ -106,9 +106,9 @@ public abstract class zzsl<T> {
 
     @Nullable
     private final T zztf() {
-        String str;
         zzsv com_google_android_gms_internal_measurement_zzsv = this.zzbrb;
         if (zzth()) {
+            String str;
             try {
                 str = (String) zza(new zzsn(this));
                 if (str != null) {

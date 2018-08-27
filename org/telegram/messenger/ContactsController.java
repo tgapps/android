@@ -1292,12 +1292,12 @@ Error: java.util.NoSuchElementException
             final boolean z6 = canceled;
             Utilities.globalQueue.postRunnable(new Runnable() {
                 public void run() {
+                    int a;
                     Contact value;
                     int newPhonebookContacts = 0;
                     int serverContactsInPhonebook = 0;
                     HashMap<String, Contact> contactShortHashMap = new HashMap();
                     for (Entry<String, Contact> entry : hashMap.entrySet()) {
-                        int a;
                         Contact c = (Contact) entry.getValue();
                         for (a = 0; a < c.shortPhones.size(); a++) {
                             contactShortHashMap.put(c.shortPhones.get(a), c);
@@ -2284,15 +2284,17 @@ Error: java.util.NoSuchElementException
     private void applyContactsUpdates(ArrayList<Integer> ids, ConcurrentHashMap<Integer, User> userDict, ArrayList<TL_contact> newC, ArrayList<Integer> contactsTD) {
         int a;
         Integer uid;
+        Contact contact;
+        int index;
         if (newC == null || contactsTD == null) {
             newC = new ArrayList();
             contactsTD = new ArrayList();
             for (a = 0; a < ids.size(); a++) {
                 uid = (Integer) ids.get(a);
                 if (uid.intValue() > 0) {
-                    TL_contact contact = new TL_contact();
-                    contact.user_id = uid.intValue();
-                    newC.add(contact);
+                    TL_contact contact2 = new TL_contact();
+                    contact2.user_id = uid.intValue();
+                    newC.add(contact2);
                 } else if (uid.intValue() < 0) {
                     contactsTD.add(Integer.valueOf(-uid.intValue()));
                 }
@@ -2305,8 +2307,6 @@ Error: java.util.NoSuchElementException
         StringBuilder toDelete = new StringBuilder();
         boolean reloadContacts = false;
         for (a = 0; a < newC.size(); a++) {
-            Contact contact2;
-            int index;
             TL_contact newContact = (TL_contact) newC.get(a);
             User user = null;
             if (userDict != null) {
@@ -2320,11 +2320,11 @@ Error: java.util.NoSuchElementException
             if (user == null || TextUtils.isEmpty(user.phone)) {
                 reloadContacts = true;
             } else {
-                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact2 != null) {
-                    index = contact2.shortPhones.indexOf(user.phone);
+                contact = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact != null) {
+                    index = contact.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact2.phoneDeleted.set(index, Integer.valueOf(0));
+                        contact.phoneDeleted.set(index, Integer.valueOf(0));
                     }
                 }
                 if (toAdd.length() != 0) {
@@ -2352,11 +2352,11 @@ Error: java.util.NoSuchElementException
             if (user == null) {
                 reloadContacts = true;
             } else if (!TextUtils.isEmpty(user.phone)) {
-                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact2 != null) {
-                    index = contact2.shortPhones.indexOf(user.phone);
+                contact = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact != null) {
+                    index = contact.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact2.phoneDeleted.set(index, Integer.valueOf(1));
+                        contact.phoneDeleted.set(index, Integer.valueOf(1));
                     }
                 }
                 if (toDelete.length() != 0) {

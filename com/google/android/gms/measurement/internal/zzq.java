@@ -116,7 +116,6 @@ final class zzq extends zzez {
     }
 
     public final zzz zzg(String str, String str2) {
-        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
@@ -124,6 +123,7 @@ final class zzq extends zzez {
         Preconditions.checkNotEmpty(str2);
         zzaf();
         zzcl();
+        Cursor query;
         try {
             query = getWritableDatabase().query("events", new String[]{"lifetime_count", "current_bundle_count", "last_fire_timestamp", "last_bundled_timestamp", "last_bundled_day", "last_sampled_complex_event_id", "last_sampling_rate", "last_exempt_from_sampling"}, "app_id=? and name=?", new String[]{str, str2}, null, null, null);
             try {
@@ -539,7 +539,6 @@ final class zzq extends zzez {
     }
 
     public final zzl zzj(String str, String str2) {
-        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
@@ -547,6 +546,7 @@ final class zzq extends zzez {
         Preconditions.checkNotEmpty(str2);
         zzaf();
         zzcl();
+        Cursor query;
         try {
             query = getWritableDatabase().query("conditional_properties", new String[]{TtmlNode.ATTR_TTS_ORIGIN, "value", "active", "trigger_event_name", "trigger_timeout", "timed_out_event", "creation_timestamp", "triggered_event", "triggered_timestamp", "time_to_live", "expired_event"}, "app_id=? and name=?", new String[]{str, str2}, null, null, null);
             try {
@@ -877,6 +877,7 @@ final class zzq extends zzez {
     }
 
     public final zzr zza(long j, String str, boolean z, boolean z2, boolean z3, boolean z4, boolean z5) {
+        Cursor query;
         Object e;
         Throwable th;
         Preconditions.checkNotEmpty(str);
@@ -884,7 +885,6 @@ final class zzq extends zzez {
         zzcl();
         String[] strArr = new String[]{str};
         zzr com_google_android_gms_measurement_internal_zzr = new zzr();
-        Cursor query;
         try {
             SQLiteDatabase writableDatabase = getWritableDatabase();
             query = writableDatabase.query("apps", new String[]{"day", "daily_events_count", "daily_public_events_count", "daily_conversions_count", "daily_error_events_count", "daily_realtime_events_count"}, "app_id=?", new String[]{str}, null, null, null);
@@ -965,12 +965,12 @@ final class zzq extends zzez {
     }
 
     public final byte[] zzbn(String str) {
+        Cursor query;
         Object e;
         Throwable th;
         Preconditions.checkNotEmpty(str);
         zzaf();
         zzcl();
-        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"remote_config"}, "app_id=?", new String[]{str}, null, null, null);
             try {
@@ -1480,7 +1480,6 @@ final class zzq extends zzez {
     }
 
     final Map<Integer, List<zzfy>> zzm(String str, String str2) {
-        Cursor query;
         Object e;
         Throwable th;
         zzcl();
@@ -1488,6 +1487,7 @@ final class zzq extends zzez {
         Preconditions.checkNotEmpty(str);
         Preconditions.checkNotEmpty(str2);
         Map<Integer, List<zzfy>> arrayMap = new ArrayMap();
+        Cursor query;
         try {
             query = getWritableDatabase().query("property_filters", new String[]{"audience_id", DataSchemeDataSource.SCHEME_DATA}, "app_id=? AND property_name=?", new String[]{str, str2}, null, null, null);
             if (query.moveToFirst()) {
@@ -1579,12 +1579,12 @@ final class zzq extends zzez {
     }
 
     final Map<Integer, zzgj> zzbo(String str) {
+        Cursor query;
         Object e;
         Throwable th;
         zzcl();
         zzaf();
         Preconditions.checkNotEmpty(str);
-        Cursor query;
         try {
             query = getWritableDatabase().query("audience_filter_values", new String[]{"audience_id", "current_results"}, "app_id=?", new String[]{str}, null, null, null);
             if (query.moveToFirst()) {
@@ -1681,7 +1681,6 @@ final class zzq extends zzez {
     }
 
     protected final long zzn(String str, String str2) {
-        long zza;
         Object e;
         Preconditions.checkNotEmpty(str);
         Preconditions.checkNotEmpty(str2);
@@ -1689,6 +1688,7 @@ final class zzq extends zzez {
         zzcl();
         SQLiteDatabase writableDatabase = getWritableDatabase();
         writableDatabase.beginTransaction();
+        long zza;
         try {
             zza = zza(new StringBuilder(String.valueOf(str2).length() + 32).append("select ").append(str2).append(" from app2 where app_id=?").toString(), new String[]{str}, -1);
             if (zza == -1) {
