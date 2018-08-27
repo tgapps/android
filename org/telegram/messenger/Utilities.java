@@ -30,6 +30,8 @@ public class Utilities {
 
     private static native void aesIgeEncryption(ByteBuffer byteBuffer, byte[] bArr, byte[] bArr2, boolean z, int i, int i2);
 
+    public static native int argon2(int i);
+
     public static native void blurBitmap(Object obj, int i, int i2, int i3, int i4, int i5);
 
     public static native void calcCDT(ByteBuffer byteBuffer, int i, int i2, ByteBuffer byteBuffer2);
@@ -41,6 +43,8 @@ public class Utilities {
     public static native long getDirSize(String str, int i);
 
     public static native boolean loadWebpImage(Bitmap bitmap, ByteBuffer byteBuffer, int i, Options options, boolean z);
+
+    private static native int pbkdf2(byte[] bArr, byte[] bArr2, byte[] bArr3, int i);
 
     public static native int pinBitmap(Bitmap bitmap);
 
@@ -176,7 +180,7 @@ public class Utilities {
     }
 
     public static boolean isGoodGaAndGb(BigInteger g_a, BigInteger p) {
-        return g_a.compareTo(BigInteger.valueOf(1)) == 1 && g_a.compareTo(p.subtract(BigInteger.valueOf(1))) == -1;
+        return g_a.compareTo(BigInteger.valueOf(1)) > 0 && g_a.compareTo(p.subtract(BigInteger.valueOf(1))) < 0;
     }
 
     public static boolean arraysEquals(byte[] arr1, int offset1, byte[] arr2, int offset2) {
@@ -245,6 +249,19 @@ public class Utilities {
         }
     }
 
+    public static byte[] computeSHA256(byte[]... args) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            for (int a = 0; a < args.length; a++) {
+                md.update(args[a], 0, args[a].length);
+            }
+            return md.digest();
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return new byte[32];
+        }
+    }
+
     public static byte[] computeSHA512(byte[] convertme) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
@@ -266,6 +283,12 @@ public class Utilities {
             FileLog.e(e);
             return new byte[64];
         }
+    }
+
+    public static byte[] computePBKDF2(byte[] password, byte[] salt) {
+        byte[] dst = new byte[64];
+        pbkdf2(password, salt, dst, DefaultOggSeeker.MATCH_BYTE_RANGE);
+        return dst;
     }
 
     public static byte[] computeSHA512(byte[] convertme, byte[] convertme2, byte[] convertme3) {

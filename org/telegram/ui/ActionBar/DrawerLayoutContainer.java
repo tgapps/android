@@ -17,7 +17,6 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.View.MeasureSpec;
-import android.view.View.OnApplyWindowInsetsListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.WindowInsets;
@@ -61,21 +60,20 @@ public class DrawerLayoutContainer extends FrameLayout {
         setFocusableInTouchMode(true);
         if (VERSION.SDK_INT >= 21) {
             setFitsSystemWindows(true);
-            setOnApplyWindowInsetsListener(new OnApplyWindowInsetsListener() {
-                @SuppressLint({"NewApi"})
-                public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
-                    DrawerLayoutContainer drawerLayout = (DrawerLayoutContainer) v;
-                    AndroidUtilities.statusBarHeight = insets.getSystemWindowInsetTop();
-                    DrawerLayoutContainer.this.lastInsets = insets;
-                    boolean z = insets.getSystemWindowInsetTop() <= 0 && DrawerLayoutContainer.this.getBackground() == null;
-                    drawerLayout.setWillNotDraw(z);
-                    drawerLayout.requestLayout();
-                    return insets.consumeSystemWindowInsets();
-                }
-            });
+            setOnApplyWindowInsetsListener(new DrawerLayoutContainer$$Lambda$0(this));
             setSystemUiVisibility(1280);
         }
         this.shadowLeft = getResources().getDrawable(R.drawable.menu_shadow);
+    }
+
+    final /* synthetic */ WindowInsets lambda$new$0$DrawerLayoutContainer(View v, WindowInsets insets) {
+        DrawerLayoutContainer drawerLayout = (DrawerLayoutContainer) v;
+        AndroidUtilities.statusBarHeight = insets.getSystemWindowInsetTop();
+        this.lastInsets = insets;
+        boolean z = insets.getSystemWindowInsetTop() <= 0 && getBackground() == null;
+        drawerLayout.setWillNotDraw(z);
+        drawerLayout.requestLayout();
+        return insets.consumeSystemWindowInsets();
     }
 
     @SuppressLint({"NewApi"})

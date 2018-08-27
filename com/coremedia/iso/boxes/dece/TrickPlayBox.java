@@ -12,9 +12,9 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class TrickPlayBox extends AbstractFullBox {
     public static final String TYPE = "trik";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
     private List<Entry> entries = new ArrayList();
 
     public static class Entry {
@@ -55,7 +55,7 @@ public class TrickPlayBox extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("TrickPlayBox.java", TrickPlayBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setEntries", "com.coremedia.iso.boxes.dece.TrickPlayBox", "java.util.List", "entries", TtmlNode.ANONYMOUS_REGION_ID, "void"), 32);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getEntries", "com.coremedia.iso.boxes.dece.TrickPlayBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.util.List"), 36);

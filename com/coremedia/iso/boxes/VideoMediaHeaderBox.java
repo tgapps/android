@@ -10,11 +10,11 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class VideoMediaHeaderBox extends AbstractMediaHeaderBox {
     public static final String TYPE = "vmhd";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
     private int graphicsmode = 0;
     private int[] opcolor = new int[3];
 
@@ -22,7 +22,7 @@ public class VideoMediaHeaderBox extends AbstractMediaHeaderBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("VideoMediaHeaderBox.java", VideoMediaHeaderBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getGraphicsmode", "com.coremedia.iso.boxes.VideoMediaHeaderBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "int"), 39);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getOpcolor", "com.coremedia.iso.boxes.VideoMediaHeaderBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "[I"), 43);

@@ -11,15 +11,15 @@ import org.aspectj.runtime.reflect.Factory;
 public class TrackReferenceTypeBox extends AbstractBox {
     public static final String TYPE1 = "hint";
     public static final String TYPE2 = "cdsc";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
     private long[] trackIds;
 
     static {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("TrackReferenceTypeBox.java", TrackReferenceTypeBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getTrackIds", "com.coremedia.iso.boxes.TrackReferenceTypeBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "[J"), 40);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "toString", "com.coremedia.iso.boxes.TrackReferenceTypeBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.lang.String"), 65);

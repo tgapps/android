@@ -1,15 +1,30 @@
 package com.google.firebase.iid;
 
-final class zzv implements InstanceIdResult {
-    private final String zzbg;
-    private final String zzbh;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Parcel;
+import android.os.RemoteException;
 
-    zzv(String str, String str2) {
-        this.zzbg = str;
-        this.zzbh = str2;
+public final class zzv implements zzu {
+    private final IBinder zzbl;
+
+    zzv(IBinder iBinder) {
+        this.zzbl = iBinder;
     }
 
-    public final String getToken() {
-        return this.zzbh;
+    public final void send(Message message) throws RemoteException {
+        Parcel obtain = Parcel.obtain();
+        obtain.writeInterfaceToken("com.google.android.gms.iid.IMessengerCompat");
+        obtain.writeInt(1);
+        message.writeToParcel(obtain, 0);
+        try {
+            this.zzbl.transact(1, obtain, null, 1);
+        } finally {
+            obtain.recycle();
+        }
+    }
+
+    public final IBinder asBinder() {
+        return this.zzbl;
     }
 }

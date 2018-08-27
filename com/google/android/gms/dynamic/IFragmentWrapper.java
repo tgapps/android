@@ -8,7 +8,7 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 import com.google.android.gms.internal.stable.zzb;
 import com.google.android.gms.internal.stable.zzc;
-import org.telegram.messenger.exoplayer2.RendererCapabilities;
+import com.googlecode.mp4parser.authoring.tracks.h265.NalUnitTypes;
 
 public interface IFragmentWrapper extends IInterface {
 
@@ -124,19 +124,19 @@ public interface IFragmentWrapper extends IInterface {
                     setMenuVisibility(zzc.zza(parcel));
                     parcel2.writeNoException();
                     break;
-                case 23:
+                case NalUnitTypes.NAL_TYPE_RSV_IRAP_VCL23 /*23*/:
                     setRetainInstance(zzc.zza(parcel));
                     parcel2.writeNoException();
                     break;
-                case RendererCapabilities.ADAPTIVE_SUPPORT_MASK /*24*/:
+                case 24:
                     setUserVisibleHint(zzc.zza(parcel));
                     parcel2.writeNoException();
                     break;
-                case 25:
+                case NalUnitTypes.NAL_TYPE_RSV_VCL25 /*25*/:
                     startActivity((Intent) zzc.zza(parcel, Intent.CREATOR));
                     parcel2.writeNoException();
                     break;
-                case 26:
+                case NalUnitTypes.NAL_TYPE_RSV_VCL26 /*26*/:
                     startActivityForResult((Intent) zzc.zza(parcel, Intent.CREATOR), parcel.readInt());
                     parcel2.writeNoException();
                     break;

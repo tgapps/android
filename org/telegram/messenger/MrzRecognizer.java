@@ -9,6 +9,12 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.text.TextUtils;
+import android.util.Base64;
+import android.util.SparseArray;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.android.gms.vision.barcode.BarcodeDetector.Builder;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -18,6 +24,7 @@ public class MrzRecognizer {
         public static final int GENDER_FEMALE = 2;
         public static final int GENDER_MALE = 1;
         public static final int GENDER_UNKNOWN = 0;
+        public static final int TYPE_DRIVER_LICENSE = 4;
         public static final int TYPE_ID = 2;
         public static final int TYPE_INTERNAL_PASSPORT = 3;
         public static final int TYPE_PASSPORT = 1;
@@ -33,6 +40,7 @@ public class MrzRecognizer {
         public String issuingCountry;
         public String lastName;
         public boolean mainCheckDigitIsValid;
+        public String middleName;
         public String nationality;
         public String number;
         public String rawMRZ;
@@ -47,7 +55,168 @@ public class MrzRecognizer {
 
     private static native void setYuvBitmapPixels(Bitmap bitmap, byte[] bArr);
 
-    public static Result recognize(Bitmap bitmap) {
+    public static Result recognize(Bitmap bitmap, boolean tryDriverLicenseFirst) {
+        Result res;
+        Result result = null;
+        if (tryDriverLicenseFirst) {
+            result = recognizeBarcode(bitmap);
+            if (result != null) {
+                res = result;
+                return result;
+            }
+        }
+        try {
+            result = recognizeMRZ(bitmap);
+            if (result != null) {
+                res = result;
+                return result;
+            }
+        } catch (Exception e) {
+        }
+        if (!tryDriverLicenseFirst) {
+            result = recognizeBarcode(bitmap);
+            if (result != null) {
+                res = result;
+                return result;
+            }
+        }
+        res = result;
+        return null;
+    }
+
+    private static Result recognizeBarcode(Bitmap bitmap) {
+        BarcodeDetector detector = new Builder(ApplicationLoader.applicationContext).build();
+        if (bitmap.getWidth() > 1500 || bitmap.getHeight() > 1500) {
+            float scale = 1500.0f / ((float) Math.max(bitmap.getWidth(), bitmap.getHeight()));
+            bitmap = Bitmap.createScaledBitmap(bitmap, Math.round(((float) bitmap.getWidth()) * scale), Math.round(((float) bitmap.getHeight()) * scale), true);
+        }
+        SparseArray<Barcode> barcodes = detector.detect(new Frame.Builder().setBitmap(bitmap).build());
+        int i = 0;
+        while (i < barcodes.size()) {
+            Barcode code = (Barcode) barcodes.valueAt(i);
+            Result res;
+            String str;
+            if (code.valueFormat != 12 || code.driverLicense == null) {
+                if (code.valueFormat == 7 && code.format == 2048 && code.rawValue.matches("^[A-Za-z0-9=]+$")) {
+                    try {
+                        String[] data = new String(Base64.decode(code.rawValue, 0), "windows-1251").split("\\|");
+                        if (data.length >= 10) {
+                            res = new Result();
+                            res.type = 4;
+                            str = "RU";
+                            res.issuingCountry = str;
+                            res.nationality = str;
+                            res.number = data[0];
+                            res.expiryYear = Integer.parseInt(data[2].substring(0, 4));
+                            res.expiryMonth = Integer.parseInt(data[2].substring(4, 6));
+                            res.expiryDay = Integer.parseInt(data[2].substring(6));
+                            res.lastName = capitalize(cyrillicToLatin(data[3]));
+                            res.firstName = capitalize(cyrillicToLatin(data[4]));
+                            res.middleName = capitalize(cyrillicToLatin(data[5]));
+                            res.birthYear = Integer.parseInt(data[6].substring(0, 4));
+                            res.birthMonth = Integer.parseInt(data[6].substring(4, 6));
+                            res.birthDay = Integer.parseInt(data[6].substring(6));
+                            return res;
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+                i++;
+            } else {
+                int yearOffset;
+                int dayOffset;
+                int monthOffset;
+                res = new Result();
+                res.type = "ID".equals(code.driverLicense.documentType) ? 2 : 4;
+                String str2 = code.driverLicense.issuingCountry;
+                Object obj = -1;
+                switch (str2.hashCode()) {
+                    case 66480:
+                        if (str2.equals("CAN")) {
+                            obj = 1;
+                            break;
+                        }
+                        break;
+                    case 84323:
+                        if (str2.equals("USA")) {
+                            obj = null;
+                            break;
+                        }
+                        break;
+                }
+                switch (obj) {
+                    case null:
+                        str = "US";
+                        res.issuingCountry = str;
+                        res.nationality = str;
+                        break;
+                    case 1:
+                        str = "CA";
+                        res.issuingCountry = str;
+                        res.nationality = str;
+                        break;
+                }
+                res.firstName = capitalize(code.driverLicense.firstName);
+                res.lastName = capitalize(code.driverLicense.lastName);
+                res.middleName = capitalize(code.driverLicense.middleName);
+                res.number = code.driverLicense.licenseNumber;
+                if (code.driverLicense.gender != null) {
+                    str2 = code.driverLicense.gender;
+                    obj = -1;
+                    switch (str2.hashCode()) {
+                        case 49:
+                            if (str2.equals("1")) {
+                                obj = null;
+                                break;
+                            }
+                            break;
+                        case 50:
+                            if (str2.equals("2")) {
+                                obj = 1;
+                                break;
+                            }
+                            break;
+                    }
+                    switch (obj) {
+                        case null:
+                            res.gender = 1;
+                            break;
+                        case 1:
+                            res.gender = 2;
+                            break;
+                    }
+                }
+                if ("USA".equals(res.issuingCountry)) {
+                    yearOffset = 4;
+                    dayOffset = 2;
+                    monthOffset = 0;
+                } else {
+                    yearOffset = 0;
+                    monthOffset = 4;
+                    dayOffset = 6;
+                }
+                try {
+                    if (code.driverLicense.birthDate != null && code.driverLicense.birthDate.length() == 8) {
+                        res.birthYear = Integer.parseInt(code.driverLicense.birthDate.substring(yearOffset, yearOffset + 4));
+                        res.birthMonth = Integer.parseInt(code.driverLicense.birthDate.substring(monthOffset, monthOffset + 2));
+                        res.birthDay = Integer.parseInt(code.driverLicense.birthDate.substring(dayOffset, dayOffset + 2));
+                    }
+                    if (code.driverLicense.expiryDate == null || code.driverLicense.expiryDate.length() != 8) {
+                        return res;
+                    }
+                    res.expiryYear = Integer.parseInt(code.driverLicense.expiryDate.substring(yearOffset, yearOffset + 4));
+                    res.expiryMonth = Integer.parseInt(code.driverLicense.expiryDate.substring(monthOffset, monthOffset + 2));
+                    res.expiryDay = Integer.parseInt(code.driverLicense.expiryDate.substring(dayOffset, dayOffset + 2));
+                    return res;
+                } catch (NumberFormatException e2) {
+                    return res;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static Result recognizeMRZ(Bitmap bitmap) {
         Bitmap smallBitmap;
         float scale = 1.0f;
         if (bitmap.getWidth() > 512 || bitmap.getHeight() > 512) {
@@ -118,6 +287,9 @@ public class MrzRecognizer {
             }
             binaryBitmap = Bitmap.createBitmap(toProcess.getWidth(), toProcess.getHeight(), Config.ALPHA_8);
             charRects = binarizeAndFindCharacters(toProcess, binaryBitmap);
+            if (charRects == null) {
+                return null;
+            }
             for (Rect[] rects : charRects) {
                 maxLength = Math.max(rects.length, maxLength);
                 if (rects.length > 0) {
@@ -187,8 +359,12 @@ public class MrzRecognizer {
                         }
                         if ("RUS".equals(result.issuingCountry) && mrzLines[0].charAt(1) == 'N') {
                             result.type = 3;
-                            result.firstName = russianTranslit(result.firstName);
-                            result.lastName = russianTranslit(result.lastName);
+                            String[] names = result.firstName.split(" ");
+                            result.firstName = cyrillicToLatin(russianPassportTranslit(names[0]));
+                            if (names.length > 1) {
+                                result.middleName = cyrillicToLatin(russianPassportTranslit(names[1]));
+                            }
+                            result.lastName = cyrillicToLatin(russianPassportTranslit(result.lastName));
                             if (result.number != null) {
                                 result.number = result.number.substring(0, 3) + mrzLines[1].charAt(28) + result.number.substring(3);
                             }
@@ -198,8 +374,11 @@ public class MrzRecognizer {
                         }
                         result.lastName = capitalize(result.lastName);
                         result.firstName = capitalize(result.firstName);
+                        result.middleName = capitalize(result.middleName);
                     }
-                } else if (type == 'I' || type == 'A' || type == 'C') {
+                } else if (type != 'I' && type != 'A' && type != 'C') {
+                    return null;
+                } else {
                     result.type = 2;
                     if (mrzLines.length == 3 && mrzLines[0].length() == 30 && mrzLines[2].length() == 30) {
                         result.issuingCountry = mrzLines[0].substring(2, 5);
@@ -263,6 +442,9 @@ public class MrzRecognizer {
                     result.firstName = capitalize(result.firstName.replace('0', 'O').replace('8', 'B'));
                     result.lastName = capitalize(result.lastName.replace('0', 'O').replace('8', 'B'));
                 }
+                if (TextUtils.isEmpty(result.firstName) && TextUtils.isEmpty(result.lastName)) {
+                    return null;
+                }
                 result.issuingCountry = (String) countries.get(result.issuingCountry);
                 result.nationality = (String) countries.get(result.nationality);
                 return result;
@@ -293,10 +475,13 @@ public class MrzRecognizer {
         } else {
             i = 0;
         }
-        return recognize(Bitmap.createBitmap(bmp, i, swap ? 0 : (height / 2) - (dh / 2), swap ? dh : dw, swap ? dw : dh, m, false));
+        return recognize(Bitmap.createBitmap(bmp, i, swap ? 0 : (height / 2) - (dh / 2), swap ? dh : dw, swap ? dw : dh, m, false), false);
     }
 
     private static String capitalize(String s) {
+        if (s == null) {
+            return null;
+        }
         char[] chars = s.toCharArray();
         boolean prevIsSpace = true;
         int i = 0;
@@ -363,7 +548,7 @@ public class MrzRecognizer {
         }
     }
 
-    private static String russianTranslit(String s) {
+    private static String russianPassportTranslit(String s) {
         String cyrillic = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
         String latin = "ABVGDE2JZIQKLMNOPRSTUFHC34WXY9678";
         char[] chars = s.toCharArray();
@@ -376,12 +561,24 @@ public class MrzRecognizer {
         return new String(chars);
     }
 
+    private static String cyrillicToLatin(String s) {
+        String alphabet = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+        String[] replacements = new String[]{"A", "B", "V", "G", "D", "E", "E", "ZH", "Z", "I", "I", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "F", "KH", "TS", "CH", "SH", "SHCH", "IE", "Y", TtmlNode.ANONYMOUS_REGION_ID, "E", "IU", "IA"};
+        for (int i = 0; i < replacements.length; i++) {
+            s = s.replace("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".substring(i, i + 1), replacements[i]);
+        }
+        return s;
+    }
+
     private static int getNumber(char c) {
         if (c == 'O') {
             return 0;
         }
         if (c == 'I') {
             return 1;
+        }
+        if (c == 'B') {
+            return 8;
         }
         return c - 48;
     }

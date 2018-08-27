@@ -4,36 +4,13 @@ import android.os.Build.VERSION;
 import android.widget.EdgeEffect;
 
 public final class EdgeEffectCompat {
-    private static final EdgeEffectBaseImpl IMPL;
     private EdgeEffect mEdgeEffect;
 
-    static class EdgeEffectBaseImpl {
-        EdgeEffectBaseImpl() {
-        }
-
-        public void onPull(EdgeEffect edgeEffect, float deltaDistance, float displacement) {
+    public static void onPull(EdgeEffect edgeEffect, float deltaDistance, float displacement) {
+        if (VERSION.SDK_INT >= 21) {
+            edgeEffect.onPull(deltaDistance, displacement);
+        } else {
             edgeEffect.onPull(deltaDistance);
         }
-    }
-
-    static class EdgeEffectApi21Impl extends EdgeEffectBaseImpl {
-        EdgeEffectApi21Impl() {
-        }
-
-        public void onPull(EdgeEffect edgeEffect, float deltaDistance, float displacement) {
-            edgeEffect.onPull(deltaDistance, displacement);
-        }
-    }
-
-    static {
-        if (VERSION.SDK_INT >= 21) {
-            IMPL = new EdgeEffectApi21Impl();
-        } else {
-            IMPL = new EdgeEffectBaseImpl();
-        }
-    }
-
-    public static void onPull(EdgeEffect edgeEffect, float deltaDistance, float displacement) {
-        IMPL.onPull(edgeEffect, deltaDistance, displacement);
     }
 }

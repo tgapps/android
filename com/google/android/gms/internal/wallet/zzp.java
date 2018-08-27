@@ -1,20 +1,104 @@
 package com.google.android.gms.internal.wallet;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.IInterface;
 import android.os.Parcel;
+import android.os.Parcelable;
 import android.os.RemoteException;
+import com.google.android.gms.dynamic.IObjectWrapper;
+import com.google.android.gms.dynamic.IObjectWrapper.Stub;
+import com.google.android.gms.wallet.MaskedWallet;
+import com.google.android.gms.wallet.MaskedWalletRequest;
+import com.google.android.gms.wallet.fragment.WalletFragmentInitParams;
+import com.google.android.gms.wallet.fragment.WalletFragmentOptions;
 
-public abstract class zzp extends zzb implements zzo {
-    public zzp() {
-        super("com.google.android.gms.wallet.fragment.internal.IWalletFragmentStateListener");
+public final class zzp extends zza implements zzn {
+    zzp(IBinder iBinder) {
+        super(iBinder, "com.google.android.gms.wallet.fragment.internal.IWalletFragmentDelegate");
     }
 
-    protected final boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        if (i != 2) {
-            return false;
+    public final void zza(IObjectWrapper iObjectWrapper, WalletFragmentOptions walletFragmentOptions, Bundle bundle) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper);
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) walletFragmentOptions);
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) bundle);
+        transactAndReadExceptionReturnVoid(1, obtainAndWriteInterfaceToken);
+    }
+
+    public final void onCreate(Bundle bundle) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) bundle);
+        transactAndReadExceptionReturnVoid(2, obtainAndWriteInterfaceToken);
+    }
+
+    public final IObjectWrapper onCreateView(IObjectWrapper iObjectWrapper, IObjectWrapper iObjectWrapper2, Bundle bundle) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper);
+        zzc.zza(obtainAndWriteInterfaceToken, (IInterface) iObjectWrapper2);
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) bundle);
+        obtainAndWriteInterfaceToken = transactAndReadException(3, obtainAndWriteInterfaceToken);
+        IObjectWrapper asInterface = Stub.asInterface(obtainAndWriteInterfaceToken.readStrongBinder());
+        obtainAndWriteInterfaceToken.recycle();
+        return asInterface;
+    }
+
+    public final void onStart() throws RemoteException {
+        transactAndReadExceptionReturnVoid(4, obtainAndWriteInterfaceToken());
+    }
+
+    public final void onResume() throws RemoteException {
+        transactAndReadExceptionReturnVoid(5, obtainAndWriteInterfaceToken());
+    }
+
+    public final void onPause() throws RemoteException {
+        transactAndReadExceptionReturnVoid(6, obtainAndWriteInterfaceToken());
+    }
+
+    public final void onStop() throws RemoteException {
+        transactAndReadExceptionReturnVoid(7, obtainAndWriteInterfaceToken());
+    }
+
+    public final void onSaveInstanceState(Bundle bundle) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) bundle);
+        obtainAndWriteInterfaceToken = transactAndReadException(8, obtainAndWriteInterfaceToken);
+        if (obtainAndWriteInterfaceToken.readInt() != 0) {
+            bundle.readFromParcel(obtainAndWriteInterfaceToken);
         }
-        zza(parcel.readInt(), parcel.readInt(), (Bundle) zzc.zza(parcel, Bundle.CREATOR));
-        parcel2.writeNoException();
-        return true;
+        obtainAndWriteInterfaceToken.recycle();
+    }
+
+    public final void onActivityResult(int i, int i2, Intent intent) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        obtainAndWriteInterfaceToken.writeInt(i);
+        obtainAndWriteInterfaceToken.writeInt(i2);
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) intent);
+        transactAndReadExceptionReturnVoid(9, obtainAndWriteInterfaceToken);
+    }
+
+    public final void initialize(WalletFragmentInitParams walletFragmentInitParams) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) walletFragmentInitParams);
+        transactAndReadExceptionReturnVoid(10, obtainAndWriteInterfaceToken);
+    }
+
+    public final void updateMaskedWalletRequest(MaskedWalletRequest maskedWalletRequest) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) maskedWalletRequest);
+        transactAndReadExceptionReturnVoid(11, obtainAndWriteInterfaceToken);
+    }
+
+    public final void setEnabled(boolean z) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.writeBoolean(obtainAndWriteInterfaceToken, z);
+        transactAndReadExceptionReturnVoid(12, obtainAndWriteInterfaceToken);
+    }
+
+    public final void updateMaskedWallet(MaskedWallet maskedWallet) throws RemoteException {
+        Parcel obtainAndWriteInterfaceToken = obtainAndWriteInterfaceToken();
+        zzc.zza(obtainAndWriteInterfaceToken, (Parcelable) maskedWallet);
+        transactAndReadExceptionReturnVoid(14, obtainAndWriteInterfaceToken);
     }
 }

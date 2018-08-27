@@ -3,6 +3,8 @@ package org.telegram.messenger;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
+import com.google.android.exoplayer2.upstream.TransferListener;
+import com.google.android.exoplayer2.util.MimeTypes;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,9 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import org.telegram.messenger.FileLoadOperation.FileLoadOperationDelegate;
 import org.telegram.messenger.FileUploadOperation.FileUploadOperationDelegate;
-import org.telegram.messenger.exoplayer2.upstream.DataSource;
-import org.telegram.messenger.exoplayer2.upstream.TransferListener;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.Document;
 import org.telegram.tgnet.TLRPC.DocumentAttribute;
@@ -1007,7 +1006,7 @@ public class FileLoader {
         return new File(dir, getAttachFileName(attach, ext));
     }
 
-    public static FileStreamLoadOperation getStreamLoadOperation(TransferListener<? super DataSource> listener) {
+    public static FileStreamLoadOperation getStreamLoadOperation(TransferListener listener) {
         return new FileStreamLoadOperation(listener);
     }
 

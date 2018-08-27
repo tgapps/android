@@ -4,6 +4,7 @@ import com.coremedia.iso.IsoTypeReader;
 import com.coremedia.iso.IsoTypeReaderVariable;
 import com.coremedia.iso.IsoTypeWriter;
 import com.coremedia.iso.IsoTypeWriterVariable;
+import com.google.android.exoplayer2.extractor.ts.TsExtractor;
 import com.googlecode.mp4parser.AbstractFullBox;
 import com.googlecode.mp4parser.RequiresParseDetailAspect;
 import java.nio.ByteBuffer;
@@ -12,22 +13,21 @@ import java.util.List;
 import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.internal.Conversions;
 import org.aspectj.runtime.reflect.Factory;
-import org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor;
 
 public class ItemLocationBox extends AbstractFullBox {
     public static final String TYPE = "iloc";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_10 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_11 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_7 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_8 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_9 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_10 = null;
+    private static final StaticPart ajc$tjp_11 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_7 = null;
+    private static final StaticPart ajc$tjp_8 = null;
+    private static final StaticPart ajc$tjp_9 = null;
     public int baseOffsetSize = 8;
     public int indexSize = 0;
     public List<Item> items = new LinkedList();
@@ -206,7 +206,7 @@ public class ItemLocationBox extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("ItemLocationBox.java", ItemLocationBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getOffsetSize", "com.coremedia.iso.boxes.ItemLocationBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "int"), 119);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setOffsetSize", "com.coremedia.iso.boxes.ItemLocationBox", "int", "offsetSize", TtmlNode.ANONYMOUS_REGION_ID, "void"), 123);

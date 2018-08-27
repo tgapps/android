@@ -1,6 +1,7 @@
 package net.hockeyapp.android.objects;
 
 import android.content.Context;
+import com.google.devtools.build.android.desugar.runtime.ThrowableExtension;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -39,7 +40,7 @@ public class CrashDetails {
         this(crashIdentifier);
         this.isXamarinException = Boolean.valueOf(false);
         Writer stackTraceResult = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(stackTraceResult));
+        ThrowableExtension.printStackTrace(throwable, new PrintWriter(stackTraceResult));
         this.throwableStackTrace = stackTraceResult.toString();
     }
 

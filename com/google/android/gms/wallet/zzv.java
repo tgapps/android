@@ -11,9 +11,14 @@ import com.google.android.gms.wallet.wobs.TextModuleData;
 import com.google.android.gms.wallet.wobs.TimeInterval;
 import com.google.android.gms.wallet.wobs.UriData;
 import com.google.android.gms.wallet.wobs.WalletObjectMessage;
+import com.googlecode.mp4parser.authoring.tracks.h265.NalUnitTypes;
 import java.util.ArrayList;
 
 public final class zzv implements Creator<LoyaltyWalletObject> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new LoyaltyWalletObject[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
@@ -104,7 +109,7 @@ public final class zzv implements Creator<LoyaltyWalletObject> {
                 case 22:
                     newArrayList6 = SafeParcelReader.createTypedList(parcel, readHeader, UriData.CREATOR);
                     break;
-                case 23:
+                case NalUnitTypes.NAL_TYPE_RSV_IRAP_VCL23 /*23*/:
                     loyaltyPoints = (LoyaltyPoints) SafeParcelReader.createParcelable(parcel, readHeader, LoyaltyPoints.CREATOR);
                     break;
                 default:
@@ -114,9 +119,5 @@ public final class zzv implements Creator<LoyaltyWalletObject> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new LoyaltyWalletObject(str, str2, str3, str4, str5, str6, str7, str8, str9, str10, i, newArrayList, timeInterval, newArrayList2, str11, str12, newArrayList3, z, newArrayList4, newArrayList5, newArrayList6, loyaltyPoints);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new LoyaltyWalletObject[i];
     }
 }

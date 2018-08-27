@@ -11,11 +11,11 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class CopyrightBox extends AbstractFullBox {
     public static final String TYPE = "cprt";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
     private String copyright;
     private String language;
 
@@ -23,7 +23,7 @@ public class CopyrightBox extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("CopyrightBox.java", CopyrightBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getLanguage", "com.coremedia.iso.boxes.CopyrightBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.lang.String"), 46);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getCopyright", "com.coremedia.iso.boxes.CopyrightBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.lang.String"), 50);

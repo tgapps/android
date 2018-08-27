@@ -11,13 +11,13 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class AmrSpecificBox extends AbstractBox {
     public static final String TYPE = "damr";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
     private int decoderVersion;
     private int framesPerSample;
     private int modeChangePeriod;
@@ -28,7 +28,7 @@ public class AmrSpecificBox extends AbstractBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("AmrSpecificBox.java", AmrSpecificBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getVendor", "com.coremedia.iso.boxes.sampleentry.AmrSpecificBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.lang.String"), 46);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getDecoderVersion", "com.coremedia.iso.boxes.sampleentry.AmrSpecificBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "int"), 50);

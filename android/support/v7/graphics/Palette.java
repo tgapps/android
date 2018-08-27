@@ -94,8 +94,10 @@ public final class Palette {
                 if (logger != null) {
                     logger.addSplit("Color quantization completed");
                 }
-            } else {
+            } else if (this.mSwatches != null) {
                 swatches = this.mSwatches;
+            } else {
+                throw new AssertionError();
             }
             Palette p = new Palette(swatches, this.mTargets);
             p.generate();

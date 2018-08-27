@@ -3,6 +3,7 @@ package org.telegram.messenger;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import com.google.devtools.build.android.desugar.runtime.ThrowableExtension;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -11,10 +12,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class NativeLoader {
-    private static final String LIB_NAME = "tmessages.28";
-    private static final String LIB_SO_NAME = "libtmessages.28.so";
-    private static final int LIB_VERSION = 28;
-    private static final String LOCALE_LIB_SO_NAME = "libtmessages.28loc.so";
+    private static final String LIB_NAME = "tmessages.29";
+    private static final String LIB_SO_NAME = "libtmessages.29.so";
+    private static final int LIB_VERSION = 29;
+    private static final String LOCALE_LIB_SO_NAME = "libtmessages.29loc.so";
     private static volatile boolean nativeLoaded = false;
     private String crashPath = TtmlNode.ANONYMOUS_REGION_ID;
 
@@ -26,7 +27,7 @@ public class NativeLoader {
             try {
                 file = new File((String) ApplicationInfo.class.getField("nativeLibraryDir").get(context.getApplicationInfo()));
             } catch (Throwable th) {
-                th.printStackTrace();
+                ThrowableExtension.printStackTrace(th);
             }
         }
         if (file == null) {
@@ -168,7 +169,7 @@ public class NativeLoader {
         return;
     L_0x0009:
         net.hockeyapp.android.Constants.loadFromContext(r9);	 Catch:{ all -> 0x00b4 }
-        r6 = "tmessages.28";
+        r6 = "tmessages.29";
         java.lang.System.loadLibrary(r6);	 Catch:{ Error -> 0x0020 }
         r6 = 1;
         nativeLoaded = r6;	 Catch:{ Error -> 0x0020 }
@@ -205,7 +206,7 @@ public class NativeLoader {
         r0.<init>(r6, r8);	 Catch:{ Throwable -> 0x0132 }
         r0.mkdirs();	 Catch:{ Throwable -> 0x0132 }
         r1 = new java.io.File;	 Catch:{ Throwable -> 0x0132 }
-        r6 = "libtmessages.28loc.so";
+        r6 = "libtmessages.29loc.so";
         r1.<init>(r0, r6);	 Catch:{ Throwable -> 0x0132 }
         r6 = r1.exists();	 Catch:{ Throwable -> 0x0132 }
         if (r6 == 0) goto L_0x0082;
@@ -240,7 +241,7 @@ public class NativeLoader {
         r6 = loadFromZip(r9, r0, r1, r3);	 Catch:{ Throwable -> 0x0132 }
         if (r6 != 0) goto L_0x0007;
     L_0x00a3:
-        r6 = "tmessages.28";
+        r6 = "tmessages.29";
         java.lang.System.loadLibrary(r6);	 Catch:{ Error -> 0x00ae }
         r6 = 1;
         nativeLoaded = r6;	 Catch:{ Error -> 0x00ae }
@@ -314,7 +315,7 @@ public class NativeLoader {
         goto L_0x0034;
     L_0x0132:
         r2 = move-exception;
-        r2.printStackTrace();	 Catch:{ all -> 0x00b4 }
+        com.google.devtools.build.android.desugar.runtime.ThrowableExtension.printStackTrace(r2);	 Catch:{ all -> 0x00b4 }
         goto L_0x00a3;
         */
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.NativeLoader.initNativeLibs(android.content.Context):void");

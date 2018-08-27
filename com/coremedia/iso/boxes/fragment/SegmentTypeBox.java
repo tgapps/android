@@ -5,6 +5,7 @@ import com.coremedia.iso.IsoTypeReader;
 import com.coremedia.iso.IsoTypeWriter;
 import com.googlecode.mp4parser.AbstractBox;
 import com.googlecode.mp4parser.RequiresParseDetailAspect;
+import com.googlecode.mp4parser.annotations.DoNotParseDetail;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -15,12 +16,12 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class SegmentTypeBox extends AbstractBox {
     public static final String TYPE = "styp";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
     private List<String> compatibleBrands = Collections.emptyList();
     private String majorBrand;
     private long minorVersion;
@@ -29,7 +30,7 @@ public class SegmentTypeBox extends AbstractBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("SegmentTypeBox.java", SegmentTypeBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getMajorBrand", "com.coremedia.iso.boxes.fragment.SegmentTypeBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.lang.String"), 85);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setMajorBrand", "com.coremedia.iso.boxes.fragment.SegmentTypeBox", "java.lang.String", "majorBrand", TtmlNode.ANONYMOUS_REGION_ID, "void"), 94);
@@ -102,6 +103,7 @@ public class SegmentTypeBox extends AbstractBox {
         this.compatibleBrands = compatibleBrands;
     }
 
+    @DoNotParseDetail
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append("SegmentTypeBox[");

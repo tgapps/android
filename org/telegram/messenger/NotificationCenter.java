@@ -74,6 +74,7 @@ public class NotificationCenter {
     public static final int mediaCountDidLoaded;
     public static final int mediaDidLoaded;
     public static final int messagePlayingDidReset;
+    public static final int messagePlayingDidSeek;
     public static final int messagePlayingDidStarted;
     public static final int messagePlayingPlayStateChanged;
     public static final int messagePlayingProgressDidChanged;
@@ -403,6 +404,9 @@ public class NotificationCenter {
         i = totalEvents;
         totalEvents = i + 1;
         messagePlayingDidStarted = i;
+        i = totalEvents;
+        totalEvents = i + 1;
+        messagePlayingDidSeek = i;
         i = totalEvents;
         totalEvents = i + 1;
         recordProgressChanged = i;

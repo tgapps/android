@@ -7,6 +7,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
+import com.google.android.exoplayer2.C;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.MessagesController;
 import org.telegram.ui.Components.LayoutHelper;
@@ -89,7 +90,7 @@ public class TextPaintView extends EntityView {
         this.editText.setTypeface(null, 1);
         this.editText.setGravity(17);
         this.editText.setHorizontallyScrolling(false);
-        this.editText.setImeOptions(268435456);
+        this.editText.setImeOptions(C.ENCODING_PCM_MU_LAW);
         this.editText.setFocusableInTouchMode(true);
         this.editText.setInputType(this.editText.getInputType() | MessagesController.UPDATE_MASK_CHAT_ADMINS);
         addView(this.editText, LayoutHelper.createFrame(-2, -2, 51));

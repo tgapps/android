@@ -3,14 +3,15 @@ package com.googlecode.mp4parser;
 import com.coremedia.iso.IsoTypeReader;
 import com.coremedia.iso.IsoTypeWriter;
 import com.coremedia.iso.boxes.FullBox;
+import com.googlecode.mp4parser.annotations.DoNotParseDetail;
 import java.nio.ByteBuffer;
 import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.internal.Conversions;
 import org.aspectj.runtime.reflect.Factory;
 
 public abstract class AbstractFullBox extends AbstractBox implements FullBox {
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
     private int flags;
     private int version;
 
@@ -18,7 +19,7 @@ public abstract class AbstractFullBox extends AbstractBox implements FullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("AbstractFullBox.java", AbstractFullBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setVersion", "com.googlecode.mp4parser.AbstractFullBox", "int", "version", TtmlNode.ANONYMOUS_REGION_ID, "void"), 51);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setFlags", "com.googlecode.mp4parser.AbstractFullBox", "int", "flags", TtmlNode.ANONYMOUS_REGION_ID, "void"), 64);
@@ -32,6 +33,7 @@ public abstract class AbstractFullBox extends AbstractBox implements FullBox {
         super(type, userType);
     }
 
+    @DoNotParseDetail
     public int getVersion() {
         if (!this.isParsed) {
             parseDetails();
@@ -44,6 +46,7 @@ public abstract class AbstractFullBox extends AbstractBox implements FullBox {
         this.version = version;
     }
 
+    @DoNotParseDetail
     public int getFlags() {
         if (!this.isParsed) {
             parseDetails();

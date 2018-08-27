@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/* compiled from: com.google.firebase:firebase-common@@16.0.1 */
 public final class Component<T> {
     private final Set<Class<? super T>> zza;
     private final Set<Dependency> zzb;
@@ -13,6 +14,7 @@ public final class Component<T> {
     private final ComponentFactory<T> zzd;
     private final Set<Class<?>> zze;
 
+    /* compiled from: com.google.firebase:firebase-common@@16.0.1 */
     public static class Builder<T> {
         private final Set<Class<? super T>> zza;
         private final Set<Dependency> zzb;
@@ -45,6 +47,10 @@ public final class Component<T> {
 
         public Builder<T> alwaysEager() {
             return zza(1);
+        }
+
+        public Builder<T> eagerInDefaultApp() {
+            return zza(2);
         }
 
         private Builder<T> zza(int i) {

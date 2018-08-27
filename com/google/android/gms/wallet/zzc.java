@@ -6,6 +6,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.identity.intents.model.UserAddress;
 
 public final class zzc implements Creator<CardInfo> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new CardInfo[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         int i = 0;
@@ -38,9 +42,5 @@ public final class zzc implements Creator<CardInfo> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new CardInfo(str3, str2, str, i, userAddress);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new CardInfo[i];
     }
 }

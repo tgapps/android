@@ -11,9 +11,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Environment;
 import android.os.StatFs;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.widget.FrameLayout;
@@ -23,7 +21,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
@@ -53,8 +50,6 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.NumberTextView;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.RecyclerListView.Holder;
-import org.telegram.ui.Components.RecyclerListView.OnItemClickListener;
-import org.telegram.ui.Components.RecyclerListView.OnItemLongClickListener;
 import org.telegram.ui.Components.RecyclerListView.SelectionAdapter;
 
 public class DocumentSelectActivity extends BaseFragment {
@@ -72,23 +67,23 @@ public class DocumentSelectActivity extends BaseFragment {
     private int maxSelectedFiles = -1;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context arg0, Intent intent) {
-            Runnable r = new Runnable() {
-                public void run() {
-                    try {
-                        if (DocumentSelectActivity.this.currentDir == null) {
-                            DocumentSelectActivity.this.listRoots();
-                        } else {
-                            DocumentSelectActivity.this.listFiles(DocumentSelectActivity.this.currentDir);
-                        }
-                    } catch (Throwable e) {
-                        FileLog.e(e);
-                    }
-                }
-            };
+            Runnable r = new DocumentSelectActivity$1$$Lambda$0(this);
             if ("android.intent.action.MEDIA_UNMOUNTED".equals(intent.getAction())) {
                 DocumentSelectActivity.this.listView.postDelayed(r, 1000);
             } else {
                 r.run();
+            }
+        }
+
+        final /* synthetic */ void lambda$onReceive$0$DocumentSelectActivity$1() {
+            try {
+                if (DocumentSelectActivity.this.currentDir == null) {
+                    DocumentSelectActivity.this.listRoots();
+                } else {
+                    DocumentSelectActivity.this.listFiles(DocumentSelectActivity.this.currentDir);
+                }
+            } catch (Throwable e) {
+                FileLog.e(e);
             }
         }
     };
@@ -275,11 +270,7 @@ public class DocumentSelectActivity extends BaseFragment {
         this.selectedMessagesCountTextView.setTextSize(18);
         this.selectedMessagesCountTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
         this.selectedMessagesCountTextView.setTextColor(Theme.getColor(Theme.key_actionBarActionModeDefaultIcon));
-        this.selectedMessagesCountTextView.setOnTouchListener(new OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+        this.selectedMessagesCountTextView.setOnTouchListener(DocumentSelectActivity$$Lambda$0.$instance);
         actionMode.addView(this.selectedMessagesCountTextView, LayoutHelper.createLinear(0, -1, 1.0f, 65, 0, 0, 0));
         this.actionModeViews.add(actionMode.addItemWithWidth(3, R.drawable.ic_ab_done, AndroidUtilities.dp(54.0f)));
         this.fragmentView = new FrameLayout(context);
@@ -304,132 +295,132 @@ public class DocumentSelectActivity extends BaseFragment {
                 DocumentSelectActivity.this.scrolling = newState != 0;
             }
         });
-        this.listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-            public boolean onItemClick(View view, int position) {
-                if (DocumentSelectActivity.this.actionBar.isActionModeShowed()) {
-                    return false;
-                }
-                ListItem item = DocumentSelectActivity.this.listAdapter.getItem(position);
-                if (item == null) {
-                    return false;
-                }
-                File file = item.file;
-                if (!(file == null || file.isDirectory())) {
-                    if (!file.canRead()) {
-                        DocumentSelectActivity.this.showErrorBox(LocaleController.getString("AccessError", R.string.AccessError));
-                        return false;
-                    } else if (DocumentSelectActivity.this.canSelectOnlyImageFiles && item.thumb == null) {
-                        DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("PassportUploadNotImage", R.string.PassportUploadNotImage, new Object[0]));
-                        return false;
-                    } else if (DocumentSelectActivity.this.sizeLimit != 0 && file.length() > DocumentSelectActivity.this.sizeLimit) {
-                        DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("FileUploadLimit", R.string.FileUploadLimit, AndroidUtilities.formatFileSize(DocumentSelectActivity.this.sizeLimit)));
-                        return false;
-                    } else if (DocumentSelectActivity.this.maxSelectedFiles >= 0 && DocumentSelectActivity.this.selectedFiles.size() >= DocumentSelectActivity.this.maxSelectedFiles) {
-                        DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("PassportUploadMaxReached", R.string.PassportUploadMaxReached, LocaleController.formatPluralString("Files", DocumentSelectActivity.this.maxSelectedFiles)));
-                        return false;
-                    } else if (file.length() == 0) {
-                        return false;
-                    } else {
-                        DocumentSelectActivity.this.selectedFiles.put(file.toString(), item);
-                        DocumentSelectActivity.this.selectedMessagesCountTextView.setNumber(1, false);
-                        AnimatorSet animatorSet = new AnimatorSet();
-                        ArrayList<Animator> animators = new ArrayList();
-                        for (int a = 0; a < DocumentSelectActivity.this.actionModeViews.size(); a++) {
-                            View view2 = (View) DocumentSelectActivity.this.actionModeViews.get(a);
-                            AndroidUtilities.clearDrawableAnimation(view2);
-                            animators.add(ObjectAnimator.ofFloat(view2, "scaleY", new float[]{0.1f, 1.0f}));
-                        }
-                        animatorSet.playTogether(animators);
-                        animatorSet.setDuration(250);
-                        animatorSet.start();
-                        DocumentSelectActivity.this.scrolling = false;
-                        if (view instanceof SharedDocumentCell) {
-                            ((SharedDocumentCell) view).setChecked(true, true);
-                        }
-                        DocumentSelectActivity.this.actionBar.showActionMode();
-                    }
-                }
-                return true;
-            }
-        });
-        this.listView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(View view, int position) {
-                ListItem item = DocumentSelectActivity.this.listAdapter.getItem(position);
-                if (item != null) {
-                    File file = item.file;
-                    HistoryEntry he;
-                    if (file == null) {
-                        if (item.icon == R.drawable.ic_storage_gallery) {
-                            if (DocumentSelectActivity.this.delegate != null) {
-                                DocumentSelectActivity.this.delegate.startDocumentSelectActivity();
-                            }
-                            DocumentSelectActivity.this.finishFragment(false);
-                            return;
-                        }
-                        he = (HistoryEntry) DocumentSelectActivity.this.history.remove(DocumentSelectActivity.this.history.size() - 1);
-                        DocumentSelectActivity.this.actionBar.setTitle(he.title);
-                        if (he.dir != null) {
-                            DocumentSelectActivity.this.listFiles(he.dir);
-                        } else {
-                            DocumentSelectActivity.this.listRoots();
-                        }
-                        DocumentSelectActivity.this.layoutManager.scrollToPositionWithOffset(he.scrollItem, he.scrollOffset);
-                    } else if (file.isDirectory()) {
-                        he = new HistoryEntry();
-                        he.scrollItem = DocumentSelectActivity.this.layoutManager.findLastVisibleItemPosition();
-                        View topView = DocumentSelectActivity.this.layoutManager.findViewByPosition(he.scrollItem);
-                        if (topView != null) {
-                            he.scrollOffset = topView.getTop();
-                        }
-                        he.dir = DocumentSelectActivity.this.currentDir;
-                        he.title = DocumentSelectActivity.this.actionBar.getTitle();
-                        DocumentSelectActivity.this.history.add(he);
-                        if (DocumentSelectActivity.this.listFiles(file)) {
-                            DocumentSelectActivity.this.actionBar.setTitle(item.title);
-                        } else {
-                            DocumentSelectActivity.this.history.remove(he);
-                        }
-                    } else {
-                        if (!file.canRead()) {
-                            DocumentSelectActivity.this.showErrorBox(LocaleController.getString("AccessError", R.string.AccessError));
-                            file = new File("/mnt/sdcard");
-                        }
-                        if (DocumentSelectActivity.this.canSelectOnlyImageFiles && item.thumb == null) {
-                            DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("PassportUploadNotImage", R.string.PassportUploadNotImage, new Object[0]));
-                        } else if (DocumentSelectActivity.this.sizeLimit != 0 && file.length() > DocumentSelectActivity.this.sizeLimit) {
-                            DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("FileUploadLimit", R.string.FileUploadLimit, AndroidUtilities.formatFileSize(DocumentSelectActivity.this.sizeLimit)));
-                        } else if (file.length() == 0) {
-                        } else {
-                            if (DocumentSelectActivity.this.actionBar.isActionModeShowed()) {
-                                if (DocumentSelectActivity.this.selectedFiles.containsKey(file.toString())) {
-                                    DocumentSelectActivity.this.selectedFiles.remove(file.toString());
-                                } else if (DocumentSelectActivity.this.maxSelectedFiles < 0 || DocumentSelectActivity.this.selectedFiles.size() < DocumentSelectActivity.this.maxSelectedFiles) {
-                                    DocumentSelectActivity.this.selectedFiles.put(file.toString(), item);
-                                } else {
-                                    DocumentSelectActivity.this.showErrorBox(LocaleController.formatString("PassportUploadMaxReached", R.string.PassportUploadMaxReached, LocaleController.formatPluralString("Files", DocumentSelectActivity.this.maxSelectedFiles)));
-                                    return;
-                                }
-                                if (DocumentSelectActivity.this.selectedFiles.isEmpty()) {
-                                    DocumentSelectActivity.this.actionBar.hideActionMode();
-                                } else {
-                                    DocumentSelectActivity.this.selectedMessagesCountTextView.setNumber(DocumentSelectActivity.this.selectedFiles.size(), true);
-                                }
-                                DocumentSelectActivity.this.scrolling = false;
-                                if (view instanceof SharedDocumentCell) {
-                                    ((SharedDocumentCell) view).setChecked(DocumentSelectActivity.this.selectedFiles.containsKey(item.file.toString()), true);
-                                }
-                            } else if (DocumentSelectActivity.this.delegate != null) {
-                                ArrayList<String> files = new ArrayList();
-                                files.add(file.getAbsolutePath());
-                                DocumentSelectActivity.this.delegate.didSelectFiles(DocumentSelectActivity.this, files);
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        this.listView.setOnItemLongClickListener(new DocumentSelectActivity$$Lambda$1(this));
+        this.listView.setOnItemClickListener(new DocumentSelectActivity$$Lambda$2(this));
         listRoots();
         return this.fragmentView;
+    }
+
+    final /* synthetic */ boolean lambda$createView$1$DocumentSelectActivity(View view, int position) {
+        if (this.actionBar.isActionModeShowed()) {
+            return false;
+        }
+        ListItem item = this.listAdapter.getItem(position);
+        if (item == null) {
+            return false;
+        }
+        File file = item.file;
+        if (!(file == null || file.isDirectory())) {
+            if (!file.canRead()) {
+                showErrorBox(LocaleController.getString("AccessError", R.string.AccessError));
+                return false;
+            } else if (this.canSelectOnlyImageFiles && item.thumb == null) {
+                showErrorBox(LocaleController.formatString("PassportUploadNotImage", R.string.PassportUploadNotImage, new Object[0]));
+                return false;
+            } else if (this.sizeLimit != 0 && file.length() > this.sizeLimit) {
+                showErrorBox(LocaleController.formatString("FileUploadLimit", R.string.FileUploadLimit, AndroidUtilities.formatFileSize(this.sizeLimit)));
+                return false;
+            } else if (this.maxSelectedFiles >= 0 && this.selectedFiles.size() >= this.maxSelectedFiles) {
+                showErrorBox(LocaleController.formatString("PassportUploadMaxReached", R.string.PassportUploadMaxReached, LocaleController.formatPluralString("Files", this.maxSelectedFiles)));
+                return false;
+            } else if (file.length() == 0) {
+                return false;
+            } else {
+                this.selectedFiles.put(file.toString(), item);
+                this.selectedMessagesCountTextView.setNumber(1, false);
+                AnimatorSet animatorSet = new AnimatorSet();
+                ArrayList<Animator> animators = new ArrayList();
+                for (int a = 0; a < this.actionModeViews.size(); a++) {
+                    View view2 = (View) this.actionModeViews.get(a);
+                    AndroidUtilities.clearDrawableAnimation(view2);
+                    animators.add(ObjectAnimator.ofFloat(view2, "scaleY", new float[]{0.1f, 1.0f}));
+                }
+                animatorSet.playTogether(animators);
+                animatorSet.setDuration(250);
+                animatorSet.start();
+                this.scrolling = false;
+                if (view instanceof SharedDocumentCell) {
+                    ((SharedDocumentCell) view).setChecked(true, true);
+                }
+                this.actionBar.showActionMode();
+            }
+        }
+        return true;
+    }
+
+    final /* synthetic */ void lambda$createView$2$DocumentSelectActivity(View view, int position) {
+        ListItem item = this.listAdapter.getItem(position);
+        if (item != null) {
+            File file = item.file;
+            HistoryEntry he;
+            if (file == null) {
+                if (item.icon == R.drawable.ic_storage_gallery) {
+                    if (this.delegate != null) {
+                        this.delegate.startDocumentSelectActivity();
+                    }
+                    finishFragment(false);
+                    return;
+                }
+                he = (HistoryEntry) this.history.remove(this.history.size() - 1);
+                this.actionBar.setTitle(he.title);
+                if (he.dir != null) {
+                    listFiles(he.dir);
+                } else {
+                    listRoots();
+                }
+                this.layoutManager.scrollToPositionWithOffset(he.scrollItem, he.scrollOffset);
+            } else if (file.isDirectory()) {
+                he = new HistoryEntry();
+                he.scrollItem = this.layoutManager.findLastVisibleItemPosition();
+                View topView = this.layoutManager.findViewByPosition(he.scrollItem);
+                if (topView != null) {
+                    he.scrollOffset = topView.getTop();
+                }
+                he.dir = this.currentDir;
+                he.title = this.actionBar.getTitle();
+                this.history.add(he);
+                if (listFiles(file)) {
+                    this.actionBar.setTitle(item.title);
+                } else {
+                    this.history.remove(he);
+                }
+            } else {
+                if (!file.canRead()) {
+                    showErrorBox(LocaleController.getString("AccessError", R.string.AccessError));
+                    file = new File("/mnt/sdcard");
+                }
+                if (this.canSelectOnlyImageFiles && item.thumb == null) {
+                    showErrorBox(LocaleController.formatString("PassportUploadNotImage", R.string.PassportUploadNotImage, new Object[0]));
+                } else if (this.sizeLimit != 0 && file.length() > this.sizeLimit) {
+                    showErrorBox(LocaleController.formatString("FileUploadLimit", R.string.FileUploadLimit, AndroidUtilities.formatFileSize(this.sizeLimit)));
+                } else if (file.length() == 0) {
+                } else {
+                    if (this.actionBar.isActionModeShowed()) {
+                        if (this.selectedFiles.containsKey(file.toString())) {
+                            this.selectedFiles.remove(file.toString());
+                        } else if (this.maxSelectedFiles < 0 || this.selectedFiles.size() < this.maxSelectedFiles) {
+                            this.selectedFiles.put(file.toString(), item);
+                        } else {
+                            showErrorBox(LocaleController.formatString("PassportUploadMaxReached", R.string.PassportUploadMaxReached, LocaleController.formatPluralString("Files", this.maxSelectedFiles)));
+                            return;
+                        }
+                        if (this.selectedFiles.isEmpty()) {
+                            this.actionBar.hideActionMode();
+                        } else {
+                            this.selectedMessagesCountTextView.setNumber(this.selectedFiles.size(), true);
+                        }
+                        this.scrolling = false;
+                        if (view instanceof SharedDocumentCell) {
+                            ((SharedDocumentCell) view).setChecked(this.selectedFiles.containsKey(item.file.toString()), true);
+                        }
+                    } else if (this.delegate != null) {
+                        ArrayList<String> files = new ArrayList();
+                        files.add(file.getAbsolutePath());
+                        this.delegate.didSelectFiles(this, files);
+                    }
+                }
+            }
+        }
     }
 
     public void setMaxSelectedFiles(int value) {
@@ -459,22 +450,22 @@ public class DocumentSelectActivity extends BaseFragment {
                     this.recentItems.add(item);
                 }
             }
-            Collections.sort(this.recentItems, new Comparator<ListItem>() {
-                public int compare(ListItem o1, ListItem o2) {
-                    long lm = o1.file.lastModified();
-                    long rm = o2.file.lastModified();
-                    if (lm == rm) {
-                        return 0;
-                    }
-                    if (lm > rm) {
-                        return -1;
-                    }
-                    return 1;
-                }
-            });
+            Collections.sort(this.recentItems, DocumentSelectActivity$$Lambda$3.$instance);
         } catch (Throwable e) {
             FileLog.e(e);
         }
+    }
+
+    static final /* synthetic */ int lambda$loadRecentFiles$3$DocumentSelectActivity(ListItem o1, ListItem o2) {
+        long lm = o1.file.lastModified();
+        long rm = o2.file.lastModified();
+        if (lm == rm) {
+            return 0;
+        }
+        if (lm > rm) {
+            return -1;
+        }
+        return 1;
     }
 
     public void onResume() {
@@ -538,15 +529,7 @@ public class DocumentSelectActivity extends BaseFragment {
                 ListItem item;
                 this.currentDir = dir;
                 this.items.clear();
-                Arrays.sort(files, new Comparator<File>() {
-                    public int compare(File lhs, File rhs) {
-                        if (lhs.isDirectory() != rhs.isDirectory()) {
-                            return lhs.isDirectory() ? -1 : 1;
-                        } else {
-                            return lhs.getName().compareToIgnoreCase(rhs.getName());
-                        }
-                    }
-                });
+                Arrays.sort(files, DocumentSelectActivity$$Lambda$4.$instance);
                 for (File file : files) {
                     if (file.getName().indexOf(46) != 0) {
                         item = new ListItem();
@@ -606,6 +589,14 @@ public class DocumentSelectActivity extends BaseFragment {
             this.scrolling = true;
             this.listAdapter.notifyDataSetChanged();
             return true;
+        }
+    }
+
+    static final /* synthetic */ int lambda$listFiles$4$DocumentSelectActivity(File lhs, File rhs) {
+        if (lhs.isDirectory() != rhs.isDirectory()) {
+            return lhs.isDirectory() ? -1 : 1;
+        } else {
+            return lhs.getName().compareToIgnoreCase(rhs.getName());
         }
     }
 

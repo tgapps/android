@@ -14,6 +14,10 @@ public class JuliLogger extends Logger {
         this.logger.log(Level.FINE, message);
     }
 
+    public void logWarn(String message) {
+        this.logger.log(Level.WARNING, message);
+    }
+
     public void logError(String message) {
         this.logger.log(Level.SEVERE, message);
     }

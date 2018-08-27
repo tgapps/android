@@ -7,37 +7,9 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
 public final class InstrumentInfo extends AbstractSafeParcelable {
     public static final Creator<InstrumentInfo> CREATOR = new zzp();
-    private int zzag;
-    private String zzbs;
+    private int zzah;
     private String zzbt;
-
-    private InstrumentInfo() {
-    }
-
-    public InstrumentInfo(String str, String str2, int i) {
-        this.zzbs = str;
-        this.zzbt = str2;
-        this.zzag = i;
-    }
-
-    public final int getCardClass() {
-        switch (this.zzag) {
-            case 1:
-            case 2:
-            case 3:
-                return this.zzag;
-            default:
-                return 0;
-        }
-    }
-
-    public final String getInstrumentDetails() {
-        return this.zzbt;
-    }
-
-    public final String getInstrumentType() {
-        return this.zzbs;
-    }
+    private String zzbu;
 
     public final void writeToParcel(Parcel parcel, int i) {
         int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
@@ -45,5 +17,33 @@ public final class InstrumentInfo extends AbstractSafeParcelable {
         SafeParcelWriter.writeString(parcel, 3, getInstrumentDetails(), false);
         SafeParcelWriter.writeInt(parcel, 4, getCardClass());
         SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+    }
+
+    public InstrumentInfo(String str, String str2, int i) {
+        this.zzbt = str;
+        this.zzbu = str2;
+        this.zzah = i;
+    }
+
+    private InstrumentInfo() {
+    }
+
+    public final String getInstrumentType() {
+        return this.zzbt;
+    }
+
+    public final String getInstrumentDetails() {
+        return this.zzbu;
+    }
+
+    public final int getCardClass() {
+        switch (this.zzah) {
+            case 1:
+            case 2:
+            case 3:
+                return this.zzah;
+            default:
+                return 0;
+        }
     }
 }

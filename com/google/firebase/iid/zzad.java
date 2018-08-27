@@ -1,13 +1,16 @@
 package com.google.firebase.iid;
 
-final /* synthetic */ class zzad implements Runnable {
-    private final zzab zzbt;
+import android.os.Handler.Callback;
+import android.os.Message;
 
-    zzad(zzab com_google_firebase_iid_zzab) {
-        this.zzbt = com_google_firebase_iid_zzab;
+final /* synthetic */ class zzad implements Callback {
+    private final zzac zzbz;
+
+    zzad(zzac com_google_firebase_iid_zzac) {
+        this.zzbz = com_google_firebase_iid_zzac;
     }
 
-    public final void run() {
-        this.zzbt.zzz();
+    public final boolean handleMessage(Message message) {
+        return this.zzbz.zza(message);
     }
 }

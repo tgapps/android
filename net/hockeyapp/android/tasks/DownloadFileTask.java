@@ -13,6 +13,7 @@ import android.os.Build.VERSION;
 import android.os.StrictMode;
 import android.os.StrictMode.VmPolicy;
 import android.os.StrictMode.VmPolicy.Builder;
+import com.google.android.exoplayer2.C;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,7 +27,6 @@ import java.util.UUID;
 import net.hockeyapp.android.R;
 import net.hockeyapp.android.listeners.DownloadFileListener;
 import net.hockeyapp.android.utils.HockeyLog;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 
 @SuppressLint({"StaticFieldLeak"})
 public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
@@ -47,32 +47,32 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
     }
 
     protected Long doInBackground(Void... args) {
-        OutputStream output;
         Throwable e;
-        Long valueOf;
         Throwable th;
         InputStream input = null;
-        OutputStream output2 = null;
+        OutputStream output = null;
         URLConnection connection = createConnection(new URL(getURLString()), 6);
         connection.connect();
         int lengthOfFile = connection.getContentLength();
         String contentType = connection.getContentType();
-        if (contentType == null || !contentType.contains(MimeTypes.BASE_TYPE_TEXT)) {
+        Long valueOf;
+        if (contentType == null || !contentType.contains("text")) {
             try {
                 if (this.mDirectory.mkdirs() || this.mDirectory.exists()) {
+                    OutputStream output2;
                     File file = new File(this.mDirectory, this.mFilename);
                     InputStream input2 = new BufferedInputStream(connection.getInputStream());
                     try {
-                        output = new FileOutputStream(file);
+                        output2 = new FileOutputStream(file);
                     } catch (IOException e2) {
                         e = e2;
                         input = input2;
                         try {
                             HockeyLog.error("Failed to download " + this.mUrlString, e);
                             valueOf = Long.valueOf(0);
-                            if (output2 != null) {
+                            if (output != null) {
                                 try {
-                                    output2.close();
+                                    output.close();
                                 } catch (IOException e3) {
                                 }
                             }
@@ -82,9 +82,9 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                             return valueOf;
                         } catch (Throwable th2) {
                             th = th2;
-                            if (output2 != null) {
+                            if (output != null) {
                                 try {
-                                    output2.close();
+                                    output.close();
                                 } catch (IOException e4) {
                                     throw th;
                                 }
@@ -97,8 +97,8 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                     } catch (Throwable th3) {
                         th = th3;
                         input = input2;
-                        if (output2 != null) {
-                            output2.close();
+                        if (output != null) {
+                            output.close();
                         }
                         if (input != null) {
                             input.close();
@@ -115,29 +115,29 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                             }
                             total += (long) count;
                             publishProgress(new Integer[]{Integer.valueOf(Math.round((((float) total) * 100.0f) / ((float) lengthOfFile)))});
-                            output.write(data, 0, count);
+                            output2.write(data, 0, count);
                         }
-                        output.flush();
+                        output2.flush();
                         valueOf = Long.valueOf(total);
-                        if (output != null) {
+                        if (output2 != null) {
                             try {
-                                output.close();
+                                output2.close();
                             } catch (IOException e5) {
                             }
                         }
                         if (input2 != null) {
                             input2.close();
                         }
-                        output2 = output;
+                        output = output2;
                         input = input2;
                     } catch (IOException e6) {
                         e = e6;
-                        output2 = output;
+                        output = output2;
                         input = input2;
                         HockeyLog.error("Failed to download " + this.mUrlString, e);
                         valueOf = Long.valueOf(0);
-                        if (output2 != null) {
-                            output2.close();
+                        if (output != null) {
+                            output.close();
                         }
                         if (input != null) {
                             input.close();
@@ -145,10 +145,10 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                         return valueOf;
                     } catch (Throwable th4) {
                         th = th4;
-                        output2 = output;
+                        output = output2;
                         input = input2;
-                        if (output2 != null) {
-                            output2.close();
+                        if (output != null) {
+                            output.close();
                         }
                         if (input != null) {
                             input.close();
@@ -162,8 +162,8 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
                 e = e7;
                 HockeyLog.error("Failed to download " + this.mUrlString, e);
                 valueOf = Long.valueOf(0);
-                if (output2 != null) {
-                    output2.close();
+                if (output != null) {
+                    output.close();
                 }
                 if (input != null) {
                     input.close();
@@ -173,9 +173,9 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
         }
         this.mDownloadErrorMessage = "The requested download does not appear to be a file.";
         valueOf = Long.valueOf(0);
-        if (output2 != null) {
+        if (output != null) {
             try {
-                output2.close();
+                output.close();
             } catch (IOException e8) {
             }
         }
@@ -230,7 +230,7 @@ public class DownloadFileTask extends AsyncTask<Void, Integer, Long> {
             this.mNotifier.downloadSuccessful(this);
             Intent intent = new Intent("android.intent.action.INSTALL_PACKAGE");
             intent.setDataAndType(Uri.fromFile(new File(this.mDirectory, this.mFilename)), "application/vnd.android.package-archive");
-            intent.setFlags(268435456);
+            intent.setFlags(C.ENCODING_PCM_MU_LAW);
             VmPolicy oldVmPolicy = null;
             if (VERSION.SDK_INT >= 24) {
                 oldVmPolicy = StrictMode.getVmPolicy();

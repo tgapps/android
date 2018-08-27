@@ -76,8 +76,11 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import java.io.File;
 import java.lang.reflect.Array;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -102,8 +105,6 @@ import org.telegram.messenger.NotificationCenter.NotificationCenterDelegate;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.browser.Browser;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.ui.AspectRatioFrameLayout;
 import org.telegram.messenger.support.widget.GridLayoutManager;
 import org.telegram.messenger.support.widget.LinearLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
@@ -4812,9 +4813,13 @@ public class ArticleViewer implements OnDoubleTapListener, OnGestureListener, No
                     boolean isAnchor = false;
                     int index = url.lastIndexOf(35);
                     if (index != -1) {
-                        anchor = url.substring(index + 1);
+                        try {
+                            anchor = URLDecoder.decode(url.substring(index + 1), C.UTF8_NAME);
+                        } catch (Exception e3) {
+                            anchor = TtmlNode.ANONYMOUS_REGION_ID;
+                        }
                         if (url.toLowerCase().contains(this.currentPage.url.toLowerCase())) {
-                            Integer row = (Integer) this.anchors.get(anchor);
+                            Integer row = (Integer) this.anchors.get(anchor.toLowerCase());
                             if (row != null) {
                                 this.layoutManager.scrollToPositionWithOffset(row.intValue(), 0);
                                 isAnchor = true;
@@ -4824,6 +4829,7 @@ public class ArticleViewer implements OnDoubleTapListener, OnGestureListener, No
                         anchor = null;
                     }
                     if (!isAnchor && this.openUrlReqId == 0) {
+                        final String anchorFinal = anchor;
                         showProgressView(true);
                         TLObject req = new TL_messages_getWebPage();
                         req.url = this.pressedLink.getUrl();
@@ -4840,7 +4846,7 @@ public class ArticleViewer implements OnDoubleTapListener, OnGestureListener, No
                                                 return;
                                             }
                                             if ((response instanceof TL_webPage) && (((TL_webPage) response).cached_page instanceof TL_pageFull)) {
-                                                ArticleViewer.this.addPageToStack((TL_webPage) response, anchor);
+                                                ArticleViewer.this.addPageToStack((TL_webPage) response, anchorFinal);
                                             } else {
                                                 Browser.openUrl(ArticleViewer.this.parentActivity, tLObject.url);
                                             }

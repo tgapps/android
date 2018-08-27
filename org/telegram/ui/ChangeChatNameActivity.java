@@ -16,6 +16,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import com.google.android.exoplayer2.C;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
@@ -197,7 +198,7 @@ public class ChangeChatNameActivity extends BaseFragment implements ImageUpdater
         this.nameTextView.setHint(LocaleController.getString("GroupName", R.string.GroupName));
         this.nameTextView.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
         this.nameTextView.setBackgroundDrawable(Theme.createEditTextDrawable(context, false));
-        this.nameTextView.setImeOptions(268435456);
+        this.nameTextView.setImeOptions(C.ENCODING_PCM_MU_LAW);
         this.nameTextView.setInputType(16385);
         this.nameTextView.setPadding(0, 0, 0, AndroidUtilities.dp(8.0f));
         this.nameTextView.setFocusable(this.nameTextView.isEnabled());

@@ -2,40 +2,40 @@ package com.coremedia.iso.boxes.fragment;
 
 import com.coremedia.iso.IsoTypeReader;
 import com.coremedia.iso.IsoTypeWriter;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.extractor.ts.TsExtractor;
 import com.googlecode.mp4parser.AbstractFullBox;
 import com.googlecode.mp4parser.RequiresParseDetailAspect;
 import java.nio.ByteBuffer;
 import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.internal.Conversions;
 import org.aspectj.runtime.reflect.Factory;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor;
 import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 
 public class TrackFragmentHeaderBox extends AbstractFullBox {
     public static final String TYPE = "tfhd";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_10 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_11 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_12 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_13 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_14 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_15 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_16 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_17 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_18 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_19 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_20 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_21 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_7 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_8 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_9 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_10 = null;
+    private static final StaticPart ajc$tjp_11 = null;
+    private static final StaticPart ajc$tjp_12 = null;
+    private static final StaticPart ajc$tjp_13 = null;
+    private static final StaticPart ajc$tjp_14 = null;
+    private static final StaticPart ajc$tjp_15 = null;
+    private static final StaticPart ajc$tjp_16 = null;
+    private static final StaticPart ajc$tjp_17 = null;
+    private static final StaticPart ajc$tjp_18 = null;
+    private static final StaticPart ajc$tjp_19 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_20 = null;
+    private static final StaticPart ajc$tjp_21 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_7 = null;
+    private static final StaticPart ajc$tjp_8 = null;
+    private static final StaticPart ajc$tjp_9 = null;
     private long baseDataOffset = -1;
     private boolean defaultBaseIsMoof;
     private long defaultSampleDuration = -1;
@@ -49,7 +49,7 @@ public class TrackFragmentHeaderBox extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("TrackFragmentHeaderBox.java", TrackFragmentHeaderBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "hasBaseDataOffset", "com.coremedia.iso.boxes.fragment.TrackFragmentHeaderBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "boolean"), 126);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "hasSampleDescriptionIndex", "com.coremedia.iso.boxes.fragment.TrackFragmentHeaderBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "boolean"), TsExtractor.TS_STREAM_TYPE_HDMV_DTS);

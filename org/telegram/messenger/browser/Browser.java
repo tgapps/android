@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.BitmapFactory;
@@ -35,9 +34,7 @@ import org.telegram.messenger.support.customtabsclient.shared.CustomTabsHelper;
 import org.telegram.messenger.support.customtabsclient.shared.ServiceConnection;
 import org.telegram.messenger.support.customtabsclient.shared.ServiceConnectionCallback;
 import org.telegram.tgnet.ConnectionsManager;
-import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
-import org.telegram.tgnet.TLRPC.TL_error;
 import org.telegram.tgnet.TLRPC.TL_messageMediaWebPage;
 import org.telegram.tgnet.TLRPC.TL_messages_getWebPagePreview;
 import org.telegram.tgnet.TLRPC.TL_webPage;
@@ -162,65 +159,16 @@ public class Browser {
     public static void openUrl(Context context, Uri uri, boolean allowCustom, boolean tryTelegraph) {
         if (context != null && uri != null) {
             Intent intent;
-            final int currentAccount = UserConfig.selectedAccount;
+            int currentAccount = UserConfig.selectedAccount;
             boolean[] forceBrowser = new boolean[]{false};
             boolean internalUri = isInternalUri(uri, forceBrowser);
             if (tryTelegraph) {
                 try {
                     if (uri.getHost().toLowerCase().equals("telegra.ph") || uri.toString().toLowerCase().contains("telegram.org/faq")) {
-                        final AlertDialog[] progressDialog = new AlertDialog[]{new AlertDialog(context, 1)};
+                        AlertDialog[] progressDialog = new AlertDialog[]{new AlertDialog(context, 1)};
                         TLObject req = new TL_messages_getWebPagePreview();
                         req.message = uri.toString();
-                        final Uri uri2 = uri;
-                        final Context context2 = context;
-                        final boolean z = allowCustom;
-                        final int sendRequest = ConnectionsManager.getInstance(UserConfig.selectedAccount).sendRequest(req, new RequestDelegate() {
-                            public void run(final TLObject response, TL_error error) {
-                                AndroidUtilities.runOnUIThread(new Runnable() {
-                                    public void run() {
-                                        try {
-                                            progressDialog[0].dismiss();
-                                        } catch (Throwable th) {
-                                        }
-                                        progressDialog[0] = null;
-                                        boolean ok = false;
-                                        if (response instanceof TL_messageMediaWebPage) {
-                                            TL_messageMediaWebPage webPage = response;
-                                            if ((webPage.webpage instanceof TL_webPage) && webPage.webpage.cached_page != null) {
-                                                NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.openArticle, webPage.webpage, uri2.toString());
-                                                ok = true;
-                                            }
-                                        }
-                                        if (!ok) {
-                                            Browser.openUrl(context2, uri2, z, false);
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                        AndroidUtilities.runOnUIThread(new Runnable() {
-                            public void run() {
-                                if (progressDialog[0] != null) {
-                                    try {
-                                        progressDialog[0].setMessage(LocaleController.getString("Loading", R.string.Loading));
-                                        progressDialog[0].setCanceledOnTouchOutside(false);
-                                        progressDialog[0].setCancelable(false);
-                                        progressDialog[0].setButton(-2, LocaleController.getString("Cancel", R.string.Cancel), new OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                ConnectionsManager.getInstance(UserConfig.selectedAccount).cancelRequest(sendRequest, true);
-                                                try {
-                                                    dialog.dismiss();
-                                                } catch (Throwable e) {
-                                                    FileLog.e(e);
-                                                }
-                                            }
-                                        });
-                                        progressDialog[0].show();
-                                    } catch (Exception e) {
-                                    }
-                                }
-                            }
-                        }, 1000);
+                        AndroidUtilities.runOnUIThread(new Browser$$Lambda$1(progressDialog, ConnectionsManager.getInstance(UserConfig.selectedAccount).sendRequest(req, new Browser$$Lambda$0(progressDialog, currentAccount, uri, context, allowCustom))), 1000);
                         return;
                     }
                 } catch (Exception e) {
@@ -310,8 +258,60 @@ public class Browser {
         }
     }
 
+    static final /* synthetic */ void lambda$null$0$Browser(AlertDialog[] progressDialog, TLObject response, int currentAccount, Uri uri, Context context, boolean allowCustom) {
+        try {
+            progressDialog[0].dismiss();
+        } catch (Throwable th) {
+        }
+        progressDialog[0] = null;
+        boolean ok = false;
+        if (response instanceof TL_messageMediaWebPage) {
+            TL_messageMediaWebPage webPage = (TL_messageMediaWebPage) response;
+            if ((webPage.webpage instanceof TL_webPage) && webPage.webpage.cached_page != null) {
+                NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.openArticle, webPage.webpage, uri.toString());
+                ok = true;
+            }
+        }
+        if (!ok) {
+            openUrl(context, uri, allowCustom, false);
+        }
+    }
+
+    static final /* synthetic */ void lambda$openUrl$3$Browser(AlertDialog[] progressDialog, int reqId) {
+        if (progressDialog[0] != null) {
+            try {
+                progressDialog[0].setMessage(LocaleController.getString("Loading", R.string.Loading));
+                progressDialog[0].setCanceledOnTouchOutside(false);
+                progressDialog[0].setCancelable(false);
+                progressDialog[0].setButton(-2, LocaleController.getString("Cancel", R.string.Cancel), new Browser$$Lambda$2(reqId));
+                progressDialog[0].show();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    static final /* synthetic */ void lambda$null$2$Browser(int reqId, DialogInterface dialog, int which) {
+        ConnectionsManager.getInstance(UserConfig.selectedAccount).cancelRequest(reqId, true);
+        try {
+            dialog.dismiss();
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
     public static boolean isInternalUrl(String url, boolean[] forceBrowser) {
         return isInternalUri(Uri.parse(url), forceBrowser);
+    }
+
+    public static boolean isPassportUrl(String url) {
+        try {
+            url = url.toLowerCase();
+            if (url.startsWith("tg:passport") || url.startsWith("tg://passport") || url.startsWith("tg:secureid") || (url.contains("resolve") && url.contains("domain=telegrampassport"))) {
+                return true;
+            }
+        } catch (Throwable th) {
+        }
+        return false;
     }
 
     public static boolean isInternalUri(Uri uri, boolean[] forceBrowser) {

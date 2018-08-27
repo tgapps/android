@@ -5,6 +5,10 @@ import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzc implements Creator<LabelValue> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new LabelValue[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
@@ -25,9 +29,5 @@ public final class zzc implements Creator<LabelValue> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new LabelValue(str2, str);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new LabelValue[i];
     }
 }

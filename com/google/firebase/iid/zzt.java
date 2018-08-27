@@ -1,9 +1,18 @@
 package com.google.firebase.iid;
 
-import android.os.IInterface;
-import android.os.Message;
-import android.os.RemoteException;
+import android.os.Bundle;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.Task;
+import java.io.IOException;
 
-interface zzt extends IInterface {
-    void send(Message message) throws RemoteException;
+final class zzt implements Continuation<Bundle, String> {
+    private final /* synthetic */ zzq zzbk;
+
+    zzt(zzq com_google_firebase_iid_zzq) {
+        this.zzbk = com_google_firebase_iid_zzq;
+    }
+
+    public final /* synthetic */ Object then(Task task) throws Exception {
+        return zzq.zza((Bundle) task.getResult(IOException.class));
+    }
 }

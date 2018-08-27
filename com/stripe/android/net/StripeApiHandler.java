@@ -1,5 +1,6 @@
 package com.stripe.android.net;
 
+import com.google.android.exoplayer2.C;
 import com.stripe.android.exception.APIConnectionException;
 import com.stripe.android.exception.APIException;
 import com.stripe.android.exception.AuthenticationException;
@@ -24,7 +25,6 @@ import java.util.Scanner;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import org.json.JSONObject;
-import org.telegram.messenger.exoplayer2.C;
 
 public class StripeApiHandler {
     private static final SSLSocketFactory SSL_SOCKET_FACTORY = new StripeSSLSocketFactory();

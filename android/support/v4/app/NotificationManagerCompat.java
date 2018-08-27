@@ -388,7 +388,7 @@ public final class NotificationManagerCompat {
         synchronized (sEnabledNotificationListenersLock) {
             if (enabledNotificationListeners != null) {
                 if (!enabledNotificationListeners.equals(sEnabledNotificationListeners)) {
-                    String[] components = enabledNotificationListeners.split(":");
+                    String[] components = enabledNotificationListeners.split(":", -1);
                     Set<String> packageNames = new HashSet(components.length);
                     for (String component : components) {
                         ComponentName componentName = ComponentName.unflattenFromString(component);

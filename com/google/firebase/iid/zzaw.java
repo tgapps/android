@@ -1,119 +1,62 @@
 package com.google.firebase.iid;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
+import android.text.TextUtils;
 import android.util.Log;
-import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-final class zzaw implements Runnable {
-    private final zzal zzak;
-    private final zzay zzan;
-    private final long zzcy;
-    private final WakeLock zzcz = ((PowerManager) getContext().getSystemService("power")).newWakeLock(1, "fiid-sync");
-    private final FirebaseInstanceId zzda;
+final class zzaw {
+    private static final long zzdc = TimeUnit.DAYS.toMillis(7);
+    private final long timestamp;
+    final String zzbn;
+    private final String zzdd;
 
-    zzaw(FirebaseInstanceId firebaseInstanceId, zzal com_google_firebase_iid_zzal, zzay com_google_firebase_iid_zzay, long j) {
-        this.zzda = firebaseInstanceId;
-        this.zzak = com_google_firebase_iid_zzal;
-        this.zzan = com_google_firebase_iid_zzay;
-        this.zzcy = j;
-        this.zzcz.setReferenceCounted(false);
+    private zzaw(String str, String str2, long j) {
+        this.zzbn = str;
+        this.zzdd = str2;
+        this.timestamp = j;
     }
 
-    private final boolean zzal() {
+    static zzaw zzi(String str) {
+        if (TextUtils.isEmpty(str)) {
+            return null;
+        }
+        if (!str.startsWith("{")) {
+            return new zzaw(str, null, 0);
+        }
         try {
-            if (!this.zzda.zzn()) {
-                this.zzda.zzo();
-            }
-            return true;
-        } catch (IOException e) {
-            String str = "FirebaseInstanceId";
-            String str2 = "Build channel failed: ";
-            String valueOf = String.valueOf(e.getMessage());
-            Log.e(str, valueOf.length() != 0 ? str2.concat(valueOf) : new String(str2));
-            return false;
+            JSONObject jSONObject = new JSONObject(str);
+            return new zzaw(jSONObject.getString("token"), jSONObject.getString("appVersion"), jSONObject.getLong("timestamp"));
+        } catch (JSONException e) {
+            String valueOf = String.valueOf(e);
+            Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 23).append("Failed to parse token: ").append(valueOf).toString());
+            return null;
         }
     }
 
-    private final boolean zzam() {
-        Exception e;
-        String str;
-        String valueOf;
-        zzav zzi = this.zzda.zzi();
-        if (zzi != null && !zzi.zzj(this.zzak.zzac())) {
-            return true;
-        }
-        String zzj;
+    static String zza(String str, String str2, long j) {
         try {
-            zzj = this.zzda.zzj();
-            if (zzj == null) {
-                Log.e("FirebaseInstanceId", "Token retrieval failed: null");
-                return false;
-            }
-            if (Log.isLoggable("FirebaseInstanceId", 3)) {
-                Log.d("FirebaseInstanceId", "Token successfully retrieved");
-            }
-            if (zzi != null && (zzi == null || zzj.equals(zzi.zzbh))) {
-                return true;
-            }
-            Context context = getContext();
-            Intent intent = new Intent("com.google.firebase.messaging.NEW_TOKEN");
-            intent.putExtra("token", zzj);
-            zzat.zzc(context, intent);
-            zzat.zzb(context, new Intent("com.google.firebase.iid.TOKEN_REFRESH"));
-            return true;
-        } catch (IOException e2) {
-            e = e2;
-            str = "FirebaseInstanceId";
-            zzj = "Token retrieval failed: ";
-            valueOf = String.valueOf(e.getMessage());
-            Log.e(str, valueOf.length() == 0 ? zzj.concat(valueOf) : new String(zzj));
-            return false;
-        } catch (SecurityException e3) {
-            e = e3;
-            str = "FirebaseInstanceId";
-            zzj = "Token retrieval failed: ";
-            valueOf = String.valueOf(e.getMessage());
-            if (valueOf.length() == 0) {
-            }
-            Log.e(str, valueOf.length() == 0 ? zzj.concat(valueOf) : new String(zzj));
-            return false;
+            JSONObject jSONObject = new JSONObject();
+            jSONObject.put("token", str);
+            jSONObject.put("appVersion", str2);
+            jSONObject.put("timestamp", j);
+            return jSONObject.toString();
+        } catch (JSONException e) {
+            String valueOf = String.valueOf(e);
+            Log.w("FirebaseInstanceId", new StringBuilder(String.valueOf(valueOf).length() + 24).append("Failed to encode token: ").append(valueOf).toString());
+            return null;
         }
     }
 
-    final Context getContext() {
-        return this.zzda.zzg().getApplicationContext();
-    }
-
-    public final void run() {
-        this.zzcz.acquire();
-        try {
-            this.zzda.zza(true);
-            if (!this.zzda.zzm()) {
-                this.zzda.zza(false);
-            } else if (zzan()) {
-                if (zzal() && zzam() && this.zzan.zza(this.zzda)) {
-                    this.zzda.zza(false);
-                } else {
-                    this.zzda.zza(this.zzcy);
-                }
-                this.zzcz.release();
-            } else {
-                new zzax(this).zzao();
-                this.zzcz.release();
-            }
-        } finally {
-            this.zzcz.release();
+    static String zza(zzaw com_google_firebase_iid_zzaw) {
+        if (com_google_firebase_iid_zzaw == null) {
+            return null;
         }
+        return com_google_firebase_iid_zzaw.zzbn;
     }
 
-    final boolean zzan() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getSystemService("connectivity");
-        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    final boolean zzj(String str) {
+        return System.currentTimeMillis() > this.timestamp + zzdc || !str.equals(this.zzdd);
     }
 }

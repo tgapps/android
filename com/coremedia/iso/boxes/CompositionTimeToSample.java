@@ -15,8 +15,8 @@ import org.aspectj.runtime.reflect.Factory;
 public class CompositionTimeToSample extends AbstractFullBox {
     static final /* synthetic */ boolean $assertionsDisabled = (!CompositionTimeToSample.class.desiredAssertionStatus());
     public static final String TYPE = "ctts";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
     List<Entry> entries = Collections.emptyList();
 
     public static class Entry {
@@ -49,7 +49,7 @@ public class CompositionTimeToSample extends AbstractFullBox {
         }
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("CompositionTimeToSample.java", CompositionTimeToSample.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getEntries", "com.coremedia.iso.boxes.CompositionTimeToSample", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.util.List"), 57);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setEntries", "com.coremedia.iso.boxes.CompositionTimeToSample", "java.util.List", "entries", TtmlNode.ANONYMOUS_REGION_ID, "void"), 61);

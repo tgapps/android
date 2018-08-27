@@ -1,11 +1,9 @@
 package com.google.android.gms.tasks;
 
 import com.google.android.gms.common.internal.Preconditions;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -67,20 +65,6 @@ public final class Tasks {
             return zzb(task);
         }
         throw new TimeoutException("Timed out waiting for Task");
-    }
-
-    public static <TResult> Task<TResult> call(Executor executor, Callable<TResult> callable) {
-        Preconditions.checkNotNull(executor, "Executor must not be null");
-        Preconditions.checkNotNull(callable, "Callback must not be null");
-        Task com_google_android_gms_tasks_zzu = new zzu();
-        executor.execute(new zzv(com_google_android_gms_tasks_zzu, callable));
-        return com_google_android_gms_tasks_zzu;
-    }
-
-    public static <TResult> Task<TResult> forException(Exception exception) {
-        Task com_google_android_gms_tasks_zzu = new zzu();
-        com_google_android_gms_tasks_zzu.setException(exception);
-        return com_google_android_gms_tasks_zzu;
     }
 
     public static <TResult> Task<TResult> forResult(TResult tResult) {

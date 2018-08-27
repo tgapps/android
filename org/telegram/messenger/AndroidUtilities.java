@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
@@ -14,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
@@ -65,6 +67,8 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import com.android.internal.telephony.ITelephony;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -90,8 +94,6 @@ import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.LocaleController.LocaleInfo;
 import org.telegram.messenger.SharedConfig.ProxyInfo;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.source.ExtractorMediaSource;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.TL_document;
@@ -119,6 +121,7 @@ public class AndroidUtilities {
     private static RectF bitmapRect;
     private static final Object callLock = new Object();
     private static ContentObserver callLogContentObserver;
+    private static CallReceiver callReceiver;
     public static DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
     public static float density = 1.0f;
     public static DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -607,8 +610,8 @@ Error: java.util.NoSuchElementException
         if (pathString == null) {
             return false;
         }
-        String path;
         while (true) {
+            String path;
             String newPath = Utilities.readlink(pathString);
             if (newPath != null && !newPath.equals(pathString)) {
                 pathString = newPath;
@@ -928,6 +931,21 @@ Error: java.util.NoSuchElementException
 
     public static void setWaitingForCall(boolean value) {
         synchronized (callLock) {
+            if (value) {
+                try {
+                    if (callReceiver == null) {
+                        IntentFilter filter = new IntentFilter("android.intent.action.PHONE_STATE");
+                        Context context = ApplicationLoader.applicationContext;
+                        BroadcastReceiver callReceiver = new CallReceiver();
+                        callReceiver = callReceiver;
+                        context.registerReceiver(callReceiver, filter);
+                    }
+                } catch (Exception e) {
+                }
+            } else if (callReceiver != null) {
+                ApplicationLoader.applicationContext.unregisterReceiver(callReceiver);
+                callReceiver = null;
+            }
             waitingForCall = value;
         }
     }
@@ -2364,5 +2382,13 @@ Error: java.util.NoSuchElementException
             }
         });
         builder.show();
+    }
+
+    public static String getSystemProperty(String key) {
+        try {
+            return (String) Class.forName("android.os.SystemProperties").getMethod("get", new Class[]{String.class}).invoke(null, new Object[]{key});
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

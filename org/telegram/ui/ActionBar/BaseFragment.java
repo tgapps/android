@@ -345,7 +345,7 @@ public class BaseFragment {
         return showDialog(dialog, false, onDismissListener);
     }
 
-    public Dialog showDialog(Dialog dialog, boolean allowInTransition, final OnDismissListener onDismissListener) {
+    public Dialog showDialog(Dialog dialog, boolean allowInTransition, OnDismissListener onDismissListener) {
         Dialog dialog2 = null;
         if (!(dialog == null || this.parentLayout == null || this.parentLayout.animationInProgress || this.parentLayout.startedTracking || (!allowInTransition && this.parentLayout.checkTransitionAnimation()))) {
             try {
@@ -359,15 +359,7 @@ public class BaseFragment {
             try {
                 this.visibleDialog = dialog;
                 this.visibleDialog.setCanceledOnTouchOutside(true);
-                this.visibleDialog.setOnDismissListener(new OnDismissListener() {
-                    public void onDismiss(DialogInterface dialog) {
-                        if (onDismissListener != null) {
-                            onDismissListener.onDismiss(dialog);
-                        }
-                        BaseFragment.this.onDialogDismiss(BaseFragment.this.visibleDialog);
-                        BaseFragment.this.visibleDialog = null;
-                    }
-                });
+                this.visibleDialog.setOnDismissListener(new BaseFragment$$Lambda$0(this, onDismissListener));
                 this.visibleDialog.show();
                 dialog2 = this.visibleDialog;
             } catch (Throwable e2) {
@@ -375,6 +367,14 @@ public class BaseFragment {
             }
         }
         return dialog2;
+    }
+
+    final /* synthetic */ void lambda$showDialog$0$BaseFragment(OnDismissListener onDismissListener, DialogInterface dialog1) {
+        if (onDismissListener != null) {
+            onDismissListener.onDismiss(dialog1);
+        }
+        onDialogDismiss(this.visibleDialog);
+        this.visibleDialog = null;
     }
 
     protected void onDialogDismiss(Dialog dialog) {

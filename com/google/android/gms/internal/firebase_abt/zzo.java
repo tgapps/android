@@ -1,9 +1,7 @@
 package com.google.android.gms.internal.firebase_abt;
 
 import java.io.IOException;
-import org.telegram.messenger.exoplayer2.RendererCapabilities;
 import org.telegram.messenger.voip.VoIPService;
-import org.telegram.tgnet.TLRPC;
 
 public final class zzo extends zzd<zzo> {
     public String zzaq;
@@ -50,7 +48,7 @@ public final class zzo extends zzd<zzo> {
                 case 18:
                     this.zzar = com_google_android_gms_internal_firebase_abt_zza.readString();
                     continue;
-                case RendererCapabilities.ADAPTIVE_SUPPORT_MASK /*24*/:
+                case 24:
                     this.zzas = com_google_android_gms_internal_firebase_abt_zza.zze();
                     continue;
                 case 34:
@@ -71,7 +69,7 @@ public final class zzo extends zzd<zzo> {
                 case VoIPService.CALL_MAX_LAYER /*74*/:
                     this.zzay = com_google_android_gms_internal_firebase_abt_zza.readString();
                     continue;
-                case TLRPC.LAYER /*82*/:
+                case 82:
                     this.zzaz = com_google_android_gms_internal_firebase_abt_zza.readString();
                     continue;
                 case 90:

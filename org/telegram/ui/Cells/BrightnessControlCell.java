@@ -12,7 +12,6 @@ import org.telegram.messenger.beta.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.SeekBarView;
-import org.telegram.ui.Components.SeekBarView.SeekBarViewDelegate;
 
 public class BrightnessControlCell extends FrameLayout {
     private ImageView leftImageView;
@@ -33,11 +32,7 @@ public class BrightnessControlCell extends FrameLayout {
             }
         };
         this.seekBarView.setReportChanges(true);
-        this.seekBarView.setDelegate(new SeekBarViewDelegate() {
-            public void onSeekBarDrag(float progress) {
-                BrightnessControlCell.this.didChangedValue(progress);
-            }
-        });
+        this.seekBarView.setDelegate(new BrightnessControlCell$$Lambda$0(this));
         addView(this.seekBarView, LayoutHelper.createFrame(-1, 30.0f, 51, 58.0f, 9.0f, 58.0f, 0.0f));
         this.rightImageView = new ImageView(context);
         this.rightImageView.setImageResource(R.drawable.brightness_high);

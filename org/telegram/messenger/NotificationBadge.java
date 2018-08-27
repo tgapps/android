@@ -13,13 +13,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import com.google.android.exoplayer2.C;
 import java.io.Closeable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.telegram.messenger.exoplayer2.C;
 
 public class NotificationBadge {
     private static final List<Class<? extends Badger>> BADGERS = new LinkedList();

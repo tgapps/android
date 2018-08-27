@@ -8,12 +8,12 @@ final class zzl implements Creator<zzk> {
     zzl() {
     }
 
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new zzk[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         IBinder readStrongBinder = parcel.readStrongBinder();
         return readStrongBinder != null ? new zzk(readStrongBinder) : null;
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new zzk[i];
     }
 }

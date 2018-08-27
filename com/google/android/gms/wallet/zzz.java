@@ -7,6 +7,10 @@ import com.google.android.gms.identity.intents.model.CountrySpecification;
 import java.util.ArrayList;
 
 public final class zzz implements Creator<MaskedWalletRequest> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new MaskedWalletRequest[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
@@ -87,9 +91,5 @@ public final class zzz implements Creator<MaskedWalletRequest> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new MaskedWalletRequest(str, z, z2, z3, str2, str3, str4, cart, z4, z5, countrySpecificationArr, z6, z7, arrayList, paymentMethodTokenizationParameters, arrayList2, str5);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new MaskedWalletRequest[i];
     }
 }

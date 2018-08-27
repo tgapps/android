@@ -13,17 +13,17 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class MediaHeaderBox extends AbstractFullBox {
     public static final String TYPE = "mdhd";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_10 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_7 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_8 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_9 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_10 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_7 = null;
+    private static final StaticPart ajc$tjp_8 = null;
+    private static final StaticPart ajc$tjp_9 = null;
     private Date creationTime = new Date();
     private long duration;
     private String language = "eng";
@@ -34,7 +34,7 @@ public class MediaHeaderBox extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("MediaHeaderBox.java", MediaHeaderBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getCreationTime", "com.coremedia.iso.boxes.MediaHeaderBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.util.Date"), 46);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getModificationTime", "com.coremedia.iso.boxes.MediaHeaderBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.util.Date"), 50);

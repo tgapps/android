@@ -186,7 +186,7 @@ public class DiffUtil {
                     dispatchAdditions(postponedUpdates, batchingCallback, endX, posNew - endY, endY);
                 }
                 for (int i = snakeSize - 1; i >= 0; i--) {
-                    if ((this.mOldItemStatuses[snake.x + i] & FLAG_MASK) == 2) {
+                    if ((this.mOldItemStatuses[snake.x + i] & 31) == 2) {
                         batchingCallback.onChanged(snake.x + i, 1, this.mCallback.getChangePayload(snake.x + i, snake.y + i));
                     }
                 }
@@ -214,7 +214,7 @@ public class DiffUtil {
         private void dispatchAdditions(List<PostponedUpdate> postponedUpdates, ListUpdateCallback updateCallback, int start, int count, int globalIndex) {
             if (this.mDetectMoves) {
                 for (int i = count - 1; i >= 0; i--) {
-                    int status = this.mNewItemStatuses[globalIndex + i] & FLAG_MASK;
+                    int status = this.mNewItemStatuses[globalIndex + i] & 31;
                     switch (status) {
                         case 0:
                             updateCallback.onInserted(start, 1);
@@ -246,7 +246,7 @@ public class DiffUtil {
         private void dispatchRemovals(List<PostponedUpdate> postponedUpdates, ListUpdateCallback updateCallback, int start, int count, int globalIndex) {
             if (this.mDetectMoves) {
                 for (int i = count - 1; i >= 0; i--) {
-                    int status = this.mOldItemStatuses[globalIndex + i] & FLAG_MASK;
+                    int status = this.mOldItemStatuses[globalIndex + i] & 31;
                     switch (status) {
                         case 0:
                             updateCallback.onRemoved(start + i, 1);
@@ -406,10 +406,10 @@ public class DiffUtil {
         boolean checkInFwd = delta % 2 != 0;
         int d = 0;
         while (d <= dLimit) {
-            boolean removal;
             int k = -d;
             while (k <= d) {
                 int x;
+                boolean removal;
                 if (k == (-d) || (k != d && forward[(kOffset + k) - 1] < forward[(kOffset + k) + 1])) {
                     x = forward[(kOffset + k) + 1];
                     removal = false;

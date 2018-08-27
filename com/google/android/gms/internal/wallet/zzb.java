@@ -17,10 +17,6 @@ public class zzb extends Binder implements IInterface {
         return this;
     }
 
-    protected boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
-        return false;
-    }
-
     public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
         boolean onTransact;
         if (i > 16777215) {
@@ -29,6 +25,13 @@ public class zzb extends Binder implements IInterface {
             parcel.enforceInterface(getInterfaceDescriptor());
             onTransact = false;
         }
-        return onTransact ? true : dispatchTransaction(i, parcel, parcel2, i2);
+        if (onTransact) {
+            return true;
+        }
+        return dispatchTransaction(i, parcel, parcel2, i2);
+    }
+
+    protected boolean dispatchTransaction(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+        return false;
     }
 }

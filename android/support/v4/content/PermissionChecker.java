@@ -1,7 +1,6 @@
 package android.support.v4.content;
 
 import android.content.Context;
-import android.os.Binder;
 import android.os.Process;
 import android.support.v4.app.AppOpsManagerCompat;
 
@@ -24,7 +23,7 @@ public final class PermissionChecker {
         return AppOpsManagerCompat.noteProxyOpNoThrow(context, op, packageName) != 0 ? -2 : 0;
     }
 
-    public static int checkCallingOrSelfPermission(Context context, String permission) {
-        return checkPermission(context, permission, Binder.getCallingPid(), Binder.getCallingUid(), Binder.getCallingPid() == Process.myPid() ? context.getPackageName() : null);
+    public static int checkSelfPermission(Context context, String permission) {
+        return checkPermission(context, permission, Process.myPid(), Process.myUid(), context.getPackageName());
     }
 }

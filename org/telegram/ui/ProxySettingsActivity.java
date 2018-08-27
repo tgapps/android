@@ -25,6 +25,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.extractor.ts.TsExtractor;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
@@ -35,8 +37,6 @@ import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.SharedConfig.ProxyInfo;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.ui.ActionBar.ActionBar.ActionBarMenuOnItemClick;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
@@ -416,7 +416,7 @@ public class ProxySettingsActivity extends BaseFragment {
                         shareIntent.setType("text/plain");
                         shareIntent.putExtra("android.intent.extra.TEXT", url + params.toString());
                         Intent chooserIntent = Intent.createChooser(shareIntent, LocaleController.getString("ShareLink", R.string.ShareLink));
-                        chooserIntent.setFlags(268435456);
+                        chooserIntent.setFlags(C.ENCODING_PCM_MU_LAW);
                         ProxySettingsActivity.this.getParentActivity().startActivity(chooserIntent);
                     }
                 } catch (Exception e) {

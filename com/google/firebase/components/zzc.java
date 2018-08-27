@@ -11,34 +11,37 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class zzc {
-    private final Context zza;
-    private final zzb zzb;
+/* compiled from: com.google.firebase:firebase-common@@16.0.1 */
+public final class zzc<T> {
+    private final T zza;
+    private final zzb<T> zzb;
 
-    interface zzb {
-        List<String> zza(Context context);
+    /* compiled from: com.google.firebase:firebase-common@@16.0.1 */
+    interface zzb<T> {
+        List<String> zza(T t);
     }
 
-    static class zza implements zzb {
+    /* compiled from: com.google.firebase:firebase-common@@16.0.1 */
+    static class zza implements zzb<Context> {
         private zza() {
         }
 
-        public final List<String> zza(Context context) {
-            Bundle zzb = zzb(context);
-            if (zzb == null) {
+        public final /* synthetic */ List zza(Object obj) {
+            Bundle zza = zza((Context) obj);
+            if (zza == null) {
                 Log.w("ComponentDiscovery", "Could not retrieve metadata, returning empty list of registrars.");
                 return Collections.emptyList();
             }
-            List<String> arrayList = new ArrayList();
-            for (String str : zzb.keySet()) {
-                if ("com.google.firebase.components.ComponentRegistrar".equals(zzb.get(str)) && str.startsWith("com.google.firebase.components:")) {
+            List arrayList = new ArrayList();
+            for (String str : zza.keySet()) {
+                if ("com.google.firebase.components.ComponentRegistrar".equals(zza.get(str)) && str.startsWith("com.google.firebase.components:")) {
                     arrayList.add(str.substring(31));
                 }
             }
             return arrayList;
         }
 
-        private static Bundle zzb(Context context) {
+        private static Bundle zza(Context context) {
             Bundle bundle = null;
             try {
                 PackageManager packageManager = context.getPackageManager();
@@ -59,13 +62,13 @@ public final class zzc {
         }
     }
 
-    public zzc(Context context) {
-        this(context, new zza());
+    public static zzc<Context> zza(Context context) {
+        return new zzc(context, new zza());
     }
 
-    private zzc(Context context, zzb com_google_firebase_components_zzc_zzb) {
-        this.zza = context;
-        this.zzb = com_google_firebase_components_zzc_zzb;
+    private zzc(T t, zzb<T> com_google_firebase_components_zzc_zzb_T) {
+        this.zza = t;
+        this.zzb = com_google_firebase_components_zzc_zzb_T;
     }
 
     public final List<ComponentRegistrar> zza() {

@@ -25,17 +25,7 @@ public abstract class zzb extends Service {
         this.zzk = 0;
     }
 
-    private final void zza(Intent intent) {
-        if (intent != null) {
-            WakefulBroadcastReceiver.completeWakefulIntent(intent);
-        }
-        synchronized (this.lock) {
-            this.zzk--;
-            if (this.zzk == 0) {
-                stopSelfResult(this.zzj);
-            }
-        }
-    }
+    public abstract void zzd(Intent intent);
 
     public final synchronized IBinder onBind(Intent intent) {
         if (Log.isLoggable("EnhancedIntentService", 3)) {
@@ -65,6 +55,18 @@ public abstract class zzb extends Service {
         }
     }
 
+    private final void zza(Intent intent) {
+        if (intent != null) {
+            WakefulBroadcastReceiver.completeWakefulIntent(intent);
+        }
+        synchronized (this.lock) {
+            this.zzk--;
+            if (this.zzk == 0) {
+                stopSelfResult(this.zzj);
+            }
+        }
+    }
+
     protected Intent zzb(Intent intent) {
         return intent;
     }
@@ -72,6 +74,4 @@ public abstract class zzb extends Service {
     public boolean zzc(Intent intent) {
         return false;
     }
-
-    public abstract void zzd(Intent intent);
 }

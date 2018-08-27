@@ -1,5 +1,6 @@
 package com.google.android.gms.internal.config;
 
+import com.googlecode.mp4parser.authoring.tracks.h265.NalUnitTypes;
 import java.io.IOException;
 
 public final class zzaw extends zzbb<zzaw> {
@@ -93,7 +94,7 @@ public final class zzaw extends zzbb<zzaw> {
                     }
                     com_google_android_gms_internal_config_zzay.zza(this.zzbq);
                     continue;
-                case 26:
+                case NalUnitTypes.NAL_TYPE_RSV_VCL26 /*26*/:
                     if (this.zzbr == null) {
                         this.zzbr = new zzas();
                     }

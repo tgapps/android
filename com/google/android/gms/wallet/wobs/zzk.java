@@ -5,6 +5,10 @@ import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzk implements Creator<TimeInterval> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new TimeInterval[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         long j = 0;
@@ -25,9 +29,5 @@ public final class zzk implements Creator<TimeInterval> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new TimeInterval(j2, j);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new TimeInterval[i];
     }
 }

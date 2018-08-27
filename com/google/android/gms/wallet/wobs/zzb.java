@@ -8,6 +8,10 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 
 public final class zzb implements Creator<CommonWalletObject> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new CommonWalletObject[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
@@ -96,9 +100,5 @@ public final class zzb implements Creator<CommonWalletObject> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new CommonWalletObject(str, str2, str3, str4, str5, str6, str7, str8, i, newArrayList, timeInterval, newArrayList2, str9, str10, newArrayList3, z, newArrayList4, newArrayList5, newArrayList6);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new CommonWalletObject[i];
     }
 }

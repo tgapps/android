@@ -12,15 +12,15 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class RatingBox extends AbstractFullBox {
     public static final String TYPE = "rtng";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_7 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_8 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_7 = null;
+    private static final StaticPart ajc$tjp_8 = null;
     private String language;
     private String ratingCriteria;
     private String ratingEntity;
@@ -30,7 +30,7 @@ public class RatingBox extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("RatingBox.java", RatingBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setRatingEntity", "com.coremedia.iso.boxes.RatingBox", "java.lang.String", "ratingEntity", TtmlNode.ANONYMOUS_REGION_ID, "void"), 46);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setRatingCriteria", "com.coremedia.iso.boxes.RatingBox", "java.lang.String", "ratingCriteria", TtmlNode.ANONYMOUS_REGION_ID, "void"), 50);

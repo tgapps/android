@@ -1,5 +1,6 @@
 package com.google.firebase.components;
 
+import com.google.android.gms.common.internal.Preconditions;
 import com.google.firebase.events.Event;
 import com.google.firebase.events.EventHandler;
 import com.google.firebase.events.Publisher;
@@ -14,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
+/* compiled from: com.google.firebase:firebase-common@@16.0.1 */
 class zzf implements Publisher, Subscriber {
     private final Map<Class<?>, ConcurrentHashMap<EventHandler<Object>, Executor>> zza = new HashMap();
     private Queue<Event<?>> zzb = new ArrayDeque();
@@ -66,6 +68,20 @@ class zzf implements Publisher, Subscriber {
         Map map;
         map = (Map) this.zza.get(event.getType());
         return map == null ? Collections.emptySet() : map.entrySet();
+    }
+
+    public synchronized <T> void subscribe(Class<T> type, Executor executor, EventHandler<? super T> handler) {
+        Preconditions.checkNotNull(type);
+        Preconditions.checkNotNull(handler);
+        Preconditions.checkNotNull(executor);
+        if (!this.zza.containsKey(type)) {
+            this.zza.put(type, new ConcurrentHashMap());
+        }
+        ((ConcurrentHashMap) this.zza.get(type)).put(handler, executor);
+    }
+
+    public <T> void subscribe(Class<T> type, EventHandler<? super T> handler) {
+        subscribe(type, this.zzc, handler);
     }
 
     final void zza() {

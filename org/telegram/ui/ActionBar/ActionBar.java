@@ -17,7 +17,6 @@ import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.MeasureSpec;
-import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
@@ -81,13 +80,13 @@ public class ActionBar extends FrameLayout {
         this.addToContainer = true;
         this.interceptTouches = true;
         this.castShadows = true;
-        setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (ActionBar.this.titleActionRunnable != null) {
-                    ActionBar.this.titleActionRunnable.run();
-                }
-            }
-        });
+        setOnClickListener(new ActionBar$$Lambda$0(this));
+    }
+
+    final /* synthetic */ void lambda$new$0$ActionBar(View v) {
+        if (this.titleActionRunnable != null) {
+            this.titleActionRunnable.run();
+        }
     }
 
     private void createBackButtonImage() {
@@ -100,15 +99,15 @@ public class ActionBar extends FrameLayout {
             }
             this.backButtonImageView.setPadding(AndroidUtilities.dp(1.0f), 0, 0, 0);
             addView(this.backButtonImageView, LayoutHelper.createFrame(54, 54, 51));
-            this.backButtonImageView.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    if (!ActionBar.this.actionModeVisible && ActionBar.this.isSearchFieldVisible) {
-                        ActionBar.this.closeSearchField();
-                    } else if (ActionBar.this.actionBarMenuOnItemClick != null) {
-                        ActionBar.this.actionBarMenuOnItemClick.onItemClick(-1);
-                    }
-                }
-            });
+            this.backButtonImageView.setOnClickListener(new ActionBar$$Lambda$1(this));
+        }
+    }
+
+    final /* synthetic */ void lambda$createBackButtonImage$1$ActionBar(View v) {
+        if (!this.actionModeVisible && this.isSearchFieldVisible) {
+            closeSearchField();
+        } else if (this.actionBarMenuOnItemClick != null) {
+            this.actionBarMenuOnItemClick.onItemClick(-1);
         }
     }
 

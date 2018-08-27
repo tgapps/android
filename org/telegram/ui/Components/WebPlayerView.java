@@ -27,17 +27,18 @@ import android.view.TextureView;
 import android.view.TextureView.SurfaceTextureListener;
 import android.view.View;
 import android.view.View.MeasureSpec;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.webkit.JavascriptInterface;
-import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.util.MimeTypes;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -59,9 +60,6 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.ui.AspectRatioFrameLayout;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.tgnet.TLRPC.Photo;
 import org.telegram.tgnet.TLRPC.PhotoSize;
 import org.telegram.ui.ActionBar.Theme;
@@ -200,11 +198,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
         private int duration;
         private StaticLayout durationLayout;
         private int durationWidth;
-        private Runnable hideRunnable = new Runnable() {
-            public void run() {
-                ControlsView.this.show(false, true);
-            }
-        };
+        private Runnable hideRunnable = new WebPlayerView$ControlsView$$Lambda$0(this);
         private ImageReceiver imageReceiver;
         private boolean isVisible = true;
         private int lastProgressX;
@@ -215,6 +209,10 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
         private Paint progressPaint;
         private boolean progressPressed;
         private TextPaint textPaint;
+
+        final /* synthetic */ void lambda$new$0$WebPlayerView$ControlsView() {
+            show(false, true);
+        }
 
         public ControlsView(Context context) {
             super(context);
@@ -721,7 +719,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
             }
         }
 
-        private String extractFunction(String funcName) throws Exception {
+        private String extractFunction(String funcName) {
             try {
                 String quote = Pattern.quote(funcName);
                 Matcher matcher = Pattern.compile(String.format(Locale.US, "(?x)(?:function\\s+%s|[{;,]\\s*%s\\s*=\\s*function|var\\s+%s\\s*=\\s*function)\\s*\\(([^)]*)\\)\\s*\\{([^}]+)\\}", new Object[]{quote, quote, quote})).matcher(this.jsCode);
@@ -1130,25 +1128,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
                                 functionCode = functionCode + "window." + WebPlayerView.this.interfaceName + ".returnResultToJava(" + functionName + "('" + this.sig.substring(3) + "'));";
                             }
                             try {
-                                final String str2 = functionCode;
-                                AndroidUtilities.runOnUIThread(new Runnable() {
-                                    public void run() {
-                                        if (VERSION.SDK_INT >= 21) {
-                                            WebPlayerView.this.webView.evaluateJavascript(str2, new ValueCallback<String>() {
-                                                public void onReceiveValue(String value) {
-                                                    YoutubeVideoTask.this.result[0] = YoutubeVideoTask.this.result[0].replace(YoutubeVideoTask.this.sig, "/signature/" + value.substring(1, value.length() - 1));
-                                                    YoutubeVideoTask.this.countDownLatch.countDown();
-                                                }
-                                            });
-                                            return;
-                                        }
-                                        try {
-                                            WebPlayerView.this.webView.loadUrl("data:text/html;charset=utf-8;base64," + Base64.encodeToString(("<script>" + str2 + "</script>").getBytes(C.UTF8_NAME), 0));
-                                        } catch (Throwable e) {
-                                            FileLog.e(e);
-                                        }
-                                    }
-                                });
+                                AndroidUtilities.runOnUIThread(new WebPlayerView$YoutubeVideoTask$$Lambda$0(this, functionCode));
                                 this.countDownLatch.await();
                                 encrypted = false;
                             } catch (Throwable e222222) {
@@ -1162,6 +1142,23 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
                 return null;
             }
             return this.result;
+        }
+
+        final /* synthetic */ void lambda$doInBackground$1$WebPlayerView$YoutubeVideoTask(String functionCodeFinal) {
+            if (VERSION.SDK_INT >= 21) {
+                WebPlayerView.this.webView.evaluateJavascript(functionCodeFinal, new WebPlayerView$YoutubeVideoTask$$Lambda$1(this));
+                return;
+            }
+            try {
+                WebPlayerView.this.webView.loadUrl("data:text/html;charset=utf-8;base64," + Base64.encodeToString(("<script>" + functionCodeFinal + "</script>").getBytes(C.UTF8_NAME), 0));
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
+        }
+
+        final /* synthetic */ void lambda$null$0$WebPlayerView$YoutubeVideoTask(String value) {
+            this.result[0] = this.result[0].replace(this.sig, "/signature/" + value.substring(1, value.length() - 1));
+            this.countDownLatch.countDown();
         }
 
         private void onInterfaceResult(String value) {
@@ -1591,13 +1588,13 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
                                     WebPlayerView.this.currentBitmap = null;
                                 }
                             }
-                            AndroidUtilities.runOnUIThread(new Runnable() {
-                                public void run() {
-                                    WebPlayerView.this.delegate.onInlineSurfaceTextureReady();
-                                }
-                            });
+                            AndroidUtilities.runOnUIThread(new WebPlayerView$2$1$$Lambda$0(this));
                             WebPlayerView.this.waitingForFirstTextureUpload = 0;
                             return true;
+                        }
+
+                        final /* synthetic */ void lambda$onPreDraw$0$WebPlayerView$2$1() {
+                            WebPlayerView.this.delegate.onInlineSurfaceTextureReady();
                         }
                     });
                     WebPlayerView.this.changedTextureView.invalidate();
@@ -1669,13 +1666,7 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
         addView(this.aspectRatioFrameLayout, LayoutHelper.createFrame(-1, -1, 17));
         this.interfaceName = "JavaScriptInterface";
         this.webView = new WebView(context);
-        this.webView.addJavascriptInterface(new JavaScriptInterface(new CallJavaResultInterface() {
-            public void jsCallFinished(String value) {
-                if (WebPlayerView.this.currentTask != null && !WebPlayerView.this.currentTask.isCancelled() && (WebPlayerView.this.currentTask instanceof YoutubeVideoTask)) {
-                    ((YoutubeVideoTask) WebPlayerView.this.currentTask).onInterfaceResult(value);
-                }
-            }
-        }), this.interfaceName);
+        this.webView.addJavascriptInterface(new JavaScriptInterface(new WebPlayerView$$Lambda$0(this)), this.interfaceName);
         WebSettings webSettings = this.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDefaultTextEncodingName("utf-8");
@@ -1711,104 +1702,110 @@ public class WebPlayerView extends ViewGroup implements OnAudioFocusChangeListen
         this.fullscreenButton = new ImageView(context);
         this.fullscreenButton.setScaleType(ScaleType.CENTER);
         this.controlsView.addView(this.fullscreenButton, LayoutHelper.createFrame(56, 56.0f, 85, 0.0f, 0.0f, 0.0f, 5.0f));
-        this.fullscreenButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (WebPlayerView.this.initied && !WebPlayerView.this.changingTextureView && !WebPlayerView.this.switchingInlineMode && WebPlayerView.this.firstFrameRendered) {
-                    WebPlayerView.this.inFullscreen = !WebPlayerView.this.inFullscreen;
-                    WebPlayerView.this.updateFullscreenState(true);
-                }
-            }
-        });
+        this.fullscreenButton.setOnClickListener(new WebPlayerView$$Lambda$1(this));
         this.playButton = new ImageView(context);
         this.playButton.setScaleType(ScaleType.CENTER);
         this.controlsView.addView(this.playButton, LayoutHelper.createFrame(48, 48, 17));
-        this.playButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (WebPlayerView.this.initied && WebPlayerView.this.playVideoUrl != null) {
-                    if (!WebPlayerView.this.videoPlayer.isPlayerPrepared()) {
-                        WebPlayerView.this.preparePlayer();
-                    }
-                    if (WebPlayerView.this.videoPlayer.isPlaying()) {
-                        WebPlayerView.this.videoPlayer.pause();
-                    } else {
-                        WebPlayerView.this.isCompleted = false;
-                        WebPlayerView.this.videoPlayer.play();
-                    }
-                    WebPlayerView.this.updatePlayButton();
-                }
-            }
-        });
+        this.playButton.setOnClickListener(new WebPlayerView$$Lambda$2(this));
         if (allowInline) {
             this.inlineButton = new ImageView(context);
             this.inlineButton.setScaleType(ScaleType.CENTER);
             this.controlsView.addView(this.inlineButton, LayoutHelper.createFrame(56, 48, 53));
-            this.inlineButton.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    if (WebPlayerView.this.textureView != null && WebPlayerView.this.delegate.checkInlinePermissions() && !WebPlayerView.this.changingTextureView && !WebPlayerView.this.switchingInlineMode && WebPlayerView.this.firstFrameRendered) {
-                        WebPlayerView.this.switchingInlineMode = true;
-                        if (WebPlayerView.this.isInline) {
-                            ViewGroup parent = (ViewGroup) WebPlayerView.this.aspectRatioFrameLayout.getParent();
-                            if (parent != WebPlayerView.this) {
-                                if (parent != null) {
-                                    parent.removeView(WebPlayerView.this.aspectRatioFrameLayout);
-                                }
-                                WebPlayerView.this.addView(WebPlayerView.this.aspectRatioFrameLayout, 0, LayoutHelper.createFrame(-1, -1, 17));
-                                WebPlayerView.this.aspectRatioFrameLayout.measure(MeasureSpec.makeMeasureSpec(WebPlayerView.this.getMeasuredWidth(), 1073741824), MeasureSpec.makeMeasureSpec(WebPlayerView.this.getMeasuredHeight() - AndroidUtilities.dp(10.0f), 1073741824));
-                            }
-                            if (WebPlayerView.this.currentBitmap != null) {
-                                WebPlayerView.this.currentBitmap.recycle();
-                                WebPlayerView.this.currentBitmap = null;
-                            }
-                            WebPlayerView.this.changingTextureView = true;
-                            WebPlayerView.this.isInline = false;
-                            WebPlayerView.this.updatePlayButton();
-                            WebPlayerView.this.updateShareButton();
-                            WebPlayerView.this.updateFullscreenButton();
-                            WebPlayerView.this.updateInlineButton();
-                            WebPlayerView.this.textureView.setVisibility(4);
-                            if (WebPlayerView.this.textureViewContainer != null) {
-                                WebPlayerView.this.textureViewContainer.addView(WebPlayerView.this.textureView);
-                            } else {
-                                WebPlayerView.this.aspectRatioFrameLayout.addView(WebPlayerView.this.textureView);
-                            }
-                            parent = (ViewGroup) WebPlayerView.this.controlsView.getParent();
-                            if (parent != WebPlayerView.this) {
-                                if (parent != null) {
-                                    parent.removeView(WebPlayerView.this.controlsView);
-                                }
-                                if (WebPlayerView.this.textureViewContainer != null) {
-                                    WebPlayerView.this.textureViewContainer.addView(WebPlayerView.this.controlsView);
-                                } else {
-                                    WebPlayerView.this.addView(WebPlayerView.this.controlsView, 1);
-                                }
-                            }
-                            WebPlayerView.this.controlsView.show(false, false);
-                            WebPlayerView.this.delegate.prepareToSwitchInlineMode(false, null, WebPlayerView.this.aspectRatioFrameLayout.getAspectRatio(), WebPlayerView.this.allowInlineAnimation);
-                            return;
-                        }
-                        WebPlayerView.this.inFullscreen = false;
-                        WebPlayerView.this.delegate.prepareToSwitchInlineMode(true, WebPlayerView.this.switchToInlineRunnable, WebPlayerView.this.aspectRatioFrameLayout.getAspectRatio(), WebPlayerView.this.allowInlineAnimation);
-                    }
-                }
-            });
+            this.inlineButton.setOnClickListener(new WebPlayerView$$Lambda$3(this));
         }
         if (allowShare) {
             this.shareButton = new ImageView(context);
             this.shareButton.setScaleType(ScaleType.CENTER);
             this.shareButton.setImageResource(R.drawable.ic_share_video);
             this.controlsView.addView(this.shareButton, LayoutHelper.createFrame(56, 48, 53));
-            this.shareButton.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    if (WebPlayerView.this.delegate != null) {
-                        WebPlayerView.this.delegate.onSharePressed();
-                    }
-                }
-            });
+            this.shareButton.setOnClickListener(new WebPlayerView$$Lambda$4(this));
         }
         updatePlayButton();
         updateFullscreenButton();
         updateInlineButton();
         updateShareButton();
+    }
+
+    final /* synthetic */ void lambda$new$0$WebPlayerView(String value) {
+        if (this.currentTask != null && !this.currentTask.isCancelled() && (this.currentTask instanceof YoutubeVideoTask)) {
+            ((YoutubeVideoTask) this.currentTask).onInterfaceResult(value);
+        }
+    }
+
+    final /* synthetic */ void lambda$new$1$WebPlayerView(View v) {
+        if (this.initied && !this.changingTextureView && !this.switchingInlineMode && this.firstFrameRendered) {
+            this.inFullscreen = !this.inFullscreen;
+            updateFullscreenState(true);
+        }
+    }
+
+    final /* synthetic */ void lambda$new$2$WebPlayerView(View v) {
+        if (this.initied && this.playVideoUrl != null) {
+            if (!this.videoPlayer.isPlayerPrepared()) {
+                preparePlayer();
+            }
+            if (this.videoPlayer.isPlaying()) {
+                this.videoPlayer.pause();
+            } else {
+                this.isCompleted = false;
+                this.videoPlayer.play();
+            }
+            updatePlayButton();
+        }
+    }
+
+    final /* synthetic */ void lambda$new$3$WebPlayerView(View v) {
+        if (this.textureView != null && this.delegate.checkInlinePermissions() && !this.changingTextureView && !this.switchingInlineMode && this.firstFrameRendered) {
+            this.switchingInlineMode = true;
+            if (this.isInline) {
+                ViewGroup parent = (ViewGroup) this.aspectRatioFrameLayout.getParent();
+                if (parent != this) {
+                    if (parent != null) {
+                        parent.removeView(this.aspectRatioFrameLayout);
+                    }
+                    addView(this.aspectRatioFrameLayout, 0, LayoutHelper.createFrame(-1, -1, 17));
+                    this.aspectRatioFrameLayout.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), 1073741824), MeasureSpec.makeMeasureSpec(getMeasuredHeight() - AndroidUtilities.dp(10.0f), 1073741824));
+                }
+                if (this.currentBitmap != null) {
+                    this.currentBitmap.recycle();
+                    this.currentBitmap = null;
+                }
+                this.changingTextureView = true;
+                this.isInline = false;
+                updatePlayButton();
+                updateShareButton();
+                updateFullscreenButton();
+                updateInlineButton();
+                this.textureView.setVisibility(4);
+                if (this.textureViewContainer != null) {
+                    this.textureViewContainer.addView(this.textureView);
+                } else {
+                    this.aspectRatioFrameLayout.addView(this.textureView);
+                }
+                parent = (ViewGroup) this.controlsView.getParent();
+                if (parent != this) {
+                    if (parent != null) {
+                        parent.removeView(this.controlsView);
+                    }
+                    if (this.textureViewContainer != null) {
+                        this.textureViewContainer.addView(this.controlsView);
+                    } else {
+                        addView(this.controlsView, 1);
+                    }
+                }
+                this.controlsView.show(false, false);
+                this.delegate.prepareToSwitchInlineMode(false, null, this.aspectRatioFrameLayout.getAspectRatio(), this.allowInlineAnimation);
+                return;
+            }
+            this.inFullscreen = false;
+            this.delegate.prepareToSwitchInlineMode(true, this.switchToInlineRunnable, this.aspectRatioFrameLayout.getAspectRatio(), this.allowInlineAnimation);
+        }
+    }
+
+    final /* synthetic */ void lambda$new$4$WebPlayerView(View v) {
+        if (this.delegate != null) {
+            this.delegate.onSharePressed();
+        }
     }
 
     private void onInitFailed() {

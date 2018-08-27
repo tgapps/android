@@ -70,6 +70,10 @@ public class Frame {
         this.zzar = null;
     }
 
+    public Bitmap getBitmap() {
+        return this.zzar;
+    }
+
     public ByteBuffer getGrayscaleImageData() {
         int i = 0;
         if (this.zzar == null) {

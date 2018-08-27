@@ -459,7 +459,9 @@ public class CameraSession {
     }
 
     public void setOneShotPreviewCallback(PreviewCallback callback) {
-        this.cameraInfo.camera.setOneShotPreviewCallback(callback);
+        if (this.cameraInfo != null && this.cameraInfo.camera != null) {
+            this.cameraInfo.camera.setOneShotPreviewCallback(callback);
+        }
     }
 
     public void destroy() {

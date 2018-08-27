@@ -33,6 +33,10 @@ public class PackageManagerWrapper {
         return this.zzjp.getPackageManager().getPackageInfo(str, i);
     }
 
+    public String[] getPackagesForUid(int i) {
+        return this.zzjp.getPackageManager().getPackagesForUid(i);
+    }
+
     public boolean isCallerInstantApp() {
         if (Binder.getCallingUid() == Process.myUid()) {
             return InstantApps.isInstantApp(this.zzjp);

@@ -53,6 +53,8 @@ import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import com.google.android.exoplayer2.extractor.ts.PsExtractor;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSink;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -72,6 +74,7 @@ import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MediaController.PhotoEntry;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.NotificationCenter.NotificationCenterDelegate;
 import org.telegram.messenger.SharedConfig;
@@ -82,8 +85,6 @@ import org.telegram.messenger.camera.CameraController;
 import org.telegram.messenger.camera.CameraInfo;
 import org.telegram.messenger.camera.CameraSession;
 import org.telegram.messenger.camera.Size;
-import org.telegram.messenger.exoplayer2.extractor.ts.PsExtractor;
-import org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink;
 import org.telegram.messenger.video.MP4Builder;
 import org.telegram.messenger.video.Mp4Movie;
 import org.telegram.tgnet.ConnectionsManager;
@@ -961,8 +962,14 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                 format.setInteger("color-format", 2130708361);
                 MediaFormat mediaFormat = format;
                 mediaFormat.setInteger("bitrate", this.videoBitrate);
-                format.setInteger("frame-rate", FRAME_RATE);
+                format.setInteger("frame-rate", 30);
                 format.setInteger("i-frame-interval", 1);
+                if (VERSION.SDK_INT >= 21) {
+                    format.setInteger("profile", 8);
+                    if (VERSION.SDK_INT >= 23) {
+                        format.setInteger("level", MessagesController.UPDATE_MASK_CHAT_ADMINS);
+                    }
+                }
                 this.videoEncoder.configure(format, null, null, 1);
                 this.surface = this.videoEncoder.createInputSurface();
                 this.videoEncoder.start();
@@ -1085,6 +1092,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         }
 
         public void drainEncoder(boolean endOfStream) throws Exception {
+            MediaFormat newFormat;
             if (endOfStream) {
                 this.videoEncoder.signalEndOfInputStream();
             }
@@ -1093,7 +1101,6 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                 encoderOutputBuffers = this.videoEncoder.getOutputBuffers();
             }
             while (true) {
-                MediaFormat newFormat;
                 ByteBuffer encodedData;
                 int encoderStatus = this.videoEncoder.dequeueOutputBuffer(this.videoBufferInfo, 10000);
                 if (encoderStatus == -1) {

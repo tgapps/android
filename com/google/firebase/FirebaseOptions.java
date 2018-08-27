@@ -7,6 +7,7 @@ import com.google.android.gms.common.internal.Preconditions;
 import com.google.android.gms.common.internal.StringResourceValueReader;
 import com.google.android.gms.common.util.Strings;
 
+/* compiled from: com.google.firebase:firebase-common@@16.0.1 */
 public final class FirebaseOptions {
     private final String zza;
     private final String zzb;

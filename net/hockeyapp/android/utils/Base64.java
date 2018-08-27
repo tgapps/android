@@ -1,7 +1,7 @@
 package net.hockeyapp.android.utils;
 
+import com.google.android.exoplayer2.C;
 import java.io.UnsupportedEncodingException;
-import org.telegram.messenger.exoplayer2.C;
 
 public class Base64 {
 

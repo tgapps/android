@@ -2,6 +2,8 @@ package android.support.media;
 
 import android.content.res.AssetManager.AssetInputStream;
 import android.util.Log;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -19,17 +21,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.DefaultLoadControl;
 
 public class ExifInterface {
-    private static final Charset ASCII = Charset.forName(C.ASCII_NAME);
+    static final Charset ASCII = Charset.forName(C.ASCII_NAME);
     public static final int[] BITS_PER_SAMPLE_GREYSCALE_1 = new int[]{4};
     public static final int[] BITS_PER_SAMPLE_GREYSCALE_2 = new int[]{8};
     public static final int[] BITS_PER_SAMPLE_RGB = new int[]{8, 8, 8};
-    private static final byte[] EXIF_ASCII_PREFIX = new byte[]{(byte) 65, (byte) 83, (byte) 67, (byte) 73, (byte) 73, (byte) 0, (byte) 0, (byte) 0};
+    static final byte[] EXIF_ASCII_PREFIX = new byte[]{(byte) 65, (byte) 83, (byte) 67, (byte) 73, (byte) 73, (byte) 0, (byte) 0, (byte) 0};
     private static final ExifTag[] EXIF_POINTER_TAGS = new ExifTag[]{new ExifTag("SubIFDPointer", 330, 4), new ExifTag("ExifIFDPointer", 34665, 4), new ExifTag("GPSInfoIFDPointer", 34853, 4), new ExifTag("InteroperabilityIFDPointer", 40965, 4), new ExifTag("CameraSettingsIFDPointer", 8224, 1), new ExifTag("ImageProcessingIFDPointer", 8256, 1)};
     static final ExifTag[][] EXIF_TAGS = new ExifTag[][]{IFD_TIFF_TAGS, IFD_EXIF_TAGS, IFD_GPS_TAGS, IFD_INTEROPERABILITY_TAGS, IFD_THUMBNAIL_TAGS, IFD_TIFF_TAGS, ORF_MAKER_NOTE_TAGS, ORF_CAMERA_SETTINGS_TAGS, ORF_IMAGE_PROCESSING_TAGS, PEF_TAGS};
     private static final List<Integer> FLIPPED_ROTATION_ORDER = Arrays.asList(new Integer[]{Integer.valueOf(2), Integer.valueOf(7), Integer.valueOf(4), Integer.valueOf(5)});
@@ -61,6 +62,7 @@ public class ExifInterface {
     private static final HashSet<String> sTagSetForCompatibility = new HashSet(Arrays.asList(new String[]{"FNumber", "DigitalZoomRatio", "ExposureTime", "SubjectDistance", "GPSTimeStamp"}));
     private final AssetInputStream mAssetInputStream;
     private final HashMap<String, ExifAttribute>[] mAttributes = new HashMap[EXIF_TAGS.length];
+    private Set<Integer> mAttributesOffsets = new HashSet(EXIF_TAGS.length);
     private ByteOrder mExifByteOrder = ByteOrder.BIG_ENDIAN;
     private int mExifOffset;
     private final String mFilename;
@@ -81,8 +83,8 @@ public class ExifInterface {
         private static final ByteOrder LITTLE_ENDIAN = ByteOrder.LITTLE_ENDIAN;
         private ByteOrder mByteOrder;
         private DataInputStream mDataInputStream;
-        private final int mLength;
-        private int mPosition;
+        final int mLength;
+        int mPosition;
 
         public ByteOrderedDataInputStream(InputStream in) throws IOException {
             this.mByteOrder = ByteOrder.BIG_ENDIAN;
@@ -299,7 +301,7 @@ public class ExifInterface {
         public final int format;
         public final int numberOfComponents;
 
-        private ExifAttribute(int format, int numberOfComponents, byte[] bytes) {
+        ExifAttribute(int format, int numberOfComponents, byte[] bytes) {
             this.format = format;
             this.numberOfComponents = numberOfComponents;
             this.bytes = bytes;
@@ -354,9 +356,9 @@ public class ExifInterface {
             return "(" + ExifInterface.IFD_FORMAT_NAMES[this.format] + ", data length:" + this.bytes.length + ")";
         }
 
-        private Object getValue(ByteOrder byteOrder) {
+        Object getValue(ByteOrder byteOrder) {
+            Object str;
             IOException e;
-            Object stringBuilder;
             Throwable th;
             ByteOrderedDataInputStream byteOrderedDataInputStream = null;
             try {
@@ -367,7 +369,6 @@ public class ExifInterface {
                     switch (this.format) {
                         case 1:
                         case 6:
-                            String str;
                             if (this.bytes.length == 1 && this.bytes[0] >= (byte) 0 && this.bytes[0] <= (byte) 1) {
                                 str = new String(new char[]{(char) (this.bytes[0] + 48)});
                                 if (inputStream != null) {
@@ -411,11 +412,11 @@ public class ExifInterface {
                                     index = ExifInterface.EXIF_ASCII_PREFIX.length;
                                 }
                             }
-                            StringBuilder stringBuilder2 = new StringBuilder();
+                            StringBuilder stringBuilder = new StringBuilder();
                             for (index = 
 /*
 Method generation error in method: android.support.media.ExifInterface.ExifAttribute.getValue(java.nio.ByteOrder):java.lang.Object
-jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r11_2 'index' int) = (r11_0 'index' int), (r11_0 'index' int), (r11_1 'index' int) binds: {(r11_0 'index' int)=B:37:0x0095, (r11_1 'index' int)=B:45:0x00b1, (r11_0 'index' int)=B:44:0x00af} in method: android.support.media.ExifInterface.ExifAttribute.getValue(java.nio.ByteOrder):java.lang.Object
+jadx.core.utils.exceptions.CodegenException: Error generate insn: PHI: (r7_2 'index' int) = (r7_0 'index' int), (r7_0 'index' int), (r7_1 'index' int) binds: {(r7_0 'index' int)=B:37:0x009f, (r7_0 'index' int)=B:44:0x00b7, (r7_1 'index' int)=B:45:0x00b9} in method: android.support.media.ExifInterface.ExifAttribute.getValue(java.nio.ByteOrder):java.lang.Object
 	at jadx.core.codegen.InsnGen.makeInsn(InsnGen.java:226)
 	at jadx.core.codegen.RegionGen.makeLoop(RegionGen.java:184)
 	at jadx.core.codegen.RegionGen.makeRegion(RegionGen.java:61)
@@ -580,21 +581,21 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                             public final int primaryFormat;
                             public final int secondaryFormat;
 
-                            private ExifTag(String name, int number, int format) {
+                            ExifTag(String name, int number, int format) {
                                 this.name = name;
                                 this.number = number;
                                 this.primaryFormat = format;
                                 this.secondaryFormat = -1;
                             }
 
-                            private ExifTag(String name, int number, int primaryFormat, int secondaryFormat) {
+                            ExifTag(String name, int number, int primaryFormat, int secondaryFormat) {
                                 this.name = name;
                                 this.number = number;
                                 this.primaryFormat = primaryFormat;
                                 this.secondaryFormat = secondaryFormat;
                             }
 
-                            private boolean isFormatCompatible(int format) {
+                            boolean isFormatCompatible(int format) {
                                 if (this.primaryFormat == 7 || format == 7 || this.primaryFormat == format || this.secondaryFormat == format) {
                                     return true;
                                 }
@@ -615,7 +616,7 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                             public final long denominator;
                             public final long numerator;
 
-                            private Rational(long numerator, long denominator) {
+                            Rational(long numerator, long denominator) {
                                 if (denominator == 0) {
                                     this.numerator = 0;
                                     this.denominator = 1;
@@ -1108,9 +1109,10 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                         }
 
                         private void readImageFileDirectory(ByteOrderedDataInputStream dataInputStream, int ifdType) throws IOException {
+                            this.mAttributesOffsets.add(Integer.valueOf(dataInputStream.mPosition));
                             if (dataInputStream.mPosition + 2 <= dataInputStream.mLength) {
                                 short numberOfDirectoryEntry = dataInputStream.readShort();
-                                if (dataInputStream.mPosition + (numberOfDirectoryEntry * 12) <= dataInputStream.mLength) {
+                                if (dataInputStream.mPosition + (numberOfDirectoryEntry * 12) <= dataInputStream.mLength && numberOfDirectoryEntry > (short) 0) {
                                     for (short i = (short) 0; i < numberOfDirectoryEntry; i = (short) (i + 1)) {
                                         int tagNumber = dataInputStream.readUnsignedShort();
                                         int dataFormat = dataInputStream.readUnsignedShort();
@@ -1183,6 +1185,8 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                                 }
                                                 if (offset <= 0 || offset >= ((long) dataInputStream.mLength)) {
                                                     Log.w("ExifInterface", "Skip jump into the IFD since its offset is invalid: " + offset);
+                                                } else if (this.mAttributesOffsets.contains(Integer.valueOf((int) offset))) {
+                                                    Log.w("ExifInterface", "Skip jump into the IFD since it has already been read: IfdType " + nextIfdType + " (at " + offset + ")");
                                                 } else {
                                                     dataInputStream.seek(offset);
                                                     readImageFileDirectory(dataInputStream, nextIfdType.intValue());
@@ -1209,7 +1213,11 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                     }
                                     if (dataInputStream.peek() + 4 <= dataInputStream.mLength) {
                                         int nextIfdOffset = dataInputStream.readInt();
-                                        if (nextIfdOffset > 8 && nextIfdOffset < dataInputStream.mLength) {
+                                        if (((long) nextIfdOffset) <= 0 || nextIfdOffset >= dataInputStream.mLength) {
+                                            Log.w("ExifInterface", "Stop reading file since a wrong offset may cause an infinite loop: " + nextIfdOffset);
+                                        } else if (this.mAttributesOffsets.contains(Integer.valueOf(nextIfdOffset))) {
+                                            Log.w("ExifInterface", "Stop reading file since re-reading an IFD may cause an infinite loop: " + nextIfdOffset);
+                                        } else {
                                             dataInputStream.seek((long) nextIfdOffset);
                                             if (this.mAttributes[4].isEmpty()) {
                                                 readImageFileDirectory(dataInputStream, 4);

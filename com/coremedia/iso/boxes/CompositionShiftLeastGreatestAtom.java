@@ -9,16 +9,16 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class CompositionShiftLeastGreatestAtom extends AbstractFullBox {
     public static final String TYPE = "cslg";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_7 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_8 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_9 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_7 = null;
+    private static final StaticPart ajc$tjp_8 = null;
+    private static final StaticPart ajc$tjp_9 = null;
     int compositionOffsetToDisplayOffsetShift;
     int displayEndTime;
     int displayStartTime;
@@ -29,7 +29,7 @@ public class CompositionShiftLeastGreatestAtom extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("CompositionShiftLeastGreatestAtom.java", CompositionShiftLeastGreatestAtom.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getCompositionOffsetToDisplayOffsetShift", "com.coremedia.iso.boxes.CompositionShiftLeastGreatestAtom", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "int"), 66);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setCompositionOffsetToDisplayOffsetShift", "com.coremedia.iso.boxes.CompositionShiftLeastGreatestAtom", "int", "compositionOffsetToDisplayOffsetShift", TtmlNode.ANONYMOUS_REGION_ID, "void"), 70);

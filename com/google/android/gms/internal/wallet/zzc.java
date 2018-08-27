@@ -11,16 +11,19 @@ public class zzc {
     private zzc() {
     }
 
-    public static <T extends Parcelable> T zza(Parcel parcel, Creator<T> creator) {
-        return parcel.readInt() == 0 ? null : (Parcelable) creator.createFromParcel(parcel);
+    public static boolean zza(Parcel parcel) {
+        return parcel.readInt() != 0;
     }
 
-    public static void zza(Parcel parcel, IInterface iInterface) {
-        if (iInterface == null) {
-            parcel.writeStrongBinder(null);
-        } else {
-            parcel.writeStrongBinder(iInterface.asBinder());
+    public static void writeBoolean(Parcel parcel, boolean z) {
+        parcel.writeInt(z ? 1 : 0);
+    }
+
+    public static <T extends Parcelable> T zza(Parcel parcel, Creator<T> creator) {
+        if (parcel.readInt() == 0) {
+            return null;
         }
+        return (Parcelable) creator.createFromParcel(parcel);
     }
 
     public static void zza(Parcel parcel, Parcelable parcelable) {
@@ -32,11 +35,11 @@ public class zzc {
         parcelable.writeToParcel(parcel, 0);
     }
 
-    public static void zza(Parcel parcel, boolean z) {
-        parcel.writeInt(z ? 1 : 0);
-    }
-
-    public static boolean zza(Parcel parcel) {
-        return parcel.readInt() != 0;
+    public static void zza(Parcel parcel, IInterface iInterface) {
+        if (iInterface == null) {
+            parcel.writeStrongBinder(null);
+        } else {
+            parcel.writeStrongBinder(iInterface.asBinder());
+        }
     }
 }

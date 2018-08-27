@@ -2,6 +2,7 @@ package com.google.firebase.components;
 
 import com.google.android.gms.common.internal.Preconditions;
 
+/* compiled from: com.google.firebase:firebase-common@@16.0.1 */
 public final class Dependency {
     private final Class<?> zza;
     private final int zzb;

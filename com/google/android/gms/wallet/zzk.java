@@ -6,6 +6,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.identity.intents.model.UserAddress;
 
 public final class zzk implements Creator<FullWallet> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new FullWallet[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         PaymentMethodToken paymentMethodToken = null;
@@ -62,9 +66,5 @@ public final class zzk implements Creator<FullWallet> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new FullWallet(str3, str2, proxyCard, str, com_google_android_gms_wallet_zza2, com_google_android_gms_wallet_zza, strArr, userAddress2, userAddress, instrumentInfoArr, paymentMethodToken);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new FullWallet[i];
     }
 }

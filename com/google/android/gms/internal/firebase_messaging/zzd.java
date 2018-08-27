@@ -14,6 +14,10 @@ final class zzd extends WeakReference<Throwable> {
         this.zzf = System.identityHashCode(th);
     }
 
+    public final int hashCode() {
+        return this.zzf;
+    }
+
     public final boolean equals(Object obj) {
         if (obj == null || obj.getClass() != getClass()) {
             return false;
@@ -22,10 +26,9 @@ final class zzd extends WeakReference<Throwable> {
             return true;
         }
         zzd com_google_android_gms_internal_firebase_messaging_zzd = (zzd) obj;
-        return this.zzf == com_google_android_gms_internal_firebase_messaging_zzd.zzf && get() == com_google_android_gms_internal_firebase_messaging_zzd.get();
-    }
-
-    public final int hashCode() {
-        return this.zzf;
+        if (this.zzf == com_google_android_gms_internal_firebase_messaging_zzd.zzf && get() == com_google_android_gms_internal_firebase_messaging_zzd.get()) {
+            return true;
+        }
+        return false;
     }
 }

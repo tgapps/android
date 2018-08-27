@@ -4,6 +4,7 @@ import com.coremedia.iso.IsoTypeReader;
 import com.coremedia.iso.IsoTypeReaderVariable;
 import com.coremedia.iso.IsoTypeWriter;
 import com.coremedia.iso.IsoTypeWriterVariable;
+import com.google.android.exoplayer2.extractor.ts.PsExtractor;
 import com.googlecode.mp4parser.AbstractFullBox;
 import com.googlecode.mp4parser.RequiresParseDetailAspect;
 import java.nio.ByteBuffer;
@@ -13,23 +14,22 @@ import java.util.List;
 import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.internal.Conversions;
 import org.aspectj.runtime.reflect.Factory;
-import org.telegram.messenger.exoplayer2.extractor.ts.PsExtractor;
 
 public class TrackFragmentRandomAccessBox extends AbstractFullBox {
     public static final String TYPE = "tfra";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_10 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_11 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_12 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_7 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_8 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_9 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_10 = null;
+    private static final StaticPart ajc$tjp_11 = null;
+    private static final StaticPart ajc$tjp_12 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_7 = null;
+    private static final StaticPart ajc$tjp_8 = null;
+    private static final StaticPart ajc$tjp_9 = null;
     private List<Entry> entries = Collections.emptyList();
     private int lengthSizeOfSampleNum = 2;
     private int lengthSizeOfTrafNum = 2;
@@ -131,7 +131,7 @@ public class TrackFragmentRandomAccessBox extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("TrackFragmentRandomAccessBox.java", TrackFragmentRandomAccessBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setTrackId", "com.coremedia.iso.boxes.fragment.TrackFragmentRandomAccessBox", "long", "trackId", TtmlNode.ANONYMOUS_REGION_ID, "void"), 145);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setLengthSizeOfTrafNum", "com.coremedia.iso.boxes.fragment.TrackFragmentRandomAccessBox", "int", "lengthSizeOfTrafNum", TtmlNode.ANONYMOUS_REGION_ID, "void"), 149);

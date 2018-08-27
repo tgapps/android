@@ -8,7 +8,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.util.SparseArray;
-import org.telegram.messenger.exoplayer2.source.chunk.ChunkedTrackBlacklistUtil;
+import com.google.android.exoplayer2.source.chunk.ChunkedTrackBlacklistUtil;
 
 @Deprecated
 public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
@@ -28,7 +28,7 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
             if (comp == null) {
                 comp = null;
             } else {
-                WakeLock wl = ((PowerManager) context.getSystemService("power")).newWakeLock(1, "wake:" + comp.flattenToShortString());
+                WakeLock wl = ((PowerManager) context.getSystemService("power")).newWakeLock(1, "androidx.core:wake:" + comp.flattenToShortString());
                 wl.setReferenceCounted(false);
                 wl.acquire(ChunkedTrackBlacklistUtil.DEFAULT_TRACK_BLACKLIST_MS);
                 sActiveWakeLocks.put(id, wl);

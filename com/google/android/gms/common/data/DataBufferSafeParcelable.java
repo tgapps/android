@@ -3,9 +3,9 @@ package com.google.android.gms.common.data;
 import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable.Creator;
+import com.google.android.exoplayer2.upstream.DataSchemeDataSource;
 import com.google.android.gms.common.data.DataHolder.Builder;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
-import org.telegram.messenger.exoplayer2.upstream.DataSchemeDataSource;
 
 public class DataBufferSafeParcelable<T extends SafeParcelable> extends AbstractDataBuffer<T> {
     private static final String[] zznk = new String[]{DataSchemeDataSource.SCHEME_DATA};

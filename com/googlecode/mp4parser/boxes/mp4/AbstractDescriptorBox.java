@@ -1,5 +1,6 @@
 package com.googlecode.mp4parser.boxes.mp4;
 
+import com.google.android.exoplayer2.upstream.DataSchemeDataSource;
 import com.googlecode.mp4parser.AbstractFullBox;
 import com.googlecode.mp4parser.RequiresParseDetailAspect;
 import com.googlecode.mp4parser.boxes.mp4.objectdescriptors.BaseDescriptor;
@@ -10,19 +11,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.reflect.Factory;
-import org.telegram.messenger.exoplayer2.upstream.DataSchemeDataSource;
 
 public class AbstractDescriptorBox extends AbstractFullBox {
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
     private static Logger log = Logger.getLogger(AbstractDescriptorBox.class.getName());
     protected ByteBuffer data;
     protected BaseDescriptor descriptor;
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("AbstractDescriptorBox.java", AbstractDescriptorBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getData", "com.googlecode.mp4parser.boxes.mp4.AbstractDescriptorBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.nio.ByteBuffer"), 42);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getDescriptor", "com.googlecode.mp4parser.boxes.mp4.AbstractDescriptorBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "com.googlecode.mp4parser.boxes.mp4.objectdescriptors.BaseDescriptor"), 58);
@@ -39,6 +39,11 @@ public class AbstractDescriptorBox extends AbstractFullBox {
         super(type);
     }
 
+    public ByteBuffer getData() {
+        RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_0, this, this));
+        return this.data;
+    }
+
     protected void getContent(ByteBuffer byteBuffer) {
         writeVersionAndFlags(byteBuffer);
         this.data.rewind();
@@ -47,6 +52,16 @@ public class AbstractDescriptorBox extends AbstractFullBox {
 
     protected long getContentSize() {
         return (long) (this.data.limit() + 4);
+    }
+
+    public BaseDescriptor getDescriptor() {
+        RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_1, this, this));
+        return this.descriptor;
+    }
+
+    public String getDescriptorAsString() {
+        RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_2, this, this));
+        return this.descriptor.toString();
     }
 
     public void setDescriptor(BaseDescriptor descriptor) {

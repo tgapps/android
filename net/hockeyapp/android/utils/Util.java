@@ -18,6 +18,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
+import com.google.android.exoplayer2.C;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.hockeyapp.android.R;
 import org.telegram.messenger.MessagesController;
-import org.telegram.messenger.exoplayer2.C;
 
 public class Util {
     private static final ThreadLocal<DateFormat> DATE_FORMAT_THREAD_LOCAL = new ThreadLocal<DateFormat>() {

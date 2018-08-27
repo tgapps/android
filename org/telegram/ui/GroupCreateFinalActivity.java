@@ -20,6 +20,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import com.google.android.exoplayer2.C;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
@@ -302,7 +303,7 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
         this.editText.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
         this.editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
         this.editText.setBackgroundDrawable(Theme.createEditTextDrawable(context, false));
-        this.editText.setImeOptions(268435456);
+        this.editText.setImeOptions(C.ENCODING_PCM_MU_LAW);
         this.editText.setInputType(MessagesController.UPDATE_MASK_CHAT_ADMINS);
         this.editText.setPadding(0, 0, 0, AndroidUtilities.dp(8.0f));
         this.editText.setFilters(new InputFilter[]{new LengthFilter(100)});

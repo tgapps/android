@@ -25,6 +25,7 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
+import com.google.android.exoplayer2.C;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import org.telegram.messenger.AndroidUtilities;
@@ -161,7 +162,7 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
             });
         }
         this.messageEditText.setHint(LocaleController.getString("AddCaption", R.string.AddCaption));
-        this.messageEditText.setImeOptions(268435456);
+        this.messageEditText.setImeOptions(C.ENCODING_PCM_MU_LAW);
         this.messageEditText.setInputType(this.messageEditText.getInputType() | MessagesController.UPDATE_MASK_CHAT_ADMINS);
         this.messageEditText.setMaxLines(4);
         this.messageEditText.setHorizontallyScrolling(false);

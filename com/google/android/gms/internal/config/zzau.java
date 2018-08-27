@@ -1,5 +1,6 @@
 package com.google.android.gms.internal.config;
 
+import com.googlecode.mp4parser.authoring.tracks.h265.NalUnitTypes;
 import java.io.IOException;
 
 public final class zzau extends zzbb<zzau> {
@@ -44,7 +45,7 @@ public final class zzau extends zzbb<zzau> {
                 case 16:
                     this.zzbl = com_google_android_gms_internal_config_zzay.zzy() != 0;
                     continue;
-                case 25:
+                case NalUnitTypes.NAL_TYPE_RSV_VCL25 /*25*/:
                     this.zzbm = com_google_android_gms_internal_config_zzay.zzz();
                     continue;
                 default:

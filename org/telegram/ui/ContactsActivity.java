@@ -351,18 +351,7 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
                                 Builder builder = new Builder(ContactsActivity.this.getParentActivity());
                                 builder.setMessage(LocaleController.getString("InviteUser", R.string.InviteUser));
                                 builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
-                                final String arg1 = usePhone;
-                                builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new OnClickListener() {
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        try {
-                                            Intent intent = new Intent("android.intent.action.VIEW", Uri.fromParts("sms", arg1, null));
-                                            intent.putExtra("sms_body", ContactsController.getInstance(ContactsActivity.this.currentAccount).getInviteText(1));
-                                            ContactsActivity.this.getParentActivity().startActivityForResult(intent, 500);
-                                        } catch (Throwable e) {
-                                            FileLog.e(e);
-                                        }
-                                    }
-                                });
+                                builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new ContactsActivity$5$$Lambda$0(this, usePhone));
                                 builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
                                 ContactsActivity.this.showDialog(builder.create());
                             }
@@ -395,6 +384,16 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
                         args.putInt("step", 0);
                         ContactsActivity.this.presentFragment(new ChannelCreateActivity(args));
                     }
+                }
+            }
+
+            final /* synthetic */ void lambda$onItemClick$0$ContactsActivity$5(String arg1, DialogInterface dialogInterface, int i) {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW", Uri.fromParts("sms", arg1, null));
+                    intent.putExtra("sms_body", ContactsController.getInstance(ContactsActivity.this.currentAccount).getInviteText(1));
+                    ContactsActivity.this.getParentActivity().startActivityForResult(intent, 500);
+                } catch (Throwable e) {
+                    FileLog.e(e);
                 }
             }
         });

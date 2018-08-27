@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.text.TextUtils;
+import com.google.android.exoplayer2.C;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +25,6 @@ import net.hockeyapp.android.utils.VersionHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.telegram.messenger.exoplayer2.C;
 
 public class CheckUpdateTask extends AsyncTask<Void, String, JSONArray> {
     protected String apkUrlString = null;

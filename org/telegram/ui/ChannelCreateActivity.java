@@ -23,6 +23,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import com.google.android.exoplayer2.C;
 import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -331,7 +332,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
             this.nameTextView.setTextSize(1, 16.0f);
             this.nameTextView.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
             this.nameTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-            this.nameTextView.setImeOptions(268435456);
+            this.nameTextView.setImeOptions(C.ENCODING_PCM_MU_LAW);
             this.nameTextView.setInputType(16385);
             this.nameTextView.setBackgroundDrawable(Theme.createEditTextDrawable(context, false));
             this.nameTextView.setFilters(new InputFilter[]{new LengthFilter(100)});

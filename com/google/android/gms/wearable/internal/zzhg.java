@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Looper;
 import android.util.Log;
+import com.google.android.exoplayer2.C;
 import com.google.android.gms.common.GoogleApiAvailabilityLight;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
@@ -23,7 +24,6 @@ import com.google.android.gms.wearable.DataApi.DataListener;
 import com.google.android.gms.wearable.MessageApi.MessageListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.telegram.messenger.exoplayer2.C;
 
 public final class zzhg extends GmsClient<zzep> {
     private final ExecutorService zzew;

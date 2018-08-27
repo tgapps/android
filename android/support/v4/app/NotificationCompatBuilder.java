@@ -2,7 +2,6 @@ package android.support.v4.app;
 
 import android.app.Notification;
 import android.app.Notification.Builder;
-import android.app.PendingIntent;
 import android.app.RemoteInput;
 import android.os.Build.VERSION;
 import android.os.Bundle;
@@ -25,7 +24,6 @@ class NotificationCompatBuilder implements NotificationBuilderWithBuilderAccesso
     private RemoteViews mHeadsUpContentView;
 
     NotificationCompatBuilder(NotificationCompat.Builder b) {
-        boolean z;
         Iterator it;
         this.mBuilderCompat = b;
         if (VERSION.SDK_INT >= 26) {
@@ -34,32 +32,7 @@ class NotificationCompatBuilder implements NotificationBuilderWithBuilderAccesso
             this.mBuilder = new Builder(b.mContext);
         }
         Notification n = b.mNotification;
-        Builder lights = this.mBuilder.setWhen(n.when).setSmallIcon(n.icon, n.iconLevel).setContent(n.contentView).setTicker(n.tickerText, b.mTickerView).setVibrate(n.vibrate).setLights(n.ledARGB, n.ledOnMS, n.ledOffMS);
-        if ((n.flags & 2) != 0) {
-            z = true;
-        } else {
-            z = false;
-        }
-        lights = lights.setOngoing(z);
-        if ((n.flags & 8) != 0) {
-            z = true;
-        } else {
-            z = false;
-        }
-        lights = lights.setOnlyAlertOnce(z);
-        if ((n.flags & 16) != 0) {
-            z = true;
-        } else {
-            z = false;
-        }
-        lights = lights.setAutoCancel(z).setDefaults(n.defaults).setContentTitle(b.mContentTitle).setContentText(b.mContentText).setContentInfo(b.mContentInfo).setContentIntent(b.mContentIntent).setDeleteIntent(n.deleteIntent);
-        PendingIntent pendingIntent = b.mFullScreenIntent;
-        if ((n.flags & 128) != 0) {
-            z = true;
-        } else {
-            z = false;
-        }
-        lights.setFullScreenIntent(pendingIntent, z).setLargeIcon(b.mLargeIcon).setNumber(b.mNumber).setProgress(b.mProgressMax, b.mProgress, b.mProgressIndeterminate);
+        this.mBuilder.setWhen(n.when).setSmallIcon(n.icon, n.iconLevel).setContent(n.contentView).setTicker(n.tickerText, b.mTickerView).setVibrate(n.vibrate).setLights(n.ledARGB, n.ledOnMS, n.ledOffMS).setOngoing((n.flags & 2) != 0).setOnlyAlertOnce((n.flags & 8) != 0).setAutoCancel((n.flags & 16) != 0).setDefaults(n.defaults).setContentTitle(b.mContentTitle).setContentText(b.mContentText).setContentInfo(b.mContentInfo).setContentIntent(b.mContentIntent).setDeleteIntent(n.deleteIntent).setFullScreenIntent(b.mFullScreenIntent, (n.flags & 128) != 0).setLargeIcon(b.mLargeIcon).setNumber(b.mNumber).setProgress(b.mProgressMax, b.mProgress, b.mProgressIndeterminate);
         if (VERSION.SDK_INT < 21) {
             this.mBuilder.setSound(n.sound, n.audioStreamType);
         }
@@ -108,6 +81,19 @@ class NotificationCompatBuilder implements NotificationBuilderWithBuilderAccesso
                 this.mBuilder.addPerson((String) it.next());
             }
             this.mHeadsUpContentView = b.mHeadsUpContentView;
+            if (b.mInvisibleActions.size() > 0) {
+                Bundle carExtenderBundle = b.getExtras().getBundle("android.car.EXTENSIONS");
+                if (carExtenderBundle == null) {
+                    carExtenderBundle = new Bundle();
+                }
+                Bundle listBundle = new Bundle();
+                for (int i = 0; i < b.mInvisibleActions.size(); i++) {
+                    listBundle.putBundle(Integer.toString(i), NotificationCompatJellybean.getBundleForAction((Action) b.mInvisibleActions.get(i)));
+                }
+                carExtenderBundle.putBundle("invisible_actions", listBundle);
+                b.getExtras().putBundle("android.car.EXTENSIONS", carExtenderBundle);
+                this.mExtras.putBundle("android.car.EXTENSIONS", carExtenderBundle);
+            }
         }
         if (VERSION.SDK_INT >= 24) {
             this.mBuilder.setExtras(b.mExtras).setRemoteInputHistory(b.mRemoteInputHistory);
@@ -187,6 +173,11 @@ class NotificationCompatBuilder implements NotificationBuilderWithBuilderAccesso
             if (VERSION.SDK_INT >= 24) {
                 actionBuilder.setAllowGeneratedReplies(action.getAllowGeneratedReplies());
             }
+            actionExtras.putInt("android.support.action.semanticAction", action.getSemanticAction());
+            if (VERSION.SDK_INT >= 28) {
+                actionBuilder.setSemanticAction(action.getSemanticAction());
+            }
+            actionExtras.putBoolean("android.support.action.showsUserInterface", action.getShowsUserInterface());
             actionBuilder.addExtras(actionExtras);
             this.mBuilder.addAction(actionBuilder.build());
         } else if (VERSION.SDK_INT >= 16) {

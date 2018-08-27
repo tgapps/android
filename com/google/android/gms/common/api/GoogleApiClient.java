@@ -11,7 +11,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Api.AbstractClientBuilder;
 import com.google.android.gms.common.api.Api.AnyClient;
 import com.google.android.gms.common.api.Api.ApiOptions;
-import com.google.android.gms.common.api.Api.ApiOptions.HasOptions;
 import com.google.android.gms.common.api.Api.ApiOptions.NotRequiredOptions;
 import com.google.android.gms.common.api.Api.BaseClientBuilder;
 import com.google.android.gms.common.api.Api.Client;
@@ -77,28 +76,6 @@ public abstract class GoogleApiClient {
             Collection impliedScopes = api.zzj().getImpliedScopes(null);
             this.zzcw.addAll(impliedScopes);
             this.zzcv.addAll(impliedScopes);
-            return this;
-        }
-
-        public final <O extends HasOptions> Builder addApi(Api<O> api, O o) {
-            Preconditions.checkNotNull(api, "Api must not be null");
-            Preconditions.checkNotNull(o, "Null options are not permitted for this Api");
-            this.zzdc.put(api, o);
-            Collection impliedScopes = api.zzj().getImpliedScopes(o);
-            this.zzcw.addAll(impliedScopes);
-            this.zzcv.addAll(impliedScopes);
-            return this;
-        }
-
-        public final Builder addConnectionCallbacks(ConnectionCallbacks connectionCallbacks) {
-            Preconditions.checkNotNull(connectionCallbacks, "Listener must not be null");
-            this.zzdi.add(connectionCallbacks);
-            return this;
-        }
-
-        public final Builder addOnConnectionFailedListener(OnConnectionFailedListener onConnectionFailedListener) {
-            Preconditions.checkNotNull(onConnectionFailedListener, "Listener must not be null");
-            this.zzdj.add(onConnectionFailedListener);
             return this;
         }
 

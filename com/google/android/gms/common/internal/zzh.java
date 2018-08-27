@@ -7,10 +7,10 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
 import android.util.Log;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.gms.common.stats.ConnectionTracker;
 import java.util.HashMap;
 import javax.annotation.concurrent.GuardedBy;
-import org.telegram.messenger.exoplayer2.DefaultRenderersFactory;
 
 final class zzh extends GmsClientSupervisor implements Callback {
     private final Handler mHandler;

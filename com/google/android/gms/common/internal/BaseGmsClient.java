@@ -16,6 +16,7 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
+import com.google.android.exoplayer2.extractor.ts.TsExtractor;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Feature;
 import com.google.android.gms.common.GoogleApiAvailabilityLight;
@@ -32,7 +33,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.GuardedBy;
-import org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor;
 
 public abstract class BaseGmsClient<T extends IInterface> {
     public static final String[] GOOGLE_PLUS_REQUIRED_FEATURES = new String[]{"service_esmobile", "service_googleme"};

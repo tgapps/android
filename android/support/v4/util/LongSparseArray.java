@@ -25,14 +25,13 @@ public class LongSparseArray<E> implements Cloneable {
     }
 
     public LongSparseArray<E> clone() {
-        LongSparseArray<E> clone = null;
         try {
-            clone = (LongSparseArray) super.clone();
+            LongSparseArray<E> clone = (LongSparseArray) super.clone();
             clone.mKeys = (long[]) this.mKeys.clone();
             clone.mValues = (Object[]) this.mValues.clone();
             return clone;
         } catch (CloneNotSupportedException e) {
-            return clone;
+            throw new AssertionError(e);
         }
     }
 

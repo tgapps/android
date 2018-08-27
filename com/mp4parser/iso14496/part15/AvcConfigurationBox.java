@@ -3,49 +3,50 @@ package com.mp4parser.iso14496.part15;
 import com.googlecode.mp4parser.AbstractBox;
 import com.googlecode.mp4parser.RequiresParseDetailAspect;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.List;
 import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.internal.Conversions;
 import org.aspectj.runtime.reflect.Factory;
 
 public final class AvcConfigurationBox extends AbstractBox {
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_10 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_11 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_12 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_13 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_14 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_15 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_16 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_17 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_18 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_19 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_20 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_21 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_22 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_23 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_24 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_25 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_26 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_27 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_28 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_29 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_7 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_8 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_9 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_10 = null;
+    private static final StaticPart ajc$tjp_11 = null;
+    private static final StaticPart ajc$tjp_12 = null;
+    private static final StaticPart ajc$tjp_13 = null;
+    private static final StaticPart ajc$tjp_14 = null;
+    private static final StaticPart ajc$tjp_15 = null;
+    private static final StaticPart ajc$tjp_16 = null;
+    private static final StaticPart ajc$tjp_17 = null;
+    private static final StaticPart ajc$tjp_18 = null;
+    private static final StaticPart ajc$tjp_19 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_20 = null;
+    private static final StaticPart ajc$tjp_21 = null;
+    private static final StaticPart ajc$tjp_22 = null;
+    private static final StaticPart ajc$tjp_23 = null;
+    private static final StaticPart ajc$tjp_24 = null;
+    private static final StaticPart ajc$tjp_25 = null;
+    private static final StaticPart ajc$tjp_26 = null;
+    private static final StaticPart ajc$tjp_27 = null;
+    private static final StaticPart ajc$tjp_28 = null;
+    private static final StaticPart ajc$tjp_29 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_7 = null;
+    private static final StaticPart ajc$tjp_8 = null;
+    private static final StaticPart ajc$tjp_9 = null;
     public AvcDecoderConfigurationRecord avcDecoderConfigurationRecord = new AvcDecoderConfigurationRecord();
 
     static {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("AvcConfigurationBox.java", AvcConfigurationBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getConfigurationVersion", "com.mp4parser.iso14496.part15.AvcConfigurationBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "int"), 44);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getAvcProfileIndication", "com.mp4parser.iso14496.part15.AvcConfigurationBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "int"), 48);
@@ -81,6 +82,21 @@ public final class AvcConfigurationBox extends AbstractBox {
 
     public AvcConfigurationBox() {
         super("avcC");
+    }
+
+    public int getLengthSizeMinusOne() {
+        RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_4, this, this));
+        return this.avcDecoderConfigurationRecord.lengthSizeMinusOne;
+    }
+
+    public List<byte[]> getSequenceParameterSets() {
+        RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_5, this, this));
+        return Collections.unmodifiableList(this.avcDecoderConfigurationRecord.sequenceParameterSets);
+    }
+
+    public List<byte[]> getPictureParameterSets() {
+        RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_6, this, this));
+        return Collections.unmodifiableList(this.avcDecoderConfigurationRecord.pictureParameterSets);
     }
 
     public void setConfigurationVersion(int configurationVersion) {
@@ -133,6 +149,11 @@ public final class AvcConfigurationBox extends AbstractBox {
         this.avcDecoderConfigurationRecord.bitDepthChromaMinus8 = bitDepthChromaMinus8;
     }
 
+    public List<byte[]> getSequenceParameterSetExts() {
+        RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_20, this, this));
+        return this.avcDecoderConfigurationRecord.sequenceParameterSetExts;
+    }
+
     public void _parseDetails(ByteBuffer content) {
         this.avcDecoderConfigurationRecord = new AvcDecoderConfigurationRecord(content);
     }
@@ -145,6 +166,11 @@ public final class AvcConfigurationBox extends AbstractBox {
     public void getContent(ByteBuffer byteBuffer) {
         RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_25, (Object) this, (Object) this, (Object) byteBuffer));
         this.avcDecoderConfigurationRecord.getContent(byteBuffer);
+    }
+
+    public AvcDecoderConfigurationRecord getavcDecoderConfigurationRecord() {
+        RequiresParseDetailAspect.aspectOf().before(Factory.makeJP(ajc$tjp_28, this, this));
+        return this.avcDecoderConfigurationRecord;
     }
 
     public String toString() {

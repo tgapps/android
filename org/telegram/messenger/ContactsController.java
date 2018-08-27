@@ -19,6 +19,7 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
 import android.util.SparseArray;
+import com.google.devtools.build.android.desugar.runtime.ThrowableExtension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -491,7 +492,7 @@ Error: java.util.NoSuchElementException
                 }
             }
         } catch (Exception e2) {
-            e2.printStackTrace();
+            ThrowableExtension.printStackTrace(e2);
         }
     }
 
@@ -960,7 +961,7 @@ Error: java.util.NoSuchElementException
         goto L_0x0174;
     L_0x01fa:
         r4 = "PhoneMobile";
-        r5 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
+        r5 = 2131494397; // 0x7f0c05fd float:1.8612301E38 double:1.053098156E-314;
         r13 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01ae;
     L_0x0205:
@@ -970,7 +971,7 @@ Error: java.util.NoSuchElementException
     L_0x020a:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneHome";
-        r5 = 2131494315; // 0x7f0c05ab float:1.8612135E38 double:1.0530981153E-314;
+        r5 = 2131494395; // 0x7f0c05fb float:1.8612297E38 double:1.053098155E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;
@@ -981,7 +982,7 @@ Error: java.util.NoSuchElementException
     L_0x021f:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneMobile";
-        r5 = 2131494317; // 0x7f0c05ad float:1.8612139E38 double:1.0530981163E-314;
+        r5 = 2131494397; // 0x7f0c05fd float:1.8612301E38 double:1.053098156E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;
@@ -992,7 +993,7 @@ Error: java.util.NoSuchElementException
     L_0x0234:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneWork";
-        r5 = 2131494323; // 0x7f0c05b3 float:1.8612151E38 double:1.0530981193E-314;
+        r5 = 2131494403; // 0x7f0c0603 float:1.8612313E38 double:1.053098159E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;
@@ -1003,14 +1004,14 @@ Error: java.util.NoSuchElementException
     L_0x024b:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneMain";
-        r5 = 2131494316; // 0x7f0c05ac float:1.8612137E38 double:1.053098116E-314;
+        r5 = 2131494396; // 0x7f0c05fc float:1.86123E38 double:1.0530981554E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;
     L_0x025c:
         r3 = r9.phoneTypes;	 Catch:{ Throwable -> 0x0117 }
         r4 = "PhoneOther";
-        r5 = 2131494322; // 0x7f0c05b2 float:1.861215E38 double:1.053098119E-314;
+        r5 = 2131494402; // 0x7f0c0602 float:1.8612311E38 double:1.0530981583E-314;
         r4 = org.telegram.messenger.LocaleController.getString(r4, r5);	 Catch:{ Throwable -> 0x0117 }
         r3.add(r4);	 Catch:{ Throwable -> 0x0117 }
         goto L_0x01b1;

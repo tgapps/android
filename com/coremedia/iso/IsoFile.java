@@ -5,6 +5,7 @@ import com.coremedia.iso.boxes.MovieBox;
 import com.googlecode.mp4parser.BasicContainer;
 import com.googlecode.mp4parser.DataSource;
 import com.googlecode.mp4parser.FileDataSourceImpl;
+import com.googlecode.mp4parser.annotations.DoNotParseDetail;
 import com.googlecode.mp4parser.util.Logger;
 import java.io.Closeable;
 import java.io.File;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.WritableByteChannel;
 
+@DoNotParseDetail
 public class IsoFile extends BasicContainer implements Closeable {
     private static Logger LOG = Logger.getLogger(IsoFile.class);
 

@@ -1,10 +1,10 @@
 package org.telegram.messenger;
 
 import android.content.SharedPreferences;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
-import org.telegram.messenger.exoplayer2.trackselection.AdaptiveTrackSelection;
 
 public class StatsController {
     private static volatile StatsController[] Instance = new StatsController[3];

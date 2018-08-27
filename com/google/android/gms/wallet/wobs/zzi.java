@@ -5,6 +5,10 @@ import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzi implements Creator<LoyaltyPoints> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new LoyaltyPoints[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         TimeInterval timeInterval = null;
@@ -29,9 +33,5 @@ public final class zzi implements Creator<LoyaltyPoints> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new LoyaltyPoints(str, loyaltyPointsBalance, timeInterval);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new LoyaltyPoints[i];
     }
 }

@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
+import com.google.android.exoplayer2.C;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -248,7 +249,7 @@ public class FileProvider extends ContentProvider {
 
     private static int modeToMode(String mode) {
         if ("r".equals(mode)) {
-            return 268435456;
+            return C.ENCODING_PCM_MU_LAW;
         }
         if ("w".equals(mode) || "wt".equals(mode)) {
             return 738197504;

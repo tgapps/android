@@ -1,14 +1,22 @@
 package com.google.android.gms.internal.measurement;
 
-import android.database.ContentObserver;
-import android.os.Handler;
+final class zzwq {
+    private static final zzwo zzcav = zzxf();
+    private static final zzwo zzcaw = new zzwp();
 
-final class zzwq extends ContentObserver {
-    zzwq(Handler handler) {
-        super(null);
+    static zzwo zzxd() {
+        return zzcav;
     }
 
-    public final void onChange(boolean z) {
-        zzwp.zzbmw.set(true);
+    static zzwo zzxe() {
+        return zzcaw;
+    }
+
+    private static zzwo zzxf() {
+        try {
+            return (zzwo) Class.forName("com.google.protobuf.MapFieldSchemaFull").getDeclaredConstructor(new Class[0]).newInstance(new Object[0]);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

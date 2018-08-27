@@ -3,6 +3,7 @@ package net.hockeyapp.android.utils;
 import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
+import com.google.android.exoplayer2.C;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.telegram.messenger.exoplayer2.C;
 
 public class HttpURLConnectionBuilder {
     private final Map<String, String> mHeaders;

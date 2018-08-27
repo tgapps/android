@@ -13,10 +13,10 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
     private static int sBaseCacheSize;
     private static Object[] sTwiceBaseCache;
     private static int sTwiceBaseCacheSize;
-    private Object[] mArray;
+    Object[] mArray;
     private MapCollections<E, E> mCollections;
     private int[] mHashes;
-    private int mSize;
+    int mSize;
 
     private int indexOf(Object key, int hash) {
         int N = this.mSize;

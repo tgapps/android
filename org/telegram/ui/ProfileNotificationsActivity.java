@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -649,29 +648,11 @@ public class ProfileNotificationsActivity extends BaseFragment implements Notifi
                             FileLog.e(e2);
                         }
                     } else if (position == ProfileNotificationsActivity.this.vibrateRow) {
-                        ProfileNotificationsActivity.this.showDialog(AlertsCreator.createVibrationSelectDialog(ProfileNotificationsActivity.this.getParentActivity(), ProfileNotificationsActivity.this, ProfileNotificationsActivity.this.dialog_id, false, false, new Runnable() {
-                            public void run() {
-                                if (ProfileNotificationsActivity.this.adapter != null) {
-                                    ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.vibrateRow);
-                                }
-                            }
-                        }));
+                        ProfileNotificationsActivity.this.showDialog(AlertsCreator.createVibrationSelectDialog(ProfileNotificationsActivity.this.getParentActivity(), ProfileNotificationsActivity.this, ProfileNotificationsActivity.this.dialog_id, false, false, new ProfileNotificationsActivity$3$$Lambda$0(this)));
                     } else if (position == ProfileNotificationsActivity.this.callsVibrateRow) {
-                        ProfileNotificationsActivity.this.showDialog(AlertsCreator.createVibrationSelectDialog(ProfileNotificationsActivity.this.getParentActivity(), ProfileNotificationsActivity.this, ProfileNotificationsActivity.this.dialog_id, "calls_vibrate_", new Runnable() {
-                            public void run() {
-                                if (ProfileNotificationsActivity.this.adapter != null) {
-                                    ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.callsVibrateRow);
-                                }
-                            }
-                        }));
+                        ProfileNotificationsActivity.this.showDialog(AlertsCreator.createVibrationSelectDialog(ProfileNotificationsActivity.this.getParentActivity(), ProfileNotificationsActivity.this, ProfileNotificationsActivity.this.dialog_id, "calls_vibrate_", new ProfileNotificationsActivity$3$$Lambda$1(this)));
                     } else if (position == ProfileNotificationsActivity.this.priorityRow) {
-                        ProfileNotificationsActivity.this.showDialog(AlertsCreator.createPrioritySelectDialog(ProfileNotificationsActivity.this.getParentActivity(), ProfileNotificationsActivity.this, ProfileNotificationsActivity.this.dialog_id, false, false, new Runnable() {
-                            public void run() {
-                                if (ProfileNotificationsActivity.this.adapter != null) {
-                                    ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.priorityRow);
-                                }
-                            }
-                        }));
+                        ProfileNotificationsActivity.this.showDialog(AlertsCreator.createPrioritySelectDialog(ProfileNotificationsActivity.this.getParentActivity(), ProfileNotificationsActivity.this, ProfileNotificationsActivity.this.dialog_id, false, false, new ProfileNotificationsActivity$3$$Lambda$2(this)));
                     } else if (position == ProfileNotificationsActivity.this.smartRow) {
                         if (ProfileNotificationsActivity.this.getParentActivity() != null) {
                             final Context context1 = ProfileNotificationsActivity.this.getParentActivity();
@@ -720,45 +701,17 @@ public class ProfileNotificationsActivity extends BaseFragment implements Notifi
                                 }
                             });
                             recyclerListView.setPadding(0, AndroidUtilities.dp(12.0f), 0, AndroidUtilities.dp(8.0f));
-                            recyclerListView.setOnItemClickListener(new OnItemClickListener() {
-                                public void onItemClick(View view, int position) {
-                                    if (position >= 0 && position < 100) {
-                                        int notifyMaxCount = (position % 10) + 1;
-                                        int notifyDelay = (position / 10) + 1;
-                                        SharedPreferences preferences = MessagesController.getNotificationsSettings(ProfileNotificationsActivity.this.currentAccount);
-                                        preferences.edit().putInt("smart_max_count_" + ProfileNotificationsActivity.this.dialog_id, notifyMaxCount).commit();
-                                        preferences.edit().putInt("smart_delay_" + ProfileNotificationsActivity.this.dialog_id, notifyDelay * 60).commit();
-                                        if (ProfileNotificationsActivity.this.adapter != null) {
-                                            ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.smartRow);
-                                        }
-                                        ProfileNotificationsActivity.this.dismissCurrentDialig();
-                                    }
-                                }
-                            });
+                            recyclerListView.setOnItemClickListener(new ProfileNotificationsActivity$3$$Lambda$3(this));
                             Builder builder = new Builder(ProfileNotificationsActivity.this.getParentActivity());
                             builder.setTitle(LocaleController.getString("SmartNotificationsAlert", R.string.SmartNotificationsAlert));
                             builder.setView(recyclerListView);
                             builder.setPositiveButton(LocaleController.getString("Cancel", R.string.Cancel), null);
-                            builder.setNegativeButton(LocaleController.getString("SmartNotificationsDisabled", R.string.SmartNotificationsDisabled), new OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    MessagesController.getNotificationsSettings(ProfileNotificationsActivity.this.currentAccount).edit().putInt("smart_max_count_" + ProfileNotificationsActivity.this.dialog_id, 0).commit();
-                                    if (ProfileNotificationsActivity.this.adapter != null) {
-                                        ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.smartRow);
-                                    }
-                                    ProfileNotificationsActivity.this.dismissCurrentDialig();
-                                }
-                            });
+                            builder.setNegativeButton(LocaleController.getString("SmartNotificationsDisabled", R.string.SmartNotificationsDisabled), new ProfileNotificationsActivity$3$$Lambda$4(this));
                             ProfileNotificationsActivity.this.showDialog(builder.create());
                         }
                     } else if (position == ProfileNotificationsActivity.this.colorRow) {
                         if (ProfileNotificationsActivity.this.getParentActivity() != null) {
-                            ProfileNotificationsActivity.this.showDialog(AlertsCreator.createColorSelectDialog(ProfileNotificationsActivity.this.getParentActivity(), ProfileNotificationsActivity.this.dialog_id, false, false, new Runnable() {
-                                public void run() {
-                                    if (ProfileNotificationsActivity.this.adapter != null) {
-                                        ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.colorRow);
-                                    }
-                                }
-                            }));
+                            ProfileNotificationsActivity.this.showDialog(AlertsCreator.createColorSelectDialog(ProfileNotificationsActivity.this.getParentActivity(), ProfileNotificationsActivity.this.dialog_id, false, false, new ProfileNotificationsActivity$3$$Lambda$5(this)));
                         }
                     } else if (position == ProfileNotificationsActivity.this.popupEnabledRow) {
                         MessagesController.getNotificationsSettings(ProfileNotificationsActivity.this.currentAccount).edit().putInt("popup_" + ProfileNotificationsActivity.this.dialog_id, 1).commit();
@@ -775,6 +728,52 @@ public class ProfileNotificationsActivity extends BaseFragment implements Notifi
                             ((RadioCell) view).setChecked(false, true);
                         }
                     }
+                }
+            }
+
+            final /* synthetic */ void lambda$onItemClick$0$ProfileNotificationsActivity$3() {
+                if (ProfileNotificationsActivity.this.adapter != null) {
+                    ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.vibrateRow);
+                }
+            }
+
+            final /* synthetic */ void lambda$onItemClick$1$ProfileNotificationsActivity$3() {
+                if (ProfileNotificationsActivity.this.adapter != null) {
+                    ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.callsVibrateRow);
+                }
+            }
+
+            final /* synthetic */ void lambda$onItemClick$2$ProfileNotificationsActivity$3() {
+                if (ProfileNotificationsActivity.this.adapter != null) {
+                    ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.priorityRow);
+                }
+            }
+
+            final /* synthetic */ void lambda$onItemClick$3$ProfileNotificationsActivity$3(View view1, int position1) {
+                if (position1 >= 0 && position1 < 100) {
+                    int notifyMaxCount1 = (position1 % 10) + 1;
+                    int notifyDelay1 = (position1 / 10) + 1;
+                    SharedPreferences preferences1 = MessagesController.getNotificationsSettings(ProfileNotificationsActivity.this.currentAccount);
+                    preferences1.edit().putInt("smart_max_count_" + ProfileNotificationsActivity.this.dialog_id, notifyMaxCount1).commit();
+                    preferences1.edit().putInt("smart_delay_" + ProfileNotificationsActivity.this.dialog_id, notifyDelay1 * 60).commit();
+                    if (ProfileNotificationsActivity.this.adapter != null) {
+                        ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.smartRow);
+                    }
+                    ProfileNotificationsActivity.this.dismissCurrentDialig();
+                }
+            }
+
+            final /* synthetic */ void lambda$onItemClick$4$ProfileNotificationsActivity$3(DialogInterface dialog, int which) {
+                MessagesController.getNotificationsSettings(ProfileNotificationsActivity.this.currentAccount).edit().putInt("smart_max_count_" + ProfileNotificationsActivity.this.dialog_id, 0).commit();
+                if (ProfileNotificationsActivity.this.adapter != null) {
+                    ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.smartRow);
+                }
+                ProfileNotificationsActivity.this.dismissCurrentDialig();
+            }
+
+            final /* synthetic */ void lambda$onItemClick$5$ProfileNotificationsActivity$3() {
+                if (ProfileNotificationsActivity.this.adapter != null) {
+                    ProfileNotificationsActivity.this.adapter.notifyItemChanged(ProfileNotificationsActivity.this.colorRow);
                 }
             }
         });

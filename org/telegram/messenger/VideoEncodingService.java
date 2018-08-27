@@ -78,6 +78,7 @@ public class VideoEncodingService extends Service implements NotificationCenterD
                 FileLog.d("start video service");
             }
             if (this.builder == null) {
+                NotificationsController.checkOtherNotificationsChannel();
                 this.builder = new Builder(ApplicationLoader.applicationContext);
                 this.builder.setSmallIcon(17301640);
                 this.builder.setWhen(System.currentTimeMillis());

@@ -1,14 +1,46 @@
 package com.google.firebase.iid;
 
-public final class zzaj extends Exception {
-    private final int errorCode;
+import android.os.Bundle;
+import android.util.Log;
+import com.google.android.gms.tasks.TaskCompletionSource;
 
-    public zzaj(int i, String str) {
-        super(str);
-        this.errorCode = i;
+abstract class zzaj<T> {
+    final int what;
+    final int zzcc;
+    final TaskCompletionSource<T> zzcd = new TaskCompletionSource();
+    final Bundle zzce;
+
+    zzaj(int i, int i2, Bundle bundle) {
+        this.zzcc = i;
+        this.what = i2;
+        this.zzce = bundle;
     }
 
-    public final int getErrorCode() {
-        return this.errorCode;
+    abstract boolean zzaa();
+
+    abstract void zzb(Bundle bundle);
+
+    final void finish(T t) {
+        if (Log.isLoggable("MessengerIpcClient", 3)) {
+            String valueOf = String.valueOf(this);
+            String valueOf2 = String.valueOf(t);
+            Log.d("MessengerIpcClient", new StringBuilder((String.valueOf(valueOf).length() + 16) + String.valueOf(valueOf2).length()).append("Finishing ").append(valueOf).append(" with ").append(valueOf2).toString());
+        }
+        this.zzcd.setResult(t);
+    }
+
+    final void zza(zzak com_google_firebase_iid_zzak) {
+        if (Log.isLoggable("MessengerIpcClient", 3)) {
+            String valueOf = String.valueOf(this);
+            String valueOf2 = String.valueOf(com_google_firebase_iid_zzak);
+            Log.d("MessengerIpcClient", new StringBuilder((String.valueOf(valueOf).length() + 14) + String.valueOf(valueOf2).length()).append("Failing ").append(valueOf).append(" with ").append(valueOf2).toString());
+        }
+        this.zzcd.setException(com_google_firebase_iid_zzak);
+    }
+
+    public String toString() {
+        int i = this.what;
+        int i2 = this.zzcc;
+        return "Request { what=" + i + " id=" + i2 + " oneWay=" + zzaa() + "}";
     }
 }

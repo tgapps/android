@@ -5,6 +5,7 @@ import com.coremedia.iso.IsoTypeReader;
 import com.coremedia.iso.IsoTypeWriter;
 import com.coremedia.iso.boxes.Box;
 import com.coremedia.iso.boxes.Container;
+import com.google.android.exoplayer2.metadata.id3.InternalFrame;
 import com.googlecode.mp4parser.DataSource;
 import com.googlecode.mp4parser.util.CastUtils;
 import java.io.IOException;
@@ -223,7 +224,7 @@ public final class AudioSampleEntry extends AbstractSampleEntry {
                 }
 
                 public String getType() {
-                    return "----";
+                    return InternalFrame.ID;
                 }
 
                 public void getBox(WritableByteChannel writableByteChannel) throws IOException {

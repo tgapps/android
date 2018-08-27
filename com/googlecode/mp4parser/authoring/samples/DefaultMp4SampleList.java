@@ -9,11 +9,13 @@ import com.googlecode.mp4parser.authoring.Sample;
 import com.googlecode.mp4parser.util.CastUtils;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultMp4SampleList extends AbstractList<Sample> {
+    private static final long MAX_MAP_SIZE = 268435456;
     ByteBuffer[][] cache = null;
     int[] chunkNumsStartSampleNum;
     long[] chunkOffsets;
@@ -160,7 +162,7 @@ public class DefaultMp4SampleList extends AbstractList<Sample> {
             int i = 0;
             while (i < sampleOffsetsWithinChunk.length) {
                 try {
-                    if ((sampleOffsetsWithinChunk[i] + this.ssb.getSampleSizeAtIndex(i + chunkStartSample)) - currentStart > 268435456) {
+                    if ((sampleOffsetsWithinChunk[i] + this.ssb.getSampleSizeAtIndex(i + chunkStartSample)) - currentStart > MAX_MAP_SIZE) {
                         _chunkBuffers.add(this.topLevel.getByteBuffer(chunkOffset + currentStart, sampleOffsetsWithinChunk[i] - currentStart));
                         currentStart = sampleOffsetsWithinChunk[i];
                     }
@@ -185,6 +187,18 @@ public class DefaultMp4SampleList extends AbstractList<Sample> {
         final ByteBuffer finalCorrectPartOfChunk = correctPartOfChunk;
         final long finalOffsetWithInChunk = offsetWithInChunk;
         return new Sample() {
+            public void writeTo(WritableByteChannel channel) throws IOException {
+                channel.write(asByteBuffer());
+            }
+
+            public long getSize() {
+                return sampleSize;
+            }
+
+            public ByteBuffer asByteBuffer() {
+                return (ByteBuffer) ((ByteBuffer) finalCorrectPartOfChunk.position(CastUtils.l2i(finalOffsetWithInChunk))).slice().limit(CastUtils.l2i(sampleSize));
+            }
+
             public String toString() {
                 return "DefaultMp4Sample(size:" + sampleSize + ")";
             }

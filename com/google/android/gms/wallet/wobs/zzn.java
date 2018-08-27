@@ -5,6 +5,10 @@ import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzn implements Creator<WalletObjectMessage> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new WalletObjectMessage[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         UriData uriData = null;
@@ -37,9 +41,5 @@ public final class zzn implements Creator<WalletObjectMessage> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new WalletObjectMessage(str2, str, timeInterval, uriData2, uriData);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new WalletObjectMessage[i];
     }
 }

@@ -21,7 +21,7 @@ public final class RemoteInput {
         private boolean mAllowFreeFormTextInput = true;
         private final Set<String> mAllowedDataTypes = new HashSet();
         private CharSequence[] mChoices;
-        private Bundle mExtras = new Bundle();
+        private final Bundle mExtras = new Bundle();
         private CharSequence mLabel;
         private final String mResultKey;
 

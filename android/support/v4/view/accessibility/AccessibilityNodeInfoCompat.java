@@ -5,8 +5,8 @@ import android.os.Build.VERSION;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityNodeInfo.CollectionInfo;
 import android.view.accessibility.AccessibilityNodeInfo.CollectionItemInfo;
+import com.google.android.exoplayer2.C;
 import org.telegram.messenger.MessagesController;
-import org.telegram.messenger.exoplayer2.C;
 
 public class AccessibilityNodeInfoCompat {
     private final AccessibilityNodeInfo mInfo;
@@ -149,13 +149,13 @@ public class AccessibilityNodeInfoCompat {
 
     public void setCollectionInfo(Object collectionInfo) {
         if (VERSION.SDK_INT >= 19) {
-            this.mInfo.setCollectionInfo((CollectionInfo) ((CollectionInfoCompat) collectionInfo).mInfo);
+            this.mInfo.setCollectionInfo(collectionInfo == null ? null : (CollectionInfo) ((CollectionInfoCompat) collectionInfo).mInfo);
         }
     }
 
     public void setCollectionItemInfo(Object collectionItemInfo) {
         if (VERSION.SDK_INT >= 19) {
-            this.mInfo.setCollectionItemInfo((CollectionItemInfo) ((CollectionItemInfoCompat) collectionItemInfo).mInfo);
+            this.mInfo.setCollectionItemInfo(collectionItemInfo == null ? null : (CollectionItemInfo) ((CollectionItemInfoCompat) collectionItemInfo).mInfo);
         }
     }
 

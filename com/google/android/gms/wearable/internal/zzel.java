@@ -6,6 +6,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.common.data.DataHolder;
 import com.google.android.gms.internal.wearable.zzb;
 import com.google.android.gms.internal.wearable.zzc;
+import com.googlecode.mp4parser.authoring.tracks.h265.NalUnitTypes;
 
 public abstract class zzel extends zzb implements zzek {
     public zzel() {
@@ -74,22 +75,22 @@ public abstract class zzel extends zzb implements zzek {
             case 22:
                 zza((zzdk) zzc.zza(parcel, zzdk.CREATOR));
                 break;
-            case 23:
+            case NalUnitTypes.NAL_TYPE_RSV_IRAP_VCL23 /*23*/:
                 zza((zzdi) zzc.zza(parcel, zzdi.CREATOR));
                 break;
-            case 26:
+            case NalUnitTypes.NAL_TYPE_RSV_VCL26 /*26*/:
                 zza((zzf) zzc.zza(parcel, zzf.CREATOR));
                 break;
             case 27:
                 zza((zzfy) zzc.zza(parcel, zzfy.CREATOR));
                 break;
-            case 28:
+            case NalUnitTypes.NAL_TYPE_RSV_VCL28 /*28*/:
                 zza((zzdr) zzc.zza(parcel, zzdr.CREATOR));
                 break;
-            case 29:
+            case NalUnitTypes.NAL_TYPE_RSV_VCL29 /*29*/:
                 zza((zzdv) zzc.zza(parcel, zzdv.CREATOR));
                 break;
-            case 30:
+            case NalUnitTypes.NAL_TYPE_RSV_VCL30 /*30*/:
                 zza((zzdt) zzc.zza(parcel, zzdt.CREATOR));
                 break;
             default:

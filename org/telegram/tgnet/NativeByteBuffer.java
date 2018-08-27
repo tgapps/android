@@ -1,10 +1,10 @@
 package org.telegram.tgnet;
 
+import com.google.android.exoplayer2.C;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.exoplayer2.C;
 
 public class NativeByteBuffer extends AbstractSerializedData {
     private static final ThreadLocal<NativeByteBuffer> addressWrapper = new ThreadLocal<NativeByteBuffer>() {

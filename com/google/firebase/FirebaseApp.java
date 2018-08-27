@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.concurrent.GuardedBy;
 
+/* compiled from: com.google.firebase:firebase-common@@16.0.1 */
 public class FirebaseApp {
     @GuardedBy("LOCK")
     static final Map<String, FirebaseApp> zza = new ArrayMap();
@@ -63,13 +64,16 @@ public class FirebaseApp {
     private final List<Object> zzt = new CopyOnWriteArrayList();
     private IdTokenListenersCountChangedListener zzv;
 
+    /* compiled from: com.google.firebase:firebase-common@@16.0.1 */
     public interface BackgroundStateChangeListener {
         void onBackgroundStateChanged(boolean z);
     }
 
+    /* compiled from: com.google.firebase:firebase-common@@16.0.1 */
     public interface IdTokenListenersCountChangedListener {
     }
 
+    /* compiled from: com.google.firebase:firebase-common@@16.0.1 */
     static class zza implements Executor {
         private static final Handler zza = new Handler(Looper.getMainLooper());
 
@@ -82,6 +86,7 @@ public class FirebaseApp {
     }
 
     @TargetApi(24)
+    /* compiled from: com.google.firebase:firebase-common@@16.0.1 */
     static class zzb extends BroadcastReceiver {
         private static AtomicReference<zzb> zza = new AtomicReference();
         private final Context zzb;
@@ -188,6 +193,11 @@ public class FirebaseApp {
         return this.zzl.get(anInterface);
     }
 
+    public boolean isDataCollectionDefaultEnabled() {
+        zzc();
+        return this.zzq.get();
+    }
+
     protected FirebaseApp(Context applicationContext, String name, FirebaseOptions options) {
         this.zzi = (Context) Preconditions.checkNotNull(applicationContext);
         this.zzj = Preconditions.checkNotEmpty(name);
@@ -195,14 +205,14 @@ public class FirebaseApp {
         this.zzv = new com.google.firebase.internal.zza();
         this.zzm = applicationContext.getSharedPreferences("com.google.firebase.common.prefs", 0);
         this.zzq = new AtomicBoolean(zzb());
-        Iterable zza = new zzc(applicationContext).zza();
+        Iterable zza = zzc.zza(applicationContext).zza();
         this.zzl = new zzd(zzh, zza, Component.of(applicationContext, Context.class, new Class[0]), Component.of(this, FirebaseApp.class, new Class[0]), Component.of(options, FirebaseOptions.class, new Class[0]));
         this.zzn = (Publisher) this.zzl.get(Publisher.class);
     }
 
     private boolean zzb() {
-        if (this.zzm.contains("firebase_automatic_data_collection_enabled")) {
-            return this.zzm.getBoolean("firebase_automatic_data_collection_enabled", true);
+        if (this.zzm.contains("firebase_data_collection_default_enabled")) {
+            return this.zzm.getBoolean("firebase_data_collection_default_enabled", true);
         }
         try {
             PackageManager packageManager = this.zzi.getPackageManager();
@@ -210,10 +220,10 @@ public class FirebaseApp {
                 return true;
             }
             ApplicationInfo applicationInfo = packageManager.getApplicationInfo(this.zzi.getPackageName(), 128);
-            if (applicationInfo == null || applicationInfo.metaData == null || !applicationInfo.metaData.containsKey("firebase_automatic_data_collection_enabled")) {
+            if (applicationInfo == null || applicationInfo.metaData == null || !applicationInfo.metaData.containsKey("firebase_data_collection_default_enabled")) {
                 return true;
             }
-            return applicationInfo.metaData.getBoolean("firebase_automatic_data_collection_enabled");
+            return applicationInfo.metaData.getBoolean("firebase_data_collection_default_enabled");
         } catch (NameNotFoundException e) {
             return true;
         }

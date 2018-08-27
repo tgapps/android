@@ -15,6 +15,8 @@ import android.text.style.URLSpan;
 import android.text.util.Linkify;
 import android.util.Base64;
 import android.util.SparseArray;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSink;
+import com.google.android.exoplayer2.util.MimeTypes;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.StringReader;
@@ -29,8 +31,7 @@ import java.util.regex.Pattern;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.Emoji.EmojiSpan;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.upstream.cache.CacheDataSink;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
+import org.telegram.messenger.browser.Browser;
 import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.SerializedData;
@@ -861,6 +862,7 @@ public class MessageObject {
 
     public MessageObject(int accountNum, Message message, AbstractMap<Integer, User> users, AbstractMap<Integer, Chat> chats, SparseArray<User> sUsers, SparseArray<Chat> sChats, boolean generateLayout, long eid) {
         int size;
+        int a;
         this.type = 1000;
         Theme.createChatResources(null, true);
         this.currentAccount = accountNum;
@@ -1141,7 +1143,6 @@ public class MessageObject {
                     TL_messageActionSecureValuesSent valuesSent = (TL_messageActionSecureValuesSent) message.action;
                     StringBuilder str = new StringBuilder();
                     size = valuesSent.types.size();
-                    int a;
                     for (a = 0; a < size; a++) {
                         SecureValueType type = (SecureValueType) valuesSent.types.get(a);
                         if (str.length() > 0) {
@@ -2414,7 +2415,7 @@ public class MessageObject {
                 }
             } else if (this.messageOwner.media instanceof TL_messageMediaDocument) {
                 if (!(this.messageOwner.media.document.thumb instanceof TL_photoSizeEmpty)) {
-                    if (!update) {
+                    if (!update || this.photoThumbs == null) {
                         this.photoThumbs = new ArrayList();
                         this.photoThumbs.add(this.messageOwner.media.document.thumb);
                     } else if (this.photoThumbs != null && !this.photoThumbs.isEmpty() && this.messageOwner.media.document.thumb != null) {
@@ -2921,11 +2922,15 @@ public class MessageObject {
                             spannable.setSpan(new URLSpanReplacement("mailto:" + url), entity.offset, entity.offset + entity.length, 33);
                             hasUrls = hasUrls2;
                         } else if (entity instanceof TL_messageEntityUrl) {
-                            hasUrls = true;
-                            if (url.toLowerCase().startsWith("http") || url.toLowerCase().startsWith("tg://")) {
-                                spannable.setSpan(new URLSpanBrowser(url), entity.offset, entity.offset + entity.length, 33);
+                            if (Browser.isPassportUrl(entity.url)) {
+                                hasUrls = hasUrls2;
                             } else {
-                                spannable.setSpan(new URLSpanBrowser("http://" + url), entity.offset, entity.offset + entity.length, 33);
+                                hasUrls = true;
+                                if (url.toLowerCase().startsWith("http") || url.toLowerCase().startsWith("tg://")) {
+                                    spannable.setSpan(new URLSpanBrowser(url), entity.offset, entity.offset + entity.length, 33);
+                                } else {
+                                    spannable.setSpan(new URLSpanBrowser("http://" + url), entity.offset, entity.offset + entity.length, 33);
+                                }
                             }
                         } else if (entity instanceof TL_messageEntityPhone) {
                             hasUrls = true;
@@ -2933,9 +2938,13 @@ public class MessageObject {
                             if (url.startsWith("+")) {
                                 tel = "+" + tel;
                             }
-                            spannable.setSpan(new URLSpanBrowser("tel://" + tel), entity.offset, entity.offset + entity.length, 33);
+                            spannable.setSpan(new URLSpanBrowser("tel:" + tel), entity.offset, entity.offset + entity.length, 33);
                         } else if (entity instanceof TL_messageEntityTextUrl) {
-                            spannable.setSpan(new URLSpanReplacement(entity.url), entity.offset, entity.offset + entity.length, 33);
+                            if (Browser.isPassportUrl(entity.url)) {
+                                hasUrls = hasUrls2;
+                            } else {
+                                spannable.setSpan(new URLSpanReplacement(entity.url), entity.offset, entity.offset + entity.length, 33);
+                            }
                         }
                     }
                 }

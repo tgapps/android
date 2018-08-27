@@ -24,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.upstream.DataSchemeDataSource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -36,7 +38,6 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.beta.R;
 import org.telegram.messenger.browser.Browser;
-import org.telegram.messenger.exoplayer2.upstream.DataSchemeDataSource;
 import org.telegram.messenger.support.widget.LinearLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
 import org.telegram.messenger.support.widget.RecyclerView.LayoutManager;
@@ -505,7 +506,7 @@ public class PhonebookShareActivity extends BaseFragment {
                     } else if (item.type == 0) {
                         try {
                             Intent intent = new Intent("android.intent.action.DIAL", Uri.parse("tel:" + item.getValue(false)));
-                            intent.addFlags(268435456);
+                            intent.addFlags(C.ENCODING_PCM_MU_LAW);
                             PhonebookShareActivity.this.getParentActivity().startActivityForResult(intent, 500);
                         } catch (Throwable e) {
                             FileLog.e(e);

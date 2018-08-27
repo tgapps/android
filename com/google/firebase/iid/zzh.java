@@ -33,6 +33,14 @@ public final class zzh implements ServiceConnection {
         this.zzx = scheduledExecutorService;
     }
 
+    public final synchronized void zza(Intent intent, PendingResult pendingResult) {
+        if (Log.isLoggable("EnhancedIntentService", 3)) {
+            Log.d("EnhancedIntentService", "new intent queued in the bind-strategy delivery");
+        }
+        this.zzy.add(new zzd(intent, pendingResult, this.zzx));
+        zzc();
+    }
+
     private final synchronized void zzc() {
         if (Log.isLoggable("EnhancedIntentService", 3)) {
             Log.d("EnhancedIntentService", "flush queue called");
@@ -84,14 +92,6 @@ public final class zzh implements ServiceConnection {
             String valueOf = String.valueOf(componentName);
             Log.d("EnhancedIntentService", new StringBuilder(String.valueOf(valueOf).length() + 23).append("onServiceDisconnected: ").append(valueOf).toString());
         }
-        zzc();
-    }
-
-    public final synchronized void zza(Intent intent, PendingResult pendingResult) {
-        if (Log.isLoggable("EnhancedIntentService", 3)) {
-            Log.d("EnhancedIntentService", "new intent queued in the bind-strategy delivery");
-        }
-        this.zzy.add(new zzd(intent, pendingResult, this.zzx));
         zzc();
     }
 }

@@ -65,24 +65,8 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
         }
     };
     private Runnable loadFrameTask;
-    protected final Runnable mInvalidateTask = new Runnable() {
-        public void run() {
-            if (AnimatedFileDrawable.this.secondParentView != null) {
-                AnimatedFileDrawable.this.secondParentView.invalidate();
-            } else if (AnimatedFileDrawable.this.parentView != null) {
-                AnimatedFileDrawable.this.parentView.invalidate();
-            }
-        }
-    };
-    private final Runnable mStartTask = new Runnable() {
-        public void run() {
-            if (AnimatedFileDrawable.this.secondParentView != null) {
-                AnimatedFileDrawable.this.secondParentView.invalidate();
-            } else if (AnimatedFileDrawable.this.parentView != null) {
-                AnimatedFileDrawable.this.parentView.invalidate();
-            }
-        }
-    };
+    protected final Runnable mInvalidateTask = new AnimatedFileDrawable$$Lambda$0(this);
+    private final Runnable mStartTask = new AnimatedFileDrawable$$Lambda$1(this);
     private final int[] metaData = new int[4];
     private volatile long nativePtr;
     private Bitmap nextRenderingBitmap;
@@ -142,6 +126,22 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
     private static native void destroyDecoder(long j);
 
     private static native int getVideoFrame(long j, Bitmap bitmap, int[] iArr);
+
+    final /* synthetic */ void lambda$new$0$AnimatedFileDrawable() {
+        if (this.secondParentView != null) {
+            this.secondParentView.invalidate();
+        } else if (this.parentView != null) {
+            this.parentView.invalidate();
+        }
+    }
+
+    final /* synthetic */ void lambda$new$1$AnimatedFileDrawable() {
+        if (this.secondParentView != null) {
+            this.secondParentView.invalidate();
+        } else if (this.parentView != null) {
+            this.parentView.invalidate();
+        }
+    }
 
     public AnimatedFileDrawable(File file, boolean createDecoder) {
         this.path = file;

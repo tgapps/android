@@ -4,4 +4,6 @@ public interface Clock {
     long currentTimeMillis();
 
     long elapsedRealtime();
+
+    long nanoTime();
 }

@@ -5,6 +5,10 @@ import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzl implements Creator<UriData> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new UriData[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         String str = null;
@@ -25,9 +29,5 @@ public final class zzl implements Creator<UriData> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new UriData(str2, str);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new UriData[i];
     }
 }

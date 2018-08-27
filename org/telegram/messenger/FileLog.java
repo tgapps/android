@@ -1,6 +1,7 @@
 package org.telegram.messenger;
 
 import android.util.Log;
+import com.google.devtools.build.android.desugar.runtime.ThrowableExtension;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -65,12 +66,12 @@ public class FileLog {
                         this.streamWriter.write("-----start log " + this.dateFormat.format(System.currentTimeMillis()) + "-----\n");
                         this.streamWriter.flush();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        ThrowableExtension.printStackTrace(e);
                     }
                     this.initied = true;
                 }
             } catch (Exception e2) {
-                e2.printStackTrace();
+                ThrowableExtension.printStackTrace(e2);
             }
         }
     }
@@ -93,7 +94,7 @@ public class FileLog {
             getInstance().networkFile = new File(dir, getInstance().dateFormat.format(System.currentTimeMillis()) + "_net.txt");
             return getInstance().networkFile.getAbsolutePath();
         } catch (Throwable e) {
-            e.printStackTrace();
+            ThrowableExtension.printStackTrace(e);
             return TtmlNode.ANONYMOUS_REGION_ID;
         }
     }
@@ -110,7 +111,7 @@ public class FileLog {
                             FileLog.getInstance().streamWriter.write(exception.toString());
                             FileLog.getInstance().streamWriter.flush();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            ThrowableExtension.printStackTrace(e);
                         }
                     }
                 });
@@ -129,7 +130,7 @@ public class FileLog {
                             FileLog.getInstance().streamWriter.write(FileLog.getInstance().dateFormat.format(System.currentTimeMillis()) + " E/tmessages: " + message + "\n");
                             FileLog.getInstance().streamWriter.flush();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            ThrowableExtension.printStackTrace(e);
                         }
                     }
                 });
@@ -140,7 +141,7 @@ public class FileLog {
     public static void e(final Throwable e) {
         if (BuildVars.LOGS_ENABLED) {
             ensureInitied();
-            e.printStackTrace();
+            ThrowableExtension.printStackTrace(e);
             if (getInstance().streamWriter != null) {
                 getInstance().logQueue.postRunnable(new Runnable() {
                     public void run() {
@@ -152,12 +153,12 @@ public class FileLog {
                             }
                             FileLog.getInstance().streamWriter.flush();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            ThrowableExtension.printStackTrace(e);
                         }
                     }
                 });
             } else {
-                e.printStackTrace();
+                ThrowableExtension.printStackTrace(e);
             }
         }
     }
@@ -173,7 +174,7 @@ public class FileLog {
                             FileLog.getInstance().streamWriter.write(FileLog.getInstance().dateFormat.format(System.currentTimeMillis()) + " D/tmessages: " + message + "\n");
                             FileLog.getInstance().streamWriter.flush();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            ThrowableExtension.printStackTrace(e);
                         }
                     }
                 });
@@ -192,7 +193,7 @@ public class FileLog {
                             FileLog.getInstance().streamWriter.write(FileLog.getInstance().dateFormat.format(System.currentTimeMillis()) + " W/tmessages: " + message + "\n");
                             FileLog.getInstance().streamWriter.flush();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            ThrowableExtension.printStackTrace(e);
                         }
                     }
                 });

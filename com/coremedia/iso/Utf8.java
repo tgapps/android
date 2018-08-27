@@ -1,7 +1,7 @@
 package com.coremedia.iso;
 
+import com.google.android.exoplayer2.C;
 import java.io.UnsupportedEncodingException;
-import org.telegram.messenger.exoplayer2.C;
 
 public final class Utf8 {
     public static byte[] convert(String s) {

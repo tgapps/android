@@ -1,6 +1,7 @@
 package org.telegram.messenger;
 
 import android.text.TextUtils;
+import com.google.android.exoplayer2.C;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.Builder;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,8 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONObject;
 import org.telegram.messenger.NotificationCenter.NotificationCenterDelegate;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC.Chat;
@@ -53,7 +52,6 @@ public class WearDataLayerListenerService extends WearableListenerService {
     }
 
     public void onChannelOpened(Channel ch) {
-        DataOutputStream dataOutputStream;
         DataInputStream dataInputStream;
         GoogleApiClient apiClient = new Builder(this).addApi(Wearable.API).build();
         if (apiClient.blockingConnect().isSuccess()) {
@@ -61,6 +59,7 @@ public class WearDataLayerListenerService extends WearableListenerService {
             if (BuildVars.LOGS_ENABLED) {
                 FileLog.d("wear channel path: " + path);
             }
+            DataOutputStream dataOutputStream;
             try {
                 User user;
                 final CyclicBarrier barrier;
@@ -276,7 +275,7 @@ public class WearDataLayerListenerService extends WearableListenerService {
                     try {
                         ApplicationLoader.postInitApplication();
                         JSONObject jSONObject = new JSONObject(new String(messageEvent.getData(), C.UTF8_NAME));
-                        CharSequence text = jSONObject.getString(MimeTypes.BASE_TYPE_TEXT);
+                        CharSequence text = jSONObject.getString("text");
                         if (text != null && text.length() != 0) {
                             long dialog_id = jSONObject.getLong("chat_id");
                             int max_id = jSONObject.getInt("max_id");

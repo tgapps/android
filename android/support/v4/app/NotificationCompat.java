@@ -2,14 +2,17 @@ package android.support.v4.app;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.Person;
 import android.app.RemoteInput;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.compat.R;
 import android.support.v4.text.BidiFormatter;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -19,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.ui.ActionBar.Theme;
 
 public class NotificationCompat {
@@ -31,6 +33,8 @@ public class NotificationCompat {
         private final RemoteInput[] mDataOnlyRemoteInputs;
         final Bundle mExtras;
         private final RemoteInput[] mRemoteInputs;
+        private final int mSemanticAction;
+        boolean mShowsUserInterface;
         public CharSequence title;
 
         public static final class Builder {
@@ -39,15 +43,18 @@ public class NotificationCompat {
             private final int mIcon;
             private final PendingIntent mIntent;
             private ArrayList<RemoteInput> mRemoteInputs;
+            private int mSemanticAction;
+            private boolean mShowsUserInterface;
             private final CharSequence mTitle;
 
             public Builder(int icon, CharSequence title, PendingIntent intent) {
-                this(icon, title, intent, new Bundle(), null, true);
+                this(icon, title, intent, new Bundle(), null, true, 0, true);
             }
 
-            private Builder(int icon, CharSequence title, PendingIntent intent, Bundle extras, RemoteInput[] remoteInputs, boolean allowGeneratedReplies) {
+            private Builder(int icon, CharSequence title, PendingIntent intent, Bundle extras, RemoteInput[] remoteInputs, boolean allowGeneratedReplies, int semanticAction, boolean showsUserInterface) {
                 ArrayList arrayList;
                 this.mAllowGeneratedReplies = true;
+                this.mShowsUserInterface = true;
                 this.mIcon = icon;
                 this.mTitle = Builder.limitCharSequenceLength(title);
                 this.mIntent = intent;
@@ -59,6 +66,8 @@ public class NotificationCompat {
                 }
                 this.mRemoteInputs = arrayList;
                 this.mAllowGeneratedReplies = allowGeneratedReplies;
+                this.mSemanticAction = semanticAction;
+                this.mShowsUserInterface = showsUserInterface;
             }
 
             public Builder addRemoteInput(RemoteInput remoteInput) {
@@ -100,15 +109,16 @@ public class NotificationCompat {
                 } else {
                     textInputsArr = (RemoteInput[]) textInputs.toArray(new RemoteInput[textInputs.size()]);
                 }
-                return new Action(this.mIcon, this.mTitle, this.mIntent, this.mExtras, textInputsArr, dataOnlyInputsArr, this.mAllowGeneratedReplies);
+                return new Action(this.mIcon, this.mTitle, this.mIntent, this.mExtras, textInputsArr, dataOnlyInputsArr, this.mAllowGeneratedReplies, this.mSemanticAction, this.mShowsUserInterface);
             }
         }
 
         public Action(int icon, CharSequence title, PendingIntent intent) {
-            this(icon, title, intent, new Bundle(), null, null, true);
+            this(icon, title, intent, new Bundle(), null, null, true, 0, true);
         }
 
-        Action(int icon, CharSequence title, PendingIntent intent, Bundle extras, RemoteInput[] remoteInputs, RemoteInput[] dataOnlyRemoteInputs, boolean allowGeneratedReplies) {
+        Action(int icon, CharSequence title, PendingIntent intent, Bundle extras, RemoteInput[] remoteInputs, RemoteInput[] dataOnlyRemoteInputs, boolean allowGeneratedReplies, int semanticAction, boolean showsUserInterface) {
+            this.mShowsUserInterface = true;
             this.icon = icon;
             this.title = Builder.limitCharSequenceLength(title);
             this.actionIntent = intent;
@@ -119,6 +129,8 @@ public class NotificationCompat {
             this.mRemoteInputs = remoteInputs;
             this.mDataOnlyRemoteInputs = dataOnlyRemoteInputs;
             this.mAllowGeneratedReplies = allowGeneratedReplies;
+            this.mSemanticAction = semanticAction;
+            this.mShowsUserInterface = showsUserInterface;
         }
 
         public int getIcon() {
@@ -145,8 +157,16 @@ public class NotificationCompat {
             return this.mRemoteInputs;
         }
 
+        public int getSemanticAction() {
+            return this.mSemanticAction;
+        }
+
         public RemoteInput[] getDataOnlyRemoteInputs() {
             return this.mDataOnlyRemoteInputs;
+        }
+
+        public boolean getShowsUserInterface() {
+            return this.mShowsUserInterface;
         }
     }
 
@@ -171,6 +191,7 @@ public class NotificationCompat {
         String mGroupKey;
         boolean mGroupSummary;
         RemoteViews mHeadsUpContentView;
+        ArrayList<Action> mInvisibleActions;
         Bitmap mLargeIcon;
         boolean mLocalOnly;
         Notification mNotification;
@@ -195,6 +216,7 @@ public class NotificationCompat {
 
         public Builder(Context context, String channelId) {
             this.mActions = new ArrayList();
+            this.mInvisibleActions = new ArrayList();
             this.mShowWhen = true;
             this.mLocalOnly = false;
             this.mColor = 0;
@@ -273,8 +295,22 @@ public class NotificationCompat {
         }
 
         public Builder setLargeIcon(Bitmap icon) {
-            this.mLargeIcon = icon;
+            this.mLargeIcon = reduceLargeIconSize(icon);
             return this;
+        }
+
+        private Bitmap reduceLargeIconSize(Bitmap icon) {
+            if (icon == null || VERSION.SDK_INT >= 27) {
+                return icon;
+            }
+            Resources res = this.mContext.getResources();
+            int maxWidth = res.getDimensionPixelSize(R.dimen.compat_notification_large_icon_max_width);
+            int maxHeight = res.getDimensionPixelSize(R.dimen.compat_notification_large_icon_max_height);
+            if (icon.getWidth() <= maxWidth && icon.getHeight() <= maxHeight) {
+                return icon;
+            }
+            double scale = Math.min(((double) maxWidth) / ((double) Math.max(1, icon.getWidth())), ((double) maxHeight) / ((double) Math.max(1, icon.getHeight())));
+            return Bitmap.createScaledBitmap(icon, (int) Math.ceil(((double) icon.getWidth()) * scale), (int) Math.ceil(((double) icon.getHeight()) * scale), true);
         }
 
         public Builder setSound(Uri sound) {
@@ -597,7 +633,7 @@ public class NotificationCompat {
             Parcelable[] messages = new Parcelable[uc.getMessages().length];
             for (int i = 0; i < messages.length; i++) {
                 Bundle m = new Bundle();
-                m.putString(MimeTypes.BASE_TYPE_TEXT, uc.getMessages()[i]);
+                m.putString("text", uc.getMessages()[i]);
                 m.putString("author", author);
                 messages[i] = m;
             }
@@ -670,22 +706,23 @@ public class NotificationCompat {
     }
 
     public static class MessagingStyle extends Style {
-        CharSequence mConversationTitle;
-        List<Message> mMessages = new ArrayList();
-        CharSequence mUserDisplayName;
+        private CharSequence mConversationTitle;
+        private Boolean mIsGroupConversation;
+        private final List<Message> mMessages = new ArrayList();
+        private Person mUser;
 
         public static final class Message {
             private String mDataMimeType;
             private Uri mDataUri;
             private Bundle mExtras = new Bundle();
-            private final CharSequence mSender;
+            private final Person mPerson;
             private final CharSequence mText;
             private final long mTimestamp;
 
-            public Message(CharSequence text, long timestamp, CharSequence sender) {
+            public Message(CharSequence text, long timestamp, Person person) {
                 this.mText = text;
                 this.mTimestamp = timestamp;
-                this.mSender = sender;
+                this.mPerson = person;
             }
 
             public Message setData(String dataMimeType, Uri dataUri) {
@@ -702,8 +739,8 @@ public class NotificationCompat {
                 return this.mTimestamp;
             }
 
-            public CharSequence getSender() {
-                return this.mSender;
+            public Person getPerson() {
+                return this.mPerson;
             }
 
             public String getDataMimeType() {
@@ -717,11 +754,16 @@ public class NotificationCompat {
             private Bundle toBundle() {
                 Bundle bundle = new Bundle();
                 if (this.mText != null) {
-                    bundle.putCharSequence(MimeTypes.BASE_TYPE_TEXT, this.mText);
+                    bundle.putCharSequence("text", this.mText);
                 }
                 bundle.putLong("time", this.mTimestamp);
-                if (this.mSender != null) {
-                    bundle.putCharSequence("sender", this.mSender);
+                if (this.mPerson != null) {
+                    bundle.putCharSequence("sender", this.mPerson.getName());
+                    if (VERSION.SDK_INT >= 28) {
+                        bundle.putParcelable("sender_person", this.mPerson.toAndroidPerson());
+                    } else {
+                        bundle.putBundle("person", this.mPerson.toBundle());
+                    }
                 }
                 if (this.mDataMimeType != null) {
                     bundle.putString("type", this.mDataMimeType);
@@ -745,11 +787,12 @@ public class NotificationCompat {
             }
         }
 
-        MessagingStyle() {
+        private MessagingStyle() {
         }
 
+        @Deprecated
         public MessagingStyle(CharSequence userDisplayName) {
-            this.mUserDisplayName = userDisplayName;
+            this.mUser = new android.support.v4.app.Person.Builder().setName(userDisplayName).build();
         }
 
         public MessagingStyle setConversationTitle(CharSequence conversationTitle) {
@@ -757,8 +800,13 @@ public class NotificationCompat {
             return this;
         }
 
-        public MessagingStyle addMessage(CharSequence text, long timestamp, CharSequence sender) {
-            this.mMessages.add(new Message(text, timestamp, sender));
+        public MessagingStyle addMessage(CharSequence text, long timestamp, Person person) {
+            addMessage(new Message(text, timestamp, person));
+            return this;
+        }
+
+        public MessagingStyle addMessage(Message message) {
+            this.mMessages.add(message);
             if (this.mMessages.size() > 25) {
                 this.mMessages.remove(0);
             }
@@ -769,25 +817,75 @@ public class NotificationCompat {
             return this.mMessages;
         }
 
-        public void apply(NotificationBuilderWithBuilderAccessor builder) {
-            if (VERSION.SDK_INT >= 24) {
-                android.app.Notification.MessagingStyle style = new android.app.Notification.MessagingStyle(this.mUserDisplayName).setConversationTitle(this.mConversationTitle);
-                for (Message message : this.mMessages) {
-                    Message message2;
-                    android.app.Notification.MessagingStyle.Message frameworkMessage = new android.app.Notification.MessagingStyle.Message(message2.getText(), message2.getTimestamp(), message2.getSender());
-                    if (message2.getDataMimeType() != null) {
-                        frameworkMessage.setData(message2.getDataMimeType(), message2.getDataUri());
-                    }
-                    style.addMessage(frameworkMessage);
+        public MessagingStyle setGroupConversation(boolean isGroupConversation) {
+            this.mIsGroupConversation = Boolean.valueOf(isGroupConversation);
+            return this;
+        }
+
+        public boolean isGroupConversation() {
+            if (this.mBuilder == null || this.mBuilder.mContext.getApplicationInfo().targetSdkVersion >= 28 || this.mIsGroupConversation != null) {
+                if (this.mIsGroupConversation != null) {
+                    return this.mIsGroupConversation.booleanValue();
                 }
-                style.setBuilder(builder.getBuilder());
+                return false;
+            } else if (this.mConversationTitle != null) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public void apply(NotificationBuilderWithBuilderAccessor builder) {
+            setGroupConversation(isGroupConversation());
+            if (VERSION.SDK_INT >= 24) {
+                android.app.Notification.MessagingStyle frameworkStyle;
+                if (VERSION.SDK_INT >= 28) {
+                    frameworkStyle = new android.app.Notification.MessagingStyle(this.mUser.toAndroidPerson());
+                } else {
+                    frameworkStyle = new android.app.Notification.MessagingStyle(this.mUser.getName());
+                }
+                if (this.mIsGroupConversation.booleanValue() || VERSION.SDK_INT >= 28) {
+                    frameworkStyle.setConversationTitle(this.mConversationTitle);
+                }
+                if (VERSION.SDK_INT >= 28) {
+                    frameworkStyle.setGroupConversation(this.mIsGroupConversation.booleanValue());
+                }
+                for (Message compatMessage : this.mMessages) {
+                    android.app.Notification.MessagingStyle.Message frameworkMessage;
+                    if (VERSION.SDK_INT >= 28) {
+                        Person person;
+                        Person compatMessagePerson = compatMessage.getPerson();
+                        CharSequence text = compatMessage.getText();
+                        long timestamp = compatMessage.getTimestamp();
+                        if (compatMessagePerson == null) {
+                            person = null;
+                        } else {
+                            person = compatMessagePerson.toAndroidPerson();
+                        }
+                        frameworkMessage = new android.app.Notification.MessagingStyle.Message(text, timestamp, person);
+                    } else {
+                        CharSequence name = null;
+                        if (compatMessage.getPerson() != null) {
+                            name = compatMessage.getPerson().getName();
+                        }
+                        frameworkMessage = new android.app.Notification.MessagingStyle.Message(compatMessage.getText(), compatMessage.getTimestamp(), name);
+                    }
+                    if (compatMessage.getDataMimeType() != null) {
+                        frameworkMessage.setData(compatMessage.getDataMimeType(), compatMessage.getDataUri());
+                    }
+                    frameworkStyle.addMessage(frameworkMessage);
+                }
+                frameworkStyle.setBuilder(builder.getBuilder());
                 return;
             }
             Message latestIncomingMessage = findLatestIncomingMessage();
-            if (this.mConversationTitle != null) {
+            if (this.mConversationTitle != null && this.mIsGroupConversation.booleanValue()) {
                 builder.getBuilder().setContentTitle(this.mConversationTitle);
             } else if (latestIncomingMessage != null) {
-                builder.getBuilder().setContentTitle(latestIncomingMessage.getSender());
+                builder.getBuilder().setContentTitle(TtmlNode.ANONYMOUS_REGION_ID);
+                if (latestIncomingMessage.getPerson() != null) {
+                    builder.getBuilder().setContentTitle(latestIncomingMessage.getPerson().getName());
+                }
             }
             if (latestIncomingMessage != null) {
                 CharSequence makeMessageLine;
@@ -800,16 +898,11 @@ public class NotificationCompat {
                 builder2.setContentText(makeMessageLine);
             }
             if (VERSION.SDK_INT >= 16) {
-                boolean showNames;
                 SpannableStringBuilder completeMessage = new SpannableStringBuilder();
-                if (this.mConversationTitle != null || hasMessagesWithoutSender()) {
-                    showNames = true;
-                } else {
-                    showNames = false;
-                }
+                boolean showNames = this.mConversationTitle != null || hasMessagesWithoutSender();
                 for (int i = this.mMessages.size() - 1; i >= 0; i--) {
-                    message2 = (Message) this.mMessages.get(i);
-                    CharSequence line = showNames ? makeMessageLine(message2) : message2.getText();
+                    Message message = (Message) this.mMessages.get(i);
+                    CharSequence line = showNames ? makeMessageLine(message) : message.getText();
                     if (i != this.mMessages.size() - 1) {
                         completeMessage.insert(0, "\n");
                     }
@@ -822,7 +915,7 @@ public class NotificationCompat {
         private Message findLatestIncomingMessage() {
             for (int i = this.mMessages.size() - 1; i >= 0; i--) {
                 Message message = (Message) this.mMessages.get(i);
-                if (!TextUtils.isEmpty(message.getSender())) {
+                if (message.getPerson() != null && !TextUtils.isEmpty(message.getPerson().getName())) {
                     return message;
                 }
             }
@@ -834,7 +927,8 @@ public class NotificationCompat {
 
         private boolean hasMessagesWithoutSender() {
             for (int i = this.mMessages.size() - 1; i >= 0; i--) {
-                if (((Message) this.mMessages.get(i)).getSender() == null) {
+                Message message = (Message) this.mMessages.get(i);
+                if (message.getPerson() != null && message.getPerson().getName() == null) {
                     return true;
                 }
             }
@@ -842,13 +936,18 @@ public class NotificationCompat {
         }
 
         private CharSequence makeMessageLine(Message message) {
+            CharSequence replyName;
             BidiFormatter bidi = BidiFormatter.getInstance();
             SpannableStringBuilder sb = new SpannableStringBuilder();
             boolean afterLollipop = VERSION.SDK_INT >= 21;
             int color = afterLollipop ? Theme.ACTION_BAR_VIDEO_EDIT_COLOR : -1;
-            CharSequence replyName = message.getSender();
-            if (TextUtils.isEmpty(message.getSender())) {
-                replyName = this.mUserDisplayName == null ? TtmlNode.ANONYMOUS_REGION_ID : this.mUserDisplayName;
+            if (message.getPerson() == null) {
+                replyName = TtmlNode.ANONYMOUS_REGION_ID;
+            } else {
+                replyName = message.getPerson().getName();
+            }
+            if (TextUtils.isEmpty(replyName)) {
+                replyName = this.mUser.getName();
                 if (afterLollipop && this.mBuilder.getColor() != 0) {
                     color = this.mBuilder.getColor();
                 }
@@ -866,14 +965,17 @@ public class NotificationCompat {
 
         public void addCompatExtras(Bundle extras) {
             super.addCompatExtras(extras);
-            if (this.mUserDisplayName != null) {
-                extras.putCharSequence("android.selfDisplayName", this.mUserDisplayName);
-            }
-            if (this.mConversationTitle != null) {
+            extras.putCharSequence("android.selfDisplayName", this.mUser.getName());
+            extras.putBundle("android.messagingStyleUser", this.mUser.toBundle());
+            extras.putCharSequence("android.hiddenConversationTitle", this.mConversationTitle);
+            if (this.mConversationTitle != null && this.mIsGroupConversation.booleanValue()) {
                 extras.putCharSequence("android.conversationTitle", this.mConversationTitle);
             }
             if (!this.mMessages.isEmpty()) {
                 extras.putParcelableArray("android.messages", Message.getBundleArrayForMessages(this.mMessages));
+            }
+            if (this.mIsGroupConversation != null) {
+                extras.putBoolean("android.isGroupConversation", this.mIsGroupConversation.booleanValue());
             }
         }
     }

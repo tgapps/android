@@ -6,10 +6,13 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Base64;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import java.io.File;
 import java.util.ArrayList;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.DefaultRenderersFactory;
+import java.util.HashMap;
+import java.util.Iterator;
+import org.json.JSONObject;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.SerializedData;
 
@@ -40,6 +43,9 @@ public class SharedConfig {
     public static long passcodeRetryInMs;
     public static byte[] passcodeSalt = new byte[0];
     public static int passcodeType;
+    public static int passportConfigHash;
+    private static String passportConfigJson = TtmlNode.ANONYMOUS_REGION_ID;
+    private static HashMap<String, String> passportConfigMap;
     public static boolean playOrderReversed;
     public static ArrayList<ProxyInfo> proxyList = new ArrayList();
     private static boolean proxyListLoaded;
@@ -118,6 +124,8 @@ public class SharedConfig {
                 editor.putString("pushString2", pushString);
                 editor.putString("pushAuthKey", pushAuthKey != null ? Base64.encodeToString(pushAuthKey, 0) : TtmlNode.ANONYMOUS_REGION_ID);
                 editor.putInt("lastLocalId", lastLocalId);
+                editor.putString("passportConfigJson", passportConfigJson);
+                editor.putInt("passportConfigHash", passportConfigHash);
                 editor.commit();
             } catch (Throwable e) {
                 FileLog.e(e);
@@ -155,6 +163,8 @@ public class SharedConfig {
             allowScreenCapture = preferences.getBoolean("allowScreenCapture", false);
             lastLocalId = preferences.getInt("lastLocalId", -210000);
             pushString = preferences.getString("pushString2", TtmlNode.ANONYMOUS_REGION_ID);
+            passportConfigJson = preferences.getString("passportConfigJson", TtmlNode.ANONYMOUS_REGION_ID);
+            passportConfigHash = preferences.getInt("passportConfigHash", 0);
             String authKeyString = preferences.getString("pushAuthKey", null);
             if (!TextUtils.isEmpty(authKeyString)) {
                 pushAuthKey = Base64.decode(authKeyString, 0);
@@ -219,6 +229,35 @@ public class SharedConfig {
             lastUptimeMillis = SystemClock.elapsedRealtime();
         }
         saveConfig();
+    }
+
+    public static boolean isPassportConfigLoaded() {
+        return passportConfigMap != null;
+    }
+
+    public static void setPassportConfig(String json, int hash) {
+        passportConfigMap = null;
+        passportConfigJson = json;
+        passportConfigHash = hash;
+        saveConfig();
+        getCountryLangs();
+    }
+
+    public static HashMap<String, String> getCountryLangs() {
+        if (passportConfigMap == null) {
+            passportConfigMap = new HashMap();
+            try {
+                JSONObject object = new JSONObject(passportConfigJson);
+                Iterator<String> iter = object.keys();
+                while (iter.hasNext()) {
+                    String key = (String) iter.next();
+                    passportConfigMap.put(key.toUpperCase(), object.getString(key).toUpperCase());
+                }
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
+        }
+        return passportConfigMap;
     }
 
     public static boolean checkPasscode(String passcode) {

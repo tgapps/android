@@ -4,6 +4,7 @@ import com.google.firebase.events.Event;
 import com.google.firebase.events.EventHandler;
 import java.util.Map.Entry;
 
+/* compiled from: com.google.firebase:firebase-common@@16.0.1 */
 final /* synthetic */ class zzg implements Runnable {
     private final Entry zza;
     private final Event zzb;

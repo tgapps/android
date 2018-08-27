@@ -2,6 +2,7 @@ package com.coremedia.iso;
 
 import com.coremedia.iso.boxes.Box;
 import com.coremedia.iso.boxes.UserBox;
+import com.google.devtools.build.android.desugar.runtime.ThrowableExtension;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -41,7 +42,7 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
             try {
                 is.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                ThrowableExtension.printStackTrace(e);
             }
         } catch (IOException e2) {
             throw new RuntimeException(e2);
@@ -49,7 +50,7 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
             try {
                 is.close();
             } catch (IOException e22) {
-                e22.printStackTrace();
+                ThrowableExtension.printStackTrace(e22);
             }
         }
     }

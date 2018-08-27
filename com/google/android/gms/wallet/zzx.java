@@ -6,6 +6,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.identity.intents.model.UserAddress;
 
 public final class zzx implements Creator<MaskedWallet> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new MaskedWallet[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         InstrumentInfo[] instrumentInfoArr = null;
@@ -62,9 +66,5 @@ public final class zzx implements Creator<MaskedWallet> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new MaskedWallet(str3, str2, strArr, str, com_google_android_gms_wallet_zza2, com_google_android_gms_wallet_zza, loyaltyWalletObjectArr, offerWalletObjectArr, userAddress2, userAddress, instrumentInfoArr);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new MaskedWallet[i];
     }
 }

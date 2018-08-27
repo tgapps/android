@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/* compiled from: com.google.firebase:firebase-common@@16.0.1 */
 final class zze {
 
+    /* compiled from: com.google.firebase:firebase-common@@16.0.1 */
     static class zza {
         private final Component<?> zza;
         private final Set<zza> zzb = new HashSet();
@@ -71,12 +73,12 @@ final class zze {
         }
         for (zza com_google_firebase_components_zze_zza3 : hashMap.values()) {
             for (Dependency dependency : com_google_firebase_components_zze_zza3.zzb().zzb()) {
-                zza com_google_firebase_components_zze_zza4;
                 if (dependency.zzc()) {
-                    com_google_firebase_components_zze_zza4 = (zza) hashMap.get(dependency.zza());
-                    if (com_google_firebase_components_zze_zza4 != null) {
-                        com_google_firebase_components_zze_zza3.zza(com_google_firebase_components_zze_zza4);
-                        com_google_firebase_components_zze_zza4.zzb(com_google_firebase_components_zze_zza3);
+                    com_google_firebase_components_zze_zza = (zza) hashMap.get(dependency.zza());
+                    if (com_google_firebase_components_zze_zza != null) {
+                        zza com_google_firebase_components_zze_zza32;
+                        com_google_firebase_components_zze_zza32.zza(com_google_firebase_components_zze_zza);
+                        com_google_firebase_components_zze_zza.zzb(com_google_firebase_components_zze_zza32);
                     }
                 }
             }
@@ -85,13 +87,13 @@ final class zze {
         Set zza = zza((Set) hashSet);
         List<Component<?>> arrayList = new ArrayList();
         while (!zza.isEmpty()) {
-            com_google_firebase_components_zze_zza3 = (zza) zza.iterator().next();
-            zza.remove(com_google_firebase_components_zze_zza3);
-            arrayList.add(com_google_firebase_components_zze_zza3.zzb());
-            for (zza com_google_firebase_components_zze_zza42 : com_google_firebase_components_zze_zza3.zza()) {
-                com_google_firebase_components_zze_zza42.zzc(com_google_firebase_components_zze_zza3);
-                if (com_google_firebase_components_zze_zza42.zzc()) {
-                    zza.add(com_google_firebase_components_zze_zza42);
+            com_google_firebase_components_zze_zza32 = (zza) zza.iterator().next();
+            zza.remove(com_google_firebase_components_zze_zza32);
+            arrayList.add(com_google_firebase_components_zze_zza32.zzb());
+            for (zza com_google_firebase_components_zze_zza4 : com_google_firebase_components_zze_zza32.zza()) {
+                com_google_firebase_components_zze_zza4.zzc(com_google_firebase_components_zze_zza32);
+                if (com_google_firebase_components_zze_zza4.zzc()) {
+                    zza.add(com_google_firebase_components_zze_zza4);
                 }
             }
         }
@@ -100,9 +102,9 @@ final class zze {
             return arrayList;
         }
         List arrayList2 = new ArrayList();
-        for (zza com_google_firebase_components_zze_zza32 : hashSet) {
-            if (!(com_google_firebase_components_zze_zza32.zzc() || com_google_firebase_components_zze_zza32.zzd())) {
-                arrayList2.add(com_google_firebase_components_zze_zza32.zzb());
+        for (zza com_google_firebase_components_zze_zza322 : hashSet) {
+            if (!(com_google_firebase_components_zze_zza322.zzc() || com_google_firebase_components_zze_zza322.zzd())) {
+                arrayList2.add(com_google_firebase_components_zze_zza322.zzb());
             }
         }
         throw new DependencyCycleException(arrayList2);

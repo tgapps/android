@@ -8,39 +8,30 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 
 public final class FullWalletRequest extends AbstractSafeParcelable implements ReflectedParcelable {
     public static final Creator<FullWalletRequest> CREATOR = new zzm();
-    String zzaw;
     String zzax;
-    Cart zzbh;
+    String zzay;
+    Cart zzbi;
 
     public final class Builder {
-        private final /* synthetic */ FullWalletRequest zzbi;
+        private final /* synthetic */ FullWalletRequest zzbj;
 
         private Builder(FullWalletRequest fullWalletRequest) {
-            this.zzbi = fullWalletRequest;
-        }
-
-        public final FullWalletRequest build() {
-            return this.zzbi;
-        }
-
-        public final Builder setCart(Cart cart) {
-            this.zzbi.zzbh = cart;
-            return this;
+            this.zzbj = fullWalletRequest;
         }
 
         public final Builder setGoogleTransactionId(String str) {
-            this.zzbi.zzaw = str;
+            this.zzbj.zzax = str;
             return this;
         }
-    }
 
-    FullWalletRequest() {
-    }
+        public final Builder setCart(Cart cart) {
+            this.zzbj.zzbi = cart;
+            return this;
+        }
 
-    FullWalletRequest(String str, String str2, Cart cart) {
-        this.zzaw = str;
-        this.zzax = str2;
-        this.zzbh = cart;
+        public final FullWalletRequest build() {
+            return this.zzbj;
+        }
     }
 
     public static Builder newBuilder() {
@@ -49,9 +40,18 @@ public final class FullWalletRequest extends AbstractSafeParcelable implements R
 
     public final void writeToParcel(Parcel parcel, int i) {
         int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
-        SafeParcelWriter.writeString(parcel, 2, this.zzaw, false);
-        SafeParcelWriter.writeString(parcel, 3, this.zzax, false);
-        SafeParcelWriter.writeParcelable(parcel, 4, this.zzbh, i, false);
+        SafeParcelWriter.writeString(parcel, 2, this.zzax, false);
+        SafeParcelWriter.writeString(parcel, 3, this.zzay, false);
+        SafeParcelWriter.writeParcelable(parcel, 4, this.zzbi, i, false);
         SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+    }
+
+    FullWalletRequest(String str, String str2, Cart cart) {
+        this.zzax = str;
+        this.zzay = str2;
+        this.zzbi = cart;
+    }
+
+    FullWalletRequest() {
     }
 }

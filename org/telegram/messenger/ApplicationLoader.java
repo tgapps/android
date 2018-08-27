@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.devtools.build.android.desugar.runtime.ThrowableExtension;
 import com.google.firebase.iid.FirebaseInstanceId;
 import java.io.File;
 import org.telegram.tgnet.ConnectionsManager;
@@ -53,14 +54,14 @@ public class ApplicationLoader extends Application {
             try {
                 LocaleController.getInstance();
             } catch (Exception e) {
-                e.printStackTrace();
+                ThrowableExtension.printStackTrace(e);
             }
             try {
                 IntentFilter filter = new IntentFilter("android.intent.action.SCREEN_ON");
                 filter.addAction("android.intent.action.SCREEN_OFF");
                 applicationContext.registerReceiver(new ScreenReceiver(), filter);
             } catch (Exception e2) {
-                e2.printStackTrace();
+                ThrowableExtension.printStackTrace(e2);
             }
             try {
                 isScreenOn = ((PowerManager) applicationContext.getSystemService("power")).isScreenOn();
@@ -102,11 +103,7 @@ public class ApplicationLoader extends Application {
         ConnectionsManager.native_setJava(false);
         ForegroundDetector foregroundDetector = new ForegroundDetector(this);
         applicationHandler = new Handler(applicationContext.getMainLooper());
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            public void run() {
-                ApplicationLoader.startPushService();
-            }
-        });
+        AndroidUtilities.runOnUIThread(ApplicationLoader$$Lambda$0.$instance);
     }
 
     public static void startPushService() {
@@ -114,8 +111,7 @@ public class ApplicationLoader extends Application {
             try {
                 applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
                 return;
-            } catch (Throwable e) {
-                FileLog.e(e);
+            } catch (Throwable th) {
                 return;
             }
         }
@@ -133,39 +129,39 @@ public class ApplicationLoader extends Application {
             LocaleController.getInstance().onDeviceConfigurationChange(newConfig);
             AndroidUtilities.checkDisplaySize(applicationContext, newConfig);
         } catch (Exception e) {
-            e.printStackTrace();
+            ThrowableExtension.printStackTrace(e);
         }
     }
 
     private void initPlayServices() {
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            public void run() {
-                if (ApplicationLoader.this.checkPlayServices()) {
-                    String currentPushString = SharedConfig.pushString;
-                    if (TextUtils.isEmpty(currentPushString)) {
-                        if (BuildVars.LOGS_ENABLED) {
-                            FileLog.d("GCM Registration not found.");
-                        }
-                    } else if (BuildVars.LOGS_ENABLED) {
-                        FileLog.d("GCM regId = " + currentPushString);
-                    }
-                    Utilities.globalQueue.postRunnable(new Runnable() {
-                        public void run() {
-                            try {
-                                String token = FirebaseInstanceId.getInstance().getToken();
-                                if (!TextUtils.isEmpty(token)) {
-                                    GcmInstanceIDListenerService.sendRegistrationToServer(token);
-                                }
-                            } catch (Throwable e) {
-                                FileLog.e(e);
-                            }
-                        }
-                    });
-                } else if (BuildVars.LOGS_ENABLED) {
-                    FileLog.d("No valid Google Play Services APK found.");
+        AndroidUtilities.runOnUIThread(new ApplicationLoader$$Lambda$1(this), 1000);
+    }
+
+    final /* synthetic */ void lambda$initPlayServices$1$ApplicationLoader() {
+        if (checkPlayServices()) {
+            String currentPushString = SharedConfig.pushString;
+            if (TextUtils.isEmpty(currentPushString)) {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("GCM Registration not found.");
                 }
+            } else if (BuildVars.LOGS_ENABLED) {
+                FileLog.d("GCM regId = " + currentPushString);
             }
-        }, 1000);
+            Utilities.globalQueue.postRunnable(ApplicationLoader$$Lambda$2.$instance);
+        } else if (BuildVars.LOGS_ENABLED) {
+            FileLog.d("No valid Google Play Services APK found.");
+        }
+    }
+
+    static final /* synthetic */ void lambda$null$0$ApplicationLoader() {
+        try {
+            String token = FirebaseInstanceId.getInstance().getToken();
+            if (!TextUtils.isEmpty(token)) {
+                GcmInstanceIDListenerService.sendRegistrationToServer(token);
+            }
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
     }
 
     private boolean checkPlayServices() {

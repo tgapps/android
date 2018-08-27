@@ -3,6 +3,7 @@ package net.hockeyapp.android;
 import android.content.Context;
 import android.os.Process;
 import android.text.TextUtils;
+import com.google.devtools.build.android.desugar.runtime.ThrowableExtension;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -33,7 +34,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
     public static void saveException(Throwable exception, Thread thread, CrashManagerListener listener) {
         Date now = new Date();
         Date startDate = new Date(CrashManager.getInitializeTimestamp());
-        exception.printStackTrace(new PrintWriter(new StringWriter()));
+        ThrowableExtension.printStackTrace(exception, new PrintWriter(new StringWriter()));
         Context context = CrashManager.weakContext != null ? (Context) CrashManager.weakContext.get() : null;
         if (context == null) {
             HockeyLog.error("Failed to save exception: context in CrashManager is null");

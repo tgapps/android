@@ -5,12 +5,8 @@ import android.util.Log;
 
 @Deprecated
 public class FirebaseInstanceIdService extends zzb {
-    @Deprecated
-    public void onTokenRefresh() {
-    }
-
     protected final Intent zzb(Intent intent) {
-        return (Intent) zzat.zzah().zzcr.poll();
+        return (Intent) zzau.zzah().zzcx.poll();
     }
 
     public final void zzd(Intent intent) {
@@ -30,5 +26,9 @@ public class FirebaseInstanceIdService extends zzb {
                 FirebaseInstanceId.getInstance().zzp();
             }
         }
+    }
+
+    @Deprecated
+    public void onTokenRefresh() {
     }
 }

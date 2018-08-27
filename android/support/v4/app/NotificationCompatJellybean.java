@@ -94,6 +94,8 @@ class NotificationCompatJellybean {
         actionExtras.putBoolean("android.support.allowGeneratedReplies", action.getAllowGeneratedReplies());
         bundle.putBundle("extras", actionExtras);
         bundle.putParcelableArray("remoteInputs", toBundleArray(action.getRemoteInputs()));
+        bundle.putBoolean("showsUserInterface", action.getShowsUserInterface());
+        bundle.putInt("semanticAction", action.getSemanticAction());
         return bundle;
     }
 

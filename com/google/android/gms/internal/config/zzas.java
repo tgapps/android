@@ -1,5 +1,6 @@
 package com.google.android.gms.internal.config;
 
+import com.googlecode.mp4parser.authoring.tracks.h265.NalUnitTypes;
 import java.io.IOException;
 
 public final class zzas extends zzbb<zzas> {
@@ -60,7 +61,7 @@ public final class zzas extends zzbb<zzas> {
                 case 17:
                     this.timestamp = com_google_android_gms_internal_config_zzay.zzz();
                     continue;
-                case 26:
+                case NalUnitTypes.NAL_TYPE_RSV_VCL26 /*26*/:
                     zzb = zzbk.zzb(com_google_android_gms_internal_config_zzay, 26);
                     zzx = this.zzbg == null ? 0 : this.zzbg.length;
                     obj = new byte[(zzb + zzx)][];

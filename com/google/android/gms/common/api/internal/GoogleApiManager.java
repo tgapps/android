@@ -14,6 +14,7 @@ import android.os.RemoteException;
 import android.support.v4.util.ArrayMap;
 import android.support.v4.util.ArraySet;
 import android.util.Log;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Feature;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -52,7 +53,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.GuardedBy;
-import org.telegram.messenger.exoplayer2.DefaultRenderersFactory;
 
 public class GoogleApiManager implements Callback {
     private static final Object lock = new Object();

@@ -8,13 +8,13 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class DataEntryUrlBox extends AbstractFullBox {
     public static final String TYPE = "url ";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_0 = null;
 
     static {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("DataEntryUrlBox.java", DataEntryUrlBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "toString", "com.coremedia.iso.boxes.DataEntryUrlBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.lang.String"), 51);
     }

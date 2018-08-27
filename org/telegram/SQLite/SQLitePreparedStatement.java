@@ -6,7 +6,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.tgnet.NativeByteBuffer;
 
 public class SQLitePreparedStatement {
-    private boolean finalizeAfterQuery = false;
+    private boolean finalizeAfterQuery;
     private boolean isFinalized = false;
     private long sqliteStatementHandle;
 

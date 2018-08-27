@@ -10,14 +10,14 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class AppleDataRateBox extends AbstractFullBox {
     public static final String TYPE = "rmdr";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_0 = null;
     private long dataRate;
 
     static {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("AppleDataRateBox.java", AppleDataRateBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getDataRate", "com.coremedia.iso.boxes.apple.AppleDataRateBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "long"), 53);
     }

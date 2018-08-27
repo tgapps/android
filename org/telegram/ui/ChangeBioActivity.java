@@ -18,6 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import com.google.android.exoplayer2.C;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
@@ -80,7 +81,7 @@ public class ChangeBioActivity extends BaseFragment {
         this.firstNameField.setMaxLines(4);
         this.firstNameField.setPadding(AndroidUtilities.dp(LocaleController.isRTL ? 24.0f : 0.0f), 0, AndroidUtilities.dp(LocaleController.isRTL ? 0.0f : 24.0f), AndroidUtilities.dp(6.0f));
         this.firstNameField.setGravity(LocaleController.isRTL ? 5 : 3);
-        this.firstNameField.setImeOptions(268435456);
+        this.firstNameField.setImeOptions(C.ENCODING_PCM_MU_LAW);
         this.firstNameField.setInputType(147457);
         this.firstNameField.setImeOptions(6);
         this.firstNameField.setFilters(new InputFilter[]{new LengthFilter(70) {

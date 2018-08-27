@@ -1,12 +1,12 @@
 package com.google.android.gms.internal.config;
 
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.extractor.ts.PsExtractor;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ReadOnlyBufferException;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.extractor.ts.PsExtractor;
 
 public final class zzaz {
     private final ByteBuffer zzcg;

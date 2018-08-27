@@ -5,6 +5,10 @@ import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzt implements Creator<LineItem> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new LineItem[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         int i = 0;
@@ -41,9 +45,5 @@ public final class zzt implements Creator<LineItem> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new LineItem(str5, str4, str3, str2, i, str);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new LineItem[i];
     }
 }

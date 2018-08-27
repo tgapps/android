@@ -11,69 +11,69 @@ import com.google.android.gms.wallet.MaskedWalletRequest;
 
 public final class WalletFragmentInitParams extends AbstractSafeParcelable implements ReflectedParcelable {
     public static final Creator<WalletFragmentInitParams> CREATOR = new zzd();
-    private String zzci;
-    private MaskedWalletRequest zzfi;
-    private MaskedWallet zzfj;
-    private int zzfx;
+    private String zzcj;
+    private MaskedWalletRequest zzfk;
+    private MaskedWallet zzfl;
+    private int zzfz;
 
     public final class Builder {
-        private final /* synthetic */ WalletFragmentInitParams zzfy;
+        private final /* synthetic */ WalletFragmentInitParams zzga;
 
         private Builder(WalletFragmentInitParams walletFragmentInitParams) {
-            this.zzfy = walletFragmentInitParams;
-        }
-
-        public final WalletFragmentInitParams build() {
-            boolean z = true;
-            boolean z2 = (this.zzfy.zzfj != null && this.zzfy.zzfi == null) || (this.zzfy.zzfj == null && this.zzfy.zzfi != null);
-            Preconditions.checkState(z2, "Exactly one of MaskedWallet or MaskedWalletRequest is required");
-            if (this.zzfy.zzfx < 0) {
-                z = false;
-            }
-            Preconditions.checkState(z, "masked wallet request code is required and must be non-negative");
-            return this.zzfy;
+            this.zzga = walletFragmentInitParams;
         }
 
         public final Builder setMaskedWalletRequest(MaskedWalletRequest maskedWalletRequest) {
-            this.zzfy.zzfi = maskedWalletRequest;
+            this.zzga.zzfk = maskedWalletRequest;
             return this;
         }
 
         public final Builder setMaskedWalletRequestCode(int i) {
-            this.zzfy.zzfx = i;
+            this.zzga.zzfz = i;
             return this;
         }
-    }
 
-    private WalletFragmentInitParams() {
-        this.zzfx = -1;
-    }
-
-    WalletFragmentInitParams(String str, MaskedWalletRequest maskedWalletRequest, int i, MaskedWallet maskedWallet) {
-        this.zzci = str;
-        this.zzfi = maskedWalletRequest;
-        this.zzfx = i;
-        this.zzfj = maskedWallet;
+        public final WalletFragmentInitParams build() {
+            boolean z = true;
+            boolean z2 = (this.zzga.zzfl != null && this.zzga.zzfk == null) || (this.zzga.zzfl == null && this.zzga.zzfk != null);
+            Preconditions.checkState(z2, "Exactly one of MaskedWallet or MaskedWalletRequest is required");
+            if (this.zzga.zzfz < 0) {
+                z = false;
+            }
+            Preconditions.checkState(z, "masked wallet request code is required and must be non-negative");
+            return this.zzga;
+        }
     }
 
     public static Builder newBuilder() {
         return new Builder();
     }
 
-    public final String getAccountName() {
-        return this.zzci;
+    private WalletFragmentInitParams() {
+        this.zzfz = -1;
     }
 
-    public final MaskedWallet getMaskedWallet() {
-        return this.zzfj;
+    WalletFragmentInitParams(String str, MaskedWalletRequest maskedWalletRequest, int i, MaskedWallet maskedWallet) {
+        this.zzcj = str;
+        this.zzfk = maskedWalletRequest;
+        this.zzfz = i;
+        this.zzfl = maskedWallet;
+    }
+
+    public final String getAccountName() {
+        return this.zzcj;
     }
 
     public final MaskedWalletRequest getMaskedWalletRequest() {
-        return this.zzfi;
+        return this.zzfk;
     }
 
     public final int getMaskedWalletRequestCode() {
-        return this.zzfx;
+        return this.zzfz;
+    }
+
+    public final MaskedWallet getMaskedWallet() {
+        return this.zzfl;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {

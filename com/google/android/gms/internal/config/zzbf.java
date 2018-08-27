@@ -1,8 +1,8 @@
 package com.google.android.gms.internal.config;
 
+import com.google.android.exoplayer2.C;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import org.telegram.messenger.exoplayer2.C;
 
 public final class zzbf {
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");

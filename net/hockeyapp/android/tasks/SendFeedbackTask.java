@@ -19,7 +19,6 @@ import net.hockeyapp.android.R;
 import net.hockeyapp.android.utils.HockeyLog;
 import net.hockeyapp.android.utils.HttpURLConnectionBuilder;
 import net.hockeyapp.android.utils.Util;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 
 @SuppressLint({"StaticFieldLeak"})
 public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String, String>> {
@@ -164,7 +163,7 @@ public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String,
             parameters.put("name", this.mName);
             parameters.put("email", this.mEmail);
             parameters.put("subject", this.mSubject);
-            parameters.put(MimeTypes.BASE_TYPE_TEXT, this.mText);
+            parameters.put("text", this.mText);
             parameters.put("bundle_identifier", Constants.APP_PACKAGE);
             parameters.put("bundle_short_version", Constants.APP_VERSION_NAME);
             parameters.put("bundle_version", Constants.APP_VERSION);
@@ -207,7 +206,7 @@ public class SendFeedbackTask extends ConnectionTask<Void, Void, HashMap<String,
             parameters.put("name", this.mName);
             parameters.put("email", this.mEmail);
             parameters.put("subject", this.mSubject);
-            parameters.put(MimeTypes.BASE_TYPE_TEXT, this.mText);
+            parameters.put("text", this.mText);
             parameters.put("bundle_identifier", Constants.APP_PACKAGE);
             parameters.put("bundle_short_version", Constants.APP_VERSION_NAME);
             parameters.put("bundle_version", Constants.APP_VERSION);

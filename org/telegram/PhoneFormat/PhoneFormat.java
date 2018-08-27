@@ -1,5 +1,6 @@
 package org.telegram.PhoneFormat;
 
+import com.google.devtools.build.android.desugar.runtime.ThrowableExtension;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -138,7 +139,7 @@ public class PhoneFormat {
                 e = e3;
                 byteArrayOutputStream = bos;
                 try {
-                    e.printStackTrace();
+                    ThrowableExtension.printStackTrace(e);
                     if (byteArrayOutputStream != null) {
                         try {
                             byteArrayOutputStream.close();
@@ -184,7 +185,7 @@ public class PhoneFormat {
             }
         } catch (Exception e4) {
             e = e4;
-            e.printStackTrace();
+            ThrowableExtension.printStackTrace(e);
             if (byteArrayOutputStream != null) {
                 byteArrayOutputStream.close();
             }
@@ -323,7 +324,7 @@ public class PhoneFormat {
                     return new String(this.data, offset, a - offset);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                ThrowableExtension.printStackTrace(e);
                 return TtmlNode.ANONYMOUS_REGION_ID;
             }
         }

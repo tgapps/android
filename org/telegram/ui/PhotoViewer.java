@@ -82,12 +82,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.coremedia.iso.IsoFile;
 import com.coremedia.iso.boxes.Box;
+import com.coremedia.iso.boxes.Container;
 import com.coremedia.iso.boxes.MediaBox;
 import com.coremedia.iso.boxes.MediaHeaderBox;
 import com.coremedia.iso.boxes.TimeToSampleBox;
 import com.coremedia.iso.boxes.TimeToSampleBox.Entry;
 import com.coremedia.iso.boxes.TrackBox;
 import com.coremedia.iso.boxes.TrackHeaderBox;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.googlecode.mp4parser.util.Matrix;
 import com.googlecode.mp4parser.util.Path;
 import java.io.ByteArrayInputStream;
@@ -136,10 +141,6 @@ import org.telegram.messenger.Utilities;
 import org.telegram.messenger.VideoEditedInfo;
 import org.telegram.messenger.WebFile;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.trackselection.AdaptiveTrackSelection;
-import org.telegram.messenger.exoplayer2.ui.AspectRatioFrameLayout;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.messenger.support.widget.DefaultItemAnimator;
 import org.telegram.messenger.support.widget.LinearLayoutManager;
 import org.telegram.messenger.support.widget.LinearSmoothScrollerEnd;
@@ -8217,6 +8218,10 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                     } else if (this.currentEditMode == 1) {
                         this.editorDoneLayout.setVisibility(8);
                         this.photoCropView.setVisibility(8);
+                    } else if (this.currentEditMode == 3) {
+                        this.photoPaintView.shutdown();
+                        this.containerView.removeView(this.photoPaintView);
+                        this.photoPaintView = null;
                     }
                     this.currentEditMode = 0;
                 }
@@ -8433,12 +8438,12 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
             }
             switchToEditMode(0);
         } else {
-            this.photoPaintView.maybeShowDismissalAlert(this, this.parentActivity, new Runnable() {
-                public void run() {
-                    PhotoViewer.this.switchToEditMode(0);
-                }
-            });
+            this.photoPaintView.maybeShowDismissalAlert(this, this.parentActivity, new PhotoViewer$$Lambda$0(this));
         }
+    }
+
+    final /* synthetic */ void lambda$closePhoto$0$PhotoViewer() {
+        switchToEditMode(0);
     }
 
     private void removeObservers() {
@@ -9000,13 +9005,13 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                     this.hintAnimation = null;
                 } else {
                     AndroidUtilities.cancelRunOnUIThread(this.hintHideRunnable);
-                    Runnable anonymousClass77 = new Runnable() {
+                    Runnable anonymousClass76 = new Runnable() {
                         public void run() {
                             PhotoViewer.this.hideHint();
                         }
                     };
-                    this.hintHideRunnable = anonymousClass77;
-                    AndroidUtilities.runOnUIThread(anonymousClass77, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS);
+                    this.hintHideRunnable = anonymousClass76;
+                    AndroidUtilities.runOnUIThread(anonymousClass76, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS);
                     return;
                 }
             } else if (this.hintAnimation != null) {
@@ -9853,17 +9858,17 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
         this.videoFramerate = 25;
         this.originalSize = new File(videoPath).length();
         DispatchQueue dispatchQueue = Utilities.globalQueue;
-        Runnable anonymousClass82 = new Runnable() {
+        Runnable anonymousClass81 = new Runnable() {
             public void run() {
                 if (PhotoViewer.this.currentLoadingVideoRunnable == this) {
                     TrackHeaderBox trackHeaderBox = null;
                     boolean isAvc = true;
                     IsoFile isoFile = new IsoFile(videoPath);
-                    List<Box> boxes = Path.getPaths(isoFile, "/moov/trak/");
-                    if (Path.getPath(isoFile, "/moov/trak/mdia/minf/stbl/stsd/mp4a/") == null && BuildVars.LOGS_ENABLED) {
+                    List<Box> boxes = Path.getPaths((Container) isoFile, "/moov/trak/");
+                    if (Path.getPath((Container) isoFile, "/moov/trak/mdia/minf/stbl/stsd/mp4a/") == null && BuildVars.LOGS_ENABLED) {
                         FileLog.d("video hasn't mp4a atom");
                     }
-                    if (Path.getPath(isoFile, "/moov/trak/mdia/minf/stbl/stsd/avc1/") == null) {
+                    if (Path.getPath((Container) isoFile, "/moov/trak/mdia/minf/stbl/stsd/avc1/") == null) {
                         if (BuildVars.LOGS_ENABLED) {
                             FileLog.d("video hasn't avc1 atom");
                         }
@@ -10033,8 +10038,8 @@ public class PhotoViewer implements OnDoubleTapListener, OnGestureListener, Noti
                 }
             }
         };
-        this.currentLoadingVideoRunnable = anonymousClass82;
-        dispatchQueue.postRunnable(anonymousClass82);
+        this.currentLoadingVideoRunnable = anonymousClass81;
+        dispatchQueue.postRunnable(anonymousClass81);
     }
 
     private void setCompressItemEnabled(boolean enabled, boolean animated) {

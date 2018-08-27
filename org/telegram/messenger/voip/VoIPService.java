@@ -18,6 +18,9 @@ import android.telecom.TelecomManager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.widget.Toast;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -40,8 +43,6 @@ import org.telegram.messenger.NotificationsController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.DefaultRenderersFactory;
-import org.telegram.messenger.exoplayer2.trackselection.AdaptiveTrackSelection;
 import org.telegram.messenger.voip.VoIPBaseService.CallConnection;
 import org.telegram.messenger.voip.VoIPBaseService.StateListener;
 import org.telegram.tgnet.ConnectionsManager;
@@ -149,7 +150,7 @@ public class VoIPService extends VoIPBaseService {
                         AndroidUtilities.runOnUIThread(this.delayedStartOutgoingCall, AdaptiveTrackSelection.DEFAULT_MIN_TIME_BETWEEN_BUFFER_REEVALUTATION_MS);
                     }
                     if (intent.getBooleanExtra("start_incall_activity", false)) {
-                        startActivity(new Intent(this, VoIPActivity.class).addFlags(268435456));
+                        startActivity(new Intent(this, VoIPActivity.class).addFlags(C.ENCODING_PCM_MU_LAW));
                     }
                 } else {
                     NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.closeInCallActivity, new Object[0]);
@@ -173,6 +174,7 @@ public class VoIPService extends VoIPBaseService {
     public void onCreate() {
         super.onCreate();
         if (callIShouldHavePutIntoIntent != null && VERSION.SDK_INT >= 26) {
+            NotificationsController.checkOtherNotificationsChannel();
             startForeground(201, new Builder(this, NotificationsController.OTHER_NOTIFICATIONS_CHANNEL).setSmallIcon(R.drawable.notification).setContentTitle(LocaleController.getString("VoipOutgoingCall", R.string.VoipOutgoingCall)).setShowWhen(false).build());
         }
     }
@@ -412,7 +414,7 @@ public class VoIPService extends VoIPBaseService {
                     FileLog.d("Starting incall activity for incoming call");
                 }
                 try {
-                    PendingIntent.getActivity(this, 12345, new Intent(this, VoIPActivity.class).addFlags(268435456), 0).send();
+                    PendingIntent.getActivity(this, 12345, new Intent(this, VoIPActivity.class).addFlags(C.ENCODING_PCM_MU_LAW), 0).send();
                 } catch (Exception x) {
                     if (BuildVars.LOGS_ENABLED) {
                         FileLog.e("Error starting incall activity", x);
@@ -429,6 +431,10 @@ public class VoIPService extends VoIPBaseService {
                 FileLog.d("Showing incoming call notification");
             }
         }
+    }
+
+    protected boolean isRinging() {
+        return this.currentState == 15;
     }
 
     public void acceptIncomingCall() {
@@ -701,7 +707,7 @@ public class VoIPService extends VoIPBaseService {
                                 correctedAuth = new byte[256];
                                 System.arraycopy(authKey, 0, correctedAuth, 256 - authKey.length, authKey.length);
                                 for (int a = 0; a < 256 - authKey.length; a++) {
-                                    authKey[a] = (byte) 0;
+                                    correctedAuth[a] = (byte) 0;
                                 }
                                 authKey = correctedAuth;
                             }
@@ -788,7 +794,7 @@ public class VoIPService extends VoIPBaseService {
                 correctedAuth = new byte[256];
                 System.arraycopy(authKey, 0, correctedAuth, 256 - authKey.length, authKey.length);
                 for (int a = 0; a < 256 - authKey.length; a++) {
-                    authKey[a] = (byte) 0;
+                    correctedAuth[a] = (byte) 0;
                 }
                 authKey = correctedAuth;
             }
@@ -913,14 +919,12 @@ public class VoIPService extends VoIPBaseService {
                 if (prefs.getBoolean("dbg_force_tcp_in_calls", false)) {
                     z2 = true;
                     voIPController.setRemoteEndpoints(endpoints, z, z2, this.call.protocol.max_layer);
-                    if (BuildVars.DEBUG_VERSION) {
-                        if (prefs.getBoolean("dbg_force_tcp_in_calls", false)) {
-                            AndroidUtilities.runOnUIThread(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(VoIPService.this, "This call uses TCP which will degrade its quality.", 0).show();
-                                }
-                            });
-                        }
+                    if (prefs.getBoolean("dbg_force_tcp_in_calls", false)) {
+                        AndroidUtilities.runOnUIThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(VoIPService.this, "This call uses TCP which will degrade its quality.", 0).show();
+                            }
+                        });
                     }
                     if (prefs.getBoolean("proxy_enabled", false)) {
                         if (prefs.getBoolean("proxy_enabled_calls", false)) {
@@ -947,10 +951,8 @@ public class VoIPService extends VoIPBaseService {
             }
             z2 = false;
             voIPController.setRemoteEndpoints(endpoints, z, z2, this.call.protocol.max_layer);
-            if (BuildVars.DEBUG_VERSION) {
-                if (prefs.getBoolean("dbg_force_tcp_in_calls", false)) {
-                    AndroidUtilities.runOnUIThread(/* anonymous class already generated */);
-                }
+            if (prefs.getBoolean("dbg_force_tcp_in_calls", false)) {
+                AndroidUtilities.runOnUIThread(/* anonymous class already generated */);
             }
             if (prefs.getBoolean("proxy_enabled", false)) {
                 if (prefs.getBoolean("proxy_enabled_calls", false)) {
@@ -1063,7 +1065,7 @@ public class VoIPService extends VoIPBaseService {
 
     void onMediaButtonEvent(KeyEvent ev) {
         boolean z = true;
-        if (ev.getKeyCode() != 79 || ev.getAction() != 1) {
+        if ((ev.getKeyCode() != 79 && ev.getKeyCode() != 127 && ev.getKeyCode() != 85) || ev.getAction() != 1) {
             return;
         }
         if (this.currentState == 15) {

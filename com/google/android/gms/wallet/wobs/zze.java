@@ -7,6 +7,10 @@ import com.google.android.gms.common.util.ArrayUtils;
 import java.util.ArrayList;
 
 public final class zze implements Creator<LabelValueRow> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new LabelValueRow[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         ArrayList newArrayList = ArrayUtils.newArrayList();
@@ -31,9 +35,5 @@ public final class zze implements Creator<LabelValueRow> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new LabelValueRow(str2, str, newArrayList);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new LabelValueRow[i];
     }
 }

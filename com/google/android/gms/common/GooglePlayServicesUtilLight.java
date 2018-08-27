@@ -214,6 +214,12 @@ public class GooglePlayServicesUtilLight {
         }
     }
 
+    @TargetApi(19)
+    @Deprecated
+    public static boolean uidHasPackageName(Context context, int i, String str) {
+        return UidVerifier.uidHasPackageName(context, i, str);
+    }
+
     private static int zza(Context context, boolean z, int i) {
         Preconditions.checkArgument(i >= 0);
         PackageManager packageManager = context.getPackageManager();

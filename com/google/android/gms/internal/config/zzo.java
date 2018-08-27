@@ -1,6 +1,7 @@
 package com.google.android.gms.internal.config;
 
 import android.os.Bundle;
+import com.google.android.exoplayer2.C;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -13,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
-import org.telegram.messenger.exoplayer2.C;
 
 public final class zzo implements zzg {
     private static final Charset UTF_8 = Charset.forName(C.UTF8_NAME);

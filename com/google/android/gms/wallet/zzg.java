@@ -6,6 +6,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import java.util.ArrayList;
 
 public final class zzg implements Creator<Cart> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new Cart[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         ArrayList arrayList = new ArrayList();
@@ -30,9 +34,5 @@ public final class zzg implements Creator<Cart> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new Cart(str2, str, arrayList);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new Cart[i];
     }
 }

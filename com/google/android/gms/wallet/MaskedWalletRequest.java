@@ -10,74 +10,49 @@ import java.util.ArrayList;
 
 public final class MaskedWalletRequest extends AbstractSafeParcelable implements ReflectedParcelable {
     public static final Creator<MaskedWalletRequest> CREATOR = new zzz();
-    ArrayList<Integer> zzai;
-    String zzao;
-    String zzax;
-    Cart zzbh;
-    boolean zzdd;
+    ArrayList<Integer> zzaj;
+    String zzap;
+    String zzay;
+    Cart zzbi;
     boolean zzde;
     boolean zzdf;
-    String zzdg;
+    boolean zzdg;
     String zzdh;
-    private boolean zzdi;
-    boolean zzdj;
-    private CountrySpecification[] zzdk;
-    boolean zzdl;
+    String zzdi;
+    private boolean zzdj;
+    boolean zzdk;
+    private CountrySpecification[] zzdl;
     boolean zzdm;
-    ArrayList<CountrySpecification> zzdn;
-    PaymentMethodTokenizationParameters zzdo;
-    String zzh;
+    boolean zzdn;
+    ArrayList<CountrySpecification> zzdo;
+    PaymentMethodTokenizationParameters zzdp;
+    String zzi;
 
     public final class Builder {
-        private final /* synthetic */ MaskedWalletRequest zzdp;
+        private final /* synthetic */ MaskedWalletRequest zzdq;
 
         private Builder(MaskedWalletRequest maskedWalletRequest) {
-            this.zzdp = maskedWalletRequest;
-        }
-
-        public final MaskedWalletRequest build() {
-            return this.zzdp;
-        }
-
-        public final Builder setCurrencyCode(String str) {
-            this.zzdp.zzao = str;
-            return this;
+            this.zzdq = maskedWalletRequest;
         }
 
         public final Builder setEstimatedTotalPrice(String str) {
-            this.zzdp.zzdg = str;
+            this.zzdq.zzdh = str;
+            return this;
+        }
+
+        public final Builder setCurrencyCode(String str) {
+            this.zzdq.zzap = str;
             return this;
         }
 
         public final Builder setPaymentMethodTokenizationParameters(PaymentMethodTokenizationParameters paymentMethodTokenizationParameters) {
-            this.zzdp.zzdo = paymentMethodTokenizationParameters;
+            this.zzdq.zzdp = paymentMethodTokenizationParameters;
             return this;
         }
-    }
 
-    MaskedWalletRequest() {
-        this.zzdl = true;
-        this.zzdm = true;
-    }
-
-    MaskedWalletRequest(String str, boolean z, boolean z2, boolean z3, String str2, String str3, String str4, Cart cart, boolean z4, boolean z5, CountrySpecification[] countrySpecificationArr, boolean z6, boolean z7, ArrayList<CountrySpecification> arrayList, PaymentMethodTokenizationParameters paymentMethodTokenizationParameters, ArrayList<Integer> arrayList2, String str5) {
-        this.zzax = str;
-        this.zzdd = z;
-        this.zzde = z2;
-        this.zzdf = z3;
-        this.zzdg = str2;
-        this.zzao = str3;
-        this.zzdh = str4;
-        this.zzbh = cart;
-        this.zzdi = z4;
-        this.zzdj = z5;
-        this.zzdk = countrySpecificationArr;
-        this.zzdl = z6;
-        this.zzdm = z7;
-        this.zzdn = arrayList;
-        this.zzdo = paymentMethodTokenizationParameters;
-        this.zzai = arrayList2;
-        this.zzh = str5;
+        public final MaskedWalletRequest build() {
+            return this.zzdq;
+        }
     }
 
     public static Builder newBuilder() {
@@ -86,23 +61,48 @@ public final class MaskedWalletRequest extends AbstractSafeParcelable implements
 
     public final void writeToParcel(Parcel parcel, int i) {
         int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
-        SafeParcelWriter.writeString(parcel, 2, this.zzax, false);
-        SafeParcelWriter.writeBoolean(parcel, 3, this.zzdd);
-        SafeParcelWriter.writeBoolean(parcel, 4, this.zzde);
-        SafeParcelWriter.writeBoolean(parcel, 5, this.zzdf);
-        SafeParcelWriter.writeString(parcel, 6, this.zzdg, false);
-        SafeParcelWriter.writeString(parcel, 7, this.zzao, false);
-        SafeParcelWriter.writeString(parcel, 8, this.zzdh, false);
-        SafeParcelWriter.writeParcelable(parcel, 9, this.zzbh, i, false);
-        SafeParcelWriter.writeBoolean(parcel, 10, this.zzdi);
-        SafeParcelWriter.writeBoolean(parcel, 11, this.zzdj);
-        SafeParcelWriter.writeTypedArray(parcel, 12, this.zzdk, i, false);
-        SafeParcelWriter.writeBoolean(parcel, 13, this.zzdl);
-        SafeParcelWriter.writeBoolean(parcel, 14, this.zzdm);
-        SafeParcelWriter.writeTypedList(parcel, 15, this.zzdn, false);
-        SafeParcelWriter.writeParcelable(parcel, 16, this.zzdo, i, false);
-        SafeParcelWriter.writeIntegerList(parcel, 17, this.zzai, false);
-        SafeParcelWriter.writeString(parcel, 18, this.zzh, false);
+        SafeParcelWriter.writeString(parcel, 2, this.zzay, false);
+        SafeParcelWriter.writeBoolean(parcel, 3, this.zzde);
+        SafeParcelWriter.writeBoolean(parcel, 4, this.zzdf);
+        SafeParcelWriter.writeBoolean(parcel, 5, this.zzdg);
+        SafeParcelWriter.writeString(parcel, 6, this.zzdh, false);
+        SafeParcelWriter.writeString(parcel, 7, this.zzap, false);
+        SafeParcelWriter.writeString(parcel, 8, this.zzdi, false);
+        SafeParcelWriter.writeParcelable(parcel, 9, this.zzbi, i, false);
+        SafeParcelWriter.writeBoolean(parcel, 10, this.zzdj);
+        SafeParcelWriter.writeBoolean(parcel, 11, this.zzdk);
+        SafeParcelWriter.writeTypedArray(parcel, 12, this.zzdl, i, false);
+        SafeParcelWriter.writeBoolean(parcel, 13, this.zzdm);
+        SafeParcelWriter.writeBoolean(parcel, 14, this.zzdn);
+        SafeParcelWriter.writeTypedList(parcel, 15, this.zzdo, false);
+        SafeParcelWriter.writeParcelable(parcel, 16, this.zzdp, i, false);
+        SafeParcelWriter.writeIntegerList(parcel, 17, this.zzaj, false);
+        SafeParcelWriter.writeString(parcel, 18, this.zzi, false);
         SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+    }
+
+    MaskedWalletRequest(String str, boolean z, boolean z2, boolean z3, String str2, String str3, String str4, Cart cart, boolean z4, boolean z5, CountrySpecification[] countrySpecificationArr, boolean z6, boolean z7, ArrayList<CountrySpecification> arrayList, PaymentMethodTokenizationParameters paymentMethodTokenizationParameters, ArrayList<Integer> arrayList2, String str5) {
+        this.zzay = str;
+        this.zzde = z;
+        this.zzdf = z2;
+        this.zzdg = z3;
+        this.zzdh = str2;
+        this.zzap = str3;
+        this.zzdi = str4;
+        this.zzbi = cart;
+        this.zzdj = z4;
+        this.zzdk = z5;
+        this.zzdl = countrySpecificationArr;
+        this.zzdm = z6;
+        this.zzdn = z7;
+        this.zzdo = arrayList;
+        this.zzdp = paymentMethodTokenizationParameters;
+        this.zzaj = arrayList2;
+        this.zzi = str5;
+    }
+
+    MaskedWalletRequest() {
+        this.zzdm = true;
+        this.zzdn = true;
     }
 }

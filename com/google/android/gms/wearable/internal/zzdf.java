@@ -2,6 +2,7 @@ package com.google.android.gms.wearable.internal;
 
 import android.net.Uri;
 import android.util.Log;
+import com.google.android.exoplayer2.upstream.DataSchemeDataSource;
 import com.google.android.gms.common.data.DataBufferRef;
 import com.google.android.gms.common.data.DataHolder;
 import com.google.android.gms.wearable.DataItem;
@@ -9,7 +10,6 @@ import com.google.android.gms.wearable.DataItemAsset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.telegram.messenger.exoplayer2.upstream.DataSchemeDataSource;
 
 public final class zzdf extends DataBufferRef implements DataItem {
     private final int zzdl;

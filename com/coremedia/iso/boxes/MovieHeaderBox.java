@@ -15,35 +15,35 @@ import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 
 public class MovieHeaderBox extends AbstractFullBox {
     public static final String TYPE = "mvhd";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_10 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_11 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_12 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_13 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_14 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_15 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_16 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_17 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_18 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_19 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_20 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_21 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_22 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_23 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_24 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_25 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_26 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_27 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_28 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_7 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_8 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_9 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_10 = null;
+    private static final StaticPart ajc$tjp_11 = null;
+    private static final StaticPart ajc$tjp_12 = null;
+    private static final StaticPart ajc$tjp_13 = null;
+    private static final StaticPart ajc$tjp_14 = null;
+    private static final StaticPart ajc$tjp_15 = null;
+    private static final StaticPart ajc$tjp_16 = null;
+    private static final StaticPart ajc$tjp_17 = null;
+    private static final StaticPart ajc$tjp_18 = null;
+    private static final StaticPart ajc$tjp_19 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_20 = null;
+    private static final StaticPart ajc$tjp_21 = null;
+    private static final StaticPart ajc$tjp_22 = null;
+    private static final StaticPart ajc$tjp_23 = null;
+    private static final StaticPart ajc$tjp_24 = null;
+    private static final StaticPart ajc$tjp_25 = null;
+    private static final StaticPart ajc$tjp_26 = null;
+    private static final StaticPart ajc$tjp_27 = null;
+    private static final StaticPart ajc$tjp_28 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_7 = null;
+    private static final StaticPart ajc$tjp_8 = null;
+    private static final StaticPart ajc$tjp_9 = null;
     private Date creationTime;
     private int currentTime;
     private long duration;
@@ -63,7 +63,7 @@ public class MovieHeaderBox extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("MovieHeaderBox.java", MovieHeaderBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getCreationTime", "com.coremedia.iso.boxes.MovieHeaderBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.util.Date"), 63);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getModificationTime", "com.coremedia.iso.boxes.MovieHeaderBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.util.Date"), 67);

@@ -171,12 +171,12 @@ public class LocationActivityAdapter extends BaseLocationAdapter {
     public void setPulledUp() {
         if (!this.pulledUp) {
             this.pulledUp = true;
-            AndroidUtilities.runOnUIThread(new Runnable() {
-                public void run() {
-                    LocationActivityAdapter.this.notifyItemChanged(LocationActivityAdapter.this.liveLocationType == 0 ? 2 : 3);
-                }
-            });
+            AndroidUtilities.runOnUIThread(new LocationActivityAdapter$$Lambda$0(this));
         }
+    }
+
+    final /* synthetic */ void lambda$setPulledUp$0$LocationActivityAdapter() {
+        notifyItemChanged(this.liveLocationType == 0 ? 2 : 3);
     }
 
     public boolean isPulledUp() {

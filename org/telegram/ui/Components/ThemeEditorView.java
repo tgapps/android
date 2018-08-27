@@ -44,6 +44,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import com.google.android.exoplayer2.C;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -166,7 +167,7 @@ public class ThemeEditorView {
                     } else if (a == 3) {
                         this.colorEditText[a].setHint("alpha");
                     }
-                    this.colorEditText[a].setImeOptions((a == 3 ? 6 : 5) | 268435456);
+                    this.colorEditText[a].setImeOptions((a == 3 ? 6 : 5) | C.ENCODING_PCM_MU_LAW);
                     this.colorEditText[a].setFilters(new InputFilter[]{new LengthFilter(3)});
                     final int num = a;
                     this.linearLayout.addView(this.colorEditText[a], LayoutHelper.createLinear(55, 36, 0.0f, 0.0f, a != 3 ? 16.0f : 0.0f, 0.0f));

@@ -1,5 +1,6 @@
 package com.google.firebase.iid;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build.VERSION;
@@ -11,32 +12,25 @@ import com.google.android.gms.common.util.PlatformVersion;
 import javax.annotation.concurrent.GuardedBy;
 
 public final class FirebaseInstanceIdReceiver extends WakefulBroadcastReceiver {
-    private static boolean zzaw = false;
+    private static boolean zzbc = false;
     @GuardedBy("FirebaseInstanceIdReceiver.class")
-    private static zzh zzax;
+    private static zzh zzbd;
     @GuardedBy("FirebaseInstanceIdReceiver.class")
-    private static zzh zzay;
+    private static zzh zzbe;
 
-    private static synchronized zzh zza(Context context, String str) {
-        zzh com_google_firebase_iid_zzh;
-        synchronized (FirebaseInstanceIdReceiver.class) {
-            if ("com.google.firebase.MESSAGING_EVENT".equals(str)) {
-                if (zzay == null) {
-                    zzay = new zzh(context, str);
-                }
-                com_google_firebase_iid_zzh = zzay;
+    public final void onReceive(Context context, Intent intent) {
+        if (intent != null) {
+            Parcelable parcelableExtra = intent.getParcelableExtra("wrapped_intent");
+            Intent intent2 = parcelableExtra instanceof Intent ? (Intent) parcelableExtra : null;
+            if (intent2 != null) {
+                zza(context, intent2, intent.getAction());
             } else {
-                if (zzax == null) {
-                    zzax = new zzh(context, str);
-                }
-                com_google_firebase_iid_zzh = zzax;
+                zza(context, intent, intent.getAction());
             }
         }
-        return com_google_firebase_iid_zzh;
     }
 
     private final void zza(Context context, Intent intent, String str) {
-        int i;
         intent.setComponent(null);
         intent.setPackage(context.getPackageName());
         if (VERSION.SDK_INT <= 18) {
@@ -55,40 +49,48 @@ public final class FirebaseInstanceIdReceiver extends WakefulBroadcastReceiver {
             Log.d("FirebaseInstanceId", "Unexpected intent");
             stringExtra = null;
         }
+        int i = -1;
         if (stringExtra != null) {
-            if (Log.isLoggable("FirebaseInstanceId", 3)) {
-                String str2 = "FirebaseInstanceId";
-                String str3 = "Starting service: ";
-                String valueOf = String.valueOf(stringExtra);
-                Log.d(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
-            }
-            i = (!PlatformVersion.isAtLeastO() || context.getApplicationInfo().targetSdkVersion < 26) ? 0 : 1;
-            if (i != 0) {
-                if (isOrderedBroadcast()) {
-                    setResultCode(-1);
-                }
-                zza(context, stringExtra).zza(intent, goAsync());
-                i = -1;
-            } else {
-                i = zzat.zzah().zzb(context, stringExtra, intent);
-            }
-        } else {
-            i = -1;
+            i = zza(this, context, stringExtra, intent);
         }
         if (isOrderedBroadcast()) {
             setResultCode(i);
         }
     }
 
-    public final void onReceive(Context context, Intent intent) {
-        if (intent != null) {
-            Parcelable parcelableExtra = intent.getParcelableExtra("wrapped_intent");
-            Intent intent2 = parcelableExtra instanceof Intent ? (Intent) parcelableExtra : null;
-            if (intent2 != null) {
-                zza(context, intent2, intent.getAction());
+    public static int zza(BroadcastReceiver broadcastReceiver, Context context, String str, Intent intent) {
+        if (Log.isLoggable("FirebaseInstanceId", 3)) {
+            String str2 = "FirebaseInstanceId";
+            String str3 = "Starting service: ";
+            String valueOf = String.valueOf(str);
+            Log.d(str2, valueOf.length() != 0 ? str3.concat(valueOf) : new String(str3));
+        }
+        Object obj = (!PlatformVersion.isAtLeastO() || context.getApplicationInfo().targetSdkVersion < 26) ? null : 1;
+        if (obj == null) {
+            return zzau.zzah().zzb(context, str, intent);
+        }
+        if (broadcastReceiver.isOrderedBroadcast()) {
+            broadcastReceiver.setResultCode(-1);
+        }
+        zza(context, str).zza(intent, broadcastReceiver.goAsync());
+        return -1;
+    }
+
+    private static synchronized zzh zza(Context context, String str) {
+        zzh com_google_firebase_iid_zzh;
+        synchronized (FirebaseInstanceIdReceiver.class) {
+            if ("com.google.firebase.MESSAGING_EVENT".equals(str)) {
+                if (zzbe == null) {
+                    zzbe = new zzh(context, str);
+                }
+                com_google_firebase_iid_zzh = zzbe;
             } else {
-                zza(context, intent, intent.getAction());
+                if (zzbd == null) {
+                    zzbd = new zzh(context, str);
+                }
+                com_google_firebase_iid_zzh = zzbd;
             }
         }
+        return com_google_firebase_iid_zzh;
     }
 }

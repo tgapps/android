@@ -41,6 +41,7 @@ import android.os.SystemClock;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.StateSet;
+import com.google.android.exoplayer2.C;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -51,7 +52,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import org.json.JSONArray;
@@ -67,7 +67,6 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.C;
 import org.telegram.messenger.support.widget.helper.ItemTouchHelper.Callback;
 import org.telegram.messenger.time.SunDate;
 import org.telegram.ui.Components.CombinedDrawable;
@@ -445,6 +444,7 @@ public class Theme {
     public static final String key_chat_inAudioCacheSeekbar = "chat_inAudioCacheSeekbar";
     public static final String key_chat_inAudioDurationSelectedText = "chat_inAudioDurationSelectedText";
     public static final String key_chat_inAudioDurationText = "chat_inAudioDurationText";
+    public static final String key_chat_inAudioPerfomerSelectedText = "chat_inAudioPerfomerSelectedText";
     public static final String key_chat_inAudioPerfomerText = "chat_inAudioPerfomerText";
     public static final String key_chat_inAudioProgress = "chat_inAudioProgress";
     public static final String key_chat_inAudioSeekbar = "chat_inAudioSeekbar";
@@ -458,6 +458,7 @@ public class Theme {
     public static final String key_chat_inContactBackground = "chat_inContactBackground";
     public static final String key_chat_inContactIcon = "chat_inContactIcon";
     public static final String key_chat_inContactNameText = "chat_inContactNameText";
+    public static final String key_chat_inContactPhoneSelectedText = "chat_inContactPhoneSelectedText";
     public static final String key_chat_inContactPhoneText = "chat_inContactPhoneText";
     public static final String key_chat_inFileBackground = "chat_inFileBackground";
     public static final String key_chat_inFileBackgroundSelected = "chat_inFileBackgroundSelected";
@@ -543,6 +544,7 @@ public class Theme {
     public static final String key_chat_outAudioCacheSeekbar = "chat_outAudioCacheSeekbar";
     public static final String key_chat_outAudioDurationSelectedText = "chat_outAudioDurationSelectedText";
     public static final String key_chat_outAudioDurationText = "chat_outAudioDurationText";
+    public static final String key_chat_outAudioPerfomerSelectedText = "chat_outAudioPerfomerSelectedText";
     public static final String key_chat_outAudioPerfomerText = "chat_outAudioPerfomerText";
     public static final String key_chat_outAudioProgress = "chat_outAudioProgress";
     public static final String key_chat_outAudioSeekbar = "chat_outAudioSeekbar";
@@ -557,6 +559,7 @@ public class Theme {
     public static final String key_chat_outContactBackground = "chat_outContactBackground";
     public static final String key_chat_outContactIcon = "chat_outContactIcon";
     public static final String key_chat_outContactNameText = "chat_outContactNameText";
+    public static final String key_chat_outContactPhoneSelectedText = "chat_outContactPhoneText";
     public static final String key_chat_outContactPhoneText = "chat_outContactPhoneText";
     public static final String key_chat_outFileBackground = "chat_outFileBackground";
     public static final String key_chat_outFileBackgroundSelected = "chat_outFileBackgroundSelected";
@@ -1380,7 +1383,9 @@ public class Theme {
         defaultColors.put(key_chat_inContactNameText, Integer.valueOf(-11625772));
         defaultColors.put(key_chat_outContactNameText, Integer.valueOf(-11162801));
         defaultColors.put(key_chat_inContactPhoneText, Integer.valueOf(-13683656));
-        defaultColors.put(key_chat_outContactPhoneText, Integer.valueOf(-13286860));
+        defaultColors.put(key_chat_inContactPhoneSelectedText, Integer.valueOf(-13683656));
+        defaultColors.put("chat_outContactPhoneText", Integer.valueOf(-13286860));
+        defaultColors.put("chat_outContactPhoneText", Integer.valueOf(-13286860));
         defaultColors.put(key_chat_mediaProgress, Integer.valueOf(-1));
         defaultColors.put(key_chat_inAudioProgress, Integer.valueOf(-1));
         defaultColors.put(key_chat_outAudioProgress, Integer.valueOf(-1048610));
@@ -1394,7 +1399,9 @@ public class Theme {
         defaultColors.put(key_chat_inTimeSelectedText, Integer.valueOf(-7752511));
         defaultColors.put(key_chat_outTimeSelectedText, Integer.valueOf(-9391780));
         defaultColors.put(key_chat_inAudioPerfomerText, Integer.valueOf(-13683656));
+        defaultColors.put(key_chat_inAudioPerfomerSelectedText, Integer.valueOf(-13683656));
         defaultColors.put(key_chat_outAudioPerfomerText, Integer.valueOf(-13286860));
+        defaultColors.put(key_chat_outAudioPerfomerSelectedText, Integer.valueOf(-13286860));
         defaultColors.put(key_chat_inAudioTitleText, Integer.valueOf(-11625772));
         defaultColors.put(key_chat_outAudioTitleText, Integer.valueOf(-11162801));
         defaultColors.put(key_chat_inAudioDurationText, Integer.valueOf(-6182221));
@@ -1744,11 +1751,7 @@ public class Theme {
             currentDayTheme = themeInfo2;
         }
         applyTheme(themeInfo2, false, false, false);
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            public void run() {
-                Theme.checkAutoNightThemeConditions();
-            }
-        });
+        AndroidUtilities.runOnUIThread(Theme$$Lambda$4.$instance);
     }
 
     public static void saveAutoNightThemeConfig() {
@@ -2162,17 +2165,17 @@ public class Theme {
     }
 
     private static void sortThemes() {
-        Collections.sort(themes, new Comparator<ThemeInfo>() {
-            public int compare(ThemeInfo o1, ThemeInfo o2) {
-                if (o1.pathToFile == null && o1.assetName == null) {
-                    return -1;
-                }
-                if (o2.pathToFile == null && o2.assetName == null) {
-                    return 1;
-                }
-                return o1.name.compareTo(o2.name);
-            }
-        });
+        Collections.sort(themes, Theme$$Lambda$0.$instance);
+    }
+
+    static final /* synthetic */ int lambda$sortThemes$0$Theme(ThemeInfo o1, ThemeInfo o2) {
+        if (o1.pathToFile == null && o1.assetName == null) {
+            return -1;
+        }
+        if (o2.pathToFile == null && o2.assetName == null) {
+            return 1;
+        }
+        return o1.name.compareTo(o2.name);
     }
 
     public static ThemeInfo applyThemeFile(File file, String themeName, boolean temporary) {
@@ -2224,7 +2227,7 @@ public class Theme {
         applyTheme(themeInfo, true, true, animated);
     }
 
-    public static void applyTheme(ThemeInfo themeInfo, boolean save, boolean removeWallpaperOverride, final boolean nightTheme) {
+    public static void applyTheme(ThemeInfo themeInfo, boolean save, boolean removeWallpaperOverride, boolean nightTheme) {
         if (themeInfo != null) {
             ThemeEditorView editorView = ThemeEditorView.getInstance();
             if (editorView != null) {
@@ -2268,11 +2271,7 @@ public class Theme {
                 applyDialogsTheme();
                 applyProfileTheme();
                 applyChatTheme(false);
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    public void run() {
-                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetNewTheme, Boolean.valueOf(nightTheme));
-                    }
-                });
+                AndroidUtilities.runOnUIThread(new Theme$$Lambda$1(nightTheme));
             } catch (Throwable e) {
                 FileLog.e(e);
             }
@@ -2553,8 +2552,8 @@ public class Theme {
     }
 
     public static File getAssetFile(String assetName) {
-        long size;
         File file = new File(ApplicationLoader.getFilesDirFixed(), assetName);
+        long size;
         try {
             InputStream stream = ApplicationLoader.applicationContext.getAssets().open(assetName);
             size = (long) stream.available();
@@ -3182,13 +3181,13 @@ public class Theme {
             setDrawableColorByKey(chat_msgCallDownGreenDrawable, key_calls_callReceivedGreenIcon);
             for (a = 0; a < 2; a++) {
                 setCombinedDrawableColor(chat_fileMiniStatesDrawable[a][0], getColor(key_chat_outLoader), false);
-                setCombinedDrawableColor(chat_fileMiniStatesDrawable[a][0], getColor(key_chat_outBubble), true);
+                setCombinedDrawableColor(chat_fileMiniStatesDrawable[a][0], getColor(key_chat_outMediaIcon), true);
                 setCombinedDrawableColor(chat_fileMiniStatesDrawable[a][1], getColor(key_chat_outLoaderSelected), false);
-                setCombinedDrawableColor(chat_fileMiniStatesDrawable[a][1], getColor(key_chat_outBubbleSelected), true);
+                setCombinedDrawableColor(chat_fileMiniStatesDrawable[a][1], getColor(key_chat_outMediaIconSelected), true);
                 setCombinedDrawableColor(chat_fileMiniStatesDrawable[a + 2][0], getColor(key_chat_inLoader), false);
-                setCombinedDrawableColor(chat_fileMiniStatesDrawable[a + 2][0], getColor(key_chat_inBubble), true);
+                setCombinedDrawableColor(chat_fileMiniStatesDrawable[a + 2][0], getColor(key_chat_inMediaIcon), true);
                 setCombinedDrawableColor(chat_fileMiniStatesDrawable[a + 2][1], getColor(key_chat_inLoaderSelected), false);
-                setCombinedDrawableColor(chat_fileMiniStatesDrawable[a + 2][1], getColor(key_chat_inBubbleSelected), true);
+                setCombinedDrawableColor(chat_fileMiniStatesDrawable[a + 2][1], getColor(key_chat_inMediaIconSelected), true);
                 setCombinedDrawableColor(chat_fileMiniStatesDrawable[a + 4][0], getColor(key_chat_mediaLoaderPhoto), false);
                 setCombinedDrawableColor(chat_fileMiniStatesDrawable[a + 4][0], getColor(key_chat_mediaLoaderPhotoIcon), true);
                 setCombinedDrawableColor(chat_fileMiniStatesDrawable[a + 4][1], getColor(key_chat_mediaLoaderPhotoSelected), false);
@@ -3302,6 +3301,9 @@ public class Theme {
     }
 
     public static Drawable getThemedDrawable(Context context, int resId, String key) {
+        if (context == null) {
+            return null;
+        }
         Drawable drawable = context.getResources().getDrawable(resId).mutate();
         drawable.setColorFilter(new PorterDuffColorFilter(getColor(key), Mode.MULTIPLY));
         return drawable;
@@ -3516,128 +3518,130 @@ public class Theme {
 
     public static void loadWallpaper() {
         if (wallpaper == null) {
-            Utilities.searchQueue.postRunnable(new Runnable() {
-                public void run() {
-                    Throwable e;
-                    int i;
-                    SharedPreferences preferences;
-                    int selectedBackground;
-                    File toFile;
-                    Throwable th;
-                    synchronized (Theme.wallpaperSync) {
-                        if (!MessagesController.getGlobalMainSettings().getBoolean("overrideThemeWallpaper", false)) {
-                            Integer backgroundColor = (Integer) Theme.currentColors.get(Theme.key_chat_wallpaper);
-                            if (backgroundColor != null) {
-                                Theme.wallpaper = new ColorDrawable(backgroundColor.intValue());
-                                Theme.isCustomTheme = true;
-                            } else if (Theme.themedWallpaperFileOffset > 0 && !(Theme.currentTheme.pathToFile == null && Theme.currentTheme.assetName == null)) {
-                                FileInputStream stream = null;
+            Utilities.searchQueue.postRunnable(Theme$$Lambda$2.$instance);
+        }
+    }
+
+    static final /* synthetic */ void lambda$loadWallpaper$3$Theme() {
+        Throwable e;
+        SharedPreferences preferences;
+        File toFile;
+        Throwable th;
+        synchronized (wallpaperSync) {
+            int i;
+            int selectedBackground;
+            if (!MessagesController.getGlobalMainSettings().getBoolean("overrideThemeWallpaper", false)) {
+                Integer backgroundColor = (Integer) currentColors.get(key_chat_wallpaper);
+                if (backgroundColor != null) {
+                    wallpaper = new ColorDrawable(backgroundColor.intValue());
+                    isCustomTheme = true;
+                } else if (themedWallpaperFileOffset > 0 && !(currentTheme.pathToFile == null && currentTheme.assetName == null)) {
+                    FileInputStream stream = null;
+                    try {
+                        File file;
+                        if (currentTheme.assetName != null) {
+                            file = getAssetFile(currentTheme.assetName);
+                        } else {
+                            file = new File(currentTheme.pathToFile);
+                        }
+                        FileInputStream stream2 = new FileInputStream(file);
+                        try {
+                            stream2.getChannel().position((long) themedWallpaperFileOffset);
+                            Bitmap bitmap = BitmapFactory.decodeStream(stream2);
+                            if (bitmap != null) {
+                                Drawable bitmapDrawable = new BitmapDrawable(bitmap);
+                                wallpaper = bitmapDrawable;
+                                themedWallpaper = bitmapDrawable;
+                                isCustomTheme = true;
+                            }
+                            if (stream2 != null) {
                                 try {
-                                    File file;
-                                    if (Theme.currentTheme.assetName != null) {
-                                        file = Theme.getAssetFile(Theme.currentTheme.assetName);
-                                    } else {
-                                        file = new File(Theme.currentTheme.pathToFile);
-                                    }
-                                    FileInputStream stream2 = new FileInputStream(file);
-                                    try {
-                                        stream2.getChannel().position((long) Theme.themedWallpaperFileOffset);
-                                        Bitmap bitmap = BitmapFactory.decodeStream(stream2);
-                                        if (bitmap != null) {
-                                            Theme.themedWallpaper = Theme.wallpaper = new BitmapDrawable(bitmap);
-                                            Theme.isCustomTheme = true;
-                                        }
-                                        if (stream2 != null) {
-                                            try {
-                                                stream2.close();
-                                            } catch (Throwable e2) {
-                                                FileLog.e(e2);
-                                            }
-                                        }
-                                    } catch (Throwable th2) {
-                                        th = th2;
-                                        stream = stream2;
-                                        if (stream != null) {
-                                            stream.close();
-                                        }
-                                        throw th;
-                                    }
-                                } catch (Throwable th3) {
-                                    e2 = th3;
+                                    stream2.close();
+                                } catch (Throwable e2) {
                                     FileLog.e(e2);
-                                    if (stream != null) {
-                                        stream.close();
-                                    }
-                                    if (Theme.wallpaper == null) {
-                                        i = 0;
-                                        preferences = MessagesController.getGlobalMainSettings();
-                                        selectedBackground = preferences.getInt("selectedBackground", 1000001);
-                                        i = preferences.getInt("selectedColor", 0);
-                                        if (i == 0) {
-                                            if (selectedBackground == 1000001) {
-                                                Theme.wallpaper = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.background_hd);
-                                                Theme.isCustomTheme = false;
-                                            } else {
-                                                toFile = new File(ApplicationLoader.getFilesDirFixed(), "wallpaper.jpg");
-                                                if (toFile.exists()) {
-                                                    Theme.wallpaper = Drawable.createFromPath(toFile.getAbsolutePath());
-                                                    Theme.isCustomTheme = true;
-                                                } else {
-                                                    Theme.wallpaper = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.background_hd);
-                                                    Theme.isCustomTheme = false;
-                                                }
-                                            }
-                                        }
-                                        if (Theme.wallpaper == null) {
-                                            if (i == 0) {
-                                                i = -2693905;
-                                            }
-                                            Theme.wallpaper = new ColorDrawable(i);
-                                        }
-                                    }
-                                    Theme.calcBackgroundColor(Theme.wallpaper, 1);
-                                    AndroidUtilities.runOnUIThread(new Runnable() {
-                                        public void run() {
-                                            Theme.applyChatServiceMessageColor();
-                                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetNewWallpapper, new Object[0]);
-                                        }
-                                    });
                                 }
                             }
+                        } catch (Throwable th2) {
+                            th = th2;
+                            stream = stream2;
+                            if (stream != null) {
+                                stream.close();
+                            }
+                            throw th;
                         }
-                        if (Theme.wallpaper == null) {
+                    } catch (Throwable th3) {
+                        e2 = th3;
+                        FileLog.e(e2);
+                        if (stream != null) {
+                            stream.close();
+                        }
+                        if (wallpaper == null) {
                             i = 0;
                             preferences = MessagesController.getGlobalMainSettings();
                             selectedBackground = preferences.getInt("selectedBackground", 1000001);
                             i = preferences.getInt("selectedColor", 0);
                             if (i == 0) {
                                 if (selectedBackground == 1000001) {
-                                    Theme.wallpaper = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.background_hd);
-                                    Theme.isCustomTheme = false;
-                                } else {
                                     toFile = new File(ApplicationLoader.getFilesDirFixed(), "wallpaper.jpg");
                                     if (toFile.exists()) {
-                                        Theme.wallpaper = Drawable.createFromPath(toFile.getAbsolutePath());
-                                        Theme.isCustomTheme = true;
+                                        wallpaper = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.background_hd);
+                                        isCustomTheme = false;
                                     } else {
-                                        Theme.wallpaper = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.background_hd);
-                                        Theme.isCustomTheme = false;
+                                        wallpaper = Drawable.createFromPath(toFile.getAbsolutePath());
+                                        isCustomTheme = true;
                                     }
+                                } else {
+                                    wallpaper = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.background_hd);
+                                    isCustomTheme = false;
                                 }
                             }
-                            if (Theme.wallpaper == null) {
+                            if (wallpaper == null) {
                                 if (i == 0) {
                                     i = -2693905;
                                 }
-                                Theme.wallpaper = new ColorDrawable(i);
+                                wallpaper = new ColorDrawable(i);
                             }
                         }
-                        Theme.calcBackgroundColor(Theme.wallpaper, 1);
-                        AndroidUtilities.runOnUIThread(/* anonymous class already generated */);
+                        calcBackgroundColor(wallpaper, 1);
+                        AndroidUtilities.runOnUIThread(Theme$$Lambda$3.$instance);
                     }
                 }
-            });
+            }
+            if (wallpaper == null) {
+                i = 0;
+                preferences = MessagesController.getGlobalMainSettings();
+                selectedBackground = preferences.getInt("selectedBackground", 1000001);
+                i = preferences.getInt("selectedColor", 0);
+                if (i == 0) {
+                    if (selectedBackground == 1000001) {
+                        wallpaper = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.background_hd);
+                        isCustomTheme = false;
+                    } else {
+                        toFile = new File(ApplicationLoader.getFilesDirFixed(), "wallpaper.jpg");
+                        if (toFile.exists()) {
+                            wallpaper = Drawable.createFromPath(toFile.getAbsolutePath());
+                            isCustomTheme = true;
+                        } else {
+                            wallpaper = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.background_hd);
+                            isCustomTheme = false;
+                        }
+                    }
+                }
+                if (wallpaper == null) {
+                    if (i == 0) {
+                        i = -2693905;
+                    }
+                    wallpaper = new ColorDrawable(i);
+                }
+            }
+            calcBackgroundColor(wallpaper, 1);
+            AndroidUtilities.runOnUIThread(Theme$$Lambda$3.$instance);
         }
+    }
+
+    static final /* synthetic */ void lambda$null$2$Theme() {
+        applyChatServiceMessageColor();
+        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetNewWallpapper, new Object[0]);
     }
 
     public static Drawable getThemedWallpaper(boolean thumb) {

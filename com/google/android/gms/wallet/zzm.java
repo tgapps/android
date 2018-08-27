@@ -5,6 +5,10 @@ import android.os.Parcelable.Creator;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 
 public final class zzm implements Creator<FullWalletRequest> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new FullWalletRequest[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         Cart cart = null;
@@ -29,9 +33,5 @@ public final class zzm implements Creator<FullWalletRequest> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new FullWalletRequest(str2, str, cart);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new FullWalletRequest[i];
     }
 }

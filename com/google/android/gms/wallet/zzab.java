@@ -6,6 +6,10 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelReader;
 import com.google.android.gms.wallet.wobs.CommonWalletObject;
 
 public final class zzab implements Creator<OfferWalletObject> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new OfferWalletObject[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         int i = 0;
@@ -34,9 +38,5 @@ public final class zzab implements Creator<OfferWalletObject> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new OfferWalletObject(i, str2, str, commonWalletObject);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new OfferWalletObject[i];
     }
 }

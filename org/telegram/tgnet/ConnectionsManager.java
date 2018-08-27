@@ -16,6 +16,10 @@ import android.os.Build.VERSION;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Base64;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.upstream.DataSchemeDataSource;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -54,10 +58,6 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.StatsController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
-import org.telegram.messenger.exoplayer2.C;
-import org.telegram.messenger.exoplayer2.DefaultLoadControl;
-import org.telegram.messenger.exoplayer2.DefaultRenderersFactory;
-import org.telegram.messenger.exoplayer2.upstream.DataSchemeDataSource;
 import org.telegram.tgnet.TLRPC.TL_config;
 import org.telegram.tgnet.TLRPC.TL_error;
 import org.telegram.tgnet.TLRPC.Updates;
@@ -601,7 +601,7 @@ public class ConnectionsManager {
             systemVersion = "SDK Unknown";
         }
         UserConfig.getInstance(this.currentAccount).loadConfig();
-        init(BuildVars.BUILD_VERSION, 82, BuildVars.APP_ID, deviceModel, systemVersion, appVersion, langCode, systemLangCode, configPath, FileLog.getNetworkLogPath(), UserConfig.getInstance(this.currentAccount).getClientUserId(), enablePushConnection);
+        init(BuildVars.BUILD_VERSION, 85, BuildVars.APP_ID, deviceModel, systemVersion, appVersion, langCode, systemLangCode, configPath, FileLog.getNetworkLogPath(), UserConfig.getInstance(this.currentAccount).getClientUserId(), enablePushConnection);
     }
 
     public long getCurrentTimeMillis() {
@@ -653,6 +653,7 @@ public class ConnectionsManager {
                     tLObject.freeResources();
                     ConnectionsManager.native_sendRequest(ConnectionsManager.this.currentAccount, buffer.address, new RequestDelegateInternal() {
                         public void run(long response, int errorCode, String errorText, int networkType) {
+                            Throwable e;
                             TLObject resp = null;
                             TL_error error = null;
                             if (response != 0) {
@@ -660,8 +661,8 @@ public class ConnectionsManager {
                                     NativeByteBuffer buff = NativeByteBuffer.wrap(response);
                                     buff.reused = true;
                                     resp = tLObject.deserializeResponse(buff, buff.readInt32(true), true);
-                                } catch (Exception e) {
-                                    e = e;
+                                } catch (Exception e2) {
+                                    e = e2;
                                     FileLog.e(e);
                                     return;
                                 }
@@ -674,11 +675,10 @@ public class ConnectionsManager {
                                         FileLog.e(tLObject + " got error " + error2.code + " " + error2.text);
                                     }
                                     error = error2;
-                                } catch (Exception e2) {
-                                    Throwable e3;
-                                    e3 = e2;
+                                } catch (Exception e3) {
+                                    e = e3;
                                     error = error2;
-                                    FileLog.e(e3);
+                                    FileLog.e(e);
                                     return;
                                 }
                             }

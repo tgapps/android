@@ -23,7 +23,6 @@ import android.text.TextUtils.TruncateAt;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.MeasureSpec;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
@@ -76,7 +75,6 @@ import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBar.ActionBarMenuOnItemClick;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
-import org.telegram.ui.ActionBar.ActionBarMenuItem.ActionBarMenuItemDelegate;
 import org.telegram.ui.ActionBar.ActionBarMenuItem.ActionBarMenuItemSearchListener;
 import org.telegram.ui.ActionBar.AlertDialog.Builder;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -87,11 +85,8 @@ import org.telegram.ui.Cells.AudioPlayerCell;
 import org.telegram.ui.Cells.CheckBoxCell;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.RecyclerListView.Holder;
-import org.telegram.ui.Components.RecyclerListView.OnItemClickListener;
 import org.telegram.ui.Components.RecyclerListView.SelectionAdapter;
-import org.telegram.ui.Components.SeekBarView.SeekBarViewDelegate;
 import org.telegram.ui.DialogsActivity;
-import org.telegram.ui.DialogsActivity.DialogsActivityDelegate;
 import org.telegram.ui.LaunchActivity;
 
 public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgressListener, NotificationCenterDelegate {
@@ -240,86 +235,89 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
             }, 200, 300);
         }
 
-        private void processSearch(final String query) {
-            AndroidUtilities.runOnUIThread(new Runnable() {
-                public void run() {
-                    final ArrayList<MessageObject> copy = new ArrayList(AudioPlayerAlert.this.playlist);
-                    Utilities.searchQueue.postRunnable(new Runnable() {
-                        public void run() {
-                            String search1 = query.trim().toLowerCase();
-                            if (search1.length() == 0) {
-                                ListAdapter.this.updateSearchResults(new ArrayList());
-                                return;
-                            }
-                            String search2 = LocaleController.getInstance().getTranslitString(search1);
-                            if (search1.equals(search2) || search2.length() == 0) {
-                                search2 = null;
-                            }
-                            String[] search = new String[((search2 != null ? 1 : 0) + 1)];
-                            search[0] = search1;
-                            if (search2 != null) {
-                                search[1] = search2;
-                            }
-                            ArrayList<MessageObject> resultArray = new ArrayList();
-                            for (int a = 0; a < copy.size(); a++) {
-                                MessageObject messageObject = (MessageObject) copy.get(a);
-                                for (String q : search) {
-                                    String name = messageObject.getDocumentName();
-                                    if (!(name == null || name.length() == 0)) {
-                                        if (!name.toLowerCase().contains(q)) {
-                                            Document document;
-                                            if (messageObject.type == 0) {
-                                                document = messageObject.messageOwner.media.webpage.document;
-                                            } else {
-                                                document = messageObject.messageOwner.media.document;
-                                            }
-                                            boolean ok = false;
-                                            int c = 0;
-                                            while (c < document.attributes.size()) {
-                                                DocumentAttribute attribute = (DocumentAttribute) document.attributes.get(c);
-                                                if (attribute instanceof TL_documentAttributeAudio) {
-                                                    if (attribute.performer != null) {
-                                                        ok = attribute.performer.toLowerCase().contains(q);
-                                                    }
-                                                    if (!(ok || attribute.title == null)) {
-                                                        ok = attribute.title.toLowerCase().contains(q);
-                                                    }
-                                                    if (ok) {
-                                                        resultArray.add(messageObject);
-                                                        break;
-                                                    }
-                                                } else {
-                                                    c++;
-                                                }
-                                            }
-                                            if (ok) {
-                                                resultArray.add(messageObject);
-                                                break;
-                                            }
-                                        } else {
-                                            resultArray.add(messageObject);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            ListAdapter.this.updateSearchResults(resultArray);
-                        }
-                    });
-                }
-            });
+        private void processSearch(String query) {
+            AndroidUtilities.runOnUIThread(new AudioPlayerAlert$ListAdapter$$Lambda$0(this, query));
         }
 
-        private void updateSearchResults(final ArrayList<MessageObject> documents) {
-            AndroidUtilities.runOnUIThread(new Runnable() {
-                public void run() {
-                    AudioPlayerAlert.this.searchWas = true;
-                    ListAdapter.this.searchResult = documents;
-                    ListAdapter.this.notifyDataSetChanged();
-                    AudioPlayerAlert.this.layoutManager.scrollToPosition(0);
-                }
-            });
+        final /* synthetic */ void lambda$processSearch$1$AudioPlayerAlert$ListAdapter(String query) {
+            Utilities.searchQueue.postRunnable(new AudioPlayerAlert$ListAdapter$$Lambda$2(this, query, new ArrayList(AudioPlayerAlert.this.playlist)));
         }
+
+        final /* synthetic */ void lambda$null$0$AudioPlayerAlert$ListAdapter(String query, ArrayList copy) {
+            String search1 = query.trim().toLowerCase();
+            if (search1.length() == 0) {
+                updateSearchResults(new ArrayList());
+                return;
+            }
+            String search2 = LocaleController.getInstance().getTranslitString(search1);
+            if (search1.equals(search2) || search2.length() == 0) {
+                search2 = null;
+            }
+            String[] search = new String[((search2 != null ? 1 : 0) + 1)];
+            search[0] = search1;
+            if (search2 != null) {
+                search[1] = search2;
+            }
+            ArrayList<MessageObject> resultArray = new ArrayList();
+            for (int a = 0; a < copy.size(); a++) {
+                MessageObject messageObject = (MessageObject) copy.get(a);
+                for (String q : search) {
+                    String name = messageObject.getDocumentName();
+                    if (!(name == null || name.length() == 0)) {
+                        if (!name.toLowerCase().contains(q)) {
+                            Document document;
+                            if (messageObject.type == 0) {
+                                document = messageObject.messageOwner.media.webpage.document;
+                            } else {
+                                document = messageObject.messageOwner.media.document;
+                            }
+                            boolean ok = false;
+                            int c = 0;
+                            while (c < document.attributes.size()) {
+                                DocumentAttribute attribute = (DocumentAttribute) document.attributes.get(c);
+                                if (attribute instanceof TL_documentAttributeAudio) {
+                                    if (attribute.performer != null) {
+                                        ok = attribute.performer.toLowerCase().contains(q);
+                                    }
+                                    if (!(ok || attribute.title == null)) {
+                                        ok = attribute.title.toLowerCase().contains(q);
+                                    }
+                                    if (ok) {
+                                        resultArray.add(messageObject);
+                                        break;
+                                    }
+                                } else {
+                                    c++;
+                                }
+                            }
+                            if (ok) {
+                                resultArray.add(messageObject);
+                                break;
+                            }
+                        } else {
+                            resultArray.add(messageObject);
+                            break;
+                        }
+                    }
+                }
+            }
+            updateSearchResults(resultArray);
+        }
+
+        private void updateSearchResults(ArrayList<MessageObject> documents) {
+            AndroidUtilities.runOnUIThread(new AudioPlayerAlert$ListAdapter$$Lambda$1(this, documents));
+        }
+
+        final /* synthetic */ void lambda$updateSearchResults$2$AudioPlayerAlert$ListAdapter(ArrayList documents) {
+            AudioPlayerAlert.this.searchWas = true;
+            this.searchResult = documents;
+            notifyDataSetChanged();
+            AudioPlayerAlert.this.layoutManager.scrollToPosition(0);
+        }
+    }
+
+    final /* bridge */ /* synthetic */ void bridge$lambda$0$AudioPlayerAlert(int i) {
+        onSubItemClick(i);
     }
 
     public AudioPlayerAlert(Context context) {
@@ -548,100 +546,7 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
         this.placeholderImageView.setRoundRadius(AndroidUtilities.dp(20.0f));
         this.placeholderImageView.setPivotX(0.0f);
         this.placeholderImageView.setPivotY(0.0f);
-        this.placeholderImageView.setOnClickListener(new OnClickListener() {
-            public void onClick(View view) {
-                float f = 0.0f;
-                if (AudioPlayerAlert.this.animatorSet != null) {
-                    AudioPlayerAlert.this.animatorSet.cancel();
-                    AudioPlayerAlert.this.animatorSet = null;
-                }
-                AudioPlayerAlert.this.animatorSet = new AnimatorSet();
-                if (AudioPlayerAlert.this.scrollOffsetY <= AudioPlayerAlert.this.actionBar.getMeasuredHeight()) {
-                    AnimatorSet access$3100 = AudioPlayerAlert.this.animatorSet;
-                    Animator[] animatorArr = new Animator[1];
-                    AudioPlayerAlert audioPlayerAlert = AudioPlayerAlert.this;
-                    String str = "fullAnimationProgress";
-                    float[] fArr = new float[1];
-                    if (!AudioPlayerAlert.this.isInFullMode) {
-                        f = 1.0f;
-                    }
-                    fArr[0] = f;
-                    animatorArr[0] = ObjectAnimator.ofFloat(audioPlayerAlert, str, fArr);
-                    access$3100.playTogether(animatorArr);
-                } else {
-                    float f2;
-                    AnimatorSet access$31002 = AudioPlayerAlert.this.animatorSet;
-                    Animator[] animatorArr2 = new Animator[4];
-                    AudioPlayerAlert audioPlayerAlert2 = AudioPlayerAlert.this;
-                    String str2 = "fullAnimationProgress";
-                    float[] fArr2 = new float[1];
-                    fArr2[0] = AudioPlayerAlert.this.isInFullMode ? 0.0f : 1.0f;
-                    animatorArr2[0] = ObjectAnimator.ofFloat(audioPlayerAlert2, str2, fArr2);
-                    ActionBar access$1300 = AudioPlayerAlert.this.actionBar;
-                    str2 = "alpha";
-                    fArr2 = new float[1];
-                    if (AudioPlayerAlert.this.isInFullMode) {
-                        f2 = 0.0f;
-                    } else {
-                        f2 = 1.0f;
-                    }
-                    fArr2[0] = f2;
-                    animatorArr2[1] = ObjectAnimator.ofFloat(access$1300, str2, fArr2);
-                    View access$1400 = AudioPlayerAlert.this.shadow;
-                    String str3 = "alpha";
-                    float[] fArr3 = new float[1];
-                    if (AudioPlayerAlert.this.isInFullMode) {
-                        f2 = 0.0f;
-                    } else {
-                        f2 = 1.0f;
-                    }
-                    fArr3[0] = f2;
-                    animatorArr2[2] = ObjectAnimator.ofFloat(access$1400, str3, fArr3);
-                    View access$3300 = AudioPlayerAlert.this.shadow2;
-                    str2 = "alpha";
-                    fArr2 = new float[1];
-                    if (!AudioPlayerAlert.this.isInFullMode) {
-                        f = 1.0f;
-                    }
-                    fArr2[0] = f;
-                    animatorArr2[3] = ObjectAnimator.ofFloat(access$3300, str2, fArr2);
-                    access$31002.playTogether(animatorArr2);
-                }
-                AudioPlayerAlert.this.animatorSet.setInterpolator(new DecelerateInterpolator());
-                AudioPlayerAlert.this.animatorSet.setDuration(250);
-                AudioPlayerAlert.this.animatorSet.addListener(new AnimatorListenerAdapter() {
-                    public void onAnimationEnd(Animator animation) {
-                        if (animation.equals(AudioPlayerAlert.this.animatorSet)) {
-                            if (AudioPlayerAlert.this.isInFullMode) {
-                                if (AudioPlayerAlert.this.hasOptions) {
-                                    AudioPlayerAlert.this.menuItem.setVisibility(0);
-                                }
-                                AudioPlayerAlert.this.searchItem.setVisibility(4);
-                            } else {
-                                AudioPlayerAlert.this.listView.setScrollEnabled(true);
-                                if (AudioPlayerAlert.this.hasOptions) {
-                                    AudioPlayerAlert.this.menuItem.setVisibility(4);
-                                }
-                                AudioPlayerAlert.this.searchItem.setVisibility(0);
-                            }
-                            AudioPlayerAlert.this.animatorSet = null;
-                        }
-                    }
-                });
-                AudioPlayerAlert.this.animatorSet.start();
-                if (AudioPlayerAlert.this.hasOptions) {
-                    AudioPlayerAlert.this.menuItem.setVisibility(0);
-                }
-                AudioPlayerAlert.this.searchItem.setVisibility(0);
-                AudioPlayerAlert.this.isInFullMode = !AudioPlayerAlert.this.isInFullMode;
-                AudioPlayerAlert.this.listView.setScrollEnabled(false);
-                if (AudioPlayerAlert.this.isInFullMode) {
-                    AudioPlayerAlert.this.shuffleButton.setAdditionalOffset(-AndroidUtilities.dp(68.0f));
-                } else {
-                    AudioPlayerAlert.this.shuffleButton.setAdditionalOffset(-AndroidUtilities.dp(10.0f));
-                }
-            }
-        });
+        this.placeholderImageView.setOnClickListener(new AudioPlayerAlert$$Lambda$0(this));
         this.titleTextView = new TextView(context);
         this.titleTextView.setTextColor(Theme.getColor(Theme.key_player_actionBarTitle));
         this.titleTextView.setTextSize(1, 15.0f);
@@ -666,22 +571,10 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
         this.optionsButton.addSubItem(1, LocaleController.getString("Forward", R.string.Forward));
         this.optionsButton.addSubItem(2, LocaleController.getString("ShareFile", R.string.ShareFile));
         this.optionsButton.addSubItem(4, LocaleController.getString("ShowInChat", R.string.ShowInChat));
-        this.optionsButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                AudioPlayerAlert.this.optionsButton.toggleSubMenu();
-            }
-        });
-        this.optionsButton.setDelegate(new ActionBarMenuItemDelegate() {
-            public void onItemClick(int id) {
-                AudioPlayerAlert.this.onSubItemClick(id);
-            }
-        });
+        this.optionsButton.setOnClickListener(new AudioPlayerAlert$$Lambda$1(this));
+        this.optionsButton.setDelegate(new AudioPlayerAlert$$Lambda$2(this));
         this.seekBarView = new SeekBarView(context);
-        this.seekBarView.setDelegate(new SeekBarViewDelegate() {
-            public void onSeekBarDrag(float progress) {
-                MediaController.getInstance().seekToProgress(MediaController.getInstance().getPlayingMessageObject(), progress);
-            }
-        });
+        this.seekBarView.setDelegate(AudioPlayerAlert$$Lambda$3.$instance);
         frameLayout = this.playerLayout;
         frameLayout.addView(this.seekBarView, LayoutHelper.createFrame(-1, 30.0f, 51, 8.0f, 62.0f, 8.0f, 0.0f));
         this.progressView = new LineProgressView(context);
@@ -719,11 +612,7 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
         this.shuffleButton.setLongClickEnabled(false);
         this.shuffleButton.setAdditionalOffset(-AndroidUtilities.dp(10.0f));
         bottomView.addView(this.shuffleButton, LayoutHelper.createFrame(48, 48, 51));
-        this.shuffleButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                AudioPlayerAlert.this.shuffleButton.toggleSubMenu();
-            }
-        });
+        this.shuffleButton.setOnClickListener(new AudioPlayerAlert$$Lambda$4(this));
         TextView textView = this.shuffleButton.addSubItem(1, LocaleController.getString("ReverseOrder", R.string.ReverseOrder));
         textView.setPadding(AndroidUtilities.dp(8.0f), 0, AndroidUtilities.dp(16.0f), 0);
         this.playOrderButtons[0] = context.getResources().getDrawable(R.drawable.music_reverse).mutate();
@@ -734,24 +623,14 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
         this.playOrderButtons[1] = context.getResources().getDrawable(R.drawable.pl_shuffle).mutate();
         textView.setCompoundDrawablePadding(AndroidUtilities.dp(8.0f));
         textView.setCompoundDrawablesWithIntrinsicBounds(this.playOrderButtons[1], null, null, null);
-        this.shuffleButton.setDelegate(new ActionBarMenuItemDelegate() {
-            public void onItemClick(int id) {
-                MediaController.getInstance().toggleShuffleMusic(id);
-                AudioPlayerAlert.this.updateShuffleButton();
-                AudioPlayerAlert.this.listAdapter.notifyDataSetChanged();
-            }
-        });
+        this.shuffleButton.setDelegate(new AudioPlayerAlert$$Lambda$5(this));
         viewArr = this.buttons;
         View imageView = new ImageView(context);
         viewArr[1] = imageView;
         imageView.setScaleType(ScaleType.CENTER);
         imageView.setImageDrawable(Theme.createSimpleSelectorDrawable(context, R.drawable.pl_previous, Theme.getColor(Theme.key_player_button), Theme.getColor(Theme.key_player_buttonActive)));
         bottomView.addView(imageView, LayoutHelper.createFrame(48, 48, 51));
-        imageView.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                MediaController.getInstance().playPreviousMessage();
-            }
-        });
+        imageView.setOnClickListener(AudioPlayerAlert$$Lambda$6.$instance);
         viewArr = this.buttons;
         ImageView imageView2 = new ImageView(context);
         this.playButton = imageView2;
@@ -759,28 +638,14 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
         this.playButton.setScaleType(ScaleType.CENTER);
         this.playButton.setImageDrawable(Theme.createSimpleSelectorDrawable(context, R.drawable.pl_play, Theme.getColor(Theme.key_player_button), Theme.getColor(Theme.key_player_buttonActive)));
         bottomView.addView(this.playButton, LayoutHelper.createFrame(48, 48, 51));
-        this.playButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (!MediaController.getInstance().isDownloadingCurrentMessage()) {
-                    if (MediaController.getInstance().isMessagePaused()) {
-                        MediaController.getInstance().playMessage(MediaController.getInstance().getPlayingMessageObject());
-                    } else {
-                        MediaController.getInstance().pauseMessage(MediaController.getInstance().getPlayingMessageObject());
-                    }
-                }
-            }
-        });
+        this.playButton.setOnClickListener(AudioPlayerAlert$$Lambda$7.$instance);
         viewArr = this.buttons;
         imageView = new ImageView(context);
         viewArr[3] = imageView;
         imageView.setScaleType(ScaleType.CENTER);
         imageView.setImageDrawable(Theme.createSimpleSelectorDrawable(context, R.drawable.pl_next, Theme.getColor(Theme.key_player_button), Theme.getColor(Theme.key_player_buttonActive)));
         bottomView.addView(imageView, LayoutHelper.createFrame(48, 48, 51));
-        imageView.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                MediaController.getInstance().playNextMessage();
-            }
-        });
+        imageView.setOnClickListener(AudioPlayerAlert$$Lambda$8.$instance);
         viewArr = this.buttons;
         imageView2 = new ImageView(context);
         this.repeatButton = imageView2;
@@ -788,12 +653,7 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
         this.repeatButton.setScaleType(ScaleType.CENTER);
         this.repeatButton.setPadding(0, 0, AndroidUtilities.dp(8.0f), 0);
         bottomView.addView(this.repeatButton, LayoutHelper.createFrame(50, 48, 51));
-        this.repeatButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                SharedConfig.toggleRepeatMode();
-                AudioPlayerAlert.this.updateRepeatButton();
-            }
-        });
+        this.repeatButton.setOnClickListener(new AudioPlayerAlert$$Lambda$9(this));
         this.listView = new RecyclerListView(context) {
             boolean ignoreLayout;
 
@@ -889,13 +749,7 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
         this.listAdapter = listAdapter;
         recyclerListView.setAdapter(listAdapter);
         this.listView.setGlowColor(Theme.getColor(Theme.key_dialogScrollGlow));
-        this.listView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(View view, int position) {
-                if (view instanceof AudioPlayerCell) {
-                    ((AudioPlayerCell) view).didPressedButton();
-                }
-            }
-        });
+        this.listView.setOnItemClickListener(AudioPlayerAlert$$Lambda$10.$instance);
         this.listView.setOnScrollListener(new OnScrollListener() {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == 1 && AudioPlayerAlert.this.searching && AudioPlayerAlert.this.searchWas) {
@@ -918,6 +772,127 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
         updateTitle(false);
         updateRepeatButton();
         updateShuffleButton();
+    }
+
+    final /* synthetic */ void lambda$new$0$AudioPlayerAlert(View view) {
+        float f = 0.0f;
+        if (this.animatorSet != null) {
+            this.animatorSet.cancel();
+            this.animatorSet = null;
+        }
+        this.animatorSet = new AnimatorSet();
+        if (this.scrollOffsetY <= this.actionBar.getMeasuredHeight()) {
+            AnimatorSet animatorSet = this.animatorSet;
+            Animator[] animatorArr = new Animator[1];
+            String str = "fullAnimationProgress";
+            float[] fArr = new float[1];
+            if (!this.isInFullMode) {
+                f = 1.0f;
+            }
+            fArr[0] = f;
+            animatorArr[0] = ObjectAnimator.ofFloat(this, str, fArr);
+            animatorSet.playTogether(animatorArr);
+        } else {
+            float f2;
+            AnimatorSet animatorSet2 = this.animatorSet;
+            Animator[] animatorArr2 = new Animator[4];
+            String str2 = "fullAnimationProgress";
+            float[] fArr2 = new float[1];
+            fArr2[0] = this.isInFullMode ? 0.0f : 1.0f;
+            animatorArr2[0] = ObjectAnimator.ofFloat(this, str2, fArr2);
+            ActionBar actionBar = this.actionBar;
+            String str3 = "alpha";
+            float[] fArr3 = new float[1];
+            fArr3[0] = this.isInFullMode ? 0.0f : 1.0f;
+            animatorArr2[1] = ObjectAnimator.ofFloat(actionBar, str3, fArr3);
+            View view2 = this.shadow;
+            String str4 = "alpha";
+            float[] fArr4 = new float[1];
+            if (this.isInFullMode) {
+                f2 = 0.0f;
+            } else {
+                f2 = 1.0f;
+            }
+            fArr4[0] = f2;
+            animatorArr2[2] = ObjectAnimator.ofFloat(view2, str4, fArr4);
+            View view3 = this.shadow2;
+            str3 = "alpha";
+            fArr3 = new float[1];
+            if (!this.isInFullMode) {
+                f = 1.0f;
+            }
+            fArr3[0] = f;
+            animatorArr2[3] = ObjectAnimator.ofFloat(view3, str3, fArr3);
+            animatorSet2.playTogether(animatorArr2);
+        }
+        this.animatorSet.setInterpolator(new DecelerateInterpolator());
+        this.animatorSet.setDuration(250);
+        this.animatorSet.addListener(new AnimatorListenerAdapter() {
+            public void onAnimationEnd(Animator animation) {
+                if (animation.equals(AudioPlayerAlert.this.animatorSet)) {
+                    if (AudioPlayerAlert.this.isInFullMode) {
+                        if (AudioPlayerAlert.this.hasOptions) {
+                            AudioPlayerAlert.this.menuItem.setVisibility(0);
+                        }
+                        AudioPlayerAlert.this.searchItem.setVisibility(4);
+                    } else {
+                        AudioPlayerAlert.this.listView.setScrollEnabled(true);
+                        if (AudioPlayerAlert.this.hasOptions) {
+                            AudioPlayerAlert.this.menuItem.setVisibility(4);
+                        }
+                        AudioPlayerAlert.this.searchItem.setVisibility(0);
+                    }
+                    AudioPlayerAlert.this.animatorSet = null;
+                }
+            }
+        });
+        this.animatorSet.start();
+        if (this.hasOptions) {
+            this.menuItem.setVisibility(0);
+        }
+        this.searchItem.setVisibility(0);
+        this.isInFullMode = !this.isInFullMode;
+        this.listView.setScrollEnabled(false);
+        if (this.isInFullMode) {
+            this.shuffleButton.setAdditionalOffset(-AndroidUtilities.dp(68.0f));
+        } else {
+            this.shuffleButton.setAdditionalOffset(-AndroidUtilities.dp(10.0f));
+        }
+    }
+
+    final /* synthetic */ void lambda$new$1$AudioPlayerAlert(View v) {
+        this.optionsButton.toggleSubMenu();
+    }
+
+    final /* synthetic */ void lambda$new$3$AudioPlayerAlert(View v) {
+        this.shuffleButton.toggleSubMenu();
+    }
+
+    final /* synthetic */ void lambda$new$4$AudioPlayerAlert(int id) {
+        MediaController.getInstance().toggleShuffleMusic(id);
+        updateShuffleButton();
+        this.listAdapter.notifyDataSetChanged();
+    }
+
+    static final /* synthetic */ void lambda$new$6$AudioPlayerAlert(View v) {
+        if (!MediaController.getInstance().isDownloadingCurrentMessage()) {
+            if (MediaController.getInstance().isMessagePaused()) {
+                MediaController.getInstance().playMessage(MediaController.getInstance().getPlayingMessageObject());
+            } else {
+                MediaController.getInstance().pauseMessage(MediaController.getInstance().getPlayingMessageObject());
+            }
+        }
+    }
+
+    final /* synthetic */ void lambda$new$8$AudioPlayerAlert(View v) {
+        SharedConfig.toggleRepeatMode();
+        updateRepeatButton();
+    }
+
+    static final /* synthetic */ void lambda$new$9$AudioPlayerAlert(View view, int position) {
+        if (view instanceof AudioPlayerCell) {
+            ((AudioPlayerCell) view).didPressedButton();
+        }
     }
 
     @Keep
@@ -959,42 +934,7 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
                 BaseFragment dialogsActivity = new DialogsActivity(args);
                 ArrayList<MessageObject> fmessages = new ArrayList();
                 fmessages.add(messageObject);
-                final ArrayList<MessageObject> arrayList = fmessages;
-                dialogsActivity.setDelegate(new DialogsActivityDelegate() {
-                    public void didSelectDialogs(DialogsActivity fragment, ArrayList<Long> dids, CharSequence message, boolean param) {
-                        long did;
-                        if (dids.size() > 1 || ((Long) dids.get(0)).longValue() == ((long) UserConfig.getInstance(AudioPlayerAlert.this.currentAccount).getClientUserId()) || message != null) {
-                            for (int a = 0; a < dids.size(); a++) {
-                                did = ((Long) dids.get(a)).longValue();
-                                if (message != null) {
-                                    SendMessagesHelper.getInstance(AudioPlayerAlert.this.currentAccount).sendMessage(message.toString(), did, null, null, true, null, null, null);
-                                }
-                                SendMessagesHelper.getInstance(AudioPlayerAlert.this.currentAccount).sendMessage(arrayList, did);
-                            }
-                            fragment.finishFragment();
-                            return;
-                        }
-                        did = ((Long) dids.get(0)).longValue();
-                        int lower_part = (int) did;
-                        int high_part = (int) (did >> 32);
-                        Bundle args = new Bundle();
-                        args.putBoolean("scrollToTopOnResume", true);
-                        if (lower_part == 0) {
-                            args.putInt("enc_id", high_part);
-                        } else if (lower_part > 0) {
-                            args.putInt("user_id", lower_part);
-                        } else if (lower_part < 0) {
-                            args.putInt("chat_id", -lower_part);
-                        }
-                        NotificationCenter.getInstance(AudioPlayerAlert.this.currentAccount).postNotificationName(NotificationCenter.closeChats, new Object[0]);
-                        ChatActivity chatActivity = new ChatActivity(args);
-                        if (AudioPlayerAlert.this.parentActivity.presentFragment(chatActivity, true, false)) {
-                            chatActivity.showFieldPanelForForward(true, arrayList);
-                        } else {
-                            fragment.finishFragment();
-                        }
-                    }
-                });
+                dialogsActivity.setDelegate(new AudioPlayerAlert$$Lambda$11(this, fmessages));
                 this.parentActivity.presentFragment(dialogsActivity);
                 dismiss();
             } else if (id == 2) {
@@ -1087,42 +1027,12 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
                             }
                             cell.setPadding(dp, 0, dp2, 0);
                             frameLayout.addView(cell, LayoutHelper.createFrame(-1, 48.0f, 51, 0.0f, 0.0f, 0.0f, 0.0f));
-                            final boolean[] zArr = deleteForAll;
-                            cell.setOnClickListener(new OnClickListener() {
-                                public void onClick(View v) {
-                                    boolean z;
-                                    CheckBoxCell cell = (CheckBoxCell) v;
-                                    boolean[] zArr = zArr;
-                                    if (zArr[0]) {
-                                        z = false;
-                                    } else {
-                                        z = true;
-                                    }
-                                    zArr[0] = z;
-                                    cell.setChecked(zArr[0], true);
-                                }
-                            });
+                            cell.setOnClickListener(new AudioPlayerAlert$$Lambda$12(deleteForAll));
                             builder.setView(frameLayout);
                         }
                     }
                 }
-                final MessageObject messageObject2 = messageObject;
-                final boolean[] zArr2 = deleteForAll;
-                builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        AudioPlayerAlert.this.dismiss();
-                        ArrayList<Integer> arr = new ArrayList();
-                        arr.add(Integer.valueOf(messageObject2.getId()));
-                        ArrayList<Long> random_ids = null;
-                        EncryptedChat encryptedChat = null;
-                        if (((int) messageObject2.getDialogId()) == 0 && messageObject2.messageOwner.random_id != 0) {
-                            random_ids = new ArrayList();
-                            random_ids.add(Long.valueOf(messageObject2.messageOwner.random_id));
-                            encryptedChat = MessagesController.getInstance(AudioPlayerAlert.this.currentAccount).getEncryptedChat(Integer.valueOf((int) (messageObject2.getDialogId() >> 32)));
-                        }
-                        MessagesController.getInstance(AudioPlayerAlert.this.currentAccount).deleteMessages(arr, random_ids, encryptedChat, messageObject2.messageOwner.to_id.channel_id, zArr2[0]);
-                    }
-                });
+                builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new AudioPlayerAlert$$Lambda$13(this, messageObject, deleteForAll));
                 builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
                 builder.show();
             } else if (id == 4) {
@@ -1153,6 +1063,66 @@ public class AudioPlayerAlert extends BottomSheet implements FileDownloadProgres
                 dismiss();
             }
         }
+    }
+
+    final /* synthetic */ void lambda$onSubItemClick$10$AudioPlayerAlert(ArrayList fmessages, DialogsActivity fragment1, ArrayList dids, CharSequence message, boolean param) {
+        long did;
+        if (dids.size() > 1 || ((Long) dids.get(0)).longValue() == ((long) UserConfig.getInstance(this.currentAccount).getClientUserId()) || message != null) {
+            for (int a = 0; a < dids.size(); a++) {
+                did = ((Long) dids.get(a)).longValue();
+                if (message != null) {
+                    SendMessagesHelper.getInstance(this.currentAccount).sendMessage(message.toString(), did, null, null, true, null, null, null);
+                }
+                SendMessagesHelper.getInstance(this.currentAccount).sendMessage(fmessages, did);
+            }
+            fragment1.finishFragment();
+            return;
+        }
+        did = ((Long) dids.get(0)).longValue();
+        int lower_part = (int) did;
+        int high_part = (int) (did >> 32);
+        Bundle args1 = new Bundle();
+        args1.putBoolean("scrollToTopOnResume", true);
+        if (lower_part == 0) {
+            args1.putInt("enc_id", high_part);
+        } else if (lower_part > 0) {
+            args1.putInt("user_id", lower_part);
+        } else if (lower_part < 0) {
+            args1.putInt("chat_id", -lower_part);
+        }
+        NotificationCenter.getInstance(this.currentAccount).postNotificationName(NotificationCenter.closeChats, new Object[0]);
+        ChatActivity chatActivity = new ChatActivity(args1);
+        if (this.parentActivity.presentFragment(chatActivity, true, false)) {
+            chatActivity.showFieldPanelForForward(true, fmessages);
+        } else {
+            fragment1.finishFragment();
+        }
+    }
+
+    static final /* synthetic */ void lambda$onSubItemClick$11$AudioPlayerAlert(boolean[] deleteForAll, View v) {
+        boolean z;
+        CheckBoxCell cell1 = (CheckBoxCell) v;
+        if (deleteForAll[0]) {
+            z = false;
+        } else {
+            z = true;
+        }
+        deleteForAll[0] = z;
+        cell1.setChecked(deleteForAll[0], true);
+    }
+
+    final /* synthetic */ void lambda$onSubItemClick$12$AudioPlayerAlert(MessageObject messageObject, boolean[] deleteForAll, DialogInterface dialogInterface, int i) {
+        dismiss();
+        ArrayList<Integer> arr = new ArrayList();
+        arr.add(Integer.valueOf(messageObject.getId()));
+        ArrayList<Long> random_ids = null;
+        EncryptedChat encryptedChat = null;
+        if (((int) messageObject.getDialogId()) == 0 && messageObject.messageOwner.random_id != 0) {
+            random_ids = new ArrayList();
+            random_ids.add(Long.valueOf(messageObject.messageOwner.random_id));
+            encryptedChat = MessagesController.getInstance(this.currentAccount).getEncryptedChat(Integer.valueOf((int) (messageObject.getDialogId() >> 32)));
+        }
+        MessagesController.getInstance(this.currentAccount).deleteMessages(arr, random_ids, encryptedChat, messageObject.messageOwner.to_id.channel_id, deleteForAll[0]);
     }
 
     private int getCurrentTop() {

@@ -31,6 +31,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.android.exoplayer2.C;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -680,7 +681,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenterDelegat
         this.nameTextView.setTextSize(1, 16.0f);
         this.nameTextView.setBackgroundDrawable(null);
         this.nameTextView.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
-        this.nameTextView.setImeOptions(268435456);
+        this.nameTextView.setImeOptions(C.ENCODING_PCM_MU_LAW);
         this.nameTextView.setInputType(16385);
         this.nameTextView.setCursorColor(Theme.getColor(Theme.key_dialogTextBlack));
         this.nameTextView.setCursorSize(AndroidUtilities.dp(20.0f));
@@ -807,7 +808,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenterDelegat
         this.commentTextView.setTextSize(1, 16.0f);
         this.commentTextView.setBackgroundDrawable(null);
         this.commentTextView.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
-        this.commentTextView.setImeOptions(268435456);
+        this.commentTextView.setImeOptions(C.ENCODING_PCM_MU_LAW);
         this.commentTextView.setInputType(16385);
         this.commentTextView.setCursorColor(Theme.getColor(Theme.key_dialogTextBlack));
         this.commentTextView.setCursorSize(AndroidUtilities.dp(20.0f));

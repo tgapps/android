@@ -10,6 +10,7 @@ import android.util.Log;
 import com.google.android.gms.common.internal.Preconditions;
 import com.google.firebase.FirebaseApp;
 
+/* compiled from: com.google.firebase:firebase-common@@16.0.1 */
 public class FirebaseInitProvider extends ContentProvider {
     public boolean onCreate() {
         if (FirebaseApp.initializeApp(getContext()) == null) {

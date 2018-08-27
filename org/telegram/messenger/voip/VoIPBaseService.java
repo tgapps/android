@@ -62,6 +62,9 @@ import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.ViewGroup;
 import android.widget.RemoteViews;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.util.MimeTypes;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -81,8 +84,6 @@ import org.telegram.messenger.NotificationsController;
 import org.telegram.messenger.StatsController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.beta.R;
-import org.telegram.messenger.exoplayer2.DefaultRenderersFactory;
-import org.telegram.messenger.exoplayer2.util.MimeTypes;
 import org.telegram.messenger.voip.VoIPController.ConnectionStateListener;
 import org.telegram.messenger.voip.VoIPController.Stats;
 import org.telegram.tgnet.ConnectionsManager;
@@ -591,6 +592,7 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
             builder.setColor(-13851168);
         }
         if (VERSION.SDK_INT >= 26) {
+            NotificationsController.checkOtherNotificationsChannel();
             builder.setChannelId(NotificationsController.OTHER_NOTIFICATIONS_CHANNEL);
         }
         if (photo != null) {
@@ -865,6 +867,15 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
                         am.setSpeakerphoneOn(true);
                         break;
                     case 2:
+                        if (!this.bluetoothScoActive) {
+                            this.needSwitchToBluetoothAfterScoActivates = true;
+                            try {
+                                am.startBluetoothSco();
+                                break;
+                            } catch (Throwable th) {
+                                break;
+                            }
+                        }
                         am.setBluetoothScoOn(true);
                         am.setSpeakerphoneOn(false);
                         break;
@@ -946,7 +957,7 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
             }
             this.isBtHeadsetConnected = connected;
             final AudioManager am = (AudioManager) getSystemService(MimeTypes.BASE_TYPE_AUDIO);
-            if (!connected) {
+            if (!connected || isRinging() || this.currentState == 0) {
                 this.bluetoothScoActive = false;
             } else if (this.bluetoothScoActive) {
                 if (BuildVars.LOGS_ENABLED) {
@@ -1132,7 +1143,7 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
             ((SpannableString) endTitle2).setSpan(new ForegroundColorSpan(-769226), 0, endTitle2.length(), 0);
             endTitle = endTitle2;
         }
-        PendingIntent endPendingIntent = PendingIntent.getBroadcast(this, 0, endIntent, 268435456);
+        PendingIntent endPendingIntent = PendingIntent.getBroadcast(this, 0, endIntent, C.ENCODING_PCM_MU_LAW);
         builder.addAction(R.drawable.ic_call_end_white_24dp, endTitle, endPendingIntent);
         Intent answerIntent = new Intent(this, VoIPActionsReceiver.class);
         answerIntent.setAction(getPackageName() + ".ANSWER_CALL");
@@ -1143,7 +1154,7 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
             ((SpannableString) answerTitle2).setSpan(new ForegroundColorSpan(-16733696), 0, answerTitle2.length(), 0);
             answerTitle = answerTitle2;
         }
-        PendingIntent answerPendingIntent = PendingIntent.getBroadcast(this, 0, answerIntent, 268435456);
+        PendingIntent answerPendingIntent = PendingIntent.getBroadcast(this, 0, answerIntent, C.ENCODING_PCM_MU_LAW);
         builder.addAction(R.drawable.ic_call_white_24dp, answerTitle, answerPendingIntent);
         builder.setPriority(2);
         if (VERSION.SDK_INT >= 17) {
@@ -1347,7 +1358,7 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
             }
         }
         try {
-            PendingIntent.getActivity(this, 0, new Intent(this, VoIPPermissionActivity.class).addFlags(268435456), 0).send();
+            PendingIntent.getActivity(this, 0, new Intent(this, VoIPPermissionActivity.class).addFlags(C.ENCODING_PCM_MU_LAW), 0).send();
         } catch (Exception x2) {
             if (BuildVars.LOGS_ENABLED) {
                 FileLog.e("Error starting permission activity", x2);
@@ -1413,6 +1424,10 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
         return this.currentState == 11 || this.currentState == 4;
     }
 
+    protected boolean isRinging() {
+        return false;
+    }
+
     @TargetApi(26)
     protected PhoneAccountHandle addAccountToTelecomManager() {
         TelecomManager tm = (TelecomManager) getSystemService("telecom");
@@ -1426,7 +1441,7 @@ public abstract class VoIPBaseService extends Service implements SensorEventList
         if (VERSION.SDK_INT < 26) {
             return false;
         }
-        if ("angler".equals(Build.PRODUCT) || "bullhead".equals(Build.PRODUCT) || "sailfish".equals(Build.PRODUCT) || "marlin".equals(Build.PRODUCT) || "walleye".equals(Build.PRODUCT) || "taimen".equals(Build.PRODUCT)) {
+        if ("angler".equals(Build.PRODUCT) || "bullhead".equals(Build.PRODUCT) || "sailfish".equals(Build.PRODUCT) || "marlin".equals(Build.PRODUCT) || "walleye".equals(Build.PRODUCT) || "taimen".equals(Build.PRODUCT) || MessagesController.getGlobalMainSettings().getBoolean("dbg_force_connection_service", false)) {
             return true;
         }
         return false;

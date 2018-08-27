@@ -2,28 +2,27 @@ package com.google.android.gms.internal.wallet;
 
 import android.os.RemoteException;
 import com.google.android.gms.common.api.Api.AnyClient;
-import com.google.android.gms.common.api.BooleanResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.common.api.internal.BaseImplementation.ResultHolder;
-import com.google.android.gms.wallet.IsReadyToPayRequest;
-import com.google.android.gms.wallet.Wallet.zza;
+import com.google.android.gms.wallet.FullWalletRequest;
+import com.google.android.gms.wallet.Wallet.zzb;
 
-final class zzab extends zza<BooleanResult> {
-    zzab(zzw com_google_android_gms_internal_wallet_zzw, GoogleApiClient googleApiClient) {
+final class zzab extends zzb {
+    private final /* synthetic */ int val$requestCode;
+    private final /* synthetic */ FullWalletRequest zzgg;
+
+    zzab(zzy com_google_android_gms_internal_wallet_zzy, GoogleApiClient googleApiClient, FullWalletRequest fullWalletRequest, int i) {
+        this.zzgg = fullWalletRequest;
+        this.val$requestCode = i;
         super(googleApiClient);
     }
 
-    protected final /* synthetic */ Result createFailedResult(Status status) {
-        return new BooleanResult(status, false);
+    protected final void zza(zzaf com_google_android_gms_internal_wallet_zzaf) {
+        com_google_android_gms_internal_wallet_zzaf.zza(this.zzgg, this.val$requestCode);
+        setResult(Status.RESULT_SUCCESS);
     }
 
     protected final /* synthetic */ void doExecute(AnyClient anyClient) throws RemoteException {
-        zza((zzad) anyClient);
-    }
-
-    protected final void zza(zzad com_google_android_gms_internal_wallet_zzad) {
-        com_google_android_gms_internal_wallet_zzad.zza(IsReadyToPayRequest.newBuilder().build(), (ResultHolder) this);
+        zza((zzaf) anyClient);
     }
 }

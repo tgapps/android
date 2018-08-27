@@ -2,7 +2,6 @@ package org.telegram.ui;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
@@ -30,8 +29,6 @@ import org.telegram.ui.Components.EmptyTextProgressView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.RecyclerListView.Holder;
-import org.telegram.ui.Components.RecyclerListView.OnItemClickListener;
-import org.telegram.ui.Components.RecyclerListView.OnItemLongClickListener;
 import org.telegram.ui.Components.RecyclerListView.SelectionAdapter;
 import org.telegram.ui.ContactsActivity.ContactsActivityDelegate;
 
@@ -50,7 +47,7 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
         }
 
         public int getItemCount() {
-            if (MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.isEmpty()) {
+            if (MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.size() == 0) {
                 return 0;
             }
             return MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.size() + 1;
@@ -76,7 +73,7 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
 
         public void onBindViewHolder(ViewHolder holder, int position) {
             if (holder.getItemViewType() == 0) {
-                User user = MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).getUser((Integer) MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.get(position));
+                User user = MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).getUser(Integer.valueOf(MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.get(position)));
                 if (user != null) {
                     String number;
                     if (user.bot) {
@@ -153,38 +150,38 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
         }
         recyclerListView.setVerticalScrollbarPosition(i);
         frameLayout.addView(this.listView, LayoutHelper.createFrame(-1, -1.0f));
-        this.listView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(View view, int position) {
-                if (position < MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.size()) {
-                    Bundle args = new Bundle();
-                    args.putInt("user_id", ((Integer) MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.get(position)).intValue());
-                    BlockedUsersActivity.this.presentFragment(new ProfileActivity(args));
-                }
-            }
-        });
-        this.listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-            public boolean onItemClick(View view, int position) {
-                if (position < MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.size() && BlockedUsersActivity.this.getParentActivity() != null) {
-                    BlockedUsersActivity.this.selectedUserId = ((Integer) MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).blockedUsers.get(position)).intValue();
-                    Builder builder = new Builder(BlockedUsersActivity.this.getParentActivity());
-                    builder.setItems(new CharSequence[]{LocaleController.getString("Unblock", R.string.Unblock)}, new OnClickListener() {
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if (i == 0) {
-                                MessagesController.getInstance(BlockedUsersActivity.this.currentAccount).unblockUser(BlockedUsersActivity.this.selectedUserId);
-                            }
-                        }
-                    });
-                    BlockedUsersActivity.this.showDialog(builder.create());
-                }
-                return true;
-            }
-        });
+        this.listView.setOnItemClickListener(new BlockedUsersActivity$$Lambda$0(this));
+        this.listView.setOnItemLongClickListener(new BlockedUsersActivity$$Lambda$1(this));
         if (MessagesController.getInstance(this.currentAccount).loadingBlockedUsers) {
             this.emptyView.showProgress();
         } else {
             this.emptyView.showTextView();
         }
         return this.fragmentView;
+    }
+
+    final /* synthetic */ void lambda$createView$0$BlockedUsersActivity(View view, int position) {
+        if (position < MessagesController.getInstance(this.currentAccount).blockedUsers.size()) {
+            Bundle args = new Bundle();
+            args.putInt("user_id", MessagesController.getInstance(this.currentAccount).blockedUsers.get(position));
+            presentFragment(new ProfileActivity(args));
+        }
+    }
+
+    final /* synthetic */ boolean lambda$createView$2$BlockedUsersActivity(View view, int position) {
+        if (position < MessagesController.getInstance(this.currentAccount).blockedUsers.size() && getParentActivity() != null) {
+            this.selectedUserId = MessagesController.getInstance(this.currentAccount).blockedUsers.get(position);
+            Builder builder = new Builder(getParentActivity());
+            builder.setItems(new CharSequence[]{LocaleController.getString("Unblock", R.string.Unblock)}, new BlockedUsersActivity$$Lambda$3(this));
+            showDialog(builder.create());
+        }
+        return true;
+    }
+
+    final /* synthetic */ void lambda$null$1$BlockedUsersActivity(DialogInterface dialogInterface, int i) {
+        if (i == 0) {
+            MessagesController.getInstance(this.currentAccount).unblockUser(this.selectedUserId);
+        }
     }
 
     public void didReceivedNotification(int id, int account, Object... args) {
@@ -227,19 +224,7 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
     }
 
     public ThemeDescription[] getThemeDescriptions() {
-        ThemeDescriptionDelegate cellDelegate = new ThemeDescriptionDelegate() {
-            public void didSetColor() {
-                if (BlockedUsersActivity.this.listView != null) {
-                    int count = BlockedUsersActivity.this.listView.getChildCount();
-                    for (int a = 0; a < count; a++) {
-                        View child = BlockedUsersActivity.this.listView.getChildAt(a);
-                        if (child instanceof UserCell) {
-                            ((UserCell) child).update(0);
-                        }
-                    }
-                }
-            }
-        };
+        ThemeDescriptionDelegate cellDelegate = new BlockedUsersActivity$$Lambda$2(this);
         r10 = new ThemeDescription[20];
         r10[9] = new ThemeDescription(this.listView, 0, new Class[]{TextInfoCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText5);
         r10[10] = new ThemeDescription(this.listView, 0, new Class[]{UserCell.class}, new String[]{"nameTextView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText);
@@ -253,5 +238,17 @@ public class BlockedUsersActivity extends BaseFragment implements NotificationCe
         r10[18] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundBlue);
         r10[19] = new ThemeDescription(null, 0, null, null, null, cellDelegate, Theme.key_avatar_backgroundPink);
         return r10;
+    }
+
+    final /* synthetic */ void lambda$getThemeDescriptions$3$BlockedUsersActivity() {
+        if (this.listView != null) {
+            int count = this.listView.getChildCount();
+            for (int a = 0; a < count; a++) {
+                View child = this.listView.getChildAt(a);
+                if (child instanceof UserCell) {
+                    ((UserCell) child).update(0);
+                }
+            }
+        }
     }
 }

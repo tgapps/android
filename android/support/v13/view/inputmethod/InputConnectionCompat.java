@@ -12,7 +12,6 @@ import android.view.inputmethod.InputConnectionWrapper;
 import android.view.inputmethod.InputContentInfo;
 
 public final class InputConnectionCompat {
-    public static int INPUT_CONTENT_GRANT_READ_URI_PERMISSION = 1;
 
     public interface OnCommitContentListener {
         boolean onCommitContent(InputContentInfoCompat inputContentInfoCompat, int i, Bundle bundle);

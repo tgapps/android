@@ -10,16 +10,16 @@ import org.aspectj.runtime.reflect.Factory;
 
 public class LyricsUriBox extends AbstractFullBox {
     public static final String TYPE = "lrcu";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
     private String lyricsUri;
 
     static {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("LyricsUriBox.java", LyricsUriBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getLyricsUri", "com.coremedia.iso.boxes.vodafone.LyricsUriBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.lang.String"), 39);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setLyricsUri", "com.coremedia.iso.boxes.vodafone.LyricsUriBox", "java.lang.String", "lyricsUri", TtmlNode.ANONYMOUS_REGION_ID, "void"), 43);

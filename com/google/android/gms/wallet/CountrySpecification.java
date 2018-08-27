@@ -8,15 +8,15 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
 @Deprecated
 public class CountrySpecification extends AbstractSafeParcelable {
     public static final Creator<CountrySpecification> CREATOR = new zzh();
-    private String zzh;
-
-    public CountrySpecification(String str) {
-        this.zzh = str;
-    }
+    private String zzi;
 
     public void writeToParcel(Parcel parcel, int i) {
         int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
-        SafeParcelWriter.writeString(parcel, 2, this.zzh, false);
+        SafeParcelWriter.writeString(parcel, 2, this.zzi, false);
         SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+    }
+
+    public CountrySpecification(String str) {
+        this.zzi = str;
     }
 }

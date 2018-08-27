@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.view.View.MeasureSpec;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -194,13 +193,7 @@ public class DialogsAdapter extends SelectionAdapter {
                 textView.setText(LocaleController.getString("RecentlyViewedHide", R.string.RecentlyViewedHide));
                 textView.setGravity((LocaleController.isRTL ? 3 : 5) | 16);
                 headerCell.addView(textView, LayoutHelper.createFrame(-1, -1.0f, (LocaleController.isRTL ? 3 : 5) | 48, 17.0f, 15.0f, 17.0f, 0.0f));
-                textView.setOnClickListener(new OnClickListener() {
-                    public void onClick(View view) {
-                        MessagesController.getInstance(DialogsAdapter.this.currentAccount).hintDialogs.clear();
-                        MessagesController.getGlobalMainSettings().edit().remove("installReferer").commit();
-                        DialogsAdapter.this.notifyDataSetChanged();
-                    }
-                });
+                textView.setOnClickListener(new DialogsAdapter$$Lambda$0(this));
                 view = headerCell;
                 break;
             case 3:
@@ -238,6 +231,12 @@ public class DialogsAdapter extends SelectionAdapter {
         }
         view.setLayoutParams(new LayoutParams(-1, viewType == 5 ? -1 : -2));
         return new Holder(view);
+    }
+
+    final /* synthetic */ void lambda$onCreateViewHolder$0$DialogsAdapter(View view1) {
+        MessagesController.getInstance(this.currentAccount).hintDialogs.clear();
+        MessagesController.getGlobalMainSettings().edit().remove("installReferer").commit();
+        notifyDataSetChanged();
     }
 
     public void onBindViewHolder(ViewHolder holder, int i) {

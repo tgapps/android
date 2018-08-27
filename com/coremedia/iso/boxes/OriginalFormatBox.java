@@ -11,12 +11,12 @@ import org.aspectj.runtime.reflect.Factory;
 public class OriginalFormatBox extends AbstractBox {
     static final /* synthetic */ boolean $assertionsDisabled = (!OriginalFormatBox.class.desiredAssertionStatus());
     public static final String TYPE = "frma";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_2 = null;
     private String dataFormat = "    ";
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("OriginalFormatBox.java", OriginalFormatBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getDataFormat", "com.coremedia.iso.boxes.OriginalFormatBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.lang.String"), 42);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setDataFormat", "com.coremedia.iso.boxes.OriginalFormatBox", "java.lang.String", "dataFormat", TtmlNode.ANONYMOUS_REGION_ID, "void"), 47);

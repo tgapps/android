@@ -7,6 +7,10 @@ import com.google.android.gms.wallet.MaskedWallet;
 import com.google.android.gms.wallet.MaskedWalletRequest;
 
 public final class zzd implements Creator<WalletFragmentInitParams> {
+    public final /* synthetic */ Object[] newArray(int i) {
+        return new WalletFragmentInitParams[i];
+    }
+
     public final /* synthetic */ Object createFromParcel(Parcel parcel) {
         int validateObjectHeader = SafeParcelReader.validateObjectHeader(parcel);
         int i = -1;
@@ -35,9 +39,5 @@ public final class zzd implements Creator<WalletFragmentInitParams> {
         }
         SafeParcelReader.ensureAtEnd(parcel, validateObjectHeader);
         return new WalletFragmentInitParams(str, maskedWalletRequest, i, maskedWallet);
-    }
-
-    public final /* synthetic */ Object[] newArray(int i) {
-        return new WalletFragmentInitParams[i];
     }
 }

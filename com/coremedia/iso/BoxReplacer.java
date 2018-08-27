@@ -1,6 +1,7 @@
 package com.coremedia.iso;
 
 import com.coremedia.iso.boxes.Box;
+import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.FileDataSourceImpl;
 import com.googlecode.mp4parser.util.Path;
 import java.io.File;
@@ -15,7 +16,7 @@ public class BoxReplacer {
     static final /* synthetic */ boolean $assertionsDisabled = (!BoxReplacer.class.desiredAssertionStatus());
 
     public static void replace(Map<String, Box> replacements, File file) throws IOException {
-        IsoFile isoFile = new IsoFile(new FileDataSourceImpl(new RandomAccessFile(file, "r").getChannel()));
+        Container isoFile = new IsoFile(new FileDataSourceImpl(new RandomAccessFile(file, "r").getChannel()));
         Map<String, Box> replacementSanitised = new HashMap();
         Map<String, Long> positions = new HashMap();
         for (Entry<String, Box> e : replacements.entrySet()) {

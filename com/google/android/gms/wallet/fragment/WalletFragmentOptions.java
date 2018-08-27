@@ -15,81 +15,65 @@ public final class WalletFragmentOptions extends AbstractSafeParcelable implemen
     private int environment;
     private int mode;
     private int theme;
-    private WalletFragmentStyle zzfz;
+    private WalletFragmentStyle zzgb;
 
     public final class Builder {
-        private final /* synthetic */ WalletFragmentOptions zzga;
+        private final /* synthetic */ WalletFragmentOptions zzgc;
 
         private Builder(WalletFragmentOptions walletFragmentOptions) {
-            this.zzga = walletFragmentOptions;
-        }
-
-        public final WalletFragmentOptions build() {
-            return this.zzga;
+            this.zzgc = walletFragmentOptions;
         }
 
         public final Builder setEnvironment(int i) {
-            this.zzga.environment = i;
+            this.zzgc.environment = i;
             return this;
         }
 
         public final Builder setFragmentStyle(WalletFragmentStyle walletFragmentStyle) {
-            this.zzga.zzfz = walletFragmentStyle;
+            this.zzgc.zzgb = walletFragmentStyle;
             return this;
         }
 
         public final Builder setMode(int i) {
-            this.zzga.mode = i;
+            this.zzgc.mode = i;
             return this;
         }
-    }
 
-    private WalletFragmentOptions() {
-        this.environment = 3;
-        this.zzfz = new WalletFragmentStyle();
-    }
-
-    WalletFragmentOptions(int i, int i2, WalletFragmentStyle walletFragmentStyle, int i3) {
-        this.environment = i;
-        this.theme = i2;
-        this.zzfz = walletFragmentStyle;
-        this.mode = i3;
+        public final WalletFragmentOptions build() {
+            return this.zzgc;
+        }
     }
 
     public static Builder newBuilder() {
         return new Builder();
     }
 
-    public static WalletFragmentOptions zza(Context context, AttributeSet attributeSet) {
-        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R.styleable.WalletFragmentOptions);
-        int i = obtainStyledAttributes.getInt(R.styleable.WalletFragmentOptions_appTheme, 0);
-        int i2 = obtainStyledAttributes.getInt(R.styleable.WalletFragmentOptions_environment, 1);
-        int resourceId = obtainStyledAttributes.getResourceId(R.styleable.WalletFragmentOptions_fragmentStyle, 0);
-        int i3 = obtainStyledAttributes.getInt(R.styleable.WalletFragmentOptions_fragmentMode, 1);
-        obtainStyledAttributes.recycle();
-        WalletFragmentOptions walletFragmentOptions = new WalletFragmentOptions();
-        walletFragmentOptions.theme = i;
-        walletFragmentOptions.environment = i2;
-        walletFragmentOptions.zzfz = new WalletFragmentStyle().setStyleResourceId(resourceId);
-        walletFragmentOptions.zzfz.zza(context);
-        walletFragmentOptions.mode = i3;
-        return walletFragmentOptions;
+    private WalletFragmentOptions() {
+        this.environment = 3;
+        this.zzgb = new WalletFragmentStyle();
+    }
+
+    WalletFragmentOptions(int i, int i2, WalletFragmentStyle walletFragmentStyle, int i3) {
+        this.environment = i;
+        this.theme = i2;
+        this.zzgb = walletFragmentStyle;
+        this.mode = i3;
     }
 
     public final int getEnvironment() {
         return this.environment;
     }
 
+    public final int getTheme() {
+        return this.theme;
+    }
+
     public final WalletFragmentStyle getFragmentStyle() {
-        return this.zzfz;
+        return this.zzgb;
     }
 
     public final int getMode() {
         return this.mode;
-    }
-
-    public final int getTheme() {
-        return this.theme;
     }
 
     public final void writeToParcel(Parcel parcel, int i) {
@@ -102,8 +86,24 @@ public final class WalletFragmentOptions extends AbstractSafeParcelable implemen
     }
 
     public final void zza(Context context) {
-        if (this.zzfz != null) {
-            this.zzfz.zza(context);
+        if (this.zzgb != null) {
+            this.zzgb.zza(context);
         }
+    }
+
+    public static WalletFragmentOptions zza(Context context, AttributeSet attributeSet) {
+        TypedArray obtainStyledAttributes = context.obtainStyledAttributes(attributeSet, R.styleable.WalletFragmentOptions);
+        int i = obtainStyledAttributes.getInt(R.styleable.WalletFragmentOptions_appTheme, 0);
+        int i2 = obtainStyledAttributes.getInt(R.styleable.WalletFragmentOptions_environment, 1);
+        int resourceId = obtainStyledAttributes.getResourceId(R.styleable.WalletFragmentOptions_fragmentStyle, 0);
+        int i3 = obtainStyledAttributes.getInt(R.styleable.WalletFragmentOptions_fragmentMode, 1);
+        obtainStyledAttributes.recycle();
+        WalletFragmentOptions walletFragmentOptions = new WalletFragmentOptions();
+        walletFragmentOptions.theme = i;
+        walletFragmentOptions.environment = i2;
+        walletFragmentOptions.zzgb = new WalletFragmentStyle().setStyleResourceId(resourceId);
+        walletFragmentOptions.zzgb.zza(context);
+        walletFragmentOptions.mode = i3;
+        return walletFragmentOptions;
     }
 }

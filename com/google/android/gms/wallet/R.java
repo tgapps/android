@@ -3,7 +3,7 @@ package com.google.android.gms.wallet;
 public final class R {
 
     public static final class string {
-        public static final int wallet_buy_button_place_holder = 2131495034;
+        public static final int wallet_buy_button_place_holder = 2131495115;
     }
 
     public static final class style {

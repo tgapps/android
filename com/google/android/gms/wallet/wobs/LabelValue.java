@@ -10,7 +10,11 @@ public final class LabelValue extends AbstractSafeParcelable {
     private String label;
     private String value;
 
-    LabelValue() {
+    public final void writeToParcel(Parcel parcel, int i) {
+        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeString(parcel, 2, this.label, false);
+        SafeParcelWriter.writeString(parcel, 3, this.value, false);
+        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
     }
 
     public LabelValue(String str, String str2) {
@@ -18,10 +22,6 @@ public final class LabelValue extends AbstractSafeParcelable {
         this.value = str2;
     }
 
-    public final void writeToParcel(Parcel parcel, int i) {
-        int beginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
-        SafeParcelWriter.writeString(parcel, 2, this.label, false);
-        SafeParcelWriter.writeString(parcel, 3, this.value, false);
-        SafeParcelWriter.finishObjectHeader(parcel, beginObjectHeader);
+    LabelValue() {
     }
 }

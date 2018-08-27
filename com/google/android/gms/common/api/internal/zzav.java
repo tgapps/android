@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Api;
@@ -37,7 +38,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import javax.annotation.concurrent.GuardedBy;
-import org.telegram.messenger.exoplayer2.DefaultRenderersFactory;
 
 public final class zzav extends GoogleApiClient implements zzbq {
     private final Context mContext;

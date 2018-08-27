@@ -1,5 +1,6 @@
 package org.telegram.tgnet;
 
+import com.google.android.exoplayer2.C;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -8,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.exoplayer2.C;
 
 public class SerializedData extends AbstractSerializedData {
     private DataInputStream in;

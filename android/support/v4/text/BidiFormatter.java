@@ -4,9 +4,9 @@ import android.text.SpannableStringBuilder;
 import java.util.Locale;
 
 public final class BidiFormatter {
-    private static final BidiFormatter DEFAULT_LTR_INSTANCE = new BidiFormatter(false, 2, DEFAULT_TEXT_DIRECTION_HEURISTIC);
-    private static final BidiFormatter DEFAULT_RTL_INSTANCE = new BidiFormatter(true, 2, DEFAULT_TEXT_DIRECTION_HEURISTIC);
-    private static TextDirectionHeuristicCompat DEFAULT_TEXT_DIRECTION_HEURISTIC = TextDirectionHeuristicsCompat.FIRSTSTRONG_LTR;
+    static final BidiFormatter DEFAULT_LTR_INSTANCE = new BidiFormatter(false, 2, DEFAULT_TEXT_DIRECTION_HEURISTIC);
+    static final BidiFormatter DEFAULT_RTL_INSTANCE = new BidiFormatter(true, 2, DEFAULT_TEXT_DIRECTION_HEURISTIC);
+    static final TextDirectionHeuristicCompat DEFAULT_TEXT_DIRECTION_HEURISTIC = TextDirectionHeuristicsCompat.FIRSTSTRONG_LTR;
     private static final String LRM_STRING = Character.toString('‎');
     private static final String RLM_STRING = Character.toString('‏');
     private final TextDirectionHeuristicCompat mDefaultTextDirectionHeuristicCompat;
@@ -332,7 +332,7 @@ public final class BidiFormatter {
         return new Builder().build();
     }
 
-    private BidiFormatter(boolean isRtlContext, int flags, TextDirectionHeuristicCompat heuristic) {
+    BidiFormatter(boolean isRtlContext, int flags, TextDirectionHeuristicCompat heuristic) {
         this.mIsRtlContext = isRtlContext;
         this.mFlags = flags;
         this.mDefaultTextDirectionHeuristicCompat = heuristic;
@@ -397,7 +397,7 @@ public final class BidiFormatter {
         return unicodeWrap(str, this.mDefaultTextDirectionHeuristicCompat, true);
     }
 
-    private static boolean isRtlLocale(Locale locale) {
+    static boolean isRtlLocale(Locale locale) {
         return TextUtilsCompat.getLayoutDirectionFromLocale(locale) == 1;
     }
 

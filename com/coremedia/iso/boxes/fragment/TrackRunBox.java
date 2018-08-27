@@ -2,6 +2,7 @@ package com.coremedia.iso.boxes.fragment;
 
 import com.coremedia.iso.IsoTypeReader;
 import com.coremedia.iso.IsoTypeWriter;
+import com.google.android.exoplayer2.extractor.ts.TsExtractor;
 import com.googlecode.mp4parser.AbstractFullBox;
 import com.googlecode.mp4parser.RequiresParseDetailAspect;
 import com.googlecode.mp4parser.util.CastUtils;
@@ -11,30 +12,29 @@ import java.util.List;
 import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.runtime.internal.Conversions;
 import org.aspectj.runtime.reflect.Factory;
-import org.telegram.messenger.exoplayer2.extractor.ts.TsExtractor;
 
 public class TrackRunBox extends AbstractFullBox {
     public static final String TYPE = "trun";
-    private static final /* synthetic */ StaticPart ajc$tjp_0 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_1 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_10 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_11 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_12 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_13 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_14 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_15 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_16 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_17 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_18 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_19 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_2 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_3 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_4 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_5 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_6 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_7 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_8 = null;
-    private static final /* synthetic */ StaticPart ajc$tjp_9 = null;
+    private static final StaticPart ajc$tjp_0 = null;
+    private static final StaticPart ajc$tjp_1 = null;
+    private static final StaticPart ajc$tjp_10 = null;
+    private static final StaticPart ajc$tjp_11 = null;
+    private static final StaticPart ajc$tjp_12 = null;
+    private static final StaticPart ajc$tjp_13 = null;
+    private static final StaticPart ajc$tjp_14 = null;
+    private static final StaticPart ajc$tjp_15 = null;
+    private static final StaticPart ajc$tjp_16 = null;
+    private static final StaticPart ajc$tjp_17 = null;
+    private static final StaticPart ajc$tjp_18 = null;
+    private static final StaticPart ajc$tjp_19 = null;
+    private static final StaticPart ajc$tjp_2 = null;
+    private static final StaticPart ajc$tjp_3 = null;
+    private static final StaticPart ajc$tjp_4 = null;
+    private static final StaticPart ajc$tjp_5 = null;
+    private static final StaticPart ajc$tjp_6 = null;
+    private static final StaticPart ajc$tjp_7 = null;
+    private static final StaticPart ajc$tjp_8 = null;
+    private static final StaticPart ajc$tjp_9 = null;
     private int dataOffset;
     private List<Entry> entries = new ArrayList();
     private SampleFlags firstSampleFlags;
@@ -93,7 +93,7 @@ public class TrackRunBox extends AbstractFullBox {
         ajc$preClinit();
     }
 
-    private static /* synthetic */ void ajc$preClinit() {
+    private static void ajc$preClinit() {
         Factory factory = new Factory("TrackRunBox.java", TrackRunBox.class);
         ajc$tjp_0 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "getEntries", "com.coremedia.iso.boxes.fragment.TrackRunBox", TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, "java.util.List"), 57);
         ajc$tjp_1 = factory.makeSJP("method-execution", factory.makeMethodSig("1", "setDataOffset", "com.coremedia.iso.boxes.fragment.TrackRunBox", "int", "dataOffset", TtmlNode.ANONYMOUS_REGION_ID, "void"), 120);

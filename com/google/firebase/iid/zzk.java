@@ -13,7 +13,7 @@ import android.util.Log;
 public class zzk implements Parcelable {
     public static final Creator<zzk> CREATOR = new zzl();
     private Messenger zzad;
-    private zzt zzae;
+    private zzu zzae;
 
     public static final class zza extends ClassLoader {
         protected final Class<?> loadClass(String str, boolean z) throws ClassNotFoundException {
@@ -31,16 +31,20 @@ public class zzk implements Parcelable {
         if (VERSION.SDK_INT >= 21) {
             this.zzad = new Messenger(iBinder);
         } else {
-            this.zzae = new zzu(iBinder);
+            this.zzae = new zzv(iBinder);
+        }
+    }
+
+    public final void send(Message message) throws RemoteException {
+        if (this.zzad != null) {
+            this.zzad.send(message);
+        } else {
+            this.zzae.send(message);
         }
     }
 
     private final IBinder getBinder() {
         return this.zzad != null ? this.zzad.getBinder() : this.zzae.asBinder();
-    }
-
-    public int describeContents() {
-        return 0;
     }
 
     public boolean equals(Object obj) {
@@ -58,12 +62,8 @@ public class zzk implements Parcelable {
         return getBinder().hashCode();
     }
 
-    public final void send(Message message) throws RemoteException {
-        if (this.zzad != null) {
-            this.zzad.send(message);
-        } else {
-            this.zzae.send(message);
-        }
+    public int describeContents() {
+        return 0;
     }
 
     public void writeToParcel(Parcel parcel, int i) {

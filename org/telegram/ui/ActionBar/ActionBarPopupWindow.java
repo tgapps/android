@@ -29,10 +29,7 @@ import org.telegram.messenger.beta.R;
 import org.telegram.ui.Components.LayoutHelper;
 
 public class ActionBarPopupWindow extends PopupWindow {
-    private static final OnScrollChangedListener NOP = new OnScrollChangedListener() {
-        public void onScrollChanged() {
-        }
-    };
+    private static final OnScrollChangedListener NOP = ActionBarPopupWindow$$Lambda$0.$instance;
     private static final boolean allowAnimation;
     private static DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
     private static final Field superListenerField;
@@ -234,6 +231,9 @@ public class ActionBarPopupWindow extends PopupWindow {
         } catch (NoSuchFieldException e) {
         }
         superListenerField = field;
+    }
+
+    static final /* synthetic */ void lambda$static$0$ActionBarPopupWindow() {
     }
 
     public ActionBarPopupWindow() {
