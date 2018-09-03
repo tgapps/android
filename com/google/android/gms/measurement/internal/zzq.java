@@ -649,13 +649,13 @@ final class zzq extends zzez {
     }
 
     public final List<zzl> zzb(String str, String[] strArr) {
-        Cursor query;
         Object e;
         Cursor cursor;
         Throwable th;
         zzaf();
         zzcl();
         List<zzl> arrayList = new ArrayList();
+        Cursor query;
         try {
             query = getWritableDatabase().query("conditional_properties", new String[]{"app_id", TtmlNode.ATTR_TTS_ORIGIN, "name", "value", "active", "trigger_event_name", "trigger_timeout", "timed_out_event", "creation_timestamp", "triggered_event", "triggered_timestamp", "time_to_live", "expired_event"}, str, strArr, null, null, "rowid", "1001");
             try {
@@ -724,12 +724,12 @@ final class zzq extends zzez {
     }
 
     public final zzg zzbl(String str) {
-        Cursor query;
         Object e;
         Throwable th;
         Preconditions.checkNotEmpty(str);
         zzaf();
         zzcl();
+        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"app_instance_id", "gmp_app_id", "resettable_device_id_hash", "last_bundle_index", "last_bundle_start_timestamp", "last_bundle_end_timestamp", "app_version", "app_store", "gmp_version", "dev_cert_hash", "measurement_enabled", "day", "daily_public_events_count", "daily_events_count", "daily_conversions_count", "config_fetched_time", "failed_config_fetch_time", "app_version_int", "firebase_instance_id", "daily_error_events_count", "daily_realtime_events_count", "health_monitor_sample", "android_id", "adid_reporting_enabled", "ssaid_reporting_enabled", "admob_app_id"}, "app_id=?", new String[]{str}, null, null, null);
             try {
@@ -965,12 +965,12 @@ final class zzq extends zzez {
     }
 
     public final byte[] zzbn(String str) {
-        Cursor query;
         Object e;
         Throwable th;
         Preconditions.checkNotEmpty(str);
         zzaf();
         zzcl();
+        Cursor query;
         try {
             query = getWritableDatabase().query("apps", new String[]{"remote_config"}, "app_id=?", new String[]{str}, null, null, null);
             try {
@@ -1410,6 +1410,7 @@ final class zzq extends zzez {
     }
 
     final Map<Integer, List<zzfv>> zzl(String str, String str2) {
+        Cursor query;
         Object e;
         Throwable th;
         zzcl();
@@ -1417,7 +1418,6 @@ final class zzq extends zzez {
         Preconditions.checkNotEmpty(str);
         Preconditions.checkNotEmpty(str2);
         Map<Integer, List<zzfv>> arrayMap = new ArrayMap();
-        Cursor query;
         try {
             query = getWritableDatabase().query("event_filters", new String[]{"audience_id", DataSchemeDataSource.SCHEME_DATA}, "app_id=? AND event_name=?", new String[]{str, str2}, null, null, null);
             if (query.moveToFirst()) {
@@ -1480,6 +1480,7 @@ final class zzq extends zzez {
     }
 
     final Map<Integer, List<zzfy>> zzm(String str, String str2) {
+        Cursor query;
         Object e;
         Throwable th;
         zzcl();
@@ -1487,7 +1488,6 @@ final class zzq extends zzez {
         Preconditions.checkNotEmpty(str);
         Preconditions.checkNotEmpty(str2);
         Map<Integer, List<zzfy>> arrayMap = new ArrayMap();
-        Cursor query;
         try {
             query = getWritableDatabase().query("property_filters", new String[]{"audience_id", DataSchemeDataSource.SCHEME_DATA}, "app_id=? AND property_name=?", new String[]{str, str2}, null, null, null);
             if (query.moveToFirst()) {
@@ -1579,12 +1579,12 @@ final class zzq extends zzez {
     }
 
     final Map<Integer, zzgj> zzbo(String str) {
-        Cursor query;
         Object e;
         Throwable th;
         zzcl();
         zzaf();
         Preconditions.checkNotEmpty(str);
+        Cursor query;
         try {
             query = getWritableDatabase().query("audience_filter_values", new String[]{"audience_id", "current_results"}, "app_id=?", new String[]{str}, null, null, null);
             if (query.moveToFirst()) {
@@ -1681,6 +1681,7 @@ final class zzq extends zzez {
     }
 
     protected final long zzn(String str, String str2) {
+        long zza;
         Object e;
         Preconditions.checkNotEmpty(str);
         Preconditions.checkNotEmpty(str2);
@@ -1688,7 +1689,6 @@ final class zzq extends zzez {
         zzcl();
         SQLiteDatabase writableDatabase = getWritableDatabase();
         writableDatabase.beginTransaction();
-        long zza;
         try {
             zza = zza(new StringBuilder(String.valueOf(str2).length() + 32).append("select ").append(str2).append(" from app2 where app_id=?").toString(), new String[]{str}, -1);
             if (zza == -1) {
@@ -1788,12 +1788,12 @@ final class zzq extends zzez {
     }
 
     public final String zzah(long j) {
-        Cursor rawQuery;
         Object e;
         Throwable th;
         String str = null;
         zzaf();
         zzcl();
+        Cursor rawQuery;
         try {
             rawQuery = getWritableDatabase().rawQuery("select app_id from apps where app_id in (select distinct app_id from raw_events) and config_fetched_time < ? order by failed_config_fetch_time limit 1;", new String[]{String.valueOf(j)});
             try {

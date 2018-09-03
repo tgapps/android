@@ -2058,13 +2058,13 @@ Error: java.util.NoSuchElementException
         final ArrayList<String> arrayList = phoneBookSectionsArrayFinal;
         Utilities.globalQueue.postRunnable(new Runnable() {
             public void run() {
-                ArrayList<Object> arrayList;
                 int size = contactsCopy.size();
                 for (int a = 0; a < size; a++) {
                     User user = MessagesController.getInstance(ContactsController.this.currentAccount).getUser(Integer.valueOf(((TL_contact) contactsCopy.get(a)).user_id));
                     if (!(user == null || TextUtils.isEmpty(user.phone))) {
                         Contact contact = (Contact) hashMap.get(user.phone.substring(Math.max(0, user.phone.length() - 7)));
                         if (contact == null) {
+                            ArrayList<Object> arrayList;
                             String key = Contact.getLetter(user.first_name, user.last_name);
                             arrayList = (ArrayList) hashMap2.get(key);
                             if (arrayList == null) {
@@ -2284,17 +2284,15 @@ Error: java.util.NoSuchElementException
     private void applyContactsUpdates(ArrayList<Integer> ids, ConcurrentHashMap<Integer, User> userDict, ArrayList<TL_contact> newC, ArrayList<Integer> contactsTD) {
         int a;
         Integer uid;
-        Contact contact;
-        int index;
         if (newC == null || contactsTD == null) {
             newC = new ArrayList();
             contactsTD = new ArrayList();
             for (a = 0; a < ids.size(); a++) {
                 uid = (Integer) ids.get(a);
                 if (uid.intValue() > 0) {
-                    TL_contact contact2 = new TL_contact();
-                    contact2.user_id = uid.intValue();
-                    newC.add(contact2);
+                    TL_contact contact = new TL_contact();
+                    contact.user_id = uid.intValue();
+                    newC.add(contact);
                 } else if (uid.intValue() < 0) {
                     contactsTD.add(Integer.valueOf(-uid.intValue()));
                 }
@@ -2307,6 +2305,8 @@ Error: java.util.NoSuchElementException
         StringBuilder toDelete = new StringBuilder();
         boolean reloadContacts = false;
         for (a = 0; a < newC.size(); a++) {
+            Contact contact2;
+            int index;
             TL_contact newContact = (TL_contact) newC.get(a);
             User user = null;
             if (userDict != null) {
@@ -2320,11 +2320,11 @@ Error: java.util.NoSuchElementException
             if (user == null || TextUtils.isEmpty(user.phone)) {
                 reloadContacts = true;
             } else {
-                contact = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact != null) {
-                    index = contact.shortPhones.indexOf(user.phone);
+                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact2 != null) {
+                    index = contact2.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact.phoneDeleted.set(index, Integer.valueOf(0));
+                        contact2.phoneDeleted.set(index, Integer.valueOf(0));
                     }
                 }
                 if (toAdd.length() != 0) {
@@ -2352,11 +2352,11 @@ Error: java.util.NoSuchElementException
             if (user == null) {
                 reloadContacts = true;
             } else if (!TextUtils.isEmpty(user.phone)) {
-                contact = (Contact) this.contactsBookSPhones.get(user.phone);
-                if (contact != null) {
-                    index = contact.shortPhones.indexOf(user.phone);
+                contact2 = (Contact) this.contactsBookSPhones.get(user.phone);
+                if (contact2 != null) {
+                    index = contact2.shortPhones.indexOf(user.phone);
                     if (index != -1) {
-                        contact.phoneDeleted.set(index, Integer.valueOf(1));
+                        contact2.phoneDeleted.set(index, Integer.valueOf(1));
                     }
                 }
                 if (toDelete.length() != 0) {

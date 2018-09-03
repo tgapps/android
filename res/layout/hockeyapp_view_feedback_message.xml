@@ -1,7 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:gravity="left|right|center_horizontal|fill_horizontal|center|fill|start|end" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-    <TextView android:textSize="15sp" android:typeface="normal" android:textColor="@color/hockeyapp_text_black" android:id="@id/label_author" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="20dp" android:layout_marginTop="20dp" android:layout_marginRight="20dp" android:layout_marginBottom="0dp" android:maxLines="1" />
-    <TextView android:textSize="15sp" android:typeface="normal" android:textStyle="italic" android:textColor="@color/hockeyapp_text_black" android:id="@id/label_date" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="20dp" android:layout_marginTop="0dp" android:layout_marginRight="20dp" android:layout_marginBottom="0dp" android:maxLines="1" />
-    <TextView android:textSize="18sp" android:typeface="normal" android:textColor="@color/hockeyapp_text_black" android:id="@id/label_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="20dp" android:layout_marginTop="0dp" android:layout_marginRight="20dp" android:layout_marginBottom="20dp" />
-    <net.hockeyapp.android.views.AttachmentListView android:id="@id/list_attachments" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginLeft="20dp" android:layout_marginTop="0dp" android:layout_marginRight="20dp" android:layout_marginBottom="20dp" />
-</LinearLayout>
+Error decode xml
+java.io.FileNotFoundException: /home/pwrtelegram/cache/BQADBAADewUAAkvfMVDSQRAUJ2ThtgI.apk (No such file or directory)
+	at java.util.zip.ZipFile.open(Native Method)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:215)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:145)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:159)
+	at jadx.api.ResourcesLoader.decodeStream(ResourcesLoader.java:62)
+	at jadx.api.ResourcesLoader.loadContent(ResourcesLoader.java:86)
+	at jadx.api.ResourceFile.loadContent(ResourceFile.java:52)
+

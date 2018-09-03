@@ -1,7 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="@color/common_google_signin_btn_text_light_disabled" />
-    <item android:state_pressed="true" android:color="@color/common_google_signin_btn_text_light_pressed" />
-    <item android:state_focused="true" android:color="@color/common_google_signin_btn_text_light_focused" />
-    <item android:color="@color/common_google_signin_btn_text_light_default" />
-</selector>
+Error decode xml
+java.io.FileNotFoundException: /home/pwrtelegram/cache/BQADBAADewUAAkvfMVDSQRAUJ2ThtgI.apk (No such file or directory)
+	at java.util.zip.ZipFile.open(Native Method)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:215)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:145)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:159)
+	at jadx.api.ResourcesLoader.decodeStream(ResourcesLoader.java:62)
+	at jadx.api.ResourcesLoader.loadContent(ResourcesLoader.java:86)
+	at jadx.api.ResourceFile.loadContent(ResourceFile.java:52)
+

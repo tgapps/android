@@ -290,6 +290,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
     private int[] currentExpireDate;
     private TL_account_authorizationForm currentForm;
     private String currentGender;
+    private String currentNonce;
     private TL_account_password currentPassword;
     private String currentPayload;
     private TL_auth_sentCode currentPhoneVerification;
@@ -2399,10 +2400,11 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
         }
     }
 
-    public PassportActivity(int type, int botId, String scope, String publicKey, String payload, String callbackUrl, TL_account_authorizationForm form, TL_account_password accountPassword) {
+    public PassportActivity(int type, int botId, String scope, String publicKey, String payload, String nonce, String callbackUrl, TL_account_authorizationForm form, TL_account_password accountPassword) {
         this(type, form, accountPassword, null, null, null, null, null, null);
         this.currentBotId = botId;
         this.currentPayload = payload;
+        this.currentNonce = nonce;
         this.currentScope = scope;
         this.currentPublicKey = publicKey;
         this.currentCallbackUrl = callbackUrl;
@@ -3668,7 +3670,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                     } else {
                         type = 0;
                     }
-                    PassportActivity activity = new PassportActivity(type, PassportActivity.this.currentBotId, PassportActivity.this.currentScope, PassportActivity.this.currentPublicKey, PassportActivity.this.currentPayload, PassportActivity.this.currentCallbackUrl, PassportActivity.this.currentForm, PassportActivity.this.currentPassword);
+                    PassportActivity activity = new PassportActivity(type, PassportActivity.this.currentBotId, PassportActivity.this.currentScope, PassportActivity.this.currentPublicKey, PassportActivity.this.currentPayload, PassportActivity.this.currentNonce, PassportActivity.this.currentCallbackUrl, PassportActivity.this.currentForm, PassportActivity.this.currentPassword);
                     activity.currentEmail = PassportActivity.this.currentEmail;
                     activity.currentAccount = PassportActivity.this.currentAccount;
                     activity.saltedPassword = PassportActivity.this.saltedPassword;
@@ -4324,6 +4326,12 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
             } catch (Exception e3) {
             }
         }
+        if (this.currentNonce != null) {
+            try {
+                result.put("nonce", this.currentNonce);
+            } catch (Exception e4) {
+            }
+        }
         EncryptionResult encryptionResult = encryptData(AndroidUtilities.getStringBytes(result.toString()));
         req.credentials = new TL_secureCredentialsEncrypted();
         req.credentials.hash = encryptionResult.fileHash;
@@ -4334,8 +4342,8 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
             Cipher c = Cipher.getInstance("RSA/NONE/OAEPWithSHA1AndMGF1Padding", "BC");
             c.init(1, pubKey);
             req.credentials.secret = c.doFinal(encryptionResult.decrypyedFileSecret);
-        } catch (Throwable e4) {
-            FileLog.e(e4);
+        } catch (Throwable e5) {
+            FileLog.e(e5);
         }
         int reqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(req, new PassportActivity$$Lambda$67(this));
         ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(reqId, this.classGuid);
@@ -5771,8 +5779,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
     }
 
     private void createIdentityInterface(Context context) {
-        final EditTextBoldCursor editTextBoldCursor;
-        final String str;
+        String key;
         this.languageMap = new HashMap();
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(context.getResources().getAssets().open("countries.txt")));
@@ -5897,8 +5904,9 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
         this.inputFields = new EditTextBoldCursor[count];
         int a = 0;
         while (a < count) {
-            String key;
             HashMap<String, String> values;
+            final EditTextBoldCursor editTextBoldCursor;
+            final String str;
             EditTextBoldCursor editTextBoldCursor2 = new EditTextBoldCursor(context);
             this.inputFields[a] = editTextBoldCursor2;
             final EditTextBoldCursor editTextBoldCursor3 = editTextBoldCursor2;
@@ -7661,7 +7669,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
                             final /* synthetic */ void lambda$null$1$PassportActivity$19$1(TLObject response1, String text, TL_secureRequiredType requiredType, PassportActivityDelegate currentDelegate, TL_error error1, ErrorRunnable errorRunnable) {
                                 if (response1 != null) {
                                     TL_account_sentEmailCode res = (TL_account_sentEmailCode) response1;
-                                    HashMap<String, String> values = new HashMap();
+                                    HashMap values = new HashMap();
                                     values.put("email", text);
                                     values.put("pattern", res.email_pattern);
                                     PassportActivity activity1 = new PassportActivity(6, PassportActivity.this.currentForm, PassportActivity.this.currentPassword, requiredType, null, null, null, values, null);
@@ -8255,7 +8263,7 @@ Error: jadx.core.utils.exceptions.JadxRuntimeException: SSA rename variables alr
 
     final /* synthetic */ void lambda$null$65$PassportActivity(TL_error error, String phone, PassportActivityDelegate delegate, TLObject response, TL_account_sendVerifyPhoneCode req) {
         if (error == null) {
-            HashMap<String, String> values = new HashMap();
+            HashMap values = new HashMap();
             values.put("phone", phone);
             PassportActivity activity = new PassportActivity(7, this.currentForm, this.currentPassword, this.currentType, null, null, null, values, null);
             activity.currentAccount = this.currentAccount;

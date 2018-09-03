@@ -535,7 +535,7 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
             builder.setCustomView(linearLayout);
             showDialog(builder.create());
         } else if (position == this.passportRow) {
-            presentFragment(new PassportActivity(5, 0, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, null, null, null, null));
+            presentFragment(new PassportActivity(5, 0, TtmlNode.ANONYMOUS_REGION_ID, TtmlNode.ANONYMOUS_REGION_ID, null, null, null, null, null));
         }
     }
 

@@ -4161,6 +4161,7 @@ public class MessagesController implements NotificationCenterDelegate {
 
     final /* synthetic */ void lambda$null$100$MessagesController(messages_Dialogs dialogsRes, LongSparseArray new_dialogs_dict, LongSparseArray new_dialogMessage) {
         int a;
+        MessageObject messageObject;
         this.resetingDialogs = false;
         applyDialogsNotificationsSettings(dialogsRes.dialogs);
         if (!UserConfig.getInstance(this.currentAccount).draftsLoaded) {
@@ -4169,7 +4170,6 @@ public class MessagesController implements NotificationCenterDelegate {
         putUsers(dialogsRes.users, false);
         putChats(dialogsRes.chats, false);
         for (a = 0; a < this.dialogs.size(); a++) {
-            MessageObject messageObject;
             TL_dialog oldDialog = (TL_dialog) this.dialogs.get(a);
             if (((int) oldDialog.id) != 0) {
                 this.dialogs_dict.remove(oldDialog.id);
@@ -4442,8 +4442,8 @@ public class MessagesController implements NotificationCenterDelegate {
             return;
         }
         int a;
-        Chat chat;
         User user;
+        Integer value;
         LongSparseArray<TL_dialog> new_dialogs_dict = new LongSparseArray();
         LongSparseArray<MessageObject> new_dialogMessage = new LongSparseArray();
         SparseArray usersDict = new SparseArray();
@@ -4461,6 +4461,7 @@ public class MessagesController implements NotificationCenterDelegate {
         }
         Message lastMessage = null;
         for (a = 0; a < dialogsRes.messages.size(); a++) {
+            Chat chat;
             Message message = (Message) dialogsRes.messages.get(a);
             if (lastMessage == null || message.date < lastMessage.date) {
                 lastMessage = message;
@@ -4532,7 +4533,6 @@ public class MessagesController implements NotificationCenterDelegate {
         }
         ArrayList<TL_dialog> dialogsToReload = new ArrayList();
         for (a = 0; a < dialogsRes.dialogs.size(); a++) {
-            Integer value;
             TL_dialog d = (TL_dialog) dialogsRes.dialogs.get(a);
             if (d.id == 0 && d.peer != null) {
                 if (d.peer.user_id != 0) {
@@ -4941,6 +4941,7 @@ public class MessagesController implements NotificationCenterDelegate {
 
     protected void checkLastDialogMessage(TL_dialog dialog, InputPeer peer, long taskId) {
         Throwable e;
+        long newTaskId;
         int lower_id = (int) dialog.id;
         if (lower_id != 0 && this.checkingLastMessagesDialogs.indexOfKey(lower_id) < 0) {
             InputPeer inputPeer;
@@ -4952,7 +4953,6 @@ public class MessagesController implements NotificationCenterDelegate {
             }
             req.peer = inputPeer;
             if (req.peer != null && !(req.peer instanceof TL_inputPeerChannel)) {
-                long newTaskId;
                 req.limit = 1;
                 this.checkingLastMessagesDialogs.put(lower_id, true);
                 if (taskId == 0) {
@@ -6575,6 +6575,8 @@ public class MessagesController implements NotificationCenterDelegate {
 
     protected void getChannelDifference(int channelId, int newDialogType, long taskId, InputChannel inputChannel) {
         Throwable e;
+        long newTaskId;
+        TL_updates_getChannelDifference req;
         if (!this.gettingDifferenceChannels.get(channelId)) {
             int channelPts;
             int limit = 100;
@@ -6609,8 +6611,6 @@ public class MessagesController implements NotificationCenterDelegate {
                 inputChannel = getInputChannel(chat);
             }
             if (inputChannel != null && inputChannel.access_hash != 0) {
-                long newTaskId;
-                TL_updates_getChannelDifference req;
                 if (taskId == 0) {
                     NativeByteBuffer data = null;
                     try {

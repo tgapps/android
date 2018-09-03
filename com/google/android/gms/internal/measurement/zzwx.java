@@ -3360,7 +3360,6 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
             }
 
             public final void zza(T t, zzxi com_google_android_gms_internal_measurement_zzxi, zzuz com_google_android_gms_internal_measurement_zzuz) throws IOException {
-                int i;
                 Throwable th;
                 if (com_google_android_gms_internal_measurement_zzuz == null) {
                     throw new NullPointerException();
@@ -3370,122 +3369,123 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                 Object obj = null;
                 zzvd com_google_android_gms_internal_measurement_zzvd = null;
                 while (true) {
+                    int i;
                     int i2;
-                    int i3;
                     int length;
                     Object zzac;
+                    int i3;
                     int zzve = com_google_android_gms_internal_measurement_zzxi.zzve();
                     if (zzve < this.zzcbb || zzve > this.zzcbc) {
-                        i2 = -1;
+                        i = -1;
                     } else {
-                        i3 = 0;
+                        i2 = 0;
                         length = (this.zzcaz.length / 3) - 1;
-                        while (i3 <= length) {
-                            int i4 = (length + i3) >>> 1;
-                            i2 = i4 * 3;
-                            int i5 = this.zzcaz[i2];
+                        while (i2 <= length) {
+                            int i4 = (length + i2) >>> 1;
+                            i = i4 * 3;
+                            int i5 = this.zzcaz[i];
                             if (zzve != i5) {
                                 if (zzve < i5) {
                                     length = i4 - 1;
                                 } else {
-                                    i3 = i4 + 1;
+                                    i2 = i4 + 1;
                                 }
                             }
                         }
-                        i2 = -1;
+                        i = -1;
                     }
                     Object zzp;
-                    if (i2 >= 0) {
-                        length = zzbq(i2);
+                    if (i >= 0) {
+                        length = zzbq(i);
                         zzvr zzbp;
                         List zza;
                         switch ((267386880 & length) >>> 20) {
                             case 0:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.readDouble());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 1:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.readFloat());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 2:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzui());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 3:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzuh());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 4:
                                 zzyh.zzb((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzuj());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 5:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzuk());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 6:
                                 zzyh.zzb((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzul());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 7:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzum());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 8:
                                 zza((Object) t, length, com_google_android_gms_internal_measurement_zzxi);
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 9:
-                                if (!zzb((Object) t, i2)) {
-                                    zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zza(zzbn(i2), com_google_android_gms_internal_measurement_zzuz));
-                                    zzc(t, i2);
+                                if (!zzb((Object) t, i)) {
+                                    zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zza(zzbn(i), com_google_android_gms_internal_measurement_zzuz));
+                                    zzc(t, i);
                                     break;
                                 }
-                                zzyh.zza((Object) t, (long) (length & 1048575), zzvo.zzb(zzyh.zzp(t, (long) (1048575 & length)), com_google_android_gms_internal_measurement_zzxi.zza(zzbn(i2), com_google_android_gms_internal_measurement_zzuz)));
+                                zzyh.zza((Object) t, (long) (length & 1048575), zzvo.zzb(zzyh.zzp(t, (long) (1048575 & length)), com_google_android_gms_internal_measurement_zzxi.zza(zzbn(i), com_google_android_gms_internal_measurement_zzuz)));
                                 continue;
                             case 10:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzuo());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 11:
                                 zzyh.zzb((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzup());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 12:
-                                i3 = com_google_android_gms_internal_measurement_zzxi.zzuq();
-                                zzbp = zzbp(i2);
-                                if (zzbp != null && !zzbp.zzb(i3)) {
-                                    obj = zzxl.zza(zzve, i3, obj, com_google_android_gms_internal_measurement_zzyb);
+                                i2 = com_google_android_gms_internal_measurement_zzxi.zzuq();
+                                zzbp = zzbp(i);
+                                if (zzbp != null && !zzbp.zzb(i2)) {
+                                    obj = zzxl.zza(zzve, i2, obj, com_google_android_gms_internal_measurement_zzyb);
                                     break;
                                 }
-                                zzyh.zzb((Object) t, (long) (length & 1048575), i3);
-                                zzc(t, i2);
+                                zzyh.zzb((Object) t, (long) (length & 1048575), i2);
+                                zzc(t, i);
                                 continue;
                                 break;
                             case 13:
                                 zzyh.zzb((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzur());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 14:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzus());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 15:
                                 zzyh.zzb((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzut());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 16:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzuu());
-                                zzc(t, i2);
+                                zzc(t, i);
                                 continue;
                             case 17:
-                                if (!zzb((Object) t, i2)) {
-                                    zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzb(zzbn(i2), com_google_android_gms_internal_measurement_zzuz));
-                                    zzc(t, i2);
+                                if (!zzb((Object) t, i)) {
+                                    zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzb(zzbn(i), com_google_android_gms_internal_measurement_zzuz));
+                                    zzc(t, i);
                                     break;
                                 }
-                                zzyh.zza((Object) t, (long) (length & 1048575), zzvo.zzb(zzyh.zzp(t, (long) (1048575 & length)), com_google_android_gms_internal_measurement_zzxi.zzb(zzbn(i2), com_google_android_gms_internal_measurement_zzuz)));
+                                zzyh.zza((Object) t, (long) (length & 1048575), zzvo.zzb(zzyh.zzp(t, (long) (1048575 & length)), com_google_android_gms_internal_measurement_zzxi.zzb(zzbn(i), com_google_android_gms_internal_measurement_zzuz)));
                                 continue;
                             case 18:
                                 com_google_android_gms_internal_measurement_zzxi.zzh(this.zzcbm.zza(t, (long) (length & 1048575)));
@@ -3520,7 +3520,7 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                     continue;
                                 }
                             case 27:
-                                com_google_android_gms_internal_measurement_zzxi.zza(this.zzcbm.zza(t, (long) (length & 1048575)), zzbn(i2), com_google_android_gms_internal_measurement_zzuz);
+                                com_google_android_gms_internal_measurement_zzxi.zza(this.zzcbm.zza(t, (long) (length & 1048575)), zzbn(i), com_google_android_gms_internal_measurement_zzuz);
                                 continue;
                             case NalUnitTypes.NAL_TYPE_RSV_VCL28 /*28*/:
                                 com_google_android_gms_internal_measurement_zzxi.zzq(this.zzcbm.zza(t, (long) (length & 1048575)));
@@ -3531,7 +3531,7 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                             case NalUnitTypes.NAL_TYPE_RSV_VCL30 /*30*/:
                                 zza = this.zzcbm.zza(t, (long) (length & 1048575));
                                 com_google_android_gms_internal_measurement_zzxi.zzs(zza);
-                                obj = zzxl.zza(zzve, zza, zzbp(i2), obj, com_google_android_gms_internal_measurement_zzyb);
+                                obj = zzxl.zza(zzve, zza, zzbp(i), obj, com_google_android_gms_internal_measurement_zzyb);
                                 continue;
                             case NalUnitTypes.NAL_TYPE_RSV_VCL31 /*31*/:
                                 com_google_android_gms_internal_measurement_zzxi.zzt(this.zzcbm.zza(t, (long) (length & 1048575)));
@@ -3575,7 +3575,7 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                             case 44:
                                 zza = this.zzcbm.zza(t, (long) (length & 1048575));
                                 com_google_android_gms_internal_measurement_zzxi.zzs(zza);
-                                obj = zzxl.zza(zzve, zza, zzbp(i2), obj, com_google_android_gms_internal_measurement_zzyb);
+                                obj = zzxl.zza(zzve, zza, zzbp(i), obj, com_google_android_gms_internal_measurement_zzyb);
                                 continue;
                             case 45:
                                 com_google_android_gms_internal_measurement_zzxi.zzt(this.zzcbm.zza(t, (long) (length & 1048575)));
@@ -3591,11 +3591,11 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                 continue;
                             case 49:
                                 long j = (long) (length & 1048575);
-                                com_google_android_gms_internal_measurement_zzxi.zzb(this.zzcbm.zza(t, j), zzbn(i2), com_google_android_gms_internal_measurement_zzuz);
+                                com_google_android_gms_internal_measurement_zzxi.zzb(this.zzcbm.zza(t, j), zzbn(i), com_google_android_gms_internal_measurement_zzuz);
                                 continue;
                             case 50:
-                                Object zzbo = zzbo(i2);
-                                long zzbq = (long) (zzbq(i2) & 1048575);
+                                Object zzbo = zzbo(i);
+                                long zzbq = (long) (zzbq(i) & 1048575);
                                 zzp = zzyh.zzp(t, zzbq);
                                 if (zzp == null) {
                                     zzac = this.zzcbp.zzac(zzbo);
@@ -3611,87 +3611,87 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                 continue;
                             case 51:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Double.valueOf(com_google_android_gms_internal_measurement_zzxi.readDouble()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 52:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Float.valueOf(com_google_android_gms_internal_measurement_zzxi.readFloat()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 53:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Long.valueOf(com_google_android_gms_internal_measurement_zzxi.zzui()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 54:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Long.valueOf(com_google_android_gms_internal_measurement_zzxi.zzuh()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 55:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Integer.valueOf(com_google_android_gms_internal_measurement_zzxi.zzuj()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 56:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Long.valueOf(com_google_android_gms_internal_measurement_zzxi.zzuk()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 57:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Integer.valueOf(com_google_android_gms_internal_measurement_zzxi.zzul()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 58:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Boolean.valueOf(com_google_android_gms_internal_measurement_zzxi.zzum()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 59:
                                 zza((Object) t, length, com_google_android_gms_internal_measurement_zzxi);
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 60:
-                                if (zza((Object) t, zzve, i2)) {
-                                    zzyh.zza((Object) t, (long) (length & 1048575), zzvo.zzb(zzyh.zzp(t, (long) (1048575 & length)), com_google_android_gms_internal_measurement_zzxi.zza(zzbn(i2), com_google_android_gms_internal_measurement_zzuz)));
+                                if (zza((Object) t, zzve, i)) {
+                                    zzyh.zza((Object) t, (long) (length & 1048575), zzvo.zzb(zzyh.zzp(t, (long) (1048575 & length)), com_google_android_gms_internal_measurement_zzxi.zza(zzbn(i), com_google_android_gms_internal_measurement_zzuz)));
                                 } else {
-                                    zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zza(zzbn(i2), com_google_android_gms_internal_measurement_zzuz));
-                                    zzc(t, i2);
+                                    zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zza(zzbn(i), com_google_android_gms_internal_measurement_zzuz));
+                                    zzc(t, i);
                                 }
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 61:
                                 zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzuo());
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 62:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Integer.valueOf(com_google_android_gms_internal_measurement_zzxi.zzup()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 63:
-                                i3 = com_google_android_gms_internal_measurement_zzxi.zzuq();
-                                zzbp = zzbp(i2);
-                                if (zzbp != null && !zzbp.zzb(i3)) {
-                                    obj = zzxl.zza(zzve, i3, obj, com_google_android_gms_internal_measurement_zzyb);
+                                i2 = com_google_android_gms_internal_measurement_zzxi.zzuq();
+                                zzbp = zzbp(i);
+                                if (zzbp != null && !zzbp.zzb(i2)) {
+                                    obj = zzxl.zza(zzve, i2, obj, com_google_android_gms_internal_measurement_zzyb);
                                     break;
                                 }
-                                zzyh.zza((Object) t, (long) (length & 1048575), Integer.valueOf(i3));
-                                zzb((Object) t, zzve, i2);
+                                zzyh.zza((Object) t, (long) (length & 1048575), Integer.valueOf(i2));
+                                zzb((Object) t, zzve, i);
                                 continue;
                                 break;
                             case 64:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Integer.valueOf(com_google_android_gms_internal_measurement_zzxi.zzur()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case VoIPService.CALL_MIN_LAYER /*65*/:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Long.valueOf(com_google_android_gms_internal_measurement_zzxi.zzus()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 66:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Integer.valueOf(com_google_android_gms_internal_measurement_zzxi.zzut()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 67:
                                 zzyh.zza((Object) t, (long) (length & 1048575), Long.valueOf(com_google_android_gms_internal_measurement_zzxi.zzuu()));
-                                zzb((Object) t, zzve, i2);
+                                zzb((Object) t, zzve, i);
                                 continue;
                             case 68:
-                                zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzb(zzbn(i2), com_google_android_gms_internal_measurement_zzuz));
-                                zzb((Object) t, zzve, i2);
+                                zzyh.zza((Object) t, (long) (length & 1048575), com_google_android_gms_internal_measurement_zzxi.zzb(zzbn(i), com_google_android_gms_internal_measurement_zzuz));
+                                zzb((Object) t, zzve, i);
                                 continue;
                             default:
                                 if (obj == null) {
@@ -3707,8 +3707,8 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                         obj = zzac;
                                         continue;
                                     } else {
-                                        for (i = this.zzcbj; i < this.zzcbk; i++) {
-                                            zzac = zza((Object) t, this.zzcbi[i], zzac, com_google_android_gms_internal_measurement_zzyb);
+                                        for (i3 = this.zzcbj; i3 < this.zzcbk; i3++) {
+                                            zzac = zza((Object) t, this.zzcbi[i3], zzac, com_google_android_gms_internal_measurement_zzyb);
                                         }
                                         if (zzac != null) {
                                             com_google_android_gms_internal_measurement_zzyb.zzg(t, zzac);
@@ -3731,8 +3731,8 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                             if (com_google_android_gms_internal_measurement_zzyb.zza(zzac, com_google_android_gms_internal_measurement_zzxi)) {
                                 obj = zzac;
                             } else {
-                                for (i = this.zzcbj; i < this.zzcbk; i++) {
-                                    zzac = zza((Object) t, this.zzcbi[i], zzac, com_google_android_gms_internal_measurement_zzyb);
+                                for (i3 = this.zzcbj; i3 < this.zzcbk; i3++) {
+                                    zzac = zza((Object) t, this.zzcbi[i3], zzac, com_google_android_gms_internal_measurement_zzyb);
                                 }
                                 if (zzac != null) {
                                     com_google_android_gms_internal_measurement_zzyb.zzg(t, zzac);
@@ -3745,8 +3745,8 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                             zzac = obj;
                         }
                     } else if (zzve == ConnectionsManager.DEFAULT_DATACENTER_ID) {
-                        for (i = this.zzcbj; i < this.zzcbk; i++) {
-                            obj = zza((Object) t, this.zzcbi[i], obj, com_google_android_gms_internal_measurement_zzyb);
+                        for (i3 = this.zzcbj; i3 < this.zzcbk; i3++) {
+                            obj = zza((Object) t, this.zzcbi[i3], obj, com_google_android_gms_internal_measurement_zzyb);
                         }
                         if (obj != null) {
                             com_google_android_gms_internal_measurement_zzyb.zzg(t, obj);
@@ -3775,8 +3775,8 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                                 if (com_google_android_gms_internal_measurement_zzyb.zza(zzac, com_google_android_gms_internal_measurement_zzxi)) {
                                     obj = zzac;
                                 } else {
-                                    for (i = this.zzcbj; i < this.zzcbk; i++) {
-                                        zzac = zza((Object) t, this.zzcbi[i], zzac, com_google_android_gms_internal_measurement_zzyb);
+                                    for (i3 = this.zzcbj; i3 < this.zzcbk; i3++) {
+                                        zzac = zza((Object) t, this.zzcbi[i3], zzac, com_google_android_gms_internal_measurement_zzyb);
                                     }
                                     if (zzac != null) {
                                         com_google_android_gms_internal_measurement_zzyb.zzg(t, zzac);
@@ -3790,8 +3790,8 @@ Caused by: jadx.core.utils.exceptions.CodegenException: PHI can be used only in 
                         }
                     }
                 }
-                for (i = this.zzcbj; i < this.zzcbk; i++) {
-                    zzac = zza((Object) t, this.zzcbi[i], zzac, com_google_android_gms_internal_measurement_zzyb);
+                for (i3 = this.zzcbj; i3 < this.zzcbk; i3++) {
+                    zzac = zza((Object) t, this.zzcbi[i3], zzac, com_google_android_gms_internal_measurement_zzyb);
                 }
                 if (zzac != null) {
                     com_google_android_gms_internal_measurement_zzyb.zzg(t, zzac);

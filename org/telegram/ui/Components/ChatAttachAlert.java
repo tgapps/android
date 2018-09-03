@@ -1999,9 +1999,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
 
     public void onActivityResultFragment(int requestCode, Intent data, String currentPicturePath) {
         Throwable e;
+        Bitmap bitmap;
         File file;
-        int i;
-        PhotoEntry entry;
+        OutputStream fileOutputStream;
         Throwable th;
         if (this.baseFragment != null && this.baseFragment.getParentActivity() != null) {
             mediaFromExternalCamera = true;
@@ -2025,12 +2025,12 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                 } catch (Throwable e2) {
                     FileLog.e(e2);
                 }
-                int i2 = lastImageId;
-                lastImageId = i2 - 1;
-                openPhotoViewer(new PhotoEntry(0, i2, 0, currentPicturePath, orientation, false), false, true);
+                int i = lastImageId;
+                lastImageId = i - 1;
+                openPhotoViewer(new PhotoEntry(0, i, 0, currentPicturePath, orientation, false), false, true);
             } else if (requestCode == 2) {
-                Bitmap bitmap;
-                OutputStream fileOutputStream;
+                int i2;
+                PhotoEntry entry;
                 String videoPath = null;
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.d("pic path " + currentPicturePath);
@@ -2096,9 +2096,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                             fileOutputStream = new FileOutputStream(file);
                             bitmap.compress(CompressFormat.JPEG, 55, fileOutputStream);
                             SharedConfig.saveConfig();
-                            i = lastImageId;
-                            lastImageId = i - 1;
-                            entry = new PhotoEntry(0, i, 0, videoPath, 0, true);
+                            i2 = lastImageId;
+                            lastImageId = i2 - 1;
+                            entry = new PhotoEntry(0, i2, 0, videoPath, 0, true);
                             entry.duration = (int) duration;
                             entry.thumbPath = file.getAbsolutePath();
                             openPhotoViewer(entry, false, true);
@@ -2132,9 +2132,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                     fileOutputStream = new FileOutputStream(file);
                     bitmap.compress(CompressFormat.JPEG, 55, fileOutputStream);
                     SharedConfig.saveConfig();
-                    i = lastImageId;
-                    lastImageId = i - 1;
-                    entry = new PhotoEntry(0, i, 0, videoPath, 0, true);
+                    i2 = lastImageId;
+                    lastImageId = i2 - 1;
+                    entry = new PhotoEntry(0, i2, 0, videoPath, 0, true);
                     entry.duration = (int) duration;
                     entry.thumbPath = file.getAbsolutePath();
                     openPhotoViewer(entry, false, true);
@@ -2148,9 +2148,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenterDe
                     FileLog.e(e22222);
                 }
                 SharedConfig.saveConfig();
-                i = lastImageId;
-                lastImageId = i - 1;
-                entry = new PhotoEntry(0, i, 0, videoPath, 0, true);
+                i2 = lastImageId;
+                lastImageId = i2 - 1;
+                entry = new PhotoEntry(0, i2, 0, videoPath, 0, true);
                 entry.duration = (int) duration;
                 entry.thumbPath = file.getAbsolutePath();
                 openPhotoViewer(entry, false, true);

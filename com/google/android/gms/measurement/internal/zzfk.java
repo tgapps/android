@@ -876,11 +876,11 @@ public final class zzfk extends zzcp {
 
     public static Object zzf(Object obj) {
         ObjectOutputStream objectOutputStream;
-        ObjectInputStream objectInputStream;
         Throwable th;
         if (obj == null) {
             return null;
         }
+        ObjectInputStream objectInputStream;
         try {
             OutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);

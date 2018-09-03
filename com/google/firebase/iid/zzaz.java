@@ -106,13 +106,13 @@ final class zzaz {
     }
 
     private static boolean zza(FirebaseInstanceId firebaseInstanceId, String str) {
-        String str2;
-        String str3;
         String[] split = str.split("!");
+        String str2;
         String valueOf;
         if (split.length != 2) {
             return true;
         }
+        String str3;
         str2 = split[0];
         String str4 = split[1];
         int i = -1;

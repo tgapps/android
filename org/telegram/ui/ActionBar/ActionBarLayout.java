@@ -1252,13 +1252,13 @@ public class ActionBarLayout extends FrameLayout {
             this.animateSetThemeAfterAnimation = theme;
             return;
         }
+        BaseFragment fragment;
         if (this.themeAnimatorSet != null) {
             this.themeAnimatorSet.cancel();
             this.themeAnimatorSet = null;
         }
         boolean startAnimation = false;
         for (int i2 = 0; i2 < 2; i2++) {
-            BaseFragment fragment;
             int a;
             if (i2 == 0) {
                 fragment = getLastFragment();

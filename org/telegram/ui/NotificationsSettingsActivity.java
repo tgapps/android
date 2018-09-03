@@ -633,6 +633,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
     }
 
     final /* synthetic */ void lambda$onFragmentCreate$1$NotificationsSettingsActivity() {
+        Chat chat;
         ArrayList<NotificationException> usersResult = new ArrayList();
         ArrayList<NotificationException> chatsResult = new ArrayList();
         LongSparseArray<NotificationException> waitingForLoadExceptions = new LongSparseArray();
@@ -647,7 +648,6 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         Map<String, ?> values = preferences.getAll();
         for (Entry<String, ?> entry : values.entrySet()) {
             User user;
-            Chat chat;
             String key = (String) entry.getKey();
             if (key.startsWith("notify2_")) {
                 key = key.replace("notify2_", TtmlNode.ANONYMOUS_REGION_ID);

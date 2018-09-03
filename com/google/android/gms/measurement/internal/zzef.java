@@ -49,6 +49,7 @@ public final class zzef implements ServiceConnection, BaseConnectionCallbacks, B
     }
 
     public final void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        zzag com_google_android_gms_measurement_internal_zzag;
         Preconditions.checkMainThread("MeasurementServiceConnection.onServiceConnected");
         synchronized (this) {
             if (iBinder == null) {
@@ -56,7 +57,6 @@ public final class zzef implements ServiceConnection, BaseConnectionCallbacks, B
                 this.zzasg.zzgo().zzjd().zzbx("Service connected with null binder");
                 return;
             }
-            zzag com_google_android_gms_measurement_internal_zzag;
             try {
                 String interfaceDescriptor = iBinder.getInterfaceDescriptor();
                 if ("com.google.android.gms.measurement.internal.IMeasurementService".equals(interfaceDescriptor)) {

@@ -1,5 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:enabled="false" android:orientation="horizontal" android:id="@+id/action_container" android:background="0x0" android:paddingLeft="4dp" android:layout_width="UNKNOWN_DATA_0x1" android:layout_height="UNKNOWN_DATA_0x3001" android:layout_weight="1.0" style="@style/Widget_Compat_NotificationActionContainer">
-    <ImageView android:enabled="false" android:layout_gravity="top|bottom|left|right|center_vertical|fill_vertical|center_horizontal|fill_horizontal|center|fill|start|end" android:id="@+id/action_image" android:layout_width="UNKNOWN_DATA_0x7f060008" android:layout_height="UNKNOWN_DATA_0x7f060008" android:scaleType="centerInside" android:alpha="0.5" />
-    <TextView android:enabled="false" android:textColor="#ccc" android:ellipsize="end" android:layout_gravity="top|bottom|left|right|center_vertical|fill_vertical|center_horizontal|fill_horizontal|center|fill|start|end" android:id="@+id/action_text" android:paddingLeft="4dp" android:clickable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:alpha="0.5" style="@style/Widget_Compat_NotificationActionText" />
-</LinearLayout>
+Error decode xml
+java.io.FileNotFoundException: /home/pwrtelegram/cache/BQADBAADewUAAkvfMVDSQRAUJ2ThtgI.apk (No such file or directory)
+	at java.util.zip.ZipFile.open(Native Method)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:215)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:145)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:159)
+	at jadx.api.ResourcesLoader.decodeStream(ResourcesLoader.java:62)
+	at jadx.api.ResourcesLoader.loadContent(ResourcesLoader.java:86)
+	at jadx.api.ResourceFile.loadContent(ResourceFile.java:52)
+

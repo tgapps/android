@@ -420,6 +420,7 @@ public class zzfa implements zzcq {
     }
 
     private final void zzd(zzad com_google_android_gms_measurement_internal_zzad, zzh com_google_android_gms_measurement_internal_zzh) {
+        zzgi com_google_android_gms_internal_measurement_zzgi;
         Preconditions.checkNotNull(com_google_android_gms_measurement_internal_zzh);
         Preconditions.checkNotEmpty(com_google_android_gms_measurement_internal_zzh.packageName);
         long nanoTime = System.nanoTime();
@@ -462,7 +463,6 @@ public class zzfa implements zzcq {
                 zzjq().endTransaction();
                 return;
             }
-            zzgi com_google_android_gms_internal_measurement_zzgi;
             try {
                 boolean zzcq = zzfk.zzcq(com_google_android_gms_measurement_internal_zzad.name);
                 boolean equals = "_err".equals(com_google_android_gms_measurement_internal_zzad.name);
@@ -704,11 +704,11 @@ public class zzfa implements zzcq {
     }
 
     final void zzlt() {
-        String str;
         zzaf();
         zzlr();
         this.zzatr = true;
         String zzid;
+        String str;
         try {
             this.zzadj.zzgr();
             Boolean zzle = this.zzadj.zzgg().zzle();
@@ -2736,6 +2736,7 @@ public class zzfa implements zzcq {
     }
 
     final void zza(int i, Throwable th, byte[] bArr, String str) {
+        zzco zzjq;
         zzaf();
         zzlr();
         if (bArr == null) {
@@ -2757,7 +2758,6 @@ public class zzfa implements zzcq {
                 zzjq().beginTransaction();
                 try {
                     for (Long l : list) {
-                        zzco zzjq;
                         try {
                             zzjq = zzjq();
                             long longValue = l.longValue();

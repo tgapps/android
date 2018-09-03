@@ -8695,7 +8695,6 @@ public class TLRPC {
         }
 
         public void serializeToStream(AbstractSerializedData stream) {
-            int count;
             int a;
             stream.writeInt32(constructor);
             stream.writeInt32(this.flags);
@@ -8713,6 +8712,7 @@ public class TLRPC {
                 this.selfie.serializeToStream(stream);
             }
             if ((this.flags & 64) != 0) {
+                int count;
                 stream.writeInt32(481674261);
                 count = this.translation.size();
                 stream.writeInt32(count);
@@ -13398,7 +13398,6 @@ public class TLRPC {
         }
 
         public void serializeToStream(AbstractSerializedData stream) {
-            int count;
             int a;
             stream.writeInt32(constructor);
             stream.writeInt32(this.flags);
@@ -13416,6 +13415,7 @@ public class TLRPC {
                 this.selfie.serializeToStream(stream);
             }
             if ((this.flags & 64) != 0) {
+                int count;
                 stream.writeInt32(481674261);
                 count = this.translation.size();
                 stream.writeInt32(count);

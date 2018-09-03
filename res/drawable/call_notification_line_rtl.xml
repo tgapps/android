@@ -1,8 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:right="20dp" android:bottom="48dp">
-        <shape>
-            <solid android:color="#17ffffff" />
-        </shape>
-    </item>
-</layer-list>
+Error decode xml
+java.io.FileNotFoundException: /home/pwrtelegram/cache/BQADBAADewUAAkvfMVDSQRAUJ2ThtgI.apk (No such file or directory)
+	at java.util.zip.ZipFile.open(Native Method)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:215)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:145)
+	at java.util.zip.ZipFile.<init>(ZipFile.java:159)
+	at jadx.api.ResourcesLoader.decodeStream(ResourcesLoader.java:62)
+	at jadx.api.ResourcesLoader.loadContent(ResourcesLoader.java:86)
+	at jadx.api.ResourceFile.loadContent(ResourceFile.java:52)
+

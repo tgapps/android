@@ -2680,7 +2680,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r4 = r0.endsWith(r4);
         if (r4 == 0) goto L_0x0850;
     L_0x0800:
-        r4 = "payload";
+        r4 = "nonce";
         r5 = "nonce";
         r0 = r33;
         r5 = r0.getQueryParameter(r5);
@@ -2991,7 +2991,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         r4 = r0.endsWith(r4);
         if (r4 == 0) goto L_0x0b56;
     L_0x0b06:
-        r4 = "payload";
+        r4 = "nonce";
         r5 = "nonce";
         r0 = r33;
         r5 = r0.getQueryParameter(r5);
@@ -3895,12 +3895,13 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
                     int bot_id = Utilities.parseInt((String) auth.get("bot_id")).intValue();
                     if (bot_id != 0) {
                         String payload = (String) auth.get("payload");
+                        String nonce = (String) auth.get("nonce");
                         String callbackUrl = (String) auth.get("callback_url");
                         req = new TL_account_getAuthorizationForm();
                         req.bot_id = bot_id;
                         req.scope = (String) auth.get("scope");
                         req.public_key = (String) auth.get("public_key");
-                        requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req, new LaunchActivity$$Lambda$12(this, requestId, intentAccount, progressDialog, req, payload, callbackUrl));
+                        requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req, new LaunchActivity$$Lambda$12(this, requestId, intentAccount, progressDialog, req, payload, nonce, callbackUrl));
                     } else {
                         return;
                     }
@@ -4201,20 +4202,20 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         }
     }
 
-    final /* synthetic */ void lambda$runLinkRequest$22$LaunchActivity(int[] requestId, int intentAccount, AlertDialog progressDialog, TL_account_getAuthorizationForm req, String payload, String callbackUrl, TLObject response, TL_error error) {
+    final /* synthetic */ void lambda$runLinkRequest$22$LaunchActivity(int[] requestId, int intentAccount, AlertDialog progressDialog, TL_account_getAuthorizationForm req, String payload, String nonce, String callbackUrl, TLObject response, TL_error error) {
         TL_account_authorizationForm authorizationForm = (TL_account_authorizationForm) response;
         if (authorizationForm != null) {
-            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(new TL_account_getPassword(), new LaunchActivity$$Lambda$39(this, progressDialog, intentAccount, authorizationForm, req, payload, callbackUrl));
+            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(new TL_account_getPassword(), new LaunchActivity$$Lambda$39(this, progressDialog, intentAccount, authorizationForm, req, payload, nonce, callbackUrl));
             return;
         }
         AndroidUtilities.runOnUIThread(new LaunchActivity$$Lambda$40(this, progressDialog, error));
     }
 
-    final /* synthetic */ void lambda$null$20$LaunchActivity(AlertDialog progressDialog, int intentAccount, TL_account_authorizationForm authorizationForm, TL_account_getAuthorizationForm req, String payload, String callbackUrl, TLObject response1, TL_error error1) {
-        AndroidUtilities.runOnUIThread(new LaunchActivity$$Lambda$41(this, progressDialog, response1, intentAccount, authorizationForm, req, payload, callbackUrl));
+    final /* synthetic */ void lambda$null$20$LaunchActivity(AlertDialog progressDialog, int intentAccount, TL_account_authorizationForm authorizationForm, TL_account_getAuthorizationForm req, String payload, String nonce, String callbackUrl, TLObject response1, TL_error error1) {
+        AndroidUtilities.runOnUIThread(new LaunchActivity$$Lambda$41(this, progressDialog, response1, intentAccount, authorizationForm, req, payload, nonce, callbackUrl));
     }
 
-    final /* synthetic */ void lambda$null$19$LaunchActivity(AlertDialog progressDialog, TLObject response1, int intentAccount, TL_account_authorizationForm authorizationForm, TL_account_getAuthorizationForm req, String payload, String callbackUrl) {
+    final /* synthetic */ void lambda$null$19$LaunchActivity(AlertDialog progressDialog, TLObject response1, int intentAccount, TL_account_authorizationForm authorizationForm, TL_account_getAuthorizationForm req, String payload, String nonce, String callbackUrl) {
         try {
             progressDialog.dismiss();
         } catch (Throwable e) {
@@ -4223,7 +4224,7 @@ public class LaunchActivity extends Activity implements NotificationCenterDelega
         if (response1 != null) {
             TL_account_password accountPassword = (TL_account_password) response1;
             MessagesController.getInstance(intentAccount).putUsers(authorizationForm.users, false);
-            presentFragment(new PassportActivity(5, req.bot_id, req.scope, req.public_key, payload, callbackUrl, authorizationForm, accountPassword));
+            presentFragment(new PassportActivity(5, req.bot_id, req.scope, req.public_key, payload, nonce, callbackUrl, authorizationForm, accountPassword));
         }
     }
 
